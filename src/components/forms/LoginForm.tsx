@@ -54,7 +54,7 @@ export default function LoginForm(): React.ReactElement {
 						duration: 3000,
 					})
 
-					router.push("/dashboard/permiso-trabajo")
+					router.push("/dashboard/permiso-de-trabajo")
 				},
 				onError: (ctx) => {
 					setLoading(false)
