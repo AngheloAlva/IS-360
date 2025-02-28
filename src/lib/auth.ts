@@ -7,12 +7,6 @@ import prisma from "./prisma"
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
 		provider: "postgresql",
-		// schema: {
-		// 	user,
-		// 	account,
-		// 	session,
-		// 	verification,
-		// },
 	}),
 	emailAndPassword: {
 		enabled: true,
@@ -32,7 +26,13 @@ export const auth = betterAuth({
 			},
 		},
 	},
-	plugins: [nextCookies(), admin()],
+	plugins: [
+		nextCookies(),
+		admin({
+			defaultRole: "PARTNER_COMPANY",
+			adminRole: ["ADMIN", "SUPERADMIN"],
+		}),
+	],
 	baseURL: process.env.NEXT_PUBLIC_BASE_URL!,
 })
 
