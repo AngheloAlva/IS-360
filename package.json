@@ -6,11 +6,20 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate:dev": "pnpm dotenv -e .env.local -- prisma migrate dev",
+    "db:push": "pnpm dotenv -e .env.local -- prisma db push",
+    "db:seed": "pnpm dotenv -e .env.local -- ts-node ./prisma/seed/seed.ts",
+    "prisma:generate": "pnpm dotenv -e .env.local -- prisma generate",
+    "prisma:studio": "pnpm dotenv -e .env.local -- prisma studio",
+    "production:build": "pnpm prisma generate && pnpm prisma migrate deploy && next build"
   },
   "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "better-auth": "^1.1.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv-cli": "^8.0.0",
     "eslint-config-prettier": "^10.0.2",
     "lucide-react": "^0.476.0",
     "next": "15.2.0",
@@ -29,7 +38,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.0",
+    "prisma": "^6.4.1",
     "tailwindcss": "^4",
+    "tsx": "^4.19.3",
     "typescript": "^5"
   },
   "pnpm": {

@@ -1,0 +1,276 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum USER_ROLE {
+  SUPERADMIN
+  ADMIN
+  USER
+  PARTNER_COMPANY
+}
+
+enum AREAS {
+  OPERATIONS // Operaciones
+  INSTRUCTIONS // Instructivos
+  INTEGRITY_AND_MAINTENANCE // Integridad y Mantencion
+  ENVIRONMENT // Medio Ambiente
+  RISK_PREVENTION // Preveencion de Riesgos
+  QUALITY_AND_PROFESSIONAL_EXCELLENCE // Calidad y Exelencia Profesional
+  HSEQ // HSEQ (nueva)
+  LEGAL // Juridica
+  COMMUNITIES // Comunidades (periodistas?)
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  role          USER_ROLE @default(PARTNER_COMPANY)
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
+  rut           String
+
+  sessions      Session[]
+  accounts      Account[]
+  workBooks     WorkBook[]
+  workTrackers  WorkTracker[]
+  
+
+  @@unique([email])
+  @@unique([rut])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model WorkBook {
+  id                   String  @id @default(cuid())
+  otNumber             String
+
+  contractingCompany   String
+  workResponsibleName  String
+  workResponsiblePhone String
+  otcInspectorName     String
+  otcInspectorPhone    String
+  workName             String
+  workLocation         String
+  workType             String
+  workStartDate        DateTime
+  workEstimatedEndDate DateTime
+  workStatus           String
+  workProgressStatus   String
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user                 User @relation(fields: [userId], references: [id])
+  userId               String
+  dailyActivities      DailyActivity[]
+  aditionalActivities  AditionalActivity[]
+  otcInspections       OtcInspection[]
+  preventionAreas      PreventionArea[]
+
+  @@unique([id])
+  @@unique([otNumber])
+  @@map("work_book")
+}
+
+model DailyActivity {
+  id                 String  @id @default(cuid())
+  otNumber           String
+
+  comments           String
+  executionDate      DateTime
+  activityStartTime  DateTime
+  activityEndTime    DateTime
+  activityName       String
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  workBook           WorkBook @relation(fields: [workBookId], references: [id])
+  workBookId         String
+  personnel          Personnel[]
+  attachments        Attachment[]
+
+  @@unique([id])
+  @@map("daily_activity")
+}
+
+model Personnel {
+  id                 String  @id @default(cuid())
+
+  name               String
+  position           String
+  rut                String?
+  phone              String?
+  email              String?
+
+  dailyActivity      DailyActivity @relation(fields: [dailyActivityId], references: [id])
+  dailyActivityId    String
+
+  @@unique([id])
+  @@map("personnel")
+}
+
+model AditionalActivity {
+  id                 String  @id @default(cuid())
+  otNumber           String
+
+  comments           String
+  executionDate      DateTime
+  activityStartTime  DateTime
+  activityEndTime    DateTime
+  activityName       String
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  workBook           WorkBook @relation(fields: [workBookId], references: [id])
+  workBookId         String
+  attachments        Attachment[]
+
+  @@unique([id])
+  @@map("aditional_activity")
+}
+
+model OtcInspection {
+  id                  String  @id @default(cuid())
+  otNumber            String
+
+  inspectorName       String
+  dateOfExecution     DateTime
+  activityStartTime   DateTime
+  activityEndTime     DateTime
+  supervisionComments String
+  safetyObservations  String
+  nonConformities     String
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  workBook            WorkBook @relation(fields: [workBookId], references: [id])
+  workBookId          String
+  attachments         Attachment[]
+
+  @@unique([id])
+  @@map("otc_inspection")
+}
+
+model PreventionArea {
+  id                 String  @id @default(cuid())
+  otNumber           String
+
+  name               String
+  recommendations    String
+  others             String
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  workBook           WorkBook @relation(fields: [workBookId], references: [id])
+  workBookId         String
+
+  @@unique([id])
+  @@map("prevention_area")
+}
+
+model WorkTracker {
+  id                 String  @id @default(cuid())
+  otNumber           String
+
+  description        String
+  date               DateTime
+  dedicatedHours     Int
+  quantityPersons    Int
+  location           String
+  status             String
+
+  user               User @relation(fields: [userId], references: [id])
+  userId             String
+  attachments        Attachment[]
+  
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("work_tracker")
+}
+
+model Attachment {
+  id                  String  @id @default(cuid())
+
+  name                String
+  url                 String
+  type                String
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  aditionalActivity   AditionalActivity @relation(fields: [aditionalActivityId], references: [id])
+  aditionalActivityId String
+  dailyActivity       DailyActivity @relation(fields: [dailyActivityId], references: [id])
+  dailyActivityId     String
+  otcInspection       OtcInspection @relation(fields: [otcInspectionId], references: [id])
+  otcInspectionId     String
+  workTracker         WorkTracker @relation(fields: [workTrackerId], references: [id])
+  workTrackerId       String
+
+  @@map("attachment")
+}
+
+// TODO: Add Work Permit and Videos models
