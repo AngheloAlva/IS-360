@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import RegisterForm from "@/components/forms/RegisterForm"
+import RegisterForm from "@/components/forms/auth/RegisterForm"
 
 export default function Register(): React.ReactElement {
 	return (
