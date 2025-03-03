@@ -132,12 +132,11 @@ model WorkBook {
 
 model DailyActivity {
   id                 String  @id @default(cuid())
-  otNumber           String
 
-  comments           String
+  comments           String?
   executionDate      DateTime
-  activityStartTime  DateTime
-  activityEndTime    DateTime
+  activityStartTime  String
+  activityEndTime    String
   activityName       String
 
   createdAt          DateTime @default(now())
@@ -170,12 +169,11 @@ model Personnel {
 
 model AditionalActivity {
   id                 String  @id @default(cuid())
-  otNumber           String
 
-  comments           String
+  comments           String?
   executionDate      DateTime
-  activityStartTime  DateTime
-  activityEndTime    DateTime
+  activityStartTime  String 
+  activityEndTime    String
   activityName       String
 
   createdAt          DateTime @default(now())
@@ -191,15 +189,14 @@ model AditionalActivity {
 
 model OtcInspection {
   id                  String  @id @default(cuid())
-  otNumber            String
 
   inspectorName       String
   dateOfExecution     DateTime
-  activityStartTime   DateTime
-  activityEndTime     DateTime
+  activityStartTime   String
+  activityEndTime     String
   supervisionComments String
   safetyObservations  String
-  nonConformities     String
+  nonConformities     String?
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -214,11 +211,10 @@ model OtcInspection {
 
 model PreventionArea {
   id                 String  @id @default(cuid())
-  otNumber           String
 
   name               String
-  recommendations    String
-  others             String
+  recommendations    String?
+  others             String?
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

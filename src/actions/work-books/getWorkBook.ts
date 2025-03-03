@@ -2,12 +2,11 @@
 
 import prisma from "@/lib/prisma"
 
-export const getWorkBook = async (userId: string, workBookId: string) => {
+export const getWorkBook = async (workBookId: string) => {
 	try {
 		const workBook = await prisma.workBook.findUnique({
 			where: {
 				id: workBookId,
-				userId: userId,
 			},
 		})
 

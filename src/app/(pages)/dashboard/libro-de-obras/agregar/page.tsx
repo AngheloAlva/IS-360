@@ -1,4 +1,4 @@
-import WorkBookForm from "@/components/forms/work-book/WorkBookForm"
+import WorkBookForm from "@/components/work-book/WorkBookForm"
 
 export default function CreateWorkBookPage() {
 	return (
