@@ -1,0 +1,116 @@
+import type { Option } from "@/components/ui/multiselect"
+
+export const MutualityOptions: Option[] = [
+	{ value: "ACHS", label: "ACHS" },
+	{ value: "IST", label: "IST" },
+	{ value: "MUTUAL", label: "MUTUAL" },
+	{ value: "ISL", label: "ISL" },
+] as const
+
+export const WorkWillBeOptions: Option[] = [
+	{ value: "Altura fisica", label: "Altura fisica" },
+	{ value: "Espacio confinado", label: "Espacio confinado" },
+	{ value: "En Caliente", label: "En Caliente" },
+	{ value: "Electrico", label: "Electrico" },
+	{ value: "General", label: "General" },
+	{ value: "Otro", label: "Otros" },
+]
+
+export const ToolsOptions: Option[] = [
+	{ value: "Iluminacion Portatil", label: "Iluminacion Portatil" },
+	{ value: "Soldadora", label: "Soldadora" },
+	{ value: "Galleta", label: "Galleta" },
+	{ value: "Compresor", label: "Compresor" },
+	{ value: "Bomba", label: "Bomba" },
+	{ value: "Eq. Medicion Tension", label: "Eq. Medicion Tension" },
+	{ value: "Eq. Medicion Gases", label: "Eq. Medicion Gases" },
+	{ value: "Soplete", label: "Soplete" },
+	{ value: "Taladro", label: "Taladro" },
+	{ value: "Generador", label: "Generador" },
+	{ value: "Eq. Celfaccion", label: "Eq. Celfaccion" },
+	{ value: "Vent/Extrac.", label: "Vent/Extrac." },
+	{ value: "Otros", label: "Otros" },
+] as const
+
+export const PreChecksOptions: Option[] = [
+	{ value: "Coordinado con Operaciones", label: "Coordinado con Operaciones" },
+	{ value: "Coord. brigada de incendio", label: "Coord. brigada de incendio" },
+	{ value: "Equipos ventilados", label: "Equipos ventilados" },
+	{ value: "Equipos desenergizados", label: "Equipos desenergizados" },
+	{ value: "Equipos fuera de operación", label: "Equipos fuera de operación" },
+	{ value: "Bloqueado con Flange", label: "Bloqueado con Flange" },
+	{ value: "Jefes de área informados", label: "Jefes de área informados" },
+	{ value: "Area de trabajo limpia", label: "Area de trabajo limpia" },
+	{ value: "Equipos dreneados", label: "Equipos dreneados" },
+	{ value: "Valvulas cerradas", label: "Valvulas cerradas" },
+	{ value: "Equipos despresurizados", label: "Equipos despresurizados" },
+	{ value: "Otros", label: "Otros" },
+] as const
+
+export const RisksOptions: Option[] = [
+	{ value: "Caida a nivel", label: "Caida a nivel" },
+	{ value: "Caida a desnivel", label: "Caida a desnivel" },
+	{ value: "Coord. brigada de incendio/explosion", label: "Coord. brigada de incendio/explosion" },
+	{ value: "Quemaduras", label: "Queamaduras" },
+	{ value: "Ruido", label: "Ruido" },
+	{ value: "Electrico", label: "Electrico" },
+	{ value: "Atrapamiento", label: "Atrapamiento" },
+	{ value: "Intoxicacion", label: "Intoxicacion" },
+	{ value: "Derrames", label: "Derrames" },
+	{ value: "Golpes", label: "Golpes" },
+	{ value: "Insolacion", label: "Insolacion" },
+	{ value: "Sobreesfuerzo", label: "Sobreesfuerzo" },
+	{ value: "Cortes", label: "Cortes" },
+	{ value: "Caida de equipo", label: "Caida de equipo" },
+	{ value: "Choque o colision", label: "Choque o colision" },
+	{ value: "Atropello", label: "Atropello" },
+	{ value: "Volcamiento", label: "Volcamiento" },
+	{ value: "Contaminacion", label: "Contaminacion" },
+	{ value: "Proyeccion de particulas", label: "Proyeccion de particulas" },
+	{ value: "Otros", label: "Otros" },
+] as const
+
+export const ControlMeasuresOptions: Option[] = [
+	{ value: "Proteccion de suelos", label: "Proteccion de suelos" },
+	{ value: "Señalizacion", label: "Señalizacion" },
+	{ value: "Conduccion defensiva", label: "Conduccion defensiva" },
+	{ value: "Uso EPP", label: "Uso EPP" },
+	{ value: "Hoja seguridad", label: "Hoja seguridad" },
+	{ value: "Uso extintor", label: "Uso extintor" },
+	{ value: "Traje quimico", label: "Traje quimico" },
+	{ value: "Manguera incendio", label: "Manguera incendio" },
+	{ value: "Iluminar", label: "Iluminar" },
+	{ value: "Instruccion", label: "Instruccion" },
+	{ value: "Delimitar areas", label: "Delimitar areas" },
+	{ value: "Candado o tarjeta bloqueo", label: "Canado o tarjeta bloqueo" },
+	{ value: "Uso escala", label: "Uso escala" },
+	{ value: "Acunar", label: "Acunar" },
+	{ value: "Botas de goma", label: "Botas de goma" },
+	{ value: "Uso ropa agua", label: "Uso ropa agua" },
+	{ value: "Arnes de seguridad", label: "Arnes de seguridad" },
+	{ value: "Coordinar", label: "Coordinar" },
+	{ value: "Proteccion solar", label: "Proteccion solar" },
+	{ value: "Guante de goma", label: "Guante de goma" },
+	{ value: "Respirador facial", label: "Respirador facial" },
+	{ value: "Desconexion automaticos", label: "Desconexion automaticos" },
+	{ value: "Control de tiempos", label: "Control de tiempos" },
+	{ value: "Proteccion auditiva", label: "Proteccion auditiva" },
+	{ value: "Equipo ERA", label: "Equipo ERA" },
+	{ value: "Medicion de gases", label: "Medicion de gases" },
+	{ value: "Supervision permanente", label: "Supervision permanente" },
+	{ value: "Uso de mascarilla", label: "Uso de mascarilla" },
+	{ value: "Ventilacion", label: "Ventilacion" },
+	{ value: "Orden y aseo", label: "Orden y aseo" },
+	{ value: "Carpa ignifuga", label: "Carpa ignifuga" },
+	{ value: "Uso de andamio sobre 180 cm", label: "Uso de andamio sobre 180 cm" },
+	{ value: "Uso linea de vida", label: "Uso linea de vida" },
+	{ value: "Proteccion facial", label: "Proteccion facial" },
+	{ value: "Med de tencion", label: "Med de tencion" },
+	{ value: "Otros", label: "Otros" },
+] as const
+
+export const WasteTypesOptions: Option[] = [
+	{ value: "Industrial", label: "Industrial" },
+	{ value: "Peligroso", label: "Peligroso" },
+	{ value: "Domestico", label: "Domestico" },
+] as const
