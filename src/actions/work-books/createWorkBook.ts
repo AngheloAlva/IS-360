@@ -7,8 +7,17 @@ import type { z } from "zod"
 
 export const createWorkBook = async (values: z.infer<typeof workBookSchema>) => {
 	try {
+		const { userId, ...rest } = values
+
 		const newWorkBook = await prisma.workBook.create({
-			data: values,
+			data: {
+				...rest,
+				user: {
+					connect: {
+						id: userId,
+					},
+				},
+			},
 		})
 
 		return {
