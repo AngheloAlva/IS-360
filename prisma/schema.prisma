@@ -271,7 +271,7 @@ model Attachment {
   @@map("attachment")
 }
 
-// TODO: Add Videos models
+// TODO: Add Videos models + Add Slug to various models
 
 model WorkPermit {
   id                             String @id @default(cuid())

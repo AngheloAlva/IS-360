@@ -239,6 +239,7 @@ export function NewFileForm({ userId, folderId, area }: NewFileFormProps) {
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">
 									<Calendar
+										locale={es}
 										mode="single"
 										selected={field.value}
 										onSelect={field.onChange}
@@ -282,6 +283,7 @@ export function NewFileForm({ userId, folderId, area }: NewFileFormProps) {
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">
 									<Calendar
+										locale={es}
 										mode="single"
 										selected={field.value}
 										onSelect={field.onChange}

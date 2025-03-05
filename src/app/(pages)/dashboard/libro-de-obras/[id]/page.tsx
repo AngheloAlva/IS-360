@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import { Plus } from "lucide-react"
+import { ChevronLeft, CircleFadingArrowUp, Plus } from "lucide-react"
 import { format } from "date-fns"
 import { Suspense } from "react"
 import Link from "next/link"
@@ -45,15 +45,35 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 	}
 
 	return (
-		<main className="flex h-full flex-col gap-8 p-4 pb-40 lg:p-8">
+		<main className="flex h-full flex-col gap-8 p-4 pt-0 pb-40 lg:p-8 lg:pt-0">
 			<div>
-				<h1 className="flex flex-col text-2xl font-bold">
-					{workBook.data.workName}
-					<span className="text-feature text-base font-medium">OT: {workBook.data.otNumber}</span>
-				</h1>
+				<div className="mt-2 flex items-center justify-between">
+					<div className="flex items-start justify-start gap-1">
+						<Link
+							href="/dashboard/libro-de-obras"
+							className="hover:bg-primary/40 hover:text-primary mt-1 -ml-7 rounded-full transition-colors"
+						>
+							<ChevronLeft />
+						</Link>
 
-				<div className="text-muted-foreground flex flex-col items-start gap-4 lg:flex-row lg:justify-between lg:gap-8">
-					<ul className="mt-2 flex flex-col gap-1">
+						<h1 className="flex flex-col text-2xl font-bold">
+							{workBook.data.workName}
+							<span className="text-feature text-base font-medium">
+								OT: {workBook.data.otNumber}
+							</span>
+						</h1>
+					</div>
+
+					<Link href={`/dashboard/libro-de-obras/${id}/editar`}>
+						<Button size={"lg"}>
+							<span className="hidden lg:block">Editar Libro de Obras</span>
+							<CircleFadingArrowUp />
+						</Button>
+					</Link>
+				</div>
+
+				<div className="text-muted-foreground mt-2 flex flex-col items-start gap-4 md:mt-4 lg:flex-row lg:justify-between lg:gap-8">
+					<ul className="flex flex-col gap-1">
 						<li>
 							<b>Tipo de Trabajo:</b> <span className="capitalize">{workBook.data.workType}</span>
 						</li>

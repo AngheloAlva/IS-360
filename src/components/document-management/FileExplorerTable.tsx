@@ -1,7 +1,9 @@
-import { FolderIcon, FileTextIcon, ImageIcon, VideoIcon, FileIcon } from "lucide-react"
+import { FolderIcon, ImageIcon, VideoIcon, FileIcon, FileText } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 import Link from "next/link"
+
+import { Codes } from "@/lib/consts/codes"
 
 import {
 	Table,
@@ -14,7 +16,6 @@ import {
 } from "@/components/ui/table"
 
 import type { File, Folder } from "@prisma/client"
-import { Codes } from "@/lib/consts/codes"
 
 type FullFolder = Folder & {
 	files: File[]
@@ -32,12 +33,12 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 		const type = item.type.split("/")[0]
 
 		switch (type) {
-			case "document":
-				return <FileTextIcon className="h-5 w-5 text-blue-500" />
+			case "application":
+				return <FileText className="h-5 w-5 text-red-500" />
 			case "image":
 				return <ImageIcon className="h-5 w-5 text-green-500" />
 			case "video":
-				return <VideoIcon className="h-5 w-5 text-red-500" />
+				return <VideoIcon className="h-5 w-5 text-orange-500" />
 			default:
 				return <FileIcon className="h-5 w-5 text-gray-500" />
 		}
@@ -48,11 +49,13 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 	return (
 		<Table>
 			<TableCaption>
-				{Codes.map((code) => (
-					<div key={code}>
-						{code.charAt(0)}: {code}
-					</div>
-				))}
+				<div className="mx-auto flex w-fit items-center gap-10">
+					{Codes.map((code) => (
+						<div key={code}>
+							{code.charAt(0)}: {code}
+						</div>
+					))}
+				</div>
 			</TableCaption>
 
 			<TableHeader>
@@ -60,9 +63,9 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 					<TableHead>Codigo-Nombre</TableHead>
 					<TableHead>Estatus</TableHead>
 					<TableHead>Descripcion</TableHead>
-					<TableHead>Ultima Revision</TableHead>
 					<TableHead>Fecha de Registro</TableHead>
 					<TableHead>Fecha de Expiracion</TableHead>
+					<TableHead>Revisiones</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -107,21 +110,20 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 								? item.expirationDate < new Date()
 									? "Expirado"
 									: "Vigente"
-								: "No especificado"}
+								: "Vigente"}
 						</TableCell>
-						<TableCell></TableCell>
-						<TableCell>{item.description}</TableCell>
-						<TableCell>{item.revisionCount}</TableCell>
+						<TableCell>{item.type}</TableCell>
 						<TableCell>{format(item.registrationDate, "dd/MM/yyyy")}</TableCell>
 						<TableCell>
 							{item.expirationDate ? format(item.expirationDate, "dd/MM/yyyy") : "N/A"}
 						</TableCell>
+						<TableCell>{item.revisionCount}</TableCell>
 					</TableRow>
 				))}
 
 				{folders.length === 0 && files.length === 0 && (
 					<TableRow>
-						<TableCell colSpan={4} className="py-8 text-center text-gray-500">
+						<TableCell colSpan={6} className="py-8 text-center text-gray-500">
 							No hay archivos ni carpetas en esta ubicación
 						</TableCell>
 					</TableRow>

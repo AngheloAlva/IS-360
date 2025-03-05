@@ -9,10 +9,13 @@ import { addDays, format } from "date-fns"
 
 import { workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
 import { createWorkBook } from "@/actions/work-books/createWorkBook"
+import { updateWorkBook } from "@/actions/work-books/updateWorkBook"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CalendarIcon } from "lucide-react"
@@ -24,9 +27,6 @@ import {
 	FormControl,
 	FormMessage,
 } from "@/components/ui/form"
-
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import {
 	Select,
 	SelectItem,
@@ -35,9 +35,14 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
+import type { WorkBook } from "@prisma/client"
 import type { z } from "zod"
 
-export default function WorkBookForm(): React.ReactElement {
+interface WorkBookFormProps {
+	workBook?: WorkBook
+}
+
+export default function WorkBookForm({ workBook }: WorkBookFormProps): React.ReactElement {
 	const { data: session, isPending } = authClient.useSession()
 	const [loading, setLoading] = useState(false)
 
@@ -47,16 +52,18 @@ export default function WorkBookForm(): React.ReactElement {
 		resolver: zodResolver(workBookSchema),
 		defaultValues: {
 			userId: session?.user.id,
-			otNumber: "",
-			workName: "",
-			workLocation: "",
-			otcInspectorName: "",
-			otcInspectorPhone: "",
-			contractingCompany: "",
-			workResponsibleName: "",
-			workResponsiblePhone: "",
-			workStartDate: new Date(),
-			workEstimatedEndDate: addDays(new Date(), 2),
+			otNumber: workBook?.otNumber ?? "",
+			workName: workBook?.workName ?? "",
+			workLocation: workBook?.workLocation ?? "",
+			otcInspectorName: workBook?.otcInspectorName ?? "",
+			workStartDate: workBook?.workStartDate ?? new Date(),
+			otcInspectorPhone: workBook?.otcInspectorPhone ?? "",
+			contractingCompany: workBook?.contractingCompany ?? "",
+			workResponsibleName: workBook?.workResponsibleName ?? "",
+			workResponsiblePhone: workBook?.workResponsiblePhone ?? "",
+			workType: (workBook?.workType as "construccion") ?? undefined,
+			workStatus: (workBook?.workStatus as "planificado") ?? undefined,
+			workEstimatedEndDate: workBook?.workEstimatedEndDate ?? addDays(new Date(), 2),
 		},
 	})
 
@@ -67,10 +74,12 @@ export default function WorkBookForm(): React.ReactElement {
 	}, [form, isPending, session?.user])
 
 	useEffect(() => {
-		navigator.geolocation.getCurrentPosition((position) => {
-			form.setValue("workLocation", `${position.coords.latitude},${position.coords.longitude}`)
-		})
-	}, [form])
+		if (!workBook || !workBook.workLocation) {
+			navigator.geolocation.getCurrentPosition((position) => {
+				form.setValue("workLocation", `${position.coords.latitude},${position.coords.longitude}`)
+			})
+		}
+	}, [form, workBook])
 
 	useEffect(() => {
 		console.log(form.formState)
@@ -81,20 +90,38 @@ export default function WorkBookForm(): React.ReactElement {
 		try {
 			setLoading(true)
 
-			const { ok, message } = await createWorkBook(values)
+			if (!workBook) {
+				const { ok, message } = await createWorkBook(values)
 
-			if (ok) {
-				toast("Registro creado", {
-					description: message,
-					duration: 5000,
-				})
+				if (ok) {
+					toast("Registro creado", {
+						description: message,
+						duration: 5000,
+					})
 
-				router.push("/dashboard/libro-de-obras")
+					router.push("/dashboard/libro-de-obras")
+				} else {
+					toast("Error al crear el registro", {
+						description: message,
+						duration: 5000,
+					})
+				}
 			} else {
-				toast("Error al crear el registro", {
-					description: message,
-					duration: 5000,
-				})
+				const { ok, message } = await updateWorkBook(workBook.id, values)
+
+				if (ok) {
+					toast("Registro actualizado", {
+						description: message,
+						duration: 5000,
+					})
+
+					router.push(`/dashboard/libro-de-obras/${workBook.id}`)
+				} else {
+					toast("Error al actualizar el registro", {
+						description: message,
+						duration: 5000,
+					})
+				}
 			}
 		} catch (error) {
 			console.error(error)
@@ -421,8 +448,10 @@ export default function WorkBookForm(): React.ReactElement {
 							</svg>
 							<span className="sr-only">Cargando...</span>
 						</div>
+					) : workBook ? (
+						"Actualizar Registro"
 					) : (
-						"Crear registro"
+						"Crear Registro"
 					)}
 				</Button>
 			</form>
