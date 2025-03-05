@@ -111,7 +111,7 @@ export function NewFileForm({ userId, folderId, area }: NewFileFormProps) {
 						duration: 3000,
 					})
 					router.push(
-						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas] === area)}`
+						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === area)}`
 					)
 				}
 			}

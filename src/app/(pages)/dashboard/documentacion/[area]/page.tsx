@@ -17,7 +17,7 @@ interface PageProps {
 export default async function AreaRootPage({ params }: PageProps) {
 	const { area } = await params
 
-	const areaName = Areas[area as keyof typeof Areas]
+	const areaName = Areas[area as keyof typeof Areas]["title"]
 
 	const res = await getFilesAndFolders(areaName)
 

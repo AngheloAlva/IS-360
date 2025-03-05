@@ -1,16 +1,8 @@
 "use client"
 
-import Image from "next/image"
+import { Send, LifeBuoy, BookCopy, FileText, FileSearch, MonitorPlay } from "lucide-react"
 
-import {
-	Send,
-	LifeBuoy,
-	BookCopy,
-	FileText,
-	FolderPlus,
-	FileSearch,
-	MonitorPlay,
-} from "lucide-react"
+import Image from "next/image"
 
 import { NavSecondary } from "./navSecondary"
 import { NavMain } from "./navMain"
@@ -27,19 +19,14 @@ import {
 const data = {
 	navMain: [
 		{
-			name: "Permiso de Trabajo",
-			url: "/dashboard/permiso-de-trabajo",
-			icon: FileText,
-		},
-		{
 			name: "Video de Seguridad",
 			url: "/dashboard/video-de-seguridad",
 			icon: MonitorPlay,
 		},
 		{
-			name: "Registro de Actividades",
-			url: "/dashboard/registro-de-actividades",
-			icon: FolderPlus,
+			name: "Permiso de Trabajo",
+			url: "/dashboard/permiso-de-trabajo",
+			icon: FileText,
 		},
 		{
 			name: "Libro de Obras",

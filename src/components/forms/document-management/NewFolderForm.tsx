@@ -34,7 +34,7 @@ export default function NewFolderForm({
 	userId: string
 	parentId?: string
 	isRootFolder: boolean
-	area: (typeof Areas)[keyof typeof Areas]
+	area: (typeof Areas)[keyof typeof Areas]["title"]
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 
@@ -65,7 +65,7 @@ export default function NewFolderForm({
 				})
 
 				router.push(
-					`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas] === area)}`
+					`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === area)}`
 				)
 			} else {
 				toast("Error al crear la carpeta", {

@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma"
 import type { Areas } from "@/lib/consts/areas"
 
 export async function getFilesAndFolders(
-	area: (typeof Areas)[keyof typeof Areas],
+	area: (typeof Areas)[keyof typeof Areas]["title"],
 	folderId: string | null = null
 ) {
 	try {

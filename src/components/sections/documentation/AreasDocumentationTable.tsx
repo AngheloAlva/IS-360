@@ -30,15 +30,16 @@ export default function AreasDocumentationTable(): React.ReactElement {
 
 					return (
 						<TableRow key={index}>
-							<TableCell>
+							<TableCell className="flex flex-col gap-1">
 								<Link
 									href={`/dashboard/documentacion/${key}`}
-									className="hover:text-primary flex items-center justify-between py-1 capitalize transition-colors"
+									className="hover:text-primary flex items-center justify-between py-1 text-lg capitalize transition-colors"
 								>
-									{area.replace(/_/g, " ").toLocaleLowerCase()}
+									{area.title.replace(/_/g, " ").toLocaleLowerCase()}
 
-									<ChevronRight className="h-4 w-4" />
+									<ChevronRight className="text-feature h-4 w-4" />
 								</Link>
+								<p className="text-sm text-gray-500">{area.description}</p>
 							</TableCell>
 						</TableRow>
 					)

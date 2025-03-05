@@ -18,7 +18,7 @@ interface PageProps {
 export default async function DocumentsFilesPage({ params }: PageProps) {
 	const { area, folderId } = await params
 
-	const areaName = Areas[area as keyof typeof Areas]
+	const areaName = Areas[area as keyof typeof Areas]["title"]
 	const lastFolder = folderId[folderId.length - 1]
 
 	const res = await getFilesAndFolders(areaName, lastFolder)

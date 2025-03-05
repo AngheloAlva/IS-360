@@ -81,7 +81,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 					<div className="flex flex-wrap gap-2">
 						<Badge
-							className={cn({
+							className={cn("text-sm", {
 								"bg-green-500": workBook.data.workStatus === "ejecucion",
 								"bg-yellow-500": workBook.data.workStatus === "planificado",
 								"bg-red-500": workBook.data.workStatus === "finalizado",
@@ -91,7 +91,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 						</Badge>
 
 						<Badge
-							className={cn({
+							className={cn("text-sm", {
 								"bg-green-500": workBook.data.workProgressStatus === "terminado",
 								"bg-yellow-500": workBook.data.workProgressStatus === "proceso",
 								"bg-red-500": workBook.data.workProgressStatus === "pendiente",
@@ -109,7 +109,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				<div className="flex justify-between">
 					<h2 className="text-2xl font-bold">Actividades Diarias</h2>
 					<Link href={`/dashboard/libro-de-obras/${id}/actividades-diarias`}>
-						<Button size={"lg"}>
+						<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 							<span className="hidden lg:block">Agregar</span>
 							<Plus />
 						</Button>
@@ -125,7 +125,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				<div className="flex justify-between">
 					<h2 className="text-2xl font-bold">Actividades Adicionales</h2>
 					<Link href={`/dashboard/libro-de-obras/${id}/actividades-adicionales`}>
-						<Button size={"lg"}>
+						<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 							<span className="hidden lg:block">Agregar</span>
 							<Plus />
 						</Button>
@@ -142,7 +142,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 					<div className="flex justify-between">
 						<h2 className="text-2xl font-bold">Inspecciones OTC</h2>
 						<Link href={`/dashboard/libro-de-obras/${id}/inspector-otc`}>
-							<Button size={"lg"}>
+							<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 								<span className="hidden lg:block">Agregar</span>
 								<Plus />
 							</Button>
@@ -159,7 +159,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				<div className="flex justify-between">
 					<h2 className="text-2xl font-bold">Áreas de Prevención</h2>
 					<Link href={`/dashboard/libro-de-obras/${id}/prevencion`}>
-						<Button size={"lg"}>
+						<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 							<span className="hidden lg:block">Agregar</span>
 							<Plus />
 						</Button>
