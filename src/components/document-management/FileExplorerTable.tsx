@@ -1,9 +1,7 @@
 import { FolderIcon, FileTextIcon, ImageIcon, VideoIcon, FileIcon } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 import Link from "next/link"
-
-import { formatBytes } from "@/utils/formatBytes"
 
 import {
 	Table,
@@ -12,9 +10,11 @@ import {
 	TableCell,
 	TableHead,
 	TableHeader,
+	TableCaption,
 } from "@/components/ui/table"
 
 import type { File, Folder } from "@prisma/client"
+import { Codes } from "@/lib/consts/codes"
 
 type FullFolder = Folder & {
 	files: File[]
@@ -47,12 +47,22 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 
 	return (
 		<Table>
+			<TableCaption>
+				{Codes.map((code) => (
+					<div key={code}>
+						{code.charAt(0)}: {code}
+					</div>
+				))}
+			</TableCaption>
+
 			<TableHeader>
 				<TableRow>
-					<TableHead className="w-[40%]">Nombre</TableHead>
-					<TableHead className="w-[20%]">Tipo</TableHead>
-					<TableHead className="w-[20%]">Tamaño</TableHead>
-					<TableHead className="w-[20%]">Última Modificación</TableHead>
+					<TableHead>Codigo-Nombre</TableHead>
+					<TableHead>Estatus</TableHead>
+					<TableHead>Descripcion</TableHead>
+					<TableHead>Ultima Revision</TableHead>
+					<TableHead>Fecha de Registro</TableHead>
+					<TableHead>Fecha de Expiracion</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -70,9 +80,9 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 							</div>
 						</TableCell>
 						<TableCell></TableCell>
-						<TableCell>
-							Carpeta con {item.subFolders.length} subcarpetas y {item.files.length} archivos
-						</TableCell>
+						<TableCell>{item.description}</TableCell>
+						<TableCell></TableCell>
+						<TableCell></TableCell>
 						<TableCell>
 							{formatDistanceToNow(item.updatedAt, {
 								addSuffix: true,
@@ -88,17 +98,23 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 							<div className="flex items-center gap-2">
 								{getFileIcon(item)}
 								<Link href={item.url} className="font-medium hover:underline">
-									{item.name}
+									{item.code.charAt(0) + "-" + item.name}
 								</Link>
 							</div>
 						</TableCell>
-						<TableCell>{item.type}</TableCell>
-						<TableCell>{formatBytes(item.size)}</TableCell>
 						<TableCell>
-							{formatDistanceToNow(item.updatedAt, {
-								addSuffix: true,
-								locale: es,
-							})}
+							{item.expirationDate
+								? item.expirationDate < new Date()
+									? "Expirado"
+									: "Vigente"
+								: "No especificado"}
+						</TableCell>
+						<TableCell></TableCell>
+						<TableCell>{item.description}</TableCell>
+						<TableCell>{item.revisionCount}</TableCell>
+						<TableCell>{format(item.registrationDate, "dd/MM/yyyy")}</TableCell>
+						<TableCell>
+							{item.expirationDate ? format(item.expirationDate, "dd/MM/yyyy") : "N/A"}
 						</TableCell>
 					</TableRow>
 				))}
