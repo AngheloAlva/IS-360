@@ -87,7 +87,10 @@ export default function PreventionAreasForm({
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full gap-4 md:grid-cols-2">
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="mx-auto grid w-full max-w-screen-xl gap-4 md:grid-cols-2"
+			>
 				<FormField
 					control={form.control}
 					name="name"

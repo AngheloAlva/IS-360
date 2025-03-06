@@ -251,7 +251,7 @@ export default function DailyActivityForm({
 									type="button"
 									onClick={() => remove(index)}
 									className="mt-2 md:col-span-2"
-									variant="destructive"
+									variant="outline"
 								>
 									Eliminar Personal #{index + 1}
 								</Button>

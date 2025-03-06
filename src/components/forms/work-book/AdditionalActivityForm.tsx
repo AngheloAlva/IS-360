@@ -96,7 +96,10 @@ export default function AdditionalActivityForm({
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full grid-cols-2 gap-4">
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="mx-auto grid w-full max-w-screen-xl grid-cols-2 gap-4"
+			>
 				<FormField
 					control={form.control}
 					name="activityName"

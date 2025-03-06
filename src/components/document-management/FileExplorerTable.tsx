@@ -112,7 +112,7 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 									: "Vigente"
 								: "Vigente"}
 						</TableCell>
-						<TableCell>{item.type}</TableCell>
+						<TableCell>{item.description}</TableCell>
 						<TableCell>{format(item.registrationDate, "dd/MM/yyyy")}</TableCell>
 						<TableCell>
 							{item.expirationDate ? format(item.expirationDate, "dd/MM/yyyy") : "N/A"}
