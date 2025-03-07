@@ -59,7 +59,7 @@ export default async function DailyActivitiesTable({
 							<TableCell>
 								{dailyActivity.personnel.map((person, index) => (
 									<div key={index}>
-										{person.name} - {person.position}
+										{person.fullName} - {person.position}
 									</div>
 								))}
 							</TableCell>

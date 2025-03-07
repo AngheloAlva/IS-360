@@ -39,7 +39,11 @@ import type { WorkBook } from "@prisma/client"
 import type { z } from "zod"
 
 interface WorkBookFormProps {
-	workBook?: WorkBook
+	workBook?: WorkBook & {
+		otNumber: {
+			otNumber: string
+		}
+	}
 }
 
 export default function WorkBookForm({ workBook }: WorkBookFormProps): React.ReactElement {
@@ -52,9 +56,9 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 		resolver: zodResolver(workBookSchema),
 		defaultValues: {
 			userId: session?.user.id,
-			otNumber: workBook?.otNumber ?? "",
 			workName: workBook?.workName ?? "",
 			workLocation: workBook?.workLocation ?? "",
+			otNumber: workBook?.otNumber.otNumber ?? "",
 			otcInspectorName: workBook?.otcInspectorName ?? "",
 			workStartDate: workBook?.workStartDate ?? new Date(),
 			otcInspectorPhone: workBook?.otcInspectorPhone ?? "",

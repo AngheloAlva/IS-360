@@ -7,11 +7,14 @@ import type { z } from "zod"
 
 export const updateWorkBook = async (id: string, values: z.infer<typeof workBookSchema>) => {
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { otNumber, ...rest } = values
+
 		const newWorkBook = await prisma.workBook.update({
 			where: {
 				id: id,
 			},
-			data: values,
+			data: rest,
 		})
 
 		return {

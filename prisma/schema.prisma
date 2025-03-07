@@ -48,6 +48,8 @@ model User {
   workPermits   WorkPermit[]
   folders       Folder[]
   files         File[]
+  workOrders    WorkOrder[]
+  safetyTalks   UserSafetyTalk[]
 
   @@unique([email])
   @@unique([rut])
@@ -100,9 +102,41 @@ model Verification {
   @@map("verification")
 }
 
+enum WORK_ORDER_STATUS {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+model WorkOrder {
+  id                 String  @id @default(cuid())
+  otNumber           String
+
+  initDate           DateTime
+  endDate            DateTime
+  quantityDays       Int
+  equipmentProperty  String
+  status             WORK_ORDER_STATUS @default(PENDING)
+  estimatedDuration  Int
+  printed            Boolean
+  type               String
+  contractCompany    String
+  
+  responsible        User @relation(fields: [responsibleId], references: [id])
+  responsibleId      String
+  workBooks          WorkBook[]
+  workTrackers       WorkTracker[]
+  workPermits        WorkPermit[]
+
+  @@unique([id])
+  @@unique([otNumber])
+  @@map("work_order")
+}
+
 model WorkBook {
   id                   String  @id @default(cuid())
-  otNumber             String
 
   contractingCompany   String
   workResponsibleName  String
@@ -120,6 +154,8 @@ model WorkBook {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
+  otNumber             WorkOrder @relation(fields: [otNumberId], references: [id])
+  otNumberId           String
   user                 User @relation(fields: [userId], references: [id])
   userId               String
   dailyActivities      DailyActivity[]
@@ -128,7 +164,6 @@ model WorkBook {
   preventionAreas      PreventionArea[]
 
   @@unique([id])
-  @@unique([otNumber])
   @@map("work_book")
 }
 
@@ -156,14 +191,19 @@ model DailyActivity {
 model Personnel {
   id                 String  @id @default(cuid())
 
-  name               String
-  position           String
+  fullName           String
+  position           String?
   rut                String?
   phone              String?
   email              String?
+  number             Int?
+  company            String?
 
-  dailyActivity      DailyActivity @relation(fields: [dailyActivityId], references: [id])
-  dailyActivityId    String
+
+  dailyActivity      DailyActivity? @relation(fields: [dailyActivityId], references: [id])
+  dailyActivityId    String?
+  workPermit         WorkPermit? @relation(fields: [workPermitId], references: [id])
+  workPermitId       String?
 
   @@unique([id])
   @@map("personnel")
@@ -230,7 +270,6 @@ model PreventionArea {
 
 model WorkTracker {
   id                 String  @id @default(cuid())
-  otNumber           String
 
   description        String
   date               DateTime
@@ -242,7 +281,9 @@ model WorkTracker {
   user               User @relation(fields: [userId], references: [id])
   userId             String
   attachments        Attachment[]
-  
+  otNumber             WorkOrder @relation(fields: [otNumberId], references: [id])
+  otNumberId           String
+
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -271,11 +312,8 @@ model Attachment {
   @@map("attachment")
 }
 
-// TODO: Add Videos models + Add Slug to various models
-
 model WorkPermit {
   id                             String @id @default(cuid())
-  otNumber                       String
 
   aplicantPt                     String
   responsiblePt                  String
@@ -312,25 +350,13 @@ model WorkPermit {
   createdAt                      DateTime @default(now())
   updatedAt                      DateTime @updatedAt
 
+  otNumber                       WorkOrder @relation(fields: [otNumberId], references: [id])
+  otNumberId                     String
   user                           User     @relation(fields: [userId], references: [id])
   userId                         String
-  participants                   ParticipantsInPermit[]
+  participants                   Personnel[]
 
   @@map("work_permit")
-}
-
-model ParticipantsInPermit {
-  id        String         @id @default(cuid())
-
-  number    Int
-  fullName  String
-  rut       String
-  company   String
-
-  workPermit    WorkPermit @relation(fields: [workPermitId], references: [id])
-  workPermitId  String
-
-  @@map("participants_in_permit")
 }
 
 enum Area {
@@ -347,6 +373,7 @@ enum Area {
 
 model Folder {
   id          String  @id @default(cuid())
+  slug        String
 
   name        String
   description String?
@@ -363,6 +390,7 @@ model Folder {
   userId      String
   files       File[]
 
+  @@unique([slug, parentId, userId])
   @@map("folder")
 }
 
@@ -395,3 +423,109 @@ model File {
 
   @@map("file")
 }
+
+enum SAFETY_TALK_TYPE {
+  IRL
+  ENVIRONMENTAL
+}
+
+enum RESOURCE_TYPE {
+  VIDEO
+  PRESENTATION
+  DOCUMENT
+}
+
+model SafetyTalk {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        SAFETY_TALK_TYPE
+  questions   Question[]
+  resources   SafetyTalkResource[]
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userSafetyTalks UserSafetyTalk[]
+
+  @@map("safety_talk")
+}
+
+model SafetyTalkResource {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  type        RESOURCE_TYPE
+  url         String
+  downloadUrl String?
+  fileSize    Int?
+  mimeType    String?
+  order       Int
+  safetyTalk  SafetyTalk @relation(fields: [safetyTalkId], references: [id])
+  safetyTalkId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("safety_talk_resource")
+}
+
+
+model Question {
+  id            String   @id @default(cuid())
+  question      String
+  options       QuestionOption[]
+  safetyTalk    SafetyTalk @relation(fields: [safetyTalkId], references: [id])
+  safetyTalkId  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userAnswers   UserSafetyTalkAnswer[]
+
+  @@map("question")
+}
+
+model QuestionOption {
+  id          String   @id @default(cuid())
+  text        String
+  isCorrect   Boolean
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userAnswers UserSafetyTalkAnswer[]
+
+  @@map("question_option")
+}
+
+model UserSafetyTalk {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  safetyTalk    SafetyTalk @relation(fields: [safetyTalkId], references: [id])
+  safetyTalkId  String
+  score         Float
+  passed        Boolean
+  completedAt   DateTime
+  expiresAt     DateTime
+  answers       UserSafetyTalkAnswer[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("user_safety_talk")
+}
+
+model UserSafetyTalkAnswer {
+  id                String   @id @default(cuid())
+  userSafetyTalk    UserSafetyTalk @relation(fields: [userSafetyTalkId], references: [id])
+  userSafetyTalkId  String
+  question          Question @relation(fields: [questionId], references: [id])
+  questionId        String
+  selectedOption    QuestionOption @relation(fields: [selectedOptionId], references: [id])
+  selectedOptionId  String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("user_safety_talk_answer")
+}
+

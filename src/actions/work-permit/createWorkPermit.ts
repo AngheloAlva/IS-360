@@ -20,6 +20,24 @@ export const createWorkPermit = async (values: z.infer<typeof workPermitSchema>)
 						number: +participant.number,
 					})),
 				},
+				otNumber: {
+					create: {
+						otNumber: rest.otNumber,
+						contractCompany: "",
+						endDate: new Date(),
+						initDate: new Date(),
+						quantityDays: 0,
+						equipmentProperty: "",
+						type: "",
+						estimatedDuration: 0,
+						printed: false,
+						responsible: {
+							connect: {
+								id: userId,
+							},
+						},
+					},
+				},
 				user: {
 					connect: {
 						id: userId,

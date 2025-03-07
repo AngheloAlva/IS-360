@@ -10,6 +10,7 @@ export const getWorkPermit = async (workPermitId: string) => {
 			},
 			include: {
 				participants: true,
+				otNumber: true,
 			},
 		})
 

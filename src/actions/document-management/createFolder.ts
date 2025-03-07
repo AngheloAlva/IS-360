@@ -41,6 +41,10 @@ export const createFolder = async (values: FolderFormSchema) => {
 			data: {
 				...rest,
 				...connections,
+				slug: rest.name
+					.toLowerCase()
+					.replace(/\s+/g, "-")
+					.replace(/[^a-z0-9-]/g, ""),
 			},
 		})
 

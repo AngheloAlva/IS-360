@@ -16,6 +16,7 @@ export const workPermitSchema = z.object({
 		.string()
 		.min(2, { message: "El nombre de la empresa debe tener al menos 2 caracteres" }),
 	mutuality: z.string().nonempty({ message: "Debe seleccionar una mutualidad" }),
+	otherMutuality: z.string().optional(),
 	initDate: z.date(),
 	hour: z
 		.string()

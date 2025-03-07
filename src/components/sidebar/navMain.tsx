@@ -34,7 +34,7 @@ export function NavMain({
 					<SidebarMenuItem
 						key={item.name}
 						className={cn({
-							"bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground":
+							"bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-md":
 								pathName === item.url,
 						})}
 					>

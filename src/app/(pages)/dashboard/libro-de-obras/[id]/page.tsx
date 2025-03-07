@@ -59,7 +59,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 						<h1 className="flex flex-col text-2xl font-bold">
 							{workBook.data.workName}
 							<span className="text-feature text-base font-medium">
-								OT: {workBook.data.otNumber}
+								OT: {workBook.data.otNumber.otNumber}
 							</span>
 						</h1>
 					</div>

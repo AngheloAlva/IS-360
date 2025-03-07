@@ -57,7 +57,7 @@ export default function DailyActivityForm({
 			executionDate: new Date(),
 			personnel: [
 				{
-					name: "",
+					fullName: "",
 					position: "",
 				},
 			],
@@ -259,7 +259,7 @@ export default function DailyActivityForm({
 
 							<FormField
 								control={form.control}
-								name={`personnel.${index}.name`}
+								name={`personnel.${index}.fullName`}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel className="text-gray-700">Nombre del Personal</FormLabel>
@@ -299,7 +299,7 @@ export default function DailyActivityForm({
 						type="button"
 						variant={"secondary"}
 						size={"lg"}
-						onClick={() => append({ name: "", position: "" })}
+						onClick={() => append({ fullName: "", position: "" })}
 						className="mt-10 w-full"
 					>
 						Añadir nuevo Personal

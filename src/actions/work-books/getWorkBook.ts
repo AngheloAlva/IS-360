@@ -8,6 +8,9 @@ export const getWorkBook = async (workBookId: string) => {
 			where: {
 				id: workBookId,
 			},
+			include: {
+				otNumber: true,
+			},
 		})
 
 		return {

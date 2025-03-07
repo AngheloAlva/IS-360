@@ -11,7 +11,7 @@ export const dailyActivitySchema = z.object({
 	personnel: z
 		.array(
 			z.object({
-				name: z.string().nonempty({ message: "El nombre del personal no puede estar vacío" }),
+				fullName: z.string().nonempty({ message: "El nombre del personal no puede estar vacío" }),
 				position: z.string().nonempty({ message: "La posición del personal no puede estar vacía" }),
 			})
 		)

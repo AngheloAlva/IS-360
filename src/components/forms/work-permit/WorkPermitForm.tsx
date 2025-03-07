@@ -128,6 +128,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 	const riskAreOther = form.watch("riskIdentification").includes("Otros")
 	const workWillBeAreOther = form.watch("workWillBe").includes("Otro")
 	const preChecksAreOther = form.watch("preChecks").includes("Otros")
+	const mutualityAreOther = form.watch("mutuality").includes("Otro")
 	const toolsAreOther = form.watch("tools").includes("Otros")
 	const generateWaste = form.watch("generateWaste")
 
@@ -230,6 +231,25 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 						</FormItem>
 					)}
 				/>
+
+				{mutualityAreOther && (
+					<FormField
+						control={form.control}
+						name="otherMutuality"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Otro</FormLabel>
+								<FormControl>
+									<Input
+										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+										placeholder="Otro"
+										{...field}
+									/>
+								</FormControl>
+							</FormItem>
+						)}
+					/>
+				)}
 
 				<Separator className="mt-2 bg-gray-200 md:col-span-2" />
 

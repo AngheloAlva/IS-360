@@ -5,6 +5,7 @@ export const MutualityOptions: Option[] = [
 	{ value: "IST", label: "IST" },
 	{ value: "MUTUAL", label: "MUTUAL" },
 	{ value: "ISL", label: "ISL" },
+	{ value: "Otro", label: "Otro" },
 ] as const
 
 export const WorkWillBeOptions: Option[] = [
