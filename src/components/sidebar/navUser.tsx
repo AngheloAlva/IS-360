@@ -1,12 +1,11 @@
 "use client"
 
+import { Building, ChevronsUpDown, LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { authClient } from "@/lib/auth-client"
 
-import { Building, ChevronsUpDown, LogOut } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Skeleton } from "../ui/skeleton"
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -22,8 +21,9 @@ import {
 	SidebarMenuButton,
 } from "@/components/ui/sidebar"
 
-export function NavUser(): React.ReactElement {
-	const { data: session, isPending } = authClient.useSession()
+import type { Session } from "@/lib/auth"
+
+export function NavUser({ session }: { session: Session }): React.ReactElement {
 	const { isMobile } = useSidebar()
 	const router = useRouter()
 
@@ -52,17 +52,8 @@ export function NavUser(): React.ReactElement {
 								</AvatarFallback>
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm leading-tight">
-								{isPending ? (
-									<>
-										<Skeleton className="h-4 w-20" />
-										<Skeleton className="mt-1 h-3 w-full" />
-									</>
-								) : (
-									<>
-										<span className="truncate font-semibold">{session?.user.name}</span>
-										<span className="truncate text-xs">{session?.user.email}</span>
-									</>
-								)}
+								<span className="truncate font-semibold">{session?.user.name}</span>
+								<span className="truncate text-xs">{session?.user.email}</span>
 							</div>
 							<ChevronsUpDown className="ml-auto size-4" />
 						</SidebarMenuButton>

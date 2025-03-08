@@ -20,9 +20,17 @@ export default async function authMiddleware(request: NextRequest) {
 	if (!session) {
 		return NextResponse.redirect(new URL("/auth/login", request.url))
 	}
+
+	// Proteger rutas de administrador
+	if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
+		if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
+			return NextResponse.redirect(new URL("/dashboard", request.url))
+		}
+	}
+
 	return NextResponse.next()
 }
 
 export const config = {
-	matcher: "/dashboard/:path*",
+	matcher: ["/dashboard/:path*"],
 }

@@ -875,7 +875,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 
 				<div className="flex w-full items-center justify-between md:col-span-2">
 					<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
-						Personas participantes
+						Registro de participacion
 					</h2>
 
 					<Button
@@ -988,7 +988,9 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 					name="additionalObservations"
 					render={({ field }) => (
 						<FormItem className="md:col-span-2">
-							<FormLabel className="text-gray-700">Observaciones adicionales</FormLabel>
+							<FormLabel className="text-gray-700">
+								Observaciones adicionales a los trabajos
+							</FormLabel>
 							<FormControl>
 								<Textarea
 									className="min-h-32 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
@@ -1000,6 +1002,8 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 						</FormItem>
 					)}
 				/>
+
+				{/* // TODO: Add Checkbox to accept terms */}
 
 				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={isSubmitting}>
 					{!isSubmitting ? (
