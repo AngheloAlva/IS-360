@@ -56,6 +56,7 @@ export default function OtcInspectorForm({
 			activityEndTime: "",
 			activityStartTime: "",
 			safetyObservations: "",
+			initialDate: new Date(),
 			supervisionComments: "",
 			dateOfExecution: new Date(),
 		},

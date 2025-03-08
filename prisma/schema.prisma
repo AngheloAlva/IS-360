@@ -239,6 +239,7 @@ model OtcInspection {
   supervisionComments String
   safetyObservations  String
   nonConformities     String?
+  initialDate         DateTime
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -257,6 +258,9 @@ model PreventionArea {
   name               String
   recommendations    String?
   others             String?
+  comments           String?
+  initialDate        DateTime
+  initialTime        String
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

@@ -798,71 +798,78 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 					)}
 				/>
 
-				<Separator className="my-2 bg-gray-200 md:col-span-2" />
+				{/* // TODO: Permitir solo al actualizar por personal de OTC */}
+				{false && (
+					<>
+						<Separator className="my-2 bg-gray-200 md:col-span-2" />
 
-				<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">Recepcion del trabajo</h2>
-				<FormField
-					control={form.control}
-					name="whoReceives"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Quien recibe (Cierre de PT)</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Quien recibe"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="cleanAndTidyWorkArea"
-					render={({ field }) => (
-						<FormItem className="flex items-center md:col-span-2">
-							<FormControl>
-								<Checkbox checked={field.value} onCheckedChange={field.onChange} />
-							</FormControl>
-							<div className="space-y-1 leading-none">
-								<FormLabel>El área de trabajo se encuentra limpia y ordenada</FormLabel>
-							</div>
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="workCompleted"
-					render={({ field }) => (
-						<FormItem className="flex items-center md:col-span-2">
-							<FormControl>
-								<Checkbox checked={field.value} onCheckedChange={field.onChange} />
-							</FormControl>
-							<div className="space-y-1 leading-none">
-								<FormLabel>Trabajo terminado</FormLabel>
-							</div>
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="observations"
-					render={({ field }) => (
-						<FormItem className="md:col-span-2">
-							<FormLabel className="mt-2 text-gray-700">Observaciones</FormLabel>
-							<FormControl>
-								<Textarea
-									className="min-h-32 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Observaciones"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
+							Recepcion del trabajo
+						</h2>
+						<FormField
+							control={form.control}
+							name="whoReceives"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Quien recibe (Cierre de PT)</FormLabel>
+									<FormControl>
+										<Input
+											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+											placeholder="Quien recibe"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="cleanAndTidyWorkArea"
+							render={({ field }) => (
+								<FormItem className="flex items-center md:col-span-2">
+									<FormControl>
+										<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+									</FormControl>
+									<div className="space-y-1 leading-none">
+										<FormLabel>El área de trabajo se encuentra limpia y ordenada</FormLabel>
+									</div>
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="workCompleted"
+							render={({ field }) => (
+								<FormItem className="flex items-center md:col-span-2">
+									<FormControl>
+										<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+									</FormControl>
+									<div className="space-y-1 leading-none">
+										<FormLabel>Trabajo terminado</FormLabel>
+									</div>
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="observations"
+							render={({ field }) => (
+								<FormItem className="md:col-span-2">
+									<FormLabel className="mt-2 text-gray-700">Observaciones</FormLabel>
+									<FormControl>
+										<Textarea
+											className="min-h-32 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+											placeholder="Observaciones"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
 				<Separator className="mt-2 bg-gray-200 md:col-span-2" />
 

@@ -3,13 +3,20 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
 import { toast } from "sonner"
 import { z } from "zod"
 
 import { preventionAreaSchema } from "@/lib/form-schemas/work-book/prevention-area.schema"
 import { createPreventionArea } from "@/actions/prevention-areas/createPreventionArea"
+import { cn } from "@/lib/utils"
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -37,7 +44,10 @@ export default function PreventionAreasForm({
 			workBookId,
 			name: "",
 			others: "",
+			comments: "",
 			recommendations: "",
+			initialDate: new Date(),
+			initialTime: new Date().toLocaleTimeString(),
 		},
 	})
 
@@ -111,6 +121,64 @@ export default function PreventionAreasForm({
 
 				<FormField
 					control={form.control}
+					name="initialDate"
+					render={({ field }) => (
+						<FormItem className="flex flex-col">
+							<FormLabel>Fecha actual</FormLabel>
+							<Popover>
+								<PopoverTrigger asChild>
+									<FormControl>
+										<Button
+											variant={"outline"}
+											className={cn(
+												"w-full rounded-md border-gray-200 bg-white pl-3 text-left text-sm font-normal text-gray-700",
+												!field.value && "text-muted-foreground"
+											)}
+										>
+											{field.value ? (
+												format(field.value, "PPP", { locale: es })
+											) : (
+												<span>Selecciona la fecha</span>
+											)}
+											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+										</Button>
+									</FormControl>
+								</PopoverTrigger>
+								<PopoverContent className="w-auto p-0" align="start">
+									<Calendar
+										mode="single"
+										selected={field.value}
+										onSelect={field.onChange}
+										disabled={(date) => date < new Date("1900-01-01")}
+										initialFocus
+									/>
+								</PopoverContent>
+							</Popover>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="initialTime"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel className="text-gray-700">Hora actual</FormLabel>
+							<FormControl>
+								<Input
+									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+									placeholder="Hora actual"
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
 					name="others"
 					render={({ field }) => (
 						<FormItem>
@@ -162,6 +230,23 @@ export default function PreventionAreasForm({
 						</p>
 					)}
 				</FormItem>
+
+				<FormField
+					control={form.control}
+					name="comments"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel className="text-gray-700">Comentarios</FormLabel>
+							<FormControl>
+								<Textarea
+									className="h-32 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+									placeholder="Comentarios"
+									{...field}
+								/>
+							</FormControl>
+						</FormItem>
+					)}
+				/>
 
 				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (
