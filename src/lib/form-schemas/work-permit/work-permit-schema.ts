@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}-[0-9kK]$/
+import { rutRegex } from "../rutRegex"
 
 export const workPermitSchema = z.object({
 	userId: z.string(),

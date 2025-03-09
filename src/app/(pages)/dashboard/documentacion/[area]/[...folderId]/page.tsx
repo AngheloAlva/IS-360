@@ -33,7 +33,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 			: `/dashboard/documentacion/${area}`
 
 	return (
-		<div className="container mx-auto p-6">
+		<div className="container mx-auto">
 			<div className="mb-6 flex items-center justify-between">
 				<div className="flex items-center gap-4">
 					<Link

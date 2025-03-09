@@ -24,10 +24,10 @@ export default async function AddNewFilePage(props: { searchParams: SearchParams
 	const parentFolderId = searchParams.parentFolderId as string | undefined
 
 	return (
-		<main className="flex flex-col items-center gap-14 p-4 pb-20 lg:p-8 lg:pb-32">
+		<>
 			<h1 className="w-fit text-3xl font-bold">Nuevo Archivo</h1>
 
 			<NewFileForm userId={res.user.id} folderId={parentFolderId} area={area} />
-		</main>
+		</>
 	)
 }

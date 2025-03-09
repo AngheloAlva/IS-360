@@ -45,7 +45,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 	}
 
 	return (
-		<main className="flex h-full flex-col gap-8 p-4 pt-0 pb-40 lg:p-8 lg:pt-0">
+		<>
 			<div>
 				<div className="mt-2 flex items-center justify-between">
 					<div className="flex items-start justify-start gap-1">
@@ -190,6 +190,6 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 					<PreventionAreasTable workBookId={id} />
 				</Suspense>
 			</div>
-		</main>
+		</>
 	)
 }

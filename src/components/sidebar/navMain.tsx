@@ -35,7 +35,7 @@ export function NavMain({
 						key={item.name}
 						className={cn({
 							"bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-md":
-								pathName === item.url,
+								pathName.includes(item.url),
 						})}
 					>
 						<SidebarMenuButton asChild>

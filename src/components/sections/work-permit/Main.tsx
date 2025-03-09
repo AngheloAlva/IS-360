@@ -45,9 +45,9 @@ export default function MainWorkBook({
 	}, [page, userId])
 
 	return (
-		<main
+		<div
 			className={cn(
-				"flex h-full flex-col gap-8 overflow-hidden p-4 transition-all md:max-w-[95dvw] lg:max-w-[98dvw] lg:p-8",
+				"flex h-full flex-col gap-8 overflow-hidden transition-all md:max-w-[95dvw] lg:max-w-[98dvw]",
 				{
 					"md:max-w-[68dvw] lg:max-w-[75dvw] xl:max-w-[80dvw] 2xl:max-w-[85dvw]":
 						state === "expanded",
@@ -57,6 +57,6 @@ export default function MainWorkBook({
 			<h1 className="w-fit text-3xl font-bold">Permisos de Trabajo Seguro</h1>
 
 			<DataTable columns={columns} data={workPermits} isLoading={isLoading} />
-		</main>
+		</div>
 	)
 }

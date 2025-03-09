@@ -13,9 +13,9 @@ export default async function WorkBooksPage(props: { searchParams: SearchParams 
 
 	if (!res) {
 		return (
-			<main className="flex h-screen items-center justify-center">
+			<>
 				<p>Acceso denegado</p>
-			</main>
+			</>
 		)
 	}
 

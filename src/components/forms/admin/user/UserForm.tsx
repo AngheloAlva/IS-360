@@ -4,15 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
-import Link from "next/link"
+import { toast } from "sonner"
 
-import { registerSchema } from "@/lib/form-schemas/register-schema"
-import { authClient } from "@/lib/auth-client"
+import { userSchema, type UserSchema } from "@/lib/form-schemas/admin/user/user.schema"
+import { UserRoleOptions } from "@/lib/consts/user-roles"
 import { formatRut } from "@/utils/formatRut"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { toast } from "sonner"
 import {
 	Form,
 	FormItem,
@@ -21,72 +20,91 @@ import {
 	FormControl,
 	FormMessage,
 } from "@/components/ui/form"
+import {
+	Select,
+	SelectItem,
+	SelectValue,
+	SelectTrigger,
+	SelectContent,
+} from "@/components/ui/select"
+import { authClient } from "@/lib/auth-client"
+import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 
-import type { z } from "zod"
-import { USER_ROLES } from "@/lib/consts/user-roles"
-
-export default function RegisterForm(): React.ReactElement {
+export default function UserForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 
 	const router = useRouter()
 
-	const form = useForm<z.infer<typeof registerSchema>>({
-		resolver: zodResolver(registerSchema),
+	const form = useForm<UserSchema>({
+		resolver: zodResolver(userSchema),
 		defaultValues: {
 			rut: "",
 			name: "",
 			email: "",
-			password: "",
+			role: "USER",
 		},
 	})
 
-	async function onSubmit(values: z.infer<typeof registerSchema>) {
-		await authClient.signUp.email(
-			{
+	async function onSubmit(values: UserSchema) {
+		setLoading(true)
+
+		try {
+			const temporalPassword = generateTemporalPassword()
+
+			const { data: newUser, error } = await authClient.admin.createUser({
 				email: values.email,
-				password: values.password,
+				password: temporalPassword,
 				name: values.name,
-				rut: values.rut,
-				role: USER_ROLES.PARTNER_COMPANY,
-			},
-			{
-				onRequest: () => {
-					setLoading(true)
+				role: values.role,
+				data: {
+					rut: values.rut,
 				},
-				onSuccess: () => {
-					setLoading(false)
+			})
 
-					toast("Cuenta creada", {
-						description: "Tu cuenta ha sido creada exitosamente",
-						duration: 3000,
-					})
-
-					router.push("/dashboard/permiso-de-trabajo")
-				},
-				onError: (ctx) => {
-					setLoading(false)
-					toast("Error", {
-						description: ctx.error.message,
-						duration: 4000,
-					})
-				},
+			if (error) {
+				toast("Error al crear el usuario", {
+					description:
+						"Por favor, verifique que los datos ingresados sean correctos y que el email o RUT no estén duplicados",
+					duration: 5000,
+				})
+				return
 			}
-		)
+
+			if (newUser) {
+				toast("Usuario creado exitosamente", {
+					description: "El usuario ha sido creado exitosamente",
+					duration: 3000,
+				})
+
+				router.push("/dashboard/admin/usuarios")
+			}
+		} catch (error) {
+			console.log(error)
+			toast("Error al crear el usuario", {
+				description: "Ocurrió un error al intentar crear el usuario",
+				duration: 5000,
+			})
+		} finally {
+			setLoading(false)
+		}
 	}
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3 md:grid-cols-2">
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="grid w-full max-w-screen-lg gap-3 md:grid-cols-2"
+			>
 				<FormField
 					control={form.control}
 					name="name"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">Nombre de la empresa</FormLabel>
+							<FormLabel className="text-gray-700">Nombre</FormLabel>
 							<FormControl>
 								<Input
 									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre de la empresa"
+									placeholder="Nombre"
 									{...field}
 								/>
 							</FormControl>
@@ -115,25 +133,6 @@ export default function RegisterForm(): React.ReactElement {
 
 				<FormField
 					control={form.control}
-					name="password"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Contaseña</FormLabel>
-							<FormControl>
-								<Input
-									type="password"
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Contraseña"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
 					name="rut"
 					render={({ field }) => {
 						// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -141,14 +140,14 @@ export default function RegisterForm(): React.ReactElement {
 
 						return (
 							<FormItem>
-								<FormLabel className="text-gray-700">RUT de la empresa</FormLabel>
+								<FormLabel className="text-gray-700">RUT</FormLabel>
 								<FormControl>
 									<Input
 										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
 										onChange={(e) => {
 											field.onChange(formatRut(e.target.value))
 										}}
-										placeholder="RUT de la empresa"
+										placeholder="RUT"
 										{...restFieldProps}
 									/>
 								</FormControl>
@@ -156,6 +155,31 @@ export default function RegisterForm(): React.ReactElement {
 							</FormItem>
 						)
 					}}
+				/>
+
+				<FormField
+					control={form.control}
+					name="role"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Mutualidad</FormLabel>
+							<Select onValueChange={field.onChange} defaultValue={field.value}>
+								<FormControl>
+									<SelectTrigger className="border-gray-200">
+										<SelectValue placeholder="Seleccione una mutualidad" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent className="text-neutral-700">
+									{UserRoleOptions.map((role) => (
+										<SelectItem key={role.value} value={role.value}>
+											{role.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
 				/>
 
 				<Button className="mt-4 md:col-span-2" type="submit" disabled={loading}>
@@ -180,16 +204,9 @@ export default function RegisterForm(): React.ReactElement {
 							<span className="sr-only">Cargando...</span>
 						</div>
 					) : (
-						"Crear cuenta"
+						"Crear usuario"
 					)}
 				</Button>
-
-				<p className="mt-4 text-sm text-gray-500 sm:mt-0">
-					¿Ya tienes una cuenta?{" "}
-					<Link href="/auth/login" className="text-gray-700 underline">
-						Inicia sesión
-					</Link>
-				</p>
 			</form>
 		</Form>
 	)
