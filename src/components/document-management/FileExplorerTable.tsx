@@ -1,4 +1,4 @@
-import { FolderIcon, ImageIcon, VideoIcon, FileIcon, FileText } from "lucide-react"
+import { FolderIcon, ImageIcon, VideoIcon, FileIcon, FileText, Edit } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 import Link from "next/link"
@@ -15,20 +15,23 @@ import {
 	TableCaption,
 } from "@/components/ui/table"
 
-import type { File, Folder } from "@prisma/client"
+import type { File, Folder, User } from "@prisma/client"
+import { Button } from "../ui/button"
 
 type FullFolder = Folder & {
 	files: File[]
 	subFolders: Folder[]
+	user: User
 }
 
 interface FileExplorerTableProps {
 	files: File[]
+	isAdmin: boolean
 	foldersIds: string[]
 	folders: FullFolder[]
 }
 
-export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTableProps) {
+export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileExplorerTableProps) {
 	const getFileIcon = (item: File) => {
 		const type = item.type.split("/")[0]
 
@@ -43,8 +46,6 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 				return <FileIcon className="h-5 w-5 text-gray-500" />
 		}
 	}
-
-	console.log(foldersIds)
 
 	return (
 		<Table>
@@ -65,7 +66,9 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 					<TableHead>Descripcion</TableHead>
 					<TableHead>Fecha de Registro</TableHead>
 					<TableHead>Fecha de Expiracion</TableHead>
-					<TableHead>Revisiones</TableHead>
+					<TableHead>Usuario</TableHead>
+					<TableHead>Revisiones / Actualizacion</TableHead>
+					{isAdmin && <TableHead>Acciones</TableHead>}
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -86,12 +89,22 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 						<TableCell>{item.description}</TableCell>
 						<TableCell></TableCell>
 						<TableCell></TableCell>
+						<TableCell>{item.user?.name}</TableCell>
 						<TableCell>
 							{formatDistanceToNow(item.updatedAt, {
 								addSuffix: true,
 								locale: es,
 							})}
 						</TableCell>
+
+						{isAdmin && (
+							<TableCell>
+								<Button size="sm" variant="outline">
+									<Edit className="mr-2 h-4 w-4" />
+									Editar
+								</Button>
+							</TableCell>
+						)}
 					</TableRow>
 				))}
 
@@ -117,7 +130,16 @@ export function FileExplorerTable({ files, folders, foldersIds }: FileExplorerTa
 						<TableCell>
 							{item.expirationDate ? format(item.expirationDate, "dd/MM/yyyy") : "N/A"}
 						</TableCell>
+						<TableCell></TableCell>
 						<TableCell>{item.revisionCount}</TableCell>
+
+						{isAdmin && (
+							<TableCell>
+								<Button size="sm" variant="outline">
+									<Edit className="mr-2 h-4 w-4" />
+								</Button>
+							</TableCell>
+						)}
 					</TableRow>
 				))}
 

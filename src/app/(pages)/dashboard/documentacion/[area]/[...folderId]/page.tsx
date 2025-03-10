@@ -7,6 +7,8 @@ import Link from "next/link"
 import { FileExplorerTable } from "@/components/document-management/FileExplorerTable"
 import { getFilesAndFolders } from "@/actions/document-management/getFilesAndFolders"
 import { Button } from "@/components/ui/button"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 
 interface PageProps {
 	params: Promise<{
@@ -17,6 +19,14 @@ interface PageProps {
 
 export default async function DocumentsFilesPage({ params }: PageProps) {
 	const { area, folderId } = await params
+
+	const data = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!data?.user) {
+		return notFound()
+	}
 
 	const areaName = Areas[area as keyof typeof Areas]["title"]
 	const lastFolder = folderId[folderId.length - 1]
@@ -77,6 +87,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 					files={res.files}
 					folders={res.folders}
 					foldersIds={[area, ...folderId]}
+					isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
 				/>
 			</div>
 		</div>

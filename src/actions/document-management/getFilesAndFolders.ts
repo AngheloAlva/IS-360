@@ -17,12 +17,16 @@ export async function getFilesAndFolders(
 			include: {
 				files: true,
 				subFolders: true,
+				user: true,
 			},
 		})
 
 		const files = await prisma.file.findMany({
 			where: {
 				folderId: folderId ? { in: [folderId] } : null,
+			},
+			include: {
+				user: true,
 			},
 		})
 
