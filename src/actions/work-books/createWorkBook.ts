@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 
 import type { workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
+import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import type { z } from "zod"
 
 export const createWorkBook = async (values: z.infer<typeof workBookSchema>) => {
@@ -48,6 +49,8 @@ export const createWorkBook = async (values: z.infer<typeof workBookSchema>) => 
 		return {
 			ok: false,
 			message: "Error al crear el área de prevención",
+			code: (error as PrismaClientKnownRequestError).code,
+			target: (error as PrismaClientKnownRequestError).meta?.target,
 		}
 	}
 }

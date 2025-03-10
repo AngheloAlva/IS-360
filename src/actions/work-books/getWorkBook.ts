@@ -40,6 +40,13 @@ export const getWorkBooks = async (userId: string, limit: number = 10, page: num
 			where: {
 				userId: userId,
 			},
+			include: {
+				otNumber: {
+					select: {
+						otNumber: true,
+					},
+				},
+			},
 			take: limit,
 			skip: offset,
 		})

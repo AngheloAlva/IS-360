@@ -6,7 +6,7 @@ import Link from "next/link"
 
 import { ArrowUpDown, Link as LinkIcon } from "lucide-react"
 
-import type { WorkBook } from "@prisma/client"
+import type { WorkBook, WorkOrder } from "@prisma/client"
 
 export const columns: ColumnDef<WorkBook>[] = [
 	{
@@ -27,6 +27,10 @@ export const columns: ColumnDef<WorkBook>[] = [
 	{
 		accessorKey: "otNumber",
 		header: "OT",
+		cell: ({ row }) => {
+			const otNumber = row.getValue("otNumber")
+			return <div>{(otNumber as WorkOrder).otNumber}</div>
+		},
 	},
 	{
 		accessorKey: "contractingCompany",

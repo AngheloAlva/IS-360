@@ -95,20 +95,33 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 			setLoading(true)
 
 			if (!workBook) {
-				const { ok, message } = await createWorkBook(values)
+				const { ok, message, code } = await createWorkBook(values)
 
-				if (ok) {
+				if (!ok) {
+					if (code === "P2002") {
+						form.setError("otNumber", {
+							message: "Ya existe un libro de obras con el mismo número de OT",
+						})
+
+						toast("Error al crear el registro", {
+							description: "Ya existe un libro de obras con el mismo número de OT",
+							duration: 5000,
+						})
+
+						return
+					}
+
+					toast("Error al crear el registro", {
+						description: message,
+						duration: 5000,
+					})
+				} else {
 					toast("Registro creado", {
 						description: message,
 						duration: 5000,
 					})
 
 					router.push("/dashboard/libro-de-obras")
-				} else {
-					toast("Error al crear el registro", {
-						description: message,
-						duration: 5000,
-					})
 				}
 			} else {
 				const { ok, message } = await updateWorkBook(workBook.id, values)

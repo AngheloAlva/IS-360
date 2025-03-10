@@ -323,6 +323,7 @@ model WorkPermit {
   responsiblePt                  String
   executanCompany                String
   mutuality                      String
+  otherMutuality                 String?
   initDate                       DateTime
   hour                           String
   workersNumber                  Int
@@ -345,11 +346,12 @@ model WorkPermit {
   whoDeliversWorkAreaOp          String
   workerExecutor                 String
   preventionOfficer              String
-  whoReceives                    String
-  cleanAndTidyWorkArea           Boolean
-  workCompleted                  Boolean
+  whoReceives                    String?
+  cleanAndTidyWorkArea           Boolean?
+  workCompleted                  Boolean?
   observations                   String?
   additionalObservations         String?
+  acceptTerms                    Boolean  @default(false)
 
   createdAt                      DateTime @default(now())
   updatedAt                      DateTime @updatedAt

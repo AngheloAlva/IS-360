@@ -3,14 +3,17 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon, Plus, X } from "lucide-react"
 import { useFieldArray, useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { useState } from "react"
+import { toast } from "sonner"
 import { z } from "zod"
 
 import { workPermitSchema } from "@/lib/form-schemas/work-permit/work-permit-schema"
+import { createWorkPermit } from "@/actions/work-permit/createWorkPermit"
 import { formatRut } from "@/utils/formatRut"
 import { cn } from "@/lib/utils"
-import { toast } from "sonner"
 import {
 	ToolsOptions,
 	RisksOptions,
@@ -44,9 +47,6 @@ import {
 	SelectTrigger,
 	SelectContent,
 } from "@/components/ui/select"
-import { createWorkPermit } from "@/actions/work-permit/createWorkPermit"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
 
 export default function WorkPermitForm({ userId }: { userId: string }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,13 +65,15 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 			aplicantPt: "",
 			exactPlace: "",
 			otherTools: "",
+			workWillBe: "",
 			whoReceives: "",
 			observations: "",
-			workWillBe: "",
 			workersNumber: "",
 			responsiblePt: "",
 			workerExecutor: "",
 			otherPreChecks: "",
+			otherMutuality: "",
+			acceptTerms: false,
 			executanCompany: "",
 			workDescription: "",
 			workWillBeOther: "",
@@ -131,6 +133,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 	const mutualityAreOther = form.watch("mutuality").includes("Otro")
 	const toolsAreOther = form.watch("tools").includes("Otros")
 	const generateWaste = form.watch("generateWaste")
+	const acceptTerms = form.watch("acceptTerms")
 
 	const {
 		fields: activityDetailsFields,
@@ -246,6 +249,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 										{...field}
 									/>
 								</FormControl>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>
@@ -687,6 +691,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 							<div className="space-y-1 leading-none">
 								<FormLabel>La ejecución del trabajo generará residuos</FormLabel>
 							</div>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -834,6 +839,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 									<div className="space-y-1 leading-none">
 										<FormLabel>El área de trabajo se encuentra limpia y ordenada</FormLabel>
 									</div>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -848,6 +854,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 									<div className="space-y-1 leading-none">
 										<FormLabel>Trabajo terminado</FormLabel>
 									</div>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -1003,9 +1010,32 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 					)}
 				/>
 
-				{/* // TODO: Add Checkbox to accept terms */}
+				<FormField
+					control={form.control}
+					name="acceptTerms"
+					render={({ field }) => (
+						<FormItem className="flex items-center md:col-span-2">
+							<FormControl>
+								<Checkbox checked={field.value} onCheckedChange={field.onChange} />
+							</FormControl>
+							<div className="flex flex-col space-y-1 leading-none">
+								<FormLabel>
+									Los trabajadores declaran haber sido participe en la ejecucion del analisis de
+									trabajo seguro (AST), estar instruido acerca del metodo correcto y seguro de
+									trabajo, los riesgos y peligros asociados y sus medidas de prevencion.
+								</FormLabel>
+								<FormMessage className="mt-2" />
+							</div>
+						</FormItem>
+					)}
+				/>
 
-				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={isSubmitting}>
+				<Button
+					className="mt-4 md:col-span-2"
+					type="submit"
+					size={"lg"}
+					disabled={isSubmitting || !acceptTerms}
+				>
 					{!isSubmitting ? (
 						"Enviar solicitud"
 					) : (

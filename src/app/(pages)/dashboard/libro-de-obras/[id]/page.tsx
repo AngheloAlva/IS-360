@@ -14,10 +14,10 @@ import PreventionAreasTableSkeleton from "@/components/work-book/PreventionAreas
 import DailyActivitiesTableSkeleton from "@/components/work-book/DailyActivitiesTableSkeleton"
 import OtcInspectionsTableSkeleton from "@/components/work-book/OtcInspectionsTableSkeleton"
 import AdditionalActivitiesTable from "@/components/work-book/AdditionalActivitiesTable"
+import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/card"
 import DailyActivitiesTable from "@/components/work-book/DailyActivitiesTable"
 import PreventionAreasTable from "@/components/work-book/PreventionAreasTable"
 import OtcInspectionsTable from "@/components/work-book/OtcInspectionsTable"
-import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
@@ -46,7 +46,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 	return (
 		<>
-			<div>
+			<div className="w-full">
 				<div className="mt-2 flex items-center justify-between">
 					<div className="flex items-start justify-start gap-1">
 						<Link
@@ -123,73 +123,79 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				</div>
 			</div>
 
-			<Separator />
-
-			<div className="mb-14 flex flex-col gap-2">
-				<div className="flex justify-between">
-					<h2 className="text-2xl font-bold">Actividades Diarias</h2>
+			<Card className="flex w-full flex-col gap-2">
+				<CardHeader className="flex justify-between">
+					<CardTitle className="text-2xl font-bold">Actividades Diarias</CardTitle>
 					<Link href={`/dashboard/libro-de-obras/${id}/actividades-diarias`}>
 						<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 							<span className="hidden lg:block">Agregar</span>
 							<Plus />
 						</Button>
 					</Link>
-				</div>
+				</CardHeader>
 
-				<Suspense fallback={<DailyActivitiesTableSkeleton />}>
-					<DailyActivitiesTable workBookId={id} />
-				</Suspense>
-			</div>
+				<CardContent>
+					<Suspense fallback={<DailyActivitiesTableSkeleton />}>
+						<DailyActivitiesTable workBookId={id} />
+					</Suspense>
+				</CardContent>
+			</Card>
 
-			<div className="mb-14 flex flex-col gap-2">
-				<div className="flex justify-between">
-					<h2 className="text-2xl font-bold">Actividades Adicionales</h2>
+			<Card className="flex w-full flex-col gap-2">
+				<CardHeader className="flex justify-between">
+					<CardTitle className="text-2xl font-bold">Actividades Adicionales</CardTitle>
 					<Link href={`/dashboard/libro-de-obras/${id}/actividades-adicionales`}>
 						<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 							<span className="hidden lg:block">Agregar</span>
 							<Plus />
 						</Button>
 					</Link>
-				</div>
+				</CardHeader>
 
-				<Suspense fallback={<AdditionalActivitiesTableSkeleton />}>
-					<AdditionalActivitiesTable workBookId={id} />
-				</Suspense>
-			</div>
+				<CardContent>
+					<Suspense fallback={<AdditionalActivitiesTableSkeleton />}>
+						<AdditionalActivitiesTable workBookId={id} />
+					</Suspense>
+				</CardContent>
+			</Card>
 
 			{isAdmin && (
-				<div className="mb-14 flex flex-col gap-2">
-					<div className="flex justify-between">
-						<h2 className="text-2xl font-bold">Inspecciones OTC</h2>
+				<Card className="flex w-full flex-col gap-2">
+					<CardHeader className="flex justify-between">
+						<CardTitle className="text-2xl font-bold">Inspecciones OTC</CardTitle>
 						<Link href={`/dashboard/libro-de-obras/${id}/inspector-otc`}>
 							<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 								<span className="hidden lg:block">Agregar</span>
 								<Plus />
 							</Button>
 						</Link>
-					</div>
+					</CardHeader>
 
-					<Suspense fallback={<OtcInspectionsTableSkeleton />}>
-						<OtcInspectionsTable workBookId={id} />
-					</Suspense>
-				</div>
+					<CardContent>
+						<Suspense fallback={<OtcInspectionsTableSkeleton />}>
+							<OtcInspectionsTable workBookId={id} />
+						</Suspense>
+					</CardContent>
+				</Card>
 			)}
 
-			<div className="mb-14 flex flex-col gap-2">
-				<div className="flex justify-between">
-					<h2 className="text-2xl font-bold">Áreas de Prevención</h2>
+			<Card className="flex w-full flex-col gap-2">
+				<CardHeader className="flex justify-between">
+					<CardTitle className="text-2xl font-bold">Áreas de Prevención</CardTitle>
 					<Link href={`/dashboard/libro-de-obras/${id}/prevencion`}>
 						<Button size={"lg"} className="bg-feature hover:bg-feature hover:brightness-90">
 							<span className="hidden lg:block">Agregar</span>
 							<Plus />
 						</Button>
 					</Link>
-				</div>
+				</CardHeader>
 
-				<Suspense fallback={<PreventionAreasTableSkeleton />}>
-					<PreventionAreasTable workBookId={id} />
-				</Suspense>
-			</div>
+				<CardContent>
+					<Suspense fallback={<PreventionAreasTableSkeleton />}>
+						<PreventionAreasTable workBookId={id} />
+					</Suspense>
+				</CardContent>
+			</Card>
 		</>
 	)
 }

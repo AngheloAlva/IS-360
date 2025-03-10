@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/form"
 
 import type { z } from "zod"
-import { USER_ROLES } from "@/lib/consts/user-roles"
 
 export default function RegisterForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -47,7 +46,6 @@ export default function RegisterForm(): React.ReactElement {
 				password: values.password,
 				name: values.name,
 				rut: values.rut,
-				role: USER_ROLES.PARTNER_COMPANY,
 			},
 			{
 				onRequest: () => {

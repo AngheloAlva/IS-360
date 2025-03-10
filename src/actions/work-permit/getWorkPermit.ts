@@ -43,6 +43,11 @@ export const getWorkPermits = async (userId: string, limit: number = 10, page: n
 			},
 			include: {
 				participants: true,
+				otNumber: {
+					select: {
+						otNumber: true,
+					},
+				},
 			},
 			take: limit,
 			skip: offset,

@@ -11,6 +11,6 @@ export function useAuthorization(session: Session) {
 		isAdmin,
 		isUser,
 		canAccessAdminRoutes: isAdmin,
-		canAccessUserRoutes: true,
+		canAccessUserRoutes: isUser,
 	}
 }
