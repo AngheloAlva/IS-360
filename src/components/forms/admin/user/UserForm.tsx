@@ -7,6 +7,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { userSchema, type UserSchema } from "@/lib/form-schemas/admin/user/user.schema"
+import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { UserRoleOptions } from "@/lib/consts/user-roles"
 import { formatRut } from "@/utils/formatRut"
 
@@ -42,6 +43,8 @@ export default function UserForm(): React.ReactElement {
 			name: "",
 			email: "",
 			role: "USER",
+			internalRole: "NONE",
+			area: null,
 		},
 	})
 
@@ -58,6 +61,9 @@ export default function UserForm(): React.ReactElement {
 				role: values.role,
 				data: {
 					rut: values.rut,
+					role: values.role,
+					internalRole: values.role === "PARTNER_COMPANY" ? "NONE" : values.internalRole,
+					area: values.role === "PARTNER_COMPANY" ? null : values.area,
 				},
 			})
 
@@ -162,11 +168,11 @@ export default function UserForm(): React.ReactElement {
 					name="role"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Mutualidad</FormLabel>
+							<FormLabel>Rol</FormLabel>
 							<Select onValueChange={field.onChange} defaultValue={field.value}>
 								<FormControl>
 									<SelectTrigger className="border-gray-200">
-										<SelectValue placeholder="Seleccione una mutualidad" />
+										<SelectValue placeholder="Seleccione un rol" />
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent className="text-neutral-700">
@@ -181,6 +187,68 @@ export default function UserForm(): React.ReactElement {
 						</FormItem>
 					)}
 				/>
+
+				{form.watch("role") !== "PARTNER_COMPANY" && (
+					<>
+						<FormField
+							control={form.control}
+							name="internalRole"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Rol Interno</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<FormControl>
+											<SelectTrigger className="border-gray-200">
+												<SelectValue placeholder="Seleccione un rol interno" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent className="text-neutral-700">
+											{InternalRoleOptions.map((role) => (
+												<SelectItem key={role.value} value={role.value}>
+													{role.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="area"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Área</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+										<FormControl>
+											<SelectTrigger className="border-gray-200">
+												<SelectValue placeholder="Seleccione un área" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent className="text-neutral-700">
+											<SelectItem value="OPERATIONS">Operaciones</SelectItem>
+											<SelectItem value="INSTRUCTIONS">Instructivos</SelectItem>
+											<SelectItem value="INTEGRITY_AND_MAINTENANCE">
+												Integridad y Mantención
+											</SelectItem>
+											<SelectItem value="ENVIRONMENT">Medio Ambiente</SelectItem>
+											<SelectItem value="RISK_PREVENTION">Prevención de Riesgos</SelectItem>
+											<SelectItem value="QUALITY_AND_PROFESSIONAL_EXCELLENCE">
+												Calidad y Excelencia Profesional
+											</SelectItem>
+											<SelectItem value="HSEQ">HSEQ</SelectItem>
+											<SelectItem value="LEGAL">Jurídica</SelectItem>
+											<SelectItem value="COMMUNITIES">Comunidades</SelectItem>
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
 
 				<Button className="mt-4 md:col-span-2" type="submit" disabled={loading}>
 					{loading ? (

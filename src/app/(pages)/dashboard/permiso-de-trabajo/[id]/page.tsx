@@ -5,12 +5,12 @@ import { useEffect, useState } from "react"
 import { getWorkPermit } from "@/actions/work-permit/getWorkPermit"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import BackButton from "@/components/shared/BackButton"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 
-import type { WorkPermit, WorkOrder, Personnel } from "@prisma/client"
-import BackButton from "@/components/shared/BackButton"
+import type { WorkPermit, WorkOrder, Personnel, User } from "@prisma/client"
 
 interface WorkPermitDetailsProps {
 	params: Promise<{
@@ -39,7 +39,13 @@ const getWorkPermitStatus = (workPermit: WorkPermitDetails) => {
 }
 
 export default function WorkPermitDetails({ params }: WorkPermitDetailsProps) {
-	const [workPermit, setWorkPermit] = useState<WorkPermitDetails | undefined | null>(null)
+	const [workPermit, setWorkPermit] = useState<
+		| (WorkPermitDetails & {
+				preventionOfficerUser: User
+		  })
+		| undefined
+		| null
+	>(null)
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
@@ -305,7 +311,7 @@ export default function WorkPermitDetails({ params }: WorkPermitDetailsProps) {
 							</div>
 							<div>
 								<p className="text-muted-foreground text-sm">Prevencionista</p>
-								<p className="font-medium">{workPermit.preventionOfficer}</p>
+								<p className="font-medium">{workPermit.preventionOfficerUser.name}</p>
 							</div>
 							{workPermit.whoReceives && (
 								<div>

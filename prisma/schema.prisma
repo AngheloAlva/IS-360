@@ -15,6 +15,17 @@ enum USER_ROLE {
   PARTNER_COMPANY
 }
 
+enum OTC_INTERNAL_ROLE {
+  GENERAL_SUPERVISOR
+  AREA_SUPERVISOR
+  PREVENTION_OFFICER
+  OPERATIONS_MANAGER
+  MAINTENANCE_SUPERVISOR
+  ENVIRONMENTAL_SUPERVISOR
+  QUALITY_SUPERVISOR
+  NONE
+}
+
 enum AREAS {
   OPERATIONS // Operaciones
   INSTRUCTIONS // Instructivos
@@ -36,6 +47,8 @@ model User {
   createdAt     DateTime
   updatedAt     DateTime
   role          USER_ROLE @default(PARTNER_COMPANY)
+  internalRole  OTC_INTERNAL_ROLE @default(NONE)
+  area          AREAS?
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
@@ -50,6 +63,7 @@ model User {
   files         File[]
   workOrders    WorkOrder[]
   safetyTalks   UserSafetyTalk[]
+  workPermitsAsPreventionOfficer WorkPermit[] @relation("PreventionOfficer")
 
   @@unique([email])
   @@unique([rut])
@@ -316,6 +330,75 @@ model Attachment {
   @@map("attachment")
 }
 
+enum WORK_PERMIT_STATUS {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+// enum MAINTENANCE_LOCATION_TYPE {
+//   TRM // Terminal Recepción Marítimo
+//   PRS // Planta Reguladora de Presión
+//   SDV // Válvula de Seccionamiento
+//   PIPELINE_16 // Ducto 16"
+//   PIPELINE_30 // Ducto 30"
+// }
+
+// model MaintenanceLocation {
+//   id          String @id @default(cuid())
+//   name        String
+//   type        MAINTENANCE_LOCATION_TYPE
+//   code        String // Ejemplo: "SDV-11", "SDV-12", etc.
+//   description String?
+//   active      Boolean @default(true)
+  
+//   // Para ductos, relacionar los puntos de inicio y fin
+//   startPoint  MaintenanceLocation? @relation("PipelineStartPoints", fields: [startPointId], references: [id])
+//   startPointId String?
+//   endPoint    MaintenanceLocation? @relation("PipelineEndPoints", fields: [endPointId], references: [id])
+//   endPointId  String?
+  
+//   // Relaciones inversas para ductos
+//   pipelinesAsStart MaintenanceLocation[] @relation("PipelineStartPoints")
+//   pipelinesAsEnd   MaintenanceLocation[] @relation("PipelineEndPoints")
+  
+//   // Relación con WorkPermit
+//   workPermits WorkPermit[]
+  
+//   // Relación con equipos
+//   equipments MaintenanceEquipment[]
+  
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+  
+//   @@unique([type, code])
+//   @@map("maintenance_location")
+// }
+
+// model MaintenanceEquipment {
+//   id          String @id @default(cuid())
+//   name        String
+//   code        String // Código SAP/MP10
+//   description String?
+//   type        String // Tipo de equipo
+//   status      String // Estado del equipo
+//   active      Boolean @default(true)
+  
+//   // Relación con ubicación
+//   location    MaintenanceLocation @relation(fields: [locationId], references: [id])
+//   locationId  String
+  
+//   // Relación con WorkPermit
+//   workPermits WorkPermit[]
+  
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+  
+//   @@unique([code])
+//   @@map("maintenance_equipment")
+// }
+
 model WorkPermit {
   id                             String @id @default(cuid())
 
@@ -325,6 +408,7 @@ model WorkPermit {
   mutuality                      String
   otherMutuality                 String?
   initDate                       DateTime
+  endDate                        DateTime?
   hour                           String
   workersNumber                  Int
   workDescription                String
@@ -345,13 +429,21 @@ model WorkPermit {
   wasteDisposalLocation          String?
   whoDeliversWorkAreaOp          String
   workerExecutor                 String
-  preventionOfficer              String
+  preventionOfficer              String    @map("prevention_officer_id")
+  preventionOfficerUser          User      @relation("PreventionOfficer", fields: [preventionOfficer], references: [id])
   whoReceives                    String?
   cleanAndTidyWorkArea           Boolean?
   workCompleted                  Boolean?
   observations                   String?
   additionalObservations         String?
   acceptTerms                    Boolean  @default(false)
+  status                         WORK_PERMIT_STATUS @default(ACTIVE)
+
+  // Nuevas relaciones para ubicación y equipos
+  // location                       MaintenanceLocation @relation(fields: [locationId], references: [id])
+  // locationId                     String
+  // equipment                      MaintenanceEquipment? @relation(fields: [equipmentId], references: [id])
+  // equipmentId                    String?
 
   createdAt                      DateTime @default(now())
   updatedAt                      DateTime @updatedAt
@@ -363,6 +455,9 @@ model WorkPermit {
   participants                   Personnel[]
 
   @@map("work_permit")
+  @@index([preventionOfficer])
+  // @@index([locationId])
+  // @@index([equipmentId])
 }
 
 enum Area {

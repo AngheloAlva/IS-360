@@ -1,9 +1,13 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown } from "lucide-react"
 import { format } from "date-fns"
 
-import { ArrowUpDown } from "lucide-react"
+import { InternalRoleOptions } from "@/lib/consts/internal-roles"
+import { UserRoleOptions } from "@/lib/consts/user-roles"
+
+import { Badge } from "@/components/ui/badge"
 
 import type { UserWithRole } from "better-auth/plugins"
 
@@ -47,6 +51,49 @@ export const columns: ColumnDef<UserWithRole>[] = [
 					<ArrowUpDown className="ml-2 h-4 w-4" />
 				</div>
 			)
+		},
+		cell: ({ row }) => {
+			const role = row.getValue("role") as string
+			const roleLabel = UserRoleOptions.find((r) => r.value === role)?.label || role
+			return <Badge variant={role === "PARTNER_COMPANY" ? "outline" : "default"}>{roleLabel}</Badge>
+		},
+	},
+	{
+		accessorKey: "internalRole",
+		header: "Rol Interno",
+		cell: ({ row }) => {
+			const role = row.getValue("role") as string
+			if (role === "PARTNER_COMPANY") return null
+
+			const internalRole = row.getValue("internalRole") as string
+			const roleLabel =
+				InternalRoleOptions.find((r) => r.value === internalRole)?.label || internalRole
+			return roleLabel === "Ninguno" ? null : <Badge variant="secondary">{roleLabel}</Badge>
+		},
+	},
+	{
+		accessorKey: "area",
+		header: "Área",
+		cell: ({ row }) => {
+			const role = row.getValue("role") as string
+			if (role === "PARTNER_COMPANY") return null
+
+			const area = row.getValue("area") as string
+			if (!area) return null
+
+			const areaLabels: Record<string, string> = {
+				OPERATIONS: "Operaciones",
+				INSTRUCTIONS: "Instructivos",
+				INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
+				ENVIRONMENT: "Medio Ambiente",
+				RISK_PREVENTION: "Prevención de Riesgos",
+				QUALITY_AND_PROFESSIONAL_EXCELLENCE: "Calidad y Excelencia Profesional",
+				HSEQ: "HSEQ",
+				LEGAL: "Jurídica",
+				COMMUNITIES: "Comunidades",
+			}
+
+			return <Badge variant="outline">{areaLabels[area] || area}</Badge>
 		},
 	},
 	{

@@ -52,7 +52,7 @@ export const workPermitSchema = z.object({
 		.min(2, { message: "El nombre del trabajador debe tener al menos 2 caracteres" }),
 	preventionOfficer: z
 		.string()
-		.min(2, { message: "El nombre del prevencionista debe tener al menos 2 caracteres" }),
+		.nonempty({ message: "Debe seleccionar un prevencionista" }),
 	whoReceives: z.string().optional(),
 	cleanAndTidyWorkArea: z.boolean(),
 	workCompleted: z.boolean(),

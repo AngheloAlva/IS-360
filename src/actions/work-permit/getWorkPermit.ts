@@ -11,6 +11,7 @@ export const getWorkPermit = async (workPermitId: string) => {
 			include: {
 				participants: true,
 				otNumber: true,
+				preventionOfficerUser: true,
 			},
 		})
 
@@ -48,6 +49,7 @@ export const getWorkPermits = async (userId: string, limit: number = 10, page: n
 						otNumber: true,
 					},
 				},
+				preventionOfficerUser: true,
 			},
 			take: limit,
 			skip: offset,

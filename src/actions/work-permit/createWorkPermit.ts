@@ -14,7 +14,14 @@ export const createWorkPermit = async (values: z.infer<typeof workPermitSchema>)
 				...rest,
 				workersNumber: +rest.workersNumber,
 				otherMutuality: rest.otherMutuality || undefined,
+				additionalObservations: rest.additionalObservations || undefined,
 				activityDetails: rest.activityDetails.map((activity) => activity.activity),
+				preventionOfficer: undefined,
+				preventionOfficerUser: {
+					connect: {
+						id: userId,
+					},
+				},
 				participants: {
 					create: rest.participants.map((participant) => ({
 						...participant,

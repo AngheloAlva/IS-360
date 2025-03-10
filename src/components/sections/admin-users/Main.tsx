@@ -28,6 +28,8 @@ export default function MainAdminUsers({ page }: { page: number }): React.ReactE
 				},
 			})
 
+			console.log(data)
+
 			if (error) {
 				toast("Error al cargar los usuarios", {
 					description: error.message,
