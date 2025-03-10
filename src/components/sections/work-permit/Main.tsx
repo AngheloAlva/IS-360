@@ -11,7 +11,7 @@ import { toast } from "sonner"
 import { DataTable } from "./DataTable"
 import { columns } from "./columns"
 
-import type { WorkPermit } from "@prisma/client"
+import type { Personnel, WorkPermit } from "@prisma/client"
 
 export default function MainWorkBook({
 	page,
@@ -21,7 +21,9 @@ export default function MainWorkBook({
 	userId: string
 }): React.ReactElement {
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [workPermits, setWorkPermits] = useState<WorkPermit[]>([])
+	const [workPermits, setWorkPermits] = useState<
+		Array<WorkPermit & { participants: Personnel[]; otNumber: { otNumber: string } }>
+	>([])
 
 	const { state } = useSidebar()
 
