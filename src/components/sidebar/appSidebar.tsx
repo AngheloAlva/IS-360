@@ -23,8 +23,8 @@ import type { Session } from "@/lib/auth"
 const data = {
 	navMain: [
 		{
-			name: "Video de Seguridad",
-			url: "/dashboard/video-de-seguridad",
+			name: "Seguridad",
+			url: "/dashboard/charlas-de-seguridad",
 			icon: MonitorPlay,
 		},
 		{

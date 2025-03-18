@@ -5,10 +5,10 @@ import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import Link from "next/link"
 
-import type { WorkPermit, Personnel, WorkOrder } from "@prisma/client"
+import type { WorkPermit, WorkOrder, User } from "@prisma/client"
 
 export const columns: ColumnDef<
-	WorkPermit & { participants: Personnel[]; otNumber: { otNumber: string } }
+	WorkPermit & { participants: User[]; otNumber: { otNumber: string } }
 >[] = [
 	{
 		accessorKey: "id",
@@ -84,7 +84,7 @@ export const columns: ColumnDef<
 		accessorKey: "participants",
 		header: "Participantes",
 		cell: ({ row }) => {
-			const participants: Personnel[] = row.getValue("participants")
+			const participants: User[] = row.getValue("participants")
 			return (
 				<div>
 					{participants.length > 1

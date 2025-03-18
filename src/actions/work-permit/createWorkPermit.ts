@@ -22,12 +22,7 @@ export const createWorkPermit = async (values: z.infer<typeof workPermitSchema>)
 						id: userId,
 					},
 				},
-				participants: {
-					create: rest.participants.map((participant) => ({
-						...participant,
-						number: +participant.number,
-					})),
-				},
+				participants: undefined,
 				otNumber: {
 					create: {
 						otNumber: rest.otNumber,

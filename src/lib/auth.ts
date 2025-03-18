@@ -43,6 +43,11 @@ export const auth = betterAuth({
 				input: true,
 				defaultValue: "PARTNER_COMPANY",
 			},
+			companyId: {
+				type: "string",
+				required: false,
+				input: true,
+			},
 		},
 	},
 	plugins: [

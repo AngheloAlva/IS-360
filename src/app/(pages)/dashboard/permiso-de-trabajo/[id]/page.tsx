@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 
-import type { WorkPermit, WorkOrder, Personnel, User } from "@prisma/client"
+import type { WorkPermit, WorkOrder, User } from "@prisma/client"
 
 interface WorkPermitDetailsProps {
 	params: Promise<{
@@ -19,7 +19,7 @@ interface WorkPermitDetailsProps {
 }
 
 type WorkPermitDetails = WorkPermit & {
-	participants: Personnel[]
+	participants: User[]
 	otNumber: WorkOrder
 }
 
@@ -359,11 +359,10 @@ export default function WorkPermitDetails({ params }: WorkPermitDetailsProps) {
 							{workPermit.participants.map((participant) => (
 								<div key={participant.id} className="w-full space-y-2 rounded-lg border p-3">
 									<div className="flex w-full items-center justify-between font-medium">
-										<p>{participant.fullName}</p>
-										{participant.number}
+										<p>{participant.name}</p>
 									</div>
 									<p className="text-muted-foreground text-sm">RUT: {participant.rut}</p>
-									<p className="text-muted-foreground text-sm">Empresa: {participant.company}</p>
+									{/* <p className="text-muted-foreground text-sm">Empresa: {participant.company}</p> */}
 								</div>
 							))}
 						</div>

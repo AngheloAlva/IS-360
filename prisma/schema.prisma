@@ -12,6 +12,7 @@ enum USER_ROLE {
   SUPERADMIN
   ADMIN
   USER
+  OPERATOR
   PARTNER_COMPANY
 }
 
@@ -46,24 +47,35 @@ model User {
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
-  role          USER_ROLE @default(PARTNER_COMPANY)
+  role          USER_ROLE         @default(PARTNER_COMPANY)
   internalRole  OTC_INTERNAL_ROLE @default(NONE)
   area          AREAS?
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
   rut           String
-
+  company       Company? @relation(fields: [companyId], references: [id])
+  companyId     String?
+  
   sessions      Session[]
   accounts      Account[]
-  workBooks     WorkBook[]
-  workTrackers  WorkTracker[]
-  workPermits   WorkPermit[]
-  folders       Folder[]
+
   files         File[]
+  folders       Folder[]
+  workBooks     WorkBook[]
   workOrders    WorkOrder[]
+  workTrackers  WorkTracker[]
   safetyTalks   UserSafetyTalk[]
-  workPermitsAsPreventionOfficer WorkPermit[] @relation("PreventionOfficer")
+  workApplications WorkApplication[]
+
+  assignedEntries                WorkBookEntry[] @relation("AssignedUsers")
+  reportedInEntries              WorkBookEntry[] @relation("ReportedUsers")
+  createdEntries                 WorkBookEntry[] @relation("WorkBookEntryCreator")
+  signedEntries                  WorkBookEntry[] @relation("WorkBookEntrySigner")
+
+  workPermitsAsUser              WorkPermit[]    @relation("WorkPermitUser")
+  workPermitsAsParticipant       WorkPermit[]    @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer WorkPermit[]    @relation("PreventionOfficer")
 
   @@unique([email])
   @@unique([rut])
@@ -105,6 +117,17 @@ model Account {
   @@map("account")
 }
 
+model Company {
+  id   String @id @default(cuid())
+
+  name String
+  rut  String
+
+  users User[]
+
+  @@map("company")
+}
+
 model Verification {
   id         String    @id
   identifier String
@@ -141,12 +164,51 @@ model WorkOrder {
   responsible        User @relation(fields: [responsibleId], references: [id])
   responsibleId      String
   workBooks          WorkBook[]
-  workTrackers       WorkTracker[]
   workPermits        WorkPermit[]
+  workTrackers       WorkTracker[]
 
   @@unique([id])
   @@unique([otNumber])
   @@map("work_order")
+}
+
+enum WORK_APPLICATION_STATUS {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+model WorkApplication {
+  id                 String  @id @default(cuid())
+
+  description        String
+  location           String
+  status             WORK_APPLICATION_STATUS @default(PENDING)
+  criticality        String
+
+  attachments        Attachment[]
+  responsible        User @relation(fields: [responsibleId], references: [id])
+  responsibleId      String
+
+  @@unique([id])
+  @@map("work_application")
+}
+
+enum ENTRY_TYPE {
+  DAILY_ACTIVITY
+  ADDITIONAL_ACTIVITY
+  PREVENTION_AREA
+  OTC_INSPECTION
+  COMMENT
+  USER_NOTE
+}
+
+enum NOTE_STATUS {
+  PENDING
+  ACKNOWLEDGED
+  RESOLVED
 }
 
 model WorkBook {
@@ -172,119 +234,68 @@ model WorkBook {
   otNumberId           String
   user                 User @relation(fields: [userId], references: [id])
   userId               String
-  dailyActivities      DailyActivity[]
-  aditionalActivities  AditionalActivity[]
-  otcInspections       OtcInspection[]
-  preventionAreas      PreventionArea[]
+  entries              WorkBookEntry[]
 
   @@unique([id])
   @@map("work_book")
 }
 
-model DailyActivity {
-  id                 String  @id @default(cuid())
-
+model WorkBookEntry {
+  id                 String   @id @default(cuid())
+  entryType          ENTRY_TYPE
+  isFavorite         Boolean  @default(false)
+  hasAttachments     Boolean  @default(false)
+  executionDate      DateTime @default(now())
+  activityName       String?
+  activityStartTime  String?
+  activityEndTime    String?
   comments           String?
-  executionDate      DateTime
-  activityStartTime  String
-  activityEndTime    String
-  activityName       String
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  workBook           WorkBook @relation(fields: [workBookId], references: [id])
-  workBookId         String
-  personnel          Personnel[]
-  attachments        Attachment[]
-
-  @@unique([id])
-  @@map("daily_activity")
-}
-
-model Personnel {
-  id                 String  @id @default(cuid())
-
-  fullName           String
-  position           String?
-  rut                String?
-  phone              String?
-  email              String?
-  number             Int?
-  company            String?
-
-
-  dailyActivity      DailyActivity? @relation(fields: [dailyActivityId], references: [id])
-  dailyActivityId    String?
-  workPermit         WorkPermit? @relation(fields: [workPermitId], references: [id])
-  workPermitId       String?
-
-  @@unique([id])
-  @@map("personnel")
-}
-
-model AditionalActivity {
-  id                 String  @id @default(cuid())
-
-  comments           String?
-  executionDate      DateTime
-  activityStartTime  String 
-  activityEndTime    String
-  activityName       String
-
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  workBook           WorkBook @relation(fields: [workBookId], references: [id])
-  workBookId         String
-  attachments        Attachment[]
-
-  @@unique([id])
-  @@map("aditional_activity")
-}
-
-model OtcInspection {
-  id                  String  @id @default(cuid())
-
-  inspectorName       String
-  dateOfExecution     DateTime
-  activityStartTime   String
-  activityEndTime     String
-  supervisionComments String
-  safetyObservations  String
+  // Campos de OtcInspection
+  supervisionComments String?
+  safetyObservations  String?
   nonConformities     String?
-  initialDate         DateTime
+  inspectorName       String?
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  workBook            WorkBook @relation(fields: [workBookId], references: [id])
-  workBookId          String
-  attachments         Attachment[]
-
-  @@unique([id])
-  @@map("otc_inspection")
-}
-
-model PreventionArea {
-  id                 String  @id @default(cuid())
-
-  name               String
+  // Campos de PreventionArea
   recommendations    String?
   others             String?
-  comments           String?
-  initialDate        DateTime
-  initialTime        String
+  preventionName     String?
 
+  // Campos para notas de usuario
+  noteStatus         NOTE_STATUS? @default(PENDING)
+  notificationSent   Boolean      @default(false)
+  acknowledgedAt     DateTime?
+  resolvedAt         DateTime?
+  
   createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
+  createdBy          User     @relation("WorkBookEntryCreator", fields: [createdById], references: [id])
+  createdById        String
+  
+  // En caso de que sea un comentario, el usuario que lo firma
+  signedAt           DateTime?
+  signedBy           User?    @relation("WorkBookEntrySigner", fields: [signedById], references: [id])
+  signedById         String?
+  
   workBook           WorkBook @relation(fields: [workBookId], references: [id])
   workBookId         String
 
+  // Relaciones con usuarios asignados y reportados
+  assignedUsers      User[]   @relation(name: "AssignedUsers")
+  reportedUsers      User[]   @relation(name: "ReportedUsers")
+  
+  // For comments/references to other entries
+  referencedEntry    WorkBookEntry? @relation("EntryReferences", fields: [referencedEntryId], references: [id])
+  referencedEntryId  String?
+  referencedBy       WorkBookEntry[] @relation("EntryReferences")
+  
+  attachments        Attachment[]
+
   @@unique([id])
-  @@map("prevention_area")
+  @@index([workBookId, createdAt]) // For efficient chronological listing
+  @@map("work_book_entry")
 }
+
 
 model WorkTracker {
   id                 String  @id @default(cuid())
@@ -318,14 +329,12 @@ model Attachment {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  aditionalActivity   AditionalActivity @relation(fields: [aditionalActivityId], references: [id])
-  aditionalActivityId String
-  dailyActivity       DailyActivity     @relation(fields: [dailyActivityId], references: [id])
-  dailyActivityId     String
-  otcInspection       OtcInspection     @relation(fields: [otcInspectionId], references: [id])
-  otcInspectionId     String
-  workTracker         WorkTracker       @relation(fields: [workTrackerId], references: [id])
-  workTrackerId       String
+  workApplication    WorkApplication? @relation(fields: [workApplicationId], references: [id])
+  workApplicationId  String?
+  workBookEntry      WorkBookEntry? @relation(fields: [workBookEntryId], references: [id])
+  workBookEntryId    String?
+  workTracker        WorkTracker?  @relation(fields: [workTrackerId], references: [id])
+  workTrackerId      String?
 
   @@map("attachment")
 }
@@ -336,68 +345,6 @@ enum WORK_PERMIT_STATUS {
   CANCELLED
   EXPIRED
 }
-
-// enum MAINTENANCE_LOCATION_TYPE {
-//   TRM // Terminal Recepción Marítimo
-//   PRS // Planta Reguladora de Presión
-//   SDV // Válvula de Seccionamiento
-//   PIPELINE_16 // Ducto 16"
-//   PIPELINE_30 // Ducto 30"
-// }
-
-// model MaintenanceLocation {
-//   id          String @id @default(cuid())
-//   name        String
-//   type        MAINTENANCE_LOCATION_TYPE
-//   code        String // Ejemplo: "SDV-11", "SDV-12", etc.
-//   description String?
-//   active      Boolean @default(true)
-  
-//   // Para ductos, relacionar los puntos de inicio y fin
-//   startPoint  MaintenanceLocation? @relation("PipelineStartPoints", fields: [startPointId], references: [id])
-//   startPointId String?
-//   endPoint    MaintenanceLocation? @relation("PipelineEndPoints", fields: [endPointId], references: [id])
-//   endPointId  String?
-  
-//   // Relaciones inversas para ductos
-//   pipelinesAsStart MaintenanceLocation[] @relation("PipelineStartPoints")
-//   pipelinesAsEnd   MaintenanceLocation[] @relation("PipelineEndPoints")
-  
-//   // Relación con WorkPermit
-//   workPermits WorkPermit[]
-  
-//   // Relación con equipos
-//   equipments MaintenanceEquipment[]
-  
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-  
-//   @@unique([type, code])
-//   @@map("maintenance_location")
-// }
-
-// model MaintenanceEquipment {
-//   id          String @id @default(cuid())
-//   name        String
-//   code        String // Código SAP/MP10
-//   description String?
-//   type        String // Tipo de equipo
-//   status      String // Estado del equipo
-//   active      Boolean @default(true)
-  
-//   // Relación con ubicación
-//   location    MaintenanceLocation @relation(fields: [locationId], references: [id])
-//   locationId  String
-  
-//   // Relación con WorkPermit
-//   workPermits WorkPermit[]
-  
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-  
-//   @@unique([code])
-//   @@map("maintenance_equipment")
-// }
 
 model WorkPermit {
   id                             String @id @default(cuid())
@@ -429,7 +376,7 @@ model WorkPermit {
   wasteDisposalLocation          String?
   whoDeliversWorkAreaOp          String
   workerExecutor                 String
-  preventionOfficer              String    @map("prevention_officer_id")
+  preventionOfficer              String
   preventionOfficerUser          User      @relation("PreventionOfficer", fields: [preventionOfficer], references: [id])
   whoReceives                    String?
   cleanAndTidyWorkArea           Boolean?
@@ -439,37 +386,29 @@ model WorkPermit {
   acceptTerms                    Boolean  @default(false)
   status                         WORK_PERMIT_STATUS @default(ACTIVE)
 
-  // Nuevas relaciones para ubicación y equipos
-  // location                       MaintenanceLocation @relation(fields: [locationId], references: [id])
-  // locationId                     String
-  // equipment                      MaintenanceEquipment? @relation(fields: [equipmentId], references: [id])
-  // equipmentId                    String?
-
   createdAt                      DateTime @default(now())
   updatedAt                      DateTime @updatedAt
 
   otNumber                       WorkOrder @relation(fields: [otNumberId], references: [id])
   otNumberId                     String
-  user                           User     @relation(fields: [userId], references: [id])
+  user                           User     @relation("WorkPermitUser", fields: [userId], references: [id])
   userId                         String
-  participants                   Personnel[]
+  participants                   User[]   @relation("WorkPermitParticipants")
 
   @@map("work_permit")
   @@index([preventionOfficer])
-  // @@index([locationId])
-  // @@index([equipmentId])
 }
 
 enum Area {
-  OPERACIONES
-  INSTRUCTIVOS
-  INTEGRIDAD_Y_MANTENCION
-  MEDIO_AMBIENTE
-  PREVENCION_RIESGOS
-  CALIDAD_Y_EXCELENCIA_PROFESIONAL
   HSEQ
   JURIDICA
   COMUNIDADES
+  OPERACIONES
+  INSTRUCTIVOS
+  MEDIO_AMBIENTE
+  PREVENCION_RIESGOS
+  INTEGRIDAD_Y_MANTENCION
+  CALIDAD_Y_EXCELENCIA_PROFESIONAL
 }
 
 model Folder {

@@ -1,24 +1,33 @@
 "use client"
 
+import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { CalendarIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { CalendarIcon } from "lucide-react"
-import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { toast } from "sonner"
 import { z } from "zod"
 
-import { createAdditionalActivity } from "@/actions/additional-activities/createAdditionalActivity"
-import { aditionalActivitySchema } from "@/lib/form-schemas/work-book/aditional-activity.schema"
+import { dailyActivitySchema } from "@/lib/form-schemas/work-book/daily-activity.schema"
+import { createActivity } from "@/actions/work-book-entries/createActivity"
+import { getUsersByCompanyId } from "@/actions/users/getUsers"
 import { cn } from "@/lib/utils"
-import { toast } from "sonner"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import { Textarea } from "@/components/ui/textarea"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+	Select,
+	SelectItem,
+	SelectValue,
+	SelectContent,
+	SelectTrigger,
+} from "@/components/ui/select"
 import {
 	Form,
 	FormItem,
@@ -28,27 +37,25 @@ import {
 	FormMessage,
 } from "@/components/ui/form"
 
-export default function AdditionalActivityForm({
+import type { ENTRY_TYPE, User } from "@prisma/client"
+import type { Session } from "@/lib/auth"
+
+export default function ActivityForm({
 	workBookId,
+	entryType,
+	session,
 }: {
+	entryType: ENTRY_TYPE
 	workBookId: string
+	session: Session
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
 
-	const router = useRouter()
+	const [loadingUsers, setLoadingUsers] = useState(false)
+	const [users, setUsers] = useState<User[]>([])
 
-	const form = useForm<z.infer<typeof aditionalActivitySchema>>({
-		resolver: zodResolver(aditionalActivitySchema),
-		defaultValues: {
-			workBookId,
-			comments: "",
-			activityName: "",
-			activityEndTime: "",
-			activityStartTime: "",
-			executionDate: new Date(),
-		},
-	})
+	const router = useRouter()
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files
@@ -59,34 +66,86 @@ export default function AdditionalActivityForm({
 		}
 	}
 
+	const form = useForm<z.infer<typeof dailyActivitySchema>>({
+		resolver: zodResolver(dailyActivitySchema),
+		defaultValues: {
+			activityEndTime: "",
+			activityName: "",
+			activityStartTime: "",
+			comments: "",
+			executionDate: new Date(),
+			personnel: [
+				{
+					userId: "",
+				},
+			],
+			workBookId,
+		},
+	})
+
+	const { fields, append, remove } = useFieldArray({
+		control: form.control,
+		name: "personnel",
+	})
+
 	useEffect(() => {
 		console.log(form.formState)
 		console.log(form.formState.errors)
 	}, [form.formState])
 
-	async function onSubmit(values: z.infer<typeof aditionalActivitySchema>) {
+	useEffect(() => {
+		const fetchUsers = async () => {
+			try {
+				setLoadingUsers(true)
+
+				const { data, ok } = await getUsersByCompanyId(session.user.companyId!)
+
+				if (!ok || !data) {
+					throw new Error("Error al cargar los usuarios")
+				}
+
+				setUsers(data)
+			} catch (error) {
+				console.error(error)
+				toast("Error al cargar los usuarios", {
+					description: "Ocurrió un error al intentar cargar los usuarios",
+					duration: 5000,
+				})
+			} finally {
+				setLoadingUsers(false)
+			}
+		}
+		void fetchUsers()
+	}, [session.user.companyId])
+
+	async function onSubmit(values: z.infer<typeof dailyActivitySchema>) {
 		try {
 			setLoading(true)
 
-			const { ok, message } = await createAdditionalActivity(values)
+			const { ok, message } = await createActivity({
+				values,
+				entryType,
+				userId: session.user.id,
+				// attachments: selectedFiles,
+			})
 
 			if (ok) {
-				toast("Actividad adicional creada", {
+				toast("Actividad creada", {
 					description: message,
 					duration: 5000,
 				})
 
 				router.push(`/dashboard/libro-de-obras/${workBookId}`)
 			} else {
-				toast("Error al crear la actividad adicional", {
+				toast("Error al crear la actividad", {
 					description: message,
 					duration: 5000,
 				})
 			}
 		} catch (error) {
 			console.error(error)
-			toast("Error al crear la actividad adicional", {
-				description: "Ocurrió un error al intentar crear la actividad adicional",
+			toast("Error al crear la actividad", {
+				description: "Ocurrió un error al intentar crear la actividad",
 				duration: 5000,
 			})
 		} finally {
@@ -98,7 +157,7 @@ export default function AdditionalActivityForm({
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className="mx-auto grid w-full max-w-screen-xl grid-cols-2 gap-4"
+				className="grid w-full max-w-screen-xl gap-4 md:grid-cols-2"
 			>
 				<FormField
 					control={form.control}
@@ -229,6 +288,66 @@ export default function AdditionalActivityForm({
 						</FormItem>
 					)}
 				/>
+
+				<div className="my-6 grid gap-4 border-y border-gray-200 py-4 md:col-span-2 md:grid-cols-2">
+					{fields.map((field, index) => (
+						<div key={field.id} className="grid grid-cols-1 gap-x-4">
+							<div className="flex items-center justify-between gap-2">
+								<h3 className="text-lg font-semibold text-gray-800">Personal #{index + 1}</h3>
+
+								<Button
+									type="button"
+									onClick={() => remove(index)}
+									className="mt-2 md:col-span-2"
+									variant="outline"
+								>
+									Eliminar Personal #{index + 1}
+								</Button>
+							</div>
+
+							{loadingUsers ? (
+								<Skeleton className="h-9 w-full rounded-md" />
+							) : (
+								<FormField
+									control={form.control}
+									name={`personnel.${index}.userId`}
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className="text-gray-700">Nombre del Personal</FormLabel>
+
+											<Select onValueChange={field.onChange} defaultValue={field.value}>
+												<FormControl>
+													<SelectTrigger className="border-gray-200">
+														<SelectValue placeholder="Seleccione al personal" />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent className="text-neutral-700">
+													{users.map((user) => (
+														<SelectItem key={user.id} value={user.id}>
+															{user.name}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							)}
+						</div>
+					))}
+
+					<Button
+						size={"lg"}
+						type="button"
+						variant={"secondary"}
+						onClick={() => append({ userId: "" })}
+						className="mt-10 w-full md:col-span-2"
+					>
+						Añadir nuevo Personal
+					</Button>
+				</div>
 
 				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (

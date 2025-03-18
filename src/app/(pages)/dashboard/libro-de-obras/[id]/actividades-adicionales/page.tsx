@@ -1,4 +1,9 @@
-import AdditionalActivityForm from "@/components/forms/work-book/AdditionalActivityForm"
+import { notFound } from "next/navigation"
+import { headers } from "next/headers"
+
+import { auth } from "@/lib/auth"
+
+import ActivityForm from "@/components/forms/work-book/ActivityForm"
 import BackButton from "@/components/shared/BackButton"
 
 export default async function CreateAdditionalActivityPage({
@@ -8,6 +13,14 @@ export default async function CreateAdditionalActivityPage({
 }) {
 	const { id } = await params
 
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.session) {
+		return notFound()
+	}
+
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-screen-xl items-center justify-start gap-2">
@@ -15,7 +28,7 @@ export default async function CreateAdditionalActivityPage({
 				<h1 className="text-2xl font-bold text-gray-800">Agregar Actividad Adicional</h1>
 			</div>
 
-			<AdditionalActivityForm workBookId={id} />
+			<ActivityForm entryType="ADDITIONAL_ACTIVITY" workBookId={id} session={session} />
 		</>
 	)
 }

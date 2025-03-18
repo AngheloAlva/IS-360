@@ -1,4 +1,4 @@
-import { getWorkBooksStats } from "@/actions/work-book/admin/getWorkBooksStats"
+import { getWorkBooksStats } from "@/actions/work-books/admin/getWorkBooksStats"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default async function WorkBooksStats() {
@@ -16,9 +16,7 @@ export default async function WorkBooksStats() {
 							<div key={company.name} className="flex items-center">
 								<div className="flex-1 space-y-1">
 									<p className="text-sm leading-none font-medium">{company.name}</p>
-									<p className="text-muted-foreground text-sm">
-										{company.books} libros activos
-									</p>
+									<p className="text-muted-foreground text-sm">{company.books} libros activos</p>
 								</div>
 								<div>{company.percentage}%</div>
 							</div>
@@ -56,9 +54,7 @@ export default async function WorkBooksStats() {
 							<div key={location.name} className="flex items-center">
 								<div className="flex-1 space-y-1">
 									<p className="text-sm leading-none font-medium">{location.name}</p>
-									<p className="text-muted-foreground text-sm">
-										{location.books} libros
-									</p>
+									<p className="text-muted-foreground text-sm">{location.books} libros</p>
 								</div>
 								<div>{location.percentage}%</div>
 							</div>

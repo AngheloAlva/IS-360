@@ -11,7 +11,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { preventionAreaSchema } from "@/lib/form-schemas/work-book/prevention-area.schema"
-import { createPreventionArea } from "@/actions/prevention-areas/createPreventionArea"
+import { createPreventionArea } from "@/actions/work-book-entries/createPeventionArea"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -29,8 +29,10 @@ import {
 } from "@/components/ui/form"
 
 export default function PreventionAreasForm({
+	userId,
 	workBookId,
 }: {
+	userId: string
 	workBookId: string
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -42,7 +44,6 @@ export default function PreventionAreasForm({
 		resolver: zodResolver(preventionAreaSchema),
 		defaultValues: {
 			workBookId,
-			name: "",
 			others: "",
 			comments: "",
 			recommendations: "",
@@ -69,7 +70,10 @@ export default function PreventionAreasForm({
 		try {
 			setLoading(true)
 
-			const { ok, message } = await createPreventionArea(values)
+			const { ok, message } = await createPreventionArea({
+				values,
+				userId,
+			})
 
 			if (ok) {
 				toast("Area de prevención creada", {
@@ -101,24 +105,6 @@ export default function PreventionAreasForm({
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="mx-auto grid w-full max-w-screen-xl gap-4 md:grid-cols-2"
 			>
-				<FormField
-					control={form.control}
-					name="name"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Nombre</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
 				<FormField
 					control={form.control}
 					name="initialDate"
@@ -235,7 +221,7 @@ export default function PreventionAreasForm({
 					control={form.control}
 					name="comments"
 					render={({ field }) => (
-						<FormItem>
+						<FormItem className="md:col-span-2">
 							<FormLabel className="text-gray-700">Comentarios</FormLabel>
 							<FormControl>
 								<Textarea

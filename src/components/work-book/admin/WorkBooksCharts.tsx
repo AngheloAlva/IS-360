@@ -1,6 +1,6 @@
 "use client"
 
-import { getWorkBooksChartData } from "@/actions/work-book/admin/getWorkBooksChartData"
+import { getWorkBooksChartData } from "@/actions/work-books/admin/getWorkBooksChartData"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 import { useState, useEffect } from "react"
@@ -45,7 +45,7 @@ export default function WorkBooksCharts() {
 				setMonthlyData(data.monthlyData)
 				setStatusDistribution(data.statusDistribution)
 			} catch (error) {
-				console.error('Error fetching chart data:', error)
+				console.error("Error fetching chart data:", error)
 			} finally {
 				setIsLoading(false)
 			}
@@ -61,56 +61,56 @@ export default function WorkBooksCharts() {
 				</CardHeader>
 				<CardContent>
 					<div className="h-[400px]">
-					{isLoading ? (
-						<div className="flex h-full items-center justify-center">
-							<div className="text-muted-foreground">Cargando datos...</div>
-						</div>
-					) : monthlyData.length === 0 ? (
-						<div className="flex h-full items-center justify-center">
-							<div className="text-muted-foreground">No hay datos disponibles</div>
-						</div>
-					) : (
-						<ChartContainer config={chartConfig}>
-							<LineChart data={monthlyData}>
-								<XAxis
-									dataKey="name"
-									stroke="#888888"
-									fontSize={12}
-									tickLine={false}
-									axisLine={false}
-								/>
-								<YAxis
-									stroke="#888888"
-									fontSize={12}
-									tickLine={false}
-									axisLine={false}
-									tickFormatter={(value) => `${value}`}
-								/>
-								<Tooltip />
-								<Line
-									type="monotone"
-									dataKey="total"
-									stroke="var(--color-total)"
-									strokeWidth={2}
-									activeDot={{ r: 8 }}
-								/>
-								<Line
-									type="monotone"
-									dataKey="active"
-									stroke="var(--color-active)"
-									strokeWidth={2}
-									activeDot={{ r: 8 }}
-								/>
-								<Line
-									type="monotone"
-									dataKey="completed"
-									stroke="var(--color-completed)"
-									strokeWidth={2}
-									activeDot={{ r: 8 }}
-								/>
-							</LineChart>
-						</ChartContainer>
-					)}
+						{isLoading ? (
+							<div className="flex h-full items-center justify-center">
+								<div className="text-muted-foreground">Cargando datos...</div>
+							</div>
+						) : monthlyData.length === 0 ? (
+							<div className="flex h-full items-center justify-center">
+								<div className="text-muted-foreground">No hay datos disponibles</div>
+							</div>
+						) : (
+							<ChartContainer config={chartConfig}>
+								<LineChart data={monthlyData}>
+									<XAxis
+										dataKey="name"
+										stroke="#888888"
+										fontSize={12}
+										tickLine={false}
+										axisLine={false}
+									/>
+									<YAxis
+										stroke="#888888"
+										fontSize={12}
+										tickLine={false}
+										axisLine={false}
+										tickFormatter={(value) => `${value}`}
+									/>
+									<Tooltip />
+									<Line
+										type="monotone"
+										dataKey="total"
+										stroke="var(--color-total)"
+										strokeWidth={2}
+										activeDot={{ r: 8 }}
+									/>
+									<Line
+										type="monotone"
+										dataKey="active"
+										stroke="var(--color-active)"
+										strokeWidth={2}
+										activeDot={{ r: 8 }}
+									/>
+									<Line
+										type="monotone"
+										dataKey="completed"
+										stroke="var(--color-completed)"
+										strokeWidth={2}
+										activeDot={{ r: 8 }}
+									/>
+								</LineChart>
+							</ChartContainer>
+						)}
 					</div>
 				</CardContent>
 			</Card>
@@ -121,36 +121,36 @@ export default function WorkBooksCharts() {
 				</CardHeader>
 				<CardContent>
 					<div className="h-[400px]">
-					{isLoading ? (
-						<div className="flex h-full items-center justify-center">
-							<div className="text-muted-foreground">Cargando datos...</div>
-						</div>
-					) : statusDistribution.length === 0 ? (
-						<div className="flex h-full items-center justify-center">
-							<div className="text-muted-foreground">No hay datos disponibles</div>
-						</div>
-					) : (
-						<ChartContainer config={chartConfig}>
-							<BarChart data={statusDistribution}>
-								<XAxis
-									dataKey="name"
-									stroke="#888888"
-									fontSize={12}
-									tickLine={false}
-									axisLine={false}
-								/>
-								<YAxis
-									stroke="#888888"
-									fontSize={12}
-									tickLine={false}
-									axisLine={false}
-									tickFormatter={(value) => `${value}`}
-								/>
-								<Tooltip />
-								<Bar dataKey="value" fill="var(--color-total)" radius={[4, 4, 0, 0]} />
-							</BarChart>
-						</ChartContainer>
-					)}
+						{isLoading ? (
+							<div className="flex h-full items-center justify-center">
+								<div className="text-muted-foreground">Cargando datos...</div>
+							</div>
+						) : statusDistribution.length === 0 ? (
+							<div className="flex h-full items-center justify-center">
+								<div className="text-muted-foreground">No hay datos disponibles</div>
+							</div>
+						) : (
+							<ChartContainer config={chartConfig}>
+								<BarChart data={statusDistribution}>
+									<XAxis
+										dataKey="name"
+										stroke="#888888"
+										fontSize={12}
+										tickLine={false}
+										axisLine={false}
+									/>
+									<YAxis
+										stroke="#888888"
+										fontSize={12}
+										tickLine={false}
+										axisLine={false}
+										tickFormatter={(value) => `${value}`}
+									/>
+									<Tooltip />
+									<Bar dataKey="value" fill="var(--color-total)" radius={[4, 4, 0, 0]} />
+								</BarChart>
+							</ChartContainer>
+						)}
 					</div>
 				</CardContent>
 			</Card>

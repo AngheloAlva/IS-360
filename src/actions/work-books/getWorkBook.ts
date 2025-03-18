@@ -10,6 +10,37 @@ export const getWorkBook = async (workBookId: string) => {
 			},
 			include: {
 				otNumber: true,
+				entries: {
+					include: {
+						createdBy: {
+							select: {
+								name: true,
+								role: true,
+								internalRole: true
+							}
+						},
+						assignedUsers: {
+							select: {
+								name: true,
+								role: true,
+								internalRole: true
+							}
+						},
+						reportedUsers: {
+							select: {
+								name: true,
+								role: true,
+								internalRole: true
+							}
+						},
+						referencedEntry: true,
+						referencedBy: true,
+						attachments: true
+					},
+					orderBy: {
+						createdAt: 'desc'
+					}
+				}
 			},
 		})
 

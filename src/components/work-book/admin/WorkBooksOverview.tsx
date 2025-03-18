@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getWorkBooksOverview } from "@/actions/work-book/admin/getWorkBooksOverview"
+import { getWorkBooksOverview } from "@/actions/work-books/admin/getWorkBooksOverview"
 
 export default async function WorkBooksOverview() {
 	const overview = await getWorkBooksOverview()

@@ -89,7 +89,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 			preventiveControlMeasures: [],
 			otherPreventiveControlMeasures: "",
 			activityDetails: [{ activity: "" }, { activity: "" }],
-			participants: [{ fullName: "", rut: "", company: "", number: "" }],
+			participants: [{ fullName: "", rut: "", company: "" }],
 		},
 	})
 
@@ -888,7 +888,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 					<Button
 						type="button"
 						variant="outline"
-						onClick={() => appendParticipants({ fullName: "", rut: "", company: "", number: "" })}
+						onClick={() => appendParticipants({ fullName: "", rut: "", company: "" })}
 					>
 						Agregar participante <Plus />
 					</Button>
@@ -899,23 +899,6 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 						key={field.id}
 						className="mb-1 flex w-full flex-wrap items-center gap-2 md:col-span-2 md:flex-nowrap"
 					>
-						<FormField
-							control={form.control}
-							name={`participants.${index}.number`}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="text-gray-700">Número</FormLabel>
-									<FormControl>
-										<Input
-											type="number"
-											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
 						<FormField
 							control={form.control}
 							name={`participants.${index}.fullName`}

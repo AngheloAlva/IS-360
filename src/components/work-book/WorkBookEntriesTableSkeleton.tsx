@@ -8,21 +8,32 @@ import {
 	TableHeader,
 } from "@/components/ui/table"
 
-export default function AdditionalActivitiesTableSkeleton(): React.ReactElement {
+export default async function WorkBookEntriesTableSkeleton(): Promise<React.ReactElement> {
 	return (
 		<Table className="w-full">
 			<TableHeader>
 				<TableRow>
-					<TableHead className="text-nowrap">Nombre de Actividad</TableHead>
-					<TableHead className="text-nowrap">Comentarios</TableHead>
-					<TableHead className="text-nowrap">Fecha de Ejecución</TableHead>
-					<TableHead className="text-nowrap">Hora de Inicio</TableHead>
-					<TableHead className="text-nowrap">Hora de Fin</TableHead>
+					<TableHead className="text-nowrap">Tipo</TableHead>
+					<TableHead className="text-nowrap">Fecha</TableHead>
+					<TableHead className="text-nowrap">Actividad/Título</TableHead>
+					<TableHead className="text-nowrap">Contenido</TableHead>
+					<TableHead className="text-nowrap">Horario</TableHead>
+					<TableHead className="text-nowrap">Creado por</TableHead>
+					<TableHead className="text-nowrap">Personal Asignado</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
 				{Array.from({ length: 5 }).map((_, index) => (
 					<TableRow key={index}>
+						<TableCell>
+							<Skeleton className="h-9 w-full" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-9 w-full" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-9 w-full" />
+						</TableCell>
 						<TableCell>
 							<Skeleton className="h-9 w-full" />
 						</TableCell>

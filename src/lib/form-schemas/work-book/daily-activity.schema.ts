@@ -11,9 +11,10 @@ export const dailyActivitySchema = z.object({
 	personnel: z
 		.array(
 			z.object({
-				fullName: z.string().nonempty({ message: "El nombre del personal no puede estar vacío" }),
-				position: z.string().nonempty({ message: "La posición del personal no puede estar vacía" }),
+				userId: z.string(),
 			})
 		)
 		.min(1, { message: "Debe haber al menos un personal" }),
 })
+
+export type DailyActivitySchema = z.infer<typeof dailyActivitySchema>

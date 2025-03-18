@@ -50,9 +50,7 @@ export const workPermitSchema = z.object({
 	workerExecutor: z
 		.string()
 		.min(2, { message: "El nombre del trabajador debe tener al menos 2 caracteres" }),
-	preventionOfficer: z
-		.string()
-		.nonempty({ message: "Debe seleccionar un prevencionista" }),
+	preventionOfficer: z.string().nonempty({ message: "Debe seleccionar un prevencionista" }),
 	whoReceives: z.string().optional(),
 	cleanAndTidyWorkArea: z.boolean(),
 	workCompleted: z.boolean(),
@@ -61,7 +59,6 @@ export const workPermitSchema = z.object({
 
 	participants: z.array(
 		z.object({
-			number: z.string().regex(/^[0-9]*$/, { message: "Debe ingresar un número válido" }),
 			fullName: z
 				.string()
 				.min(2, { message: "El nombre completo debe tener al menos 2 caracteres" }),

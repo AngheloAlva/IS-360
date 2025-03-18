@@ -11,7 +11,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { otcInspectionsSchema } from "@/lib/form-schemas/work-book/otc-inspections.schema"
-import { createOtcInspections } from "@/actions/otc-inspections/createOtcInspections"
+import { createOtcInspections } from "@/actions/work-book-entries/createOtcInspections"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -29,8 +29,10 @@ import {
 } from "@/components/ui/form"
 
 export default function OtcInspectorForm({
+	userId,
 	workBookId,
 }: {
+	userId: string
 	workBookId: string
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -51,14 +53,12 @@ export default function OtcInspectorForm({
 		resolver: zodResolver(otcInspectionsSchema),
 		defaultValues: {
 			workBookId,
-			inspectorName: "",
 			nonConformities: "",
 			activityEndTime: "",
 			activityStartTime: "",
 			safetyObservations: "",
-			initialDate: new Date(),
 			supervisionComments: "",
-			dateOfExecution: new Date(),
+			executionDate: new Date(),
 		},
 	})
 
@@ -71,7 +71,10 @@ export default function OtcInspectorForm({
 		try {
 			setLoading(true)
 
-			const { ok, message } = await createOtcInspections(values)
+			const { ok, message } = await createOtcInspections({
+				values,
+				userId,
+			})
 
 			if (ok) {
 				toast("Actividad del Inspector creado", {
@@ -105,25 +108,7 @@ export default function OtcInspectorForm({
 			>
 				<FormField
 					control={form.control}
-					name="inspectorName"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Nombre del Inspector</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre del Inspector"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="dateOfExecution"
+					name="executionDate"
 					render={({ field }) => (
 						<FormItem className="flex flex-col">
 							<FormLabel>Fecha de Ejecución</FormLabel>

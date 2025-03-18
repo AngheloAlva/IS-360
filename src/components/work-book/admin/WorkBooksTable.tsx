@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, ChevronUp, LinkIcon } from "lucide-react"
-import { getWorkBooksTableData } from "@/actions/work-book/admin/getWorkBooksTableData"
+import { getWorkBooksTableData } from "@/actions/work-books/admin/getWorkBooksTableData"
 import Link from "next/link"
 
 export default async function WorkBooksTable() {
