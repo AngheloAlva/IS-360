@@ -1,6 +1,5 @@
 "use client"
 
-import { Plus } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
 import {
@@ -14,7 +13,6 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -25,6 +23,8 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
+import { Plus } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -60,35 +60,23 @@ export function DataTable<TData, TValue>({
 				<Input
 					type="text"
 					className="w-fit"
-					placeholder="Filtrar por Nombre..."
-					value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+					placeholder="Numero de OT..."
+					value={(table.getColumn("otNumber")?.getFilterValue() as string) ?? ""}
+					onChange={(event) => table.getColumn("otNumber")?.setFilterValue(event.target.value)}
 				/>
 
 				<Input
 					className="w-fit"
-					placeholder="Filtrar por RUT..."
-					value={(table.getColumn("rut")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("rut")?.setFilterValue(event.target.value)}
+					placeholder="Empresa Colaboradora..."
+					value={(table.getColumn("contractCompany")?.getFilterValue() as string) ?? ""}
+					onChange={(event) =>
+						table.getColumn("contractCompany")?.setFilterValue(event.target.value)
+					}
 				/>
 
-				<Input
-					className="w-fit"
-					placeholder="Filtrar por email..."
-					value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
-				/>
-
-				<Link href="/dashboard/admin/usuarios/internos/agregar" className="md:ml-auto">
+				<Link href="/dashboard/admin/ordenes-de-trabajo/agregar" className="md:ml-auto">
 					<Button size={"lg"}>
-						Nuevos Usuario OTC
-						<Plus className="ml-1" />
-					</Button>
-				</Link>
-
-				<Link href="/dashboard/admin/usuarios/externos/agregar">
-					<Button size={"lg"} className="bg-feature hover:bg-feature/80">
-						Nuevos Usuarios Externos
+						Nueva Orden de Trabajo
 						<Plus className="ml-1" />
 					</Button>
 				</Link>
@@ -113,44 +101,43 @@ export function DataTable<TData, TValue>({
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
-							? Array.from({ length: 10 }).map((_, index) => (
-									<TableRow key={index}>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
+						{isLoading ? (
+							Array.from({ length: 10 }).map((_, index) => (
+								<TableRow key={index}>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+								</TableRow>
+							))
+						) : table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => (
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id}>
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
 										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-									</TableRow>
-								))
-							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id}>
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))}
+									))}
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell colSpan={columns.length} className="h-24 text-center">
+									No hay datos
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
 			</div>

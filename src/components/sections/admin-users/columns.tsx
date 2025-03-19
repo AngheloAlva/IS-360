@@ -1,32 +1,19 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, Edit } from "lucide-react"
 import { format } from "date-fns"
+import Link from "next/link"
 
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { UserRoleOptions } from "@/lib/consts/user-roles"
+import { USER_ROLE } from "@prisma/client"
 
 import { Badge } from "@/components/ui/badge"
 
 import type { UserWithRole } from "better-auth/plugins"
 
 export const columns: ColumnDef<UserWithRole>[] = [
-	// {
-	// 	accessorKey: "id",
-	// 	header: "",
-	// 	cell: ({ row }) => {
-	// 		const id = row.getValue("id")
-	// 		return (
-	// 			<Link
-	// 				href={`/dashboard/libro-de-obras/${id}`}
-	// 				className="text-primary hover:text-feature text-right font-medium hover:underline"
-	// 			>
-	// 				<LinkIcon className="h-4 w-4" />
-	// 			</Link>
-	// 		)
-	// 	},
-	// },
 	{
 		accessorKey: "name",
 		header: "Nombre",
@@ -56,6 +43,15 @@ export const columns: ColumnDef<UserWithRole>[] = [
 			const role = row.getValue("role") as string
 			const roleLabel = UserRoleOptions.find((r) => r.value === role)?.label || role
 			return <Badge variant={role === "PARTNER_COMPANY" ? "outline" : "default"}>{roleLabel}</Badge>
+		},
+	},
+	{
+		accessorKey: "isSupervisor",
+		header: "Supervisor Externo",
+		cell: ({ row }) => {
+			const isSupervisor = row.getValue("isSupervisor")
+
+			return isSupervisor && <Badge variant="secondary">Sí</Badge>
 		},
 	},
 	{
@@ -113,6 +109,25 @@ export const columns: ColumnDef<UserWithRole>[] = [
 			const date = row.getValue("createdAt")
 			const formattedDate = format(date as Date, "dd/MM/yyyy")
 			return <div>{formattedDate}</div>
+		},
+	},
+	{
+		accessorKey: "id",
+		header: "",
+		cell: ({ row }) => {
+			const id = row.getValue("id")
+			const role = row.getValue("role")
+
+			const isPartnerCompany = role === USER_ROLE.PARTNER_COMPANY || role === USER_ROLE.OPERATOR
+
+			return (
+				<Link
+					href={`/dashboard/admin/usuarios/${isPartnerCompany ? "externos" : "internos"}/${id}`}
+					className="text-primary hover:text-feature text-right font-medium hover:underline"
+				>
+					<Edit className="h-4 w-4" />
+				</Link>
+			)
 		},
 	},
 ]

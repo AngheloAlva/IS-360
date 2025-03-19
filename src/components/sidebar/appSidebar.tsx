@@ -1,6 +1,18 @@
 "use client"
 
-import { Send, LifeBuoy, BookCopy, FileText, FileSearch, MonitorPlay, User } from "lucide-react"
+import {
+	Send,
+	User,
+	Wrench,
+	FileText,
+	LifeBuoy,
+	BookCopy,
+	Building2,
+	FileSearch,
+	LayoutList,
+	MonitorPlay,
+	Construction,
+} from "lucide-react"
 import Image from "next/image"
 
 import { useAuthorization } from "@/hooks/useAuthorization"
@@ -40,6 +52,31 @@ const data = {
 	],
 	navAdmin: [
 		{
+			name: "Planes de Mantenimiento",
+			url: "/dashboard/admin/planes-de-mantenimiento",
+			icon: Construction,
+		},
+		{
+			name: "Ordenes de Trabajo",
+			url: "/dashboard/admin/ordenes-de-trabajo",
+			icon: LayoutList,
+		},
+		{
+			name: "Herramientas",
+			url: "/dashboard/admin/herramientas",
+			icon: Wrench,
+		},
+		{
+			name: "Empresas",
+			url: "/dashboard/admin/empresas",
+			icon: Building2,
+		},
+		{
+			name: "Usuarios",
+			url: "/dashboard/admin/usuarios",
+			icon: User,
+		},
+		{
 			name: "Permisos de Trabajo",
 			url: "/dashboard/admin/permisos-de-trabajo",
 			icon: FileText,
@@ -48,11 +85,6 @@ const data = {
 			name: "Libros de Obras",
 			url: "/dashboard/admin/libros-de-obras",
 			icon: BookCopy,
-		},
-		{
-			name: "Usuarios",
-			url: "/dashboard/admin/usuarios",
-			icon: User,
 		},
 	],
 	navUser: [

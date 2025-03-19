@@ -4,43 +4,37 @@ import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
 import { toast } from "sonner"
 
+import { getWorkOrders } from "@/actions/work-orders/getWorkOrders"
 import { useSidebar } from "@/components/ui/sidebar"
-import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 import { DataTable } from "./DataTable"
 import { columns } from "./columns"
 
-import type { UserWithRole } from "better-auth/plugins"
+import type { WorkOrder } from "@prisma/client"
 
-export default function MainAdminUsers({ page }: { page: number }): React.ReactElement {
+export default function MainAdminWorkOrders({ page }: { page: number }): React.ReactElement {
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [users, setUsers] = useState<UserWithRole[]>([])
+	const [workOrders, setWorkOrders] = useState<WorkOrder[]>([])
 	const { state } = useSidebar()
 
 	useEffect(() => {
-		const fetchUsers = async () => {
-			const { data, error } = await authClient.admin.listUsers({
-				query: {
-					limit: 10,
-					offset: (page - 1) * 10,
-					sortBy: "createdAt",
-				},
-			})
+		const fetchWorkOrders = async () => {
+			const { data, ok } = await getWorkOrders(10, page)
 
-			if (error) {
-				toast("Error al cargar los usuarios", {
-					description: error.message,
+			if (!ok || !data) {
+				toast("Error al cargar las ordenes de trabajo", {
+					description: "Error al cargar las ordenes de trabajo",
 					duration: 5000,
 				})
 				return notFound()
 			}
 
-			setUsers(data.users)
+			setWorkOrders(data)
 			setIsLoading(false)
 		}
 
-		void fetchUsers()
+		void fetchWorkOrders()
 	}, [page])
 
 	return (
@@ -53,9 +47,9 @@ export default function MainAdminUsers({ page }: { page: number }): React.ReactE
 				}
 			)}
 		>
-			<h1 className="w-fit text-3xl font-bold">Lista de Usuarios</h1>
+			<h1 className="w-fit text-3xl font-bold">Lista de Ordenes de Trabajo</h1>
 
-			<DataTable columns={columns} data={users} isLoading={isLoading} />
+			<DataTable columns={columns} data={workOrders} isLoading={isLoading} />
 		</div>
 	)
 }

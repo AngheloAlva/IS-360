@@ -48,6 +48,11 @@ export const auth = betterAuth({
 				required: false,
 				input: true,
 			},
+			isSupervisor: {
+				type: "boolean",
+				required: false,
+				input: true,
+			},
 		},
 	},
 	plugins: [

@@ -47,3 +47,25 @@ export const getUsersByCompanyId = async (companyId: string) => {
 		}
 	}
 }
+
+export const getUserById = async (userId: string) => {
+	try {
+		const user = await prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+		})
+
+		return {
+			ok: true,
+			data: user,
+		}
+	} catch (error) {
+		console.log(error)
+
+		return {
+			ok: false,
+			message: "Error al cargar el usuario",
+		}
+	}
+}

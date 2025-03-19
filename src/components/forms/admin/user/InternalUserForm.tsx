@@ -6,10 +6,15 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { userSchema, type UserSchema } from "@/lib/form-schemas/admin/user/user.schema"
+import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { UserRoleOptions } from "@/lib/consts/user-roles"
+import { authClient } from "@/lib/auth-client"
 import { formatRut } from "@/utils/formatRut"
+import {
+	internalUserSchema,
+	type InternalUserSchema,
+} from "@/lib/form-schemas/admin/user/internalUser.schema"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,27 +33,23 @@ import {
 	SelectTrigger,
 	SelectContent,
 } from "@/components/ui/select"
-import { authClient } from "@/lib/auth-client"
-import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 
-export default function UserForm(): React.ReactElement {
+export default function InternalUserForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 
 	const router = useRouter()
 
-	const form = useForm<UserSchema>({
-		resolver: zodResolver(userSchema),
+	const form = useForm<InternalUserSchema>({
+		resolver: zodResolver(internalUserSchema),
 		defaultValues: {
 			rut: "",
 			name: "",
 			email: "",
 			role: "USER",
-			internalRole: "NONE",
-			area: null,
 		},
 	})
 
-	async function onSubmit(values: UserSchema) {
+	async function onSubmit(values: InternalUserSchema) {
 		setLoading(true)
 
 		try {
@@ -61,9 +62,9 @@ export default function UserForm(): React.ReactElement {
 				role: values.role,
 				data: {
 					rut: values.rut,
+					area: values.area,
 					role: values.role,
-					internalRole: values.role === "PARTNER_COMPANY" ? "NONE" : values.internalRole,
-					area: values.role === "PARTNER_COMPANY" ? null : values.area,
+					internalRole: values.internalRole,
 				},
 			})
 

@@ -1,53 +1,53 @@
 "use server"
 
-import prisma from "@/lib/prisma"
+// import prisma from "@/lib/prisma"
 
 import type { workPermitSchema } from "@/lib/form-schemas/work-permit/work-permit-schema"
 import type { z } from "zod"
 
 export const createWorkPermit = async (values: z.infer<typeof workPermitSchema>) => {
 	try {
-		const { userId, ...rest } = values
+		console.log(values)
+		// const { userId, ...rest } = values
 
-		await prisma.workPermit.create({
-			data: {
-				...rest,
-				workersNumber: +rest.workersNumber,
-				otherMutuality: rest.otherMutuality || undefined,
-				additionalObservations: rest.additionalObservations || undefined,
-				activityDetails: rest.activityDetails.map((activity) => activity.activity),
-				preventionOfficer: undefined,
-				preventionOfficerUser: {
-					connect: {
-						id: userId,
-					},
-				},
-				participants: undefined,
-				otNumber: {
-					create: {
-						otNumber: rest.otNumber,
-						contractCompany: "",
-						endDate: new Date(),
-						initDate: new Date(),
-						quantityDays: 0,
-						equipmentProperty: "",
-						type: "",
-						estimatedDuration: 0,
-						printed: false,
-						responsible: {
-							connect: {
-								id: userId,
-							},
-						},
-					},
-				},
-				user: {
-					connect: {
-						id: userId,
-					},
-				},
-			},
-		})
+		// await prisma.workPermit.create({
+		// 	data: {
+		// 		...rest,
+		// 		workersNumber: +rest.workersNumber,
+		// 		otherMutuality: rest.otherMutuality || undefined,
+		// 		additionalObservations: rest.additionalObservations || undefined,
+		// 		activityDetails: rest.activityDetails.map((activity) => activity.activity),
+		// 		preventionOfficer: undefined,
+		// 		preventionOfficerUser: {
+		// 			connect: {
+		// 				id: userId,
+		// 			},
+		// 		},
+		// 		participants: undefined,
+		// 		otNumber: {
+		// 			create: {
+		// 				otNumber: rest.otNumber,
+		// 				endDate: new Date(),
+		// 				initDate: new Date(),
+		// 				quantityDays: 0,
+		// 				equipmentProperty: "",
+		// 				type: "CORRECTIVE",
+		// 				estimatedDuration: 0,
+		// 				printed: false,
+		// 				responsible: {
+		// 					connect: {
+		// 						id: userId,
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 		user: {
+		// 			connect: {
+		// 				id: userId,
+		// 			},
+		// 		},
+		// 	},
+		// })
 
 		return {
 			ok: true,

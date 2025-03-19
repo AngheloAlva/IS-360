@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -54,28 +53,34 @@ model User {
   banReason     String?
   banExpires    DateTime?
   rut           String
-  company       Company? @relation(fields: [companyId], references: [id])
-  companyId     String?
+  progress      Float    @default(0)
   
   sessions      Session[]
   accounts      Account[]
 
-  files         File[]
-  folders       Folder[]
-  workBooks     WorkBook[]
-  workOrders    WorkOrder[]
-  workTrackers  WorkTracker[]
-  safetyTalks   UserSafetyTalk[]
+  files            File[]
+  folders          Folder[]
+  workBooks        WorkBook[]
+  marcoWorkBooks   MarcoWorkBook[]
+  workTrackers     WorkTracker[]
+  safetyTalks      UserSafetyTalk[]
   workApplications WorkApplication[]
+
+  company          Company? @relation(fields: [companyId], references: [id])
+  companyId        String?
+  isSupervisor     Boolean?
+
+  workOrders                     WorkOrder[]     @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor         WorkOrder[]     @relation("WorkOrderSupervisor")
 
   assignedEntries                WorkBookEntry[] @relation("AssignedUsers")
   reportedInEntries              WorkBookEntry[] @relation("ReportedUsers")
   createdEntries                 WorkBookEntry[] @relation("WorkBookEntryCreator")
   signedEntries                  WorkBookEntry[] @relation("WorkBookEntrySigner")
-
-  workPermitsAsUser              WorkPermit[]    @relation("WorkPermitUser")
+  
   workPermitsAsParticipant       WorkPermit[]    @relation("WorkPermitParticipants")
   workPermitsAsPreventionOfficer WorkPermit[]    @relation("PreventionOfficer")
+  workPermits                    WorkPermit[]    @relation("WorkPermitUser")
 
   @@unique([email])
   @@unique([rut])
@@ -123,8 +128,15 @@ model Company {
   name String
   rut  String
 
-  users User[]
+  users          User[]
+  workOrders     WorkOrder[]
+  workBooks      WorkBook[]
+  marcoWorkBooks MarcoWorkBook[]
 
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([id])
   @@map("company")
 }
 
@@ -147,29 +159,69 @@ enum WORK_ORDER_STATUS {
   EXPIRED
 }
 
+enum WORK_ORDER_TYPE {
+  CORRECTIVE
+  PREVENTIVE
+  PREDICTIVE
+}
+
+enum WORK_ORDER_PRIORITY {
+  HIGH
+  MEDIUM
+  LOW
+}
+
 model WorkOrder {
   id                 String  @id @default(cuid())
   otNumber           String
 
-  initDate           DateTime
-  endDate            DateTime
-  quantityDays       Int
-  equipmentProperty  String
+  type               WORK_ORDER_TYPE
   status             WORK_ORDER_STATUS @default(PENDING)
-  estimatedDuration  Int
-  printed            Boolean
-  type               String
-  contractCompany    String
-  
-  responsible        User @relation(fields: [responsibleId], references: [id])
+  solicitationDate   DateTime
+  solicitationTime   DateTime
+  workRequest        String
+  workDescription    String
+  priority           WORK_ORDER_PRIORITY
+  equipment          Equipment[]
+  programDate        DateTime
+  estimatedHours     Float
+  estimatedDays      Float
+  requiresBreak      Boolean
+  breakDays          Int
+  estimatedEndDate   DateTime?
+
+  company            Company     @relation(fields: [companyId], references: [id])
+  companyId          String
+  supervisor         User        @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
+  supervisorId       String
+  responsible        User        @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
   responsibleId      String
+  initReport         Attachment? @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
+  initReportId       String?     @unique
+  endReport          Attachment? @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
+  endReportId        String?     @unique
   workBooks          WorkBook[]
+  marcoWorkBooks     MarcoWorkBook[]
   workPermits        WorkPermit[]
   workTrackers       WorkTracker[]
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@unique([id])
   @@unique([otNumber])
   @@map("work_order")
+}
+
+model Equipment {
+  id   String @id @default(cuid())
+
+  name String
+  location String
+
+  workOrders WorkOrder[]
+
+  @@map("equipment")
 }
 
 enum WORK_APPLICATION_STATUS {
@@ -189,7 +241,7 @@ model WorkApplication {
   criticality        String
 
   attachments        Attachment[]
-  responsible        User @relation(fields: [responsibleId], references: [id])
+  responsible        User        @relation(fields: [responsibleId], references: [id])
   responsibleId      String
 
   @@unique([id])
@@ -234,10 +286,42 @@ model WorkBook {
   otNumberId           String
   user                 User @relation(fields: [userId], references: [id])
   userId               String
+  company              Company @relation(fields: [companyId], references: [id])
+  companyId            String
   entries              WorkBookEntry[]
 
   @@unique([id])
   @@map("work_book")
+}
+
+model MarcoWorkBook {
+  id String @id @default(cuid())
+
+  contractingCompany   String
+  workResponsibleName  String
+  workResponsiblePhone String
+  otcInspectorName     String
+  otcInspectorPhone    String
+  workName             String
+  workLocation         String
+  workType             String
+  workStartDate        DateTime
+  workEstimatedEndDate DateTime
+  workStatus           String
+  workProgressStatus   String
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  otNumber             WorkOrder[]
+  user                 User @relation(fields: [userId], references: [id])
+  userId               String
+  company              Company @relation(fields: [companyId], references: [id])
+  companyId            String
+  entries              WorkBookEntry[]
+
+  @@unique([id])
+  @@map("marco_work_book")
 }
 
 model WorkBookEntry {
@@ -279,6 +363,7 @@ model WorkBookEntry {
   
   workBook           WorkBook @relation(fields: [workBookId], references: [id])
   workBookId         String
+  marcoWorkBooks     MarcoWorkBook[]
 
   // Relaciones con usuarios asignados y reportados
   assignedUsers      User[]   @relation(name: "AssignedUsers")
@@ -295,7 +380,6 @@ model WorkBookEntry {
   @@index([workBookId, createdAt]) // For efficient chronological listing
   @@map("work_book_entry")
 }
-
 
 model WorkTracker {
   id                 String  @id @default(cuid())
@@ -335,6 +419,10 @@ model Attachment {
   workBookEntryId    String?
   workTracker        WorkTracker?  @relation(fields: [workTrackerId], references: [id])
   workTrackerId      String?
+  initReport         WorkOrder? @relation("WorkOrderInitReport")
+  initReportId       String? @unique
+  endReport          WorkOrder? @relation("WorkOrderEndReport")
+  endReportId        String? @unique
 
   @@map("attachment")
 }
@@ -509,7 +597,6 @@ model SafetyTalkResource {
   @@map("safety_talk_resource")
 }
 
-
 model Question {
   id            String   @id @default(cuid())
   question      String
@@ -568,4 +655,3 @@ model UserSafetyTalkAnswer {
 
   @@map("user_safety_talk_answer")
 }
-
