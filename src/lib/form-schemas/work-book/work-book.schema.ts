@@ -2,9 +2,10 @@ import { z } from "zod"
 
 export const workBookSchema = z.object({
 	userId: z.string().nonempty(),
-	workLocation: z.string().nonempty(),
 
-	otNumber: z.string().nonempty({ message: "El número de OT no puede estar vacío" }),
+	otNumber: z.string().nonempty({ message: "Debe seleccionar un número de OT" }),
+	companyId: z.string().nonempty({ message: "La empresa no puede estar vacía" }),
+	workLocation: z.string().nonempty({ message: "La ubicación de la obra no puede estar vacía" }),
 	contractingCompany: z
 		.string()
 		.nonempty({ message: "La empresa contratante no puede estar vacía" }),

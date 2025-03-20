@@ -10,12 +10,15 @@ import { es } from "date-fns/locale"
 import { toast } from "sonner"
 
 import { workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
+import { getWorkOrdersByCompanyId } from "@/actions/work-orders/getWorkOrders"
 import { createWorkBook } from "@/actions/work-books/createWorkBook"
 import { updateWorkBook } from "@/actions/work-books/updateWorkBook"
+import { getCompanyById } from "@/actions/companies/getCompanies"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,7 +38,7 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-import type { WorkBook } from "@prisma/client"
+import type { WorkBook, WorkOrder } from "@prisma/client"
 import type { z } from "zod"
 
 interface WorkBookFormProps {
@@ -46,9 +49,26 @@ interface WorkBookFormProps {
 	}
 }
 
+type WorkOrderWithSupervisorAndResponsible = WorkOrder & {
+	supervisor: {
+		name: string
+		id: string
+		phone: string | null
+	}
+	responsible: {
+		name: string
+		id: string
+		phone: string | null
+	}
+}
+
 export default function WorkBookForm({ workBook }: WorkBookFormProps): React.ReactElement {
 	const { data: session, isPending } = authClient.useSession()
-	const [loading, setLoading] = useState(false)
+
+	const [loading, setLoading] = useState<boolean>(false)
+	const [companyId, setCompanyId] = useState<string | undefined>(undefined)
+	const [workOrdersIsLoading, setWorkOrdersIsLoading] = useState<boolean>(true)
+	const [workOrders, setWorkOrders] = useState<WorkOrderWithSupervisorAndResponsible[]>([])
 
 	const router = useRouter()
 
@@ -84,6 +104,65 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 			})
 		}
 	}, [form, workBook])
+
+	useEffect(() => {
+		if (!session?.user.companyId) return
+		setCompanyId(session?.user.companyId)
+	}, [session?.user.companyId])
+
+	useEffect(() => {
+		const fetchWorkOrders = async () => {
+			if (!companyId) return
+			const { ok, data } = await getWorkOrdersByCompanyId(companyId)
+
+			if (!ok || !data) {
+				toast("Error al cargar las ordenes de trabajo", {
+					description: "Error al cargar las ordenes de trabajo",
+					duration: 5000,
+				})
+
+				return
+			}
+
+			setWorkOrders(data)
+			setWorkOrdersIsLoading(false)
+		}
+
+		void fetchWorkOrders()
+	}, [companyId])
+
+	useEffect(() => {
+		const fetchCompanies = async () => {
+			if (!companyId) return
+			const { ok, data } = await getCompanyById(companyId)
+
+			if (!ok || !data) {
+				toast("Error al cargar la empresa", {
+					description: "Error al cargar la empresa",
+					duration: 5000,
+				})
+
+				return
+			}
+
+			form.setValue("companyId", companyId)
+			form.setValue("contractingCompany", data.name)
+			form.setValue("workResponsibleName", data.users[0].name)
+			form.setValue("workResponsiblePhone", data.users[0]?.phone ?? "No disponible")
+		}
+
+		void fetchCompanies()
+	}, [form, companyId])
+
+	useEffect(() => {
+		const workOrder = workOrders.find((workOrder) => workOrder.id === form.getValues("otNumber"))
+		if (!workOrder) return
+
+		form.setValue("otcInspectorName", workOrder.responsible.name)
+		form.setValue("otcInspectorPhone", workOrder.responsible?.phone ?? "No disponible")
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("otNumber")])
 
 	useEffect(() => {
 		console.log(form.formState)
@@ -163,19 +242,29 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 					name="otNumber"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">Numero de OT</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Numero de OT"
-									{...field}
-								/>
-							</FormControl>
+							<FormLabel>Numero de OT</FormLabel>
+							<Select onValueChange={field.onChange} defaultValue={field.value}>
+								<FormControl>
+									<SelectTrigger className="border-gray-200">
+										<SelectValue placeholder="Seleccione un número de OT" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent className="text-neutral-700">
+									{workOrdersIsLoading ? (
+										<Skeleton className="h-8 w-full" />
+									) : (
+										workOrders.map((workOrder) => (
+											<SelectItem key={workOrder.id} value={workOrder.id}>
+												{workOrder.otNumber}
+											</SelectItem>
+										))
+									)}
+								</SelectContent>
+							</Select>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
 					name="workName"
@@ -355,24 +444,6 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 						)}
 					/>
 				</div>
-
-				<FormField
-					control={form.control}
-					name="contractingCompany"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Empresa Contratista</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre de la empresa contratista"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
 
 				<FormField
 					control={form.control}

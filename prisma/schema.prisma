@@ -44,6 +44,7 @@ model User {
   email         String
   emailVerified Boolean
   image         String?
+  phone         String?
   createdAt     DateTime
   updatedAt     DateTime
   role          USER_ROLE         @default(PARTNER_COMPANY)
@@ -178,7 +179,7 @@ model WorkOrder {
   type               WORK_ORDER_TYPE
   status             WORK_ORDER_STATUS @default(PENDING)
   solicitationDate   DateTime
-  solicitationTime   DateTime
+  solicitationTime   String
   workRequest        String
   workDescription    String
   priority           WORK_ORDER_PRIORITY
@@ -187,7 +188,7 @@ model WorkOrder {
   estimatedHours     Float
   estimatedDays      Float
   requiresBreak      Boolean
-  breakDays          Int
+  breakDays          Int?
   estimatedEndDate   DateTime?
 
   company            Company     @relation(fields: [companyId], references: [id])
@@ -214,13 +215,21 @@ model WorkOrder {
 }
 
 model Equipment {
-  id   String @id @default(cuid())
+  id            String  @id @default(cuid())
+  barcode       String
 
-  name String
-  location String
+  name          String
+  description   String?
+  location      String
+  isOperational Boolean @default(true)
 
-  workOrders WorkOrder[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  workOrders    WorkOrder[]
+
+  @@unique([id])
+  @@unique([barcode])
   @@map("equipment")
 }
 
@@ -507,6 +516,9 @@ model Folder {
   description String?
   root        Boolean  @default(false)
   area        Area
+  color       String   @default("oklch(.795 .184 86.047)")
+  type        String   @default("default")
+  isExternal  Boolean  @default(false)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -540,6 +552,7 @@ model File {
   registrationDate DateTime
   expirationDate   DateTime?
   revisionCount    Int      @default(0)
+  isExternal       Boolean  @default(false)
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

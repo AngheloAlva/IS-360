@@ -65,15 +65,6 @@ export function DataTable<TData, TValue>({
 					onChange={(event) => table.getColumn("otNumber")?.setFilterValue(event.target.value)}
 				/>
 
-				<Input
-					className="w-fit"
-					placeholder="Empresa Colaboradora..."
-					value={(table.getColumn("contractCompany")?.getFilterValue() as string) ?? ""}
-					onChange={(event) =>
-						table.getColumn("contractCompany")?.setFilterValue(event.target.value)
-					}
-				/>
-
 				<Link href="/dashboard/admin/ordenes-de-trabajo/agregar" className="md:ml-auto">
 					<Button size={"lg"}>
 						Nueva Orden de Trabajo
@@ -104,6 +95,21 @@ export function DataTable<TData, TValue>({
 						{isLoading ? (
 							Array.from({ length: 10 }).map((_, index) => (
 								<TableRow key={index}>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+									<TableCell className="">
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
 									<TableCell className="">
 										<Skeleton className="h-9 min-w-full" />
 									</TableCell>

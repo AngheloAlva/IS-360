@@ -56,7 +56,7 @@ export default function WorkBookEntriesTable({
 					(entries.length === 0 && (
 						<TableRow>
 							<TableCell colSpan={7} className="text-center">
-								<span className="flex w-full items-center justify-center gap-1">
+								<span className="flex w-full items-center justify-center gap-1 py-6">
 									<Info className="h-4 w-4" />
 									No hay entradas en el libro de obras
 								</span>

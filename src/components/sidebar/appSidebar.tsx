@@ -62,7 +62,7 @@ const data = {
 			icon: LayoutList,
 		},
 		{
-			name: "Herramientas",
+			name: "Equipos",
 			url: "/dashboard/admin/herramientas",
 			icon: Wrench,
 		},

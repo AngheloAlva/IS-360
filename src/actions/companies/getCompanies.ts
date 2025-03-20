@@ -58,3 +58,32 @@ export const getCompaniesByUserId = async (userId: string) => {
 		}
 	}
 }
+
+export const getCompanyById = async (id: string) => {
+	try {
+		const company = await prisma.company.findUnique({
+			where: {
+				id,
+			},
+			include: {
+				users: {
+					where: {
+						isSupervisor: true,
+					},
+				},
+			},
+		})
+
+		return {
+			ok: true,
+			data: company,
+		}
+	} catch (error) {
+		console.log(error)
+
+		return {
+			ok: false,
+			message: "Error al cargar la empresa",
+		}
+	}
+}
