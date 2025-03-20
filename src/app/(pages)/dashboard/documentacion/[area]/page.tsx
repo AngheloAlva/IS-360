@@ -1,6 +1,6 @@
 import { Areas } from "@/lib/consts/areas"
 
-import { PlusIcon, UploadIcon, RefreshCcw, ChevronLeft } from "lucide-react"
+import { PlusIcon, UploadIcon, ChevronLeft } from "lucide-react"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import Link from "next/link"
@@ -49,13 +49,8 @@ export default async function AreaRootPage({ params }: PageProps) {
 					<h1 className="text-2xl font-bold capitalize">Gestor Documental - {area}</h1>
 				</div>
 				<div className="flex gap-2">
-					<Button size="sm" variant="outline">
-						<RefreshCcw className="mr-2 h-4 w-4" />
-						Actualizar
-					</Button>
-
 					<Link href={`/dashboard/documentacion/nuevo-archivo?area=${areaName}`}>
-						<Button size="sm" variant="outline">
+						<Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
 							<UploadIcon className="mr-2 h-4 w-4" />
 							Subir Archivo
 						</Button>

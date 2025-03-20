@@ -3,7 +3,9 @@ import AreasDocumentationTable from "@/components/sections/documentation/AreasDo
 export default function DocumentationPage(): React.ReactElement {
 	return (
 		<>
-			<h1 className="text-2xl font-bold">Documentación</h1>
+			<div className="w-full text-left">
+				<h1 className="text-2xl font-bold">Documentación</h1>
+			</div>
 
 			<AreasDocumentationTable />
 		</>

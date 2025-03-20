@@ -1,15 +1,15 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
 import { CalendarIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { useState } from "react"
 import { toast } from "sonner"
 
-import { uploadFile } from "@/actions/document-management/uploadFile"
+import { updateFile } from "@/actions/document-management/updateFile"
 import { Codes } from "@/lib/consts/codes"
 import { cn } from "@/lib/utils"
 import {
@@ -37,14 +37,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
-interface NewFileFormProps {
-	area: string
+
+import type { File as PrismaFile } from "@prisma/client"
+
+interface UpdateFileFormProps {
+	fileId: string
+	initialData: PrismaFile
 	userId: string
-	backPath?: string
-	folderSlug?: string
+	lastPath?: string
 }
 
-export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormProps) {
+export function UpdateFileForm({ fileId, initialData, userId, lastPath }: UpdateFileFormProps) {
 	const [selectedFile, setSelectedFile] = useState<File | null>(null)
 	const [uploading, setUploading] = useState(false)
 	const [message, setMessage] = useState("")
@@ -55,19 +58,22 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		resolver: zodResolver(fileFormSchema),
 		defaultValues: {
 			userId,
-			name: "",
-			folderSlug,
-			description: "",
-			expirationDate: undefined,
-			registrationDate: new Date(),
+			name: initialData.name,
+			code: initialData.code,
+			description: initialData.description || "",
+			registrationDate: initialData.registrationDate,
+			expirationDate: initialData.expirationDate || undefined,
 		},
 	})
 
 	const onSubmit = async (values: FileFormSchema) => {
-		if (!selectedFile) return
+		if (!selectedFile) {
+			toast.error("Por favor selecciona un archivo")
+			return
+		}
 
 		setUploading(true)
-		setMessage("Subiendo documento...")
+		setMessage("Actualizando documento...")
 
 		try {
 			const fileExtension = selectedFile.name.split(".").pop()
@@ -92,12 +98,13 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					const fileSize = selectedFile.size
 					const fileType = selectedFile.type
 
-					const saveResult = await uploadFile(
-						values,
-						`${process.env.NEXT_PUBLIC_S3_URL}/${uniqueFilename}`,
-						fileSize,
-						fileType
-					)
+					const saveResult = await updateFile({
+						...values,
+						fileId,
+						url: `${process.env.NEXT_PUBLIC_S3_URL}/${uniqueFilename}`,
+						size: fileSize,
+						type: fileType,
+					})
 					if (!saveResult.ok) {
 						throw new Error("Error al guardar el documento en la base de datos")
 					}
@@ -109,7 +116,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 						description: "El documento se ha subido correctamente",
 						duration: 3000,
 					})
-					router.push(backPath || `/dashboard/documentacion/${area}`)
+					router.push(lastPath || `/dashboard/documentacion/`)
 				}
 			}
 		} catch (error) {
@@ -125,10 +132,6 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		}
 	}
 
-	useEffect(() => {
-		console.log(form.getValues())
-	}, [form])
-
 	return (
 		<Form {...form}>
 			<form
@@ -140,13 +143,9 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					name="name"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">Nombre del documento</FormLabel>
+							<FormLabel>Nombre del archivo</FormLabel>
 							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre del documento"
-									{...field}
-								/>
+								<Input {...field} disabled={uploading} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -158,16 +157,9 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					name="description"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">
-								Descripción
-								<span className="text-muted-foreground text-xs">(opcional)</span>
-							</FormLabel>
+							<FormLabel>Descripción</FormLabel>
 							<FormControl>
-								<Textarea
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Descripción"
-									{...field}
-								/>
+								<Textarea {...field} disabled={uploading} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -199,39 +191,27 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					)}
 				/>
 
-				<FormItem>
-					<FormLabel className="text-gray-700">Archivo</FormLabel>
-					<FormControl>
-						<Input
-							type="file"
-							accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt, .jpg, .jpeg, .png, .webp, .avif"
-							className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-							onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-						/>
-					</FormControl>
-					<FormMessage />
-				</FormItem>
-
 				<FormField
 					control={form.control}
 					name="registrationDate"
 					render={({ field }) => (
-						<FormItem className="flex flex-col gap-1">
-							<FormLabel>Fecha de Registro</FormLabel>
+						<FormItem className="flex flex-col">
+							<FormLabel>Fecha de registro</FormLabel>
 							<Popover>
 								<PopoverTrigger asChild>
 									<FormControl>
 										<Button
 											variant={"outline"}
 											className={cn(
-												"w-full rounded-md border-gray-200 bg-white pl-3 text-left text-sm font-normal text-gray-700",
+												"w-full pl-3 text-left font-normal",
 												!field.value && "text-muted-foreground"
 											)}
+											disabled={uploading}
 										>
 											{field.value ? (
 												format(field.value, "PPP", { locale: es })
 											) : (
-												<span>Selecciona la fecha</span>
+												<span>Selecciona una fecha</span>
 											)}
 											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 										</Button>
@@ -239,12 +219,12 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">
 									<Calendar
-										locale={es}
 										mode="single"
 										selected={field.value}
 										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
+										disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
 										initialFocus
+										locale={es}
 									/>
 								</PopoverContent>
 							</Popover>
@@ -257,25 +237,23 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					control={form.control}
 					name="expirationDate"
 					render={({ field }) => (
-						<FormItem className="flex flex-col gap-1">
-							<FormLabel>
-								Fecha de Expiracion
-								<span className="text-muted-foreground text-xs">(opcional)</span>
-							</FormLabel>
+						<FormItem className="flex flex-col">
+							<FormLabel>Fecha de expiración</FormLabel>
 							<Popover>
 								<PopoverTrigger asChild>
 									<FormControl>
 										<Button
 											variant={"outline"}
 											className={cn(
-												"w-full rounded-md border-gray-200 bg-white pl-3 text-left text-sm font-normal text-gray-700",
+												"w-full pl-3 text-left font-normal",
 												!field.value && "text-muted-foreground"
 											)}
+											disabled={uploading}
 										>
 											{field.value ? (
 												format(field.value, "PPP", { locale: es })
 											) : (
-												<span>Selecciona la fecha</span>
+												<span>Selecciona una fecha</span>
 											)}
 											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
 										</Button>
@@ -283,12 +261,12 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">
 									<Calendar
-										locale={es}
 										mode="single"
-										selected={field.value}
+										selected={field.value || undefined}
 										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
+										disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
 										initialFocus
+										locale={es}
 									/>
 								</PopoverContent>
 							</Popover>
@@ -297,11 +275,32 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					)}
 				/>
 
-				<Button type="submit" disabled={uploading || !selectedFile}>
-					{uploading ? "Subiendo..." : "Subir documento"}
-				</Button>
+				<div className="space-y-4">
+					<FormLabel>Archivo</FormLabel>
+					<Input
+						type="file"
+						disabled={uploading}
+						onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+						accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .txt, .jpg, .jpeg, .png, .webp, .avif"
+					/>
+					{message && <p className="text-muted-foreground text-sm">{message}</p>}
+				</div>
 
-				{message && <p className="text-muted-foreground text-sm">{message}</p>}
+				<div className="flex gap-4">
+					<Button type="submit" disabled={uploading}>
+						{uploading ? "Actualizando..." : "Actualizar archivo"}
+					</Button>
+					{lastPath && (
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => router.push(lastPath)}
+							disabled={uploading}
+						>
+							Cancelar
+						</Button>
+					)}
+				</div>
 			</form>
 		</Form>
 	)

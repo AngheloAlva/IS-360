@@ -1,6 +1,6 @@
 import { Areas } from "@/lib/consts/areas"
 
-import { PlusIcon, UploadIcon, RefreshCcw, ChevronLeft } from "lucide-react"
+import { PlusIcon, UploadIcon, ChevronLeft } from "lucide-react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 
@@ -42,6 +42,11 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 			? `/dashboard/documentacion/${area}/${folderSlug.slice(0, -1).join("/")}`
 			: `/dashboard/documentacion/${area}`
 
+	const lastPath =
+		folderSlug.length > 1
+			? `/dashboard/documentacion/${area}/${folderSlug.join("/")}`
+			: `/dashboard/documentacion/${area}`
+
 	return (
 		<div className="container mx-auto">
 			<div className="mb-6 flex items-center justify-between">
@@ -57,15 +62,10 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 				</div>
 
 				<div className="flex gap-2">
-					<Button size="sm" variant="outline">
-						<RefreshCcw className="mr-2 h-4 w-4" />
-						Actualizar
-					</Button>
-
 					<Link
 						href={`/dashboard/documentacion/nuevo-archivo?area=${areaName}&parentFolderSlug=${lastFolder}&backPath=${backPath}`}
 					>
-						<Button size="sm" variant="outline">
+						<Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
 							<UploadIcon className="mr-2 h-4 w-4" />
 							Subir Archivo
 						</Button>
@@ -85,6 +85,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 			<div className="rounded-md border bg-white shadow-sm">
 				<FileExplorerTable
 					files={res.files}
+					lastPath={lastPath}
 					folders={res.folders}
 					foldersSlugs={[area, ...folderSlug]}
 					isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}

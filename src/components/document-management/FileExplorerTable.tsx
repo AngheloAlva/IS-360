@@ -37,16 +37,18 @@ type FullFolder = Folder & {
 }
 
 interface FileExplorerTableProps {
-	files: (File & { user: User })[]
 	isAdmin: boolean
+	lastPath?: string
 	folders: FullFolder[]
 	foldersSlugs: string[]
+	files: (File & { user: User })[]
 }
 
 export function FileExplorerTable({
 	files,
 	folders,
 	isAdmin,
+	lastPath,
 	foldersSlugs,
 }: FileExplorerTableProps) {
 	const getFileIcon = (item: File) => {
@@ -135,9 +137,15 @@ export function FileExplorerTable({
 
 						{isAdmin && (
 							<TableCell>
-								<Button size="sm" variant="outline">
-									<Edit className="h-4 w-4" />
-								</Button>
+								<Link
+									href={`/dashboard/documentacion/actualizar-carpeta/${item.id}${
+										lastPath && "?lastPath=" + lastPath
+									}`}
+								>
+									<Button size="sm" variant="outline">
+										<Edit className="h-4 w-4" />
+									</Button>
+								</Link>
 							</TableCell>
 						)}
 					</TableRow>
@@ -148,7 +156,12 @@ export function FileExplorerTable({
 						<TableCell>
 							<div className="flex items-center gap-2">
 								{getFileIcon(item)}
-								<Link href={item.url} className="font-medium hover:underline">
+								<Link
+									href={item.url}
+									target="_blank"
+									rel="noreferrer noopener"
+									className="font-medium hover:underline"
+								>
 									{item.code.charAt(0) + "-" + item.name}
 								</Link>
 							</div>
@@ -170,9 +183,15 @@ export function FileExplorerTable({
 
 						{isAdmin && (
 							<TableCell>
-								<Button size="sm" variant="outline">
-									<Edit className="h-4 w-4" />
-								</Button>
+								<Link
+									href={`/dashboard/documentacion/actualizar-archivo/${item.id}${
+										lastPath && "?lastPath=" + lastPath
+									}`}
+								>
+									<Button size="sm" variant="outline">
+										<Edit className="h-4 w-4" />
+									</Button>
+								</Link>
 							</TableCell>
 						)}
 					</TableRow>

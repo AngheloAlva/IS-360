@@ -66,6 +66,10 @@ export const columns: ColumnDef<
 	{
 		accessorKey: "programDate",
 		header: "Fecha Programada",
+		cell: ({ row }) => {
+			const date = row.getValue("programDate") as Date
+			return <span>{format(new Date(date), "yyyy-MM-dd")}</span>
+		},
 	},
 	{
 		accessorKey: "estimatedHours",
@@ -78,10 +82,18 @@ export const columns: ColumnDef<
 	{
 		accessorKey: "requiresBreak",
 		header: "Requiere Dias de Paro",
+		cell: ({ row }) => {
+			const requiresBreak = row.getValue("requiresBreak") as boolean
+			return <span>{requiresBreak ? "Sí" : "No"}</span>
+		},
 	},
 	{
 		accessorKey: "estimatedEndDate",
 		header: "Fecha de Finalización",
+		cell: ({ row }) => {
+			const date = row.getValue("estimatedEndDate") as Date
+			return <span>{format(new Date(date), "yyyy-MM-dd")}</span>
+		},
 	},
 	{
 		accessorKey: "responsible",
