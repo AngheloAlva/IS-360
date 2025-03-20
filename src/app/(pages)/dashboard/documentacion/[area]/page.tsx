@@ -2,13 +2,13 @@ import { Areas } from "@/lib/consts/areas"
 
 import { PlusIcon, UploadIcon, RefreshCcw, ChevronLeft } from "lucide-react"
 import { notFound } from "next/navigation"
+import { headers } from "next/headers"
 import Link from "next/link"
 
 import { FileExplorerTable } from "@/components/document-management/FileExplorerTable"
 import { getFilesAndFolders } from "@/actions/document-management/getFilesAndFolders"
 import { Button } from "@/components/ui/button"
 import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
 
 interface PageProps {
 	params: Promise<{
@@ -46,7 +46,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 						<ChevronLeft className="h-7 w-7" />
 					</Link>
 
-					<h1 className="text-2xl font-bold">Gestor Documental - {area}</h1>
+					<h1 className="text-2xl font-bold capitalize">Gestor Documental - {area}</h1>
 				</div>
 				<div className="flex gap-2">
 					<Button size="sm" variant="outline">
@@ -74,7 +74,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 				<FileExplorerTable
 					folders={res.folders}
 					files={res.files}
-					foldersIds={[area]}
+					foldersSlugs={[area]}
 					isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
 				/>
 			</div>

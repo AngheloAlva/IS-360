@@ -21,13 +21,19 @@ export default async function AddNewFilePage(props: { searchParams: SearchParams
 
 	const searchParams = await props.searchParams
 	const area = searchParams.area as string
-	const parentFolderId = searchParams.parentFolderId as string | undefined
+	const parentFolderSlug = searchParams.parentFolderSlug as string | undefined
+	const backPath = searchParams.backPath as string | undefined
 
 	return (
 		<>
 			<h1 className="w-fit text-3xl font-bold">Nuevo Archivo</h1>
 
-			<NewFileForm userId={res.user.id} folderId={parentFolderId} area={area} />
+			<NewFileForm
+				area={area}
+				backPath={backPath}
+				userId={res.user.id}
+				folderSlug={parentFolderSlug}
+			/>
 		</>
 	)
 }

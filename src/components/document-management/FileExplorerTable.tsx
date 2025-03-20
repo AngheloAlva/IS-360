@@ -1,10 +1,23 @@
-import { FolderIcon, ImageIcon, VideoIcon, FileIcon, FileText, Edit } from "lucide-react"
+import {
+	FolderIcon,
+	ImageIcon,
+	VideoIcon,
+	FileIcon,
+	FileText,
+	Edit,
+	FolderCheckIcon,
+	FolderClockIcon,
+	FolderCogIcon,
+	FolderHeartIcon,
+	FolderLockIcon,
+} from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 import Link from "next/link"
 
 import { Codes } from "@/lib/consts/codes"
 
+import { Button } from "../ui/button"
 import {
 	Table,
 	TableRow,
@@ -16,7 +29,6 @@ import {
 } from "@/components/ui/table"
 
 import type { File, Folder, User } from "@prisma/client"
-import { Button } from "../ui/button"
 
 type FullFolder = Folder & {
 	files: File[]
@@ -25,13 +37,18 @@ type FullFolder = Folder & {
 }
 
 interface FileExplorerTableProps {
-	files: File[]
+	files: (File & { user: User })[]
 	isAdmin: boolean
-	foldersIds: string[]
 	folders: FullFolder[]
+	foldersSlugs: string[]
 }
 
-export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileExplorerTableProps) {
+export function FileExplorerTable({
+	files,
+	folders,
+	isAdmin,
+	foldersSlugs,
+}: FileExplorerTableProps) {
 	const getFileIcon = (item: File) => {
 		const type = item.type.split("/")[0]
 
@@ -44,6 +61,25 @@ export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileE
 				return <VideoIcon className="h-5 w-5 text-orange-500" />
 			default:
 				return <FileIcon className="h-5 w-5 text-gray-500" />
+		}
+	}
+
+	const getFolderIcon = (type: Folder["type"]) => {
+		switch (type) {
+			case "default":
+				return <FolderIcon className="h-5 w-5 text-yellow-500" />
+			case "check":
+				return <FolderCheckIcon className="h-5 w-5 text-green-500" />
+			case "clock":
+				return <FolderClockIcon className="h-5 w-5 text-blue-500" />
+			case "service":
+				return <FolderCogIcon className="h-5 w-5 text-indigo-500" />
+			case "favorite":
+				return <FolderHeartIcon className="h-5 w-5 text-red-500" />
+			case "lock":
+				return <FolderLockIcon className="h-5 w-5 text-gray-500" />
+			default:
+				return <FolderIcon className="h-5 w-5 text-yellow-500" />
 		}
 	}
 
@@ -76,9 +112,9 @@ export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileE
 					<TableRow key={item.id}>
 						<TableCell>
 							<div className="flex items-center gap-2">
-								<FolderIcon className="h-5 w-5 text-yellow-500" />
+								{getFolderIcon(item.type)}
 								<Link
-									href={`/dashboard/documentacion/${foldersIds.join("/")}/${item.id}`}
+									href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug}`}
 									className="font-medium hover:underline"
 								>
 									{item.name}
@@ -100,8 +136,7 @@ export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileE
 						{isAdmin && (
 							<TableCell>
 								<Button size="sm" variant="outline">
-									<Edit className="mr-2 h-4 w-4" />
-									Editar
+									<Edit className="h-4 w-4" />
 								</Button>
 							</TableCell>
 						)}
@@ -130,13 +165,13 @@ export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileE
 						<TableCell>
 							{item.expirationDate ? format(item.expirationDate, "dd/MM/yyyy") : "N/A"}
 						</TableCell>
-						<TableCell></TableCell>
+						<TableCell>{item.user?.name}</TableCell>
 						<TableCell>{item.revisionCount}</TableCell>
 
 						{isAdmin && (
 							<TableCell>
 								<Button size="sm" variant="outline">
-									<Edit className="mr-2 h-4 w-4" />
+									<Edit className="h-4 w-4" />
 								</Button>
 							</TableCell>
 						)}
@@ -145,7 +180,7 @@ export function FileExplorerTable({ files, folders, foldersIds, isAdmin }: FileE
 
 				{folders.length === 0 && files.length === 0 && (
 					<TableRow>
-						<TableCell colSpan={6} className="py-8 text-center text-gray-500">
+						<TableCell colSpan={8} className="py-8 text-center text-gray-500">
 							No hay archivos ni carpetas en esta ubicación
 						</TableCell>
 					</TableRow>

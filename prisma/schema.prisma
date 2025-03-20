@@ -516,7 +516,6 @@ model Folder {
   description String?
   root        Boolean  @default(false)
   area        Area
-  color       String   @default("oklch(.795 .184 86.047)")
   type        String   @default("default")
   isExternal  Boolean  @default(false)
   

@@ -8,8 +8,9 @@ export const folderFormSchema = z.object({
 	name: z.string({ message: "El nombre es requerido" }),
 	description: z.string().optional(),
 	area: z.enum(SimpleAreas, { message: "El área es requerida" }),
+	type: z.string().optional(),
 
-	parentId: z.string().optional(),
+	parentSlug: z.string().optional(),
 })
 
 export type FolderFormSchema = z.infer<typeof folderFormSchema>

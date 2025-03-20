@@ -11,7 +11,28 @@ export const uploadFile = async (
 	fileType: string
 ) => {
 	try {
-		const { folderId, userId, ...rest } = data
+		const { folderSlug, userId, ...rest } = data
+		let folderId: string | null = null
+
+		if (folderSlug) {
+			const foundFolder = await prisma.folder.findFirst({
+				where: {
+					slug: folderSlug,
+				},
+				select: {
+					id: true,
+				},
+			})
+
+			if (!foundFolder) {
+				return {
+					ok: false,
+					error: "Carpeta no encontrada",
+				}
+			}
+
+			folderId = foundFolder.id
+		}
 
 		let relations: {
 			folder?: {
@@ -32,7 +53,7 @@ export const uploadFile = async (
 			},
 		}
 
-		if (folderId) {
+		if (folderSlug && folderId !== null) {
 			relations = {
 				...relations,
 				folder: {

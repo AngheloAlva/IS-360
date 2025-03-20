@@ -4,10 +4,19 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
+import { toast } from "sonner"
+import {
+	FolderIcon,
+	FolderCogIcon,
+	FolderLockIcon,
+	FolderCheckIcon,
+	FolderClockIcon,
+	FolderHeartIcon,
+} from "lucide-react"
 
 import { createFolder } from "@/actions/document-management/createFolder"
+import { FolderTypes } from "@/lib/consts/folder-types"
 import { Areas } from "@/lib/consts/areas"
-import { toast } from "sonner"
 import {
 	folderFormSchema,
 	type FolderFormSchema,
@@ -24,15 +33,24 @@ import {
 	FormControl,
 	FormMessage,
 } from "@/components/ui/form"
+import {
+	Select,
+	SelectItem,
+	SelectValue,
+	SelectContent,
+	SelectTrigger,
+} from "@/components/ui/select"
 
 export default function NewFolderForm({
 	area,
 	userId,
-	parentId,
+	backPath,
+	parentSlug,
 	isRootFolder,
 }: {
 	userId: string
-	parentId?: string
+	backPath?: string
+	parentSlug?: string
 	isRootFolder: boolean
 	area: (typeof Areas)[keyof typeof Areas]["title"]
 }): React.ReactElement {
@@ -46,9 +64,10 @@ export default function NewFolderForm({
 			area,
 			userId,
 			name: "",
+			type: "default",
 			description: "",
 			root: isRootFolder,
-			parentId: parentId || "",
+			parentSlug: parentSlug || "",
 		},
 	})
 
@@ -56,7 +75,7 @@ export default function NewFolderForm({
 		try {
 			setLoading(true)
 
-			const { ok, message } = await createFolder(values)
+			const { ok, data, message } = await createFolder(values)
 
 			if (ok) {
 				toast("Carpeta creada con éxito", {
@@ -64,9 +83,13 @@ export default function NewFolderForm({
 					duration: 5000,
 				})
 
-				router.push(
-					`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === area)}`
-				)
+				if (backPath) {
+					router.push(`${backPath}/${data?.slug}`)
+				} else {
+					router.push(
+						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === area)}/${data?.slug}`
+					)
+				}
 			} else {
 				toast("Error al crear la carpeta", {
 					description: message,
@@ -128,6 +151,59 @@ export default function NewFolderForm({
 						</FormItem>
 					)}
 				/>
+
+				<FormField
+					control={form.control}
+					name="type"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Tipo de Carpeta</FormLabel>
+							<Select onValueChange={field.onChange} defaultValue={field.value}>
+								<FormControl>
+									<SelectTrigger className="border-gray-200">
+										<SelectValue placeholder="Seleccione un tipo" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent className="text-neutral-700">
+									{FolderTypes.map((type) => (
+										<SelectItem key={type.value} value={type.value}>
+											{type.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<span className="text-muted-foreground mt-4 font-medium underline">Tipos de carpetas</span>
+				<div className="flex flex-wrap items-center justify-between gap-4">
+					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+						<FolderIcon className="h-5 w-5 text-yellow-500" />
+						<span>Por defecto</span>
+					</div>
+					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+						<FolderCheckIcon className="h-5 w-5 text-green-500" />
+						<span>Check</span>
+					</div>
+					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+						<FolderClockIcon className="h-5 w-5 text-blue-500" />
+						<span>Reloj</span>
+					</div>
+					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+						<FolderCogIcon className="h-5 w-5 text-indigo-500" />
+						<span>Servicio</span>
+					</div>
+					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+						<FolderHeartIcon className="h-5 w-5 text-red-500" />
+						<span>Favorito</span>
+					</div>
+					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+						<FolderLockIcon className="h-5 w-5 text-gray-500" />
+						<span>Bloqueado</span>
+					</div>
+				</div>
 
 				<Button className="mt-4" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (

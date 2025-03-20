@@ -37,15 +37,14 @@ import {
 	SelectValue,
 } from "@/components/ui/select"
 import { Codes } from "@/lib/consts/codes"
-import { Areas } from "@/lib/consts/areas"
-
 interface NewFileFormProps {
 	area: string
 	userId: string
-	folderId?: string
+	backPath?: string
+	folderSlug?: string
 }
 
-export function NewFileForm({ userId, folderId, area }: NewFileFormProps) {
+export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormProps) {
 	const [selectedFile, setSelectedFile] = useState<File | null>(null)
 	const [uploading, setUploading] = useState(false)
 	const [message, setMessage] = useState("")
@@ -57,7 +56,7 @@ export function NewFileForm({ userId, folderId, area }: NewFileFormProps) {
 		defaultValues: {
 			userId,
 			name: "",
-			folderId,
+			folderSlug,
 			description: "",
 			expirationDate: undefined,
 			registrationDate: new Date(),
@@ -110,9 +109,7 @@ export function NewFileForm({ userId, folderId, area }: NewFileFormProps) {
 						description: "El documento se ha subido correctamente",
 						duration: 3000,
 					})
-					router.push(
-						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === area)}`
-					)
+					router.push(backPath || `/dashboard/documentacion/${area}`)
 				}
 			}
 		} catch (error) {

@@ -5,7 +5,27 @@ import prisma from "@/lib/prisma"
 
 export const createFolder = async (values: FolderFormSchema) => {
 	try {
-		const { parentId, userId, ...rest } = values
+		const { parentSlug, userId, ...rest } = values
+
+		let parentId: string | null = null
+
+		if (parentSlug) {
+			const foundParentId = await prisma.folder.findFirst({
+				where: {
+					slug: parentSlug,
+					area: rest.area,
+				},
+				select: {
+					id: true,
+				},
+			})
+
+			if (!foundParentId) {
+				return { ok: false, message: "Parent folder not found" }
+			}
+
+			parentId = foundParentId.id
+		}
 
 		let connections: {
 			user: {
@@ -26,7 +46,7 @@ export const createFolder = async (values: FolderFormSchema) => {
 			},
 		}
 
-		if (parentId) {
+		if (parentSlug && parentId !== null) {
 			connections = {
 				...connections,
 				parent: {
@@ -48,7 +68,7 @@ export const createFolder = async (values: FolderFormSchema) => {
 			},
 		})
 
-		return { ok: true, folder }
+		return { ok: true, data: folder }
 	} catch (error) {
 		console.error("Error creating folder:", error)
 		return { ok: false, message: "Error creating folder" }

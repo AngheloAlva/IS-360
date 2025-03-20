@@ -3,7 +3,7 @@ import { z } from "zod"
 
 export const fileFormSchema = z.object({
 	userId: z.string(),
-	folderId: z.string().optional(),
+	folderSlug: z.string().optional(),
 
 	code: z.enum(Codes, { message: "El código es requerido" }),
 	name: z.string({ message: "El nombre es requerido" }),

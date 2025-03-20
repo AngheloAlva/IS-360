@@ -6,13 +6,13 @@ import type { Areas } from "@/lib/consts/areas"
 
 export async function getFilesAndFolders(
 	area: (typeof Areas)[keyof typeof Areas]["title"],
-	folderId: string | null = null
+	folderSlug: string | null = null
 ) {
 	try {
 		const folders = await prisma.folder.findMany({
 			where: {
 				area,
-				parentId: folderId ? { in: [folderId] } : null,
+				parent: folderSlug ? { slug: folderSlug } : null,
 			},
 			include: {
 				files: true,
@@ -23,7 +23,7 @@ export async function getFilesAndFolders(
 
 		const files = await prisma.file.findMany({
 			where: {
-				folderId: folderId ? { in: [folderId] } : null,
+				folder: folderSlug ? { slug: folderSlug } : null,
 			},
 			include: {
 				user: true,
