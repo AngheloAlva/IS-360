@@ -9,7 +9,7 @@ export const workOrderSchema = z.object({
 	solicitationDate: z.date({ message: "La fecha de solicitud no es válida" }),
 	solicitationTime: z.string({ message: "La hora de solicitud no es válida" }),
 	workRequest: z.string().min(1, { message: "La solicitud no puede estar vacía" }),
-	workDescription: z.string().min(1, { message: "La descripción no puede estar vacía" }),
+	workDescription: z.string().optional(),
 	priority: z.enum(WorkOrderPriorityKeys, { message: "La prioridad no es válida" }),
 	// equipment: z.array(z.string(), { message: "El equipo no es válido" }),
 	equipment: z.string().nonempty({ message: "El equipo no puede estar vacío" }),

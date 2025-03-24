@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import {
 	Send,
 	User,
@@ -13,11 +14,11 @@ import {
 	MonitorPlay,
 	Construction,
 } from "lucide-react"
-import Image from "next/image"
 
 import { useAuthorization } from "@/hooks/useAuthorization"
 
 import { NavSecondary } from "./navSecondary"
+import { NavInternal } from "./navInternal"
 import { NavMain } from "./navMain"
 import { NavUser } from "./navUser"
 import {
@@ -53,37 +54,22 @@ const data = {
 	navAdmin: [
 		{
 			name: "Planes de Mantenimiento",
-			url: "/dashboard/admin/planes-de-mantenimiento",
+			url: "/admin/dashboard/planes-de-mantenimiento",
 			icon: Construction,
 		},
 		{
 			name: "Ordenes de Trabajo",
-			url: "/dashboard/admin/ordenes-de-trabajo",
+			url: "/admin/dashboard/ordenes-de-trabajo",
 			icon: LayoutList,
 		},
 		{
-			name: "Equipos",
-			url: "/dashboard/admin/herramientas",
-			icon: Wrench,
-		},
-		{
-			name: "Empresas",
-			url: "/dashboard/admin/empresas",
-			icon: Building2,
-		},
-		{
-			name: "Usuarios",
-			url: "/dashboard/admin/usuarios",
-			icon: User,
-		},
-		{
 			name: "Permisos de Trabajo",
-			url: "/dashboard/admin/permisos-de-trabajo",
+			url: "/admin/dashboard/permisos-de-trabajo",
 			icon: FileText,
 		},
 		{
 			name: "Libros de Obras",
-			url: "/dashboard/admin/libros-de-obras",
+			url: "/admin/dashboard/libros-de-obras",
 			icon: BookCopy,
 		},
 	],
@@ -108,6 +94,24 @@ const data = {
 	],
 }
 
+const navInternal = [
+	{
+		name: "Equipos",
+		url: "/admin/dashboard/herramientas",
+		icon: Wrench,
+	},
+	{
+		name: "Empresas",
+		url: "/admin/dashboard/empresas",
+		icon: Building2,
+	},
+	{
+		name: "Usuarios",
+		url: "/admin/dashboard/usuarios",
+		icon: User,
+	},
+]
+
 interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
 	session: Session
 }
@@ -122,7 +126,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 	]
 
 	return (
-		<Sidebar collapsible="icon" {...props}>
+		<Sidebar collapsible="icon" variant="inset" {...props}>
 			<SidebarHeader>
 				<SidebarMenuButton size="lg">
 					<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
@@ -137,6 +141,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 
 			<SidebarContent>
 				<NavMain navItems={navItems} />
+				{canAccessAdminRoutes && <NavInternal navItems={navInternal} />}
 
 				<NavSecondary items={data.navSecondary} className="mt-auto" />
 			</SidebarContent>

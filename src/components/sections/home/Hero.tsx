@@ -13,23 +13,17 @@ export default function Hero(): React.ReactElement {
 					</h1>
 
 					<p className="mt-4 max-w-lg text-white sm:text-xl/relaxed">
-						Aca podras gestionar todas las ordenes de trabajo que fueron asignadas a tu empresa
+						Sistema para la gestion de ordenes de trabajo, permisos de trabajo, libros de obra,
+						charlas de seguridad, entre otros.
 					</p>
 
 					<div className="mt-8 flex flex-wrap gap-4 text-center">
 						<Link
-							href="/auth/register"
-							className="bg-feature block w-full rounded-md px-12 py-3 text-sm font-medium text-white shadow-sm hover:brightness-90 focus:ring-3 focus:outline-hidden sm:w-auto"
-						>
-							Registrarse
-						</Link>
-
-						<a
 							href="/auth/login"
-							className="text-feature block w-full rounded-md bg-white px-12 py-3 text-sm font-medium shadow-sm hover:brightness-90 focus:ring-3 focus:outline-hidden sm:w-auto"
+							className="bg-feature block w-full rounded-md px-12 py-3 text-sm font-bold tracking-wider text-white shadow-sm hover:brightness-90 focus:ring-3 focus:outline-hidden sm:w-auto"
 						>
 							Iniciar Sesión
-						</a>
+						</Link>
 					</div>
 				</div>
 			</div>

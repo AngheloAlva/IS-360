@@ -12,7 +12,7 @@
 }
 
 :root {
-	--background: oklch(1 0 0);
+	--background: oklch(99.45% 0.0017 67.8);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
@@ -41,7 +41,7 @@
 	--chart-7: oklch(0.6 0.2 160);
 	--chart-8: oklch(0.5 0.2 200);
 	--chart-9: oklch(0.8 0.3 60);
-	--sidebar: hsl(0 0% 98%);
+	--sidebar: hsl(0, 0%, 100%);
 	--sidebar-foreground: hsl(240 5.3% 26.1%);
 	--sidebar-primary: hsl(240 5.9% 10%);
 	--sidebar-primary-foreground: hsl(0 0% 98%);

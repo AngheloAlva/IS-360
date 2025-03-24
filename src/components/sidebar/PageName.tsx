@@ -7,6 +7,7 @@ import {
 	BreadcrumbItem,
 	BreadcrumbList,
 	BreadcrumbPage,
+	BreadcrumbLink,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
@@ -19,7 +20,9 @@ export default function PageName(): React.ReactElement {
 			<BreadcrumbList>
 				{path.map((item, i) => (
 					<BreadcrumbItem key={i}>
-						<BreadcrumbPage className="capitalize">{item.split("-").join(" ")}</BreadcrumbPage>
+						<BreadcrumbLink href={`/${path.slice(0, i + 1).join("/")}`}>
+							<BreadcrumbPage className="capitalize">{item.split("-").join(" ")}</BreadcrumbPage>
+						</BreadcrumbLink>
 						{i < path.length - 1 && <BreadcrumbSeparator />}
 					</BreadcrumbItem>
 				))}

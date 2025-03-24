@@ -39,7 +39,7 @@ enum AREAS {
 }
 
 model User {
-  id            String    @id
+  id            String            @id
   name          String
   email         String
   emailVerified Boolean
@@ -54,34 +54,30 @@ model User {
   banReason     String?
   banExpires    DateTime?
   rut           String
-  progress      Float    @default(0)
-  
-  sessions      Session[]
-  accounts      Account[]
+  progress      Float             @default(0)
 
-  files            File[]
-  folders          Folder[]
-  workBooks        WorkBook[]
-  marcoWorkBooks   MarcoWorkBook[]
-  workTrackers     WorkTracker[]
-  safetyTalks      UserSafetyTalk[]
-  workApplications WorkApplication[]
-
-  company          Company? @relation(fields: [companyId], references: [id])
-  companyId        String?
-  isSupervisor     Boolean?
-
-  workOrders                     WorkOrder[]     @relation("WorkOrderResponsible")
-  workOrdersAsSupervisor         WorkOrder[]     @relation("WorkOrderSupervisor")
-
-  assignedEntries                WorkBookEntry[] @relation("AssignedUsers")
-  reportedInEntries              WorkBookEntry[] @relation("ReportedUsers")
-  createdEntries                 WorkBookEntry[] @relation("WorkBookEntryCreator")
-  signedEntries                  WorkBookEntry[] @relation("WorkBookEntrySigner")
-  
-  workPermitsAsParticipant       WorkPermit[]    @relation("WorkPermitParticipants")
-  workPermitsAsPreventionOfficer WorkPermit[]    @relation("PreventionOfficer")
-  workPermits                    WorkPermit[]    @relation("WorkPermitUser")
+  sessions                       Session[]
+  accounts                       Account[]
+  files                          File[]
+  folders                        Folder[]
+  workTrackers                   WorkTracker[]
+  safetyTalks                    UserSafetyTalk[]
+  workApplications               WorkApplication[]
+  company                        Company?            @relation(fields: [companyId], references: [id])
+  companyId                      String?
+  isSupervisor                   Boolean?
+  workOrders                     WorkOrder[]         @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor         WorkOrder[]         @relation("WorkOrderSupervisor")
+  assignedEntries                WorkEntry[]         @relation("AssignedUsers")
+  reportedInEntries              WorkEntry[]         @relation("ReportedUsers")
+  createdEntries                 WorkEntry[]         @relation("WorkEntryCreator")
+  signedEntries                  WorkEntry[]         @relation("WorkEntrySigner")
+  workEntries                    WorkEntry[]         @relation("WorkEntryApproval")
+  workPermitsAsParticipant       WorkPermit[]        @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer WorkPermit[]        @relation("PreventionOfficer")
+  workPermits                    WorkPermit[]        @relation("WorkPermitUser")
+  attachmentsHistory             AttachmentHistory[]
+  equipmentHistory               EquipmentHistory[]
 
   @@unique([email])
   @@unique([rut])
@@ -124,18 +120,16 @@ model Account {
 }
 
 model Company {
-  id   String @id @default(cuid())
+  id String @id @default(cuid())
 
   name String
   rut  String
 
-  users          User[]
-  workOrders     WorkOrder[]
-  workBooks      WorkBook[]
-  marcoWorkBooks MarcoWorkBook[]
+  users      User[]
+  workOrders WorkOrder[]
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([id])
   @@map("company")
@@ -173,41 +167,47 @@ enum WORK_ORDER_PRIORITY {
 }
 
 model WorkOrder {
-  id                 String  @id @default(cuid())
-  otNumber           String
+  id       String @id @default(cuid())
+  otNumber String
 
-  type               WORK_ORDER_TYPE
-  status             WORK_ORDER_STATUS @default(PENDING)
-  solicitationDate   DateTime
-  solicitationTime   String
-  workRequest        String
-  workDescription    String
-  priority           WORK_ORDER_PRIORITY
-  equipment          Equipment[]
-  programDate        DateTime
-  estimatedHours     Float
-  estimatedDays      Float
-  requiresBreak      Boolean
-  breakDays          Int?
-  estimatedEndDate   DateTime?
+  type             WORK_ORDER_TYPE
+  status           WORK_ORDER_STATUS   @default(PENDING)
+  solicitationDate DateTime
+  solicitationTime String
+  workRequest      String
+  workDescription  String?
+  priority         WORK_ORDER_PRIORITY
+  equipment        Equipment[]
+  programDate      DateTime
+  estimatedHours   Float
+  estimatedDays    Float
+  requiresBreak    Boolean
+  breakDays        Int?
+  estimatedEndDate DateTime?
 
-  company            Company     @relation(fields: [companyId], references: [id])
-  companyId          String
-  supervisor         User        @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
-  supervisorId       String
-  responsible        User        @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
-  responsibleId      String
-  initReport         Attachment? @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
-  initReportId       String?     @unique
-  endReport          Attachment? @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
-  endReportId        String?     @unique
-  workBooks          WorkBook[]
-  marcoWorkBooks     MarcoWorkBook[]
-  workPermits        WorkPermit[]
-  workTrackers       WorkTracker[]
+  // Work book data
+  workName           String
+  workLocation       String
+  workStartDate      DateTime
+  workProgressStatus String
+  workEntries        WorkEntry[]
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  company          Company            @relation(fields: [companyId], references: [id])
+  companyId        String
+  supervisor       User               @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
+  supervisorId     String
+  responsible      User               @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
+  responsibleId    String
+  initReport       Attachment?        @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
+  initReportId     String?            @unique
+  endReport        Attachment?        @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
+  endReportId      String?            @unique
+  workPermits      WorkPermit[]
+  workTrackers     WorkTracker[]
+  equipmentHistory EquipmentHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([id])
   @@unique([otNumber])
@@ -215,18 +215,19 @@ model WorkOrder {
 }
 
 model Equipment {
-  id            String  @id @default(cuid())
-  barcode       String
+  id      String @id @default(cuid())
+  barcode String
 
   name          String
   description   String?
   location      String
   isOperational Boolean @default(true)
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  workOrders    WorkOrder[]
+  workOrders WorkOrder[]
+  history    EquipmentHistory[]
 
   @@unique([id])
   @@unique([barcode])
@@ -242,16 +243,16 @@ enum WORK_APPLICATION_STATUS {
 }
 
 model WorkApplication {
-  id                 String  @id @default(cuid())
+  id String @id @default(cuid())
 
-  description        String
-  location           String
-  status             WORK_APPLICATION_STATUS @default(PENDING)
-  criticality        String
+  description String
+  location    String
+  status      WORK_APPLICATION_STATUS @default(PENDING)
+  criticality String
 
-  attachments        Attachment[]
-  responsible        User        @relation(fields: [responsibleId], references: [id])
-  responsibleId      String
+  attachments   Attachment[]
+  responsible   User         @relation(fields: [responsibleId], references: [id])
+  responsibleId String
 
   @@unique([id])
   @@map("work_application")
@@ -272,77 +273,22 @@ enum NOTE_STATUS {
   RESOLVED
 }
 
-model WorkBook {
-  id                   String  @id @default(cuid())
-
-  contractingCompany   String
-  workResponsibleName  String
-  workResponsiblePhone String
-  otcInspectorName     String
-  otcInspectorPhone    String
-  workName             String
-  workLocation         String
-  workType             String
-  workStartDate        DateTime
-  workEstimatedEndDate DateTime
-  workStatus           String
-  workProgressStatus   String
-
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  otNumber             WorkOrder @relation(fields: [otNumberId], references: [id])
-  otNumberId           String
-  user                 User @relation(fields: [userId], references: [id])
-  userId               String
-  company              Company @relation(fields: [companyId], references: [id])
-  companyId            String
-  entries              WorkBookEntry[]
-
-  @@unique([id])
-  @@map("work_book")
+enum APPROVAL_STATUS {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
-model MarcoWorkBook {
-  id String @id @default(cuid())
-
-  contractingCompany   String
-  workResponsibleName  String
-  workResponsiblePhone String
-  otcInspectorName     String
-  otcInspectorPhone    String
-  workName             String
-  workLocation         String
-  workType             String
-  workStartDate        DateTime
-  workEstimatedEndDate DateTime
-  workStatus           String
-  workProgressStatus   String
-
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  otNumber             WorkOrder[]
-  user                 User @relation(fields: [userId], references: [id])
-  userId               String
-  company              Company @relation(fields: [companyId], references: [id])
-  companyId            String
-  entries              WorkBookEntry[]
-
-  @@unique([id])
-  @@map("marco_work_book")
-}
-
-model WorkBookEntry {
-  id                 String   @id @default(cuid())
-  entryType          ENTRY_TYPE
-  isFavorite         Boolean  @default(false)
-  hasAttachments     Boolean  @default(false)
-  executionDate      DateTime @default(now())
-  activityName       String?
-  activityStartTime  String?
-  activityEndTime    String?
-  comments           String?
+model WorkEntry {
+  id                String     @id @default(cuid())
+  entryType         ENTRY_TYPE
+  isFavorite        Boolean    @default(false)
+  hasAttachments    Boolean    @default(false)
+  executionDate     DateTime   @default(now())
+  activityName      String?
+  activityStartTime String?
+  activityEndTime   String?
+  comments          String?
 
   // Campos de OtcInspection
   supervisionComments String?
@@ -351,87 +297,93 @@ model WorkBookEntry {
   inspectorName       String?
 
   // Campos de PreventionArea
-  recommendations    String?
-  others             String?
-  preventionName     String?
+  recommendations String?
+  others          String?
+  preventionName  String?
 
   // Campos para notas de usuario
-  noteStatus         NOTE_STATUS? @default(PENDING)
-  notificationSent   Boolean      @default(false)
-  acknowledgedAt     DateTime?
-  resolvedAt         DateTime?
-  
-  createdAt          DateTime @default(now())
-  createdBy          User     @relation("WorkBookEntryCreator", fields: [createdById], references: [id])
-  createdById        String
-  
+  noteStatus       NOTE_STATUS? @default(PENDING)
+  notificationSent Boolean      @default(false)
+  acknowledgedAt   DateTime?
+  resolvedAt       DateTime?
+
+  approvalStatus APPROVAL_STATUS? @default(PENDING)
+  approvalDate   DateTime?
+  approvalBy     User?            @relation("WorkEntryApproval", fields: [approvalById], references: [id])
+  approvalById   String?
+
+  createdAt   DateTime @default(now())
+  createdBy   User     @relation("WorkEntryCreator", fields: [createdById], references: [id])
+  createdById String
+
   // En caso de que sea un comentario, el usuario que lo firma
-  signedAt           DateTime?
-  signedBy           User?    @relation("WorkBookEntrySigner", fields: [signedById], references: [id])
-  signedById         String?
-  
-  workBook           WorkBook @relation(fields: [workBookId], references: [id])
-  workBookId         String
-  marcoWorkBooks     MarcoWorkBook[]
+  signedAt   DateTime?
+  signedBy   User?     @relation("WorkEntrySigner", fields: [signedById], references: [id])
+  signedById String?
+
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  workOrderId String
 
   // Relaciones con usuarios asignados y reportados
-  assignedUsers      User[]   @relation(name: "AssignedUsers")
-  reportedUsers      User[]   @relation(name: "ReportedUsers")
-  
+  assignedUsers User[] @relation(name: "AssignedUsers")
+  reportedUsers User[] @relation(name: "ReportedUsers")
+
   // For comments/references to other entries
-  referencedEntry    WorkBookEntry? @relation("EntryReferences", fields: [referencedEntryId], references: [id])
-  referencedEntryId  String?
-  referencedBy       WorkBookEntry[] @relation("EntryReferences")
-  
-  attachments        Attachment[]
+  referencedEntry   WorkEntry?         @relation("EntryReferences", fields: [referencedEntryId], references: [id])
+  referencedEntryId String?
+  referencedBy      WorkEntry[]        @relation("EntryReferences")
+  equipmentHistory  EquipmentHistory[]
+
+  attachments Attachment[]
 
   @@unique([id])
-  @@index([workBookId, createdAt]) // For efficient chronological listing
+  @@index([workOrderId, createdAt]) // For efficient chronological listing
   @@map("work_book_entry")
 }
 
 model WorkTracker {
-  id                 String  @id @default(cuid())
+  id String @id @default(cuid())
 
-  description        String
-  date               DateTime
-  dedicatedHours     Int
-  quantityPersons    Int
-  location           String
-  status             String
+  description     String
+  date            DateTime
+  dedicatedHours  Int
+  quantityPersons Int
+  location        String
+  status          String
 
-  user               User @relation(fields: [userId], references: [id])
-  userId             String
-  attachments        Attachment[]
-  otNumber             WorkOrder @relation(fields: [otNumberId], references: [id])
-  otNumberId           String
+  user        User         @relation(fields: [userId], references: [id])
+  userId      String
+  attachments Attachment[]
+  otNumber    WorkOrder    @relation(fields: [otNumberId], references: [id])
+  otNumberId  String
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("work_tracker")
 }
 
 model Attachment {
-  id                  String  @id @default(cuid())
+  id String @id @default(cuid())
 
-  name                String
-  url                 String
-  type                String
+  name String
+  url  String
+  type String
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  workApplication    WorkApplication? @relation(fields: [workApplicationId], references: [id])
-  workApplicationId  String?
-  workBookEntry      WorkBookEntry? @relation(fields: [workBookEntryId], references: [id])
-  workBookEntryId    String?
-  workTracker        WorkTracker?  @relation(fields: [workTrackerId], references: [id])
-  workTrackerId      String?
-  initReport         WorkOrder? @relation("WorkOrderInitReport")
-  initReportId       String? @unique
-  endReport          WorkOrder? @relation("WorkOrderEndReport")
-  endReportId        String? @unique
+  workApplication   WorkApplication?    @relation(fields: [workApplicationId], references: [id])
+  workApplicationId String?
+  workEntry         WorkEntry?          @relation(fields: [workEntryId], references: [id])
+  workEntryId       String?
+  workTracker       WorkTracker?        @relation(fields: [workTrackerId], references: [id])
+  workTrackerId     String?
+  initReport        WorkOrder?          @relation("WorkOrderInitReport")
+  initReportId      String?             @unique
+  endReport         WorkOrder?          @relation("WorkOrderEndReport")
+  endReportId       String?             @unique
+  history           AttachmentHistory[]
 
   @@map("attachment")
 }
@@ -444,7 +396,7 @@ enum WORK_PERMIT_STATUS {
 }
 
 model WorkPermit {
-  id                             String @id @default(cuid())
+  id String @id @default(cuid())
 
   aplicantPt                     String
   responsiblePt                  String
@@ -474,60 +426,48 @@ model WorkPermit {
   whoDeliversWorkAreaOp          String
   workerExecutor                 String
   preventionOfficer              String
-  preventionOfficerUser          User      @relation("PreventionOfficer", fields: [preventionOfficer], references: [id])
+  preventionOfficerUser          User               @relation("PreventionOfficer", fields: [preventionOfficer], references: [id])
   whoReceives                    String?
   cleanAndTidyWorkArea           Boolean?
   workCompleted                  Boolean?
   observations                   String?
   additionalObservations         String?
-  acceptTerms                    Boolean  @default(false)
+  acceptTerms                    Boolean            @default(false)
   status                         WORK_PERMIT_STATUS @default(ACTIVE)
 
-  createdAt                      DateTime @default(now())
-  updatedAt                      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  otNumber                       WorkOrder @relation(fields: [otNumberId], references: [id])
-  otNumberId                     String
-  user                           User     @relation("WorkPermitUser", fields: [userId], references: [id])
-  userId                         String
-  participants                   User[]   @relation("WorkPermitParticipants")
+  otNumber     WorkOrder @relation(fields: [otNumberId], references: [id])
+  otNumberId   String
+  user         User      @relation("WorkPermitUser", fields: [userId], references: [id])
+  userId       String
+  participants User[]    @relation("WorkPermitParticipants")
 
-  @@map("work_permit")
   @@index([preventionOfficer])
-}
-
-enum Area {
-  HSEQ
-  JURIDICA
-  COMUNIDADES
-  OPERACIONES
-  INSTRUCTIVOS
-  MEDIO_AMBIENTE
-  PREVENCION_RIESGOS
-  INTEGRIDAD_Y_MANTENCION
-  CALIDAD_Y_EXCELENCIA_PROFESIONAL
+  @@map("work_permit")
 }
 
 model Folder {
-  id          String  @id @default(cuid())
-  slug        String
+  id   String @id @default(cuid())
+  slug String
 
   name        String
   description String?
-  root        Boolean  @default(false)
-  area        Area
-  type        String   @default("default")
-  isExternal  Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  root        Boolean @default(false)
+  area        AREAS
+  type        String  @default("default")
+  isExternal  Boolean @default(false)
 
-  parent      Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
-  parentId    String? 
-  subFolders  Folder[] @relation("FolderToFolder")
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
-  files       File[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent     Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
+  parentId   String?
+  subFolders Folder[] @relation("FolderToFolder")
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  files      File[]
 
   @@unique([slug, parentId, userId])
   @@map("folder")
@@ -540,7 +480,7 @@ enum Code {
 }
 
 model File {
-  id               String   @id @default(cuid())
+  id String @id @default(cuid())
 
   code             Code
   name             String
@@ -550,16 +490,16 @@ model File {
   url              String
   registrationDate DateTime
   expirationDate   DateTime?
-  revisionCount    Int      @default(0)
-  isExternal       Boolean  @default(false)
+  revisionCount    Int       @default(0)
+  isExternal       Boolean   @default(false)
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  folder           Folder?  @relation(fields: [folderId], references: [id])
-  folderId         String?
-  user             User     @relation(fields: [userId], references: [id])
-  userId           String
+  folder   Folder? @relation(fields: [folderId], references: [id])
+  folderId String?
+  user     User    @relation(fields: [userId], references: [id])
+  userId   String
 
   @@map("file")
 }
@@ -576,15 +516,15 @@ enum RESOURCE_TYPE {
 }
 
 model SafetyTalk {
-  id          String   @id @default(cuid())
+  id          String               @id @default(cuid())
   title       String
   description String?
   type        SAFETY_TALK_TYPE
   questions   Question[]
   resources   SafetyTalkResource[]
   expiresAt   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
   userSafetyTalks UserSafetyTalk[]
 
@@ -592,45 +532,45 @@ model SafetyTalk {
 }
 
 model SafetyTalkResource {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  type        RESOURCE_TYPE
-  url         String
-  downloadUrl String?
-  fileSize    Int?
-  mimeType    String?
-  order       Int
-  safetyTalk  SafetyTalk @relation(fields: [safetyTalkId], references: [id])
+  id           String        @id @default(cuid())
+  title        String
+  description  String?
+  type         RESOURCE_TYPE
+  url          String
+  downloadUrl  String?
+  fileSize     Int?
+  mimeType     String?
+  order        Int
+  safetyTalk   SafetyTalk    @relation(fields: [safetyTalkId], references: [id])
   safetyTalkId String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@map("safety_talk_resource")
 }
 
 model Question {
-  id            String   @id @default(cuid())
-  question      String
-  options       QuestionOption[]
-  safetyTalk    SafetyTalk @relation(fields: [safetyTalkId], references: [id])
-  safetyTalkId  String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String           @id @default(cuid())
+  question     String
+  options      QuestionOption[]
+  safetyTalk   SafetyTalk       @relation(fields: [safetyTalkId], references: [id])
+  safetyTalkId String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
-  userAnswers   UserSafetyTalkAnswer[]
+  userAnswers UserSafetyTalkAnswer[]
 
   @@map("question")
 }
 
 model QuestionOption {
-  id          String   @id @default(cuid())
-  text        String
-  isCorrect   Boolean
-  question    Question @relation(fields: [questionId], references: [id])
-  questionId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   userAnswers UserSafetyTalkAnswer[]
 
@@ -638,32 +578,66 @@ model QuestionOption {
 }
 
 model UserSafetyTalk {
-  id            String   @id @default(cuid())
-  user          User     @relation(fields: [userId], references: [id])
-  userId        String
-  safetyTalk    SafetyTalk @relation(fields: [safetyTalkId], references: [id])
-  safetyTalkId  String
-  score         Float
-  passed        Boolean
-  completedAt   DateTime
-  expiresAt     DateTime
-  answers       UserSafetyTalkAnswer[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String                 @id @default(cuid())
+  user         User                   @relation(fields: [userId], references: [id])
+  userId       String
+  safetyTalk   SafetyTalk             @relation(fields: [safetyTalkId], references: [id])
+  safetyTalkId String
+  score        Float
+  passed       Boolean
+  completedAt  DateTime
+  expiresAt    DateTime
+  answers      UserSafetyTalkAnswer[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
 
   @@map("user_safety_talk")
 }
 
 model UserSafetyTalkAnswer {
-  id                String   @id @default(cuid())
-  userSafetyTalk    UserSafetyTalk @relation(fields: [userSafetyTalkId], references: [id])
-  userSafetyTalkId  String
-  question          Question @relation(fields: [questionId], references: [id])
-  questionId        String
-  selectedOption    QuestionOption @relation(fields: [selectedOptionId], references: [id])
-  selectedOptionId  String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String         @id @default(cuid())
+  userSafetyTalk   UserSafetyTalk @relation(fields: [userSafetyTalkId], references: [id])
+  userSafetyTalkId String
+  question         Question       @relation(fields: [questionId], references: [id])
+  questionId       String
+  selectedOption   QuestionOption @relation(fields: [selectedOptionId], references: [id])
+  selectedOptionId String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@map("user_safety_talk_answer")
+}
+
+model AttachmentHistory {
+  id           String     @id @default(cuid())
+  attachment   Attachment @relation(fields: [attachmentId], references: [id])
+  attachmentId String
+  previousUrl  String
+  previousName String
+  modifiedBy   User       @relation(fields: [userId], references: [id])
+  userId       String
+  modifiedAt   DateTime   @default(now())
+  reason       String?
+
+  @@map("attachment_history")
+}
+
+model EquipmentHistory {
+  id          String     @id @default(cuid())
+  equipment   Equipment  @relation(fields: [equipmentId], references: [id])
+  equipmentId String
+  changeType  String
+  description String
+  modifiedBy  User       @relation(fields: [userId], references: [id])
+  userId      String
+  modifiedAt  DateTime   @default(now())
+  status      String
+  createdAt   DateTime   @default(now())
+  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
+  workOrderId String?
+  workEntry   WorkEntry? @relation(fields: [workEntryId], references: [id])
+  workEntryId String?
+
+  @@unique([id])
+  @@map("equipment_history")
 }

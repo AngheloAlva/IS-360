@@ -4,14 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
-import Link from "next/link"
+import { toast } from "sonner"
 
 import { loginSchema } from "@/lib/form-schemas/login-schema"
 import { authClient } from "@/lib/auth-client"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { toast } from "sonner"
 import {
 	Form,
 	FormItem,
@@ -46,13 +45,12 @@ export default function LoginForm(): React.ReactElement {
 				onRequest: () => {
 					setLoading(true)
 				},
-				onSuccess: () => {
-					setLoading(false)
-
+				onSuccess: (data) => {
 					toast("Inicio de sesión", {
 						description: "Has iniciado sesión exitosamente",
 						duration: 3000,
 					})
+					console.log(data)
 
 					router.push("/dashboard/permiso-de-trabajo")
 				},
@@ -132,13 +130,6 @@ export default function LoginForm(): React.ReactElement {
 						"Iniciar sesión"
 					)}
 				</Button>
-
-				<p className="mt-4 text-sm text-gray-500 sm:mt-0">
-					¿No tienes una cuenta?{" "}
-					<Link href="/auth/register" className="text-gray-700 underline">
-						Regístrate
-					</Link>
-				</p>
 			</form>
 		</Form>
 	)

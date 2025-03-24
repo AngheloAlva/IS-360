@@ -1,9 +1,9 @@
 import {
-	SidebarGroup,
-	SidebarGroupContent,
 	SidebarMenu,
-	SidebarMenuButton,
+	SidebarGroup,
 	SidebarMenuItem,
+	SidebarMenuButton,
+	SidebarGroupContent,
 } from "@/components/ui/sidebar"
 
 import { type LucideIcon } from "lucide-react"
@@ -24,7 +24,11 @@ export function NavSecondary({
 				<SidebarMenu>
 					{items.map((item) => (
 						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton asChild size="sm">
+							<SidebarMenuButton
+								asChild
+								size="sm"
+								className="hover:bg-primary/5 hover:text-primary"
+							>
 								{/* <a href={item.url}> */}
 								<div>
 									<item.icon />

@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/sidebar/appSidebar"
 import { Separator } from "@/components/ui/separator"
 import PageName from "@/components/sidebar/PageName"
 
-export default async function DashboardLayout({
+export default async function AdminDashboardLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode

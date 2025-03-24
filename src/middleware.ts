@@ -22,9 +22,9 @@ export default async function authMiddleware(request: NextRequest) {
 	}
 
 	// Proteger rutas de administrador
-	if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
-		if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
-			return NextResponse.redirect(new URL("/dashboard", request.url))
+	if (request.nextUrl.pathname.startsWith("/admin/dashboard")) {
+		if (session.user.role === "PARTNER_COMPANY") {
+			return NextResponse.redirect(new URL("/dashboard/permiso-de-trabajo", request.url))
 		}
 	}
 
@@ -32,5 +32,5 @@ export default async function authMiddleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/dashboard/:path*"],
+	matcher: ["/admin/dashboard/:path*", "/dashboard/:path*"],
 }

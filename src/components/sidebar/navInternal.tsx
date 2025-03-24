@@ -15,7 +15,7 @@ import {
 
 import { type LucideIcon } from "lucide-react"
 
-export function NavMain({
+export function NavInternal({
 	navItems,
 }: {
 	navItems: {
@@ -28,7 +28,7 @@ export function NavMain({
 
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel>Menú principal</SidebarGroupLabel>
+			<SidebarGroupLabel>Menú Interno</SidebarGroupLabel>
 			<SidebarMenu>
 				{navItems.map((item) => (
 					<SidebarMenuItem

@@ -102,9 +102,9 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 						<Plus />
 					</Button>
 				</Link>
-				<Link href={`/dashboard/admin/libros-de-obras/${id}/inspeccion-otc`}>
+				<Link href={`/dashboard/admin/libro-de-obras/${id}/inspeccion-otc`}>
 					<Button size={"lg"} className="bg-purple-500 hover:bg-purple-600">
-						<span className="hidden lg:block">Inspección OTC</span>
+						<span className="hidden lg:block">Inspección</span>
 						<Plus />
 					</Button>
 				</Link>
