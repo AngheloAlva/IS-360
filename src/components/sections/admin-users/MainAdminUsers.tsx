@@ -1,0 +1,104 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { notFound } from "next/navigation"
+import { Plus } from "lucide-react"
+import { toast } from "sonner"
+import Link from "next/link"
+
+import GeneralSummary from "./GeneralSummary"
+import RoleDistribution from "./RoleDistribution"
+import AreaDistribution from "./AreaDistribution"
+
+import { authClient } from "@/lib/auth-client"
+import { cn } from "@/lib/utils"
+
+import { useSidebar } from "@/components/ui/sidebar"
+import { UsersDataTable } from "./UsersDataTable"
+import { Button } from "@/components/ui/button"
+import { UserColumns } from "./user-columns"
+
+import type { UserWithRole } from "better-auth/plugins"
+
+export default function MainAdminUsers({ page }: { page: number }): React.ReactElement {
+	const [isLoading, setIsLoading] = useState<boolean>(true)
+	const [users, setUsers] = useState<UserWithRole[]>([])
+
+	const { state } = useSidebar()
+
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const { data, error } = await authClient.admin.listUsers({
+				query: {
+					limit: 10,
+					offset: (page - 1) * 10,
+					sortBy: "createdAt",
+				},
+			})
+
+			if (error) {
+				toast("Error al cargar los usuarios", {
+					description: error.message,
+					duration: 5000,
+				})
+				return notFound()
+			}
+
+			setUsers(data.users)
+			setIsLoading(false)
+		}
+
+		void fetchUsers()
+	}, [page])
+
+	return (
+		<div
+			className={cn(
+				"flex h-full w-full flex-col gap-8 transition-all md:max-w-[87dvw] lg:max-w-[98dvw]",
+				{
+					"md:max-w-[62dvw] lg:max-w-[70dvw] xl:max-w-[85dvw] 2xl:max-w-[85dvw]":
+						state === "expanded",
+				}
+			)}
+		>
+			<div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+				<div className="flex flex-col gap-1">
+					<h1 className="text-text w-fit text-3xl font-bold">Usuarios</h1>
+					<p className="text-text-foreground w-fit text-lg">
+						En esta sección puedes gestionar los usuarios de la plataforma.
+					</p>
+				</div>
+
+				<div className="flex flex-col gap-2 md:items-end">
+					<Link href="/dashboard/admin/usuarios/internos/agregar">
+						<Button
+							size={"lg"}
+							className="border-primary text-primary border bg-white hover:text-white"
+						>
+							<Plus className="ml-1" />
+							Nuevo Miembro OTC
+						</Button>
+					</Link>
+
+					<Link href="/dashboard/admin/usuarios/externos/agregar">
+						<Button
+							size={"lg"}
+							className="border-feature text-feature hover:bg-feature border bg-white hover:text-white"
+						>
+							<Plus className="ml-1" />
+							Nuevos Usuarios Externos
+						</Button>
+					</Link>
+				</div>
+			</div>
+
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<GeneralSummary />
+				<RoleDistribution />
+				<AreaDistribution />
+			</div>
+
+			<UsersDataTable columns={UserColumns} data={users} isLoading={isLoading} />
+		</div>
+	)
+}

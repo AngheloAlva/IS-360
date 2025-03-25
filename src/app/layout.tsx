@@ -1,4 +1,4 @@
-import { geistMono, geistSans } from "@/config/fonts"
+import { spaceGrotesk } from "@/config/fonts"
 
 import "./globals.css"
 
@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="es">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+			<body className={`${spaceGrotesk.variable} antialiased`}>
 				{children}
 				<Toaster />
 			</body>

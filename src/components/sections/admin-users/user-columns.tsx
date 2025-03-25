@@ -7,13 +7,33 @@ import Link from "next/link"
 
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { UserRoleOptions } from "@/lib/consts/user-roles"
+import { AreasLabels } from "@/lib/consts/areas"
 import { USER_ROLE } from "@prisma/client"
 
 import { Badge } from "@/components/ui/badge"
 
 import type { UserWithRole } from "better-auth/plugins"
 
-export const columns: ColumnDef<UserWithRole>[] = [
+export const UserColumns: ColumnDef<UserWithRole>[] = [
+	{
+		accessorKey: "isSupervisor",
+		header: "Empresa",
+		cell: ({ row }) => {
+			const role = row.getValue("role") as string
+			const isSupervisor = row.getValue("isSupervisor") as boolean
+
+			if (role !== "PARTNER_COMPANY") {
+				return <div>OTC {isSupervisor && "- Supervisor"}</div>
+			}
+
+			const company = row.getValue("company") as string
+			return (
+				<div>
+					{company} {isSupervisor && "- Supervisor"}
+				</div>
+			)
+		},
+	},
 	{
 		accessorKey: "name",
 		header: "Nombre",
@@ -46,15 +66,6 @@ export const columns: ColumnDef<UserWithRole>[] = [
 		},
 	},
 	{
-		accessorKey: "isSupervisor",
-		header: "Supervisor Externo",
-		cell: ({ row }) => {
-			const isSupervisor = row.getValue("isSupervisor")
-
-			return isSupervisor && <Badge variant="secondary">Sí</Badge>
-		},
-	},
-	{
 		accessorKey: "internalRole",
 		header: "Rol Interno",
 		cell: ({ row }) => {
@@ -74,22 +85,10 @@ export const columns: ColumnDef<UserWithRole>[] = [
 			const role = row.getValue("role") as string
 			if (role === "PARTNER_COMPANY") return null
 
-			const area = row.getValue("area") as string
+			const area = row.getValue("area") as keyof typeof AreasLabels
 			if (!area) return null
 
-			const areaLabels: Record<string, string> = {
-				OPERATIONS: "Operaciones",
-				INSTRUCTIONS: "Instructivos",
-				INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
-				ENVIRONMENT: "Medio Ambiente",
-				RISK_PREVENTION: "Prevención de Riesgos",
-				QUALITY_AND_PROFESSIONAL_EXCELLENCE: "Calidad y Excelencia Profesional",
-				HSEQ: "HSEQ",
-				LEGAL: "Jurídica",
-				COMMUNITIES: "Comunidades",
-			}
-
-			return <Badge variant="outline">{areaLabels[area] || area}</Badge>
+			return <Badge variant="outline">{AreasLabels[area]}</Badge>
 		},
 	},
 	{
@@ -122,7 +121,7 @@ export const columns: ColumnDef<UserWithRole>[] = [
 
 			return (
 				<Link
-					href={`/dashboard/admin/usuarios/${isPartnerCompany ? "externos" : "internos"}/${id}`}
+					href={`/admin/dashboard/usuarios/${isPartnerCompany ? "externos" : "internos"}/${id}`}
 					className="text-primary hover:text-feature text-right font-medium hover:underline"
 				>
 					<Edit className="h-4 w-4" />

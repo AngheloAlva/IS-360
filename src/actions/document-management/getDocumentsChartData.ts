@@ -4,11 +4,11 @@ import { addDays } from "date-fns"
 
 import prisma from "@/lib/prisma"
 
-import { Area } from "@prisma/client"
+import { AREAS } from "@prisma/client"
 
 export async function getDocumentsChartData() {
 	// Get documents by area
-	const areas = Object.values(Area)
+	const areas = Object.values(AREAS)
 
 	const areaData = await Promise.all(
 		areas.map(async (area) => {
@@ -144,7 +144,7 @@ export async function getDocumentsChartData() {
 	}
 
 	return {
-		areaData: areaData.map((area: { area: Area; _count: { files: number } }) => ({
+		areaData: areaData.map((area: { area: AREAS; _count: { files: number } }) => ({
 			name: areaLabels[area.area as keyof typeof areaLabels],
 			value: area._count.files,
 			fill: areaColors[area.area as keyof typeof areaColors],

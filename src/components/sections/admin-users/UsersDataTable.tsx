@@ -1,8 +1,7 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { Sheet } from "lucide-react"
 import { useState } from "react"
-import Link from "next/link"
 import {
 	ColumnDef,
 	flexRender,
@@ -14,9 +13,12 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { AreasLabels } from "@/lib/consts/areas"
+
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -25,6 +27,15 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
+import {
+	Select,
+	SelectItem,
+	SelectLabel,
+	SelectValue,
+	SelectGroup,
+	SelectTrigger,
+	SelectContent,
+} from "@/components/ui/select"
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -32,7 +43,7 @@ interface DataTableProps<TData, TValue> {
 	data: TData[]
 }
 
-export function DataTable<TData, TValue>({
+export function UsersDataTable<TData, TValue>({
 	columns,
 	data,
 	isLoading,
@@ -55,46 +66,68 @@ export function DataTable<TData, TValue>({
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start">
-			<div className="flex w-fit flex-col flex-wrap items-start gap-2 py-4 md:w-full md:flex-row">
+		<section className="flex w-full flex-col items-start gap-4">
+			<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>
+
+			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 				<Input
 					type="text"
-					className="w-fit"
-					placeholder="Filtrar por Nombre..."
+					className="w-full sm:w-fit"
+					placeholder="Nombre..."
 					value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
 				/>
 
 				<Input
-					className="w-fit"
-					placeholder="Filtrar por RUT..."
+					className="w-full sm:w-fit"
+					placeholder="RUT..."
 					value={(table.getColumn("rut")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("rut")?.setFilterValue(event.target.value)}
 				/>
 
 				<Input
-					className="w-fit"
-					placeholder="Filtrar por email..."
+					className="w-full sm:w-fit"
+					placeholder="Email..."
 					value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
 				/>
 
-				<Link href="/dashboard/admin/usuarios/internos/agregar" className="md:ml-auto">
-					<Button size={"lg"}>
-						Nuevos Usuario OTC
-						<Plus className="ml-1" />
-					</Button>
-				</Link>
+				<Select
+					onValueChange={(value) => {
+						if (value === "all") {
+							table.getColumn("area")?.setFilterValue(undefined)
+						} else {
+							table.getColumn("area")?.setFilterValue(value)
+						}
+					}}
+					value={(table.getColumn("area")?.getFilterValue() as string) ?? "all"}
+				>
+					<SelectTrigger className="border-input w-full border bg-white sm:w-fit">
+						<SelectValue placeholder="Área" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							<SelectLabel>Áreas</SelectLabel>
+							<SelectItem value="all">Todas las áreas</SelectItem>
+							{Object.keys(AreasLabels).map((area) => (
+								<SelectItem key={area} value={area}>
+									{AreasLabels[area as keyof typeof AreasLabels]}
+								</SelectItem>
+							))}
+						</SelectGroup>
+					</SelectContent>
+				</Select>
 
-				<Link href="/dashboard/admin/usuarios/externos/agregar">
-					<Button size={"lg"} className="bg-feature hover:bg-feature/80">
-						Nuevos Usuarios Externos
-						<Plus className="ml-1" />
-					</Button>
-				</Link>
+				<Button
+					size={"lg"}
+					className="border-input text-primary ml-auto border bg-white hover:text-white"
+				>
+					<Sheet />
+					Exportar
+				</Button>
 			</div>
 
-			<div className="w-full max-w-full overflow-x-scroll rounded-md border">
+			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none bg-white p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -116,28 +149,7 @@ export function DataTable<TData, TValue>({
 						{isLoading
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-										<TableCell className="">
+										<TableCell className="" colSpan={8}>
 											<Skeleton className="h-9 min-w-full" />
 										</TableCell>
 									</TableRow>
@@ -145,7 +157,7 @@ export function DataTable<TData, TValue>({
 							: table.getRowModel().rows.map((row) => (
 									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
 										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id}>
+											<TableCell key={cell.id} className="font-medium">
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</TableCell>
 										))}
@@ -153,12 +165,13 @@ export function DataTable<TData, TValue>({
 								))}
 					</TableBody>
 				</Table>
-			</div>
+			</Card>
 
-			<div className="flex items-center justify-end space-x-2 py-4">
+			<div className="flex w-full items-center justify-end space-x-2">
 				<Button
 					variant="outline"
 					size="sm"
+					className="bg-white"
 					onClick={() => table.previousPage()}
 					disabled={!table.getCanPreviousPage()}
 				>
@@ -168,6 +181,7 @@ export function DataTable<TData, TValue>({
 				<Button
 					variant="outline"
 					size="sm"
+					className="bg-white"
 					onClick={() => table.nextPage()}
 					disabled={!table.getCanNextPage()}
 				>

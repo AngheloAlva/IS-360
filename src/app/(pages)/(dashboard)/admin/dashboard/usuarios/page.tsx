@@ -1,4 +1,4 @@
-import MainAdminUsers from "@/components/sections/admin-users/Main"
+import MainAdminUsers from "@/components/sections/admin-users/MainAdminUsers"
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 

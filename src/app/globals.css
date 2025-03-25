@@ -5,14 +5,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
-
+	--font-sans: var(--font-space-grotesk);
 	--color-feature: oklch(50.91% 0.1671 143.22);
+	--color-text: oklch(20.97% 0.0172 358.92);
+	--color-text-foreground: oklch(49.76% 0.0065 3.54);
 }
 
 :root {
-	--background: oklch(99.45% 0.0017 67.8);
+	--background: oklch(96.02% 0.0035 39.48);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
