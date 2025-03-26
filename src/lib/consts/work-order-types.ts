@@ -1,16 +1,10 @@
 export const WorkOrderType = {
-	CORRECTIVE: "CORRECTIVE",
-	PREVENTIVE: "PREVENTIVE",
-	PREDICTIVE: "PREDICTIVE",
+	CORRECTIVE: "Correctivo",
+	PREVENTIVE: "Preventivo",
+	PREDICTIVE: "Predictivo",
 } as const
 
-export const WorkOrderTypeKeys = [
-	WorkOrderType.CORRECTIVE,
-	WorkOrderType.PREVENTIVE,
-	WorkOrderType.PREDICTIVE,
-] as const
-
-export type WorkOrderType = keyof typeof WorkOrderType
+export const WorkOrderTypeKeys = ["CORRECTIVE", "PREVENTIVE", "PREDICTIVE"] as const
 
 export const WorkOrderTypeOptions = [
 	{

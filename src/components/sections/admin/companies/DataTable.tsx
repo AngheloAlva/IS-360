@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import {
 	ColumnDef,
 	flexRender,
@@ -13,8 +12,10 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -23,8 +24,6 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
-import { Plus } from "lucide-react"
-import { Skeleton } from "@/components/ui/skeleton"
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -55,11 +54,13 @@ export function DataTable<TData, TValue>({
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start">
-			<div className="flex w-fit flex-col flex-wrap items-start gap-2 py-4 md:w-full md:flex-row">
+		<section className="flex w-full flex-col items-start gap-4">
+			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
+				<h2 className="text-text- text-2xl font-semibold">Lista de Empresas</h2>
+
 				<Input
 					type="text"
-					className="w-fit"
+					className="ml-auto w-fit"
 					placeholder="Filtrar por Nombre..."
 					value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
@@ -71,16 +72,9 @@ export function DataTable<TData, TValue>({
 					value={(table.getColumn("rut")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("rut")?.setFilterValue(event.target.value)}
 				/>
-
-				<Link href="/admin/dashboard/empresas/agregar" className="md:ml-auto">
-					<Button size={"lg"}>
-						Nueva Empresa
-						<Plus className="ml-1" />
-					</Button>
-				</Link>
 			</div>
 
-			<div className="w-full max-w-full overflow-x-scroll rounded-md border">
+			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -138,12 +132,13 @@ export function DataTable<TData, TValue>({
 						)}
 					</TableBody>
 				</Table>
-			</div>
+			</Card>
 
-			<div className="flex items-center justify-end space-x-2 py-4">
+			<div className="flex w-full items-center justify-end space-x-2">
 				<Button
 					variant="outline"
 					size="sm"
+					className="bg-white"
 					onClick={() => table.previousPage()}
 					disabled={!table.getCanPreviousPage()}
 				>
@@ -153,6 +148,7 @@ export function DataTable<TData, TValue>({
 				<Button
 					variant="outline"
 					size="sm"
+					className="bg-white"
 					onClick={() => table.nextPage()}
 					disabled={!table.getCanNextPage()}
 				>

@@ -12,6 +12,9 @@ import { workBookColumns } from "./work-book-columns"
 import { useSidebar } from "@/components/ui/sidebar"
 
 import type { WorkOrder } from "@prisma/client"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 
 export default function WorkBookMain({
 	page,
@@ -47,13 +50,30 @@ export default function WorkBookMain({
 	return (
 		<main
 			className={cn(
-				"flex h-full w-full flex-col gap-8 overflow-hidden transition-all md:max-w-[95dvw] lg:max-w-[96dvw]",
+				"flex h-full w-full flex-col gap-8 transition-all md:max-w-[95dvw] lg:max-w-[96dvw]",
 				{
 					"md:max-w-[68dvw] lg:max-w-[75dvw] xl:max-w-[80dvw]": state === "expanded",
 				}
 			)}
 		>
-			<h1 className="w-fit text-3xl font-bold">Libro de Obras</h1>
+			<div className="flex w-full flex-wrap items-center justify-between gap-2">
+				<div>
+					<h1 className="text-text w-fit text-3xl font-bold">Libro de Obras</h1>
+					<p className="text-text-foreground">
+						Aca puedes gestionar tus libros de obras y sus actividades.
+					</p>
+				</div>
+
+				<Link href="/dashboard/libro-de-obras/agregar" className="md:ml-auto">
+					<Button
+						size={"lg"}
+						className="border-primary text-primary border bg-white hover:text-white"
+					>
+						<Plus />
+						Agregar Obra
+					</Button>
+				</Link>
+			</div>
 
 			<WorkBookDataTable columns={workBookColumns} data={workBooks} isLoading={isLoading} />
 		</main>

@@ -1,8 +1,8 @@
 "use client"
 
 import { useFieldArray, useForm } from "react-hook-form"
+import { CalendarIcon, UploadIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { es } from "date-fns/locale"
@@ -75,6 +75,9 @@ export default function ActivityForm({
 			comments: "",
 			executionDate: new Date(),
 			personnel: [
+				{
+					userId: "",
+				},
 				{
 					userId: "",
 				},
@@ -164,10 +167,10 @@ export default function ActivityForm({
 					name="activityName"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">Nombre de la Actividad</FormLabel>
+							<FormLabel className="">Nombre de la Actividad</FormLabel>
 							<FormControl>
 								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+									className="w-full rounded-md text-sm"
 									placeholder="Nombre de la Actividad"
 									{...field}
 								/>
@@ -177,109 +180,93 @@ export default function ActivityForm({
 					)}
 				/>
 
-				<FormField
-					control={form.control}
-					name="executionDate"
-					render={({ field }) => (
-						<FormItem className="flex flex-col">
-							<FormLabel>Fecha de Ejecución</FormLabel>
-							<Popover>
-								<PopoverTrigger asChild>
-									<FormControl>
-										<Button
-											variant={"outline"}
-											className={cn(
-												"w-full rounded-md border-gray-200 bg-white pl-3 text-left text-sm font-normal text-gray-700",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											{field.value ? (
-												format(field.value, "PPP", { locale: es })
-											) : (
-												<span>Selecciona la fecha</span>
-											)}
-											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-										</Button>
-									</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={field.value}
-										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
-										initialFocus
+				<div className="flex gap-2">
+					<FormField
+						control={form.control}
+						name="executionDate"
+						render={({ field }) => (
+							<FormItem className="flex w-2/3 flex-col">
+								<FormLabel>Fecha de Ejecución</FormLabel>
+								<Popover>
+									<PopoverTrigger asChild>
+										<FormControl>
+											<Button
+												variant={"outline"}
+												className={cn(
+													"w-full rounded-md bg-transparent pl-3 text-left text-sm font-normal",
+													!field.value && "text-muted-foreground"
+												)}
+											>
+												{field.value ? (
+													format(field.value, "PPP", { locale: es })
+												) : (
+													<span>Selecciona la fecha</span>
+												)}
+												<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+											</Button>
+										</FormControl>
+									</PopoverTrigger>
+									<PopoverContent className="w-auto p-0" align="start">
+										<Calendar
+											mode="single"
+											selected={field.value}
+											onSelect={field.onChange}
+											disabled={(date) => date < new Date("1900-01-01")}
+											initialFocus
+										/>
+									</PopoverContent>
+								</Popover>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="activityStartTime"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel className="">Hora de Inicio</FormLabel>
+								<FormControl>
+									<Input
+										className="w-full rounded-md text-sm"
+										placeholder="Hora de Inicio"
+										{...field}
 									/>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-				<FormField
-					control={form.control}
-					name="activityStartTime"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Hora de Inicio</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Hora de Inicio"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="activityEndTime"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Hora de Fin</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Hora de Fin"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormItem>
-					<FormLabel className="text-gray-700">Adjuntos</FormLabel>
-					<FormControl>
-						<Input
-							multiple
-							type="file"
-							onChange={handleFileChange}
-							className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-gray-700 hover:file:bg-gray-200"
-							accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-						/>
-					</FormControl>
-					{selectedFiles && (
-						<p className="text-sm text-gray-500">
-							{selectedFiles.length} archivo{selectedFiles.length > 1 && "s"} seleccionado
-						</p>
-					)}
-				</FormItem>
+					<FormField
+						control={form.control}
+						name="activityEndTime"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel className="">Hora de Fin</FormLabel>
+								<FormControl>
+									<Input
+										className="w-full rounded-md text-sm"
+										placeholder="Hora de Fin"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
 
 				<FormField
 					control={form.control}
 					name="comments"
 					render={({ field }) => (
 						<FormItem className="md:col-span-2">
-							<FormLabel className="text-gray-700">Comentarios</FormLabel>
+							<FormLabel className="">Comentarios</FormLabel>
 							<FormControl>
 								<Textarea
-									className="min-h-32 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+									className="min-h-32 w-full rounded-md text-sm"
 									placeholder="Comentarios"
 									{...field}
 								/>
@@ -289,7 +276,41 @@ export default function ActivityForm({
 					)}
 				/>
 
-				<div className="my-6 grid gap-4 border-y border-gray-200 py-4 md:col-span-2 md:grid-cols-2">
+				<FormLabel className="mt-4 md:col-span-2">Adjuntos</FormLabel>
+				<div className="flex gap-2 md:col-span-2">
+					<FormItem className="w-1/2">
+						<FormControl>
+							<div className="group relative h-96">
+								<Input
+									multiple
+									type="file"
+									onChange={handleFileChange}
+									accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+									className="absolute inset-0 z-10 h-full w-full cursor-pointer rounded-md text-sm opacity-0"
+								/>
+								<div className="group-hover:border-feature group-hover:bg-feature/5 flex h-full flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-white transition-colors">
+									<UploadIcon className="group-hover:text-feature h-10 w-10 text-gray-400" />
+									<p className="group-hover:text-feature mt-4 text-sm text-gray-500">
+										Haz clic para seleccionar archivos
+									</p>
+									<p className="group-hover:text-feature mt-1 text-xs text-gray-400">
+										Imágenes, PDF, DOC, XLS, TXT
+									</p>
+								</div>
+							</div>
+						</FormControl>
+					</FormItem>
+
+					<div className="border-input flex h-96 w-1/2 items-center justify-center rounded-md border bg-gray-50">
+						{selectedFiles && (
+							<p className="mt-2 text-sm text-gray-500">
+								{selectedFiles.length} archivo{selectedFiles.length > 1 && "s"} seleccionado
+							</p>
+						)}
+					</div>
+				</div>
+
+				<div className="my-6 grid gap-4 border-y py-4 md:col-span-2 md:grid-cols-2">
 					{fields.map((field, index) => (
 						<div key={field.id} className="grid grid-cols-1 gap-x-4">
 							<div className="flex items-center justify-between gap-2">
@@ -298,10 +319,10 @@ export default function ActivityForm({
 								<Button
 									type="button"
 									onClick={() => remove(index)}
-									className="mt-2 md:col-span-2"
+									className="mt-2 bg-transparent md:col-span-2"
 									variant="outline"
 								>
-									Eliminar Personal #{index + 1}
+									Eliminar #{index + 1}
 								</Button>
 							</div>
 
@@ -313,11 +334,11 @@ export default function ActivityForm({
 									name={`personnel.${index}.userId`}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel className="text-gray-700">Nombre del Personal</FormLabel>
+											<FormLabel className="">Nombre del Personal</FormLabel>
 
 											<Select onValueChange={field.onChange} defaultValue={field.value}>
 												<FormControl>
-													<SelectTrigger className="border-gray-200">
+													<SelectTrigger className="">
 														<SelectValue placeholder="Seleccione al personal" />
 													</SelectTrigger>
 												</FormControl>
@@ -343,7 +364,7 @@ export default function ActivityForm({
 						type="button"
 						variant={"secondary"}
 						onClick={() => append({ userId: "" })}
-						className="mt-10 w-full md:col-span-2"
+						className="mt-4 w-full md:col-span-2"
 					>
 						Añadir nuevo Personal
 					</Button>
