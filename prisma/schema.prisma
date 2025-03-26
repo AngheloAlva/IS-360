@@ -124,14 +124,47 @@ model Company {
   name String
   rut  String
 
-  users      User[]
-  workOrders WorkOrder[]
+  users       User[]
+  workOrders  WorkOrder[]
+  workPermits WorkPermit[]
+  vehicles    Vehicle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([id])
   @@map("company")
+}
+
+enum VEHICLE_TYPE {
+  CAR
+  TRUCK
+  MOTORCYCLE
+  BUS
+  TRACTOR
+  TRAILER
+  OTHER
+}
+
+model Vehicle {
+  id String @id @default(cuid())
+
+  plate  String
+  model  String
+  year   Int
+  brand  String
+  type   VEHICLE_TYPE
+  color  String?
+  isMain Boolean      @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company      @relation(fields: [companyId], references: [id])
+  companyId   String
+  workPermits WorkPermit[]
+
+  @@map("vehicle")
 }
 
 model Verification {
@@ -443,6 +476,9 @@ model WorkPermit {
   user         User      @relation("WorkPermitUser", fields: [userId], references: [id])
   userId       String
   participants User[]    @relation("WorkPermitParticipants")
+  company      Company   @relation(fields: [companyId], references: [id])
+  companyId    String
+  vehicles     Vehicle[]
 
   @@index([preventionOfficer])
   @@map("work_permit")

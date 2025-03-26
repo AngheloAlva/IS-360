@@ -10,8 +10,20 @@ interface CreateCompanyProps {
 
 export const createCompany = async ({ values }: CreateCompanyProps) => {
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { vehicles, addVehicle, ...rest } = values
+
 		await prisma.company.create({
-			data: values,
+			data: {
+				...rest,
+				vehicles: {
+					create:
+						vehicles?.map((vehicle) => ({
+							...vehicle,
+							year: Number(vehicle.year),
+						})) ?? [],
+				},
+			},
 		})
 
 		return {

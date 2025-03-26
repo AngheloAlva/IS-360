@@ -35,7 +35,10 @@ export default function GeneralSummary(): React.ReactElement {
 				{isLoading ? (
 					<Skeleton className="h-9 w-[60px]" />
 				) : (
-					<div className="text-2xl font-bold">{data?.totalCompanies ?? 0}</div>
+					<div className="text-3xl font-bold">
+						{data?.totalCompanies ?? 0}{" "}
+						<span className="text-muted-foreground text-xl">Empresas</span>
+					</div>
 				)}
 			</CardContent>
 		</Card>

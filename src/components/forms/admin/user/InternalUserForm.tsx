@@ -107,13 +107,9 @@ export default function InternalUserForm(): React.ReactElement {
 					name="name"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">Nombre</FormLabel>
+							<FormLabel className="">Nombre</FormLabel>
 							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre"
-									{...field}
-								/>
+								<Input className="w-full rounded-md text-sm" placeholder="Nombre" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -125,13 +121,9 @@ export default function InternalUserForm(): React.ReactElement {
 					name="email"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-gray-700">Email</FormLabel>
+							<FormLabel className="">Email</FormLabel>
 							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Email"
-									{...field}
-								/>
+								<Input className="w-full rounded-md text-sm" placeholder="Email" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -147,10 +139,10 @@ export default function InternalUserForm(): React.ReactElement {
 
 						return (
 							<FormItem>
-								<FormLabel className="text-gray-700">RUT</FormLabel>
+								<FormLabel className="">RUT</FormLabel>
 								<FormControl>
 									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+										className="w-full rounded-md text-sm"
 										onChange={(e) => {
 											field.onChange(formatRut(e.target.value))
 										}}
@@ -172,7 +164,7 @@ export default function InternalUserForm(): React.ReactElement {
 							<FormLabel>Rol</FormLabel>
 							<Select onValueChange={field.onChange} defaultValue={field.value}>
 								<FormControl>
-									<SelectTrigger className="border-gray-200">
+									<SelectTrigger className="">
 										<SelectValue placeholder="Seleccione un rol" />
 									</SelectTrigger>
 								</FormControl>
@@ -199,7 +191,7 @@ export default function InternalUserForm(): React.ReactElement {
 									<FormLabel>Rol Interno</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
-											<SelectTrigger className="border-gray-200">
+											<SelectTrigger className="">
 												<SelectValue placeholder="Seleccione un rol interno" />
 											</SelectTrigger>
 										</FormControl>
@@ -224,7 +216,7 @@ export default function InternalUserForm(): React.ReactElement {
 									<FormLabel>Área</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value || ""}>
 										<FormControl>
-											<SelectTrigger className="border-gray-200">
+											<SelectTrigger className="">
 												<SelectValue placeholder="Seleccione un área" />
 											</SelectTrigger>
 										</FormControl>

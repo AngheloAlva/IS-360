@@ -1,9 +1,10 @@
+import { Toaster } from "sonner"
+
 import { spaceGrotesk } from "@/config/fonts"
 
-import "./globals.css"
-
 import type { Metadata } from "next"
-import { Toaster } from "sonner"
+
+import "./globals.css"
 
 export const metadata: Metadata = {
 	title: "OTC",
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="es">
-			<body className={`${spaceGrotesk.variable} antialiased`}>
+			<body className={`${spaceGrotesk.className} font-general antialiased`}>
 				{children}
 				<Toaster />
 			</body>

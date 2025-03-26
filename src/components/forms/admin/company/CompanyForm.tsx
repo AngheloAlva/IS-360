@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
+import { useFieldArray, useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -20,6 +20,8 @@ import {
 	FormControl,
 	FormMessage,
 } from "@/components/ui/form"
+import { Card, CardContent, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function UserForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -31,8 +33,17 @@ export default function UserForm(): React.ReactElement {
 		defaultValues: {
 			rut: "",
 			name: "",
+			vehicles: [],
+			addVehicle: false,
 		},
 	})
+
+	const { fields, append, remove } = useFieldArray({
+		control: form.control,
+		name: "vehicles",
+	})
+
+	const needAddVehicle = form.watch("addVehicle")
 
 	async function onSubmit(values: CompanySchema) {
 		setLoading(true)
@@ -67,55 +78,226 @@ export default function UserForm(): React.ReactElement {
 
 	return (
 		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className="grid w-full max-w-screen-lg gap-3 md:grid-cols-2"
-			>
-				<FormField
-					control={form.control}
-					name="name"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Nombre</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-screen-lg space-y-4">
+				<Card className="w-full">
+					<CardContent className="grid gap-3 md:grid-cols-2">
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Nombre</FormLabel>
+									<FormControl>
+										<Input
+											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+											placeholder="Nombre"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="rut"
-					render={({ field }) => {
-						// eslint-disable-next-line @typescript-eslint/no-unused-vars
-						const { onChange, ...restFieldProps } = field
+						<FormField
+							control={form.control}
+							name="rut"
+							render={({ field }) => {
+								// eslint-disable-next-line @typescript-eslint/no-unused-vars
+								const { onChange, ...restFieldProps } = field
 
-						return (
-							<FormItem>
-								<FormLabel className="text-gray-700">RUT</FormLabel>
-								<FormControl>
-									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-										onChange={(e) => {
-											field.onChange(formatRut(e.target.value))
-										}}
-										placeholder="RUT"
-										{...restFieldProps}
+								return (
+									<FormItem>
+										<FormLabel className="text-gray-700">RUT</FormLabel>
+										<FormControl>
+											<Input
+												className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+												onChange={(e) => {
+													field.onChange(formatRut(e.target.value))
+												}}
+												placeholder="RUT"
+												{...restFieldProps}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)
+							}}
+						/>
+					</CardContent>
+				</Card>
+
+				<Card className="w-full">
+					<CardContent className="grid gap-3 md:grid-cols-2">
+						<FormField
+							control={form.control}
+							name="addVehicle"
+							render={({ field }) => (
+								<FormItem className="flex flex-row items-center gap-2">
+									<FormControl>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={() => {
+												field.onChange(!field.value)
+
+												if (!field.value) {
+													append({
+														year: "",
+														plate: "",
+														brand: "",
+														model: "",
+														color: "",
+														type: "CAR",
+														isMain: true,
+													})
+												} else {
+													remove()
+												}
+											}}
+										/>
+									</FormControl>
+									<div className="space-y-1 leading-none">
+										<FormLabel>Agregar vehículos</FormLabel>
+									</div>
+								</FormItem>
+							)}
+						/>
+
+						{needAddVehicle && (
+							<Button
+								type="button"
+								className="border-primary text-primary border bg-white hover:text-white md:ml-auto"
+								onClick={() =>
+									append({
+										year: "",
+										plate: "",
+										brand: "",
+										model: "",
+										color: "",
+										type: "CAR",
+										isMain: false,
+									})
+								}
+							>
+								Agregar vehículo
+							</Button>
+						)}
+					</CardContent>
+				</Card>
+
+				{needAddVehicle &&
+					fields.map((field, index) => (
+						<Card key={field.id}>
+							<CardContent>
+								<div className="grid gap-3 md:col-span-2 md:grid-cols-2">
+									<div className="flex items-center justify-between md:col-span-2">
+										<CardTitle className="text-gray-700">
+											Vehículo {index === 0 ? "Principal" : index + 1}
+										</CardTitle>
+
+										{index !== 0 && (
+											<Button
+												type="button"
+												className="border border-red-500 bg-white text-red-500 hover:bg-red-500 hover:text-white md:ml-auto"
+												onClick={() => remove(index)}
+											>
+												Eliminar #{index + 1}
+											</Button>
+										)}
+									</div>
+
+									<FormField
+										name={`vehicles.${index}.year`}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-gray-700">Año</FormLabel>
+												<FormControl>
+													<Input
+														type="number"
+														className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+														placeholder="Año"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
 									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)
-					}}
-				/>
 
-				<Button className="mt-4 md:col-span-2" type="submit" disabled={loading}>
+									<FormField
+										name={`vehicles.${index}.plate`}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-gray-700">Patente</FormLabel>
+												<FormControl>
+													<Input
+														className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+														placeholder="Patente"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										name={`vehicles.${index}.brand`}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-gray-700">Marca</FormLabel>
+												<FormControl>
+													<Input
+														className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+														placeholder="Marca"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										name={`vehicles.${index}.model`}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-gray-700">Modelo</FormLabel>
+												<FormControl>
+													<Input
+														className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+														placeholder="Modelo"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										name={`vehicles.${index}.color`}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel className="text-gray-700">Color</FormLabel>
+												<FormControl>
+													<Input
+														type="color"
+														className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+														placeholder="Color"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+							</CardContent>
+						</Card>
+					))}
+
+				<Button className="mt-4 w-full" size={"lg"} type="submit" disabled={loading}>
 					{loading ? (
 						<div role="status" className="flex items-center justify-center">
 							<svg
@@ -137,7 +319,7 @@ export default function UserForm(): React.ReactElement {
 							<span className="sr-only">Cargando...</span>
 						</div>
 					) : (
-						"Crear empresa"
+						"Crear empresa" + (needAddVehicle ? " y vehículo(s)" : "")
 					)}
 				</Button>
 			</form>

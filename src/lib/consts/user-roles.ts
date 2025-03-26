@@ -22,10 +22,6 @@ export const UserRoleOptions = [
 		label: "Usuario OTC",
 	},
 	{
-		value: USER_ROLES.PARTNER_COMPANY,
-		label: "Empresa Colaboradora",
-	},
-	{
 		value: USER_ROLES.OPERATOR,
 		label: "Operador",
 	},
