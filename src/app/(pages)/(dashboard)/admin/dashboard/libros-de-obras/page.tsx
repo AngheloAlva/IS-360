@@ -1,10 +1,4 @@
-import { Suspense } from "react"
-import { Card } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import WorkBooksOverview from "@/components/work-book/admin/WorkBooksOverview"
-import WorkBooksStats from "@/components/work-book/admin/WorkBooksStats"
-import WorkBooksCharts from "@/components/work-book/admin/WorkBooksCharts"
-import WorkBooksTable from "@/components/work-book/admin/WorkBooksTable"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function WorkBooksAdminPage() {
 	return (
@@ -17,27 +11,7 @@ export default function WorkBooksAdminPage() {
 					<TabsTrigger value="stats">Estadísticas</TabsTrigger>
 					<TabsTrigger value="charts">Gráficos</TabsTrigger>
 				</TabsList>
-
-				<TabsContent value="overview" className="w-full space-y-4">
-					<Suspense fallback={<Card className="h-[200px] animate-pulse" />}>
-						<WorkBooksOverview />
-					</Suspense>
-				</TabsContent>
-
-				<TabsContent value="stats" className="w-full space-y-4">
-					<Suspense fallback={<Card className="h-[200px] animate-pulse" />}>
-						<WorkBooksStats />
-					</Suspense>
-				</TabsContent>
-
-				<TabsContent value="charts" className="w-full space-y-4">
-					<WorkBooksCharts />
-				</TabsContent>
 			</Tabs>
-
-			<Suspense fallback={<Card className="h-[600px] animate-pulse" />}>
-				<WorkBooksTable />
-			</Suspense>
 		</div>
 	)
 }

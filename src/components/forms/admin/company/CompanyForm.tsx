@@ -53,7 +53,7 @@ export default function UserForm(): React.ReactElement {
 				duration: 3000,
 			})
 
-			router.push("/dashboard/admin/empresas")
+			router.push("/admin/dashboard/empresas")
 		} catch (error) {
 			console.log(error)
 			toast("Error al crear la empresa", {

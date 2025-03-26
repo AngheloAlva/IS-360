@@ -52,7 +52,7 @@ export default function NewFolderForm({
 	backPath?: string
 	parentSlug?: string
 	isRootFolder: boolean
-	area: (typeof Areas)[keyof typeof Areas]["title"]
+	area: (typeof Areas)[keyof typeof Areas]["value"]
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 

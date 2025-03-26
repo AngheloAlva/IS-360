@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const preventionAreaSchema = z.object({
-	workBookId: z.string(),
+	workOrderId: z.string(),
 
 	others: z.string().optional(),
 	recommendations: z.string().optional(),

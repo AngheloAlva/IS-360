@@ -10,15 +10,15 @@ interface CreateOtcInspectionsProps {
 
 export const createOtcInspections = async ({ values, userId }: CreateOtcInspectionsProps) => {
 	try {
-		const { workBookId, ...rest } = values
+		const { workOrderId, ...rest } = values
 
-		await prisma.workBookEntry.create({
+		await prisma.workEntry.create({
 			data: {
 				entryType: "OTC_INSPECTION",
 				...rest,
-				workBook: {
+				workOrder: {
 					connect: {
-						id: workBookId,
+						id: workOrderId,
 					},
 				},
 				createdBy: {

@@ -28,8 +28,9 @@ export default async function AreaRootPage({ params }: PageProps) {
 	}
 
 	const areaName = Areas[area as keyof typeof Areas]["title"]
+	const areaValue = Areas[area as keyof typeof Areas]["value"]
 
-	const res = await getFilesAndFolders(areaName)
+	const res = await getFilesAndFolders(areaValue)
 
 	if (!res.ok || !res.folders || !res.files) {
 		return notFound()

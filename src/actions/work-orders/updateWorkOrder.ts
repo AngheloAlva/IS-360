@@ -1,0 +1,35 @@
+"use server"
+
+import type { WorkBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
+import prisma from "@/lib/prisma"
+
+interface UpdateWorkOrderLikeBook {
+	id: string
+	values: WorkBookSchema
+}
+
+export const updateWorkOrderLikeBook = async ({ id, values }: UpdateWorkOrderLikeBook) => {
+	try {
+		await prisma.workOrder.update({
+			where: {
+				id,
+			},
+			data: {
+				workName: values.workName,
+				workLocation: values.workLocation,
+				workStartDate: values.workStartDate,
+			},
+		})
+
+		return {
+			ok: true,
+			message: "Libro de obras actualizado exitosamente",
+		}
+	} catch (error) {
+		console.error(error)
+		return {
+			ok: false,
+			message: "Error al actualizar el libro de obras",
+		}
+	}
+}

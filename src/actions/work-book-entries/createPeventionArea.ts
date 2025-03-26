@@ -10,9 +10,9 @@ interface CreatePreventionAreaProps {
 
 export const createPreventionArea = async ({ values, userId }: CreatePreventionAreaProps) => {
 	try {
-		const { workBookId, ...rest } = values
+		const { workOrderId, ...rest } = values
 
-		await prisma.workBookEntry.create({
+		await prisma.workEntry.create({
 			data: {
 				entryType: "PREVENTION_AREA",
 				others: rest.others,
@@ -20,9 +20,9 @@ export const createPreventionArea = async ({ values, userId }: CreatePreventionA
 				executionDate: rest.initialDate,
 				activityStartTime: rest.initialTime,
 				comments: rest.comments,
-				workBook: {
+				workOrder: {
 					connect: {
-						id: workBookId,
+						id: workOrderId,
 					},
 				},
 				createdBy: {

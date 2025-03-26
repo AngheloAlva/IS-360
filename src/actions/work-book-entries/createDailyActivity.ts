@@ -16,16 +16,16 @@ export const createDailyActivity = async ({
 	userId,
 }: CreateDailyActivityProps) => {
 	try {
-		const { workBookId, ...rest } = values
+		const { workOrderId, ...rest } = values
 
-		await prisma.workBookEntry.create({
+		await prisma.workEntry.create({
 			data: {
 				entryType: "DAILY_ACTIVITY",
 				hasAttachments: attachments.length > 0,
 				...rest,
-				workBook: {
+				workOrder: {
 					connect: {
-						id: workBookId,
+						id: workOrderId,
 					},
 				},
 				attachments: {

@@ -70,7 +70,7 @@ export default function MainAdminUsers({ page }: { page: number }): React.ReactE
 				</div>
 
 				<div className="flex flex-col gap-2 md:items-end">
-					<Link href="/dashboard/admin/usuarios/internos/agregar">
+					<Link href="/admin/dashboard/usuarios/internos/agregar">
 						<Button
 							size={"lg"}
 							className="border-primary text-primary border bg-white hover:text-white"
@@ -80,7 +80,7 @@ export default function MainAdminUsers({ page }: { page: number }): React.ReactE
 						</Button>
 					</Link>
 
-					<Link href="/dashboard/admin/usuarios/externos/agregar">
+					<Link href="/admin/dashboard/usuarios/externos/agregar">
 						<Button
 							size={"lg"}
 							className="border-feature text-feature hover:bg-feature border bg-white hover:text-white"

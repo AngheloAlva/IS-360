@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const dailyActivitySchema = z.object({
-	workBookId: z.string(),
+	workOrderId: z.string(),
 
 	comments: z.string().nonempty({ message: "Los comentarios no pueden estar vacíos" }),
 	executionDate: z.date({ message: "La fecha de ejecución no es válida" }),

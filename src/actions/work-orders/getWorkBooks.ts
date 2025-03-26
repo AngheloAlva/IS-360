@@ -2,9 +2,12 @@
 
 import prisma from "@/lib/prisma"
 
-export const getWorkOrders = async (limit: number, page: number) => {
+export const getWorkBooks = async (limit: number, page: number) => {
 	try {
-		const workOrders = await prisma.workOrder.findMany({
+		const workBooks = await prisma.workOrder.findMany({
+			where: {
+				isWorkBook: true,
+			},
 			take: limit,
 			skip: (page - 1) * limit,
 			orderBy: {
@@ -36,7 +39,7 @@ export const getWorkOrders = async (limit: number, page: number) => {
 
 		return {
 			ok: true,
-			data: workOrders,
+			data: workBooks,
 		}
 	} catch (error) {
 		console.log(error)
@@ -48,11 +51,17 @@ export const getWorkOrders = async (limit: number, page: number) => {
 	}
 }
 
-export const getWorkOrdersByCompanyId = async (companyId: string) => {
+export const getWorkBooksByCompanyId = async (companyId: string, limit: number, page: number) => {
 	try {
-		const workOrders = await prisma.workOrder.findMany({
+		const workBooks = await prisma.workOrder.findMany({
 			where: {
 				companyId,
+				isWorkBook: true,
+			},
+			take: limit,
+			skip: (page - 1) * limit,
+			orderBy: {
+				createdAt: "desc",
 			},
 			include: {
 				supervisor: {
@@ -74,7 +83,7 @@ export const getWorkOrdersByCompanyId = async (companyId: string) => {
 
 		return {
 			ok: true,
-			data: workOrders,
+			data: workBooks,
 		}
 	} catch (error) {
 		console.log(error)
@@ -86,39 +95,47 @@ export const getWorkOrdersByCompanyId = async (companyId: string) => {
 	}
 }
 
-export const getWorkOrderById = async (id: string) => {
+export const getWorkBooksByCompanyIdLikeBook = async (
+	companyId: string,
+	limit: number,
+	page: number
+) => {
 	try {
-		const work = await prisma.workOrder.findUnique({
+		const workBooks = await prisma.workOrder.findMany({
 			where: {
-				id,
+				companyId,
+				isWorkBook: true,
+				workName: {
+					not: null,
+				},
+			},
+			take: limit,
+			skip: (page - 1) * limit,
+			orderBy: {
+				createdAt: "desc",
 			},
 			include: {
-				workEntries: {
-					include: {
-						createdBy: true,
-						assignedUsers: true,
-						reportedUsers: true,
-					},
-				},
 				company: {
 					select: {
 						name: true,
-						rut: true,
+					},
+				},
+				equipment: {
+					select: {
+						name: true,
 					},
 				},
 				supervisor: {
 					select: {
-						id: true,
-						rut: true,
 						name: true,
+						id: true,
 						phone: true,
 					},
 				},
 				responsible: {
 					select: {
-						id: true,
-						rut: true,
 						name: true,
+						id: true,
 						phone: true,
 					},
 				},
@@ -127,13 +144,13 @@ export const getWorkOrderById = async (id: string) => {
 
 		return {
 			ok: true,
-			data: work,
+			data: workBooks,
 		}
 	} catch (error) {
 		console.log(error)
 
 		return {
-			message: "Error al cargar la orden de trabajo",
+			message: "Error al cargar las ordenes de trabajo",
 			ok: false,
 		}
 	}

@@ -41,12 +41,12 @@ import type { ENTRY_TYPE, User } from "@prisma/client"
 import type { Session } from "@/lib/auth"
 
 export default function ActivityForm({
-	workBookId,
+	workOrderId,
 	entryType,
 	session,
 }: {
 	entryType: ENTRY_TYPE
-	workBookId: string
+	workOrderId: string
 	session: Session
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -79,7 +79,7 @@ export default function ActivityForm({
 					userId: "",
 				},
 			],
-			workBookId,
+			workOrderId,
 		},
 	})
 
@@ -135,7 +135,7 @@ export default function ActivityForm({
 					duration: 5000,
 				})
 
-				router.push(`/dashboard/libro-de-obras/${workBookId}`)
+				router.push(`/dashboard/libro-de-obras/${workOrderId}`)
 			} else {
 				toast("Error al crear la actividad", {
 					description: message,

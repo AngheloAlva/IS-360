@@ -1,7 +1,20 @@
-import BackButton from "@/components/shared/BackButton"
-import WorkBookForm from "@/components/work-book/WorkBookForm"
+import { notFound } from "next/navigation"
+import { headers } from "next/headers"
 
-export default function CreateWorkBookPage() {
+import { auth } from "@/lib/auth"
+
+import WorkBookForm from "@/components/work-book/WorkBookForm"
+import BackButton from "@/components/shared/BackButton"
+
+export default async function CreateWorkBookPage() {
+	const data = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!data || !data.session) {
+		return notFound()
+	}
+
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-screen-lg items-center justify-start gap-2">
@@ -9,7 +22,7 @@ export default function CreateWorkBookPage() {
 				<h1 className="w-fit text-3xl font-bold">Nuevo Libro de Obras</h1>
 			</div>
 
-			<WorkBookForm />
+			<WorkBookForm userId={data.user.id} companyId={data.user.companyId!} />
 		</>
 	)
 }

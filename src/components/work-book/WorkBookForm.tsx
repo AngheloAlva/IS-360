@@ -4,17 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { addDays, format } from "date-fns"
 import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
+import { format } from "date-fns"
 import { toast } from "sonner"
 
-import { workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
+import { type WorkBookSchema, workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
 import { getWorkOrdersByCompanyId } from "@/actions/work-orders/getWorkOrders"
-import { createWorkBook } from "@/actions/work-books/createWorkBook"
-import { updateWorkBook } from "@/actions/work-books/updateWorkBook"
 import { getCompanyById } from "@/actions/companies/getCompanies"
-import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -38,15 +35,12 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-import type { WorkBook, WorkOrder } from "@prisma/client"
-import type { z } from "zod"
+import type { WorkOrder } from "@prisma/client"
+import { updateWorkOrderLikeBook } from "@/actions/work-orders/updateWorkOrder"
 
 interface WorkBookFormProps {
-	workBook?: WorkBook & {
-		otNumber: {
-			otNumber: string
-		}
-	}
+	userId: string
+	companyId: string
 }
 
 type WorkOrderWithSupervisorAndResponsible = WorkOrder & {
@@ -62,57 +56,34 @@ type WorkOrderWithSupervisorAndResponsible = WorkOrder & {
 	}
 }
 
-export default function WorkBookForm({ workBook }: WorkBookFormProps): React.ReactElement {
-	const { data: session, isPending } = authClient.useSession()
-
+export default function WorkBookForm({ userId, companyId }: WorkBookFormProps): React.ReactElement {
 	const [loading, setLoading] = useState<boolean>(false)
-	const [companyId, setCompanyId] = useState<string | undefined>(undefined)
 	const [workOrdersIsLoading, setWorkOrdersIsLoading] = useState<boolean>(true)
 	const [workOrders, setWorkOrders] = useState<WorkOrderWithSupervisorAndResponsible[]>([])
+	const [workOrderSelected, setWorkOrderSelected] =
+		useState<WorkOrderWithSupervisorAndResponsible | null>(null)
 
 	const router = useRouter()
 
-	const form = useForm<z.infer<typeof workBookSchema>>({
+	const form = useForm<WorkBookSchema>({
 		resolver: zodResolver(workBookSchema),
 		defaultValues: {
-			userId: session?.user.id,
-			workName: workBook?.workName ?? "",
-			workLocation: workBook?.workLocation ?? "",
-			otNumber: workBook?.otNumber.otNumber ?? "",
-			otcInspectorName: workBook?.otcInspectorName ?? "",
-			workStartDate: workBook?.workStartDate ?? new Date(),
-			otcInspectorPhone: workBook?.otcInspectorPhone ?? "",
-			contractingCompany: workBook?.contractingCompany ?? "",
-			workResponsibleName: workBook?.workResponsibleName ?? "",
-			workResponsiblePhone: workBook?.workResponsiblePhone ?? "",
-			workType: (workBook?.workType as "construccion") ?? undefined,
-			workStatus: (workBook?.workStatus as "planificado") ?? undefined,
-			workEstimatedEndDate: workBook?.workEstimatedEndDate ?? addDays(new Date(), 2),
+			workName: "",
+			userId: userId,
+			workOrderId: "",
+			workLocation: "",
+			workStartDate: new Date(),
 		},
 	})
 
 	useEffect(() => {
-		if (!isPending && session?.user) {
-			form.setValue("userId", session?.user.id)
-		}
-	}, [form, isPending, session?.user])
-
-	useEffect(() => {
-		if (!workBook || !workBook.workLocation) {
-			navigator.geolocation.getCurrentPosition((position) => {
-				form.setValue("workLocation", `${position.coords.latitude},${position.coords.longitude}`)
-			})
-		}
-	}, [form, workBook])
-
-	useEffect(() => {
-		if (!session?.user.companyId) return
-		setCompanyId(session?.user.companyId)
-	}, [session?.user.companyId])
+		navigator.geolocation.getCurrentPosition((position) => {
+			form.setValue("workLocation", `${position.coords.latitude},${position.coords.longitude}`)
+		})
+	}, [form])
 
 	useEffect(() => {
 		const fetchWorkOrders = async () => {
-			if (!companyId) return
 			const { ok, data } = await getWorkOrdersByCompanyId(companyId)
 
 			if (!ok || !data) {
@@ -144,80 +115,52 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 
 				return
 			}
-
-			form.setValue("companyId", companyId)
-			form.setValue("contractingCompany", data.name)
-			form.setValue("workResponsibleName", data.users[0].name)
-			form.setValue("workResponsiblePhone", data.users[0]?.phone ?? "No disponible")
 		}
 
 		void fetchCompanies()
-	}, [form, companyId])
+	}, [companyId])
 
 	useEffect(() => {
-		const workOrder = workOrders.find((workOrder) => workOrder.id === form.getValues("otNumber"))
+		const workOrder = workOrders.find((workOrder) => workOrder.id === form.getValues("workOrderId"))
 		if (!workOrder) return
 
-		form.setValue("otcInspectorName", workOrder.responsible.name)
-		form.setValue("otcInspectorPhone", workOrder.responsible?.phone ?? "No disponible")
+		setWorkOrderSelected(workOrder)
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("otNumber")])
+	}, [form.watch("workOrderId")])
 
 	useEffect(() => {
 		console.log(form.formState)
 		console.log(form.formState.errors)
 	}, [form.formState])
 
-	async function onSubmit(values: z.infer<typeof workBookSchema>) {
+	async function onSubmit(values: WorkBookSchema) {
 		try {
 			setLoading(true)
 
-			if (!workBook) {
-				const { ok, message, code } = await createWorkBook(values)
+			if (!workOrderSelected) {
+				toast("Error al actualizar el libro de obras", {
+					description: "Debe seleccionar una orden de trabajo.",
+					duration: 5000,
+				})
 
-				if (!ok) {
-					if (code === "P2002") {
-						form.setError("otNumber", {
-							message: "Ya existe un libro de obras con el mismo número de OT",
-						})
+				return
+			}
 
-						toast("Error al crear el registro", {
-							description: "Ya existe un libro de obras con el mismo número de OT",
-							duration: 5000,
-						})
+			const { ok, message } = await updateWorkOrderLikeBook({ id: workOrderSelected.id, values })
 
-						return
-					}
+			if (ok) {
+				toast("Libro de obras actualizado", {
+					description: message,
+					duration: 5000,
+				})
 
-					toast("Error al crear el registro", {
-						description: message,
-						duration: 5000,
-					})
-				} else {
-					toast("Registro creado", {
-						description: message,
-						duration: 5000,
-					})
-
-					router.push("/dashboard/libro-de-obras")
-				}
+				router.push(`/dashboard/libro-de-obras/${workOrderSelected.id}`)
 			} else {
-				const { ok, message } = await updateWorkBook(workBook.id, values)
-
-				if (ok) {
-					toast("Registro actualizado", {
-						description: message,
-						duration: 5000,
-					})
-
-					router.push(`/dashboard/libro-de-obras/${workBook.id}`)
-				} else {
-					toast("Error al actualizar el registro", {
-						description: message,
-						duration: 5000,
-					})
-				}
+				toast("Error al actualizar el libro de obras", {
+					description: message,
+					duration: 5000,
+				})
 			}
 		} catch (error) {
 			console.error(error)
@@ -239,10 +182,10 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 			>
 				<FormField
 					control={form.control}
-					name="otNumber"
+					name="workOrderId"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Numero de OT</FormLabel>
+							<FormLabel>Nombre de la obra</FormLabel>
 							<Select onValueChange={field.onChange} defaultValue={field.value}>
 								<FormControl>
 									<SelectTrigger className="border-gray-200">
@@ -323,198 +266,6 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 					)}
 				/>
 
-				<FormField
-					control={form.control}
-					name="workEstimatedEndDate"
-					render={({ field }) => (
-						<FormItem className="flex flex-col">
-							<FormLabel>Fecha de Finalizacion</FormLabel>
-							<Popover>
-								<PopoverTrigger asChild>
-									<FormControl>
-										<Button
-											variant={"outline"}
-											className={cn(
-												"w-full rounded-md border-gray-200 bg-white pl-3 text-left text-sm font-normal text-gray-700",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											{field.value ? (
-												format(field.value, "PPP", { locale: es })
-											) : (
-												<span>Selecciona la fecha</span>
-											)}
-											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-										</Button>
-									</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={field.value}
-										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
-										initialFocus
-									/>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<div className="my-4 grid grid-cols-1 gap-4 border-y border-gray-200 py-4 md:col-span-2 md:grid-cols-2">
-					<p className="text-gray-700 md:col-span-2">
-						<strong>Responsable de la obra</strong>
-					</p>
-
-					<FormField
-						control={form.control}
-						name="workResponsibleName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="text-gray-700">Nombre del Responsable</FormLabel>
-								<FormControl>
-									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-										placeholder="Nombre"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="workResponsiblePhone"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="text-gray-700">Teléfono del Responsable</FormLabel>
-								<FormControl>
-									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-										placeholder="Teléfono"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<p className="text-gray-700 md:col-span-2">
-						<strong>Inspector OTC</strong>
-					</p>
-
-					<FormField
-						control={form.control}
-						name="otcInspectorName"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="text-gray-700">Nombre del Inspector</FormLabel>
-								<FormControl>
-									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-										placeholder="Nombre"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="otcInspectorPhone"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="text-gray-700">Teléfono del Inspector</FormLabel>
-								<FormControl>
-									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-										placeholder="Teléfono"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-
-				<FormField
-					control={form.control}
-					name="workStatus"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Estado</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<FormControl>
-									<SelectTrigger className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700">
-										<SelectValue placeholder="Selecciona el estado" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									<SelectItem value="planificado">Planificado</SelectItem>
-									<SelectItem value="ejecucion">Ejecución</SelectItem>
-									<SelectItem value="finalizado">Finalizado</SelectItem>
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="workType"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Tipo de Obra</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<FormControl>
-									<SelectTrigger className="w-full overflow-hidden rounded-md border-gray-200 bg-white text-sm text-gray-700">
-										<SelectValue placeholder="Selecciona el tipo de obra" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									<SelectItem value="construccion">Construcción</SelectItem>
-									<SelectItem value="mantenimiento">Mantenimiento</SelectItem>
-									<SelectItem value="ampliacion">Ampliación</SelectItem>
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="workProgressStatus"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Estado del Avance</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<FormControl>
-									<SelectTrigger className="w-full overflow-hidden rounded-md border-gray-200 bg-white text-sm text-gray-700">
-										<SelectValue placeholder="Selecciona el estado del avance" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									<SelectItem value="pendiente">Pendiente</SelectItem>
-									<SelectItem value="proceso">Proceso</SelectItem>
-									<SelectItem value="terminado">Terminado</SelectItem>
-									<SelectItem value="postergado">Postergado</SelectItem>
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
 				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (
 						<div role="status" className="flex items-center justify-center">
@@ -536,10 +287,8 @@ export default function WorkBookForm({ workBook }: WorkBookFormProps): React.Rea
 							</svg>
 							<span className="sr-only">Cargando...</span>
 						</div>
-					) : workBook ? (
-						"Actualizar Registro"
 					) : (
-						"Crear Registro"
+						"Crear Libro de Obras"
 					)}
 				</Button>
 			</form>

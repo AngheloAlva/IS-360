@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const otcInspectionsSchema = z.object({
-	workBookId: z.string(),
+	workOrderId: z.string(),
 
 	executionDate: z.date({ message: "La fecha de ejecución no es válida" }),
 	activityStartTime: z.string().nonempty({ message: "La hora de inicio no puede estar vacía" }),

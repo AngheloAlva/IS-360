@@ -54,7 +54,6 @@ model User {
   banReason     String?
   banExpires    DateTime?
   rut           String
-  progress      Float             @default(0)
 
   sessions                       Session[]
   accounts                       Account[]
@@ -184,12 +183,13 @@ model WorkOrder {
   requiresBreak    Boolean
   breakDays        Int?
   estimatedEndDate DateTime?
+  isWorkBook       Boolean
 
   // Work book data
-  workName           String
-  workLocation       String
-  workStartDate      DateTime
-  workProgressStatus String
+  workName           String?
+  workLocation       String?
+  workStartDate      DateTime?
+  workProgressStatus Int?        @default(0)
   workEntries        WorkEntry[]
 
   company          Company            @relation(fields: [companyId], references: [id])

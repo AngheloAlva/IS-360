@@ -29,9 +29,10 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 	}
 
 	const areaName = Areas[area as keyof typeof Areas]["title"]
+	const areaValue = Areas[area as keyof typeof Areas]["value"]
 	const lastFolder = folderSlug[folderSlug.length - 1]
 
-	const res = await getFilesAndFolders(areaName, lastFolder)
+	const res = await getFilesAndFolders(areaValue, lastFolder)
 
 	if (!res.ok || !res.folders || !res.files) {
 		return notFound()

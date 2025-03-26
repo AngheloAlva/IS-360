@@ -30,10 +30,10 @@ import {
 
 export default function PreventionAreasForm({
 	userId,
-	workBookId,
+	workOrderId,
 }: {
 	userId: string
-	workBookId: string
+	workOrderId: string
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
@@ -43,7 +43,7 @@ export default function PreventionAreasForm({
 	const form = useForm<z.infer<typeof preventionAreaSchema>>({
 		resolver: zodResolver(preventionAreaSchema),
 		defaultValues: {
-			workBookId,
+			workOrderId,
 			others: "",
 			comments: "",
 			recommendations: "",
@@ -81,7 +81,7 @@ export default function PreventionAreasForm({
 					duration: 5000,
 				})
 
-				router.push(`/dashboard/libro-de-obras/${workBookId}`)
+				router.push(`/dashboard/libro-de-obras/${workOrderId}`)
 			} else {
 				toast("Error al crear el registro", {
 					description: message,

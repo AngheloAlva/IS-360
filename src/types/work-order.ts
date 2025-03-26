@@ -1,6 +1,6 @@
-import { WorkBookEntry as WorkBookEntryPrisma } from "@prisma/client"
+import { WorkEntry as WorkEntryPrisma } from "@prisma/client"
 
-export interface WorkBookEntry extends WorkBookEntryPrisma {
+export interface WorkEntry extends WorkEntryPrisma {
 	createdBy: {
 		name: string
 		role: string

@@ -28,7 +28,7 @@ export default async function CreateDailyActivityPage({
 				<h1 className="text-2xl font-bold text-gray-800">Agregar Actividad Diaria</h1>
 			</div>
 
-			<ActivityForm entryType="DAILY_ACTIVITY" workBookId={id} session={session} />
+			<ActivityForm entryType="DAILY_ACTIVITY" workOrderId={id} session={session} />
 		</>
 	)
 }

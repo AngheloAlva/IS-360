@@ -28,7 +28,7 @@ export default async function CreatePreventionAreaPage({
 				<h1 className="text-2xl font-bold text-gray-800">Agregar Área de Prevención</h1>
 			</div>
 
-			<PreventionAreasForm workBookId={id} userId={session.session.userId} />
+			<PreventionAreasForm workOrderId={id} userId={session.session.userId} />
 		</>
 	)
 }

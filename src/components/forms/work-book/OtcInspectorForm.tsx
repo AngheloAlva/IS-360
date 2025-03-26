@@ -30,10 +30,10 @@ import {
 
 export default function OtcInspectorForm({
 	userId,
-	workBookId,
+	workOrderId,
 }: {
 	userId: string
-	workBookId: string
+	workOrderId: string
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
@@ -52,7 +52,7 @@ export default function OtcInspectorForm({
 	const form = useForm<z.infer<typeof otcInspectionsSchema>>({
 		resolver: zodResolver(otcInspectionsSchema),
 		defaultValues: {
-			workBookId,
+			workOrderId,
 			nonConformities: "",
 			activityEndTime: "",
 			activityStartTime: "",
@@ -82,7 +82,7 @@ export default function OtcInspectorForm({
 					duration: 5000,
 				})
 
-				router.push(`/dashboard/libro-de-obras/${workBookId}`)
+				router.push(`/dashboard/libro-de-obras/${workOrderId}`)
 			} else {
 				toast("Error al crear la actividad del Inspector", {
 					description: message,

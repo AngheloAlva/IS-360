@@ -57,7 +57,7 @@ export default function ExternalUserForm({ user }: ExternalUserFormProps): React
 					description: `El usuario ${data?.name} ha sido actualizado exitosamente`,
 					duration: 3000,
 				})
-				router.push("/dashboard/admin/usuarios")
+				router.push("/admin/dashboard/usuarios")
 			} else {
 				toast("Error al actualizar el usuario", {
 					description: "Ocurrió un error al intentar actualizar el usuario",

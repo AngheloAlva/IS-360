@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
-import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { getCompanies } from "@/actions/companies/getCompanies"
 import { USER_ROLES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
@@ -115,7 +114,8 @@ export default function ExternalUsersForm(): React.ReactElement {
 		try {
 			const results = await Promise.allSettled(
 				values.employees.map(async (employee) => {
-					const temporalPassword = generateTemporalPassword()
+					// const temporalPassword = generateTemporalPassword()
+					const temporalPassword = "123456"
 
 					const { data: newUser, error } = await authClient.admin.createUser({
 						email: employee.email,
@@ -150,7 +150,7 @@ export default function ExternalUsersForm(): React.ReactElement {
 					description: `${successes.length} usuarios han sido creados exitosamente`,
 					duration: 3000,
 				})
-				router.push("/dashboard/admin/usuarios")
+				router.push("/admin/dashboard/usuarios")
 			}
 		} catch (error) {
 			console.error(error)

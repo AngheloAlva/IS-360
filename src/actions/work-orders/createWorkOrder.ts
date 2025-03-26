@@ -33,6 +33,7 @@ export const createWorkOrder = async ({ values }: CreateWorkOrderProps) => {
 					},
 				},
 				...rest,
+				isWorkBook: true,
 				estimatedDays: +rest.estimatedDays,
 				estimatedHours: +rest.estimatedHours,
 				estimatedEndDate: rest.estimatedEndDate ? new Date(rest.estimatedEndDate) : undefined,

@@ -65,7 +65,7 @@ export function DataTable<TData, TValue>({
 					onChange={(event) => table.getColumn("otNumber")?.setFilterValue(event.target.value)}
 				/>
 
-				<Link href="/dashboard/admin/ordenes-de-trabajo/agregar" className="md:ml-auto">
+				<Link href="/admin/dashboard/ordenes-de-trabajo/agregar" className="md:ml-auto">
 					<Button size={"lg"}>
 						Nueva Orden de Trabajo
 						<Plus className="ml-1" />

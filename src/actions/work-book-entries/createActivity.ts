@@ -20,10 +20,10 @@ export const createActivity = async ({
 }: CreateActivityProps) => {
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { workBookId, comments, personnel, ...rest } = values
+		const { workOrderId, comments, personnel, ...rest } = values
 
 		const workBookEntryConnectionData: {
-			workBook: { connect: { id: string } }
+			workOrder: { connect: { id: string } }
 			assignedUsers: {
 				connect: {
 					id: string
@@ -32,9 +32,9 @@ export const createActivity = async ({
 			createdBy: { connect: { id: string } }
 			attachments?: { create: { type: string; url: string; name: string }[] }
 		} = {
-			workBook: {
+			workOrder: {
 				connect: {
-					id: workBookId,
+					id: workOrderId,
 				},
 			},
 			assignedUsers: {
@@ -59,7 +59,7 @@ export const createActivity = async ({
 			}
 		}
 
-		await prisma.workBookEntry.create({
+		await prisma.workEntry.create({
 			data: {
 				entryType,
 				hasAttachments: !!attachments?.length,

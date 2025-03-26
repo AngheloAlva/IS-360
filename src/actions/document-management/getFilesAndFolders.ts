@@ -1,13 +1,9 @@
 "use server"
 
 import prisma from "@/lib/prisma"
+import type { AREAS } from "@prisma/client"
 
-import type { Areas } from "@/lib/consts/areas"
-
-export async function getFilesAndFolders(
-	area: (typeof Areas)[keyof typeof Areas]["value"],
-	folderSlug: string | null = null
-) {
+export async function getFilesAndFolders(area: AREAS, folderSlug: string | null = null) {
 	try {
 		const folders = await prisma.folder.findMany({
 			where: {

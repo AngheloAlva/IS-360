@@ -83,7 +83,7 @@ export default function InternalUserForm(): React.ReactElement {
 					duration: 3000,
 				})
 
-				router.push("/dashboard/admin/usuarios")
+				router.push("/admin/dashboard/usuarios")
 			}
 		} catch (error) {
 			console.log(error)

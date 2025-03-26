@@ -72,7 +72,7 @@ export function DataTable<TData, TValue>({
 					onChange={(event) => table.getColumn("rut")?.setFilterValue(event.target.value)}
 				/>
 
-				<Link href="/dashboard/admin/empresas/agregar" className="md:ml-auto">
+				<Link href="/admin/dashboard/empresas/agregar" className="md:ml-auto">
 					<Button size={"lg"}>
 						Nueva Empresa
 						<Plus className="ml-1" />

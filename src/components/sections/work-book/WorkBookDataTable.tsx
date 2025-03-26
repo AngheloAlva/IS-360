@@ -32,7 +32,7 @@ interface DataTableProps<TData, TValue> {
 	data: TData[]
 }
 
-export function DataTable<TData, TValue>({
+export function WorkBookDataTable<TData, TValue>({
 	columns,
 	data,
 	isLoading,
@@ -68,9 +68,9 @@ export function DataTable<TData, TValue>({
 				<Input
 					className="w-96"
 					placeholder="Filtrar por Empresa Contratista..."
-					value={(table.getColumn("contractingCompany")?.getFilterValue() as string) ?? ""}
+					value={(table.getColumn("company.name")?.getFilterValue() as string) ?? ""}
 					onChange={(event) =>
-						table.getColumn("contractingCompany")?.setFilterValue(event.target.value)
+						table.getColumn("company.name")?.setFilterValue(event.target.value)
 					}
 				/>
 
@@ -104,38 +104,8 @@ export function DataTable<TData, TValue>({
 						{isLoading ? (
 							Array.from({ length: 10 }).map((_, index) => (
 								<TableRow key={index}>
-									<TableCell className="">
+									<TableCell className="" colSpan={columns.length}>
 										<Skeleton className="h-9 min-w-5" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-20" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-									<TableCell className="">
-										<Skeleton className="h-9 min-w-full" />
 									</TableCell>
 								</TableRow>
 							))

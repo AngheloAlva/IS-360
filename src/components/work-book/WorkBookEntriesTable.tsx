@@ -13,9 +13,9 @@ import {
 	TableHeader,
 } from "@/components/ui/table"
 
-import type { WorkBookEntry } from "@/types/work-book"
+import type { WorkEntry } from "@/types/work-order"
 
-const EntryTypeLabel: Record<WorkBookEntry["entryType"], string> = {
+const EntryTypeLabel: Record<WorkEntry["entryType"], string> = {
 	DAILY_ACTIVITY: "Actividad Diaria",
 	ADDITIONAL_ACTIVITY: "Actividad Adicional",
 	PREVENTION_AREA: "Área de Prevención",
@@ -24,7 +24,7 @@ const EntryTypeLabel: Record<WorkBookEntry["entryType"], string> = {
 	USER_NOTE: "Nota de Usuario",
 }
 
-const EntryTypeColor: Record<WorkBookEntry["entryType"], string> = {
+const EntryTypeColor: Record<WorkEntry["entryType"], string> = {
 	DAILY_ACTIVITY: "bg-blue-500",
 	ADDITIONAL_ACTIVITY: "bg-cyan-500",
 	PREVENTION_AREA: "bg-emerald-500",
@@ -36,7 +36,7 @@ const EntryTypeColor: Record<WorkBookEntry["entryType"], string> = {
 export default function WorkBookEntriesTable({
 	entries,
 }: {
-	entries: WorkBookEntry[]
+	entries: WorkEntry[]
 }): React.ReactElement {
 	return (
 		<Table className="w-full">

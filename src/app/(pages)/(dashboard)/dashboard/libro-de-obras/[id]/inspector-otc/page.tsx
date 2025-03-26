@@ -24,11 +24,11 @@ export default async function CreateOtcInspectorPage({
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-screen-xl items-center justify-start gap-2">
-				<BackButton href={`/dashboard/admin/libros-de-obras/${id}`} />
+				<BackButton href={`/admin/dashboard/libros-de-obras/${id}`} />
 				<h1 className="text-2xl font-bold text-gray-800">Inpector OTC</h1>
 			</div>
 
-			<OtcInspectorForm workBookId={id} userId={session.user.id} />
+			<OtcInspectorForm workOrderId={id} userId={session.user.id} />
 		</>
 	)
 }

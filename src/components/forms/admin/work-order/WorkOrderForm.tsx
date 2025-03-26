@@ -84,6 +84,7 @@ export default function WorkOrderForm(): React.ReactElement {
 		const fetchCompanies = async () => {
 			setIsCompaniesLoading(true)
 			const { data, ok } = await getCompanies(100, 1)
+			console.log(data)
 
 			if (!ok || !data) {
 				toast("Error al cargar las empresas", {
@@ -143,7 +144,7 @@ export default function WorkOrderForm(): React.ReactElement {
 	useEffect(() => {
 		const company = companies.find((c) => c.id === form.watch("companyId"))
 		setSelectedCompany(company)
-		form.setValue("supervisorId", company?.users[0].id || "")
+		form.setValue("supervisorId", company?.users[0]?.id || "")
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("companyId")])
 
@@ -165,7 +166,7 @@ export default function WorkOrderForm(): React.ReactElement {
 				description: "Solicitud creada exitosamente",
 				duration: 5000,
 			})
-			router.push(`/dashboard/admin/ordenes-de-trabajo/`)
+			router.push(`/admin/dashboard/ordenes-de-trabajo/`)
 		} catch (error) {
 			toast("Error al crear la solicitud", {
 				description: "Error al crear la solicitud" + error,
@@ -365,7 +366,7 @@ export default function WorkOrderForm(): React.ReactElement {
 							</div>
 							<div>
 								<p className="text-sm font-medium text-gray-700">Supervisor</p>
-								<p className="text-sm text-gray-700">{selectedCompany.users[0].name}</p>
+								<p className="text-sm text-gray-700">{selectedCompany.users[0]?.name}</p>
 							</div>
 						</>
 					)}

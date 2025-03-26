@@ -2,31 +2,32 @@
 
 import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
-
-import { getWorkBooks } from "@/actions/work-books/getWorkBook"
-import { useSidebar } from "@/components/ui/sidebar"
-import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
-import { DataTable } from "./DataTable"
-import { columns } from "./columns"
+import { getWorkBooksByCompanyIdLikeBook } from "@/actions/work-orders/getWorkBooks"
+import { cn } from "@/lib/utils"
 
-import type { WorkBook } from "@prisma/client"
+import { WorkBookDataTable } from "./WorkBookDataTable"
+import { workBookColumns } from "./work-book-columns"
+import { useSidebar } from "@/components/ui/sidebar"
 
-export default function MainWorkBook({
+import type { WorkOrder } from "@prisma/client"
+
+export default function WorkBookMain({
 	page,
-	userId,
+	companyId,
 }: {
 	page: number
-	userId: string
+	companyId: string
 }): React.ReactElement {
 	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [workBooks, setWorkBooks] = useState<WorkBook[]>([])
+	const [workBooks, setWorkBooks] = useState<WorkOrder[]>([])
+
 	const { state } = useSidebar()
 
 	useEffect(() => {
 		const fetchWorkBooks = async () => {
-			const data = await getWorkBooks(userId, 10, page)
+			const data = await getWorkBooksByCompanyIdLikeBook(companyId, 10, page)
 
 			if (!data.ok || !data.data) {
 				toast("Error al cargar los libros de obras", {
@@ -41,7 +42,7 @@ export default function MainWorkBook({
 		}
 
 		void fetchWorkBooks()
-	}, [page, userId])
+	}, [page, companyId])
 
 	return (
 		<main
@@ -54,7 +55,7 @@ export default function MainWorkBook({
 		>
 			<h1 className="w-fit text-3xl font-bold">Libro de Obras</h1>
 
-			<DataTable columns={columns} data={workBooks} isLoading={isLoading} />
+			<WorkBookDataTable columns={workBookColumns} data={workBooks} isLoading={isLoading} />
 		</main>
 	)
 }
