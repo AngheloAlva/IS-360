@@ -12,7 +12,7 @@
     "db:seed": "pnpm dotenv -e .env.local -- ts-node ./prisma/seed/seed.ts",
     "prisma:generate": "pnpm dotenv -e .env.local -- prisma generate",
     "prisma:studio": "pnpm dotenv -e .env.local -- prisma studio",
-    "production:build": "pnpm prisma generate && pnpm prisma migrate deploy && next build"
+    "production:build": "pnpm prisma generate && next build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
