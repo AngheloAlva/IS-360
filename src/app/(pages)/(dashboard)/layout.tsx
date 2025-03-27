@@ -4,10 +4,10 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import QueryProvider from "@/components/providers/QueryProvider"
 import { AppSidebar } from "@/components/sidebar/appSidebar"
 import { Separator } from "@/components/ui/separator"
 import PageName from "@/components/sidebar/PageName"
-import QueryProvider from "@/components/providers/QueryProvider"
 
 export default async function AdminDashboardLayout({
 	children,
@@ -32,7 +32,7 @@ export default async function AdminDashboardLayout({
 						<div className="flex items-center gap-2 px-4">
 							<SidebarTrigger className="-ml-1" />
 							<Separator orientation="vertical" className="mr-2 h-4" />
-							<PageName />
+							<PageName externalPath={session.user.role === "PARTNER_COMPANY"} />
 						</div>
 					</header>
 

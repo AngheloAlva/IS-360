@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table"
 import { Plus } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card } from "@/components/ui/card"
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -55,8 +56,8 @@ export function DataTable<TData, TValue>({
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start">
-			<div className="flex w-fit flex-col flex-wrap items-start gap-2 py-4 md:w-full md:flex-row">
+		<section className="flex w-full flex-col items-start gap-4">
+			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
 				<Input
 					type="text"
 					className="w-fit"
@@ -73,7 +74,7 @@ export function DataTable<TData, TValue>({
 				</Link>
 			</div>
 
-			<div className="w-full max-w-full overflow-x-scroll rounded-md border">
+			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -146,7 +147,7 @@ export function DataTable<TData, TValue>({
 						)}
 					</TableBody>
 				</Table>
-			</div>
+			</Card>
 
 			<div className="flex items-center justify-end space-x-2 py-4">
 				<Button

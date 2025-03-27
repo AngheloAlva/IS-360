@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form"
 
 import type { User } from "@prisma/client"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface ExternalUserFormProps {
 	user: User
@@ -77,92 +78,81 @@ export default function ExternalUserForm({ user }: ExternalUserFormProps): React
 
 	return (
 		<Form {...form}>
-			<form
-				onSubmit={form.handleSubmit(onSubmit)}
-				className="grid w-full max-w-screen-lg gap-3 md:grid-cols-2"
-			>
-				<FormField
-					control={form.control}
-					name={`name`}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Nombre</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-screen-lg">
+				<Card className="w-full">
+					<CardContent className="grid gap-3 md:grid-cols-2">
+						<FormField
+							control={form.control}
+							name={`name`}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="">Nombre</FormLabel>
+									<FormControl>
+										<Input className="w-full rounded-md text-sm" placeholder="Nombre" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name={`email`}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Email</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Email"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name={`email`}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="">Email</FormLabel>
+									<FormControl>
+										<Input className="w-full rounded-md text-sm" placeholder="Email" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name={`rut`}
-					render={({ field }) => {
-						// eslint-disable-next-line @typescript-eslint/no-unused-vars
-						const { onChange, ...restFieldProps } = field
+						<FormField
+							control={form.control}
+							name={`rut`}
+							render={({ field }) => {
+								// eslint-disable-next-line @typescript-eslint/no-unused-vars
+								const { onChange, ...restFieldProps } = field
 
-						return (
-							<FormItem>
-								<FormLabel className="text-gray-700">RUT</FormLabel>
-								<FormControl>
-									<Input
-										className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-										onChange={(e) => {
-											field.onChange(formatRut(e.target.value))
-										}}
-										placeholder="RUT"
-										{...restFieldProps}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)
-					}}
-				/>
+								return (
+									<FormItem>
+										<FormLabel className="">RUT</FormLabel>
+										<FormControl>
+											<Input
+												className="w-full rounded-md text-sm"
+												onChange={(e) => {
+													field.onChange(formatRut(e.target.value))
+												}}
+												placeholder="RUT"
+												{...restFieldProps}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)
+							}}
+						/>
 
-				<FormField
-					control={form.control}
-					name={`isSupervisor`}
-					render={({ field }) => (
-						<FormItem className="flex h-9 flex-row items-center justify-start rounded-md border border-gray-200 px-3 shadow-xs md:mt-5.5">
-							<FormControl>
-								<Checkbox
-									checked={field.value}
-									onCheckedChange={field.onChange}
-									className="border-gray-200"
-								/>
-							</FormControl>
-							<div className="space-y-1 leading-none">
-								<FormLabel>Es Supervisor?</FormLabel>
-							</div>
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name={`isSupervisor`}
+							render={({ field }) => (
+								<FormItem className="flex h-9 flex-row items-center justify-start rounded-md border px-3 shadow-xs md:mt-5.5">
+									<FormControl>
+										<Checkbox checked={field.value} onCheckedChange={field.onChange} className="" />
+									</FormControl>
+									<div className="space-y-1 leading-none">
+										<FormLabel>Es Supervisor?</FormLabel>
+									</div>
+								</FormItem>
+							)}
+						/>
+					</CardContent>
+				</Card>
 
-				<Button className="mt-4 md:col-span-2" type="submit" disabled={loading}>
+				<Button className="mt-4 w-full" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (
 						<div role="status" className="flex items-center justify-center">
 							<svg

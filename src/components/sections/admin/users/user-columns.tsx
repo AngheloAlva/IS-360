@@ -5,16 +5,16 @@ import { ArrowUpDown, Edit } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 
+import { USER_ROLES, UserRoleOptions } from "@/lib/consts/user-roles"
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
-import { UserRoleOptions } from "@/lib/consts/user-roles"
 import { AreasLabels } from "@/lib/consts/areas"
-import { USER_ROLE } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
 import { Badge } from "@/components/ui/badge"
 
-import type { UserWithRole } from "better-auth/plugins"
+import type { ApiUser } from "@/types/user"
 
-export const UserColumns: ColumnDef<UserWithRole>[] = [
+export const UserColumns: ColumnDef<ApiUser>[] = [
 	{
 		accessorKey: "isSupervisor",
 		header: "Empresa",
@@ -23,10 +23,10 @@ export const UserColumns: ColumnDef<UserWithRole>[] = [
 			const isSupervisor = row.getValue("isSupervisor") as boolean
 
 			if (role !== "PARTNER_COMPANY") {
-				return <div>OTC {isSupervisor && "- Supervisor"}</div>
+				return <div>OTC</div>
 			}
 
-			const company = row.getValue("company") as string
+			const company = row.original.company?.name
 			return (
 				<div>
 					{company} {isSupervisor && "- Supervisor"}
@@ -48,21 +48,20 @@ export const UserColumns: ColumnDef<UserWithRole>[] = [
 	},
 	{
 		accessorKey: "role",
-		header: ({ column }) => {
-			return (
-				<div
-					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					className="hover:text-primary flex cursor-pointer items-center transition-colors"
-				>
-					Rol
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</div>
-			)
-		},
+		header: "Rol",
 		cell: ({ row }) => {
 			const role = row.getValue("role") as string
 			const roleLabel = UserRoleOptions.find((r) => r.value === role)?.label || role
-			return <Badge variant={role === "PARTNER_COMPANY" ? "outline" : "default"}>{roleLabel}</Badge>
+			return (
+				<Badge
+					className={cn("border-feature text-feature", {
+						"border-primary text-primary bg-white": role !== "PARTNER_COMPANY",
+					})}
+					variant={role === "PARTNER_COMPANY" ? "outline" : "default"}
+				>
+					{roleLabel}
+				</Badge>
+			)
 		},
 	},
 	{
@@ -117,7 +116,7 @@ export const UserColumns: ColumnDef<UserWithRole>[] = [
 			const id = row.getValue("id")
 			const role = row.getValue("role")
 
-			const isPartnerCompany = role === USER_ROLE.PARTNER_COMPANY || role === USER_ROLE.OPERATOR
+			const isPartnerCompany = role === USER_ROLES.PARTNER_COMPANY || role === USER_ROLES.OPERATOR
 
 			return (
 				<Link

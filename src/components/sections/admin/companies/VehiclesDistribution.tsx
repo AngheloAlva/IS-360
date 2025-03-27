@@ -47,8 +47,6 @@ export default function VehiclesDistribution(): React.ReactElement {
 					</div>
 					Vehículos
 				</CardTitle>
-
-				<CarIcon className="text-muted-foreground h-4 w-4" />
 			</CardHeader>
 			<CardContent>
 				{isLoading ? (

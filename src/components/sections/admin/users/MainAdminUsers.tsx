@@ -1,55 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { notFound } from "next/navigation"
 import { Plus } from "lucide-react"
-import { toast } from "sonner"
 import Link from "next/link"
 
 import GeneralSummary from "./GeneralSummary"
 import RoleDistribution from "./RoleDistribution"
 import AreaDistribution from "./AreaDistribution"
 
-import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 
 import { useSidebar } from "@/components/ui/sidebar"
 import { UsersDataTable } from "./UsersDataTable"
 import { Button } from "@/components/ui/button"
-import { UserColumns } from "./user-columns"
 
-import type { UserWithRole } from "better-auth/plugins"
-
-export default function MainAdminUsers({ page }: { page: number }): React.ReactElement {
-	const [isLoading, setIsLoading] = useState<boolean>(true)
-	const [users, setUsers] = useState<UserWithRole[]>([])
-
+export default function MainAdminUsers(): React.ReactElement {
 	const { state } = useSidebar()
-
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const { data, error } = await authClient.admin.listUsers({
-				query: {
-					limit: 10,
-					offset: (page - 1) * 10,
-					sortBy: "createdAt",
-				},
-			})
-
-			if (error) {
-				toast("Error al cargar los usuarios", {
-					description: error.message,
-					duration: 5000,
-				})
-				return notFound()
-			}
-
-			setUsers(data.users)
-			setIsLoading(false)
-		}
-
-		void fetchUsers()
-	}, [page])
 
 	return (
 		<div
@@ -98,7 +63,7 @@ export default function MainAdminUsers({ page }: { page: number }): React.ReactE
 				<AreaDistribution />
 			</div>
 
-			<UsersDataTable columns={UserColumns} data={users} isLoading={isLoading} />
+			<UsersDataTable />
 		</div>
 	)
 }

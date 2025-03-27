@@ -22,10 +22,8 @@ export default function AreaDistribution(): React.ReactElement {
 			if (!response.ok) throw new Error("Error fetching area distribution")
 			return response.json()
 		},
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		staleTime: 1000 * 60 * 5,
 	})
-
-	console.log(data)
 
 	return (
 		<Card className="border-none">

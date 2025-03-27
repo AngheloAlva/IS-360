@@ -1,4 +1,4 @@
-import { Info } from "lucide-react"
+import { HeartIcon, Info } from "lucide-react"
 import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
@@ -44,6 +44,7 @@ export default function WorkBookEntriesTable({
 			<Table className="w-full">
 				<TableHeader>
 					<TableRow>
+						<TableHead />
 						<TableHead className="text-nowrap">Tipo</TableHead>
 						<TableHead className="text-nowrap">Fecha</TableHead>
 						<TableHead className="text-nowrap">Actividad/Título</TableHead>
@@ -68,6 +69,9 @@ export default function WorkBookEntriesTable({
 
 					{entries.map((entry) => (
 						<TableRow key={entry.id}>
+							<TableCell>
+								<HeartIcon />
+							</TableCell>
 							<TableCell>
 								<Badge className={cn("text-sm", EntryTypeColor[entry.entryType])}>
 									{EntryTypeLabel[entry.entryType]}

@@ -25,4 +25,8 @@ export const UserRoleOptions = [
 		value: USER_ROLES.OPERATOR,
 		label: "Operador",
 	},
+	{
+		value: USER_ROLES.PARTNER_COMPANY,
+		label: "Empresa Colaboradora",
+	},
 ]

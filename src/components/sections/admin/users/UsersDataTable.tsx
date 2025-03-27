@@ -3,18 +3,19 @@
 import { Sheet } from "lucide-react"
 import { useState } from "react"
 import {
-	ColumnDef,
 	flexRender,
 	SortingState,
 	useReactTable,
 	getCoreRowModel,
 	ColumnFiltersState,
 	getFilteredRowModel,
-	getPaginationRowModel,
 } from "@tanstack/react-table"
 
 import { AreasLabels } from "@/lib/consts/areas"
+import { useUsers } from "@/hooks/use-users"
+import { UserColumns } from "./user-columns"
 
+import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,32 +38,38 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[]
-	isLoading: boolean
-	data: TData[]
-}
+import type { ApiUser } from "@/types/user"
 
-export function UsersDataTable<TData, TValue>({
-	columns,
-	data,
-	isLoading,
-}: DataTableProps<TData, TValue>) {
+export function UsersDataTable() {
+	const [page, setPage] = useState(1)
+	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const table = useReactTable({
-		data,
-		columns,
+	const { data, isLoading } = useUsers({
+		page,
+		search,
+		limit: 10,
+	})
+	console.log(data)
+
+	const table = useReactTable<ApiUser>({
+		data: data?.users ?? [],
+		columns: UserColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
 		state: {
 			sorting,
 			columnFilters,
+			pagination: {
+				pageIndex: page - 1,
+				pageSize: 10,
+			},
 		},
+		manualPagination: true,
+		pageCount: data?.pages ?? 0,
 	})
 
 	return (
@@ -72,24 +79,10 @@ export function UsersDataTable<TData, TValue>({
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 				<Input
 					type="text"
-					className="w-full sm:w-fit"
-					placeholder="Nombre..."
-					value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-				/>
-
-				<Input
-					className="w-full sm:w-fit"
-					placeholder="RUT..."
-					value={(table.getColumn("rut")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("rut")?.setFilterValue(event.target.value)}
-				/>
-
-				<Input
-					className="w-full sm:w-fit"
-					placeholder="Email..."
-					value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
+					className="w-full sm:w-64"
+					placeholder="Buscar por nombre, email o RUT..."
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
 				/>
 
 				<Select
@@ -167,27 +160,12 @@ export function UsersDataTable<TData, TValue>({
 				</Table>
 			</Card>
 
-			<div className="flex w-full items-center justify-end space-x-2">
-				<Button
-					variant="outline"
-					size="sm"
-					className="bg-white"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-				>
-					Anterior
-				</Button>
-
-				<Button
-					variant="outline"
-					size="sm"
-					className="bg-white"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-				>
-					Siguiente
-				</Button>
-			</div>
+			<TablePagination
+				table={table}
+				onPageChange={setPage}
+				pageCount={data?.pages ?? 0}
+				isLoading={isLoading}
+			/>
 		</section>
 	)
 }

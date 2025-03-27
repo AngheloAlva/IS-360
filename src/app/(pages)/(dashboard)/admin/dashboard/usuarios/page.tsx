@@ -1,12 +1,5 @@
-import MainAdminUsers from "@/components/sections/admin-users/MainAdminUsers"
+import MainAdminUsers from "@/components/sections/admin/users/MainAdminUsers"
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
-
-export default async function AdminUsersPage(props: {
-	searchParams: SearchParams
-}): Promise<React.ReactElement> {
-	const searchParams = await props.searchParams
-	const page = searchParams.page ? parseInt(searchParams.page as string) : 1
-
-	return <MainAdminUsers page={page} />
+export default function AdminUsersPage(): React.ReactElement {
+	return <MainAdminUsers />
 }

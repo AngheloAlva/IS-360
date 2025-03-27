@@ -13,11 +13,11 @@ export default function BackButton({ href, className }: BackButtonProps): React.
 		<Link
 			href={href}
 			className={cn(
-				"hover:bg-primary/40 hover:text-primary mt-0.5 rounded-full transition-colors",
+				"bg-primary/10 text-primary hover:bg-primary rounded-full p-0.5 transition-colors hover:text-white",
 				className
 			)}
 		>
-			<ChevronLeft className="h-7 w-7" />
+			<ChevronLeft className="h-6 w-6" />
 			<span className="sr-only">Atrás</span>
 		</Link>
 	)

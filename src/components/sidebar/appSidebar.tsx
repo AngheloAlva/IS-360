@@ -72,6 +72,11 @@ const data = {
 			url: "/admin/dashboard/libros-de-obras",
 			icon: BookCopy,
 		},
+		{
+			name: "Charlas de Seguridad",
+			url: "/admin/dashboard/charlas-de-seguridad",
+			icon: MonitorPlay,
+		},
 	],
 	navUser: [
 		{
@@ -129,12 +134,12 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 		<Sidebar collapsible="icon" variant="inset" {...props}>
 			<SidebarHeader>
 				<SidebarMenuButton size="lg">
-					<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-						<Image src="/logo.jpeg" width={50} height={50} alt="Logo" />
+					<div className="flex aspect-square size-8 items-center justify-center bg-white">
+						<Image src="/logo.svg" width={50} height={50} alt="Logo" />
 					</div>
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-semibold">OTC</span>
-						<span className="truncate text-xs">Sistema</span>
+						<span className="truncate text-xs">IS ERP</span>
 					</div>
 				</SidebarMenuButton>
 			</SidebarHeader>
