@@ -26,7 +26,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -496,7 +495,7 @@ export default function WorkOrderForm(): React.ReactElement {
 							)}
 						/>
 
-						<FormField
+						{/* <FormField
 							control={form.control}
 							name="requiresBreak"
 							render={({ field }) => (
@@ -512,7 +511,7 @@ export default function WorkOrderForm(): React.ReactElement {
 									<FormMessage />
 								</FormItem>
 							)}
-						/>
+						/> */}
 					</CardContent>
 				</Card>
 
