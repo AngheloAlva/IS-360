@@ -8,7 +8,6 @@ export const SimpleAreas = [
 	"HSEQ",
 	"LEGAL",
 	"COMMUNITIES",
-	"PROJECTS",
 ] as const
 
 export const SpecialAreas = {
