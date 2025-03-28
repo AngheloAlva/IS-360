@@ -7,6 +7,8 @@ import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 
 import type { Company, User, WorkOrder } from "@prisma/client"
+import { WorkOrderPriority } from "../../../lib/consts/work-order-priority"
+import { cn } from "@/lib/utils"
 
 export const columns: ColumnDef<
 	WorkOrder & {
@@ -54,6 +56,20 @@ export const columns: ColumnDef<
 	{
 		accessorKey: "priority",
 		header: "Prioridad",
+		cell: ({ row }) => {
+			const priority = row.getValue("priority") as WorkOrder["priority"]
+			return (
+				<Badge
+					className={cn({
+						"bg-primary/10 border-primary text-primary": priority === "HIGH",
+						"border-yellow-500 bg-yellow-500/10 text-yellow-500": priority === "MEDIUM",
+						"border-red-500 bg-red-500/10 text-red-500": priority === "LOW",
+					})}
+				>
+					{WorkOrderPriority[priority]}
+				</Badge>
+			)
+		},
 	},
 	{
 		accessorKey: "equipment",

@@ -8,12 +8,20 @@ export async function GET(req: NextRequest) {
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
+		const workOrderId = searchParams.get("workOrderId")
+
+		if (!workOrderId) {
+			return NextResponse.json({ error: "Work Order ID is required" }, { status: 400 })
+		}
 
 		const skip = (page - 1) * limit
 
 		const [entries, total] = await Promise.all([
 			prisma.workEntry.findMany({
 				where: {
+					workOrder: {
+						id: workOrderId,
+					},
 					...(search
 						? {
 								OR: [
@@ -82,6 +90,9 @@ export async function GET(req: NextRequest) {
 			}),
 			prisma.workEntry.count({
 				where: {
+					workOrder: {
+						id: workOrderId,
+					},
 					...(search
 						? {
 								OR: [

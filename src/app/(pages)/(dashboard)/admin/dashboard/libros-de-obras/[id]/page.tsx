@@ -3,15 +3,15 @@ import { notFound } from "next/navigation"
 import { format } from "date-fns"
 import Link from "next/link"
 
+import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
+import { WorkOrderType } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
 import WorkBookEntriesTable from "@/components/work-book/WorkBookEntriesTable"
-import { Separator } from "@/components/ui/separator"
+import { Card, CardContent } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
-import { Progress } from "@/components/ui/progress"
-import { WorkOrderType } from "@/lib/consts/work-order-types"
 
 export default async function AdminWorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
@@ -24,11 +24,11 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 	return (
 		<>
-			<div className="mt-2 flex w-full items-center justify-between">
+			<div className="flex w-full flex-row items-center justify-between">
 				<div className="flex items-start justify-start gap-1">
 					<Link
 						href="/admin/dashboard/libros-de-obras"
-						className="hover:bg-primary/40 hover:text-primary mt-1 -ml-7 rounded-full transition-colors"
+						className="hover:bg-primary/40 hover:text-primary mt-1 rounded-full transition-colors"
 					>
 						<ChevronLeft />
 					</Link>
@@ -39,7 +39,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 					</h1>
 				</div>
 
-				<div className="flex flex-wrap gap-2">
+				<div className="flex flex-col flex-wrap gap-2">
 					<Badge
 						className={cn("text-sm", {
 							"bg-emerald-500": data.status === "EXPIRED",
@@ -51,65 +51,81 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 						<b>Estado:</b> {data.status}
 					</Badge>
 
-					<Progress className="w-1/2" value={data.workProgressStatus} />
+					<div className="flex flex-col">
+						<span className="text-sm">Progreso:</span>
+						<Progress value={data.workProgressStatus} />
+					</div>
 				</div>
 			</div>
 
-			<ul className="text-muted-foreground flex w-full flex-col items-start gap-1">
-				<li>
-					<b>Tipo de Trabajo:</b> <span className="capitalize">{WorkOrderType[data.type]}</span>
-				</li>
-				<li>
-					<b>Contratista:</b> {data.company.name}
-				</li>
-				<li>
-					<b>Fecha de Inicio:</b> {data.workStartDate && format(data.workStartDate, "dd/MM/yyyy")}
-				</li>
-				<li>
-					<b>Fecha de Término:</b>{" "}
-					{data.estimatedEndDate && format(data.estimatedEndDate, "dd/MM/yyyy")}
-				</li>
-				<li>
-					<b>Ubicación:</b> {data.workLocation}
-				</li>
-				<li>
-					<b>Responsable:</b> {data.responsible.name} - {data.responsible.phone}
-				</li>
-				<li>
-					<b>Inspector OTC:</b> {data.supervisor.name} - {data.supervisor.phone}
-				</li>
-			</ul>
+			<Card className="w-full">
+				<CardContent>
+					<ul className="text-muted-foreground grid w-full gap-3 md:grid-cols-2">
+						<li>
+							<b>Trabajo Solicitado:</b> <span>{data.workRequest}</span>
+						</li>
+						<li>
+							<b>Tipo de Trabajo:</b> <span>{WorkOrderType[data.type]}</span>
+						</li>
+						<li>
+							<b>Contratista:</b> {data.company.name} - {data.company.rut}
+						</li>
+						<li>
+							<b>Fecha de Inicio:</b>{" "}
+							{data.workStartDate && format(data.workStartDate, "dd/MM/yyyy")}
+						</li>
+						<li>
+							<b>Fecha de Término:</b>{" "}
+							{data.estimatedEndDate && format(data.estimatedEndDate, "dd/MM/yyyy")}
+						</li>
+						<li>
+							<b>Ubicación:</b> {data.workLocation}
+						</li>
+						<li>
+							<b>Responsable:</b> {data.supervisor.name} - {data.supervisor.phone}
+						</li>
+						<li>
+							<b>Inspector OTC:</b> {data.responsible.name} - {data.responsible.phone}
+						</li>
+					</ul>
+				</CardContent>
+			</Card>
 
-			<Separator />
+			<div className="flex w-full items-center gap-2">
+				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
 
-			<div className="flex w-full items-center justify-end gap-2">
-				<Link href={`/dashboard/libro-de-obras/${id}/actividades-diarias`}>
-					<Button size={"lg"} className="bg-blue-500 hover:bg-blue-600">
+				<Link href={`/dashboard/libro-de-obras/${id}/actividades-diarias`} className="ml-auto">
+					<Button
+						size={"lg"}
+						className="border border-blue-500 bg-white text-blue-500 hover:bg-blue-600 hover:text-white"
+					>
 						<span className="hidden lg:block">Actividad Diaria</span>
 						<Plus />
 					</Button>
 				</Link>
+
 				<Link href={`/dashboard/libro-de-obras/${id}/actividades-adicionales`}>
-					<Button size={"lg"} className="bg-cyan-500 hover:bg-cyan-600">
+					<Button
+						size={"lg"}
+						className="border border-cyan-500 bg-white text-cyan-500 hover:bg-cyan-600 hover:text-white"
+					>
 						<span className="hidden lg:block">Actividad Adicional</span>
 						<Plus />
 					</Button>
 				</Link>
-				<Link href={`/admin/dashboard/libro-de-obras/${id}/inspeccion-otc`}>
-					<Button size={"lg"} className="bg-purple-500 hover:bg-purple-600">
+
+				<Link href={`/admin/dashboard/libros-de-obras/${id}/inspeccion-otc`}>
+					<Button
+						size={"lg"}
+						className="border border-purple-500 bg-white text-purple-500 hover:bg-purple-600 hover:text-white"
+					>
 						<span className="hidden lg:block">Inspección</span>
-						<Plus />
-					</Button>
-				</Link>
-				<Link href={`/dashboard/libro-de-obras/${id}/prevencion`}>
-					<Button size={"lg"} className="bg-emerald-500 hover:bg-emerald-600">
-						<span className="hidden lg:block">Área de Prevención</span>
 						<Plus />
 					</Button>
 				</Link>
 			</div>
 
-			<WorkBookEntriesTable />
+			<WorkBookEntriesTable workOrderId={id} />
 		</>
 	)
 }

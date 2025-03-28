@@ -8,15 +8,15 @@ export const WorkOrderTypeKeys = ["CORRECTIVE", "PREVENTIVE", "PREDICTIVE"] as c
 
 export const WorkOrderTypeOptions = [
 	{
-		value: WorkOrderType.CORRECTIVE,
+		value: "CORRECTIVE",
 		label: "Correctivo",
 	},
 	{
-		value: WorkOrderType.PREVENTIVE,
+		value: "PREVENTIVE",
 		label: "Preventivo",
 	},
 	{
-		value: WorkOrderType.PREDICTIVE,
+		value: "PREDICTIVE",
 		label: "Predictivo",
 	},
 ]

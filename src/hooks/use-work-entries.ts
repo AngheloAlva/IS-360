@@ -33,6 +33,7 @@ interface UseWorkEntriesParams {
 	page?: number
 	limit?: number
 	search?: string
+	workOrderId?: string
 }
 
 interface WorkEntriesResponse {
@@ -45,14 +46,16 @@ export const useWorkEntries = ({
 	page = 1,
 	limit = 10,
 	search = "",
+	workOrderId,
 }: UseWorkEntriesParams = {}) => {
 	return useQuery<WorkEntriesResponse>({
-		queryKey: ["work-entries", { page, limit, search }],
+		queryKey: ["work-entries", { page, limit, search, workOrderId }],
 		queryFn: async () => {
 			const searchParams = new URLSearchParams()
 			searchParams.set("page", page.toString())
 			searchParams.set("limit", limit.toString())
 			if (search) searchParams.set("search", search)
+			if (workOrderId) searchParams.set("workOrderId", workOrderId)
 
 			const res = await fetch(`/api/work-book/entries?${searchParams.toString()}`)
 			if (!res.ok) throw new Error("Error fetching work entries")

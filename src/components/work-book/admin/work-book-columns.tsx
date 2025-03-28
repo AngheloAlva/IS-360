@@ -1,0 +1,119 @@
+import { ColumnDef } from "@tanstack/react-table"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+import { ArrowUpRight } from "lucide-react"
+import Link from "next/link"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import type { WorkBook } from "@/hooks/use-work-books"
+
+const workOrderStatusMap = {
+	PENDING: { label: "Pendiente", variant: "secondary" as const },
+	IN_PROGRESS: { label: "En progreso", variant: "default" as const },
+	COMPLETED: { label: "Completado", variant: "outline" as const },
+	CANCELLED: { label: "Cancelado", variant: "destructive" as const },
+} as const
+
+export const workBookColumns: ColumnDef<WorkBook>[] = [
+	{
+		accessorKey: "otNumber",
+		header: "N° OT",
+		cell: ({ row }) => {
+			const otNumber = row.getValue("otNumber") as string
+
+			return <div className="font-medium">{otNumber}</div>
+		},
+	},
+	{
+		accessorKey: "workName",
+		header: "Nombre del trabajo",
+		cell: ({ row }) => {
+			const workName = row.getValue("workName") as string
+
+			return <div className="font-medium">{workName || "Sin nombre"}</div>
+		},
+	},
+	{
+		accessorKey: "workLocation",
+		header: "Ubicación",
+		cell: ({ row }) => {
+			const location = row.getValue("workLocation") as string
+
+			return <div className="font-medium">{location || "Sin ubicación"}</div>
+		},
+	},
+	{
+		accessorKey: "workProgressStatus",
+		header: "Progreso",
+		cell: ({ row }) => {
+			const progress = row.getValue("workProgressStatus") as number
+
+			return (
+				<div className="flex w-[100px] items-center gap-1">
+					<Progress value={progress || 0} className="h-2" />
+					<span className="text-muted-foreground text-xs">{progress || 0}%</span>
+				</div>
+			)
+		},
+	},
+	{
+		accessorKey: "status",
+		header: "Estado",
+		cell: ({ row }) => {
+			const status = row.getValue("status") as keyof typeof workOrderStatusMap
+
+			return (
+				<Badge variant={workOrderStatusMap[status].variant}>
+					{workOrderStatusMap[status].label}
+				</Badge>
+			)
+		},
+	},
+	{
+		accessorKey: "workStartDate",
+		header: "Fecha de inicio",
+		cell: ({ row }) => {
+			const date = row.getValue("workStartDate") as string
+
+			return (
+				<div className="font-medium">
+					{date ? format(new Date(date), "PPP", { locale: es }) : "Sin fecha"}
+				</div>
+			)
+		},
+	},
+	{
+		accessorKey: "company",
+		header: "Empresa",
+		cell: ({ row }) => {
+			const company = row.getValue("company") as { name: string }
+
+			return <div className="font-medium">{company.name}</div>
+		},
+	},
+	{
+		accessorKey: "_count",
+		header: "Entradas",
+		cell: ({ row }) => {
+			const count = row.getValue("_count") as { workEntries: number }
+
+			return <div className="font-medium">{count.workEntries}</div>
+		},
+	},
+	{
+		id: "actions",
+		cell: ({ row }) => {
+			const { id } = row.original
+
+			return (
+				<Button className="text-primary bg-primary/10 hover:bg-primary/50" size="icon" asChild>
+					<Link href={`/admin/dashboard/libros-de-obras/${id}`}>
+						<ArrowUpRight className="h-4 w-4" />
+					</Link>
+				</Button>
+			)
+		},
+	},
+]

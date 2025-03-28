@@ -26,7 +26,12 @@ import {
 	TableHeader,
 } from "@/components/ui/table"
 
-export default function WorkBookEntriesTable(): React.ReactElement {
+export default function WorkBookEntriesTable({
+	workOrderId,
+}: {
+	workOrderId: string
+}): React.ReactElement {
+	console.log("WorkBookEntriesTable received workOrderId:", workOrderId)
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -36,7 +41,10 @@ export default function WorkBookEntriesTable(): React.ReactElement {
 		page,
 		search,
 		limit: 10,
+		workOrderId,
 	})
+
+	console.log(data)
 
 	const table = useReactTable<WorkEntry>({
 		data: data?.entries ?? [],

@@ -8,15 +8,15 @@ export const WorkOrderPriorityKeys = ["HIGH", "MEDIUM", "LOW"] as const
 
 export const WorkOrderPriorityOptions = [
 	{
-		value: WorkOrderPriority.HIGH,
+		value: "HIGH",
 		label: "Alto",
 	},
 	{
-		value: WorkOrderPriority.MEDIUM,
+		value: "MEDIUM",
 		label: "Medio",
 	},
 	{
-		value: WorkOrderPriority.LOW,
+		value: "LOW",
 		label: "Bajo",
 	},
 ]

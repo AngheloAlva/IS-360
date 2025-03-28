@@ -22,7 +22,7 @@ import {
 } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
@@ -148,6 +148,18 @@ export default function WorkOrderForm(): React.ReactElement {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("companyId")])
 
+	useEffect(() => {
+		const estimatedHours = Number(form.watch("estimatedHours"))
+		const estimatedDays = Math.ceil(estimatedHours / 8)
+
+		form.setValue("estimatedDays", estimatedDays.toString())
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("estimatedHours")])
+
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
+
 	async function onSubmit(values: WorkOrderSchema) {
 		setIsSubmitting(true)
 
@@ -177,324 +189,334 @@ export default function WorkOrderForm(): React.ReactElement {
 		}
 	}
 
-	useEffect(() => {
-		console.log(form.formState.errors)
-	}, [form.formState])
-
 	return (
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className="mx-auto grid w-full max-w-screen-xl gap-4 md:grid-cols-2"
+				className="mx-auto flex w-full max-w-screen-xl flex-col gap-4"
 			>
-				<FormField
-					control={form.control}
-					name="responsibleId"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Responsable OTC</FormLabel>
+				<Card className="w-full">
+					<CardContent className="grid gap-4 md:grid-cols-2">
+						<h2 className="text-xl font-bold md:col-span-2">Información General</h2>
 
-							{isInternalUsersLoading ? (
-								<Skeleton className="h-9 w-full rounded-md" />
-							) : (
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger className="border-gray-200">
-											<SelectValue placeholder="Seleccione al responsable" />
+						<FormField
+							control={form.control}
+							name="responsibleId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Responsable OTC</FormLabel>
+
+									{isInternalUsersLoading ? (
+										<Skeleton className="h-9 w-full rounded-md" />
+									) : (
+										<Select onValueChange={field.onChange} defaultValue={field.value}>
+											<FormControl>
+												<SelectTrigger className="border-gray-200">
+													<SelectValue placeholder="Seleccione al responsable" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent className="text-neutral-700">
+												{internalUsers.map((user) => (
+													<SelectItem key={user.id} value={user.id}>
+														{user.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									)}
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="type"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Tipo de Trabajo</FormLabel>
+
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<FormControl>
+											<SelectTrigger className="border-gray-200">
+												<SelectValue placeholder="Seleccione el tipo de trabajo" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent className="text-neutral-700">
+											{WorkOrderTypeOptions.map((option) => (
+												<SelectItem key={option.value} value={option.value}>
+													{option.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="solicitationDate"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Fecha de Solicitud</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant={"outline"}
+													className={cn(
+														"w-full border-gray-200 bg-white pl-3 text-left font-normal text-gray-700",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value ? (
+														format(field.value, "PPP", { locale: es })
+													) : (
+														<span>Pick a date</span>
+													)}
+													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={field.value}
+												onSelect={field.onChange}
+												disabled={(date) => date < new Date("1900-01-01")}
+												initialFocus
+											/>
+										</PopoverContent>
+									</Popover>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="solicitationTime"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Hora de Solicitud</FormLabel>
+									<Input value={field.value} onChange={field.onChange} />
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="workRequest"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Trabajo Solicitado</FormLabel>
+									<Input value={field.value} onChange={field.onChange} />
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="priority"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Prioridad</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<SelectTrigger>
+											<SelectValue placeholder="Seleccione una prioridad" />
 										</SelectTrigger>
-									</FormControl>
-									<SelectContent className="text-neutral-700">
-										{internalUsers.map((user) => (
-											<SelectItem key={user.id} value={user.id}>
-												{user.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+										<SelectContent>
+											{WorkOrderPriorityOptions.map((option) => (
+												<SelectItem key={option.value} value={option.value}>
+													{option.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
 							)}
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						/>
 
-				<FormField
-					control={form.control}
-					name="type"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Tipo de Trabajo</FormLabel>
-
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<FormControl>
-									<SelectTrigger className="border-gray-200">
-										<SelectValue placeholder="Seleccione el tipo de trabajo" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent className="text-neutral-700">
-									{WorkOrderTypeOptions.map((option) => (
-										<SelectItem key={option.value} value={option.value}>
-											{option.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="solicitationDate"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Fecha de Solicitud</FormLabel>
-							<Popover>
-								<PopoverTrigger asChild>
-									<FormControl>
-										<Button
-											variant={"outline"}
-											className={cn(
-												"w-full border-gray-200 bg-white pl-3 text-left font-normal text-gray-700",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											{field.value ? (
-												format(field.value, "PPP", { locale: es })
-											) : (
-												<span>Pick a date</span>
-											)}
-											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-										</Button>
-									</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={field.value}
-										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
-										initialFocus
-									/>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="solicitationTime"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Hora de Solicitud</FormLabel>
-							<Input value={field.value} onChange={field.onChange} />
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="workRequest"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Trabajo Solicitado</FormLabel>
-							<Input value={field.value} onChange={field.onChange} />
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="priority"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Prioridad</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<SelectTrigger>
-									<SelectValue placeholder="Seleccione una prioridad" />
-								</SelectTrigger>
-								<SelectContent>
-									{WorkOrderPriorityOptions.map((option) => (
-										<SelectItem key={option.value} value={option.value}>
-											{option.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="companyId"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Empresa Responsable</FormLabel>
-							{isCompaniesLoading ? (
-								<Skeleton className="h-10 w-full" />
-							) : (
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<SelectTrigger>
-										<SelectValue placeholder="Seleccione una empresa" />
-									</SelectTrigger>
-									<SelectContent>
-										{companies.map((company) => (
-											<SelectItem key={company.id} value={company.id}>
-												{company.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+						<FormField
+							control={form.control}
+							name="companyId"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Empresa Responsable</FormLabel>
+									{isCompaniesLoading ? (
+										<Skeleton className="h-10 w-full" />
+									) : (
+										<Select onValueChange={field.onChange} defaultValue={field.value}>
+											<SelectTrigger>
+												<SelectValue placeholder="Seleccione una empresa" />
+											</SelectTrigger>
+											<SelectContent>
+												{companies.map((company) => (
+													<SelectItem key={company.id} value={company.id}>
+														{company.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									)}
+									<FormMessage />
+								</FormItem>
 							)}
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						/>
 
-				<div className="grid w-full grid-cols-2 pt-7">
-					{selectedCompany && (
-						<>
-							<div>
-								<p className="text-sm font-medium text-gray-700">Empresa seleccionada</p>
-								<p className="text-sm text-gray-700">{selectedCompany.name}</p>
-							</div>
-							<div>
-								<p className="text-sm font-medium text-gray-700">Supervisor</p>
-								<p className="text-sm text-gray-700">{selectedCompany.users[0]?.name}</p>
-							</div>
-						</>
-					)}
-				</div>
-
-				<FormField
-					control={form.control}
-					name="workDescription"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5 md:col-span-2">
-							<FormLabel className="text-gray-700">Descripción del Trabajo</FormLabel>
-							<Textarea value={field.value} onChange={field.onChange} className="min-h-32" />
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="equipment"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Equipo</FormLabel>
-
-							{isEquipmentsLoading ? (
-								<Skeleton className="h-9 w-full rounded-md" />
-							) : (
-								<Select onValueChange={field.onChange} defaultValue={field.value}>
-									<FormControl>
-										<SelectTrigger className="border-gray-200">
-											<SelectValue placeholder="Seleccione el equipo" />
-										</SelectTrigger>
-									</FormControl>
-									<SelectContent className="text-neutral-700">
-										{equipments.map((equipment) => (
-											<SelectItem key={equipment.id} value={equipment.id}>
-												{equipment.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+						<div className="grid w-full grid-cols-2 pt-7">
+							{selectedCompany && (
+								<>
+									<div>
+										<p className="text-sm font-medium text-gray-700">Empresa seleccionada</p>
+										<p className="text-sm text-gray-700">{selectedCompany.name}</p>
+									</div>
+									<div>
+										<p className="text-sm font-medium text-gray-700">Supervisor</p>
+										<p className="text-sm text-gray-700">{selectedCompany.users[0]?.name}</p>
+									</div>
+								</>
 							)}
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						</div>
 
-				<Separator className="my-4 md:col-span-2" />
+						<FormField
+							control={form.control}
+							name="workDescription"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5 md:col-span-2">
+									<FormLabel className="text-gray-700">Descripción del Trabajo</FormLabel>
+									<Textarea value={field.value} onChange={field.onChange} className="min-h-32" />
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="programDate"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Fecha Programada</FormLabel>
-							<Popover>
-								<PopoverTrigger asChild>
+						<FormField
+							control={form.control}
+							name="equipment"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Equipo</FormLabel>
+
+									{isEquipmentsLoading ? (
+										<Skeleton className="h-9 w-full rounded-md" />
+									) : (
+										<Select onValueChange={field.onChange} defaultValue={field.value}>
+											<FormControl>
+												<SelectTrigger className="border-gray-200">
+													<SelectValue placeholder="Seleccione el equipo" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent className="text-neutral-700">
+												{equipments.map((equipment) => (
+													<SelectItem key={equipment.id} value={equipment.id}>
+														{equipment.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									)}
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</CardContent>
+				</Card>
+
+				<Card className="w-full">
+					<CardContent className="grid gap-4 md:grid-cols-2">
+						<h2 className="text-xl font-bold md:col-span-2">Fechas y Horas</h2>
+
+						<FormField
+							control={form.control}
+							name="programDate"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Fecha Programada</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant={"outline"}
+													className={cn(
+														"w-full border-gray-200 bg-white pl-3 text-left font-normal text-gray-700",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value ? (
+														format(field.value, "PPP", { locale: es })
+													) : (
+														<span>Seleccione una fecha</span>
+													)}
+													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={field.value}
+												onSelect={field.onChange}
+												disabled={(date) => date < new Date("1900-01-01")}
+												initialFocus
+											/>
+										</PopoverContent>
+									</Popover>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="estimatedHours"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Horas Estimadas</FormLabel>
+									<Input value={field.value} onChange={field.onChange} type="number" min="1" />
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="estimatedDays"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Días Estimados</FormLabel>
+									<Input value={field.value} onChange={field.onChange} type="number" min="1" />
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="requiresBreak"
+							render={({ field }) => (
+								<FormItem className="flex flex-col pt-2.5">
+									<FormLabel className="text-gray-700">Requiere dias de paro</FormLabel>
 									<FormControl>
-										<Button
-											variant={"outline"}
-											className={cn(
-												"w-full border-gray-200 bg-white pl-3 text-left font-normal text-gray-700",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											{field.value ? (
-												format(field.value, "PPP", { locale: es })
-											) : (
-												<span>Seleccione una fecha</span>
-											)}
-											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-										</Button>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+											className="mt-2"
+										/>
 									</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={field.value}
-										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
-										initialFocus
-									/>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</CardContent>
+				</Card>
 
-				<FormField
-					control={form.control}
-					name="estimatedHours"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Horas Estimadas</FormLabel>
-							<Input value={field.value} onChange={field.onChange} type="number" min="1" />
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="estimatedDays"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Días Estimados</FormLabel>
-							<Input value={field.value} onChange={field.onChange} type="number" min="1" />
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="requiresBreak"
-					render={({ field }) => (
-						<FormItem className="flex flex-col pt-2.5">
-							<FormLabel className="text-gray-700">Requiere dias de paro</FormLabel>
-							<FormControl>
-								<Checkbox checked={field.value} onCheckedChange={field.onChange} className="mt-2" />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={isSubmitting}>
+				<Button className="mt-4 w-full" type="submit" size={"lg"} disabled={isSubmitting}>
 					{!isSubmitting ? (
 						"Crear Nueva OT"
 					) : (

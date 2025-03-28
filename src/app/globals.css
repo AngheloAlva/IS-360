@@ -31,15 +31,15 @@
 	--input: oklch(0.9 0.05 260);
 	--ring: oklch(0.55 0.2 260);
 	--radius: 0.75rem;
-	--chart-1: oklch(0.7 0.3 20);
-	--chart-2: oklch(0.6 0.2 160);
-	--chart-3: oklch(0.5 0.2 200);
-	--chart-4: oklch(0.8 0.3 60);
-	--chart-5: oklch(0.75 0.3 40);
-	--chart-6: oklch(0.7 0.3 20);
-	--chart-7: oklch(0.6 0.2 160);
-	--chart-8: oklch(0.5 0.2 200);
-	--chart-9: oklch(0.8 0.3 60);
+	--chart-1: hsl(220 70% 50%);
+	--chart-2: hsl(160 60% 45%);
+	--chart-3: hsl(30 80% 55%);
+	--chart-4: hsl(280 65% 60%);
+	--chart-5: hsl(340 75% 55%);
+	--chart-6: hsl(220 70% 50%);
+	--chart-7: hsl(160 60% 45%);
+	--chart-8: hsl(30 80% 55%);
+	--chart-9: hsl(280 65% 60%);
 	--sidebar: hsl(0, 0%, 100%);
 	--sidebar-foreground: hsl(240 5.3% 26.1%);
 	--sidebar-primary: hsl(240 5.9% 10%);
@@ -70,15 +70,15 @@
 	--border: oklch(0.2 0.1 260);
 	--input: oklch(0.2 0.1 260);
 	--ring: oklch(0.6 0.2 260);
-	--chart-1: oklch(0.6 0.3 20);
-	--chart-2: oklch(0.5 0.2 160);
-	--chart-3: oklch(0.4 0.2 200);
-	--chart-4: oklch(0.7 0.3 60);
-	--chart-5: oklch(0.65 0.3 40);
-	--chart-6: oklch(0.7 0.3 20);
-	--chart-7: oklch(0.6 0.2 160);
-	--chart-8: oklch(0.5 0.2 200);
-	--chart-9: oklch(0.8 0.3 60);
+	--chart-1: hsl(220 70% 50%);
+	--chart-2: hsl(160 60% 45%);
+	--chart-3: hsl(30 80% 55%);
+	--chart-4: hsl(280 65% 60%);
+	--chart-5: hsl(340 75% 55%);
+	--chart-6: hsl(220 70% 50%);
+	--chart-7: hsl(160 60% 45%);
+	--chart-8: hsl(30 80% 55%);
+	--chart-9: hsl(280 65% 60%);
 	--sidebar: hsl(240 5.9% 10%);
 	--sidebar-foreground: hsl(240 4.8% 95.9%);
 	--sidebar-primary: hsl(224.3 76.3% 48%);
@@ -87,11 +87,6 @@
 	--sidebar-accent-foreground: hsl(240 4.8% 95.9%);
 	--sidebar-border: hsl(240 3.7% 15.9%);
 	--sidebar-ring: hsl(217.2 91.2% 59.8%);
-	--chart-1: hsl(12 76% 61%);
-	--chart-2: hsl(173 58% 39%);
-	--chart-3: hsl(197 37% 24%);
-	--chart-4: hsl(43 74% 66%);
-	--chart-5: hsl(27 87% 67%);
 }
 
 @theme inline {
@@ -132,11 +127,6 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
-	--chart-1: hsl(220 70% 50%);
-	--chart-2: hsl(160 60% 45%);
-	--chart-3: hsl(30 80% 55%);
-	--chart-4: hsl(280 65% 60%);
-	--chart-5: hsl(340 75% 55%);
 }
 
 @layer base {

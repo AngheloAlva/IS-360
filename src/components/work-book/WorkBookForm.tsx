@@ -216,6 +216,10 @@ export default function WorkBookForm({ userId, companyId }: WorkBookFormProps): 
 							<>
 								<div className="grid grid-cols-2 gap-4 text-sm">
 									<div>
+										<h3 className="font-medium">Trabajo solicitado:</h3>
+										<p>{workOrderSelected.workRequest}</p>
+									</div>
+									<div>
 										<h3 className="font-medium">Tipo de trabajo:</h3>
 										<p>{WorkOrderType[workOrderSelected.type]}</p>
 									</div>
