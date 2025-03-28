@@ -4,11 +4,7 @@ export const WorkOrderPriority = {
 	LOW: "Bajo",
 } as const
 
-export const WorkOrderPriorityKeys = [
-	WorkOrderPriority.HIGH,
-	WorkOrderPriority.MEDIUM,
-	WorkOrderPriority.LOW,
-] as const
+export const WorkOrderPriorityKeys = ["HIGH", "MEDIUM", "LOW"] as const
 
 export const WorkOrderPriorityOptions = [
 	{

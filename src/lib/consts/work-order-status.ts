@@ -7,11 +7,11 @@ export const WorkOrderStatus = {
 } as const
 
 export const WorkOrderStatusKeys = [
-	WorkOrderStatus.PENDING,
-	WorkOrderStatus.IN_PROGRESS,
-	WorkOrderStatus.COMPLETED,
-	WorkOrderStatus.CANCELLED,
-	WorkOrderStatus.EXPIRED,
+	"PENDING",
+	"IN_PROGRESS",
+	"COMPLETED",
+	"CANCELLED",
+	"EXPIRED",
 ] as const
 
 export const WorkOrderStatusOptions = [

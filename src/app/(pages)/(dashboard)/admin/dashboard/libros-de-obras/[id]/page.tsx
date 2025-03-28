@@ -109,7 +109,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 				</Link>
 			</div>
 
-			<WorkBookEntriesTable entries={data.workEntries} />
+			<WorkBookEntriesTable />
 		</>
 	)
 }
