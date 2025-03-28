@@ -42,6 +42,7 @@ interface FileExplorerTableProps {
 	folders: FullFolder[]
 	foldersSlugs: string[]
 	files: (File & { user: User })[]
+	className?: string // Prop añadida
 }
 
 export function FileExplorerTable({
@@ -50,6 +51,7 @@ export function FileExplorerTable({
 	isAdmin,
 	lastPath,
 	foldersSlugs,
+	className, // Prop recibida
 }: FileExplorerTableProps) {
 	const getFileIcon = (item: File) => {
 		const type = item.type.split("/")[0]
@@ -86,7 +88,7 @@ export function FileExplorerTable({
 	}
 
 	return (
-		<Table>
+		<Table className={className}>
 			<TableCaption>
 				<div className="mx-auto flex w-fit items-center gap-10">
 					{Codes.map((code) => (
@@ -96,7 +98,6 @@ export function FileExplorerTable({
 					))}
 				</div>
 			</TableCaption>
-
 			<TableHeader>
 				<TableRow>
 					<TableHead>Codigo-Nombre</TableHead>

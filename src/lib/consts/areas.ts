@@ -8,7 +8,17 @@ export const SimpleAreas = [
 	"HSEQ",
 	"LEGAL",
 	"COMMUNITIES",
+	"PROJECTS",
 ] as const
+
+export const SpecialAreas = {
+	proyectos: {
+		title: "PROYECTOS",
+		value: "PROJECTS",
+		description:
+			"Gestiona y supervisa los proyectos de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
+	},
+} as const
 
 export const Areas = {
 	"operaciones": {
@@ -18,7 +28,7 @@ export const Areas = {
 			"Gestiona y supervisa las actividades diarias de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
 	},
 	"instructivos": {
-		title: "INSTRUCTIVOS",
+		title: "INSTRUCTIVOS Y FORMATOS OTC",
 		value: "INSTRUCTIONS",
 		description:
 			"Contiene documentos con guías y pasos detallados para la correcta ejecución de tareas y procedimientos dentro de la organización.",
@@ -42,7 +52,7 @@ export const Areas = {
 			"Responsable de minimizar accidentes y riesgos laborales mediante protocolos de seguridad, capacitaciones y cumplimiento de normativas.",
 	},
 	"calidad-y-excelencia-profesional": {
-		title: "CALIDAD_Y_EXCELENCIA_PROFESIONAL",
+		title: "CALIDAD_Y_EXCELENCIA_OPERACIONAL",
 		value: "QUALITY_AND_PROFESSIONAL_EXCELLENCE",
 		description:
 			"Busca garantizar la mejora continua, estandarización y cumplimiento de altos estándares de calidad en todos los procesos y servicios.",
@@ -77,4 +87,5 @@ export const AreasLabels = {
 	HSEQ: "HSEQ",
 	LEGAL: "JURIDICA",
 	COMMUNITIES: "COMUNIDADES",
+	PROJECTS: "PROYECTOS",
 }
