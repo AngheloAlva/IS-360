@@ -62,13 +62,6 @@ export function WorkBookDataTable<TData, TValue>({
 					value={(table.getColumn("otNumber")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("otNumber")?.setFilterValue(event.target.value)}
 				/>
-
-				<Input
-					className="w-96"
-					placeholder="Filtrar por Empresa Contratista..."
-					value={(table.getColumn("company.name")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("company.name")?.setFilterValue(event.target.value)}
-				/>
 			</div>
 
 			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">

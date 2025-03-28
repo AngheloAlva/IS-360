@@ -11,13 +11,18 @@ import { toast } from "sonner"
 
 import { type WorkBookSchema, workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
 import { getWorkOrdersByCompanyId } from "@/actions/work-orders/getWorkOrders"
+import { updateWorkOrderLikeBook } from "@/actions/work-orders/updateWorkOrder"
+import { WorkOrderPriority } from "../../lib/consts/work-order-priority"
 import { getCompanyById } from "@/actions/companies/getCompanies"
+import { WorkOrderStatus } from "@/lib/consts/work-order-status"
+import { WorkOrderType } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "../ui/card"
 import { Input } from "@/components/ui/input"
 import {
 	Form,
@@ -36,7 +41,6 @@ import {
 } from "@/components/ui/select"
 
 import type { WorkOrder } from "@prisma/client"
-import { updateWorkOrderLikeBook } from "@/actions/work-orders/updateWorkOrder"
 
 interface WorkBookFormProps {
 	userId: string
@@ -129,11 +133,6 @@ export default function WorkBookForm({ userId, companyId }: WorkBookFormProps): 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("workOrderId")])
 
-	useEffect(() => {
-		console.log(form.formState)
-		console.log(form.formState.errors)
-	}, [form.formState])
-
 	async function onSubmit(values: WorkBookSchema) {
 		try {
 			setLoading(true)
@@ -178,95 +177,147 @@ export default function WorkBookForm({ userId, companyId }: WorkBookFormProps): 
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className="grid w-full max-w-screen-lg gap-4 md:grid-cols-2"
+				className="flex w-full max-w-screen-md flex-col gap-4"
 			>
-				<FormField
-					control={form.control}
-					name="workOrderId"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Nombre de la obra</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<FormControl>
-									<SelectTrigger className="border-gray-200">
-										<SelectValue placeholder="Seleccione un número de OT" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent className="text-neutral-700">
-									{workOrdersIsLoading ? (
-										<Skeleton className="h-8 w-full" />
-									) : (
-										workOrders.map((workOrder) => (
-											<SelectItem key={workOrder.id} value={workOrder.id}>
-												{workOrder.otNumber}
-											</SelectItem>
-										))
-									)}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="workName"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Nombre de la Obra</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre de la obra"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				<Card className="w-full">
+					<CardContent className="flex flex-col gap-4">
+						<h2 className="text-xl font-bold">Orden de Trabajo (OT)</h2>
 
-				<FormField
-					control={form.control}
-					name="workStartDate"
-					render={({ field }) => (
-						<FormItem className="flex flex-col">
-							<FormLabel>Fecha de Inicio</FormLabel>
-							<Popover>
-								<PopoverTrigger asChild>
-									<FormControl>
-										<Button
-											variant={"outline"}
-											className={cn(
-												"w-full rounded-md border-gray-200 bg-white pl-3 text-left text-sm font-normal text-gray-700",
-												!field.value && "text-muted-foreground"
-											)}
-										>
-											{field.value ? (
-												format(field.value, "PPP", { locale: es })
+						<FormField
+							control={form.control}
+							name="workOrderId"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Número de OT</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<FormControl>
+											<SelectTrigger>
+												<SelectValue placeholder="Seleccione un número de OT" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											{workOrdersIsLoading ? (
+												<Skeleton className="h-8 w-full" />
 											) : (
-												<span>Selecciona la fecha</span>
+												workOrders.map((workOrder) => (
+													<SelectItem key={workOrder.id} value={workOrder.id}>
+														{workOrder.otNumber}
+													</SelectItem>
+												))
 											)}
-											<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-										</Button>
-									</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={field.value}
-										onSelect={field.onChange}
-										disabled={(date) => date < new Date("1900-01-01")}
-										initialFocus
-									/>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<Button className="mt-4 md:col-span-2" type="submit" size={"lg"} disabled={loading}>
+						{workOrderSelected && (
+							<>
+								<div className="grid grid-cols-2 gap-4 text-sm">
+									<div>
+										<h3 className="font-medium">Tipo de trabajo:</h3>
+										<p>{WorkOrderType[workOrderSelected.type]}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Estado:</h3>
+										<p>{WorkOrderStatus[workOrderSelected.status]}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Prioridad:</h3>
+										<p>{WorkOrderPriority[workOrderSelected.priority]}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Fecha de solicitud:</h3>
+										<p>{workOrderSelected.solicitationDate.toLocaleDateString()}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Descripción del trabajo:</h3>
+										<p>{workOrderSelected.workDescription || "N/A"}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Fecha programada:</h3>
+										<p>{workOrderSelected.programDate.toLocaleDateString()}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Horas estimadas:</h3>
+										<p>{workOrderSelected.estimatedHours}</p>
+									</div>
+									<div>
+										<h3 className="font-medium">Días estimados:</h3>
+										<p>{workOrderSelected.estimatedDays}</p>
+									</div>
+								</div>
+							</>
+						)}
+					</CardContent>
+				</Card>
+
+				<Card className="w-full">
+					<CardContent className="grid gap-4 md:grid-cols-2">
+						<h2 className="text-xl font-bold md:col-span-2">Datos Libro de Obras</h2>
+
+						<FormField
+							control={form.control}
+							name="workName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Nombre de la Obra</FormLabel>
+									<FormControl>
+										<Input
+											className="w-full rounded-md bg-white text-sm text-gray-700"
+											placeholder="Nombre de la obra"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="workStartDate"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<FormLabel>Fecha de Inicio</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant={"outline"}
+													className={cn(
+														"w-full rounded-md bg-white pl-3 text-left text-sm font-normal text-gray-700",
+														!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value ? (
+														format(field.value, "PPP", { locale: es })
+													) : (
+														<span>Selecciona la fecha</span>
+													)}
+													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="w-auto p-0" align="start">
+											<Calendar
+												mode="single"
+												selected={field.value}
+												onSelect={field.onChange}
+												disabled={(date) => date < new Date("1900-01-01")}
+												initialFocus
+											/>
+										</PopoverContent>
+									</Popover>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</CardContent>
+				</Card>
+
+				<Button className="mt-4 w-full" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (
 						<div role="status" className="flex items-center justify-center">
 							<svg

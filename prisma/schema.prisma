@@ -328,22 +328,18 @@ model WorkEntry {
   safetyObservations  String?
   nonConformities     String?
   inspectorName       String?
-
-  // Campos de PreventionArea
-  recommendations String?
-  others          String?
-  preventionName  String?
+  recommendations     String?
+  others              String?
 
   // Campos para notas de usuario
-  noteStatus       NOTE_STATUS? @default(PENDING)
-  notificationSent Boolean      @default(false)
+  noteStatus       NOTE_STATUS?     @default(PENDING)
+  notificationSent Boolean          @default(false)
   acknowledgedAt   DateTime?
   resolvedAt       DateTime?
-
-  approvalStatus APPROVAL_STATUS? @default(PENDING)
-  approvalDate   DateTime?
-  approvalBy     User?            @relation("WorkEntryApproval", fields: [approvalById], references: [id])
-  approvalById   String?
+  approvalStatus   APPROVAL_STATUS? @default(PENDING)
+  approvalDate     DateTime?
+  approvalBy       User?            @relation("WorkEntryApproval", fields: [approvalById], references: [id])
+  approvalById     String?
 
   createdAt   DateTime @default(now())
   createdBy   User     @relation("WorkEntryCreator", fields: [createdById], references: [id])

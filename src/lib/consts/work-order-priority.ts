@@ -1,7 +1,7 @@
 export const WorkOrderPriority = {
-	HIGH: "HIGH",
-	MEDIUM: "MEDIUM",
-	LOW: "LOW",
+	HIGH: "Alto",
+	MEDIUM: "Medio",
+	LOW: "Bajo",
 } as const
 
 export const WorkOrderPriorityKeys = [
@@ -9,8 +9,6 @@ export const WorkOrderPriorityKeys = [
 	WorkOrderPriority.MEDIUM,
 	WorkOrderPriority.LOW,
 ] as const
-
-export type WorkOrderPriority = keyof typeof WorkOrderPriority
 
 export const WorkOrderPriorityOptions = [
 	{

@@ -60,7 +60,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 			<Card className="w-full">
 				<CardContent>
-					<ul className="text-muted-foreground flex w-full flex-col items-start gap-1">
+					<ul className="text-muted-foreground grid w-full gap-3 md:grid-cols-2">
 						<li>
 							<b>Tipo de Trabajo:</b> <span>{WorkOrderType[data.type]}</span>
 						</li>
@@ -100,6 +100,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 						<Plus />
 					</Button>
 				</Link>
+
 				<Link href={`/dashboard/libro-de-obras/${id}/actividades-adicionales`}>
 					<Button
 						size={"lg"}
@@ -109,7 +110,8 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 						<Plus />
 					</Button>
 				</Link>
-				<Link href={`/dashboard/libro-de-obras/${id}/prevencion`}>
+
+				{/* <Link href={`/dashboard/libro-de-obras/${id}/prevencion`}>
 					<Button
 						size={"lg"}
 						className="border border-emerald-500 bg-white text-emerald-500 hover:bg-emerald-600 hover:text-white"
@@ -117,10 +119,10 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 						<span className="hidden lg:block">Área de Prevención</span>
 						<Plus />
 					</Button>
-				</Link>
+				</Link> */}
 			</div>
 
-			<WorkBookEntriesTable entries={data.workEntries} />
+			<WorkBookEntriesTable />
 		</>
 	)
 }

@@ -17,7 +17,7 @@ export default async function CreateWorkBookPage() {
 
 	return (
 		<>
-			<div className="mx-auto flex w-full max-w-screen-lg items-center justify-start gap-2">
+			<div className="mx-auto flex w-full max-w-screen-md items-center justify-start gap-2">
 				<BackButton href="/dashboard/libro-de-obras" />
 				<h1 className="w-fit text-3xl font-bold">Nuevo Libro de Obras</h1>
 			</div>

@@ -1,9 +1,9 @@
 export const WorkOrderStatus = {
-	PENDING: "PENDING",
-	IN_PROGRESS: "IN_PROGRESS",
-	COMPLETED: "COMPLETED",
-	CANCELLED: "CANCELLED",
-	EXPIRED: "EXPIRED",
+	PENDING: "Pendiente",
+	IN_PROGRESS: "En Proceso",
+	COMPLETED: "Completado",
+	CANCELLED: "Cancelado",
+	EXPIRED: "Expirado",
 } as const
 
 export const WorkOrderStatusKeys = [
@@ -13,8 +13,6 @@ export const WorkOrderStatusKeys = [
 	WorkOrderStatus.CANCELLED,
 	WorkOrderStatus.EXPIRED,
 ] as const
-
-export type WorkOrderStatus = keyof typeof WorkOrderStatus
 
 export const WorkOrderStatusOptions = [
 	{

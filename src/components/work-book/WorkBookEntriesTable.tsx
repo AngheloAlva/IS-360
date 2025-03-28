@@ -1,179 +1,133 @@
-import { HeartIcon, Info } from "lucide-react"
-import { format } from "date-fns"
+"use client"
 
-import { cn } from "@/lib/utils"
+import { useState } from "react"
+import {
+	flexRender,
+	SortingState,
+	useReactTable,
+	getCoreRowModel,
+	ColumnFiltersState,
+	getFilteredRowModel,
+} from "@tanstack/react-table"
 
-import { Badge } from "@/components/ui/badge"
+import { useWorkEntries, WorkEntry } from "@/hooks/use-work-entries"
+import { WorkEntryColumns } from "./work-entry-columns"
+
+import { TablePagination } from "@/components/ui/table-pagination"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
 	TableBody,
-	TableHead,
 	TableCell,
+	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
 
-import type { WorkEntry } from "@/types/work-order"
+export default function WorkBookEntriesTable(): React.ReactElement {
+	const [page, setPage] = useState(1)
+	const [search, setSearch] = useState("")
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [sorting, setSorting] = useState<SortingState>([])
 
-const EntryTypeLabel: Record<WorkEntry["entryType"], string> = {
-	DAILY_ACTIVITY: "Actividad Diaria",
-	ADDITIONAL_ACTIVITY: "Actividad Adicional",
-	PREVENTION_AREA: "Área de Prevención",
-	OTC_INSPECTION: "Inspección OTC",
-	COMMENT: "Comentario",
-	USER_NOTE: "Nota de Usuario",
-}
+	const { data, isLoading } = useWorkEntries({
+		page,
+		search,
+		limit: 10,
+	})
 
-const EntryTypeColor: Record<WorkEntry["entryType"], string> = {
-	DAILY_ACTIVITY: "bg-blue-500",
-	ADDITIONAL_ACTIVITY: "bg-cyan-500",
-	PREVENTION_AREA: "bg-emerald-500",
-	OTC_INSPECTION: "bg-purple-500",
-	COMMENT: "bg-gray-500",
-	USER_NOTE: "bg-red-500",
-}
+	const table = useReactTable<WorkEntry>({
+		data: data?.entries ?? [],
+		columns: WorkEntryColumns,
+		onSortingChange: setSorting,
+		getCoreRowModel: getCoreRowModel(),
+		onColumnFiltersChange: setColumnFilters,
+		getFilteredRowModel: getFilteredRowModel(),
+		state: {
+			sorting,
+			columnFilters,
+			pagination: {
+				pageIndex: page - 1,
+				pageSize: 10,
+			},
+		},
+		manualPagination: true,
+		pageCount: data?.pages ?? 0,
+	})
 
-export default function WorkBookEntriesTable({
-	entries,
-}: {
-	entries: WorkEntry[]
-}): React.ReactElement {
 	return (
-		<Card className="w-full p-1.5">
-			<Table className="w-full">
-				<TableHeader>
-					<TableRow>
-						<TableHead />
-						<TableHead className="text-nowrap">Tipo</TableHead>
-						<TableHead className="text-nowrap">Fecha</TableHead>
-						<TableHead className="text-nowrap">Actividad/Título</TableHead>
-						<TableHead className="text-nowrap">Contenido</TableHead>
-						<TableHead className="text-nowrap">Horario</TableHead>
-						<TableHead className="text-nowrap">Creado por</TableHead>
-						<TableHead className="text-nowrap">Personal Asignado</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{!entries ||
-						(entries.length === 0 && (
-							<TableRow>
-								<TableCell colSpan={7} className="text-center">
-									<span className="flex w-full items-center justify-center gap-1 py-6">
-										<Info className="h-4 w-4" />
-										No hay entradas en el libro de obras
-									</span>
-								</TableCell>
-							</TableRow>
-						))}
+		<section className="flex w-full flex-col items-start gap-4">
+			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
+				<Input
+					type="text"
+					className="w-full sm:w-96"
+					placeholder="Buscar por nombre de actividad o comentarios..."
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
+				/>
+			</div>
 
-					{entries.map((entry) => (
-						<TableRow key={entry.id}>
-							<TableCell>
-								<HeartIcon />
-							</TableCell>
-							<TableCell>
-								<Badge className={cn("text-sm", EntryTypeColor[entry.entryType])}>
-									{EntryTypeLabel[entry.entryType]}
-								</Badge>
-								{entry.isFavorite && <span className="ml-2">⭐</span>}
-							</TableCell>
-							<TableCell>{format(new Date(entry.executionDate), "dd/MM/yyyy")}</TableCell>
-							<TableCell>{entry.activityName || entry.preventionName || "N/A"}</TableCell>
-							<TableCell className="max-w-96">
-								{entry.entryType === "DAILY_ACTIVITY" && (
-									<>
-										{entry.comments && (
-											<div>
-												<b>Comentarios:</b> {entry.comments}
-											</div>
-										)}
-									</>
-								)}
-								{entry.entryType === "ADDITIONAL_ACTIVITY" && (
-									<>
-										{entry.comments && (
-											<div>
-												<b>Comentarios:</b> {entry.comments}
-											</div>
-										)}
-									</>
-								)}
-								{entry.entryType === "PREVENTION_AREA" && (
-									<>
-										{entry.recommendations && (
-											<div>
-												<b>Recomendaciones:</b> {entry.recommendations}
-											</div>
-										)}
-										{entry.others && (
-											<div>
-												<b>Otros:</b> {entry.others}
-											</div>
-										)}
-									</>
-								)}
-								{entry.entryType === "OTC_INSPECTION" && (
-									<>
-										{entry.supervisionComments && (
-											<div>
-												<b>Supervisión:</b> {entry.supervisionComments}
-											</div>
-										)}
-										{entry.safetyObservations && (
-											<div>
-												<b>Observaciones de Seguridad:</b> {entry.safetyObservations}
-											</div>
-										)}
-										{entry.nonConformities && (
-											<div>
-												<b>No Conformidades:</b> {entry.nonConformities}
-											</div>
-										)}
-									</>
-								)}
-								{entry.entryType === "USER_NOTE" && (
-									<>
-										{entry.noteStatus && (
-											<Badge
-												className={cn("ml-2", {
-													"bg-yellow-500": entry.noteStatus === "PENDING",
-													"bg-blue-500": entry.noteStatus === "ACKNOWLEDGED",
-													"bg-green-500": entry.noteStatus === "RESOLVED",
-												})}
-											>
-												{entry.noteStatus}
-											</Badge>
-										)}
-									</>
-								)}
-							</TableCell>
-							<TableCell>
-								{entry.activityStartTime ? (
-									<>
-										{entry.activityStartTime}{" "}
-										{entry.activityEndTime && ` - ${entry.activityEndTime}`}
-									</>
-								) : (
-									"N/A"
-								)}
-							</TableCell>
-							<TableCell>
-								<div className="flex flex-col">
-									<span>{entry.createdBy.name}</span>
-								</div>
-							</TableCell>
-							<TableCell>
-								{entry.assignedUsers.map((user, index) => (
-									<div key={index} className="flex flex-col">
-										<span>{user.name}</span>
-									</div>
-								))}
-							</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-		</Card>
+			<Card className="w-full p-4">
+				{isLoading ? (
+					<div className="space-y-2 p-4">
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+					</div>
+				) : (
+					<Table>
+						<TableHeader>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<TableRow key={headerGroup.id}>
+									{headerGroup.headers.map((header) => {
+										return (
+											<TableHead key={header.id}>
+												{header.isPlaceholder
+													? null
+													: flexRender(header.column.columnDef.header, header.getContext())}
+											</TableHead>
+										)
+									})}
+								</TableRow>
+							))}
+						</TableHeader>
+						<TableBody>
+							{table.getRowModel().rows?.length ? (
+								table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className="font-medium">
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))
+							) : (
+								<TableRow>
+									<TableCell colSpan={WorkEntryColumns.length} className="h-24 text-center">
+										No hay entradas
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
+					</Table>
+				)}
+			</Card>
+
+			<TablePagination<WorkEntry>
+				table={table}
+				pageCount={data?.pages ?? 0}
+				onPageChange={setPage}
+				isLoading={isLoading}
+			/>
+		</section>
 	)
 }
