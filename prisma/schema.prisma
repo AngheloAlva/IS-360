@@ -36,6 +36,7 @@ enum AREAS {
   HSEQ // HSEQ (nueva)
   LEGAL // Juridica
   COMMUNITIES // Comunidades (periodistas?)
+  PROJECTS // Proyectos
 }
 
 model User {

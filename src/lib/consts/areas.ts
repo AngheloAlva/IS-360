@@ -12,7 +12,7 @@ export const SimpleAreas = [
 
 export const SpecialAreas = {
 	proyectos: {
-		title: "PROYECTOS",
+		title: "Proyectos",
 		value: "PROJECTS",
 		description:
 			"Gestiona y supervisa los proyectos de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
@@ -21,37 +21,37 @@ export const SpecialAreas = {
 
 export const Areas = {
 	"operaciones": {
-		title: "OPERACIONES",
+		title: "Operaciones",
 		value: "OPERATIONS",
 		description:
 			"Gestiona y supervisa las actividades diarias de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
 	},
 	"instructivos": {
-		title: "INSTRUCTIVOS Y FORMATOS OTC",
+		title: "Instructivos y formatos OTC",
 		value: "INSTRUCTIONS",
 		description:
 			"Contiene documentos con guías y pasos detallados para la correcta ejecución de tareas y procedimientos dentro de la organización.",
 	},
 	"integridad-y-mantencion": {
-		title: "INTEGRIDAD_Y_MANTENCION",
+		title: "Integridad y Mantención",
 		value: "INTEGRITY_AND_MAINTENANCE",
 		description:
 			"Área enfocada en la conservación y correcto funcionamiento de equipos, infraestructuras y activos, garantizando su seguridad y durabilidad.",
 	},
 	"medio-ambiente": {
-		title: "MEDIO_AMBIENTE",
+		title: "Medio Ambiente",
 		value: "ENVIRONMENT",
 		description:
 			"Encargada de la gestión ambiental, promoviendo prácticas sostenibles, cumplimiento normativo y reducción del impacto ecológico.",
 	},
 	"prevencion-riesgos": {
-		title: "PREVENCION_RIESGOS",
+		title: "Prevención de Riesgos",
 		value: "RISK_PREVENTION",
 		description:
 			"Responsable de minimizar accidentes y riesgos laborales mediante protocolos de seguridad, capacitaciones y cumplimiento de normativas.",
 	},
 	"calidad-y-excelencia-profesional": {
-		title: "CALIDAD_Y_EXCELENCIA_OPERACIONAL",
+		title: "Calidad y Excelencia Profesional",
 		value: "QUALITY_AND_PROFESSIONAL_EXCELLENCE",
 		description:
 			"Busca garantizar la mejora continua, estandarización y cumplimiento de altos estándares de calidad en todos los procesos y servicios.",
@@ -63,13 +63,13 @@ export const Areas = {
 			"Asegura el cumplimiento de normativas y estándares en salud, seguridad, medio ambiente y calidad, promoviendo un entorno de trabajo seguro y sostenible.",
 	},
 	"juridica": {
-		title: "JURIDICA",
+		title: "Juridica",
 		value: "LEGAL",
 		description:
 			"Se encarga de la asesoría legal, cumplimiento normativo y gestión de contratos, reduciendo riesgos legales y garantizando el marco jurídico adecuado.",
 	},
 	"comunidades": {
-		title: "COMUNIDADES",
+		title: "Comunidades",
 		value: "COMMUNITIES",
 		description:
 			"Área enfocada en la relación con comunidades y actores externos, promoviendo el diálogo, la responsabilidad social y la comunicación corporativa.",
@@ -77,14 +77,44 @@ export const Areas = {
 } as const
 
 export const AreasLabels = {
-	OPERATIONS: "OPERACIONES",
-	INSTRUCTIONS: "INSTRUCTIVOS",
-	INTEGRITY_AND_MAINTENANCE: "INTEGRIDAD Y MANTENCION",
-	ENVIRONMENT: "MEDIO AMBIENTE",
-	RISK_PREVENTION: "PREVENCION RIESGOS",
-	QUALITY_AND_PROFESSIONAL_EXCELLENCE: "CALIDAD Y EXCELENCIA PROFESIONAL",
+	OPERATIONS: "Operaciones",
+	INSTRUCTIONS: "Instructivos",
+	INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
+	ENVIRONMENT: "Medio Ambiente",
+	RISK_PREVENTION: "Prevención de Riesgos",
+	QUALITY_AND_PROFESSIONAL_EXCELLENCE: "Calidad y Excelencia Profesional",
 	HSEQ: "HSEQ",
-	LEGAL: "JURIDICA",
-	COMMUNITIES: "COMUNIDADES",
-	PROJECTS: "PROYECTOS",
+	LEGAL: "Juridica",
+	COMMUNITIES: "Comunidades",
+	PROJECTS: "Proyectos",
+}
+
+export const areaColors: Record<string, { text: string }> = {
+	"operaciones": {
+		text: "text-[#26A69A] border-[#26A69A]",
+	},
+	"instructivos": {
+		text: "text-[#5A6B7F] border-[#5A6B7F]",
+	},
+	"integridad-y-mantencion": {
+		text: "text-[#F08C42] border-[#F08C42]",
+	},
+	"medio-ambiente": {
+		text: "text-[#4CAF50] border-[#4CAF50]",
+	},
+	"prevencion-riesgos": {
+		text: "text-[#FF5722] border-[#FF5722]",
+	},
+	"calidad-y-excelencia-profesional": {
+		text: "text-[#2196F3] border-[#2196F3]",
+	},
+	"hseq": {
+		text: "text-[#009688] border-[#009688]",
+	},
+	"juridica": {
+		text: "text-[#424242] border-[#424242]",
+	},
+	"comunidades": {
+		text: "text-yellow-500 border-yellow-500",
+	},
 }

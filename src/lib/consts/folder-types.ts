@@ -1,5 +1,5 @@
 export const FolderTypes: { label: string; value: string }[] = [
-	{ label: "Default", value: "default" },
+	{ label: "Por defecto", value: "default" },
 	{ label: "Check", value: "check" },
 	{ label: "Reloj", value: "clock" },
 	{ label: "Servicio", value: "service" },

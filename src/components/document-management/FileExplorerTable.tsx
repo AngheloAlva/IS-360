@@ -1,19 +1,19 @@
-import {
-	FolderIcon,
-	ImageIcon,
-	VideoIcon,
-	FileIcon,
-	FileText,
-	Edit,
-	FolderCheckIcon,
-	FolderClockIcon,
-	FolderCogIcon,
-	FolderHeartIcon,
-	FolderLockIcon,
-} from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 import Link from "next/link"
+import {
+	Edit,
+	FileIcon,
+	FileText,
+	ImageIcon,
+	VideoIcon,
+	FolderIcon,
+	FolderCogIcon,
+	FolderLockIcon,
+	FolderCheckIcon,
+	FolderClockIcon,
+	FolderHeartIcon,
+} from "lucide-react"
 
 import { Codes } from "@/lib/consts/codes"
 
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/table"
 
 import type { File, Folder, User } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
 type FullFolder = Folder & {
 	files: File[]
@@ -42,7 +43,7 @@ interface FileExplorerTableProps {
 	folders: FullFolder[]
 	foldersSlugs: string[]
 	files: (File & { user: User })[]
-	className?: string // Prop añadida
+	className?: string
 }
 
 export function FileExplorerTable({
@@ -51,7 +52,7 @@ export function FileExplorerTable({
 	isAdmin,
 	lastPath,
 	foldersSlugs,
-	className, // Prop recibida
+	className,
 }: FileExplorerTableProps) {
 	const getFileIcon = (item: File) => {
 		const type = item.type.split("/")[0]
@@ -88,8 +89,8 @@ export function FileExplorerTable({
 	}
 
 	return (
-		<Table className={className}>
-			<TableCaption>
+		<Table className={cn("rounded-md bg-white p-2 shadow", className)}>
+			<TableCaption className="rounded-md bg-white py-2 text-center shadow">
 				<div className="mx-auto flex w-fit items-center gap-10">
 					{Codes.map((code) => (
 						<div key={code}>
@@ -98,6 +99,7 @@ export function FileExplorerTable({
 					))}
 				</div>
 			</TableCaption>
+
 			<TableHeader>
 				<TableRow>
 					<TableHead>Codigo-Nombre</TableHead>
@@ -110,6 +112,7 @@ export function FileExplorerTable({
 					{isAdmin && <TableHead>Acciones</TableHead>}
 				</TableRow>
 			</TableHeader>
+
 			<TableBody>
 				{folders?.map((item) => (
 					<TableRow key={item.id}>
