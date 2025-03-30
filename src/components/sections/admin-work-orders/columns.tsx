@@ -4,11 +4,12 @@ import { ColumnDef } from "@tanstack/react-table"
 import { LinkIcon } from "lucide-react"
 import { format } from "date-fns"
 
+import { WORK_ORDER_PRIORITY_VALUES } from "@/lib/consts/work-order-priority"
+import { cn } from "@/lib/utils"
+
 import { Badge } from "@/components/ui/badge"
 
 import type { Company, User, WorkOrder } from "@prisma/client"
-import { WorkOrderPriority } from "../../../lib/consts/work-order-priority"
-import { cn } from "@/lib/utils"
 
 export const columns: ColumnDef<
 	WorkOrder & {
@@ -66,7 +67,7 @@ export const columns: ColumnDef<
 						"border-red-500 bg-red-500/10 text-red-500": priority === "LOW",
 					})}
 				>
-					{WorkOrderPriority[priority]}
+					{WORK_ORDER_PRIORITY_VALUES[priority]}
 				</Badge>
 			)
 		},

@@ -5,8 +5,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import Link from "next/link"
 
-import { WorkOrderStatus } from "@/lib/consts/work-order-status"
-import { WorkOrderType } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_STATUS_VALUES } from "@/lib/consts/work-order-status"
+import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 
 import { Progress } from "@/components/ui/progress"
 
@@ -69,7 +69,7 @@ export const workBookColumns: ColumnDef<WorkOrder>[] = [
 		header: "Tipo de obra",
 		cell: ({ row }) => {
 			const type = row.getValue("type") as WorkOrder["type"]
-			return <div>{WorkOrderType[type]}</div>
+			return <div>{WORK_ORDER_TYPE_VALUES[type]}</div>
 		},
 	},
 	{
@@ -115,7 +115,7 @@ export const workBookColumns: ColumnDef<WorkOrder>[] = [
 		header: "Estado",
 		cell: ({ row }) => {
 			const status = row.getValue("status") as WorkOrder["status"]
-			return <div>{WorkOrderStatus[status]}</div>
+			return <div>{WORK_ORDER_STATUS_VALUES[status]}</div>
 		},
 	},
 	{

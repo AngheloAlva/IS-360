@@ -1,17 +1,17 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
 import { CalendarIcon, UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { useState } from "react"
 import { toast } from "sonner"
-import Image from "next/image"
+// import Image from "next/image"
 
 import { uploadFile } from "@/actions/document-management/uploadFile"
-import { Codes } from "@/lib/consts/codes"
+import { CodesValuesArray } from "@/lib/consts/codes"
 import { cn } from "@/lib/utils"
 import {
 	fileFormSchema,
@@ -19,6 +19,8 @@ import {
 } from "@/lib/form-schemas/document-management/file.schema"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Card, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
@@ -38,8 +40,6 @@ import {
 	SelectContent,
 	SelectTrigger,
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 
 interface NewFileFormProps {
 	area: string
@@ -107,11 +107,16 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 				.toString(36)
 				.substring(2, 9)}-${userId.slice(0, 4)}.${fileExtension}`
 
-			// Obtener URL de subida
+			// Obtener URL de subida para el contenedor de documentación
+			console.log("Obteniendo URL de subida...")
+			console.log(uniqueFilename)
 			const response = await fetch("/api/file", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ filenames: [uniqueFilename] }),
+				body: JSON.stringify({
+					filenames: [uniqueFilename],
+					containerType: "documents", // Especificar que es para documentos
+				}),
 			})
 
 			if (!response.ok) throw new Error("Error al obtener URL de subida")
@@ -119,22 +124,31 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 			const data = await response.json()
 			if (!data.urls?.[0]) throw new Error("Respuesta inválida del servidor")
 
-			// Subir archivo
+			// Subir archivo a Azure Blob Storage
 			const uploadResponse = await fetch(data.urls[0], {
 				method: "PUT",
 				body: selectedFile,
-				headers: { "Content-Type": selectedFile.type },
+				headers: {
+					"Content-Type": selectedFile.type,
+					"x-ms-blob-type": "BlockBlob",
+					"x-ms-version": "2020-04-08",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "PUT",
+					"Access-Control-Allow-Headers": "*",
+				},
+				mode: "cors",
+				credentials: "omit",
 			})
 
 			if (!uploadResponse.ok) throw new Error("Error al subir el archivo")
 
-			// Guardar metadatos
-			const saveResult = await uploadFile(
-				values,
-				`${process.env.NEXT_PUBLIC_S3_URL}/${uniqueFilename}`,
-				selectedFile.size,
-				selectedFile.type
-			)
+			// Obtener la URL base del blob (sin los parámetros SAS)
+			const blobUrl = data.urls[0].split("?")[0]
+
+			// Guardar metadatos en la base de datos
+			console.log("Guardando metadatos...")
+			console.log(values, blobUrl, selectedFile.size, selectedFile.type)
+			const saveResult = await uploadFile(values, blobUrl, selectedFile.size, selectedFile.type)
 
 			if (!saveResult.ok) throw new Error(saveResult.error || "Error al guardar metadatos")
 
@@ -210,7 +224,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent>
-											{Codes.map((code) => (
+											{CodesValuesArray.map((code) => (
 												<SelectItem key={code} value={code}>
 													<span className="font-mono">{code}</span>
 												</SelectItem>
@@ -265,11 +279,11 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 										<div className="flex h-full flex-col items-center justify-center">
 											{filePreview ? (
 												<>
-													<Image
+													{/* <Image
 														src={filePreview}
 														alt="Previsualización"
 														className="mb-4 max-h-40 object-contain"
-													/>
+													/> */}
 													<p className="max-w-full truncate text-sm font-medium">
 														{selectedFile.name}
 													</p>

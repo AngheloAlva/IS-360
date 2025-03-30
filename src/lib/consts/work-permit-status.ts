@@ -1,4 +1,4 @@
-export const WorkPermitStatus = {
+export const WORK_PERMIT_STATUS_VALUES = {
 	PENDING: "PENDING",
 	IN_PROGRESS: "IN_PROGRESS",
 	COMPLETED: "COMPLETED",
@@ -6,35 +6,35 @@ export const WorkPermitStatus = {
 	EXPIRED: "EXPIRED",
 } as const
 
-export const WorkPermitStatusKeys = [
-	WorkPermitStatus.PENDING,
-	WorkPermitStatus.IN_PROGRESS,
-	WorkPermitStatus.COMPLETED,
-	WorkPermitStatus.CANCELLED,
-	WorkPermitStatus.EXPIRED,
+export const WORK_PERMIT_STATUS_VALUES_ARRAY = [
+	WORK_PERMIT_STATUS_VALUES.PENDING,
+	WORK_PERMIT_STATUS_VALUES.IN_PROGRESS,
+	WORK_PERMIT_STATUS_VALUES.COMPLETED,
+	WORK_PERMIT_STATUS_VALUES.CANCELLED,
+	WORK_PERMIT_STATUS_VALUES.EXPIRED,
 ] as const
 
-export type WorkPermitStatus = keyof typeof WorkPermitStatus
+export type WorkPermitStatus = keyof typeof WORK_PERMIT_STATUS_VALUES
 
 export const WorkPermitStatusOptions = [
 	{
-		value: WorkPermitStatus.PENDING,
+		value: WORK_PERMIT_STATUS_VALUES.PENDING,
 		label: "Pendiente",
 	},
 	{
-		value: WorkPermitStatus.IN_PROGRESS,
+		value: WORK_PERMIT_STATUS_VALUES.IN_PROGRESS,
 		label: "En Proceso",
 	},
 	{
-		value: WorkPermitStatus.COMPLETED,
+		value: WORK_PERMIT_STATUS_VALUES.COMPLETED,
 		label: "Completado",
 	},
 	{
-		value: WorkPermitStatus.CANCELLED,
+		value: WORK_PERMIT_STATUS_VALUES.CANCELLED,
 		label: "Cancelado",
 	},
 	{
-		value: WorkPermitStatus.EXPIRED,
+		value: WORK_PERMIT_STATUS_VALUES.EXPIRED,
 		label: "Expirado",
 	},
 ]

@@ -10,7 +10,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { updateFile } from "@/actions/document-management/updateFile"
-import { Codes } from "@/lib/consts/codes"
+import { CodesValuesArray } from "@/lib/consts/codes"
 import { cn } from "@/lib/utils"
 import {
 	fileFormSchema,
@@ -179,7 +179,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent className="text-neutral-700">
-									{Codes.map((option: string) => (
+									{CodesValuesArray.map((option: string) => (
 										<SelectItem key={option} value={option} className="capitalize">
 											{option.toLocaleLowerCase()}
 										</SelectItem>

@@ -1,22 +1,26 @@
-export const WorkOrderPriority = {
-	HIGH: "Alto",
-	MEDIUM: "Medio",
-	LOW: "Bajo",
+export const WORK_ORDER_PRIORITY_VALUES = {
+	HIGH: "HIGH",
+	MEDIUM: "MEDIUM",
+	LOW: "LOW",
 } as const
 
-export const WorkOrderPriorityKeys = ["HIGH", "MEDIUM", "LOW"] as const
+export const WORK_ORDER_PRIORITY_VALUES_ARRAY = [
+	WORK_ORDER_PRIORITY_VALUES.HIGH,
+	WORK_ORDER_PRIORITY_VALUES.MEDIUM,
+	WORK_ORDER_PRIORITY_VALUES.LOW,
+] as const
 
 export const WorkOrderPriorityOptions = [
 	{
-		value: "HIGH",
+		value: WORK_ORDER_PRIORITY_VALUES.HIGH,
 		label: "Alto",
 	},
 	{
-		value: "MEDIUM",
+		value: WORK_ORDER_PRIORITY_VALUES.MEDIUM,
 		label: "Medio",
 	},
 	{
-		value: "LOW",
+		value: WORK_ORDER_PRIORITY_VALUES.LOW,
 		label: "Bajo",
 	},
 ]

@@ -15,7 +15,7 @@ import {
 	FolderHeartIcon,
 } from "lucide-react"
 
-import { Codes } from "@/lib/consts/codes"
+import { CodesValuesArray } from "@/lib/consts/codes"
 
 import { Button } from "../ui/button"
 import {
@@ -92,7 +92,7 @@ export function FileExplorerTable({
 		<Table className={cn("rounded-md bg-white p-2 shadow", className)}>
 			<TableCaption className="rounded-md bg-white py-2 text-center shadow">
 				<div className="mx-auto flex w-fit items-center gap-10">
-					{Codes.map((code) => (
+					{CodesValuesArray.map((code) => (
 						<div key={code}>
 							{code.charAt(0)}: {code}
 						</div>

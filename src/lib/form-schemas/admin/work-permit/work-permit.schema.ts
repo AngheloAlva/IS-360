@@ -1,4 +1,4 @@
-import { WorkPermitStatusKeys } from "@/lib/consts/work-permit-status"
+import { WORK_PERMIT_STATUS_VALUES_ARRAY } from "@/lib/consts/work-permit-status"
 import { z } from "zod"
 
 export const workPermitSchema = z.object({
@@ -14,7 +14,7 @@ export const workPermitSchema = z.object({
 		{ message: "La cantidad de días no es válida" }
 	),
 	equipmentParent: z.string().nonempty({ message: "El equipo padre no puede estar vacío" }),
-	status: z.enum(WorkPermitStatusKeys, { message: "El estado no es válido" }),
+	status: z.enum(WORK_PERMIT_STATUS_VALUES_ARRAY, { message: "El estado no es válido" }),
 	estimatedDuration: z.string().refine(
 		(value) => {
 			const duration = parseInt(value)

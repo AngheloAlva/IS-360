@@ -8,7 +8,7 @@ import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
 import { getCompanies } from "@/actions/companies/getCompanies"
-import { USER_ROLES } from "@/lib/consts/user-roles"
+import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
 import { formatRut } from "@/utils/formatRut"
 import { cn } from "@/lib/utils"
@@ -121,7 +121,7 @@ export default function ExternalUsersForm(): React.ReactElement {
 
 					const { data: newUser, error } = await authClient.admin.createUser({
 						email: employee.email,
-						role: USER_ROLES.PARTNER_COMPANY,
+						role: USER_ROLES_VALUES.PARTNER_COMPANY,
 						password: temporalPassword,
 						name: employee.name,
 						data: {

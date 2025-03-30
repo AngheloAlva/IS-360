@@ -4,7 +4,7 @@ import { format } from "date-fns"
 import Link from "next/link"
 
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
-import { WorkOrderType } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
 import WorkBookEntriesTable from "@/components/work-book/WorkBookEntriesTable"
@@ -65,7 +65,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 							<b>Trabajo Solicitado:</b> <span>{data.workRequest}</span>
 						</li>
 						<li>
-							<b>Tipo de Trabajo:</b> <span>{WorkOrderType[data.type]}</span>
+							<b>Tipo de Trabajo:</b> <span>{WORK_ORDER_TYPE_VALUES[data.type]}</span>
 						</li>
 						<li>
 							<b>Contratista:</b> {data.company.name} - {data.company.rut}

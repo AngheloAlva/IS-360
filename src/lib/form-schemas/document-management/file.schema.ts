@@ -1,11 +1,11 @@
-import { Codes } from "@/lib/consts/codes"
+import { CodesValuesArray } from "@/lib/consts/codes"
 import { z } from "zod"
 
 export const fileFormSchema = z.object({
 	userId: z.string(),
 	folderSlug: z.string().optional(),
 
-	code: z.enum(Codes, { message: "El código es requerido" }),
+	code: z.enum(CodesValuesArray, { message: "El código es requerido" }),
 	name: z.string({ message: "El nombre es requerido" }),
 	description: z.string().optional(),
 	registrationDate: z.date({ message: "La fecha de registro es requerida" }),

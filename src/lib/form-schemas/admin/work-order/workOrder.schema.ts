@@ -1,16 +1,18 @@
-import { WorkOrderPriorityKeys } from "@/lib/consts/work-order-priority"
-import { WorkOrderStatusKeys } from "@/lib/consts/work-order-status"
-import { WorkOrderTypeKeys } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_PRIORITY_VALUES_ARRAY } from "@/lib/consts/work-order-priority"
+import { WORK_ORDER_STATUS_VALUES_ARRAY } from "@/lib/consts/work-order-status"
+import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
 import { z } from "zod"
 
 export const workOrderSchema = z.object({
-	type: z.enum(WorkOrderTypeKeys, { message: "El tipo no es válido" }),
-	status: z.enum(WorkOrderStatusKeys, { message: "El estado no es válido" }).default("PENDING"),
+	type: z.enum(WORK_ORDER_TYPE_VALUES_ARRAY, { message: "El tipo no es válido" }),
+	status: z
+		.enum(WORK_ORDER_STATUS_VALUES_ARRAY, { message: "El estado no es válido" })
+		.default("PENDING"),
 	solicitationDate: z.date({ message: "La fecha de solicitud no es válida" }),
 	solicitationTime: z.string({ message: "La hora de solicitud no es válida" }),
 	workRequest: z.string().min(1, { message: "La solicitud no puede estar vacía" }),
 	workDescription: z.string().optional(),
-	priority: z.enum(WorkOrderPriorityKeys, { message: "La prioridad no es válida" }),
+	priority: z.enum(WORK_ORDER_PRIORITY_VALUES_ARRAY, { message: "La prioridad no es válida" }),
 	// equipment: z.array(z.string(), { message: "El equipo no es válido" }),
 	equipment: z.string().nonempty({ message: "El equipo no puede estar vacío" }),
 	programDate: z.date({ message: "La fecha de programación no es válida" }),

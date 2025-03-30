@@ -1,56 +1,100 @@
-import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-
-import { S3, S3_BUCKET } from "@/lib/s3-client"
+import { BlobSASPermissions } from "@azure/storage-blob"
+import {
+	blobServiceClient,
+	FILES_CONTAINER_NAME,
+	DOCUMENTS_CONTAINER_NAME,
+} from "@/lib/azure-storage-client"
 
 import type { NextRequest } from "next/server"
 
-export const runtime = "edge"
+type ContainerType = "documents" | "files"
 
 export async function POST(request: NextRequest) {
-	const { filenames }: { filenames: string[] } = await request.json()
+	const {
+		filenames,
+		containerType = "documents",
+	}: { filenames: string[]; containerType?: ContainerType } = await request.json()
 
 	try {
+		// Validar entrada
+		if (!filenames || filenames.length === 0) {
+			console.error("No se proporcionaron nombres de archivo")
+			return Response.json({ error: "No se proporcionaron nombres de archivo" }, { status: 400 })
+		}
+
+		// Seleccionar el contenedor correcto basado en el tipo
+		const containerName =
+			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
+
+		console.log(`Usando contenedor: ${containerName}`)
+		const containerClient = blobServiceClient.getContainerClient(containerName)
+
 		const urls = await Promise.all(
 			filenames.map(async (filename) => {
-				const url = await getSignedUrl(
-					S3,
-					new PutObjectCommand({
-						Bucket: S3_BUCKET,
-						Key: filename,
-					}),
-					{
-						expiresIn: 600,
-					}
-				)
+				console.log(`Generando URL SAS para: ${filename}`)
+				const blobClient = containerClient.getBlockBlobClient(filename)
+				const permissions = new BlobSASPermissions()
+				permissions.write = true
+				permissions.create = true
 
+				const url = await blobClient.generateSasUrl({
+					permissions,
+					expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
+					contentType: "application/octet-stream",
+					cacheControl: "no-cache",
+					contentDisposition: "attachment"
+				})
+
+				console.log(`URL SAS generada exitosamente para: ${filename}`)
 				return url
 			})
 		)
 
 		return Response.json({ urls })
 	} catch (error: unknown) {
-		console.log(error)
-		return Response.json({ error: (error as Error).message })
+		console.error("Error en POST /api/file:", error)
+		return Response.json(
+			{ error: error instanceof Error ? error.message : "Error interno del servidor" },
+			{ status: 500 }
+		)
 	}
 }
 
 export async function GET(request: NextRequest) {
 	const filename = request.nextUrl.searchParams.get("filename") as string
-	try {
-		const url = await getSignedUrl(
-			S3,
-			new GetObjectCommand({
-				Bucket: S3_BUCKET,
-				Key: filename,
-			}),
-			{
-				expiresIn: 600,
-			}
-		)
+	const containerType = request.nextUrl.searchParams.get("containerType") || "documents"
 
+	try {
+		// Validar entrada
+		if (!filename) {
+			console.error("No se proporcionó nombre de archivo")
+			return Response.json({ error: "No se proporcionó nombre de archivo" }, { status: 400 })
+		}
+
+		// Seleccionar el contenedor correcto basado en el tipo
+		const containerName =
+			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
+
+		console.log(`Usando contenedor: ${containerName}`)
+		const containerClient = blobServiceClient.getContainerClient(containerName)
+
+		console.log(`Generando URL SAS para: ${filename}`)
+		const blobClient = containerClient.getBlockBlobClient(filename)
+		const permissions = new BlobSASPermissions()
+		permissions.read = true
+
+		const url = await blobClient.generateSasUrl({
+			permissions,
+			expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
+		})
+
+		console.log(`URL SAS generada exitosamente para: ${filename}`)
 		return Response.json({ url })
 	} catch (error: unknown) {
-		return Response.json({ error: (error as Error).message })
+		console.error("Error en GET /api/file:", error)
+		return Response.json(
+			{ error: error instanceof Error ? error.message : "Error interno del servidor" },
+			{ status: 500 }
+		)
 	}
 }

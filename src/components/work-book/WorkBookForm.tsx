@@ -10,12 +10,12 @@ import { format } from "date-fns"
 import { toast } from "sonner"
 
 import { type WorkBookSchema, workBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
-import { getWorkOrdersByCompanyId } from "@/actions/work-orders/getWorkOrders"
 import { updateWorkOrderLikeBook } from "@/actions/work-orders/updateWorkOrder"
-import { WorkOrderPriority } from "../../lib/consts/work-order-priority"
+import { getWorkOrdersByCompanyId } from "@/actions/work-orders/getWorkOrders"
+import { WORK_ORDER_PRIORITY_VALUES } from "@/lib/consts/work-order-priority"
+import { WORK_ORDER_STATUS_VALUES } from "@/lib/consts/work-order-status"
+import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 import { getCompanyById } from "@/actions/companies/getCompanies"
-import { WorkOrderStatus } from "@/lib/consts/work-order-status"
-import { WorkOrderType } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -221,15 +221,15 @@ export default function WorkBookForm({ userId, companyId }: WorkBookFormProps): 
 									</div>
 									<div>
 										<h3 className="font-medium">Tipo de trabajo:</h3>
-										<p>{WorkOrderType[workOrderSelected.type]}</p>
+										<p>{WORK_ORDER_TYPE_VALUES[workOrderSelected.type]}</p>
 									</div>
 									<div>
 										<h3 className="font-medium">Estado:</h3>
-										<p>{WorkOrderStatus[workOrderSelected.status]}</p>
+										<p>{WORK_ORDER_STATUS_VALUES[workOrderSelected.status]}</p>
 									</div>
 									<div>
 										<h3 className="font-medium">Prioridad:</h3>
-										<p>{WorkOrderPriority[workOrderSelected.priority]}</p>
+										<p>{WORK_ORDER_PRIORITY_VALUES[workOrderSelected.priority]}</p>
 									</div>
 									<div>
 										<h3 className="font-medium">Fecha de solicitud:</h3>

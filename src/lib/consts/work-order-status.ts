@@ -1,38 +1,38 @@
-export const WorkOrderStatus = {
-	PENDING: "Pendiente",
-	IN_PROGRESS: "En Proceso",
-	COMPLETED: "Completado",
-	CANCELLED: "Cancelado",
-	EXPIRED: "Expirado",
+export const WORK_ORDER_STATUS_VALUES = {
+	PENDING: "PENDING",
+	IN_PROGRESS: "IN_PROGRESS",
+	COMPLETED: "COMPLETED",
+	CANCELLED: "CANCELLED",
+	EXPIRED: "EXPIRED",
 } as const
 
-export const WorkOrderStatusKeys = [
-	"PENDING",
-	"IN_PROGRESS",
-	"COMPLETED",
-	"CANCELLED",
-	"EXPIRED",
+export const WORK_ORDER_STATUS_VALUES_ARRAY = [
+	WORK_ORDER_STATUS_VALUES.PENDING,
+	WORK_ORDER_STATUS_VALUES.IN_PROGRESS,
+	WORK_ORDER_STATUS_VALUES.COMPLETED,
+	WORK_ORDER_STATUS_VALUES.CANCELLED,
+	WORK_ORDER_STATUS_VALUES.EXPIRED,
 ] as const
 
 export const WorkOrderStatusOptions = [
 	{
-		value: WorkOrderStatus.PENDING,
+		value: WORK_ORDER_STATUS_VALUES.PENDING,
 		label: "Pendiente",
 	},
 	{
-		value: WorkOrderStatus.IN_PROGRESS,
+		value: WORK_ORDER_STATUS_VALUES.IN_PROGRESS,
 		label: "En Proceso",
 	},
 	{
-		value: WorkOrderStatus.COMPLETED,
+		value: WORK_ORDER_STATUS_VALUES.COMPLETED,
 		label: "Completado",
 	},
 	{
-		value: WorkOrderStatus.CANCELLED,
+		value: WORK_ORDER_STATUS_VALUES.CANCELLED,
 		label: "Cancelado",
 	},
 	{
-		value: WorkOrderStatus.EXPIRED,
+		value: WORK_ORDER_STATUS_VALUES.EXPIRED,
 		label: "Expirado",
 	},
 ]

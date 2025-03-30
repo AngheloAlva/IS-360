@@ -5,7 +5,7 @@ import { ArrowUpDown, Edit } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 
-import { USER_ROLES, UserRoleOptions } from "@/lib/consts/user-roles"
+import { USER_ROLES_VALUES, UserRoleOptions } from "@/lib/consts/user-roles"
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { AreasLabels } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
@@ -116,7 +116,8 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const id = row.getValue("id")
 			const role = row.getValue("role")
 
-			const isPartnerCompany = role === USER_ROLES.PARTNER_COMPANY || role === USER_ROLES.OPERATOR
+			const isPartnerCompany =
+				role === USER_ROLES_VALUES.PARTNER_COMPANY || role === USER_ROLES_VALUES.OPERATOR
 
 			return (
 				<Link

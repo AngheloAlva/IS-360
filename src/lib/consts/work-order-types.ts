@@ -1,22 +1,26 @@
-export const WorkOrderType = {
-	CORRECTIVE: "Correctivo",
-	PREVENTIVE: "Preventivo",
-	PREDICTIVE: "Predictivo",
+export const WORK_ORDER_TYPE_VALUES = {
+	CORRECTIVE: "CORRECTIVE",
+	PREVENTIVE: "PREVENTIVE",
+	PREDICTIVE: "PREDICTIVE",
 } as const
 
-export const WorkOrderTypeKeys = ["CORRECTIVE", "PREVENTIVE", "PREDICTIVE"] as const
+export const WORK_ORDER_TYPE_VALUES_ARRAY = [
+	WORK_ORDER_TYPE_VALUES.CORRECTIVE,
+	WORK_ORDER_TYPE_VALUES.PREVENTIVE,
+	WORK_ORDER_TYPE_VALUES.PREDICTIVE,
+] as const
 
 export const WorkOrderTypeOptions = [
 	{
-		value: "CORRECTIVE",
+		value: WORK_ORDER_TYPE_VALUES.CORRECTIVE,
 		label: "Correctivo",
 	},
 	{
-		value: "PREVENTIVE",
+		value: WORK_ORDER_TYPE_VALUES.PREVENTIVE,
 		label: "Preventivo",
 	},
 	{
-		value: "PREDICTIVE",
+		value: WORK_ORDER_TYPE_VALUES.PREDICTIVE,
 		label: "Predictivo",
 	},
 ]
