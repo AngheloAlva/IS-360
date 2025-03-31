@@ -24,16 +24,13 @@ export const AreasValuesArray = [
 	AreasValues.PROJECTS,
 ] as const
 
-export const SpecialAreas = {
-	proyectos: {
+export const Areas = {
+	"proyectos": {
 		title: "Proyectos",
 		value: AreasValues.PROJECTS,
 		description:
 			"Gestiona y supervisa los proyectos de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
 	},
-} as const
-
-export const Areas = {
 	"operaciones": {
 		title: "Operaciones",
 		value: AreasValues.OPERATIONS,
@@ -103,32 +100,32 @@ export const AreasLabels = {
 	PROJECTS: "Proyectos",
 }
 
-export const areaColors: Record<string, { text: string }> = {
+export const areaColors: Record<string, { className: string }> = {
 	"operaciones": {
-		text: "text-[#26A69A] border-[#26A69A]",
+		className: "text-[#26A69A] border-[#26A69A]",
 	},
 	"instructivos": {
-		text: "text-[#5A6B7F] border-[#5A6B7F]",
+		className: "text-[#5A6B7F] border-[#5A6B7F]",
 	},
 	"integridad-y-mantencion": {
-		text: "text-[#F08C42] border-[#F08C42]",
+		className: "text-[#F08C42] border-[#F08C42]",
 	},
 	"medio-ambiente": {
-		text: "text-[#4CAF50] border-[#4CAF50]",
+		className: "text-[#4CAF50] border-[#4CAF50]",
 	},
 	"prevencion-riesgos": {
-		text: "text-[#FF5722] border-[#FF5722]",
+		className: "text-[#FF5722] border-[#FF5722]",
 	},
 	"calidad-y-excelencia-profesional": {
-		text: "text-[#2196F3] border-[#2196F3]",
+		className: "text-[#2196F3] border-[#2196F3]",
 	},
 	"hseq": {
-		text: "text-[#009688] border-[#009688]",
+		className: "text-[#009688] border-[#009688]",
 	},
 	"juridica": {
-		text: "text-[#424242] border-[#424242]",
+		className: "text-[#424242] border-[#424242]",
 	},
 	"comunidades": {
-		text: "text-yellow-500 border-yellow-500",
+		className: "text-yellow-500 border-yellow-500",
 	},
 }

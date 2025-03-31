@@ -1,14 +1,15 @@
-import { Areas } from "@/lib/consts/areas"
-
-import { PlusIcon, UploadIcon, ChevronLeft } from "lucide-react"
+import { PlusIcon, UploadIcon } from "lucide-react"
 import { notFound } from "next/navigation"
+import { headers } from "next/headers"
 import Link from "next/link"
 
-import { FileExplorerTable } from "@/components/document-management/FileExplorerTable"
-import { getFilesAndFolders } from "@/actions/document-management/getFilesAndFolders"
-import { Button } from "@/components/ui/button"
+import { Areas } from "@/lib/consts/areas"
 import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+
+import { FileExplorerTable } from "@/components/sections/documentation/FileExplorerTable"
+import BackButton from "@/components/shared/BackButton"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 interface PageProps {
 	params: Promise<{
@@ -32,66 +33,54 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 	const areaValue = Areas[area as keyof typeof Areas]["value"]
 	const lastFolder = folderSlug[folderSlug.length - 1]
 
-	const res = await getFilesAndFolders(areaValue, lastFolder)
-
-	if (!res.ok || !res.folders || !res.files) {
-		return notFound()
-	}
-
 	const backPath =
-		folderSlug.length > 1
+		folderSlug.length >= 1
 			? `/dashboard/documentacion/${area}/${folderSlug.slice(0, -1).join("/")}`
 			: `/dashboard/documentacion/${area}`
 
 	const lastPath =
-		folderSlug.length > 1
+		folderSlug.length >= 1
 			? `/dashboard/documentacion/${area}/${folderSlug.join("/")}`
 			: `/dashboard/documentacion/${area}`
 
 	return (
-		<div className="container mx-auto">
-			<div className="mb-6 flex items-center justify-between">
-				<div className="flex items-center gap-4">
-					<Link
-						className="hover:bg-primary/40 hover:text-primary mt-0.5 rounded-full transition-colors"
-						href={backPath}
-					>
-						<ChevronLeft className="h-7 w-7" />
-					</Link>
+		<div className="container mx-auto px-4 py-6">
+			<div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+				<div className="flex items-center gap-3">
+					<BackButton href={backPath} />
 
-					<h1 className="text-2xl font-bold capitalize">Gestor Documental - {area}</h1>
+					<h1 className="text-3xl font-bold text-gray-800">Gestor Documental</h1>
+					<Badge className={"mt-0.5 rounded-lg text-sm font-medium"}>{areaName}</Badge>
 				</div>
 
-				<div className="flex gap-2">
+				<div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
 					<Link
-						href={`/dashboard/documentacion/nuevo-archivo?area=${areaName}&parentFolderSlug=${lastFolder}&backPath=${backPath}`}
+						href={`/dashboard/documentacion/nuevo-archivo?area=${area}&parentFolderSlug=${lastFolder}&backPath=${lastPath}`}
 					>
-						<Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
-							<UploadIcon className="mr-2 h-4 w-4" />
-							Subir Archivo
+						<Button className="group flex items-center gap-2 border border-green-600 bg-white text-green-600 hover:bg-green-600 hover:text-white">
+							<span className="font-medium">Subir Archivo</span>
+							<UploadIcon className="h-4 w-4" />
 						</Button>
 					</Link>
 
 					<Link
-						href={`/dashboard/documentacion/nueva-carpeta?area=${areaName}&isRootFolder=false&parentFolderSlug=${lastFolder}&backPath=${backPath}`}
+						href={`/dashboard/documentacion/nueva-carpeta?area=${area}&isRootFolder=false&parentFolderSlug=${lastFolder}&backPath=${lastPath}`}
 					>
-						<Button size="sm">
-							<PlusIcon className="mr-2 h-4 w-4" />
-							Nueva Carpeta
+						<Button className="group hover:bg-primary border-primary text-primary flex items-center gap-2 border bg-white hover:text-white">
+							<span className="font-medium">Nueva Carpeta</span>
+							<PlusIcon className="h-4 w-4" />
 						</Button>
 					</Link>
 				</div>
 			</div>
 
-			<div className="rounded-md border bg-white shadow-sm">
-				<FileExplorerTable
-					files={res.files}
-					lastPath={lastPath}
-					folders={res.folders}
-					foldersSlugs={[area, ...folderSlug]}
-					isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
-				/>
-			</div>
+			<FileExplorerTable
+				lastPath={lastPath}
+				areaValue={areaValue}
+				actualFolderSlug={lastFolder}
+				foldersSlugs={[area, ...folderSlug]}
+				isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
+			/>
 		</div>
 	)
 }

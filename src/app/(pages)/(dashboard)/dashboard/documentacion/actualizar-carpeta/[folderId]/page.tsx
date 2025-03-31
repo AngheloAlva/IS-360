@@ -5,6 +5,7 @@ import { getFolderById } from "@/actions/document-management/getFolders"
 import { auth } from "@/lib/auth"
 
 import UpdateFolderForm from "@/components/forms/document-management/UpdateFolderForm"
+import BackButton from "@/components/shared/BackButton"
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 type Params = Promise<{ folderId: string }>
@@ -33,7 +34,10 @@ export default async function UpdateFolderPage(props: {
 
 	return (
 		<>
-			<h1 className="w-fit text-3xl font-bold">Actualizar Carpeta</h1>
+			<div className="flex w-full max-w-screen-md items-center justify-start gap-2">
+				<BackButton href={lastPath || `/dashboard/documentacion/${data.area}`} />
+				<h1 className="w-fit text-3xl font-bold">Actualizar Carpeta</h1>
+			</div>
 
 			<UpdateFolderForm lastPath={lastPath} userId={res.user.id} oldFolder={data} />
 		</>

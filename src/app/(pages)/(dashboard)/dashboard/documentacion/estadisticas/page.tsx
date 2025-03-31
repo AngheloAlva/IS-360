@@ -1,4 +1,4 @@
-import DocumentCharts from "@/components/document-management/DocumentCharts"
+import DocumentCharts from "@/components/sections/documentation/DocumentCharts"
 
 export default function DocumentationPage(): React.ReactElement {
 	return (

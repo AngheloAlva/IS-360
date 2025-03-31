@@ -22,6 +22,7 @@ import {
 	type FolderFormSchema,
 } from "@/lib/form-schemas/document-management/folder.schema"
 
+import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -40,31 +41,31 @@ import {
 	SelectContent,
 	SelectTrigger,
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
 
 export default function NewFolderForm({
 	area,
 	userId,
 	backPath,
 	parentSlug,
-	isRootFolder,
+	isRootFolder = false,
 }: {
+	area: string
 	userId: string
 	backPath?: string
 	parentSlug?: string
-	isRootFolder: boolean
-	area: (typeof Areas)[keyof typeof Areas]["value"]
+	isRootFolder?: boolean
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 
 	const router = useRouter()
+	const areaValue = Areas[area as keyof typeof Areas].value
 
 	const form = useForm<FolderFormSchema>({
 		resolver: zodResolver(folderFormSchema),
 		defaultValues: {
-			area,
 			userId,
 			name: "",
+			area: areaValue,
 			type: "default",
 			description: "",
 			root: isRootFolder,
@@ -76,7 +77,7 @@ export default function NewFolderForm({
 		try {
 			setLoading(true)
 
-			const { ok, data, message } = await createFolder(values)
+			const { ok, message } = await createFolder(values)
 
 			if (ok) {
 				toast("Carpeta creada con éxito", {
@@ -85,11 +86,9 @@ export default function NewFolderForm({
 				})
 
 				if (backPath) {
-					router.push(`${backPath}/${data?.slug}`)
+					router.push(`${backPath}`)
 				} else {
-					router.push(
-						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === area)}/${data?.slug}`
-					)
+					router.push(`/dashboard/documentacion/${area}`)
 				}
 			} else {
 				toast("Error al crear la carpeta", {

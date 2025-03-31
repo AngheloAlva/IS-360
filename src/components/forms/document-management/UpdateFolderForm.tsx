@@ -22,6 +22,7 @@ import {
 	type FolderFormSchema,
 } from "@/lib/form-schemas/document-management/folder.schema"
 
+import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -72,7 +73,7 @@ export default function UpdateFolderForm({
 		try {
 			setLoading(true)
 
-			const { ok, data, message } = await updateFolder({ id: oldFolder.id, values })
+			const { ok, message } = await updateFolder({ id: oldFolder.id, values })
 
 			if (ok) {
 				toast("Carpeta actualizada con éxito", {
@@ -81,10 +82,10 @@ export default function UpdateFolderForm({
 				})
 
 				if (lastPath) {
-					router.push(`${lastPath}/${data?.slug}`)
+					router.push(`${lastPath}`)
 				} else {
 					router.push(
-						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === oldFolder.area)}/${data?.slug}`
+						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === oldFolder.area)}`
 					)
 				}
 			} else {
@@ -110,97 +111,103 @@ export default function UpdateFolderForm({
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="mx-auto grid w-full max-w-screen-md gap-4"
 			>
-				<FormField
-					control={form.control}
-					name="name"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-gray-700">Nombre de la Carpeta</FormLabel>
-							<FormControl>
-								<Input
-									className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Nombre de la Carpeta"
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+				<Card className="w-full">
+					<CardContent className="grid gap-5">
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-gray-700">Nombre de la Carpeta</FormLabel>
+									<FormControl>
+										<Input
+											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+											placeholder="Nombre de la Carpeta"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="gap-1 text-gray-700">
-								Descipción de la Carpeta
-								<span className="text-muted-foreground text-xs">(opcional)</span>
-							</FormLabel>
-							<FormControl>
-								<Textarea
-									className="min-h-20 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-									placeholder="Descripción de la Carpeta..."
-									{...field}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="gap-1 text-gray-700">
+										Descipción de la Carpeta
+										<span className="text-muted-foreground text-xs">(opcional)</span>
+									</FormLabel>
+									<FormControl>
+										<Textarea
+											className="min-h-20 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+											placeholder="Descripción de la Carpeta..."
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<FormField
-					control={form.control}
-					name="type"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Tipo de Carpeta</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={field.value}>
-								<FormControl>
-									<SelectTrigger className="border-gray-200">
-										<SelectValue placeholder="Seleccione un tipo" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent className="text-neutral-700">
-									{FolderTypes.map((type) => (
-										<SelectItem key={type.value} value={type.value}>
-											{type.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+						<FormField
+							control={form.control}
+							name="type"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Tipo de Carpeta</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<FormControl>
+											<SelectTrigger className="border-gray-200">
+												<SelectValue placeholder="Seleccione un tipo" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent className="text-neutral-700">
+											{FolderTypes.map((type) => (
+												<SelectItem key={type.value} value={type.value}>
+													{type.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-				<span className="text-muted-foreground mt-4 font-medium underline">Tipos de carpetas</span>
-				<div className="flex flex-wrap items-center justify-between gap-4">
-					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-						<FolderIcon className="h-5 w-5 text-yellow-500" />
-						<span>Por defecto</span>
-					</div>
-					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-						<FolderCheckIcon className="h-5 w-5 text-green-500" />
-						<span>Check</span>
-					</div>
-					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-						<FolderClockIcon className="h-5 w-5 text-blue-500" />
-						<span>Reloj</span>
-					</div>
-					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-						<FolderCogIcon className="h-5 w-5 text-indigo-500" />
-						<span>Servicio</span>
-					</div>
-					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-						<FolderHeartIcon className="h-5 w-5 text-red-500" />
-						<span>Favorito</span>
-					</div>
-					<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-						<FolderLockIcon className="h-5 w-5 text-gray-500" />
-						<span>Bloqueado</span>
-					</div>
-				</div>
+						<span className="text-muted-foreground mt-4 font-medium underline">
+							Tipos de carpetas
+						</span>
+						<div className="flex flex-wrap items-center justify-between gap-4">
+							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+								<FolderIcon className="h-5 w-5 text-yellow-500" />
+								<span>Por defecto</span>
+							</div>
+							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+								<FolderCheckIcon className="h-5 w-5 text-green-500" />
+								<span>Check</span>
+							</div>
+							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+								<FolderClockIcon className="h-5 w-5 text-blue-500" />
+								<span>Reloj</span>
+							</div>
+							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+								<FolderCogIcon className="h-5 w-5 text-indigo-500" />
+								<span>Servicio</span>
+							</div>
+							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+								<FolderHeartIcon className="h-5 w-5 text-red-500" />
+								<span>Favorito</span>
+							</div>
+							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
+								<FolderLockIcon className="h-5 w-5 text-gray-500" />
+								<span>Bloqueado</span>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
 
 				<Button className="mt-4" type="submit" size={"lg"} disabled={loading}>
 					{loading ? (

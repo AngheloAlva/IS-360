@@ -3,11 +3,10 @@ import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import Link from "next/link"
 
-import { getFilesAndFolders } from "@/actions/document-management/getFilesAndFolders"
-import { Areas, SpecialAreas } from "@/lib/consts/areas"
+import { Areas } from "@/lib/consts/areas"
 import { auth } from "@/lib/auth"
 
-import { FileExplorerTable } from "@/components/document-management/FileExplorerTable"
+import { FileExplorerTable } from "@/components/sections/documentation/FileExplorerTable"
 import BackButton from "@/components/shared/BackButton"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,16 +23,12 @@ export default async function AreaRootPage({ params }: PageProps) {
 
 	if (!data?.user) return notFound()
 
-	const areaData =
-		SpecialAreas[area as keyof typeof SpecialAreas] || Areas[area as keyof typeof Areas]
+	const areaData = Areas[area as keyof typeof Areas]
 	if (!areaData) return notFound()
 
-	const areaKey = area as keyof typeof Areas
+	const areaKey = area
 	const areaName = areaData.title
 	const areaValue = areaData.value
-	const res = await getFilesAndFolders(areaValue)
-
-	if (!res.ok || !res.folders || !res.files) return notFound()
 
 	return (
 		<div className="container mx-auto px-4 py-6">
@@ -42,9 +37,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 					<BackButton href="/dashboard/documentacion" />
 
 					<h1 className="text-3xl font-bold text-gray-800">Gestor Documental</h1>
-					<Badge className={"mt-0.5 rounded-lg text-sm font-medium"}>
-						{areaName.replace(/_/g, " ")}
-					</Badge>
+					<Badge className={"mt-0.5 rounded-lg text-sm font-medium"}>{areaName}</Badge>
 				</div>
 
 				<div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
@@ -65,9 +58,9 @@ export default async function AreaRootPage({ params }: PageProps) {
 			</div>
 
 			<FileExplorerTable
-				folders={res.folders}
-				files={res.files}
+				areaValue={areaValue}
 				foldersSlugs={[area]}
+				lastPath={"/dashboard/documentacion/" + area}
 				isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
 			/>
 		</div>

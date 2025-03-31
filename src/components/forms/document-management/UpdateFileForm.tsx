@@ -32,10 +32,10 @@ import {
 } from "@/components/ui/form"
 import {
 	Select,
-	SelectContent,
 	SelectItem,
-	SelectTrigger,
 	SelectValue,
+	SelectContent,
+	SelectTrigger,
 } from "@/components/ui/select"
 
 import type { File as PrismaFile } from "@prisma/client"

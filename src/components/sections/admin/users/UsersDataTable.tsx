@@ -51,7 +51,6 @@ export function UsersDataTable() {
 		search,
 		limit: 10,
 	})
-	console.log(data)
 
 	const table = useReactTable<ApiUser>({
 		data: data?.users ?? [],
