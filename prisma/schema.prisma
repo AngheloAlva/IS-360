@@ -491,6 +491,7 @@ model Folder {
   area        AREAS
   type        String  @default("default")
   isExternal  Boolean @default(false)
+  isActive    Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -525,11 +526,12 @@ model File {
   expirationDate   DateTime?
   revisionCount    Int       @default(0)
   isExternal       Boolean   @default(false)
+  isActive         Boolean   @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  folder   Folder? @relation(fields: [folderId], references: [id])
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId String?
   user     User    @relation(fields: [userId], references: [id])
   userId   String
@@ -540,6 +542,11 @@ model File {
 enum SAFETY_TALK_TYPE {
   IRL
   ENVIRONMENTAL
+}
+
+model Counter {
+  id    String @id @default("ot_counter")
+  value Int    @default(1)
 }
 
 enum RESOURCE_TYPE {

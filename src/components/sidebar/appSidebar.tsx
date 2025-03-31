@@ -8,6 +8,7 @@ import {
 	FileText,
 	LifeBuoy,
 	BookCopy,
+	BookUser,
 	Building2,
 	FileSearch,
 	LayoutList,
@@ -63,6 +64,11 @@ const data = {
 			icon: LayoutList,
 		},
 		{
+			name: "Libros de Arranques",
+			url: "/admin/dashboard/libros-de-arranques",
+			icon: BookUser,
+		},
+		{
 			name: "Permisos de Trabajo",
 			url: "/admin/dashboard/permisos-de-trabajo",
 			icon: FileText,
@@ -102,7 +108,7 @@ const data = {
 const navInternal = [
 	{
 		name: "Equipos",
-		url: "/admin/dashboard/herramientas",
+		url: "/admin/dashboard/equipos",
 		icon: Wrench,
 	},
 	{

@@ -23,6 +23,14 @@ export const columns: ColumnDef<
 		header: "Numero de OT",
 	},
 	{
+		accessorKey: "solicitationDate",
+		header: "Fecha de Solicitud",
+		cell: ({ row }) => {
+			const date = row.getValue("solicitationDate") as Date
+			return <span>{format(new Date(date), "yyyy-MM-dd")}</span>
+		},
+	},
+	{
 		accessorKey: "type",
 		header: "Tipo de Trabajo",
 	},
@@ -32,14 +40,6 @@ export const columns: ColumnDef<
 		cell: ({ row }) => {
 			const status = row.getValue("status") as string
 			return <Badge variant={"outline"}>{status}</Badge>
-		},
-	},
-	{
-		accessorKey: "solicitationDate",
-		header: "Fecha de Solicitud",
-		cell: ({ row }) => {
-			const date = row.getValue("solicitationDate") as Date
-			return <span>{format(new Date(date), "yyyy-MM-dd")}</span>
 		},
 	},
 	{
