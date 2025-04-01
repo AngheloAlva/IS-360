@@ -249,21 +249,26 @@ model WorkOrder {
 }
 
 model Equipment {
-  id      String @id @default(cuid())
-  barcode String
-
+  id            String  @id @default(cuid())
+  barcode       String
   name          String
   description   String?
   location      String
   isOperational Boolean @default(true)
+  type          String?
+  tag           String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  parent     Equipment?         @relation("EquipmentHierarchy", fields: [parentId], references: [id])
+  parentId   String?
+  children   Equipment[]        @relation("EquipmentHierarchy")
   workOrders WorkOrder[]
   history    EquipmentHistory[]
 
   @@unique([id])
+  @@unique([tag])
   @@unique([barcode])
   @@map("equipment")
 }

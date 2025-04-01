@@ -19,7 +19,7 @@ export function TablePagination<TData>({
 	const currentPage = table.getState().pagination.pageIndex + 1
 
 	return (
-		<div className="flex w-full items-center justify-between">
+		<div className="text-text flex w-full items-center justify-between">
 			<span className="flex items-center gap-1">
 				<div>Página</div>
 				<strong>
