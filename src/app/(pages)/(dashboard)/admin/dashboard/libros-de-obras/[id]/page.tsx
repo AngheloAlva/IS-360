@@ -7,7 +7,7 @@ import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
 import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
-import WorkBookEntriesTable from "@/components/work-book/WorkBookEntriesTable"
+import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
@@ -94,7 +94,10 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 			<div className="flex w-full items-center gap-2">
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
 
-				<Link href={`/dashboard/libro-de-obras/${id}/actividades-diarias`} className="ml-auto">
+				<Link
+					href={`/admin/dashboard/libros-de-obras/${id}/actividades-diarias`}
+					className="ml-auto"
+				>
 					<Button
 						size={"lg"}
 						className="border border-blue-500 bg-white text-blue-500 hover:bg-blue-600 hover:text-white"
@@ -104,7 +107,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 					</Button>
 				</Link>
 
-				<Link href={`/dashboard/libro-de-obras/${id}/actividades-adicionales`}>
+				<Link href={`/admin/dashboard/libros-de-obras/${id}/actividades-adicionales`}>
 					<Button
 						size={"lg"}
 						className="border border-cyan-500 bg-white text-cyan-500 hover:bg-cyan-600 hover:text-white"

@@ -3,10 +3,10 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
-import PreventionAreasForm from "@/components/forms/work-book/PreventionAreasForm"
+import ActivityForm from "@/components/forms/work-book/ActivityForm"
 import BackButton from "@/components/shared/BackButton"
 
-export default async function CreatePreventionAreaPage({
+export default async function CreateDailyActivityPage({
 	params,
 }: {
 	params: Promise<{ id: string }>
@@ -24,11 +24,11 @@ export default async function CreatePreventionAreaPage({
 	return (
 		<>
 			<div className="mx-auto flex w-full max-w-screen-xl items-center justify-start gap-2">
-				<BackButton href={`/dashboard/libro-de-obras/${id}`} />
-				<h1 className="text-2xl font-bold text-gray-800">Agregar Área de Prevención</h1>
+				<BackButton href={`/admin/dashboard/libros-de-obras/${id}`} />
+				<h1 className="text-text text-2xl font-bold">Agregar Actividad Diaria</h1>
 			</div>
 
-			<PreventionAreasForm workOrderId={id} userId={session.session.userId} />
+			<ActivityForm entryType="DAILY_ACTIVITY" workOrderId={id} session={session} />
 		</>
 	)
 }

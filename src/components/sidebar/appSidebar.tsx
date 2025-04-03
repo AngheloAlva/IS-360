@@ -64,8 +64,8 @@ const data = {
 			icon: LayoutList,
 		},
 		{
-			name: "Libros de Arranques",
-			url: "/admin/dashboard/libros-de-arranques",
+			name: "Carpetas de Arranques",
+			url: "/admin/dashboard/carpetas-de-arranques",
 			icon: BookUser,
 		},
 		{

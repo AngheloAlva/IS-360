@@ -7,7 +7,7 @@ import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
 import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
-import WorkBookEntriesTable from "@/components/work-book/WorkBookEntriesTable"
+import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"

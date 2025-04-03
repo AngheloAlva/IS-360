@@ -4,7 +4,7 @@ import { format } from "date-fns"
 
 import { WORK_ENTRY_TYPE } from "@/lib/consts/work-entry-type"
 
-import { Badge } from "../ui/badge"
+import { Badge } from "@/components/ui/badge"
 
 import type { WorkEntry } from "@/hooks/use-work-entries"
 import type { ENTRY_TYPE } from "@prisma/client"

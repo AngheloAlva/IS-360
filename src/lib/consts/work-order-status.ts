@@ -14,6 +14,14 @@ export const WORK_ORDER_STATUS_VALUES_ARRAY = [
 	WORK_ORDER_STATUS_VALUES.EXPIRED,
 ] as const
 
+export const WorkOrderStatusLabels = {
+	PENDING: "Pendiente",
+	IN_PROGRESS: "En Proceso",
+	COMPLETED: "Completado",
+	CANCELLED: "Cancelado",
+	EXPIRED: "Expirado",
+}
+
 export const WorkOrderStatusOptions = [
 	{
 		value: WORK_ORDER_STATUS_VALUES.PENDING,

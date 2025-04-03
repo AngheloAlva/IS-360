@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
-import WorkBookForm from "@/components/work-book/WorkBookForm"
+import WorkBookForm from "@/components/sections/work-book/WorkBookForm"
 import BackButton from "@/components/shared/BackButton"
 
 export default async function CreateWorkBookPage() {

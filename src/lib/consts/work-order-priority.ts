@@ -10,17 +10,23 @@ export const WORK_ORDER_PRIORITY_VALUES_ARRAY = [
 	WORK_ORDER_PRIORITY_VALUES.LOW,
 ] as const
 
+export const WorkOrderPriorityLabels = {
+	HIGH: "Alto",
+	MEDIUM: "Medio",
+	LOW: "Bajo",
+}
+
 export const WorkOrderPriorityOptions = [
 	{
 		value: WORK_ORDER_PRIORITY_VALUES.HIGH,
-		label: "Alto",
+		label: WorkOrderPriorityLabels.HIGH,
 	},
 	{
 		value: WORK_ORDER_PRIORITY_VALUES.MEDIUM,
-		label: "Medio",
+		label: WorkOrderPriorityLabels.MEDIUM,
 	},
 	{
 		value: WORK_ORDER_PRIORITY_VALUES.LOW,
-		label: "Bajo",
+		label: WorkOrderPriorityLabels.LOW,
 	},
 ]

@@ -32,7 +32,7 @@ enum AREAS {
   INTEGRITY_AND_MAINTENANCE // Integridad y Mantencion
   ENVIRONMENT // Medio Ambiente
   RISK_PREVENTION // Preveencion de Riesgos
-  QUALITY_AND_PROFESSIONAL_EXCELLENCE // Calidad y Exelencia Profesional
+  QUALITY_AND_OPERATIONAL_EXCELLENCE // Calidad y Exelencia Operacional
   HSEQ // HSEQ (nueva)
   LEGAL // Juridica
   COMMUNITIES // Comunidades (periodistas?)
@@ -191,6 +191,13 @@ enum WORK_ORDER_TYPE {
   CORRECTIVE
   PREVENTIVE
   PREDICTIVE
+  PROACTIVE
+}
+
+enum WORK_ORDER_CAPEX {
+  CONFIDABILITY // Confiabilidad
+  MITIGATE_RISK // Mitiga riesgo
+  COMPLIANCE // Cumplimiento normativo
 }
 
 enum WORK_ORDER_PRIORITY {
@@ -210,6 +217,7 @@ model WorkOrder {
   workRequest      String
   workDescription  String?
   priority         WORK_ORDER_PRIORITY
+  capex            WORK_ORDER_CAPEX?
   equipment        Equipment[]
   programDate      DateTime
   estimatedHours   Float

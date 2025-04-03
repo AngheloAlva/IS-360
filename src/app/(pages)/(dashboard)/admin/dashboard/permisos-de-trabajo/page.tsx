@@ -4,10 +4,10 @@ import { Metadata } from "next"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-import WorkPermitsOverview from "@/components/work-permit/admin/WorkPermitsOverview"
-import WorkPermitsTable from "@/components/work-permit/admin/WorkPermitsTable"
-import WorkPermitsStats from "@/components/work-permit/admin/WorkPermitsStats"
-import WorkPermitsCharts from "@/components/work-permit/admin/WorkPermitsCharts"
+import WorkPermitsOverview from "@/components/sections/work-permit/admin/WorkPermitsOverview"
+import WorkPermitsTable from "@/components/sections/work-permit/admin/WorkPermitsTable"
+import WorkPermitsStats from "@/components/sections/work-permit/admin/WorkPermitsStats"
+import WorkPermitsCharts from "@/components/sections/work-permit/admin/WorkPermitsCharts"
 
 export const metadata: Metadata = {
 	title: "Administración de Permisos de Trabajo | OTC",

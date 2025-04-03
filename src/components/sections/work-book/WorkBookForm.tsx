@@ -19,10 +19,10 @@ import { getCompanyById } from "@/actions/companies/getCompanies"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Calendar } from "@/components/ui/calendar"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "../ui/card"
 import { Input } from "@/components/ui/input"
 import {
 	Form,

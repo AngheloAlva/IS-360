@@ -4,7 +4,7 @@ export const AreasValues = {
 	INTEGRITY_AND_MAINTENANCE: "INTEGRITY_AND_MAINTENANCE",
 	ENVIRONMENT: "ENVIRONMENT",
 	RISK_PREVENTION: "RISK_PREVENTION",
-	QUALITY_AND_PROFESSIONAL_EXCELLENCE: "QUALITY_AND_PROFESSIONAL_EXCELLENCE",
+	QUALITY_AND_OPERATIONAL_EXCELLENCE: "QUALITY_AND_OPERATIONAL_EXCELLENCE",
 	HSEQ: "HSEQ",
 	LEGAL: "LEGAL",
 	COMMUNITIES: "COMMUNITIES",
@@ -17,7 +17,7 @@ export const AreasValuesArray = [
 	AreasValues.INTEGRITY_AND_MAINTENANCE,
 	AreasValues.ENVIRONMENT,
 	AreasValues.RISK_PREVENTION,
-	AreasValues.QUALITY_AND_PROFESSIONAL_EXCELLENCE,
+	AreasValues.QUALITY_AND_OPERATIONAL_EXCELLENCE,
 	AreasValues.HSEQ,
 	AreasValues.LEGAL,
 	AreasValues.COMMUNITIES,
@@ -61,9 +61,9 @@ export const Areas = {
 		description:
 			"Responsable de minimizar accidentes y riesgos laborales mediante protocolos de seguridad, capacitaciones y cumplimiento de normativas.",
 	},
-	"calidad-y-excelencia-profesional": {
-		title: "Calidad y Excelencia Profesional",
-		value: AreasValues.QUALITY_AND_PROFESSIONAL_EXCELLENCE,
+	"calidad-y-excelencia-operacional": {
+		title: "Calidad y Excelencia Operacional",
+		value: AreasValues.QUALITY_AND_OPERATIONAL_EXCELLENCE,
 		description:
 			"Busca garantizar la mejora continua, estandarización y cumplimiento de altos estándares de calidad en todos los procesos y servicios.",
 	},
@@ -93,7 +93,7 @@ export const AreasLabels = {
 	INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
 	ENVIRONMENT: "Medio Ambiente",
 	RISK_PREVENTION: "Prevención de Riesgos",
-	QUALITY_AND_PROFESSIONAL_EXCELLENCE: "Calidad y Excelencia Profesional",
+	QUALITY_AND_OPERATIONAL_EXCELLENCE: "Calidad y Excelencia Operacional",
 	HSEQ: "HSEQ",
 	LEGAL: "Juridica",
 	COMMUNITIES: "Comunidades",

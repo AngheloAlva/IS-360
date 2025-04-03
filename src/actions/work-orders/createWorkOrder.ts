@@ -11,7 +11,7 @@ interface CreateWorkOrderProps {
 
 export const createWorkOrder = async ({ values }: CreateWorkOrderProps) => {
 	try {
-		const { supervisorId, responsibleId, companyId, breakDays, ...rest } = values
+		const { supervisorId, responsibleId, companyId, breakDays, equipment, ...rest } = values
 		const otNumber = await generateOTNumber()
 
 		await prisma.workOrder.create({
@@ -40,9 +40,7 @@ export const createWorkOrder = async ({ values }: CreateWorkOrderProps) => {
 				requiresBreak: rest.requiresBreak || false,
 				breakDays: breakDays ? +breakDays : 0,
 				equipment: {
-					connect: {
-						id: rest.equipment,
-					},
+					connect: equipment.map((id) => ({ id })),
 				},
 			},
 		})

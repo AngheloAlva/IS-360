@@ -14,7 +14,7 @@ export const generateOTNumber = async () => {
 	const month = (now.getMonth() + 1).toString().padStart(2, "0")
 	const year = now.getFullYear()
 
-	const otNumber = `OT-${counter.value.toString().padStart(4, "0")}-${day}${month}${year}`
+	const otNumber = `OT-${counter.value.toString().padStart(4, "0")}${day}${month}${year}`
 
 	return otNumber
 }

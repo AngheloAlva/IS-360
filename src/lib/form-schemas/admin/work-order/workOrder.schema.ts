@@ -1,4 +1,5 @@
 import { WORK_ORDER_PRIORITY_VALUES_ARRAY } from "@/lib/consts/work-order-priority"
+import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_STATUS_VALUES_ARRAY } from "@/lib/consts/work-order-status"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
 import { z } from "zod"
@@ -13,8 +14,10 @@ export const workOrderSchema = z.object({
 	workRequest: z.string().min(1, { message: "La solicitud no puede estar vacía" }),
 	workDescription: z.string().optional(),
 	priority: z.enum(WORK_ORDER_PRIORITY_VALUES_ARRAY, { message: "La prioridad no es válida" }),
-	// equipment: z.array(z.string(), { message: "El equipo no es válido" }),
-	equipment: z.string().nonempty({ message: "El equipo no puede estar vacío" }),
+	capex: z.enum(WORK_ORDER_CAPEX_VALUES_ARRAY, { message: "El indicador no es válido" }),
+	equipment: z.array(z.string().nonempty({ message: "El equipo no puede estar vacío" })).min(1, {
+		message: "Debe seleccionar al menos un equipo",
+	}),
 	programDate: z.date({ message: "La fecha de programación no es válida" }),
 	estimatedHours: z.string({ message: "La hora estimada no es válida" }).refine(
 		(value) => {

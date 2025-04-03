@@ -11,6 +11,7 @@ import { toast } from "sonner"
 
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { createWorkOrder } from "@/actions/work-orders/createWorkOrder"
+import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { getEquipment } from "@/actions/equipments/getEquipment"
 import { getCompanies } from "@/actions/companies/getCompanies"
@@ -22,6 +23,7 @@ import {
 } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import MultipleSelector from "@/components/ui/multiselect"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
@@ -44,13 +46,18 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-import type { Company, Equipment, User } from "@prisma/client"
+import type { Company, User } from "@prisma/client"
 
 type CompanyWithUsers = Company & { users: User[] }
 
 export default function WorkOrderForm(): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [equipments, setEquipments] = useState<Equipment[]>([])
+	const [equipments, setEquipments] = useState<
+		Array<{
+			value: string
+			label: string
+		}>
+	>([])
 	const [internalUsers, setInternalUsers] = useState<User[]>([])
 	const [companies, setCompanies] = useState<CompanyWithUsers[]>([])
 	const [isCompaniesLoading, setIsCompaniesLoading] = useState<boolean>(false)
@@ -133,7 +140,12 @@ export default function WorkOrderForm(): React.ReactElement {
 				return
 			}
 
-			setEquipments(data)
+			const equipments = data.map((equipment) => ({
+				value: equipment.id,
+				label: equipment.tag + " - " + equipment.name,
+			}))
+
+			setEquipments(equipments)
 			setIsEquipmentsLoading(false)
 		}
 
@@ -195,7 +207,7 @@ export default function WorkOrderForm(): React.ReactElement {
 				className="mx-auto flex w-full max-w-screen-xl flex-col gap-4"
 			>
 				<Card className="w-full">
-					<CardContent className="grid gap-4 md:grid-cols-2">
+					<CardContent className="grid gap-x-4 gap-y-5 md:grid-cols-2">
 						<h2 className="text-xl font-bold md:col-span-2">Información General</h2>
 
 						<FormField
@@ -203,7 +215,7 @@ export default function WorkOrderForm(): React.ReactElement {
 							name="responsibleId"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className="text-gray-700">Responsable OTC</FormLabel>
+									<FormLabel>Responsable OTC</FormLabel>
 
 									{isInternalUsersLoading ? (
 										<Skeleton className="h-9 w-full rounded-md" />
@@ -233,7 +245,7 @@ export default function WorkOrderForm(): React.ReactElement {
 							name="type"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className="text-gray-700">Tipo de Trabajo</FormLabel>
+									<FormLabel>Tipo de Trabajo</FormLabel>
 
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
@@ -258,15 +270,15 @@ export default function WorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="solicitationDate"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Fecha de Solicitud</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Fecha de Solicitud</FormLabel>
 									<Popover>
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
 													variant={"outline"}
 													className={cn(
-														"w-full border-gray-200 bg-white pl-3 text-left font-normal text-gray-700",
+														"w-full border-gray-200 bg-white pl-3 text-left font-normal",
 														!field.value && "text-muted-foreground"
 													)}
 												>
@@ -298,8 +310,8 @@ export default function WorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="solicitationTime"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Hora de Solicitud</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Hora de Solicitud</FormLabel>
 									<Input value={field.value} onChange={field.onChange} />
 									<FormMessage />
 								</FormItem>
@@ -310,8 +322,8 @@ export default function WorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="workRequest"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Trabajo Solicitado</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Trabajo Solicitado</FormLabel>
 									<Input value={field.value} onChange={field.onChange} />
 									<FormMessage />
 								</FormItem>
@@ -322,8 +334,8 @@ export default function WorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="priority"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Prioridad</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Prioridad</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<SelectTrigger>
 											<SelectValue placeholder="Seleccione una prioridad" />
@@ -343,10 +355,86 @@ export default function WorkOrderForm(): React.ReactElement {
 
 						<FormField
 							control={form.control}
+							name="capex"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<FormLabel>CAPEX</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<SelectTrigger>
+											<SelectValue placeholder="Seleccione un indicador" />
+										</SelectTrigger>
+										<SelectContent>
+											{WorkOrderCAPEXOptions.map((option) => (
+												<SelectItem key={option.value} value={option.value}>
+													{option.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="equipment"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Equipo(s)</FormLabel>
+									<FormControl>
+										{isEquipmentsLoading ? (
+											<Skeleton className="h-9 w-full rounded-md" />
+										) : (
+											<MultipleSelector
+												value={equipments.filter((equipment) =>
+													field.value?.includes(equipment.value)
+												)}
+												options={equipments}
+												placeholder="Seleccione uno o más equipos"
+												commandProps={{
+													label: "Equipos",
+												}}
+												hideClearAllButton
+												hidePlaceholderWhenSelected
+												emptyIndicator={
+													<p className="text-center text-sm">No hay más equipos disponibles</p>
+												}
+												onChange={(options) => {
+													field.onChange(options.map((option) => option.value))
+												}}
+											/>
+										)}
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="workDescription"
+							render={({ field }) => (
+								<FormItem className="flex flex-col md:col-span-2">
+									<FormLabel>Descripción del Trabajo</FormLabel>
+									<Textarea value={field.value} onChange={field.onChange} className="min-h-32" />
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardContent className="grid gap-x-4 gap-y-5 md:grid-cols-2">
+						<h2 className="text-xl font-bold md:col-span-2">Empresa Colaboradora</h2>
+
+						<FormField
+							control={form.control}
 							name="companyId"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Empresa Responsable</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Empresa Responsable</FormLabel>
 									{isCompaniesLoading ? (
 										<Skeleton className="h-10 w-full" />
 									) : (
@@ -368,82 +456,40 @@ export default function WorkOrderForm(): React.ReactElement {
 							)}
 						/>
 
-						<div className="grid w-full grid-cols-2 pt-7">
+						<div className="grid w-full grid-cols-2 pt-4.5">
 							{selectedCompany && (
 								<>
 									<div>
-										<p className="text-sm font-medium text-gray-700">Empresa seleccionada</p>
-										<p className="text-sm text-gray-700">{selectedCompany.name}</p>
+										<p className="text-sm font-medium">Empresa seleccionada</p>
+										<p className="text-sm">{selectedCompany.name}</p>
 									</div>
 									<div>
-										<p className="text-sm font-medium text-gray-700">Supervisor</p>
-										<p className="text-sm text-gray-700">{selectedCompany.users[0]?.name}</p>
+										<p className="text-sm font-medium">Supervisor</p>
+										<p className="text-sm">{selectedCompany.users[0]?.name}</p>
 									</div>
 								</>
 							)}
 						</div>
-
-						<FormField
-							control={form.control}
-							name="workDescription"
-							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5 md:col-span-2">
-									<FormLabel className="text-gray-700">Descripción del Trabajo</FormLabel>
-									<Textarea value={field.value} onChange={field.onChange} className="min-h-32" />
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="equipment"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="text-gray-700">Equipo</FormLabel>
-
-									{isEquipmentsLoading ? (
-										<Skeleton className="h-9 w-full rounded-md" />
-									) : (
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
-											<FormControl>
-												<SelectTrigger className="border-gray-200">
-													<SelectValue placeholder="Seleccione el equipo" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent className="text-neutral-700">
-												{equipments.map((equipment) => (
-													<SelectItem key={equipment.id} value={equipment.id}>
-														{equipment.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									)}
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
 					</CardContent>
 				</Card>
 
 				<Card className="w-full">
-					<CardContent className="grid gap-4 md:grid-cols-2">
+					<CardContent className="grid gap-x-4 gap-y-5 md:grid-cols-2">
 						<h2 className="text-xl font-bold md:col-span-2">Fechas y Horas</h2>
 
 						<FormField
 							control={form.control}
 							name="programDate"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Fecha Programada</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Fecha Programada</FormLabel>
 									<Popover>
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
 													variant={"outline"}
 													className={cn(
-														"w-full border-gray-200 bg-white pl-3 text-left font-normal text-gray-700",
+														"w-full border-gray-200 bg-white pl-3 text-left font-normal",
 														!field.value && "text-muted-foreground"
 													)}
 												>
@@ -475,8 +521,8 @@ export default function WorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="estimatedHours"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Horas Estimadas</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Horas Estimadas</FormLabel>
 									<Input value={field.value} onChange={field.onChange} type="number" min="1" />
 									<FormMessage />
 								</FormItem>
@@ -487,31 +533,13 @@ export default function WorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="estimatedDays"
 							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Días Estimados</FormLabel>
+								<FormItem className="flex flex-col">
+									<FormLabel>Días Estimados</FormLabel>
 									<Input value={field.value} onChange={field.onChange} type="number" min="1" />
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-
-						{/* <FormField
-							control={form.control}
-							name="requiresBreak"
-							render={({ field }) => (
-								<FormItem className="flex flex-col pt-2.5">
-									<FormLabel className="text-gray-700">Requiere dias de paro</FormLabel>
-									<FormControl>
-										<Checkbox
-											checked={field.value}
-											onCheckedChange={field.onChange}
-											className="mt-2"
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/> */}
 					</CardContent>
 				</Card>
 

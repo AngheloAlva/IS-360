@@ -1,12 +1,24 @@
-import MainAdminWorkOrders from "@/components/sections/admin-work-orders/Main"
+"use client"
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+import { useSidebar } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 
-export default async function AdminUsersPage(props: {
-	searchParams: SearchParams
-}): Promise<React.ReactElement> {
-	const searchParams = await props.searchParams
-	const page = searchParams.page ? parseInt(searchParams.page as string) : 1
+import { WorkOrderDataTable } from "@/components/sections/work-order/WorkOrderDataTable"
 
-	return <MainAdminWorkOrders page={page} />
+export default function AdminUsersPage(): React.ReactElement {
+	const { state } = useSidebar()
+
+	return (
+		<div
+			className={cn(
+				"flex h-full w-full flex-col gap-8 transition-all md:max-w-[95dvw] lg:max-w-[98dvw]",
+				{
+					"md:max-w-[68dvw] lg:max-w-[72dvw] xl:max-w-[76dvw] 2xl:max-w-[81dvw]":
+						state === "expanded",
+				}
+			)}
+		>
+			<WorkOrderDataTable />
+		</div>
+	)
 }
