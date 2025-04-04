@@ -4,6 +4,7 @@ import Image from "next/image"
 import {
 	Send,
 	User,
+	Siren,
 	Wrench,
 	FileText,
 	LifeBuoy,
@@ -83,6 +84,11 @@ const data = {
 			url: "/admin/dashboard/charlas-de-seguridad",
 			icon: MonitorPlay,
 		},
+		{
+			name: "Patrullaje",
+			url: "/admin/dashboard/patrullaje",
+			icon: Siren,
+		},
 	],
 	navUser: [
 		{
@@ -145,7 +151,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 					</div>
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-semibold">OTC</span>
-						<span className="truncate text-xs">IS ERP</span>
+						<span className="truncate text-xs">IS 360 ERP</span>
 					</div>
 				</SidebarMenuButton>
 			</SidebarHeader>

@@ -552,11 +552,6 @@ model File {
   @@map("file")
 }
 
-enum SAFETY_TALK_TYPE {
-  IRL
-  ENVIRONMENTAL
-}
-
 model Counter {
   id    String @id @default("ot_counter")
   value Int    @default(1)
@@ -569,15 +564,21 @@ enum RESOURCE_TYPE {
 }
 
 model SafetyTalk {
-  id          String               @id @default(cuid())
-  title       String
-  description String?
-  type        SAFETY_TALK_TYPE
-  questions   Question[]
-  resources   SafetyTalkResource[]
-  expiresAt   DateTime
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
+  id                String               @id @default(cuid())
+  slug              String               @unique
+  title             String
+  description       String?
+  type              String
+  isPresential      Boolean              @default(false)
+  questions         Question[]
+  resources         SafetyTalkResource[]
+  expiresAt         DateTime
+  timeLimit         Int?
+  minimumScore      Float                @default(70.0)
+  pdfGenerations    Int                  @default(0)
+  lastPdfGeneration DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
 
   userSafetyTalks UserSafetyTalk[]
 
@@ -602,9 +603,19 @@ model SafetyTalkResource {
   @@map("safety_talk_resource")
 }
 
+enum QUESTION_TYPE {
+  MULTIPLE_CHOICE // Opción múltiple tradicional
+  IMAGE_ZONES // Preguntas con zonas en imágenes
+  TRUE_FALSE // Verdadero/Falso
+  SHORT_ANSWER // Respuesta corta
+}
+
 model Question {
   id           String           @id @default(cuid())
+  type         QUESTION_TYPE    @default(MULTIPLE_CHOICE)
   question     String
+  imageUrl     String?
+  description  String?
   options      QuestionOption[]
   safetyTalk   SafetyTalk       @relation(fields: [safetyTalkId], references: [id])
   safetyTalkId String
@@ -620,6 +631,9 @@ model QuestionOption {
   id         String   @id @default(cuid())
   text       String
   isCorrect  Boolean
+  zoneLabel  String? // Para IMAGE_ZONES, etiqueta de la zona (ej: 'A', 'B', 'C')
+  zoneId     String? // Identificador único de la zona en la imagen
+  order      Int      @default(0) // Orden de la opción
   question   Question @relation(fields: [questionId], references: [id])
   questionId String
   createdAt  DateTime @default(now())

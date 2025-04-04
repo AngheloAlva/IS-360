@@ -1,4 +1,4 @@
-import { SecurityItemsTable } from "@/components/security/SecurityItemsTable"
+import { SecurityItemsTable } from "@/components/sections/safety-talks/SecurityItemsTable"
 
 const items = [
 	{
