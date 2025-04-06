@@ -5,7 +5,7 @@ import { ArrowUpDown, Edit } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 
-import { USER_ROLES_VALUES, UserRoleOptions } from "@/lib/consts/user-roles"
+import { USER_ROLES_VALUES, UserRolesLabels } from "@/lib/consts/user-roles"
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { AreasLabels } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 import type { ApiUser } from "@/types/user"
+import { USER_ROLE } from "@prisma/client"
 
 export const UserColumns: ColumnDef<ApiUser>[] = [
 	{
@@ -50,8 +51,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		accessorKey: "role",
 		header: "Rol",
 		cell: ({ row }) => {
-			const role = row.getValue("role") as string
-			const roleLabel = UserRoleOptions.find((r) => r.value === role)?.label || role
+			const role = row.getValue("role") as USER_ROLE
 			return (
 				<Badge
 					className={cn("border-feature text-feature", {
@@ -59,7 +59,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 					})}
 					variant={role === "PARTNER_COMPANY" ? "outline" : "default"}
 				>
-					{roleLabel}
+					{UserRolesLabels[role]}
 				</Badge>
 			)
 		},

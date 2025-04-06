@@ -6,13 +6,10 @@ export async function GET() {
 		const totalUsers = await prisma.user.count()
 
 		return NextResponse.json({
-			totalUsers
+			totalUsers,
 		})
 	} catch (error) {
-		console.error('Error fetching general summary:', error)
-		return NextResponse.json(
-			{ error: 'Error fetching general summary' },
-			{ status: 500 }
-		)
+		console.error("Error fetching general summary:", error)
+		return NextResponse.json({ error: "Error fetching general summary" }, { status: 500 })
 	}
 }

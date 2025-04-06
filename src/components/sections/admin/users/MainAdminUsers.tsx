@@ -21,7 +21,7 @@ export default function MainAdminUsers(): React.ReactElement {
 			className={cn(
 				"flex h-full w-full flex-col gap-8 transition-all md:max-w-[87dvw] lg:max-w-[98dvw]",
 				{
-					"md:max-w-[62dvw] lg:max-w-[70dvw] xl:max-w-[85dvw] 2xl:max-w-[85dvw]":
+					"md:max-w-[62dvw] lg:max-w-[70dvw] xl:max-w-[77dvw] 2xl:max-w-[83dvw]":
 						state === "expanded",
 				}
 			)}

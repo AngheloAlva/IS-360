@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import Link from "next/link"
 
-import { registerSchema } from "@/lib/form-schemas/register-schema"
+import { registerSchema } from "@/lib/form-schemas/auth/register-schema"
 import { authClient } from "@/lib/auth-client"
 import { formatRut } from "@/utils/formatRut"
 

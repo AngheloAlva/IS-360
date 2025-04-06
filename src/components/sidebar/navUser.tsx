@@ -1,7 +1,15 @@
 "use client"
 
-import { Building, ChevronsUpDown, LogOut } from "lucide-react"
+import {
+	Building,
+	ChevronsUpDown,
+	LogOut,
+	RectangleEllipsis,
+	ShieldMinus,
+	ShieldPlus,
+} from "lucide-react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -10,6 +18,7 @@ import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuLabel,
+	DropdownMenuGroup,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuSeparator,
@@ -77,22 +86,33 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 								</div>
 							</div>
 						</DropdownMenuLabel>
+
 						<DropdownMenuSeparator />
-						{/* <DropdownMenuGroup>
-							<DropdownMenuItem>
-								<BadgeCheck />
-								Account
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<CreditCard />
-								Billing
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Bell />
-								Notifications
-							</DropdownMenuItem>
+
+						<DropdownMenuGroup>
+							{!session.user.twoFactorEnabled ? (
+								<Link href="/dashboard/activate-2fa">
+									<DropdownMenuItem>
+										<ShieldPlus />
+										Activar 2FA
+									</DropdownMenuItem>
+								</Link>
+							) : (
+								<DropdownMenuItem disabled>
+									<ShieldMinus />
+									Desactivar 2FA
+								</DropdownMenuItem>
+							)}
+							<Link href="/dashboard/cambiar-contrasena">
+								<DropdownMenuItem>
+									<RectangleEllipsis />
+									Cambiar Contraseña
+								</DropdownMenuItem>
+							</Link>
 						</DropdownMenuGroup>
-						<DropdownMenuSeparator /> */}
+
+						<DropdownMenuSeparator />
+
 						<DropdownMenuItem onClick={() => handleLogOut()}>
 							<LogOut />
 							Log out

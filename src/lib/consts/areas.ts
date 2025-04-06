@@ -87,6 +87,11 @@ export const Areas = {
 	},
 } as const
 
+export const AreaOptions = Object.values(Areas).map((area) => ({
+	label: area.title,
+	value: area.value,
+}))
+
 export const AreasLabels = {
 	OPERATIONS: "Operaciones",
 	INSTRUCTIONS: "Instructivos",
@@ -116,7 +121,7 @@ export const areaColors: Record<string, { className: string }> = {
 	"prevencion-riesgos": {
 		className: "text-[#FF5722] border-[#FF5722]",
 	},
-	"calidad-y-excelencia-profesional": {
+	"calidad-y-excelencia-operacional": {
 		className: "text-[#2196F3] border-[#2196F3]",
 	},
 	"hseq": {

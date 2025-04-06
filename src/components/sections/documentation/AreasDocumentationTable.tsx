@@ -46,7 +46,7 @@ export default function AreasDocumentationTable(): React.ReactElement {
 								"relative rounded-xl border bg-white p-6 shadow-sm transition-all duration-300 hover:z-10 hover:scale-[1.02] hover:border-current hover:shadow-md",
 								areaColors[key]?.className,
 								{
-									"bg-[#26A69A] hover:shadow-[#26A69A]/50": key === "proyectos",
+									"border-[#26A69A] bg-[#26A69A] hover:shadow-[#26A69A]/50": key === "proyectos",
 								}
 							)}
 						>

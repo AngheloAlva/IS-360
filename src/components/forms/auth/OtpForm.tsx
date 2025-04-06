@@ -1,16 +1,15 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { loginSchema } from "@/lib/form-schemas/auth/login-schema"
+import { otpSchema, type OtpSchema } from "@/lib/form-schemas/auth/otp.schema"
 import { authClient } from "@/lib/auth-client"
 
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
 	Form,
 	FormItem,
@@ -18,46 +17,39 @@ import {
 	FormField,
 	FormControl,
 	FormMessage,
+	FormDescription,
 } from "@/components/ui/form"
+import { useRouter } from "next/navigation"
 
-import type { z } from "zod"
-
-export default function LoginForm(): React.ReactElement {
+export default function OtpForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
-
 	const router = useRouter()
 
-	const form = useForm<z.infer<typeof loginSchema>>({
-		resolver: zodResolver(loginSchema),
+	const form = useForm<OtpSchema>({
+		resolver: zodResolver(otpSchema),
 		defaultValues: {
-			email: "",
-			password: "",
+			otpCode: "",
 		},
 	})
 
-	async function onSubmit(values: z.infer<typeof loginSchema>) {
-		await authClient.signIn.email(
+	const onSubmit = async (data: OtpSchema) => {
+		await authClient.twoFactor.verifyOtp(
 			{
-				email: values.email,
-				password: values.password,
+				code: data.otpCode,
 			},
 			{
 				onRequest: () => {
 					setLoading(true)
 				},
-				onSuccess: async (ctx) => {
-					if (ctx.data.twoFactorRedirect) {
-						router.push("/auth/2fa")
-					} else {
-						router.push("/dashboard/documentacion")
-					}
+				onSuccess: (ctx) => {
+					console.log(ctx)
+					toast("Se ha verificado el codigo de verificacion correctamente.")
+					router.push("/dashboard/documentacion")
 				},
 				onError: (ctx) => {
 					setLoading(false)
-					toast("Error", {
-						description: ctx.error.message,
-						duration: 4000,
-					})
+					console.log(ctx)
+					toast.error("Ha ocurrido un error al verificar el codigo de verificacion.")
 				},
 			}
 		)
@@ -68,32 +60,25 @@ export default function LoginForm(): React.ReactElement {
 			<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-3">
 				<FormField
 					control={form.control}
-					name="email"
+					name="otpCode"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Email</FormLabel>
+							<FormLabel className="text-lg">Codigo de verificacion</FormLabel>
 							<FormControl>
-								<Input className="w-full rounded-md text-sm" placeholder="Email" {...field} />
+								<InputOTP maxLength={6} {...field}>
+									<InputOTPGroup>
+										<InputOTPSlot index={0} />
+										<InputOTPSlot index={1} />
+										<InputOTPSlot index={2} />
+										<InputOTPSlot index={3} />
+										<InputOTPSlot index={4} />
+										<InputOTPSlot index={5} />
+									</InputOTPGroup>
+								</InputOTP>
 							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="password"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Contaseña</FormLabel>
-							<FormControl>
-								<Input
-									type="password"
-									className="w-full rounded-md text-sm"
-									placeholder="Contraseña"
-									{...field}
-								/>
-							</FormControl>
+							<FormDescription>
+								Por favor, ingresa el codigo de verificacion enviado a tu correo.
+							</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}

@@ -1,0 +1,42 @@
+"use server"
+
+import { Resend } from "resend"
+
+import { OTPCodeEmailTemplate } from "@/components/emails/OTPCodeEmailTemplate"
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+interface SendOtpEmailProps {
+	email: string
+	otp: string
+}
+
+export const sendOtpEmail = async ({ email, otp }: SendOtpEmailProps) => {
+	try {
+		const { data, error } = await resend.emails.send({
+			from: "anghelo.alva@ingenieriasimple.cl",
+			to: [email],
+			subject: `Código de verificación para OTC 360`,
+			react: await OTPCodeEmailTemplate({
+				otp,
+			}),
+		})
+
+		if (error) {
+			return {
+				ok: false,
+				error,
+			}
+		}
+
+		return {
+			ok: true,
+			data,
+		}
+	} catch (error) {
+		return {
+			ok: false,
+			error,
+		}
+	}
+}

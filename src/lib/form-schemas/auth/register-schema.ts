@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { rutRegex } from "./rutRegex"
+import { rutRegex } from "../rutRegex"
 
 export const registerSchema = z.object({
 	name: z.string().min(2, { message: "El nombre de la empresa debe tener al menos 2 caracteres" }),

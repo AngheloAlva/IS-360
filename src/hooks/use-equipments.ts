@@ -30,7 +30,12 @@ interface UseEquipmentsParams {
 	parentId?: string | null
 }
 
-export const useEquipments = ({ page = 1, limit = 10, search = "", parentId = null }: UseEquipmentsParams) => {
+export const useEquipments = ({
+	page = 1,
+	limit = 10,
+	search = "",
+	parentId = null,
+}: UseEquipmentsParams) => {
 	return useQuery<EquipmentsResponse>({
 		queryKey: ["equipments", { page, limit, search, parentId }],
 		queryFn: async () => {

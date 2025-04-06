@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 					expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
 					contentType: "application/octet-stream",
 					cacheControl: "no-cache",
-					contentDisposition: "attachment"
+					contentDisposition: "attachment",
 				})
 
 				console.log(`URL SAS generada exitosamente para: ${filename}`)

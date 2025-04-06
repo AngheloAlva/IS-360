@@ -7,8 +7,10 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
+import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { UserRoleOptions } from "@/lib/consts/user-roles"
+import { AreaOptions } from "@/lib/consts/areas"
 import { authClient } from "@/lib/auth-client"
 import { formatRut } from "@/utils/formatRut"
 import {
@@ -16,6 +18,7 @@ import {
 	type InternalUserSchema,
 } from "@/lib/form-schemas/admin/user/internalUser.schema"
 
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -33,7 +36,6 @@ import {
 	SelectTrigger,
 	SelectContent,
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
 
 export default function InternalUserForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -53,23 +55,22 @@ export default function InternalUserForm(): React.ReactElement {
 	async function onSubmit(values: InternalUserSchema) {
 		setLoading(true)
 
-		try {
-			const temporalPassword = generateTemporalPassword()
+		const temporalPassword = generateTemporalPassword()
 
-			const { data: newUser, error } = await authClient.admin.createUser({
-				email: values.email,
-				password: temporalPassword,
+		try {
+			const { data, error } = await authClient.admin.createUser({
 				name: values.name,
 				role: values.role,
+				email: values.email,
+				password: temporalPassword,
 				data: {
 					rut: values.rut,
 					area: values.area,
-					role: values.role,
 					internalRole: values.internalRole,
 				},
 			})
 
-			if (error) {
+			if (!data || error) {
 				toast("Error al crear el usuario", {
 					description:
 						"Por favor, verifique que los datos ingresados sean correctos y que el email o RUT no estén duplicados",
@@ -78,13 +79,28 @@ export default function InternalUserForm(): React.ReactElement {
 				return
 			}
 
-			if (newUser) {
+			await authClient.admin.setRole({
+				userId: data.user.id,
+				role: values.role,
+			})
+			sendNewUserEmail({
+				name: values.name,
+				email: values.email,
+				password: temporalPassword,
+			})
+
+			if (data) {
 				toast("Usuario creado exitosamente", {
 					description: "El usuario ha sido creado exitosamente",
 					duration: 3000,
 				})
 
 				router.push("/admin/dashboard/usuarios")
+			} else {
+				toast("Error al crear el usuario", {
+					description: "Ocurrió un error al intentar crear el usuario",
+					duration: 5000,
+				})
 			}
 		} catch (error) {
 			console.log(error)
@@ -224,19 +240,11 @@ export default function InternalUserForm(): React.ReactElement {
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent className="text-neutral-700">
-													<SelectItem value="OPERATIONS">Operaciones</SelectItem>
-													<SelectItem value="INSTRUCTIONS">Instructivos</SelectItem>
-													<SelectItem value="INTEGRITY_AND_MAINTENANCE">
-														Integridad y Mantención
-													</SelectItem>
-													<SelectItem value="ENVIRONMENT">Medio Ambiente</SelectItem>
-													<SelectItem value="RISK_PREVENTION">Prevención de Riesgos</SelectItem>
-													<SelectItem value="QUALITY_AND_PROFESSIONAL_EXCELLENCE">
-														Calidad y Excelencia Profesional
-													</SelectItem>
-													<SelectItem value="HSEQ">HSEQ</SelectItem>
-													<SelectItem value="LEGAL">Jurídica</SelectItem>
-													<SelectItem value="COMMUNITIES">Comunidades</SelectItem>
+													{AreaOptions.map((area) => (
+														<SelectItem key={area.value} value={area.value}>
+															{area.label}
+														</SelectItem>
+													))}
 												</SelectContent>
 											</Select>
 											<FormMessage />

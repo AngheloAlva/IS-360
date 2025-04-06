@@ -14,25 +14,25 @@ export const USER_ROLES_VALUES_ARRAY = [
 	USER_ROLES_VALUES.PARTNER_COMPANY,
 ] as const
 
+export const UserRolesLabels = {
+	SUPERADMIN: "Super Administrador",
+	ADMIN: "Administrador",
+	USER: "Usuario OTC",
+	OPERATOR: "Operador",
+	PARTNER_COMPANY: "Empresa Colaboradora",
+} as const
+
 export const UserRoleOptions = [
 	{
 		value: USER_ROLES_VALUES.SUPERADMIN,
-		label: "Super Administrador",
+		label: UserRolesLabels.SUPERADMIN,
 	},
 	{
 		value: USER_ROLES_VALUES.ADMIN,
-		label: "Administrador",
+		label: UserRolesLabels.ADMIN,
 	},
 	{
 		value: USER_ROLES_VALUES.USER,
-		label: "Usuario OTC",
-	},
-	{
-		value: USER_ROLES_VALUES.OPERATOR,
-		label: "Operador",
-	},
-	{
-		value: USER_ROLES_VALUES.PARTNER_COMPANY,
-		label: "Empresa Colaboradora",
+		label: UserRolesLabels.USER,
 	},
 ]

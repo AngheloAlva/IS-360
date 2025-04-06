@@ -40,21 +40,22 @@ enum AREAS {
 }
 
 model User {
-  id            String            @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  phone         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  role          USER_ROLE         @default(PARTNER_COMPANY)
-  internalRole  OTC_INTERNAL_ROLE @default(NONE)
-  area          AREAS?
-  banned        Boolean?
-  banReason     String?
-  banExpires    DateTime?
-  rut           String
+  id               String            @id
+  name             String
+  email            String
+  emailVerified    Boolean
+  image            String?
+  phone            String?
+  createdAt        DateTime
+  updatedAt        DateTime
+  role             USER_ROLE         @default(PARTNER_COMPANY)
+  internalRole     OTC_INTERNAL_ROLE @default(NONE)
+  area             AREAS?
+  banned           Boolean?
+  banReason        String?
+  banExpires       DateTime?
+  rut              String
+  twoFactorEnabled Boolean?
 
   sessions                       Session[]
   accounts                       Account[]
@@ -78,10 +79,24 @@ model User {
   workPermits                    WorkPermit[]        @relation("WorkPermitUser")
   attachmentsHistory             AttachmentHistory[]
   equipmentHistory               EquipmentHistory[]
+  twofactors                     TwoFactor[]
 
   @@unique([email])
   @@unique([rut])
   @@map("user")
+}
+
+model TwoFactor {
+  id          String
+  secret      String?
+  backupCodes String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([id])
+  @@unique([userId])
+  @@map("twoFactor")
 }
 
 model Session {
@@ -379,8 +394,9 @@ model WorkEntry {
 
   attachments Attachment[]
 
+  // For efficient chronological listing
   @@unique([id])
-  @@index([workOrderId, createdAt]) // For efficient chronological listing
+  @@index([workOrderId, createdAt])
   @@map("work_book_entry")
 }
 
