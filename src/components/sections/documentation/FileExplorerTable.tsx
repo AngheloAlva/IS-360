@@ -142,7 +142,9 @@ export function FileExplorerTable({
 									</div>
 								</TableCell>
 								<TableCell></TableCell>
-								<TableCell>{item.description}</TableCell>
+								<TableCell className="max-w-52 overflow-hidden whitespace-normal">
+									{item.description}
+								</TableCell>
 								<TableCell></TableCell>
 								<TableCell></TableCell>
 								<TableCell>{item.user?.name}</TableCell>
@@ -153,22 +155,20 @@ export function FileExplorerTable({
 									})}
 								</TableCell>
 
-								{isAdmin && (
-									<TableCell className="space-x-1">
-										<Link
-											href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
+								<TableCell className="space-x-1">
+									<Link
+										href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
+									>
+										<Button
+											size="icon"
+											variant="outline"
+											className="text-primary hover:bg-primary bg-white hover:text-white"
 										>
-											<Button
-												size="icon"
-												variant="outline"
-												className="text-primary hover:bg-primary bg-white hover:text-white"
-											>
-												<Edit className="h-4 w-4" />
-											</Button>
-										</Link>
-										<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
-									</TableCell>
-								)}
+											<Edit className="h-4 w-4" />
+										</Button>
+									</Link>
+									<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
+								</TableCell>
 							</TableRow>
 						))}
 
@@ -202,23 +202,21 @@ export function FileExplorerTable({
 								<TableCell>{item.user?.name}</TableCell>
 								<TableCell>{item.revisionCount}</TableCell>
 
-								{isAdmin && (
-									<TableCell className="space-x-1">
-										<Link
-											href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
+								<TableCell className="space-x-1">
+									<Link
+										href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
+									>
+										<Button
+											size="icon"
+											variant="outline"
+											className="text-primary hover:bg-primary bg-white hover:text-white"
 										>
-											<Button
-												size="sm"
-												variant="outline"
-												className="text-primary hover:bg-primary bg-white hover:text-white"
-											>
-												<Edit className="h-4 w-4" />
-											</Button>
-										</Link>
+											<Edit className="h-4 w-4" />
+										</Button>
+									</Link>
 
-										<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
-									</TableCell>
-								)}
+									<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
+								</TableCell>
 							</TableRow>
 						))}
 

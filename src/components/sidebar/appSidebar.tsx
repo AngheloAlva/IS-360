@@ -19,7 +19,7 @@ import {
 
 import { useAuthorization } from "@/hooks/useAuthorization"
 
-import { NavSecondary } from "./navSecondary"
+// import { NavSecondary } from "./navSecondary"
 import { NavInternal } from "./navInternal"
 import { NavMain } from "./navMain"
 import { NavUser } from "./navUser"
@@ -160,7 +160,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 				<NavMain navItems={navItems} />
 				{canAccessAdminRoutes && <NavInternal navItems={navInternal} />}
 
-				<NavSecondary items={data.navSecondary} className="mt-auto" />
+				{/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
 			</SidebarContent>
 
 			<SidebarFooter>

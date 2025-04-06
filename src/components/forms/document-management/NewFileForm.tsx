@@ -52,6 +52,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 	const [selectedFile, setSelectedFile] = useState<File | null>(null)
 	const [filePreview, setFilePreview] = useState<string | null>(null)
 	const [uploading, setUploading] = useState(false)
+
 	const router = useRouter()
 
 	const form = useForm<FileFormSchema>({
@@ -108,8 +109,6 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 				.substring(2, 9)}-${userId.slice(0, 4)}.${fileExtension}`
 
 			// Obtener URL de subida para el contenedor de documentación
-			console.log("Obteniendo URL de subida...")
-			console.log(uniqueFilename)
 			const response = await fetch("/api/file", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -273,17 +272,18 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 							</div>
 
 							<div className="space-y-4">
-								<FormLabel>Vista previa</FormLabel>
+								<FormLabel>Previsualización</FormLabel>
 								<div className="h-full rounded-lg border-2 border-dashed border-gray-200 p-4">
 									{selectedFile ? (
 										<div className="flex h-full flex-col items-center justify-center">
 											{filePreview ? (
 												<>
-													{/* <Image
+													{/* eslint-disable-next-line @next/next/no-img-element */}
+													<img
 														src={filePreview}
 														alt="Previsualización"
 														className="mb-4 max-h-40 object-contain"
-													/> */}
+													/>
 													<p className="max-w-full truncate text-sm font-medium">
 														{selectedFile.name}
 													</p>
@@ -301,17 +301,18 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 													</p>
 												</>
 											)}
-											<button
+											<Button
 												type="button"
+												variant={"ghost"}
 												onClick={() => {
 													setSelectedFile(null)
 													setFilePreview(null)
 												}}
-												className="mt-4 flex items-center gap-1 text-red-600 hover:text-red-700"
+												className="mt-4 flex items-center gap-1 text-red-600 hover:bg-red-100 hover:text-red-700"
 											>
 												<X className="h-4 w-4" />
 												<span className="text-sm">Eliminar</span>
-											</button>
+											</Button>
 										</div>
 									) : (
 										<div className="flex h-full items-center justify-center text-gray-400">

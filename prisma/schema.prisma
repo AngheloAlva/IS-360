@@ -79,6 +79,7 @@ model User {
   workPermits                    WorkPermit[]        @relation("WorkPermitUser")
   attachmentsHistory             AttachmentHistory[]
   equipmentHistory               EquipmentHistory[]
+  fileHistory                    FileHistory[]
   twofactors                     TwoFactor[]
 
   @@unique([email])
@@ -560,9 +561,10 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  history  FileHistory[]
+  folder   Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId String?
-  user     User    @relation(fields: [userId], references: [id])
+  user     User          @relation(fields: [userId], references: [id])
   userId   String
 
   @@map("file")
@@ -703,6 +705,20 @@ model AttachmentHistory {
   reason       String?
 
   @@map("attachment_history")
+}
+
+model FileHistory {
+  id           String   @id @default(cuid())
+  file         File     @relation(fields: [fileId], references: [id])
+  fileId       String
+  previousUrl  String
+  previousName String
+  modifiedBy   User     @relation(fields: [userId], references: [id])
+  userId       String
+  modifiedAt   DateTime @default(now())
+  reason       String?
+
+  @@map("file_history")
 }
 
 model EquipmentHistory {

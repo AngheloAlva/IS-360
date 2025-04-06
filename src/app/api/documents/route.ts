@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 			prisma.file.findMany({
 				where: {
 					folder: folderSlug ? { slug: folderSlug } : null,
+					isActive: true,
 				},
 				include: {
 					user: {
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
 				},
 			}),
 			prisma.folder.findMany({
-				where: { area, parent: folderSlug ? { slug: folderSlug } : null },
+				where: { area, parent: folderSlug ? { slug: folderSlug } : null, isActive: true },
 				include: {
 					user: {
 						select: {

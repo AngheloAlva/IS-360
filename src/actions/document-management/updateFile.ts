@@ -9,6 +9,8 @@ interface UpdateFileParams extends FileFormSchema {
 	url: string
 	size: number
 	type: string
+	previousUrl: string
+	previousName: string
 }
 
 export const updateFile = async ({
@@ -17,7 +19,10 @@ export const updateFile = async ({
 	type,
 	name,
 	fileId,
+	userId,
 	description,
+	previousUrl,
+	previousName,
 	expirationDate,
 	registrationDate,
 }: UpdateFileParams) => {
@@ -42,6 +47,28 @@ export const updateFile = async ({
 				expirationDate,
 				registrationDate,
 				revisionCount: { increment: 1 },
+				user: {
+					connect: {
+						id: userId,
+					},
+				},
+			},
+		})
+
+		await prisma.fileHistory.create({
+			data: {
+				file: {
+					connect: {
+						id: fileId,
+					},
+				},
+				modifiedBy: {
+					connect: {
+						id: userId,
+					},
+				},
+				previousUrl,
+				previousName,
 			},
 		})
 

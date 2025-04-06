@@ -105,7 +105,7 @@ export default function DeleteConfirmationDialog({
 						) : (
 							preview && (
 								<>
-									<p>Se marcarán como eliminados los siguientes elementos:</p>
+									<span>Se marcarán como eliminados los siguientes elementos:</span>
 									{preview.folders.length > 0 && (
 										<div>
 											<span className="font-medium">Carpetas ({preview.folders.length}):</span>
