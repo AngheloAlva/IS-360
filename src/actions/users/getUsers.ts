@@ -98,3 +98,45 @@ export const getInternalUsers = async (limit: number, page: number) => {
 		}
 	}
 }
+
+export const getUsersByWorkOrderId = async (workOrderId: string) => {
+	try {
+		const company = await prisma.company.findFirst({
+			where: {
+				workOrders: {
+					some: {
+						id: workOrderId,
+					},
+				},
+			},
+			select: {
+				id: true,
+			},
+		})
+
+		if (!company) {
+			return {
+				ok: false,
+				message: "No se encontró la empresa",
+			}
+		}
+
+		const users = await prisma.user.findMany({
+			where: {
+				companyId: company.id,
+			},
+		})
+
+		return {
+			ok: true,
+			data: users,
+		}
+	} catch (error) {
+		console.log(error)
+
+		return {
+			ok: false,
+			message: "Error al cargar los usuarios",
+		}
+	}
+}

@@ -1,12 +1,12 @@
 "use client"
 
+import { CalendarIcon, UploadCloud, X } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { CalendarIcon, UploadIcon } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -36,19 +36,11 @@ export default function OtcInspectorForm({
 	userId: string
 	workOrderId: string
 }): React.ReactElement {
+	const [selectedFile, setSelectedFile] = useState<File | null>(null)
+	const [filePreview, setFilePreview] = useState<string | null>(null)
 	const [loading, setLoading] = useState(false)
-	const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null)
 
 	const router = useRouter()
-
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const files = e.target.files
-
-		if (files?.length) {
-			setSelectedFiles(files)
-			// form.setValue("attachments", files)
-		}
-	}
 
 	const form = useForm<z.infer<typeof otcInspectionsSchema>>({
 		resolver: zodResolver(otcInspectionsSchema),
@@ -62,39 +54,105 @@ export default function OtcInspectorForm({
 			executionDate: new Date(),
 		},
 	})
+	const handleFileChange = (file: File | null) => {
+		if (!file) return
 
-	useEffect(() => {
-		console.log(form.formState)
-		console.log(form.formState.errors)
-	}, [form.formState])
+		// Validación de tamaño (10MB)
+		if (file.size > 10_000_000) {
+			toast.error("Archivo demasiado grande", {
+				description: "El tamaño máximo permitido es 10MB",
+			})
+			return
+		}
+
+		// Validación de tipo
+		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt|jpe?g|png|webp|avif)$/i
+		if (!validTypes.test(file.name)) {
+			toast.error("Formato no soportado")
+			return
+		}
+
+		setSelectedFile(file)
+
+		// Generar preview para imágenes
+		if (file.type.startsWith("image/")) {
+			const reader = new FileReader()
+			reader.onload = (e) => setFilePreview(e.target?.result as string)
+			reader.readAsDataURL(file)
+		} else {
+			setFilePreview(null)
+		}
+	}
 
 	async function onSubmit(values: z.infer<typeof otcInspectionsSchema>) {
+		setLoading(true)
+
 		try {
-			setLoading(true)
+			if (selectedFile) {
+				const fileExtension = selectedFile.name.split(".").pop()
+				const uniqueFilename = `${Date.now()}-${Math.random()
+					.toString(36)
+					.substring(2, 9)}-${workOrderId.slice(0, 4)}.${fileExtension}`
 
-			const { ok, message } = await createOtcInspections({
-				values,
-				userId,
-			})
-
-			if (ok) {
-				toast("Actividad del Inspector creado", {
-					description: message,
-					duration: 5000,
+				const response = await fetch("/api/file", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						filenames: [uniqueFilename],
+						containerType: "files",
+					}),
 				})
 
-				router.push(`/dashboard/libro-de-obras/${workOrderId}`)
+				if (!response.ok) throw new Error("Error al obtener URL de subida")
+
+				const data = await response.json()
+				if (!data.urls?.[0]) throw new Error("Respuesta inválida del servidor")
+
+				const uploadResponse = await fetch(data.urls[0], {
+					method: "PUT",
+					body: selectedFile,
+					headers: {
+						"Content-Type": selectedFile.type,
+						"x-ms-blob-type": "BlockBlob",
+						"x-ms-version": "2020-04-08",
+						"Access-Control-Allow-Origin": "*",
+						"Access-Control-Allow-Methods": "PUT",
+						"Access-Control-Allow-Headers": "*",
+					},
+					mode: "cors",
+					credentials: "omit",
+				})
+
+				if (!uploadResponse.ok) throw new Error("Error al subir el archivo")
+
+				const blobUrl = data.urls[0].split("?")[0]
+
+				const { ok, message } = await createOtcInspections({
+					values,
+					userId,
+					attachment: {
+						fileUrl: blobUrl,
+						fileType: selectedFile.type,
+						name: "Inspeccion-" + selectedFile.name,
+					},
+				})
+
+				if (!ok) throw new Error(message)
 			} else {
-				toast("Error al crear la actividad del Inspector", {
-					description: message,
-					duration: 5000,
+				const { ok, message } = await createOtcInspections({
+					values,
+					userId,
 				})
+
+				if (!ok) throw new Error(message)
 			}
+
+			toast.success("Inspección creada correctamente")
+			router.push(`/admin/dashboard/libros-de-obras/${workOrderId}`)
 		} catch (error) {
 			console.error(error)
-			toast("Error al crear la actividad del Inspector", {
-				description: "Ocurrió un error al intentar crear la actividad del Inspector",
-				duration: 5000,
+			toast.error("Error al crear inspección", {
+				description: error instanceof Error ? error.message : "Intente nuevamente",
 			})
 		} finally {
 			setLoading(false)
@@ -105,10 +163,10 @@ export default function OtcInspectorForm({
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
-				className="mx-auto flex w-full max-w-screen-xl flex-col gap-4"
+				className="mx-auto flex w-full max-w-screen-xl flex-col gap-5"
 			>
 				<Card>
-					<CardContent className="grid gap-4 md:grid-cols-2">
+					<CardContent className="grid gap-5 pb-10 md:grid-cols-2">
 						<FormField
 							control={form.control}
 							name="executionDate"
@@ -149,41 +207,43 @@ export default function OtcInspectorForm({
 							)}
 						/>
 
-						<FormField
-							control={form.control}
-							name="activityStartTime"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="text-gray-700">Hora de Inicio</FormLabel>
-									<FormControl>
-										<Input
-											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-											placeholder="Hora de Inicio"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+						<div className="grid gap-3 md:grid-cols-2">
+							<FormField
+								control={form.control}
+								name="activityStartTime"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-gray-700">Hora de Inicio</FormLabel>
+										<FormControl>
+											<Input
+												className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+												placeholder="Hora de Inicio"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 
-						<FormField
-							control={form.control}
-							name="activityEndTime"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="text-gray-700">Hora de Fin</FormLabel>
-									<FormControl>
-										<Input
-											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-											placeholder="Hora de Fin"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+							<FormField
+								control={form.control}
+								name="activityEndTime"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-gray-700">Hora de Fin</FormLabel>
+										<FormControl>
+											<Input
+												className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+												placeholder="Hora de Fin"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
 
 						<FormField
 							control={form.control}
@@ -192,8 +252,8 @@ export default function OtcInspectorForm({
 								<FormItem>
 									<FormLabel className="text-gray-700">No Conformidades</FormLabel>
 									<FormControl>
-										<Input
-											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+										<Textarea
+											className="min-h-32 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
 											placeholder="No Conformidades"
 											{...field}
 										/>
@@ -239,37 +299,91 @@ export default function OtcInspectorForm({
 							)}
 						/>
 
-						<FormLabel className="mt-4 md:col-span-2">Adjuntos</FormLabel>
-						<div className="flex gap-2 md:col-span-2">
-							<FormItem className="w-1/2">
-								<FormControl>
-									<div className="group relative h-96">
-										<Input
-											multiple
-											type="file"
-											onChange={handleFileChange}
-											accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-											className="absolute inset-0 z-10 h-full w-full cursor-pointer rounded-md text-sm opacity-0"
-										/>
-										<div className="group-hover:border-feature group-hover:bg-feature/5 flex h-full flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-white transition-colors">
-											<UploadIcon className="group-hover:text-feature h-10 w-10 text-gray-400" />
-											<p className="group-hover:text-feature mt-4 text-sm text-gray-500">
-												Haz clic para seleccionar archivos
+						<div className="grid gap-4 md:col-span-2 md:grid-cols-2">
+							<div className="space-y-4">
+								<FormLabel>Subir documento</FormLabel>
+								<div
+									className={cn(
+										"group relative h-full cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
+										!selectedFile
+											? "border-blue-200 bg-blue-50 hover:border-blue-300"
+											: "border-green-200 bg-green-50"
+									)}
+									onDrop={(e) => {
+										e.preventDefault()
+										handleFileChange(e.dataTransfer.files?.[0] ?? null)
+									}}
+									onDragOver={(e) => e.preventDefault()}
+								>
+									<Input
+										type="file"
+										className="absolute inset-0 h-full w-full opacity-0"
+										onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+										accept=".pdf, image/*, .doc, .docx, .xls, .xlsx"
+									/>
+									<div className="flex flex-col items-center gap-4">
+										<UploadCloud className="h-12 w-12 text-gray-400" />
+										<div>
+											<p className="font-medium text-gray-700">
+												{selectedFile ? "¡Archivo listo!" : "Arrastra tu archivo aquí"}
 											</p>
-											<p className="group-hover:text-feature mt-1 text-xs text-gray-400">
-												Imágenes, PDF, DOC, XLS, TXT
+											<p className="mt-2 text-sm text-gray-500">
+												Formatos soportados: PDF, DOC, XLS, JPG, PNG
 											</p>
 										</div>
 									</div>
-								</FormControl>
-							</FormItem>
+								</div>
+							</div>
 
-							<div className="border-input flex h-96 w-1/2 items-center justify-center rounded-md border bg-gray-50">
-								{selectedFiles && (
-									<p className="mt-2 text-sm text-gray-500">
-										{selectedFiles.length} archivo{selectedFiles.length > 1 && "s"} seleccionado
-									</p>
-								)}
+							<div className="space-y-4">
+								<FormLabel>Previsualización</FormLabel>
+								<div className="h-full rounded-lg border-2 border-dashed border-gray-200 p-4">
+									{selectedFile ? (
+										<div className="flex h-full flex-col items-center justify-center">
+											{filePreview ? (
+												<>
+													{/* eslint-disable-next-line @next/next/no-img-element */}
+													<img
+														src={filePreview}
+														alt="Previsualización"
+														className="mb-4 max-h-40 object-contain"
+													/>
+													<p className="max-w-full truncate text-sm font-medium">
+														{selectedFile.name}
+													</p>
+												</>
+											) : (
+												<>
+													<div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+														<span className="text-3xl">📄</span>
+													</div>
+													<p className="max-w-full truncate text-sm font-medium">
+														{selectedFile.name}
+													</p>
+													<p className="mt-1 text-xs text-gray-500">
+														{(selectedFile.size / 1024).toFixed(2)} KB
+													</p>
+												</>
+											)}
+											<Button
+												type="button"
+												variant={"ghost"}
+												onClick={() => {
+													setSelectedFile(null)
+													setFilePreview(null)
+												}}
+												className="mt-4 flex items-center gap-1 text-red-600 hover:bg-red-100 hover:text-red-700"
+											>
+												<X className="h-4 w-4" />
+												<span className="text-sm">Eliminar</span>
+											</Button>
+										</div>
+									) : (
+										<div className="flex h-full items-center justify-center text-gray-400">
+											<p>Previsualización del documento</p>
+										</div>
+									)}
+								</div>
 							</div>
 						</div>
 					</CardContent>

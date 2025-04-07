@@ -34,7 +34,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 					</Link>
 
 					<h1 className="flex flex-col text-2xl font-bold">
-						{data.workName}
+						{data.workName || "Libro de Obras no creado"}
 						<span className="text-feature text-base font-medium">{data.otNumber}</span>
 					</h1>
 				</div>

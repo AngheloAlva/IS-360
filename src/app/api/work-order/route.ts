@@ -61,11 +61,16 @@ export async function GET(req: NextRequest) {
 					solicitationDate: true,
 					type: true,
 					status: true,
+					capex: true,
 					solicitationTime: true,
 					workRequest: true,
 					workDescription: true,
 					priority: true,
-					initReport: true,
+					initReport: {
+						select: {
+							url: true,
+						},
+					},
 					endReport: true,
 					programDate: true,
 					estimatedHours: true,

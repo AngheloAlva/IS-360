@@ -2,13 +2,28 @@
 
 import prisma from "@/lib/prisma"
 
-export const getCompanies = async (limit: number, page: number) => {
+export const getCompanies = async (
+	limit: number,
+	page: number,
+	haveSupervisor: boolean = false
+) => {
 	try {
 		const companies = await prisma.company.findMany({
 			take: limit,
 			skip: (page - 1) * limit,
 			orderBy: {
 				createdAt: "desc",
+			},
+			where: {
+				...(haveSupervisor
+					? {
+							users: {
+								some: {
+									isSupervisor: true,
+								},
+							},
+						}
+					: {}),
 			},
 			include: {
 				users: {

@@ -31,6 +31,17 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 	{
 		accessorKey: "activityName",
 		header: "Título",
+		cell: ({ row }) => {
+			const activityName = row.getValue("activityName") as string
+			const entryType = row.getValue("entryType") as ENTRY_TYPE
+			const nonConformities = row.original.nonConformities
+
+			if (!activityName && entryType === "OTC_INSPECTION" && nonConformities) {
+				return <span className="line-clamp-2">{nonConformities}</span>
+			}
+
+			return activityName || "Sin título"
+		},
 	},
 	{
 		accessorKey: "comments",

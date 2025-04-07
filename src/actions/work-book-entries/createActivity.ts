@@ -8,15 +8,19 @@ import type { ENTRY_TYPE } from "@prisma/client"
 interface CreateActivityProps {
 	userId: string
 	entryType: ENTRY_TYPE
-	attachments?: string[]
 	values: DailyActivitySchema
+	attachment?: {
+		fileType: string
+		fileUrl: string
+		name: string
+	}
 }
 
 export const createActivity = async ({
 	values,
 	userId,
 	entryType,
-	attachments,
+	attachment,
 }: CreateActivityProps) => {
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -49,20 +53,22 @@ export const createActivity = async ({
 			},
 		}
 
-		if (attachments?.length) {
+		if (attachment) {
 			workBookEntryConnectionData.attachments = {
-				create: attachments.map((attachment) => ({
-					type: "",
-					url: attachment,
-					name: attachment,
-				})),
+				create: [
+					{
+						type: attachment.fileType,
+						url: attachment.fileUrl,
+						name: attachment.name,
+					},
+				],
 			}
 		}
 
-		await prisma.workEntry.create({
+		const newWorkEntry = await prisma.workEntry.create({
 			data: {
 				entryType,
-				hasAttachments: !!attachments?.length,
+				hasAttachments: !!attachment,
 				comments: comments || "",
 				...rest,
 				...workBookEntryConnectionData,
@@ -71,6 +77,7 @@ export const createActivity = async ({
 
 		return {
 			ok: true,
+			data: newWorkEntry,
 			message: "Actividad creada exitosamente",
 		}
 	} catch (error) {

@@ -28,7 +28,11 @@ export default async function CreateAdditionalActivityPage({
 				<h1 className="text-2xl font-bold text-gray-800">Agregar Actividad Adicional</h1>
 			</div>
 
-			<ActivityForm entryType="ADDITIONAL_ACTIVITY" workOrderId={id} session={session} />
+			<ActivityForm
+				entryType="ADDITIONAL_ACTIVITY"
+				workOrderId={id}
+				userId={session.session.userId}
+			/>
 		</>
 	)
 }

@@ -120,13 +120,14 @@ export default function ExternalUsersForm(): React.ReactElement {
 					const temporalPassword = "123456"
 
 					const { data: newUser, error } = await authClient.admin.createUser({
-						email: employee.email,
-						role: USER_ROLES_VALUES.PARTNER_COMPANY,
-						password: temporalPassword,
 						name: employee.name,
+						email: employee.email,
+						password: temporalPassword,
+						role: USER_ROLES_VALUES.PARTNER_COMPANY,
 						data: {
 							rut: employee.rut,
 							companyId: selectedCompany?.id,
+							isSupervisor: employee.isSupervisor,
 						},
 					})
 

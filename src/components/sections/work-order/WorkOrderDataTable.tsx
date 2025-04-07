@@ -162,7 +162,7 @@ export function WorkOrderDataTable() {
 						<SelectGroup>
 							<SelectLabel>Empresa</SelectLabel>
 							<SelectItem value="all">Todas las empresas</SelectItem>
-							{companies?.map((company) => (
+							{companies?.companies?.map((company) => (
 								<SelectItem key={company.id} value={company.id}>
 									{company.name}
 								</SelectItem>

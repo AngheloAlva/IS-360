@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, LinkIcon } from "lucide-react"
 import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
@@ -188,13 +188,68 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
+		accessorKey: "initReport",
+		header: "Reporte Inicial",
+		cell: ({ row }) => {
+			const report = row.original.initReport as { url: string } | null
+
+			return (
+				<Button
+					size="icon"
+					variant="outline"
+					disabled={!report}
+					className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
+				>
+					<Link
+						target="_blank"
+						className="font-medium"
+						rel="noopener noreferrer"
+						href={report ? report.url : "#"}
+					>
+						<LinkIcon className="h-4 w-4" />
+					</Link>
+				</Button>
+			)
+		},
+	},
+	{
+		accessorKey: "endReport",
+		header: "Reporte Final",
+		cell: ({ row }) => {
+			const report = row.original.endReport as { url: string } | null
+
+			return (
+				<Button
+					size="icon"
+					variant="outline"
+					disabled={!report}
+					className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
+				>
+					<Link
+						target="_blank"
+						className="font-medium"
+						rel="noopener noreferrer"
+						href={report ? report.url : "#"}
+					>
+						<LinkIcon className="h-4 w-4" />
+					</Link>
+				</Button>
+			)
+		},
+	},
+	{
 		id: "actions",
 		enableHiding: false,
 		cell: ({ row }) => {
 			const { id } = row.original
 
 			return (
-				<Button className="text-primary bg-primary/10 hover:bg-primary/50" size="icon" asChild>
+				<Button
+					asChild
+					size="icon"
+					variant="outline"
+					className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
+				>
 					<Link href={`/admin/dashboard/libros-de-obras/${id}`}>
 						<ArrowUpRight className="h-4 w-4" />
 					</Link>

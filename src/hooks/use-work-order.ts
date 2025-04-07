@@ -16,10 +16,15 @@ export interface WorkOrder {
 	status: string
 	solicitationTime: string
 	workRequest: string
+	capex: string
 	workDescription: string
 	priority: string
-	initReport: string | null
-	endReport: string | null
+	initReport: {
+		url: string
+	} | null
+	endReport: {
+		url: string
+	} | null
 	programDate: string | null
 	estimatedHours: number | null
 	estimatedDays: number | null

@@ -7,9 +7,14 @@ import type { WorkOrderSchema } from "@/lib/form-schemas/admin/work-order/workOr
 
 interface CreateWorkOrderProps {
 	values: WorkOrderSchema
+	initReportFile?: {
+		fileType: string
+		fileName: string
+		fileUrl: string
+	}
 }
 
-export const createWorkOrder = async ({ values }: CreateWorkOrderProps) => {
+export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrderProps) => {
 	try {
 		const { supervisorId, responsibleId, companyId, breakDays, equipment, ...rest } = values
 		const otNumber = await generateOTNumber()
@@ -33,6 +38,17 @@ export const createWorkOrder = async ({ values }: CreateWorkOrderProps) => {
 					},
 				},
 				...rest,
+				...(initReportFile
+					? {
+							initReport: {
+								create: {
+									url: initReportFile.fileUrl,
+									name: initReportFile.fileName,
+									type: initReportFile.fileType,
+								},
+							},
+						}
+					: {}),
 				isWorkBook: true,
 				estimatedDays: +rest.estimatedDays,
 				estimatedHours: +rest.estimatedHours,
