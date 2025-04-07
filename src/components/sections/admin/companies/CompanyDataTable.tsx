@@ -6,41 +6,41 @@ import {
 	SortingState,
 	useReactTable,
 	getCoreRowModel,
+	ColumnFiltersState,
 	getFilteredRowModel,
-	type ColumnFiltersState,
 } from "@tanstack/react-table"
 
-import { VehiclesColumns } from "./vehicles-columns"
-import { useVehicles } from "@/hooks/use-vehicles"
+import { useCompanies } from "@/hooks/use-companies"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
+import { CompanyColumns } from "./company-columns"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
+	TableBody,
 	TableCell,
 	TableHead,
-	TableBody,
 	TableHeader,
 } from "@/components/ui/table"
 
-export function VehiclesDataTable(): React.ReactElement {
+export function CompanyDataTable() {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading } = useVehicles({
+	const { data, isLoading } = useCompanies({
 		page,
 		search,
 		limit: 10,
 	})
 
 	const table = useReactTable({
-		data: data?.vehicles ?? [],
-		columns: VehiclesColumns,
+		data: data?.companies ?? [],
+		columns: CompanyColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
@@ -58,20 +58,20 @@ export function VehiclesDataTable(): React.ReactElement {
 	})
 
 	return (
-		<div className="space-y-4">
-			<div className="flex items-center justify-between gap-2">
-				<h2 className="text-text mb-4 text-2xl font-bold">Lista de Vehículos</h2>
+		<section className="flex w-full flex-col items-start gap-4">
+			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
+				<h2 className="text-text- text-2xl font-semibold">Lista de Empresas</h2>
 
 				<Input
 					type="text"
 					value={search}
 					className="ml-auto w-fit"
-					placeholder="Buscar por Patente, Modelo..."
+					placeholder="Buscar por Nombre o RUT..."
 					onChange={(e) => setSearch(e.target.value)}
 				/>
 			</div>
 
-			<Card className="rounded-md border p-1.5">
+			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -88,6 +88,7 @@ export function VehiclesDataTable(): React.ReactElement {
 							</TableRow>
 						))}
 					</TableHeader>
+
 					<TableBody>
 						{isLoading
 							? Array.from({ length: 10 }).map((_, index) => (
@@ -116,6 +117,6 @@ export function VehiclesDataTable(): React.ReactElement {
 				onPageChange={setPage}
 				pageCount={data?.pages ?? 0}
 			/>
-		</div>
+		</section>
 	)
 }

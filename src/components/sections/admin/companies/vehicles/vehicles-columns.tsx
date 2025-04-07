@@ -2,8 +2,7 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { DotIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-
-import type { Vehicle } from "@prisma/client"
+import { Vehicle } from "@/hooks/use-vehicles"
 
 const VehicleTypeLabels: Record<string, string> = {
 	CAR: "Automóvil",
@@ -15,7 +14,15 @@ const VehicleTypeLabels: Record<string, string> = {
 	OTHER: "Otro",
 }
 
-export const columns: ColumnDef<Vehicle>[] = [
+export const VehiclesColumns: ColumnDef<Vehicle>[] = [
+	{
+		accessorKey: "company.name",
+		header: "Empresa",
+		cell: ({ row }) => {
+			const company = row.original.company
+			return <span>{company.name}</span>
+		},
+	},
 	{
 		accessorKey: "plate",
 		header: "Patente",

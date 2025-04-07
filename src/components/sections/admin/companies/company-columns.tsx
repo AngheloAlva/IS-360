@@ -3,10 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 import { format } from "date-fns"
+import { Company } from "@/hooks/use-companies"
 
-import type { Company, User } from "@prisma/client"
-
-export const columns: ColumnDef<Company>[] = [
+export const CompanyColumns: ColumnDef<Company>[] = [
 	{
 		accessorKey: "name",
 		header: "Nombre",
@@ -36,10 +35,10 @@ export const columns: ColumnDef<Company>[] = [
 	},
 	{
 		accessorKey: "users",
-		header: "Supervisor",
+		header: "Supervisores",
 		cell: ({ row }) => {
-			const users = row.getValue("users") as User[]
-			return <div>{users[0]?.name ?? "No Asignado"}</div>
+			const users = row.getValue("users") as Company["users"]
+			return <div>{users ? users.map((user) => user.name).join(", ") : "No Asignado"}</div>
 		},
 	},
 ]

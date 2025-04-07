@@ -52,7 +52,8 @@ export default function WorkBookMain({
 			className={cn(
 				"flex h-full w-full flex-col gap-8 transition-all md:max-w-[95dvw] lg:max-w-[96dvw]",
 				{
-					"md:max-w-[68dvw] lg:max-w-[75dvw] xl:max-w-[80dvw]": state === "expanded",
+					"md:max-w-[62dvw] lg:max-w-[70dvw] xl:max-w-[77dvw] 2xl:max-w-[80dvw]":
+						state === "expanded",
 				}
 			)}
 		>
