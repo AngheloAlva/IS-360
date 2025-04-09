@@ -7,6 +7,7 @@ const prismaClientSingleton = () => {
 				url: process.env.DATABASE_URL,
 			},
 		},
+		log: ['error', 'warn'],
 	})
 }
 
