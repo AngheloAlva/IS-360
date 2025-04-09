@@ -1,14 +1,21 @@
 import { PrismaClient } from "@prisma/client"
 
 const prismaClientSingleton = () => {
-	return new PrismaClient({
+	const client = new PrismaClient({
 		datasources: {
 			db: {
 				url: process.env.DATABASE_URL,
 			},
 		},
-		log: ['error', 'warn'],
+		log: ["error", "warn"],
 	})
+
+	// Asegurarse de que las conexiones se cierren al salir
+	process.on("beforeExit", async () => {
+		await client.$disconnect()
+	})
+
+	return client
 }
 
 type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>
