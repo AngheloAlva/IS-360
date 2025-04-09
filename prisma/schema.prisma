@@ -586,7 +586,6 @@ model SafetyTalk {
   slug              String               @unique
   title             String
   description       String?
-  type              String
   isPresential      Boolean              @default(false)
   questions         Question[]
   resources         SafetyTalkResource[]
@@ -609,7 +608,6 @@ model SafetyTalkResource {
   description  String?
   type         RESOURCE_TYPE
   url          String
-  downloadUrl  String?
   fileSize     Int?
   mimeType     String?
   order        Int
