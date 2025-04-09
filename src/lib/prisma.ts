@@ -8,11 +8,18 @@ const prismaClientSingleton = () => {
 			},
 		},
 		log: ["error", "warn"],
-	})
-
-	// Asegurarse de que las conexiones se cierren al salir
-	process.on("beforeExit", async () => {
-		await client.$disconnect()
+	}).$extends({
+		name: "connection-manager",
+		client: {
+			afterRequest: async () => {
+				if (process.env.NODE_ENV === "production") {
+					// Desconectar después de cada operación en producción
+					setTimeout(() => {
+						client.$disconnect()
+					}, 200)
+				}
+			},
+		},
 	})
 
 	return client

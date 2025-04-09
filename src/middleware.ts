@@ -6,16 +6,8 @@ import type { auth } from "@/lib/auth"
 type Session = typeof auth.$Infer.Session
 
 export default async function authMiddleware(request: NextRequest) {
-	if (request.nextUrl.pathname.startsWith("/_next")) {
+	if (request.nextUrl.pathname.startsWith("/_next") || request.nextUrl.pathname.includes("/api/")) {
 		return NextResponse.next()
-	}
-
-	// Configurar headers para conexiones persistentes en rutas API
-	if (request.nextUrl.pathname.includes("/api/")) {
-		const response = NextResponse.next()
-		response.headers.set("Connection", "keep-alive")
-		response.headers.set("Keep-Alive", "timeout=5, max=1000")
-		return response
 	}
 
 	const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
