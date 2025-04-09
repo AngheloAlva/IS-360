@@ -17,41 +17,45 @@ const areaChartConfig = {
 	value: {
 		label: "Documentos",
 	},
-	OPERACIONES: {
+	OPERATIONS: {
 		label: "Operaciones",
 		color: "var(--chart-1)",
 	},
-	INSTRUCTIVOS: {
+	INSTRUCTIONS: {
 		label: "Instructivos",
 		color: "var(--chart-2)",
 	},
-	INTEGRIDAD_Y_MANTENCION: {
+	INTEGRITY_AND_MAINTENANCE: {
 		label: "Integridad y Mantención",
 		color: "var(--chart-3)",
 	},
-	MEDIO_AMBIENTE: {
+	ENVIRONMENT: {
 		label: "Medio Ambiente",
 		color: "var(--chart-4)",
 	},
-	PREVENCION_RIESGOS: {
+	OPERATIONAL_SAFETY: {
 		label: "Prevención de Riesgos",
 		color: "var(--chart-5)",
 	},
-	CALIDAD_Y_EXCELENCIA_PROFESIONAL: {
+	QUALITY_AND_OPERATIONAL_EXCELLENCE: {
 		label: "Calidad y Excelencia Profesional",
 		color: "var(--chart-6)",
 	},
-	HSEQ: {
+	REGULATORY_COMPLIANCE: {
 		label: "HSEQ",
 		color: "var(--chart-7)",
 	},
-	JURIDICA: {
+	LEGAL: {
 		label: "Jurídica",
 		color: "var(--chart-8)",
 	},
-	COMUNIDADES: {
+	COMMUNITIES: {
 		label: "Comunidades",
 		color: "var(--chart-9)",
+	},
+	PROJECTS: {
+		label: "Proyectos",
+		color: "var(--chart-1)",
 	},
 } satisfies ChartConfig
 

@@ -22,9 +22,9 @@ function getIconForArea(key: string): React.ReactNode {
 		"instructivos": <FileText />,
 		"integridad-y-mantencion": <Wrench />,
 		"medio-ambiente": <Leaf />,
-		"prevencion-riesgos": <ShieldAlert />,
+		"seguridad-operacional": <ShieldAlert />,
 		"calidad-y-excelencia-operacional": <Award />,
-		"hseq": <HardHat />,
+		"cumplimiento-normativo": <HardHat />,
 		"juridica": <Scale />,
 		"comunidades": <Users />,
 	}

@@ -1,9 +1,11 @@
+import { AreasValuesArray } from "@/lib/consts/areas"
 import { CodesValuesArray } from "@/lib/consts/codes"
 import { z } from "zod"
 
 export const fileFormSchema = z.object({
 	userId: z.string(),
 	folderSlug: z.string().optional(),
+	area: z.enum(AreasValuesArray, { message: "El área es requerido" }),
 
 	code: z.enum(CodesValuesArray, { message: "El código es requerido" }),
 	name: z.string({ message: "El nombre es requerido" }),

@@ -85,7 +85,7 @@ export default function UpdateFolderForm({
 					router.push(`${lastPath}`)
 				} else {
 					router.push(
-						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title === oldFolder.area)}`
+						`/dashboard/documentacion/${Object.keys(Areas).find((key) => Areas[key as keyof typeof Areas].title as string === oldFolder.area)}`
 					)
 				}
 			} else {

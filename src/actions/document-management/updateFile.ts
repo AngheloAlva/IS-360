@@ -36,6 +36,10 @@ export const updateFile = async ({
 			return { ok: false, error: "Archivo no encontrado" }
 		}
 
+		if (currentFile.userId !== userId) {
+			return { ok: false, error: "El usuario no tiene acceso a editar este archivo" }
+		}
+
 		const updatedFile = await prisma.file.update({
 			where: { id: fileId },
 			data: {

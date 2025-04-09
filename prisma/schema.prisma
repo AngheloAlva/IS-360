@@ -31,9 +31,9 @@ enum AREAS {
   INSTRUCTIONS // Instructivos
   INTEGRITY_AND_MAINTENANCE // Integridad y Mantencion
   ENVIRONMENT // Medio Ambiente
-  RISK_PREVENTION // Preveencion de Riesgos
+  OPERATIONAL_SAFETY // Seguridad Operacional
   QUALITY_AND_OPERATIONAL_EXCELLENCE // Calidad y Exelencia Operacional
-  HSEQ // HSEQ (nueva)
+  REGULATORY_COMPLIANCE // Cumplimiento Normativo
   LEGAL // Juridica
   COMMUNITIES // Comunidades (periodistas?)
   PROJECTS // Proyectos
@@ -549,6 +549,7 @@ model File {
   code             Code
   name             String
   description      String?
+  area             AREAS?
   type             String
   size             Int
   url              String

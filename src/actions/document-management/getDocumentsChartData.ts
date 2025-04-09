@@ -3,17 +3,17 @@
 import { addDays } from "date-fns"
 
 import prisma from "@/lib/prisma"
-
+import { AreasValues } from "@/lib/consts/areas"
 import { AREAS } from "@prisma/client"
 
 export async function getDocumentsChartData() {
 	// Get documents by area
-	const areas = Object.values(AREAS)
+	const areas = Object.values(AreasValues)
 
 	const areaData = await Promise.all(
 		areas.map(async (area) => {
 			const count = await prisma.folder.findMany({
-				where: { area },
+				where: { area, isActive: true },
 				include: {
 					_count: {
 						select: { files: true },
@@ -42,6 +42,7 @@ export async function getDocumentsChartData() {
 		// Expired
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					lt: now,
 				},
@@ -50,6 +51,7 @@ export async function getDocumentsChartData() {
 		// Expires this week
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					gte: now,
 					lt: nextWeek,
@@ -59,6 +61,7 @@ export async function getDocumentsChartData() {
 		// Expires in 8-15 days
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					gte: nextWeek,
 					lt: next15Days,
@@ -68,6 +71,7 @@ export async function getDocumentsChartData() {
 		// Expires in 16-30 days
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					gte: next15Days,
 					lt: next30Days,
@@ -77,6 +81,7 @@ export async function getDocumentsChartData() {
 		// Expires in 31-60 days
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					gte: next30Days,
 					lt: next60Days,
@@ -86,6 +91,7 @@ export async function getDocumentsChartData() {
 		// Expires in 61-90 days
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					gte: next60Days,
 					lt: next90Days,
@@ -95,6 +101,7 @@ export async function getDocumentsChartData() {
 		// Expires after 90 days
 		prisma.file.count({
 			where: {
+				isActive: true,
 				expirationDate: {
 					gte: next90Days,
 				},
@@ -119,35 +126,37 @@ export async function getDocumentsChartData() {
 		},
 	})
 
-	const areaColors = {
-		OPERACIONES: "#2563eb",
-		INSTRUCTIVOS: "#60a5fa",
-		INTEGRIDAD_Y_MANTENCION: "#10b981",
-		MEDIO_AMBIENTE: "#84cc16",
-		PREVENCION_RIESGOS: "#eab308",
-		CALIDAD_Y_EXCELENCIA_PROFESIONAL: "#f59e0b",
-		HSEQ: "#dc2626",
-		JURIDICA: "#8b5cf6",
-		COMUNIDADES: "#ec4899",
+	const areaColors: Record<keyof typeof AreasValues, string> = {
+		OPERATIONS: "#2563eb",
+		INSTRUCTIONS: "#60a5fa",
+		INTEGRITY_AND_MAINTENANCE: "#10b981",
+		ENVIRONMENT: "#84cc16",
+		OPERATIONAL_SAFETY: "#eab308", // Añadido OPERATIONAL_SAFETY que faltaba
+		QUALITY_AND_OPERATIONAL_EXCELLENCE: "#f59e0b",
+		REGULATORY_COMPLIANCE: "#dc2626",
+		LEGAL: "#8b5cf6",
+		COMMUNITIES: "#ec4899",
+		PROJECTS: "#6b7280", // Añadido PROJECTS que faltaba
 	}
 
-	const areaLabels = {
-		OPERACIONES: "Operaciones",
-		INSTRUCTIVOS: "Instructivos",
-		INTEGRIDAD_Y_MANTENCION: "Integridad y Mantención",
-		MEDIO_AMBIENTE: "Medio Ambiente",
-		PREVENCION_RIESGOS: "Prevención de Riesgos",
-		CALIDAD_Y_EXCELENCIA_PROFESIONAL: "Calidad y Excelencia Profesional",
-		HSEQ: "HSEQ",
-		JURIDICA: "Jurídica",
-		COMUNIDADES: "Comunidades",
+	const areaLabels: Record<keyof typeof AreasValues, string> = {
+		OPERATIONS: "Operaciones",
+		INSTRUCTIONS: "Instructivos",
+		INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
+		ENVIRONMENT: "Medio Ambiente",
+		OPERATIONAL_SAFETY: "Seguridad Operacional",
+		QUALITY_AND_OPERATIONAL_EXCELLENCE: "Calidad y Excelencia Operacional",
+		REGULATORY_COMPLIANCE: "Cumplimiento Normativo",
+		LEGAL: "Jurídica",
+		COMMUNITIES: "Comunidades",
+		PROJECTS: "Proyectos", // Añadido PROJECTS que faltaba,
 	}
 
 	return {
 		areaData: areaData.map((area: { area: AREAS; _count: { files: number } }) => ({
-			name: areaLabels[area.area as keyof typeof areaLabels],
+			name: areaLabels[area.area as keyof typeof AreasValues],
 			value: area._count.files,
-			fill: areaColors[area.area as keyof typeof areaColors],
+			fill: areaColors[area.area as keyof typeof AreasValues],
 		})),
 		expirationData: [
 			{

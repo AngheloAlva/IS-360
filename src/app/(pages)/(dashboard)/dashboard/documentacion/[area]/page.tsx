@@ -60,8 +60,8 @@ export default async function AreaRootPage({ params }: PageProps) {
 			<FileExplorerTable
 				areaValue={areaValue}
 				foldersSlugs={[area]}
+				userId={data.user.id}
 				lastPath={"/dashboard/documentacion/" + area}
-				isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
 			/>
 		</div>
 	)

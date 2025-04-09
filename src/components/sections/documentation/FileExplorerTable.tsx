@@ -37,7 +37,7 @@ import type { AREAS, File, Folder } from "@prisma/client"
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
 
 interface FileExplorerTableProps {
-	isAdmin: boolean
+	userId: string
 	lastPath?: string
 	areaValue: AREAS
 	className?: string
@@ -46,7 +46,7 @@ interface FileExplorerTableProps {
 }
 
 export function FileExplorerTable({
-	isAdmin,
+	userId,
 	lastPath,
 	className,
 	areaValue,
@@ -113,7 +113,7 @@ export function FileExplorerTable({
 					<TableHead>Fecha de Expiracion</TableHead>
 					<TableHead>Usuario</TableHead>
 					<TableHead>Revisiones / Actualizacion</TableHead>
-					{isAdmin && <TableHead>Acciones</TableHead>}
+					{<TableHead></TableHead>}
 				</TableRow>
 			</TableHeader>
 
@@ -155,20 +155,22 @@ export function FileExplorerTable({
 									})}
 								</TableCell>
 
-								<TableCell className="space-x-1">
-									<Link
-										href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
-									>
-										<Button
-											size="icon"
-											variant="outline"
-											className="text-primary hover:bg-primary bg-white hover:text-white"
+								{item.userId === userId && (
+									<TableCell className="space-x-1">
+										<Link
+											href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
 										>
-											<Edit className="h-4 w-4" />
-										</Button>
-									</Link>
-									<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
-								</TableCell>
+											<Button
+												size="icon"
+												variant="outline"
+												className="text-primary hover:bg-primary bg-white hover:text-white"
+											>
+												<Edit className="h-4 w-4" />
+											</Button>
+										</Link>
+										<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
+									</TableCell>
+								)}
 							</TableRow>
 						))}
 
@@ -202,21 +204,23 @@ export function FileExplorerTable({
 								<TableCell>{item.user?.name}</TableCell>
 								<TableCell>{item.revisionCount}</TableCell>
 
-								<TableCell className="space-x-1">
-									<Link
-										href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
-									>
-										<Button
-											size="icon"
-											variant="outline"
-											className="text-primary hover:bg-primary bg-white hover:text-white"
+								{item.userId === userId && (
+									<TableCell className="space-x-1">
+										<Link
+											href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
 										>
-											<Edit className="h-4 w-4" />
-										</Button>
-									</Link>
+											<Button
+												size="icon"
+												variant="outline"
+												className="text-primary hover:bg-primary bg-white hover:text-white"
+											>
+												<Edit className="h-4 w-4" />
+											</Button>
+										</Link>
 
-									<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
-								</TableCell>
+										<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
+									</TableCell>
+								)}
 							</TableRow>
 						))}
 

@@ -77,9 +77,9 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 			<FileExplorerTable
 				lastPath={lastPath}
 				areaValue={areaValue}
+				userId={data.user.id}
 				actualFolderSlug={lastFolder}
 				foldersSlugs={[area, ...folderSlug]}
-				isAdmin={data.user.role === "ADMIN" || data.user.role === "SUPERADMIN"}
 			/>
 		</div>
 	)

@@ -3,9 +3,9 @@ export const AreasValues = {
 	INSTRUCTIONS: "INSTRUCTIONS",
 	INTEGRITY_AND_MAINTENANCE: "INTEGRITY_AND_MAINTENANCE",
 	ENVIRONMENT: "ENVIRONMENT",
-	RISK_PREVENTION: "RISK_PREVENTION",
+	OPERATIONAL_SAFETY: "OPERATIONAL_SAFETY",
 	QUALITY_AND_OPERATIONAL_EXCELLENCE: "QUALITY_AND_OPERATIONAL_EXCELLENCE",
-	HSEQ: "HSEQ",
+	REGULATORY_COMPLIANCE: "REGULATORY_COMPLIANCE",
 	LEGAL: "LEGAL",
 	COMMUNITIES: "COMMUNITIES",
 	PROJECTS: "PROJECTS",
@@ -16,9 +16,9 @@ export const AreasValuesArray = [
 	AreasValues.INSTRUCTIONS,
 	AreasValues.INTEGRITY_AND_MAINTENANCE,
 	AreasValues.ENVIRONMENT,
-	AreasValues.RISK_PREVENTION,
+	AreasValues.OPERATIONAL_SAFETY,
 	AreasValues.QUALITY_AND_OPERATIONAL_EXCELLENCE,
-	AreasValues.HSEQ,
+	AreasValues.REGULATORY_COMPLIANCE,
 	AreasValues.LEGAL,
 	AreasValues.COMMUNITIES,
 	AreasValues.PROJECTS,
@@ -55,9 +55,9 @@ export const Areas = {
 		description:
 			"Encargada de la gestión ambiental, promoviendo prácticas sostenibles, cumplimiento normativo y reducción del impacto ecológico.",
 	},
-	"prevencion-riesgos": {
-		title: "Prevención de Riesgos",
-		value: AreasValues.RISK_PREVENTION,
+	"seguridad-operacional": {
+		title: "Seguridad Operacional",
+		value: AreasValues.OPERATIONAL_SAFETY,
 		description:
 			"Responsable de minimizar accidentes y riesgos laborales mediante protocolos de seguridad, capacitaciones y cumplimiento de normativas.",
 	},
@@ -67,11 +67,11 @@ export const Areas = {
 		description:
 			"Busca garantizar la mejora continua, estandarización y cumplimiento de altos estándares de calidad en todos los procesos y servicios.",
 	},
-	"hseq": {
-		title: "HSEQ",
-		value: AreasValues.HSEQ,
+	"cumplimiento-normativo": {
+		title: "Cumplimiento Normativo",
+		value: AreasValues.REGULATORY_COMPLIANCE,
 		description:
-			"Asegura el cumplimiento de normativas y estándares en salud, seguridad, medio ambiente y calidad, promoviendo un entorno de trabajo seguro y sostenible.",
+			"Reúne información asociada al decreto 160, asegurando el cumplimiento de las normativas y regulaciones aplicables a la empresa.",
 	},
 	"juridica": {
 		title: "Juridica",
@@ -97,9 +97,9 @@ export const AreasLabels = {
 	INSTRUCTIONS: "Instructivos",
 	INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
 	ENVIRONMENT: "Medio Ambiente",
-	RISK_PREVENTION: "Prevención de Riesgos",
+	OPERATIONAL_SAFETY: "Seguridad Operacional",
 	QUALITY_AND_OPERATIONAL_EXCELLENCE: "Calidad y Excelencia Operacional",
-	HSEQ: "HSEQ",
+	REGULATORY_COMPLIANCE: "Cumplimiento Normativo",
 	LEGAL: "Juridica",
 	COMMUNITIES: "Comunidades",
 	PROJECTS: "Proyectos",
@@ -118,13 +118,13 @@ export const areaColors: Record<string, { className: string }> = {
 	"medio-ambiente": {
 		className: "text-[#4CAF50] border-[#4CAF50]",
 	},
-	"prevencion-riesgos": {
+	"seguridad-operacional": {
 		className: "text-[#FF5722] border-[#FF5722]",
 	},
 	"calidad-y-excelencia-operacional": {
 		className: "text-[#2196F3] border-[#2196F3]",
 	},
-	"hseq": {
+	"cumplimiento-normativo": {
 		className: "text-[#009688] border-[#009688]",
 	},
 	"juridica": {

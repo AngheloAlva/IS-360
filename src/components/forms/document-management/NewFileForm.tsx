@@ -8,7 +8,6 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import { useState } from "react"
 import { toast } from "sonner"
-// import Image from "next/image"
 
 import { uploadFile } from "@/actions/document-management/uploadFile"
 import { CodesValuesArray } from "@/lib/consts/codes"
@@ -40,6 +39,7 @@ import {
 	SelectContent,
 	SelectTrigger,
 } from "@/components/ui/select"
+import { Areas } from "@/lib/consts/areas"
 
 interface NewFileFormProps {
 	area: string
@@ -64,6 +64,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 			description: "",
 			expirationDate: undefined,
 			registrationDate: new Date(),
+			area: Areas[area as keyof typeof Areas].value,
 		},
 	})
 
