@@ -80,7 +80,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		}
 
 		// Validación de tipo
-		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt|jpe?g|png|webp|avif)$/i
+		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt|jpe?g|png|webp|avif|zip|rar|7z)$/i
 		if (!validTypes.test(file.name)) {
 			toast.error("Formato no soportado")
 			return
