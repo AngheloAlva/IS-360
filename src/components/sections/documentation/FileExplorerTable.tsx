@@ -17,7 +17,6 @@ import {
 	FolderHeartIcon,
 } from "lucide-react"
 
-import { CodesValuesArray } from "@/lib/consts/codes"
 import { useDocuments } from "@/hooks/use-documents"
 import { cn } from "@/lib/utils"
 
@@ -30,7 +29,6 @@ import {
 	TableCell,
 	TableHead,
 	TableHeader,
-	TableCaption,
 } from "@/components/ui/table"
 
 import type { AREAS, File, Folder } from "@prisma/client"
@@ -94,16 +92,6 @@ export function FileExplorerTable({
 
 	return (
 		<Table className={cn("rounded-md bg-white p-2", className)}>
-			<TableCaption className="border-input rounded-md border bg-white py-2 text-center">
-				<div className="mx-auto flex w-fit items-center gap-10">
-					{CodesValuesArray.map((code) => (
-						<div key={code}>
-							{code.charAt(0)}: {code}
-						</div>
-					))}
-				</div>
-			</TableCaption>
-
 			<TableHeader>
 				<TableRow>
 					<TableHead>Codigo-Nombre</TableHead>
@@ -185,7 +173,7 @@ export function FileExplorerTable({
 											rel="noreferrer noopener"
 											className="font-medium hover:underline"
 										>
-											{item.code.charAt(0) + "-" + item.name}
+											{item?.code?.charAt(0) + "-" + item.name}
 										</Link>
 									</div>
 								</TableCell>

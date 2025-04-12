@@ -46,7 +46,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 		defaultValues: {
 			userId,
 			name: initialData.name,
-			code: initialData.code,
+			code: initialData.code ?? undefined,
 			description: initialData.description || "",
 			registrationDate: initialData.registrationDate,
 			expirationDate: initialData.expirationDate || undefined,
