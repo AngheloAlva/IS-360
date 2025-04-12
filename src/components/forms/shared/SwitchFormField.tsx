@@ -1,0 +1,44 @@
+"use client"
+
+import { FormItem, FormLabel, FormField, FormControl, FormMessage } from "@/components/ui/form"
+import { Switch } from "@/components/ui/switch"
+
+import type { Control, FieldValues, Path } from "react-hook-form"
+
+interface SwitchFormFieldProps<T extends FieldValues> {
+	name: Path<T>
+	label: string
+	className?: string
+	control: Control<T>
+	itemClassName?: string
+	onCheckedChange?: (checked: boolean) => void
+}
+
+export function SwitchFormField<T extends FieldValues>({
+	name,
+	label,
+	control,
+	className,
+	itemClassName,
+	onCheckedChange,
+}: SwitchFormFieldProps<T>) {
+	return (
+		<FormField
+			name={name}
+			control={control}
+			render={({ field }) => (
+				<FormItem className={itemClassName}>
+					<FormLabel>{label}</FormLabel>
+					<FormControl>
+						<Switch
+							checked={field.value}
+							className={className}
+							onCheckedChange={onCheckedChange ?? field.onChange}
+						/>
+					</FormControl>
+					<FormMessage />
+				</FormItem>
+			)}
+		/>
+	)
+}

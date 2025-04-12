@@ -44,7 +44,7 @@ type CompanyWithUser = Company & {
 	users: User[]
 }
 
-export default function ExternalUsersForm(): React.ReactElement {
+export default function CreateExternalUsersForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [companies, setCompanies] = useState<CompanyWithUser[]>([])
 	const [isCompaniesLoading, setIsCompaniesLoading] = useState(false)

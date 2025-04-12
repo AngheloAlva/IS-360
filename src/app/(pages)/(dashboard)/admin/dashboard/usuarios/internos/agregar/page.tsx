@@ -1,4 +1,4 @@
-import InternalUserForm from "@/components/forms/admin/user/InternalUserForm"
+import CreateInternalUserForm from "@/components/forms/admin/user/CreateInternalUserForm"
 import BackButton from "@/components/shared/BackButton"
 
 export default function CreateInternalUserPage() {
@@ -9,7 +9,7 @@ export default function CreateInternalUserPage() {
 				<h1 className="w-fit text-2xl font-bold">Nuevos Usuario OTC</h1>
 			</div>
 
-			<InternalUserForm />
+			<CreateInternalUserForm />
 		</>
 	)
 }

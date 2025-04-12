@@ -72,3 +72,5 @@ export const workPermitSchema = z.object({
 		.boolean()
 		.refine((value) => value, { message: "Debe aceptar los términos y condiciones" }),
 })
+
+export type WorkPermitSchema = z.infer<typeof workPermitSchema>

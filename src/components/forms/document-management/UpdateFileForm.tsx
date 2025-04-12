@@ -1,46 +1,31 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, UploadCloud, X } from "lucide-react"
+import { UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
-import { es } from "date-fns/locale"
-import { format } from "date-fns"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { updateFile } from "@/actions/document-management/updateFile"
-import { CodesValuesArray } from "@/lib/consts/codes"
+import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { cn } from "@/lib/utils"
 import {
 	fileFormSchema,
 	type FileFormSchema,
 } from "@/lib/form-schemas/document-management/file.schema"
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormField,
-	FormMessage,
-	FormControl,
-} from "@/components/ui/form"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectContent,
-	SelectTrigger,
-} from "@/components/ui/select"
-
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
+import { SelectFormField } from "@/components/forms/shared/SelectFormField"
+import { InputFormField } from "@/components/forms/shared/InputFormField"
 import type { File as PrismaFile } from "@prisma/client"
 import { Card, CardContent } from "@/components/ui/card"
+import { Form, FormLabel } from "@/components/ui/form"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import SubmitButton from "../shared/SubmitButton"
 
 interface UpdateFileFormProps {
 	fileId: string
@@ -191,63 +176,43 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 		}
 	}
 
+	const codeIsOther = form.watch("code") === CodesValues.OTRO
+
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full max-w-screen-md">
 				<Card className="w-full">
 					<CardContent className="grid gap-5">
-						<FormField
-							control={form.control}
+						<InputFormField<FileFormSchema>
 							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Nombre del archivo</FormLabel>
-									<FormControl>
-										<Input {...field} disabled={uploading} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Nombre del archivo"
+							placeholder="Nombre del archivo"
 						/>
 
-						<FormField
-							control={form.control}
+						<TextAreaFormField<FileFormSchema>
 							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Descripción</FormLabel>
-									<FormControl>
-										<Textarea {...field} disabled={uploading} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Descripción"
+							control={form.control}
+							placeholder="Descripción"
 						/>
 
-						<FormField
-							control={form.control}
+						<SelectFormField<FileFormSchema>
 							name="code"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Código</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger className="border-gray-200 capitalize">
-												<SelectValue placeholder="Seleccione un código" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent className="text-neutral-700">
-											{CodesValuesArray.map((option: string) => (
-												<SelectItem key={option} value={option} className="capitalize">
-													{option.toLocaleLowerCase()}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Código"
+							placeholder="Código"
+							options={CodeOptions}
+							control={form.control}
 						/>
+
+						{codeIsOther && (
+							<InputFormField<FileFormSchema>
+								name="otherCode"
+								control={form.control}
+								placeholder="Ej: OTRO"
+								label="Otro código de clasificación"
+							/>
+						)}
 
 						<div className="grid gap-4 md:grid-cols-2">
 							<div className="space-y-4">
@@ -327,102 +292,22 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 						<Separator className="mt-8" />
 
 						<div className="grid gap-4 md:grid-cols-2">
-							<FormField
-								control={form.control}
+							<DatePickerFormField<FileFormSchema>
 								name="registrationDate"
-								render={({ field }) => (
-									<FormItem className="flex flex-col">
-										<FormLabel>Fecha de Registro</FormLabel>
-										<Popover>
-											<PopoverTrigger asChild>
-												<FormControl>
-													<Button
-														variant={"outline"}
-														className={cn(
-															"border-input w-full justify-start bg-white text-left font-normal",
-															!field.value && "text-muted-foreground"
-														)}
-													>
-														<CalendarIcon className="mr-2 h-4 w-4" />
-														{field.value ? (
-															format(field.value, "PPP", { locale: es })
-														) : (
-															<span>Seleccionar fecha</span>
-														)}
-													</Button>
-												</FormControl>
-											</PopoverTrigger>
-											<PopoverContent className="w-auto p-0">
-												<Calendar
-													mode="single"
-													selected={field.value}
-													onSelect={field.onChange}
-													initialFocus
-													locale={es}
-												/>
-											</PopoverContent>
-										</Popover>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
+								label="Fecha de Registro"
 								control={form.control}
+							/>
+
+							<DatePickerFormField<FileFormSchema>
 								name="expirationDate"
-								render={({ field }) => (
-									<FormItem className="flex flex-col">
-										<FormLabel>
-											Fecha de Expiración
-											<span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
-										</FormLabel>
-										<Popover>
-											<PopoverTrigger asChild>
-												<FormControl>
-													<Button
-														variant={"outline"}
-														className={cn(
-															"border-input w-full justify-start bg-white text-left font-normal",
-															!field.value && "text-muted-foreground"
-														)}
-													>
-														<CalendarIcon className="mr-2 h-4 w-4" />
-														{field.value ? (
-															format(field.value, "PPP", { locale: es })
-														) : (
-															<span>Seleccionar fecha</span>
-														)}
-													</Button>
-												</FormControl>
-											</PopoverTrigger>
-											<PopoverContent className="w-auto p-0">
-												<Calendar
-													mode="single"
-													selected={field.value}
-													onSelect={field.onChange}
-													initialFocus
-													locale={es}
-													disabled={(date) => date < (form.watch("registrationDate") || new Date())}
-												/>
-											</PopoverContent>
-										</Popover>
-										<FormMessage />
-									</FormItem>
-								)}
+								control={form.control}
+								label="Fecha de Expiración"
 							/>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Button size="lg" type="submit" disabled={uploading} className="mt-4 w-full">
-					{uploading ? (
-						<>
-							<span className="animate-pulse">Actualizando...</span>
-							<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-						</>
-					) : (
-						"Actualizar Documento"
-					)}
-				</Button>
+				<SubmitButton isSubmitting={uploading} label="Actualizar Documento" />
 			</form>
 		</Form>
 	)

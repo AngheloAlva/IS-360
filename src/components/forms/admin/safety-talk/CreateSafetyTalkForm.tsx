@@ -1,35 +1,26 @@
 "use client"
 
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
-import { CalendarIcon, UploadCloud, X } from "lucide-react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { es } from "date-fns/locale"
-import { format } from "date-fns"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { safetyTalkSchema, type SafetyTalkSchema } from "@/lib/form-schemas/safety-talk/safety-talk"
 import { createSafetyTalk } from "@/actions/safety-talks/create-safety-talks"
+import { generateSlug } from "@/lib/generateSlug"
 import { cn } from "@/lib/utils"
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
+import { SwitchFormField } from "@/components/forms/shared/SwitchFormField"
+import { InputFormField } from "@/components/forms/shared/InputFormField"
+import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Card, CardContent } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
-import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormField,
-	FormMessage,
-	FormControl,
-} from "@/components/ui/form"
-import { generateSlug } from "@/lib/generateSlug"
+import { Form } from "@/components/ui/form"
 
 export default function CreateSafetyTalkForm(): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -92,11 +83,11 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 
 			// Agregar recurso
 			appendResource({
-				title: file.name,
 				type,
-				url: "", // Se llenará después de subir el archivo
 				file,
+				url: "",
 				preview,
+				title: file.name,
 				fileSize: file.size,
 				mimeType: file.type,
 			})
@@ -139,153 +130,62 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 			<form onSubmit={form.handleSubmit(onSubmit)} className="grid w-full max-w-screen-lg gap-y-4">
 				<Card className="w-full">
 					<CardContent className="grid w-full gap-x-3 gap-y-5 md:grid-cols-2">
-						<FormField
-							control={form.control}
-							name="title"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Título</FormLabel>
-									<FormControl>
-										<Input className="w-full rounded-md text-sm" placeholder="Título" {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+						<InputFormField<SafetyTalkSchema> name="title" label="Título" control={form.control} />
 
 						<div className="grid w-full gap-x-3 gap-y-5 md:grid-cols-2">
-							<FormField
-								control={form.control}
-								name="timeLimit"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Tiempo Límite</FormLabel>
-										<FormControl>
-											<div className="flex items-center gap-x-0.5">
-												<Input
-													type="number"
-													className="w-full rounded-md text-sm"
-													placeholder="Tiempo Límite"
-													{...field}
-												/>
+							<div className="flex items-center gap-x-0.5">
+								<InputFormField<SafetyTalkSchema>
+									name="timeLimit"
+									label="Tiempo Límite"
+									control={form.control}
+								/>
 
-												<Button
-													disabled
-													size={"icon"}
-													type="button"
-													variant={"outline"}
-													className="disabled:bg-transparent disabled:opacity-100"
-												>
-													min
-												</Button>
-											</div>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+								<Button
+									disabled
+									size={"icon"}
+									type="button"
+									variant={"outline"}
+									className="mt-5.5 disabled:bg-transparent disabled:opacity-100"
+								>
+									min
+								</Button>
+							</div>
 
-							<FormField
-								control={form.control}
-								name="minimumScore"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Porcentaje Mínimo</FormLabel>
-										<FormControl>
-											<div className="flex items-center gap-x-0.5">
-												<Input
-													type="number"
-													className="w-full rounded-md text-sm"
-													placeholder="Porcentaje Mínimo"
-													{...field}
-												/>
-												<Button
-													disabled
-													size={"icon"}
-													type="button"
-													variant={"outline"}
-													className="disabled:bg-transparent disabled:opacity-100"
-												>
-													%
-												</Button>
-											</div>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+							<div className="flex items-center gap-x-0.5">
+								<InputFormField<SafetyTalkSchema>
+									name="minimumScore"
+									label="Porcentaje Mínimo"
+									control={form.control}
+								/>
+								<Button
+									disabled
+									size={"icon"}
+									type="button"
+									variant={"outline"}
+									className="mt-5.5 disabled:bg-transparent disabled:opacity-100"
+								>
+									%
+								</Button>
+							</div>
 						</div>
 
-						<FormField
-							control={form.control}
+						<TextAreaFormField<SafetyTalkSchema>
 							name="description"
-							render={({ field }) => (
-								<FormItem className="md:col-span-2">
-									<FormLabel>Descripción</FormLabel>
-									<FormControl>
-										<Textarea
-											className="min-h-32 w-full rounded-md text-sm"
-											placeholder="Descripción"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Descripción"
+							control={form.control}
+							itemClassName="md:col-span-2"
 						/>
 
-						<FormField
-							control={form.control}
+						<DatePickerFormField<SafetyTalkSchema>
 							name="expiresAt"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Fecha de Expiración</FormLabel>
-									<Popover>
-										<PopoverTrigger asChild>
-											<FormControl>
-												<Button
-													variant={"outline"}
-													className={cn(
-														"border-input w-full justify-start bg-white text-left font-normal",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													<CalendarIcon className="mr-2 h-4 w-4" />
-													{field.value ? (
-														format(field.value, "PPP", { locale: es })
-													) : (
-														<span>Seleccionar fecha</span>
-													)}
-												</Button>
-											</FormControl>
-										</PopoverTrigger>
-										<PopoverContent className="w-auto p-0">
-											<Calendar
-												locale={es}
-												initialFocus
-												mode="single"
-												selected={field.value}
-												onSelect={field.onChange}
-											/>
-										</PopoverContent>
-									</Popover>
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Fecha de Expiración"
 						/>
 
-						<FormField
-							control={form.control}
+						<SwitchFormField<SafetyTalkSchema>
 							name="isPresential"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>¿Es presencial?</FormLabel>
-									<FormControl>
-										<Switch checked={field.value} onCheckedChange={field.onChange} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="¿Es presencial?"
+							control={form.control}
 						/>
 					</CardContent>
 				</Card>
@@ -390,31 +290,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 					</CardContent>
 				</Card>
 
-				<Button size={"lg"} type="submit" disabled={isSubmitting} className="mt-4 w-full">
-					{isSubmitting ? (
-						<div role="status" className="flex items-center justify-center">
-							<svg
-								aria-hidden="true"
-								className="fill-primary h-8 w-8 animate-spin text-gray-200 dark:text-gray-600"
-								viewBox="0 0 100 101"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-									fill="currentColor"
-								/>
-								<path
-									d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-									fill="currentFill"
-								/>
-							</svg>
-							<span className="sr-only">Cargando...</span>
-						</div>
-					) : (
-						"Crear charla"
-					)}
-				</Button>
+				<SubmitButton label="Crear charla" isSubmitting={isSubmitting} className="mt-4 w-full" />
 			</form>
 		</Form>
 	)

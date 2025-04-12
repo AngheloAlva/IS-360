@@ -1,4 +1,4 @@
-import ExternalUsersForm from "@/components/forms/admin/user/ExternalUsersForm"
+import CreateExternalUsersForm from "@/components/forms/admin/user/CreateExternalUsersForm"
 import BackButton from "@/components/shared/BackButton"
 
 export default function CreateExternalUserPage() {
@@ -9,7 +9,7 @@ export default function CreateExternalUserPage() {
 				<h1 className="w-fit text-3xl font-bold">Nuevos Usuarios Externos</h1>
 			</div>
 
-			<ExternalUsersForm />
+			<CreateExternalUsersForm />
 		</>
 	)
 }

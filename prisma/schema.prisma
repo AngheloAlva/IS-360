@@ -537,16 +537,10 @@ model Folder {
   @@map("folder")
 }
 
-enum Code {
-  INSTRUCTIVO
-  FORMULARIO
-  PROCEDIMIENTO
-}
-
 model File {
   id String @id @default(cuid())
 
-  code             Code
+  code             String?
   name             String
   description      String?
   area             AREAS?

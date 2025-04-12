@@ -1,45 +1,31 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, UploadCloud, X } from "lucide-react"
+import { UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
-import { es } from "date-fns/locale"
-import { format } from "date-fns"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { uploadFile } from "@/actions/document-management/uploadFile"
-import { CodesValuesArray } from "@/lib/consts/codes"
+import { CodeOptions, CodesValues } from "@/lib/consts/codes"
+import { Areas } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 import {
 	fileFormSchema,
 	type FileFormSchema,
 } from "@/lib/form-schemas/document-management/file.schema"
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
+import { SelectFormField } from "@/components/forms/shared/SelectFormField"
+import { InputFormField } from "@/components/forms/shared/InputFormField"
+import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Card, CardContent } from "@/components/ui/card"
+import { Form, FormLabel } from "@/components/ui/form"
 import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormField,
-	FormMessage,
-	FormControl,
-} from "@/components/ui/form"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectContent,
-	SelectTrigger,
-} from "@/components/ui/select"
-import { Areas } from "@/lib/consts/areas"
 
 interface NewFileFormProps {
 	area: string
@@ -51,7 +37,7 @@ interface NewFileFormProps {
 export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormProps) {
 	const [selectedFile, setSelectedFile] = useState<File | null>(null)
 	const [filePreview, setFilePreview] = useState<string | null>(null)
-	const [uploading, setUploading] = useState(false)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const router = useRouter()
 
@@ -71,15 +57,6 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 	const handleFileChange = (file: File | null) => {
 		if (!file) return
 
-		// Validación de tamaño (10MB)
-		if (file.size > 10_000_000) {
-			toast.error("Archivo demasiado grande", {
-				description: "El tamaño máximo permitido es 10MB",
-			})
-			return
-		}
-
-		// Validación de tipo
 		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt|jpe?g|png|webp|avif|zip|rar|7z)$/i
 		if (!validTypes.test(file.name)) {
 			toast.error("Formato no soportado")
@@ -88,7 +65,6 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 
 		setSelectedFile(file)
 
-		// Generar preview para imágenes
 		if (file.type.startsWith("image/")) {
 			const reader = new FileReader()
 			reader.onload = (e) => setFilePreview(e.target?.result as string)
@@ -101,7 +77,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 	const onSubmit = async (values: FileFormSchema) => {
 		if (!selectedFile) return
 
-		setUploading(true)
+		setIsSubmitting(true)
 
 		try {
 			const fileExtension = selectedFile.name.split(".").pop()
@@ -163,78 +139,47 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 				description: error instanceof Error ? error.message : "Intente nuevamente",
 			})
 		} finally {
-			setUploading(false)
+			setIsSubmitting(false)
 		}
 	}
+
+	const codeIsOther = form.watch("code") === CodesValues.OTRO
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full max-w-screen-md">
 				<Card className="w-full">
 					<CardContent className="grid gap-5">
-						<FormField
-							control={form.control}
+						<InputFormField<FileFormSchema>
 							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Nombre del documento</FormLabel>
-									<FormControl>
-										<Input
-											placeholder="Ej: Informe Técnico 2023"
-											className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Nombre del documento"
+							placeholder="Ej: Informe Técnico 2023"
 						/>
 
-						<FormField
-							control={form.control}
+						<TextAreaFormField<FileFormSchema>
 							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>
-										Descripción
-										<span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
-									</FormLabel>
-									<FormControl>
-										<Textarea
-											placeholder="Agregue detalles adicionales..."
-											className="min-h-[100px] w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Descripción"
+							control={form.control}
+							placeholder="Agregue detalles adicionales..."
 						/>
 
-						<FormField
-							control={form.control}
+						<SelectFormField<FileFormSchema>
 							name="code"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Código de clasificación</FormLabel>
-									<Select onValueChange={field.onChange} value={field.value}>
-										<FormControl>
-											<SelectTrigger className="border-gray-200">
-												<SelectValue placeholder="Seleccione un código" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{CodesValuesArray.map((code) => (
-												<SelectItem key={code} value={code}>
-													<span className="font-mono">{code}</span>
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							options={CodeOptions}
+							control={form.control}
+							label="Código de clasificación"
+							placeholder="Seleccione un código"
 						/>
+
+						{codeIsOther && (
+							<InputFormField<FileFormSchema>
+								name="otherCode"
+								control={form.control}
+								placeholder="Ej: OTRO"
+								label="Otro código de clasificación"
+							/>
+						)}
 
 						<div className="grid gap-4 md:grid-cols-2">
 							<div className="space-y-4">
@@ -327,108 +272,26 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 						<Separator className="mt-8" />
 
 						<div className="grid gap-4 md:grid-cols-2">
-							<FormField
-								control={form.control}
+							<DatePickerFormField<FileFormSchema>
 								name="registrationDate"
-								render={({ field }) => (
-									<FormItem className="flex flex-col">
-										<FormLabel>Fecha de Registro</FormLabel>
-										<Popover>
-											<PopoverTrigger asChild>
-												<FormControl>
-													<Button
-														variant={"outline"}
-														className={cn(
-															"border-input w-full justify-start bg-white text-left font-normal",
-															!field.value && "text-muted-foreground"
-														)}
-													>
-														<CalendarIcon className="mr-2 h-4 w-4" />
-														{field.value ? (
-															format(field.value, "PPP", { locale: es })
-														) : (
-															<span>Seleccionar fecha</span>
-														)}
-													</Button>
-												</FormControl>
-											</PopoverTrigger>
-											<PopoverContent className="w-auto p-0">
-												<Calendar
-													mode="single"
-													selected={field.value}
-													onSelect={field.onChange}
-													initialFocus
-													locale={es}
-												/>
-											</PopoverContent>
-										</Popover>
-										<FormMessage />
-									</FormItem>
-								)}
+								label="Fecha de Registro"
+								control={form.control}
 							/>
 
-							<FormField
-								control={form.control}
+							<DatePickerFormField<FileFormSchema>
 								name="expirationDate"
-								render={({ field }) => (
-									<FormItem className="flex flex-col">
-										<FormLabel>
-											Fecha de Expiración
-											<span className="text-muted-foreground ml-1 text-xs">(opcional)</span>
-										</FormLabel>
-										<Popover>
-											<PopoverTrigger asChild>
-												<FormControl>
-													<Button
-														variant={"outline"}
-														className={cn(
-															"border-input w-full justify-start bg-white text-left font-normal",
-															!field.value && "text-muted-foreground"
-														)}
-													>
-														<CalendarIcon className="mr-2 h-4 w-4" />
-														{field.value ? (
-															format(field.value, "PPP", { locale: es })
-														) : (
-															<span>Seleccionar fecha</span>
-														)}
-													</Button>
-												</FormControl>
-											</PopoverTrigger>
-											<PopoverContent className="w-auto p-0">
-												<Calendar
-													mode="single"
-													selected={field.value}
-													onSelect={field.onChange}
-													initialFocus
-													locale={es}
-													disabled={(date) => date < (form.watch("registrationDate") || new Date())}
-												/>
-											</PopoverContent>
-										</Popover>
-										<FormMessage />
-									</FormItem>
-								)}
+								control={form.control}
+								label="Fecha de Expiración"
 							/>
 						</div>
 					</CardContent>
 				</Card>
 
-				<Button
-					size="lg"
-					type="submit"
-					className="mt-4 w-full"
-					disabled={uploading || !selectedFile}
-				>
-					{uploading ? (
-						<>
-							<span className="animate-pulse">Subiendo...</span>
-							<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-						</>
-					) : (
-						"Subir Documento"
-					)}
-				</Button>
+				<SubmitButton
+					isSubmitting={isSubmitting}
+					disabled={!selectedFile}
+					label="Subir Documento"
+				/>
 			</form>
 		</Form>
 	)
