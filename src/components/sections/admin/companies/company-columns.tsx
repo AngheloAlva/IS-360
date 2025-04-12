@@ -1,9 +1,11 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, Plus } from "lucide-react"
 import { format } from "date-fns"
 import { Company } from "@/hooks/use-companies"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export const CompanyColumns: ColumnDef<Company>[] = [
 	{
@@ -13,6 +15,18 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 	{
 		accessorKey: "rut",
 		header: "RUT",
+	},
+	{
+		accessorKey: "users",
+		header: "Supervisores",
+		cell: ({ row }) => {
+			const users = row.getValue("users") as Company["users"]
+			return (
+				<ul className="flex flex-col">
+					{users ? users.map((user) => <li key={user.id}>{user.name}</li>) : "No Asignado"}
+				</ul>
+			)
+		},
 	},
 	{
 		accessorKey: "createdAt",
@@ -34,11 +48,21 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 		},
 	},
 	{
-		accessorKey: "users",
-		header: "Supervisores",
+		accessorKey: "actions",
 		cell: ({ row }) => {
-			const users = row.getValue("users") as Company["users"]
-			return <div>{users ? users.map((user) => user.name).join(", ") : "No Asignado"}</div>
+			const id = row.original.id
+
+			return (
+				<Link href={`/admin/dashboard/empresas/${id}/supervisores/agregar`}>
+					<Button
+						size={"sm"}
+						variant={"outline"}
+						className="border-feature text-feature hover:bg-feature bg-white hover:text-white"
+					>
+						<Plus className="mr-2 h-4 w-4" /> Supervisor(es)
+					</Button>
+				</Link>
+			)
 		},
 	},
 ]

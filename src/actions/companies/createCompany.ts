@@ -11,9 +11,9 @@ interface CreateCompanyProps {
 export const createCompany = async ({ values }: CreateCompanyProps) => {
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { vehicles, addVehicle, ...rest } = values
+		const { vehicles, addVehicle, supervisors, ...rest } = values
 
-		await prisma.company.create({
+		const company = await prisma.company.create({
 			data: {
 				...rest,
 				vehicles: {
@@ -29,6 +29,9 @@ export const createCompany = async ({ values }: CreateCompanyProps) => {
 		return {
 			ok: true,
 			message: "Empresa creada exitosamente",
+			data: {
+				id: company.id,
+			},
 		}
 	} catch (error) {
 		console.log(error)

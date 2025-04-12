@@ -6,6 +6,7 @@ export interface Company {
 	name: string
 	createdAt: Date
 	users: Array<{
+		id: string
 		name: string
 	}>
 }
