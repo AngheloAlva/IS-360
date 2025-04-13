@@ -35,7 +35,11 @@ export const safetyTalkResourceSchema = z.object({
 	fileSize: z.number(),
 	mimeType: z.string(),
 	file: z.instanceof(File).optional(),
-	preview: z.string().regex(/^data:image\/(jpeg|png|gif|webp);base64,/).or(z.string().url()).optional(),
+	preview: z
+		.string()
+		.regex(/^data:image\/(jpeg|png|gif|webp);base64,/)
+		.or(z.string().url())
+		.optional(),
 })
 
 export const safetyTalkSchema = z.object({

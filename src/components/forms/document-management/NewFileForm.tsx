@@ -168,7 +168,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 							name="code"
 							options={CodeOptions}
 							control={form.control}
-							label="Código de clasificación"
+							label="Código de ISO"
 							placeholder="Seleccione un código"
 						/>
 
@@ -177,7 +177,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 								name="otherCode"
 								control={form.control}
 								placeholder="Ej: OTRO"
-								label="Otro código de clasificación"
+								label="Otro código de ISO"
 							/>
 						)}
 

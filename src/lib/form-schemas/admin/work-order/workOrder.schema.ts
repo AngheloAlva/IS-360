@@ -1,6 +1,6 @@
 import { WORK_ORDER_PRIORITY_VALUES_ARRAY } from "@/lib/consts/work-order-priority"
-import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_STATUS_VALUES_ARRAY } from "@/lib/consts/work-order-status"
+import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
 import { z } from "zod"
 

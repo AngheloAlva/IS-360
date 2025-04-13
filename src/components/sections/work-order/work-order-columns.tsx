@@ -1,20 +1,21 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
+import { LinkIcon } from "lucide-react"
 import { es } from "date-fns/locale"
-import { ArrowUpRight, LinkIcon } from "lucide-react"
+import { format } from "date-fns"
 import Link from "next/link"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
+import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
+import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
+import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
+import { cn } from "@/lib/utils"
+
 import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 import type { WorkOrder } from "@/hooks/use-work-order"
-import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
-import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
-import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
-import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
-import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
-import { cn } from "@/lib/utils"
 
 export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	{
@@ -23,19 +24,53 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "N° OT",
 		cell: ({ row }) => {
 			const otNumber = row.getValue("otNumber") as string
+			const id = row.original.id
 
-			return <div className="font-medium">{otNumber}</div>
+			return (
+				<Link
+					href={`/admin/dashboard/libros-de-obras/${id}`}
+					className="hover:text-feature text-primary font-medium transition-colors hover:underline"
+				>
+					{otNumber}
+				</Link>
+			)
 		},
 	},
 	{
-		accessorKey: "solicitationDate",
-		header: "Fecha de solicitud",
+		accessorKey: "company",
+		header: "Empresa",
 		cell: ({ row }) => {
-			const date = row.getValue("solicitationDate") as Date
+			const company = row.getValue("company") as { name: string }
+
+			return <div className="font-medium">{company.name}</div>
+		},
+	},
+	{
+		accessorKey: "workRequest",
+		header: "Trabajo Solicitado",
+		cell: ({ row }) => {
+			const request = row.getValue("workRequest") as string
+			return <div className="font-medium">{request}</div>
+		},
+	},
+	{
+		accessorKey: "workDescription",
+		header: "Descripción del trabajo",
+		cell: ({ row }) => {
+			const description = row.getValue("workDescription") as string
+			return <div className="font-medium">{description}</div>
+		},
+	},
+	{
+		accessorKey: "workProgressStatus",
+		header: "Progreso",
+		cell: ({ row }) => {
+			const progress = row.getValue("workProgressStatus") as number
 
 			return (
-				<div className="font-medium">
-					{date ? format(date, "dd/MM/yyyy", { locale: es }) : "Sin fecha"}
+				<div className="flex w-[100px] items-center gap-1">
+					<Progress value={progress || 0} className="h-2" />
+					<span className="text-muted-foreground text-xs">{progress || 0}%</span>
 				</div>
 			)
 		},
@@ -63,6 +98,19 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
+		accessorKey: "solicitationDate",
+		header: "Fecha de solicitud",
+		cell: ({ row }) => {
+			const date = row.getValue("solicitationDate") as Date
+
+			return (
+				<div className="font-medium">
+					{date ? format(date, "dd/MM/yyyy", { locale: es }) : "Sin fecha"}
+				</div>
+			)
+		},
+	},
+	{
 		accessorKey: "type",
 		header: "Tipo de obra",
 		cell: ({ row }) => {
@@ -79,45 +127,17 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
-		accessorKey: "workRequest",
-		header: "Trabajo Solicitado",
-		cell: ({ row }) => {
-			const request = row.getValue("workRequest") as string
-			return <div className="font-medium">{request}</div>
-		},
-	},
-	{
-		accessorKey: "workDescription",
-		header: "Descripción del trabajo",
-		cell: ({ row }) => {
-			const description = row.getValue("workDescription") as string
-			return <div className="font-medium">{description}</div>
-		},
-	},
-	{
 		accessorKey: "equipment",
 		header: "Equipo",
 		cell: ({ row }) => {
 			const equipment = row.getValue("equipment") as { name: string }[]
 
 			return (
-				<div className="font-medium">
-					{equipment.length > 0 ? equipment.map((e) => e.name).join(" - ") : "Sin equipo"}
-				</div>
-			)
-		},
-	},
-	{
-		accessorKey: "workProgressStatus",
-		header: "Progreso",
-		cell: ({ row }) => {
-			const progress = row.getValue("workProgressStatus") as number
-
-			return (
-				<div className="flex w-[100px] items-center gap-1">
-					<Progress value={progress || 0} className="h-2" />
-					<span className="text-muted-foreground text-xs">{progress || 0}%</span>
-				</div>
+				<ul className="flex flex-col">
+					{equipment.length > 0
+						? equipment.map((e) => <li key={e.name}>{e.name}</li>)
+						: "Sin equipo"}
+				</ul>
 			)
 		},
 	},
@@ -170,17 +190,8 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
-		accessorKey: "company",
-		header: "Empresa",
-		cell: ({ row }) => {
-			const company = row.getValue("company") as { name: string }
-
-			return <div className="font-medium">{company.name}</div>
-		},
-	},
-	{
 		accessorKey: "_count",
-		header: "Entradas",
+		header: "Actividades Realizadas",
 		cell: ({ row }) => {
 			const count = row.getValue("_count") as { workEntries: number }
 
@@ -232,26 +243,6 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 						href={report ? report.url : "#"}
 					>
 						<LinkIcon className="h-4 w-4" />
-					</Link>
-				</Button>
-			)
-		},
-	},
-	{
-		id: "actions",
-		enableHiding: false,
-		cell: ({ row }) => {
-			const { id } = row.original
-
-			return (
-				<Button
-					asChild
-					size="icon"
-					variant="outline"
-					className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
-				>
-					<Link href={`/admin/dashboard/libros-de-obras/${id}`}>
-						<ArrowUpRight className="h-4 w-4" />
 					</Link>
 				</Button>
 			)

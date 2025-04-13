@@ -19,7 +19,7 @@ import { getInternalUsers } from "@/actions/users/getUsers"
 import { cn } from "@/lib/utils"
 import {
 	workOrderSchema,
-	WorkOrderSchema,
+	type WorkOrderSchema,
 } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -50,7 +50,7 @@ import type { Company, User } from "@prisma/client"
 
 type CompanyWithUsers = Company & { users: User[] }
 
-export default function WorkOrderForm(): React.ReactElement {
+export default function CreateWorkOrderForm(): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [equipments, setEquipments] = useState<
 		Array<{
@@ -73,6 +73,7 @@ export default function WorkOrderForm(): React.ReactElement {
 		resolver: zodResolver(workOrderSchema),
 		defaultValues: {
 			companyId: "",
+			equipment: [],
 			breakDays: "0",
 			workRequest: "",
 			supervisorId: "",
@@ -131,7 +132,7 @@ export default function WorkOrderForm(): React.ReactElement {
 	useEffect(() => {
 		const fetchEquipments = async () => {
 			setIsEquipmentsLoading(true)
-			const { data, ok } = await getEquipment(100, 1)
+			const { data, ok } = await getEquipment(1000, 1)
 
 			if (!ok || !data) {
 				toast("Error al cargar los equipos", {

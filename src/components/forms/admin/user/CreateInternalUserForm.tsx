@@ -127,8 +127,8 @@ export default function CreateInternalUserForm(): React.ReactElement {
 						/>
 
 						<SelectFormField<InternalUserSchema>
+							label="Cargo"
 							name="internalRole"
-							label="Rol Interno"
 							control={form.control}
 							options={InternalRoleOptions}
 						/>

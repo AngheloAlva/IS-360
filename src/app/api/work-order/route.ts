@@ -106,7 +106,11 @@ export async function GET(req: NextRequest) {
 					},
 					_count: {
 						select: {
-							workEntries: true,
+							workEntries: {
+								where: {
+									entryType: { in: ["ADDITIONAL_ACTIVITY", "DAILY_ACTIVITY"] },
+								},
+							},
 						},
 					},
 				},

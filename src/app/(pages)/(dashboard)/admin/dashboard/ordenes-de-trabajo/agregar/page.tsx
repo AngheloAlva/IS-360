@@ -1,4 +1,4 @@
-import WorkOrderForm from "@/components/forms/admin/work-order/WorkOrderForm"
+import CreateWorkOrderForm from "@/components/forms/admin/work-order/CreateWorkOrderForm"
 import BackButton from "@/components/shared/BackButton"
 
 export default function CreateUserPage() {
@@ -9,7 +9,7 @@ export default function CreateUserPage() {
 				<h1 className="w-fit text-3xl font-bold">Nueva Orden de Trabajo</h1>
 			</div>
 
-			<WorkOrderForm />
+			<CreateWorkOrderForm />
 		</>
 	)
 }

@@ -151,7 +151,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 					</div>
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-semibold">OTC</span>
-						<span className="truncate text-xs">IS 360 ERP</span>
+						<span className="truncate text-xs">360 ERP</span>
 					</div>
 				</SidebarMenuButton>
 			</SidebarHeader>

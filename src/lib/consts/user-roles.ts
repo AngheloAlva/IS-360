@@ -17,16 +17,12 @@ export const USER_ROLES_VALUES_ARRAY = [
 export const UserRolesLabels = {
 	SUPERADMIN: "Super Administrador",
 	ADMIN: "Administrador",
-	USER: "Usuario OTC",
+	USER: "Acceso Tecnico",
 	OPERATOR: "Operador",
 	PARTNER_COMPANY: "Empresa Colaboradora",
 } as const
 
 export const UserRoleOptions = [
-	{
-		value: USER_ROLES_VALUES.SUPERADMIN,
-		label: UserRolesLabels.SUPERADMIN,
-	},
 	{
 		value: USER_ROLES_VALUES.ADMIN,
 		label: UserRolesLabels.ADMIN,
