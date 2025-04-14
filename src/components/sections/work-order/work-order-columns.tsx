@@ -38,11 +38,16 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	},
 	{
 		accessorKey: "company",
-		header: "Empresa",
+		header: "Empresa - Supervisor",
 		cell: ({ row }) => {
 			const company = row.getValue("company") as { name: string }
+			const supervisor = row.original.supervisor as { name: string }
 
-			return <div className="font-medium">{company.name}</div>
+			return (
+				<div className="font-medium">
+					{company.name} - {supervisor.name}
+				</div>
+			)
 		},
 	},
 	{
@@ -58,7 +63,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "Descripción del trabajo",
 		cell: ({ row }) => {
 			const description = row.getValue("workDescription") as string
-			return <div className="font-medium">{description}</div>
+			return <div className="max-w-52 font-medium text-wrap">{description}</div>
 		},
 	},
 	{

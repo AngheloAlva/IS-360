@@ -8,6 +8,7 @@ export const dailyActivitySchema = z.object({
 	activityStartTime: z.string().nonempty({ message: "La hora de inicio no puede estar vacía" }),
 	activityEndTime: z.string().nonempty({ message: "La hora de fin no puede estar vacía" }),
 	activityName: z.string().nonempty({ message: "El nombre de la actividad no puede estar vacío" }),
+	progress: z.string().regex(/^[0-9]+$/, "Debe ser un número"),
 	personnel: z
 		.array(
 			z.object({

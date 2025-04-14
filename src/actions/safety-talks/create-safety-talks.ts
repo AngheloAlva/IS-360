@@ -1,4 +1,9 @@
-import { SafetyTalkSchema, safetyTalkSchema } from "@/lib/form-schemas/safety-talk/safety-talk"
+"use server"
+
+import {
+	type SafetyTalkSchema,
+	safetyTalkSchema,
+} from "@/lib/form-schemas/safety-talk/safety-talk.schema"
 import prisma from "@/lib/prisma"
 
 interface CreateSafetyTalkProps {
@@ -12,6 +17,7 @@ export async function createSafetyTalk({
 }: CreateSafetyTalkProps): Promise<{ ok: boolean; message: string }> {
 	try {
 		const validatedData = safetyTalkSchema.parse(data)
+		console.log(validatedData)
 
 		const safetyTalk = await prisma.safetyTalk.create({
 			data: {
@@ -19,8 +25,8 @@ export async function createSafetyTalk({
 				slug: slug,
 				description: validatedData.description,
 				isPresential: validatedData.isPresential,
-				timeLimit: validatedData.timeLimit,
-				minimumScore: validatedData.minimumScore,
+				timeLimit: validatedData.timeLimit ? +validatedData.timeLimit : null,
+				minimumScore: +validatedData.minimumScore,
 				expiresAt: validatedData.expiresAt,
 				resources: {
 					create: validatedData.resources.map((resource) => ({
@@ -32,25 +38,27 @@ export async function createSafetyTalk({
 						order: 0,
 					})),
 				},
-				questions: {
-					create: validatedData.questions.map((question) => ({
-						type: question.type,
-						question: question.question,
-						imageUrl: question.imageUrl,
-						description: question.description,
-						options: {
-							create: question.options.map((option) => ({
-								text: option.text,
-								isCorrect: option.isCorrect,
-								zoneLabel: option.zoneLabel,
-								zoneId: option.zoneId,
-								order: option.order,
-							})),
-						},
-					})),
-				},
+				// questions: {
+				// 	create: validatedData.questions.map((question) => ({
+				// 		type: question.type,
+				// 		question: question.question,
+				// 		imageUrl: question.imageUrl,
+				// 		description: question.description,
+				// 		options: {
+				// 			create: question.options.map((option) => ({
+				// 				text: option.text,
+				// 				isCorrect: option.isCorrect,
+				// 				zoneLabel: option.zoneLabel,
+				// 				zoneId: option.zoneId,
+				// 				order: option.order,
+				// 			})),
+				// 		},
+				// 	})),
+				// },
 			},
 		})
+
+		console.log(safetyTalk)
 
 		if (!safetyTalk) {
 			throw new Error("No se pudo crear la charla de seguridad")
@@ -61,6 +69,7 @@ export async function createSafetyTalk({
 			message: "Charla de seguridad creada exitosamente",
 		}
 	} catch (error) {
+		console.log(error)
 		return {
 			ok: false,
 			message: error instanceof Error ? error.message : "Error al crear la charla de seguridad",

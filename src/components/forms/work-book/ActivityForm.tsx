@@ -49,10 +49,11 @@ export default function ActivityForm({
 	const form = useForm<DailyActivitySchema>({
 		resolver: zodResolver(dailyActivitySchema),
 		defaultValues: {
-			activityEndTime: "",
-			activityName: "",
-			activityStartTime: "",
 			comments: "",
+			progress: "",
+			activityName: "",
+			activityEndTime: "",
+			activityStartTime: "",
 			executionDate: new Date(),
 			personnel: [
 				{
@@ -212,7 +213,7 @@ export default function ActivityForm({
 			>
 				<Card className="w-full">
 					<CardContent className="grid gap-4 pb-10 md:grid-cols-2">
-						<InputFormField
+						<InputFormField<DailyActivitySchema>
 							name="activityName"
 							control={form.control}
 							label="Nombre de la Actividad"
@@ -220,25 +221,38 @@ export default function ActivityForm({
 						/>
 
 						<div className="flex gap-2">
-							<DatePickerFormField
+							<DatePickerFormField<DailyActivitySchema>
 								name="executionDate"
 								control={form.control}
 								label="Fecha de Ejecución"
 							/>
 
-							<InputFormField
+							<InputFormField<DailyActivitySchema>
 								control={form.control}
 								label="Hora de Inicio"
 								name="activityStartTime"
 							/>
 
-							<InputFormField name="activityEndTime" control={form.control} label="Hora de Fin" />
+							<InputFormField<DailyActivitySchema>
+								name="activityEndTime"
+								control={form.control}
+								label="Hora de Fin"
+							/>
+
+							<InputFormField<DailyActivitySchema>
+								name="progress"
+								control={form.control}
+								label="Progreso"
+								type="number"
+							/>
 						</div>
 
 						<TextAreaFormField<DailyActivitySchema>
 							name="comments"
+							className="h-32"
 							label="Comentarios"
 							control={form.control}
+							itemClassName="md:col-span-2"
 						/>
 
 						<div className="grid gap-4 md:col-span-2 md:grid-cols-2">
@@ -371,7 +385,6 @@ export default function ActivityForm({
 											label: user.name,
 										}))}
 										control={form.control}
-										label={`Personal ${index + 1}`}
 										name={`personnel.${index}.userId`}
 										placeholder="Seleccione al personal"
 									/>

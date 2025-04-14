@@ -15,7 +15,7 @@ import type { Control, FieldValues, Path } from "react-hook-form"
 
 interface SelectFormFieldProps<T extends FieldValues> {
 	name: Path<T>
-	label: string
+	label?: string
 	className?: string
 	control: Control<T>
 	placeholder?: string

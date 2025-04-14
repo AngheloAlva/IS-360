@@ -5,11 +5,11 @@ import { QUESTION_TYPES } from "@/lib/consts/safety-talks"
 // Schema para opciones de pregunta
 export const questionOptionSchema = z.object({
 	id: z.string().optional(),
-	text: z.string().min(1, "El texto de la opción es requerido"),
-	isCorrect: z.boolean(),
+	text: z.string().min(3, "El texto de la opción debe tener al menos 3 caracteres"),
+	isCorrect: z.boolean().default(false),
 	zoneLabel: z.string().optional(),
 	zoneId: z.string().optional(),
-	order: z.number().int().min(0),
+	order: z.string().regex(/^[0-9]+$/, "Debe ser un número"),
 })
 
 // Schema para preguntas
@@ -21,7 +21,7 @@ export const questionSchema = z.object({
 		QUESTION_TYPES.TRUE_FALSE,
 		QUESTION_TYPES.SHORT_ANSWER,
 	]),
-	question: z.string().min(1, "La pregunta es requerida"),
+	question: z.string().min(3, "La pregunta debe tener al menos 3 caracteres"),
 	imageUrl: z.string().url("URL inválida").optional(),
 	description: z.string().optional(),
 	options: z.array(questionOptionSchema).min(1, "Debe haber al menos una opción"),
@@ -29,7 +29,7 @@ export const questionSchema = z.object({
 
 // Schema principal para charla de seguridad
 export const safetyTalkResourceSchema = z.object({
-	title: z.string(),
+	title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
 	type: z.enum(["VIDEO", "PRESENTATION", "DOCUMENT"]),
 	url: z.string().url("URL inválida").optional(),
 	fileSize: z.number(),
@@ -43,11 +43,18 @@ export const safetyTalkResourceSchema = z.object({
 })
 
 export const safetyTalkSchema = z.object({
-	title: z.string().min(1, "El título es requerido"),
+	title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
 	description: z.string().optional(),
 	isPresential: z.boolean().default(false),
-	timeLimit: z.number().int().min(1, "El tiempo límite debe ser mayor a 0").optional(),
-	minimumScore: z.number().min(0).max(100).default(70),
+	timeLimit: z
+		.string()
+		.regex(/^[0-9]+$/, "Debe ser un número")
+		.min(1, "El tiempo límite debe ser mayor a 0")
+		.optional(),
+	minimumScore: z
+		.string()
+		.regex(/^[0-9]+$/, "Debe ser un número")
+		.default("70"),
 	expiresAt: z.date(),
 	questions: z.array(questionSchema).optional().default([]),
 	resources: z.array(safetyTalkResourceSchema).optional().default([]),

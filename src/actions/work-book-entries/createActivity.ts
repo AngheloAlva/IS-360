@@ -23,63 +23,80 @@ export const createActivity = async ({
 	attachment,
 }: CreateActivityProps) => {
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { workOrderId, comments, personnel, ...rest } = values
+		return await prisma.$transaction(async (tx) => {
+			const { workOrderId, comments, progress, ...rest } = values
 
-		const workBookEntryConnectionData: {
-			workOrder: { connect: { id: string } }
-			assignedUsers: {
-				connect: {
-					id: string
-				}[]
+			const workBookEntryConnectionData: {
+				workOrder: { connect: { id: string } }
+				assignedUsers: {
+					connect: {
+						id: string
+					}[]
+				}
+				createdBy: { connect: { id: string } }
+				attachments?: { create: { type: string; url: string; name: string }[] }
+			} = {
+				workOrder: {
+					connect: {
+						id: workOrderId,
+					},
+				},
+				assignedUsers: {
+					connect: values.personnel.map((personnel) => ({
+						id: personnel.userId,
+					})),
+				},
+				createdBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			}
-			createdBy: { connect: { id: string } }
-			attachments?: { create: { type: string; url: string; name: string }[] }
-		} = {
-			workOrder: {
-				connect: {
+
+			if (attachment) {
+				workBookEntryConnectionData.attachments = {
+					create: [
+						{
+							type: attachment.fileType,
+							url: attachment.fileUrl,
+							name: attachment.name,
+						},
+					],
+				}
+			}
+
+			const newWorkEntry = await tx.workEntry.create({
+				data: {
+					entryType,
+					hasAttachments: !!attachment,
+					comments: comments || "",
+					...rest,
+					...workBookEntryConnectionData,
+				},
+			})
+
+			const workOrder = await tx.workOrder.findUnique({
+				where: { id: workOrderId },
+				select: { workProgressStatus: true },
+			})
+
+			const updatedProgress = (workOrder?.workProgressStatus || 0) + Number(progress)
+
+			await tx.workOrder.update({
+				where: {
 					id: workOrderId,
 				},
-			},
-			assignedUsers: {
-				connect: values.personnel.map((personnel) => ({
-					id: personnel.userId,
-				})),
-			},
-			createdBy: {
-				connect: {
-					id: userId,
+				data: {
+					workProgressStatus: updatedProgress,
 				},
-			},
-		}
+			})
 
-		if (attachment) {
-			workBookEntryConnectionData.attachments = {
-				create: [
-					{
-						type: attachment.fileType,
-						url: attachment.fileUrl,
-						name: attachment.name,
-					},
-				],
+			return {
+				ok: true,
+				data: newWorkEntry,
+				message: "Actividad creada exitosamente",
 			}
-		}
-
-		const newWorkEntry = await prisma.workEntry.create({
-			data: {
-				entryType,
-				hasAttachments: !!attachment,
-				comments: comments || "",
-				...rest,
-				...workBookEntryConnectionData,
-			},
 		})
-
-		return {
-			ok: true,
-			data: newWorkEntry,
-			message: "Actividad creada exitosamente",
-		}
 	} catch (error) {
 		console.error(error)
 

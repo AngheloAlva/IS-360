@@ -8,7 +8,12 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { safetyTalkSchema, type SafetyTalkSchema } from "@/lib/form-schemas/safety-talk/safety-talk"
+import QuestionsSection from "./QuestionsSection"
+
+import {
+	safetyTalkSchema,
+	type SafetyTalkSchema,
+} from "@/lib/form-schemas/safety-talk/safety-talk.schema"
 import { createSafetyTalk } from "@/actions/safety-talks/create-safety-talks"
 import { generateSlug } from "@/lib/generateSlug"
 import { cn } from "@/lib/utils"
@@ -32,11 +37,11 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 		resolver: zodResolver(safetyTalkSchema),
 		defaultValues: {
 			title: "",
-			timeLimit: 0,
 			questions: [],
 			resources: [],
+			timeLimit: "0",
 			description: "",
-			minimumScore: 70,
+			minimumScore: "70",
 			isPresential: false,
 			expiresAt: new Date(),
 		},
@@ -99,7 +104,9 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 
 		try {
 			const slug = generateSlug(values.title)
+			console.log({ values, slug })
 			const { ok, message } = await createSafetyTalk({ data: values, slug })
+			console.log({ ok, message })
 
 			if (ok) {
 				toast("Charla de seguridad creada exitosamente", {
@@ -135,6 +142,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 						<div className="grid w-full gap-x-3 gap-y-5 md:grid-cols-2">
 							<div className="flex items-center gap-x-0.5">
 								<InputFormField<SafetyTalkSchema>
+									type="number"
 									name="timeLimit"
 									label="Tiempo Límite"
 									control={form.control}
@@ -153,6 +161,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 
 							<div className="flex items-center gap-x-0.5">
 								<InputFormField<SafetyTalkSchema>
+									type="number"
 									name="minimumScore"
 									label="Porcentaje Mínimo"
 									control={form.control}
@@ -289,6 +298,8 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 						</div>
 					</CardContent>
 				</Card>
+
+				<QuestionsSection control={form.control} />
 
 				<SubmitButton label="Crear charla" isSubmitting={isSubmitting} className="mt-4 w-full" />
 			</form>

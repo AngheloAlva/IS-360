@@ -1,8 +1,8 @@
 "use client"
 
+import { CalendarIcon, UploadCloud, X } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { CalendarIcon, UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
@@ -14,8 +14,8 @@ import { createWorkOrder } from "@/actions/work-orders/createWorkOrder"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { getEquipment } from "@/actions/equipments/getEquipment"
-import { getCompanies } from "@/actions/companies/getCompanies"
 import { getInternalUsers } from "@/actions/users/getUsers"
+import { useCompanies } from "@/hooks/use-companies"
 import { cn } from "@/lib/utils"
 import {
 	workOrderSchema,
@@ -28,6 +28,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
+import SafetyTalksInfo from "./SafetyTalksInfo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -46,9 +47,8 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-import type { Company, User } from "@prisma/client"
-
-type CompanyWithUsers = Company & { users: User[] }
+import type { User } from "@prisma/client"
+import type { Company } from "@/hooks/use-companies"
 
 export default function CreateWorkOrderForm(): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -59,13 +59,13 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 		}>
 	>([])
 	const [internalUsers, setInternalUsers] = useState<User[]>([])
-	const [companies, setCompanies] = useState<CompanyWithUsers[]>([])
-	const [isCompaniesLoading, setIsCompaniesLoading] = useState<boolean>(false)
-	const [isEquipmentsLoading, setIsEquipmentsLoading] = useState<boolean>(false)
-	const [isInternalUsersLoading, setIsInternalUsersLoading] = useState<boolean>(false)
-	const [selectedCompany, setSelectedCompany] = useState<CompanyWithUsers | undefined>(undefined)
 	const [initReportFile, setInitReportFile] = useState<File | null>(null)
+	const [isEquipmentsLoading, setIsEquipmentsLoading] = useState<boolean>(false)
 	const [initReportPreview, setInitReportPreview] = useState<string | null>(null)
+	const [isInternalUsersLoading, setIsInternalUsersLoading] = useState<boolean>(false)
+	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
+
+	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
 
 	const router = useRouter()
 
@@ -88,26 +88,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 			solicitationTime: new Date().toTimeString().split(" ")[0],
 		},
 	})
-
-	useEffect(() => {
-		const fetchCompanies = async () => {
-			setIsCompaniesLoading(true)
-			const { data, ok } = await getCompanies(100, 1, true)
-
-			if (!ok || !data) {
-				toast("Error al cargar las empresas", {
-					description: "Error al cargar las empresas",
-					duration: 5000,
-				})
-				return
-			}
-
-			setCompanies(data)
-			setIsCompaniesLoading(false)
-		}
-
-		void fetchCompanies()
-	}, [])
 
 	useEffect(() => {
 		const fetchInternalUsers = async () => {
@@ -153,13 +133,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 
 		void fetchEquipments()
 	}, [])
-
-	useEffect(() => {
-		const company = companies.find((c) => c.id === form.watch("companyId"))
-		setSelectedCompany(company)
-		form.setValue("supervisorId", company?.users[0]?.id || "")
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("companyId")])
 
 	useEffect(() => {
 		const estimatedHours = Number(form.watch("estimatedHours"))
@@ -286,18 +259,23 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							name="responsibleId"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Responsable OTC</FormLabel>
-
+									<FormLabel>Responsable</FormLabel>
 									{isInternalUsersLoading ? (
-										<Skeleton className="h-9 w-full rounded-md" />
+										<FormControl>
+											<Skeleton className="h-10 w-full" />
+										</FormControl>
 									) : (
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<Select
+											disabled={!internalUsers}
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
 											<FormControl>
-												<SelectTrigger className="border-gray-200">
-													<SelectValue placeholder="Seleccione al responsable" />
+												<SelectTrigger>
+													<SelectValue placeholder="Selecciona un responsable" />
 												</SelectTrigger>
 											</FormControl>
-											<SelectContent className="text-neutral-700">
+											<SelectContent>
 												{internalUsers.map((user) => (
 													<SelectItem key={user.id} value={user.id}>
 														{user.name}
@@ -497,7 +475,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 				</Card>
 
 				<Card>
-					<CardContent className="grid gap-x-4 gap-y-5 md:grid-cols-2">
+					<CardContent className="grid w-full gap-x-3 gap-y-5 md:grid-cols-2">
 						<div className="md:col-span-2">
 							<h2 className="text-xl font-bold">Empresa Colaboradora</h2>
 							<span className="text-muted-foreground text-sm">
@@ -508,43 +486,74 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 						<FormField
 							control={form.control}
 							name="companyId"
-							render={({ field }) => (
+							render={() => (
 								<FormItem className="flex flex-col">
 									<FormLabel>Empresa Responsable</FormLabel>
-									{isCompaniesLoading ? (
-										<Skeleton className="h-10 w-full" />
-									) : (
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
+									<Select
+										disabled={isCompaniesLoading}
+										onValueChange={(value) => {
+											const company = companiesData?.companies.find((c) => c.id === value)
+											setSelectedCompany(company)
+											form.setValue("companyId", value)
+										}}
+									>
+										<FormControl>
 											<SelectTrigger>
-												<SelectValue placeholder="Seleccione una empresa" />
+												<SelectValue placeholder="Selecciona una empresa" />
 											</SelectTrigger>
-											<SelectContent>
-												{companies.map((company) => (
+										</FormControl>
+										<SelectContent>
+											{isCompaniesLoading ? (
+												<div className="flex w-full items-center justify-center p-4">
+													<Skeleton className="h-4 w-full" />
+												</div>
+											) : (
+												companiesData?.companies.map((company) => (
 													<SelectItem key={company.id} value={company.id}>
 														{company.name}
 													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									)}
+												))
+											)}
+										</SelectContent>
+									</Select>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-						<div className="grid w-full grid-cols-2 pt-4.5">
-							{selectedCompany && (
-								<>
-									<div>
-										<p className="text-sm font-medium">Empresa seleccionada</p>
-										<p className="text-sm">{selectedCompany.name}</p>
-									</div>
-									<div>
-										<p className="text-sm font-medium">Supervisor</p>
-										<p className="text-sm">{selectedCompany.users[0]?.name}</p>
-									</div>
-								</>
-							)}
-						</div>
+						{selectedCompany && (
+							<FormField
+								control={form.control}
+								name="supervisorId"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Supervisor</FormLabel>
+										<Select
+											disabled={!selectedCompany}
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Selecciona un supervisor" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{selectedCompany?.users
+													.filter((user) => user.isSupervisor)
+													.map((user) => (
+														<SelectItem key={user.id} value={user.id}>
+															{user.name}
+														</SelectItem>
+													))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						)}
+
+						{selectedCompany && <SafetyTalksInfo users={selectedCompany.users} />}
 					</CardContent>
 				</Card>
 

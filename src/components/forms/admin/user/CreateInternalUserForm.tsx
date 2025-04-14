@@ -35,6 +35,7 @@ export default function CreateInternalUserForm(): React.ReactElement {
 			rut: "",
 			name: "",
 			email: "",
+			phone: "",
 			role: "USER",
 		},
 	})
@@ -53,6 +54,7 @@ export default function CreateInternalUserForm(): React.ReactElement {
 				data: {
 					rut: values.rut,
 					area: values.area,
+					phone: values.phone,
 					internalRole: values.internalRole,
 				},
 			})
@@ -118,6 +120,12 @@ export default function CreateInternalUserForm(): React.ReactElement {
 						/>
 
 						<RutFormField<InternalUserSchema> name="rut" label="RUT" control={form.control} />
+
+						<InputFormField<InternalUserSchema>
+							name="phone"
+							label="Teléfono"
+							control={form.control}
+						/>
 
 						<SelectFormField<InternalUserSchema>
 							name="role"

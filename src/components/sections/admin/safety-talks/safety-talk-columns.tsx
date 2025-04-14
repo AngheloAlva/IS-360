@@ -1,17 +1,11 @@
-import { ArrowUpDown, Eye, FileEdit, Trash } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import {
-	DropdownMenu,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-} from "@/components/ui/dropdown-menu"
 
 import type { SafetyTalk } from "@/hooks/use-safety-talks"
 
@@ -85,41 +79,6 @@ export const SafetyTalkColumns: ColumnDef<SafetyTalk>[] = [
 		cell: ({ row }) => {
 			const date = new Date(row.getValue("expiresAt"))
 			return format(date, "dd 'de' MMMM, yyyy", { locale: es })
-		},
-	},
-	{
-		id: "actions",
-		cell: ({ row }) => {
-			const slug = row.original.slug
-
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<span className="sr-only">Abrir menú</span>
-							<Eye className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem asChild>
-							<Link href={`/admin/dashboard/charlas-de-seguridad/${slug}`}>
-								<Eye className="mr-2 h-4 w-4" />
-								Ver detalles
-							</Link>
-						</DropdownMenuItem>
-						<DropdownMenuItem asChild>
-							<Link href={`/admin/dashboard/charlas-de-seguridad/${slug}/editar`}>
-								<FileEdit className="mr-2 h-4 w-4" />
-								Editar
-							</Link>
-						</DropdownMenuItem>
-						<DropdownMenuItem className="text-destructive">
-							<Trash className="mr-2 h-4 w-4" />
-							Eliminar
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			)
 		},
 	},
 ]

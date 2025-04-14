@@ -1,14 +1,30 @@
 import { useQuery } from "@tanstack/react-query"
 
+interface SafetyTalkStatus {
+	id: string
+	title: string
+	minimumScore: number
+	expiresAt: Date
+	isPresential: boolean
+	completed: boolean
+	score?: number
+	passed?: boolean
+	completedAt?: Date
+}
+
+export interface CompanyUser {
+	id: string
+	name: string
+	isSupervisor: boolean
+	safetyTalks: SafetyTalkStatus[]
+}
+
 export interface Company {
 	id: string
 	rut: string
 	name: string
 	createdAt: Date
-	users: Array<{
-		id: string
-		name: string
-	}>
+	users: CompanyUser[]
 }
 
 interface UseCompaniesParams {
