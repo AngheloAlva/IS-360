@@ -1,21 +1,19 @@
 import { PrismaClient } from "@prisma/client"
 
-const prismaClientSingleton = () => {
-	if (typeof window === "undefined") {
-		return new PrismaClient({
-			log: ["error", "warn"],
-			datasourceUrl: process.env.DATABASE_URL,
-		})
-	}
-	return null
-}
-
 const globalForPrisma = globalThis as unknown as {
-	prisma: PrismaClient
+	prisma: PrismaClient | undefined
 }
 
-const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
+const prisma =
+	globalForPrisma.prisma ??
+	new PrismaClient({
+		log: ["error", "warn"],
+		datasourceUrl: process.env.DATABASE_URL,
+	})
 
-if (process.env.NODE_ENV !== "production" && prisma) globalForPrisma.prisma = prisma
+// Guardar en globalThis en todos los entornos
+if (!globalForPrisma.prisma) {
+	globalForPrisma.prisma = prisma
+}
 
 export default prisma
