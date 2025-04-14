@@ -24,7 +24,7 @@ export const createActivity = async ({
 }: CreateActivityProps) => {
 	try {
 		return await prisma.$transaction(async (tx) => {
-			const { workOrderId, comments, progress, ...rest } = values
+			const { workOrderId, comments, personnel, progress, ...rest } = values
 
 			const workBookEntryConnectionData: {
 				workOrder: { connect: { id: string } }
@@ -42,7 +42,7 @@ export const createActivity = async ({
 					},
 				},
 				assignedUsers: {
-					connect: values.personnel.map((personnel) => ({
+					connect: personnel.map((personnel) => ({
 						id: personnel.userId,
 					})),
 				},
