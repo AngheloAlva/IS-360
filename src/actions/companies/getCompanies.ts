@@ -32,6 +32,10 @@ export const getCompanies = async (
 					},
 				},
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {

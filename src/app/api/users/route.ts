@@ -50,8 +50,18 @@ export async function GET(req: NextRequest) {
 				orderBy: {
 					createdAt: "desc",
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
-			prisma.user.count({ where }),
+			prisma.user.count({
+				where,
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
+			}),
 		])
 
 		return NextResponse.json({

@@ -1,5 +1,6 @@
-import prisma from "@/lib/prisma"
 import { NextResponse } from "next/server"
+
+import prisma from "@/lib/prisma"
 
 export async function GET() {
 	try {
@@ -12,6 +13,10 @@ export async function GET() {
 						workOrders: true,
 					},
 				},
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 

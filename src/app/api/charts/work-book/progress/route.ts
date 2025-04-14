@@ -25,6 +25,10 @@ export async function GET() {
 				workProgressStatus: true,
 				createdAt: true,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		// Group by week and calculate average progress

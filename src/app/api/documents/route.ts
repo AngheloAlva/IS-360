@@ -23,6 +23,10 @@ export async function GET(req: NextRequest) {
 						},
 					},
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			prisma.folder.findMany({
 				where: { area, parent: folderSlug ? { slug: folderSlug } : null, isActive: true },
@@ -32,6 +36,10 @@ export async function GET(req: NextRequest) {
 							name: true,
 						},
 					},
+				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
 				},
 			}),
 		])

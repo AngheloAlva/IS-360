@@ -7,6 +7,10 @@ export const getEquipment = async (limit: number = 10, page: number = 1) => {
 		const equipments = await prisma.equipment.findMany({
 			take: limit,
 			skip: (page - 1) * limit,
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {

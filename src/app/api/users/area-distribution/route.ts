@@ -6,6 +6,10 @@ export async function GET() {
 		const areaDistribution = await prisma.user.groupBy({
 			by: ["area"],
 			_count: true,
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
 		})
 
 		return NextResponse.json({

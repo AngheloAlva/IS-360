@@ -69,6 +69,10 @@ export async function GET(req: NextRequest) {
 				orderBy: {
 					createdAt: "desc",
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			// Get total count
 			prisma.workOrder.count({
@@ -84,6 +88,10 @@ export async function GET(req: NextRequest) {
 							}
 						: {}),
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			// Get statistics
 			prisma.$transaction([
@@ -93,12 +101,20 @@ export async function GET(req: NextRequest) {
 						isWorkBook: true,
 						status: { in: ["IN_PROGRESS", "PENDING"] },
 					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
 				}),
 				// Total completed work books
 				prisma.workOrder.count({
 					where: {
 						isWorkBook: true,
 						status: "COMPLETED",
+					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
 					},
 				}),
 				// Total entries in all work books
@@ -108,6 +124,10 @@ export async function GET(req: NextRequest) {
 							isWorkBook: true,
 						},
 					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
 				}),
 				// Average entries per work book
 				prisma.workOrder.aggregate({
@@ -116,6 +136,10 @@ export async function GET(req: NextRequest) {
 					},
 					_avg: {
 						workProgressStatus: true,
+					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
 					},
 				}),
 			]),

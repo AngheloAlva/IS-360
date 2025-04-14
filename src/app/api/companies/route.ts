@@ -56,6 +56,10 @@ export async function GET(req: NextRequest) {
 				},
 				skip,
 				take: limit,
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			prisma.company.count({
 				where: {
@@ -68,8 +72,11 @@ export async function GET(req: NextRequest) {
 							}
 						: {}),
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
-			// Obtener todas las charlas de seguridad
 			prisma.safetyTalk.findMany({
 				select: {
 					id: true,
@@ -78,18 +85,20 @@ export async function GET(req: NextRequest) {
 					expiresAt: true,
 					isPresential: true,
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 		])
 
-		// Procesar los datos para incluir las charlas pendientes
-		const processedCompanies = companies.map(company => ({
+		const processedCompanies = companies.map((company) => ({
 			...company,
-			users: company.users.map(user => ({
+			users: company.users.map((user) => ({
 				...user,
-				safetyTalks: safetyTalks.map(talk => {
-					// Buscar si el usuario ya completó esta charla
-					const userTalk = user.safetyTalks.find(ut => ut.safetyTalk.id === talk.id)
-					
+				safetyTalks: safetyTalks.map((talk) => {
+					const userTalk = user.safetyTalks.find((ut) => ut.safetyTalk.id === talk.id)
+
 					return {
 						...talk,
 						completed: !!userTalk,

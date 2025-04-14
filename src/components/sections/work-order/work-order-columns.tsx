@@ -1,5 +1,5 @@
+import { LinkIcon, SquarePen } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { LinkIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -63,7 +63,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "Descripción del trabajo",
 		cell: ({ row }) => {
 			const description = row.getValue("workDescription") as string
-			return <div className="max-w-52 font-medium text-wrap">{description}</div>
+			return <div className="max-w-80 min-w-80 font-medium text-wrap">{description}</div>
 		},
 	},
 	{
@@ -250,6 +250,27 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 						<LinkIcon className="h-4 w-4" />
 					</Link>
 				</Button>
+			)
+		},
+	},
+	{
+		id: "actions",
+		header: "Acciones",
+		cell: ({ row }) => {
+			const id = row.original.id
+
+			return (
+				<div className="flex items-center gap-2">
+					<Link className="font-medium" href={`/admin/dashboard/ordenes-de-trabajo/${id}`}>
+						<Button
+							size="icon"
+							variant="outline"
+							className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
+						>
+							<SquarePen className="h-4 w-4" />
+						</Button>
+					</Link>
+				</div>
 			)
 		},
 	},

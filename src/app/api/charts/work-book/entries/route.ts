@@ -28,6 +28,10 @@ export async function GET() {
 				entryType: true,
 				createdAt: true,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		// Group entries by month and type

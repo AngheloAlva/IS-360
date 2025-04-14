@@ -35,6 +35,10 @@ export const getWorkBooks = async (limit: number, page: number) => {
 					},
 				},
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {
@@ -78,6 +82,10 @@ export const getWorkBooksByCompanyId = async (companyId: string, limit: number, 
 						phone: true,
 					},
 				},
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 
@@ -139,6 +147,10 @@ export const getWorkBooksByCompanyIdLikeBook = async (
 						phone: true,
 					},
 				},
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 

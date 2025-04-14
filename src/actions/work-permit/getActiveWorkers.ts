@@ -17,6 +17,10 @@ export async function getActiveWorkers() {
 			orderBy: {
 				initDate: "desc",
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return { activeWorkers }

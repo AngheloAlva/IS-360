@@ -3,7 +3,12 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
 	try {
-		const totalCompanies = await prisma.company.count()
+		const totalCompanies = await prisma.company.count({
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
+		})
 
 		return NextResponse.json({
 			totalCompanies,

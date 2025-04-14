@@ -13,6 +13,10 @@ export const getWorkPermit = async (workPermitId: string) => {
 				otNumber: true,
 				preventionOfficerUser: true,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {
@@ -53,6 +57,10 @@ export const getWorkPermits = async (userId: string, limit: number = 10, page: n
 			},
 			take: limit,
 			skip: offset,
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {

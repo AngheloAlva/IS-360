@@ -8,6 +8,10 @@ export const getFileById = async (id: string) => {
 			where: {
 				id,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return { ok: true, data: file }

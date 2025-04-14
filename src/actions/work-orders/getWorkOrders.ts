@@ -32,6 +32,10 @@ export const getWorkOrders = async (limit: number, page: number) => {
 					},
 				},
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {
@@ -69,6 +73,10 @@ export const getWorkOrdersByCompanyId = async (companyId: string) => {
 						phone: true,
 					},
 				},
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 
@@ -122,6 +130,11 @@ export const getWorkOrderById = async (id: string) => {
 						phone: true,
 					},
 				},
+				equipment: true,
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 

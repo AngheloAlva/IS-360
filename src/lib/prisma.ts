@@ -1,19 +1,16 @@
-import { PrismaClient } from "@prisma/client"
+import { withAccelerate } from "@prisma/extension-accelerate"
+import { PrismaClient } from "@prisma/client/edge"
 
-const globalForPrisma = globalThis as unknown as {
-	prisma: PrismaClient | undefined
+const prismaClientSingleton = () => {
+	return new PrismaClient().$extends(withAccelerate())
 }
 
-const prisma =
-	globalForPrisma.prisma ??
-	new PrismaClient({
-		log: ["error", "warn"],
-		datasourceUrl: process.env.DATABASE_URL,
-	})
+declare const globalThis: {
+	prismaGlobal: ReturnType<typeof prismaClientSingleton>
+} & typeof global
 
-// Guardar en globalThis en todos los entornos
-if (!globalForPrisma.prisma) {
-	globalForPrisma.prisma = prisma
-}
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
 
 export default prisma
+
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = prisma

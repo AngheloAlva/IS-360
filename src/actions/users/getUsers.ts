@@ -10,6 +10,10 @@ export const getUsers = async (limit: number, page: number) => {
 			orderBy: {
 				createdAt: "desc",
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {
@@ -32,6 +36,10 @@ export const getUsersByCompanyId = async (companyId: string) => {
 			where: {
 				companyId,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {
@@ -53,6 +61,10 @@ export const getUserById = async (userId: string) => {
 		const user = await prisma.user.findUnique({
 			where: {
 				id: userId,
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 
@@ -83,6 +95,10 @@ export const getInternalUsers = async (limit: number, page: number) => {
 			orderBy: {
 				createdAt: "desc",
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		return {
@@ -112,6 +128,10 @@ export const getUsersByWorkOrderId = async (workOrderId: string) => {
 			select: {
 				id: true,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		if (!company) {
@@ -124,6 +144,10 @@ export const getUsersByWorkOrderId = async (workOrderId: string) => {
 		const users = await prisma.user.findMany({
 			where: {
 				companyId: company.id,
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 

@@ -6,6 +6,10 @@ export async function GET() {
 		const roleDistribution = await prisma.user.groupBy({
 			by: ["role"],
 			_count: true,
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
 		})
 
 		const supervisorsCount = await prisma.user.count({

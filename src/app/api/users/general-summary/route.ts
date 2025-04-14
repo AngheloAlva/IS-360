@@ -3,7 +3,12 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
 	try {
-		const totalUsers = await prisma.user.count()
+		const totalUsers = await prisma.user.count({
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
+		})
 
 		return NextResponse.json({
 			totalUsers,

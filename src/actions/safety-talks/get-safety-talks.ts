@@ -12,6 +12,10 @@ export async function getSafetyTalks() {
 				},
 			},
 		},
+		cacheStrategy: {
+			ttl: 60,
+			swr: 10,
+		},
 	})
 }
 
@@ -25,6 +29,10 @@ export async function getSafetyTalkBySlug(slug: string) {
 					options: true,
 				},
 			},
+		},
+		cacheStrategy: {
+			ttl: 60,
+			swr: 10,
 		},
 	})
 }

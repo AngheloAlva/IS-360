@@ -68,6 +68,10 @@ export async function GET(req: NextRequest) {
 				orderBy: {
 					createdAt: "desc",
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			prisma.equipment.count({
 				where: {
@@ -81,6 +85,10 @@ export async function GET(req: NextRequest) {
 								],
 							}
 						: {}),
+				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
 				},
 			}),
 		])

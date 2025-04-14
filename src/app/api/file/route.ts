@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
 		const containerName =
 			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
 
-		console.log(`Usando contenedor: ${containerName}`)
 		const containerClient = blobServiceClient.getContainerClient(containerName)
 
 		const urls = await Promise.all(

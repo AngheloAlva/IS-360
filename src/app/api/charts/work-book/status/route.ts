@@ -14,6 +14,10 @@ export async function GET() {
 			_count: {
 				_all: true,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		const statusColors = {

@@ -19,6 +19,10 @@ export async function getDocumentsChartData() {
 						select: { files: true },
 					},
 				},
+				cacheStrategy: {
+					ttl: 120,
+					swr: 10,
+				},
 			})
 
 			const totalFiles = count.reduce((acc, folder) => acc + folder._count.files, 0)
@@ -47,6 +51,10 @@ export async function getDocumentsChartData() {
 					lt: now,
 				},
 			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
 		}),
 		// Expires this week
 		prisma.file.count({
@@ -56,6 +64,10 @@ export async function getDocumentsChartData() {
 					gte: now,
 					lt: nextWeek,
 				},
+			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
 			},
 		}),
 		// Expires in 8-15 days
@@ -67,6 +79,10 @@ export async function getDocumentsChartData() {
 					lt: next15Days,
 				},
 			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
 		}),
 		// Expires in 16-30 days
 		prisma.file.count({
@@ -76,6 +92,10 @@ export async function getDocumentsChartData() {
 					gte: next15Days,
 					lt: next30Days,
 				},
+			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
 			},
 		}),
 		// Expires in 31-60 days
@@ -87,6 +107,10 @@ export async function getDocumentsChartData() {
 					lt: next60Days,
 				},
 			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
 		}),
 		// Expires in 61-90 days
 		prisma.file.count({
@@ -97,6 +121,10 @@ export async function getDocumentsChartData() {
 					lt: next90Days,
 				},
 			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
+			},
 		}),
 		// Expires after 90 days
 		prisma.file.count({
@@ -105,6 +133,10 @@ export async function getDocumentsChartData() {
 				expirationDate: {
 					gte: next90Days,
 				},
+			},
+			cacheStrategy: {
+				ttl: 120,
+				swr: 10,
 			},
 		}),
 	])
@@ -123,6 +155,10 @@ export async function getDocumentsChartData() {
 			files: {
 				some: {},
 			},
+		},
+		cacheStrategy: {
+			ttl: 120,
+			swr: 10,
 		},
 	})
 

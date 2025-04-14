@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
 					solicitationTime: true,
 					workRequest: true,
 					workDescription: true,
+					workProgressStatus: true,
 					priority: true,
 					initReport: {
 						select: {
@@ -119,24 +120,44 @@ export async function GET(req: NextRequest) {
 				orderBy: {
 					createdAt: "desc",
 				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			prisma.workOrder.count({
 				where: filter,
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			prisma.$transaction([
 				prisma.workOrder.count({
 					where: {
 						status: { in: ["IN_PROGRESS", "PENDING"] },
 					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
 				}),
 				prisma.workOrder.count({
 					where: {
 						status: "COMPLETED",
 					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
 				}),
 				prisma.workOrder.aggregate({
 					_avg: {
 						workProgressStatus: true,
+					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
 					},
 				}),
 			]),

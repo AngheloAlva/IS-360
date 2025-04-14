@@ -3,27 +3,24 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
 	try {
-		const totalVehicles = await prisma.vehicle.count()
-
-		const vehiclesByType = await prisma.vehicle.groupBy({
-			by: ["type"],
-			_count: true,
-		})
-
-		const mainVehicles = await prisma.vehicle.count({
-			where: {
-				isMain: {
-					equals: true,
-				},
-			},
-		})
+		const [totalVehicles, vehiclesByType, mainVehicles] = await Promise.all([
+			prisma.vehicle.count({
+				cacheStrategy: { ttl: 60, swr: 10 },
+			}),
+			prisma.vehicle.groupBy({
+				by: ["type"],
+				_count: true,
+				cacheStrategy: { ttl: 60, swr: 10 },
+			}),
+			prisma.vehicle.count({
+				where: { isMain: { equals: true } },
+				cacheStrategy: { ttl: 60, swr: 10 },
+			}),
+		])
 
 		return NextResponse.json({
 			totalVehicles,
-			vehiclesByType: vehiclesByType.map((type) => ({
-				type: type.type,
-				count: type._count,
-			})),
+			vehiclesByType: vehiclesByType.map(({ type, _count }) => ({ type, count: _count })),
 			mainVehicles,
 		})
 	} catch (error) {

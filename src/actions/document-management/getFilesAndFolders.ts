@@ -15,6 +15,10 @@ export async function getFilesAndFolders(area: AREAS, folderSlug: string | null 
 				subFolders: true,
 				user: true,
 			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
+			},
 		})
 
 		const files = await prisma.file.findMany({
@@ -23,6 +27,10 @@ export async function getFilesAndFolders(area: AREAS, folderSlug: string | null 
 			},
 			include: {
 				user: true,
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 

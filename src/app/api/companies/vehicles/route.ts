@@ -43,6 +43,10 @@ export async function GET(req: NextRequest) {
 				},
 				skip,
 				take: limit,
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
+				},
 			}),
 			prisma.vehicle.count({
 				where: {
@@ -55,6 +59,10 @@ export async function GET(req: NextRequest) {
 								],
 							}
 						: {}),
+				},
+				cacheStrategy: {
+					ttl: 60,
+					swr: 10,
 				},
 			}),
 		])

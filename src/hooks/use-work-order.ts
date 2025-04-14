@@ -19,6 +19,7 @@ export interface WorkOrder {
 	capex: string
 	workDescription: string
 	priority: string
+	workProgressStatus: number
 	initReport: {
 		url: string
 	} | null
