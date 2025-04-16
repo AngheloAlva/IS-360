@@ -53,7 +53,7 @@ function ChartContainer({
 				data-slot="chart"
 				data-chart={chartId}
 				className={cn(
-					"[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+					"[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-input/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-input [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-input [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-input flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
 					className
 				)}
 				{...props}
@@ -155,7 +155,7 @@ function ChartTooltipContent({
 	return (
 		<div
 			className={cn(
-				"border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+				"border-input/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
 				className
 			)}
 		>
@@ -184,7 +184,7 @@ function ChartTooltipContent({
 										!hideIndicator && (
 											<div
 												className={cn(
-													"shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
+													"shrink-0 rounded-[2px] border-(--color-input) bg-(--color-bg)",
 													{
 														"h-2.5 w-2.5": indicator === "dot",
 														"w-1": indicator === "line",
@@ -196,7 +196,7 @@ function ChartTooltipContent({
 												style={
 													{
 														"--color-bg": indicatorColor,
-														"--color-border": indicatorColor,
+														"--color-input": indicatorColor,
 													} as React.CSSProperties
 												}
 											/>

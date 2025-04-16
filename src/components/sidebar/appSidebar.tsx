@@ -143,7 +143,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 	]
 
 	return (
-		<Sidebar collapsible="icon" variant="inset" {...props}>
+		<Sidebar collapsible="icon" variant="sidebar" {...props}>
 			<SidebarHeader>
 				<SidebarMenuButton size="lg">
 					<div className="flex aspect-square size-8 items-center justify-center bg-white">

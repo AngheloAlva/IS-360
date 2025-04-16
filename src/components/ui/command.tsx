@@ -18,7 +18,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
 		<CommandPrimitive
 			data-slot="command"
 			className={cn(
-				"bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+				"bg-background text-text flex h-full w-full flex-col overflow-hidden rounded-md",
 				className
 			)}
 			{...props}
@@ -112,7 +112,7 @@ function CommandSeparator({
 	return (
 		<CommandPrimitive.Separator
 			data-slot="command-separator"
-			className={cn("bg-border -mx-1 h-px", className)}
+			className={cn("bg-input -mx-1 h-px", className)}
 			{...props}
 		/>
 	)

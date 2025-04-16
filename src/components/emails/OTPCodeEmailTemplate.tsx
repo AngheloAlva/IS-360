@@ -69,7 +69,7 @@ export const OTPCodeEmailTemplate: React.FC<Readonly<OTPCodeEmailTemplateProps>>
 						<Section className="mb-[32px] text-center">
 							<Button
 								href={systemUrl}
-								className="box-border rounded-[4px] bg-blue-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
+								className="box-input rounded-[4px] bg-blue-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
 							>
 								Ir al Sistema
 							</Button>

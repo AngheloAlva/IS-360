@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
+import { Geist, Geist_Mono, Space_Grotesk, Manrope } from "next/font/google"
 
 export const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -12,5 +12,10 @@ export const geistMono = Geist_Mono({
 
 export const spaceGrotesk = Space_Grotesk({
 	variable: "--font-space-grotesk",
+	subsets: ["latin"],
+})
+
+export const generalFont = Manrope({
+	variable: "--font-general",
 	subsets: ["latin"],
 })

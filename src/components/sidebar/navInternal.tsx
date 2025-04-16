@@ -31,16 +31,16 @@ export function NavInternal({
 			<SidebarGroupLabel>Menú Interno</SidebarGroupLabel>
 			<SidebarMenu>
 				{navItems.map((item) => (
-					<SidebarMenuItem
-						key={item.name}
-						className={cn({
-							"bg-primary/5 border-primary data-[state=open]:border-primary text-primary data-[state=open]:bg-primary/5 data-[state=open]:text-primary rounded-md border":
-								pathName.includes(item.url),
-						})}
-					>
+					<SidebarMenuItem key={item.name}>
 						<SidebarMenuButton
 							asChild
-							className="hover:bg-primary/5 hover:text-primary active:bg-primary/5 active:text-primary"
+							className={cn(
+								"hover:bg-text/10 hover:border-text hover:text-text h-8.5 rounded-full border border-transparent font-medium transition-colors",
+								{
+									"bg-text hover:bg-text hover:text-background text-background border-text font-bold":
+										pathName.includes(item.url),
+								}
+							)}
 						>
 							<Link href={item.url}>
 								<item.icon />

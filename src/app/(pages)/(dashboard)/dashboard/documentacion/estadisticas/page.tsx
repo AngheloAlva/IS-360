@@ -1,10 +1,12 @@
 import DocumentCharts from "@/components/sections/documentation/DocumentCharts"
+import BackButton from "@/components/shared/BackButton"
 
 export default function DocumentationPage(): React.ReactElement {
 	return (
 		<>
-			<div className="w-full text-left">
-				<h1 className="text-2xl font-bold">Documentación</h1>
+			<div className="flex w-full items-center gap-2 text-left">
+				<BackButton href="/dashboard/documentacion" />
+				<h1 className="text-2xl font-bold">Estadísticas de Documentos</h1>
 			</div>
 
 			<DocumentCharts />
