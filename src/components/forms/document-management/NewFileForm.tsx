@@ -1,16 +1,14 @@
 "use client"
 
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { UploadCloud, X } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { UploadCloud } from "lucide-react"
 import { toast } from "sonner"
 
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { Areas } from "@/lib/consts/areas"
-import { cn } from "@/lib/utils"
 import {
 	fileFormSchema,
 	type FileFormSchema,
@@ -24,8 +22,8 @@ import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
+import { cn } from "@/lib/utils"
 
 interface NewFileFormProps {
 	area: string
@@ -35,7 +33,7 @@ interface NewFileFormProps {
 }
 
 export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormProps) {
-	const [currentPreview, setCurrentPreview] = useState<number>(0)
+	// const [currentPreview, setCurrentPreview] = useState<number>(0)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [isOneFile, setIsOneFile] = useState(true)
 
@@ -55,7 +53,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		},
 	})
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append } = useFieldArray({
 		control: form.control,
 		name: "files",
 	})
@@ -130,7 +128,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 			}
 
 			toast.success("Archivos subidos correctamente")
-			router.push(backPath || `/documentacion/${area}`)
+			router.push(backPath || `/dashboard/documentacion/${area}`)
 		} catch (error) {
 			console.error(error)
 			toast.error("Error al subir los archivos")
@@ -195,24 +193,42 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 								<h3 className="text-lg font-medium">Archivos</h3>
 								<p className="text-muted-foreground text-sm">
 									Puedes subir uno o más archivos, en el caso de subir más de uno, se aplicara el
-									codigo de ISO y fechas a todos los archivos.
+									codigo de ISO y fechas a todos los archivos.{" "}
+									<strong>Podrás editarlos una vez subidos.</strong>
 								</p>
 
-								<div className="mt-4 grid gap-4 md:grid-cols-2">
+								<div className="mt-4 grid gap-4">
 									<div className="flex w-full items-center justify-center">
 										<label
 											htmlFor="dropzone-file"
-											className="dark:hover:bg-bray-800 flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+											className={cn(
+												"dark:hover:bg-bray-800 flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600",
+												{
+													"border-feature bg-feature/10": fields.length > 0,
+												}
+											)}
 										>
 											<div className="flex flex-col items-center justify-center pt-5 pb-6">
 												<UploadCloud className="mb-3 h-10 w-10 text-gray-400" />
-												<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-													<span className="font-semibold">Click para subir</span> o arrastra y
-													suelta
-												</p>
-												<p className="text-xs text-gray-500 dark:text-gray-400">
-													PDF, DOCX, PPTX (MAX. 10MB)
-												</p>
+
+												{fields.length > 0 ? (
+													<p className="text-muted-foreground flex flex-col text-center text-lg">
+														{fields.length} archivos subidos
+														<span className="text-sm">
+															Pronto habilitaremos la previsualización de archivos.
+														</span>
+													</p>
+												) : (
+													<>
+														<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+															<span className="font-semibold">Click para subir</span> o arrastra y
+															suelta
+														</p>
+														<p className="text-xs text-gray-500 dark:text-gray-400">
+															PDF, DOCX, PPTX, XLSX, etc.
+														</p>
+													</>
+												)}
 											</div>
 											<input
 												multiple
@@ -220,12 +236,11 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 												className="hidden"
 												id="dropzone-file"
 												onChange={(e) => handleFileChange(e.target.files)}
-												accept=".pdf, .docx, .pptx, .zip, .rar, .7z, .png, .jpg, .jpeg, .gif, .webp, .avif"
 											/>
 										</label>
 									</div>
 
-									<div className="relative h-96 w-full overflow-hidden rounded-lg border bg-white">
+									{/* <div className="relative h-96 w-full overflow-hidden rounded-lg border bg-white">
 										{fields.length > 0 && (
 											<div className="h-full w-full p-4">
 												<div className="h-full w-full">
@@ -254,7 +269,6 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 											</div>
 										)}
 
-										{/* Controles de navegación */}
 										<div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
 											{fields.map((_, index) => (
 												<button
@@ -283,7 +297,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 												<X className="h-5 w-5" />
 											</Button>
 										)}
-									</div>
+									</div> */}
 								</div>
 							</div>
 						</div>

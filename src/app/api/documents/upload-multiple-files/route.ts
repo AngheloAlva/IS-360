@@ -68,9 +68,9 @@ export async function POST(request: Request) {
 					data: {
 						...rest,
 						url: blobUrl,
-						name: file.name,
 						size: file.size,
 						type: file.type,
+						name: rest.name || file.name,
 						registrationDate: new Date(),
 						user: { connect: { id: userId } },
 						...(folderId ? { folder: { connect: { id: folderId } } } : {}),

@@ -2,9 +2,9 @@
 
 import prisma from "@/lib/prisma"
 
-import type { FileFormSchema } from "@/lib/form-schemas/document-management/file.schema"
+import type { UpdateFileSchema } from "@/lib/form-schemas/document-management/update-file.schema.ts"
 
-interface UpdateFileParams extends FileFormSchema {
+interface UpdateFileParams extends UpdateFileSchema {
 	fileId: string
 	url: string
 	size: number
