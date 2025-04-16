@@ -167,12 +167,12 @@ export async function getDocumentsChartData() {
 		INSTRUCTIONS: "#60a5fa",
 		INTEGRITY_AND_MAINTENANCE: "#10b981",
 		ENVIRONMENT: "#84cc16",
-		OPERATIONAL_SAFETY: "#eab308", // Añadido OPERATIONAL_SAFETY que faltaba
+		OPERATIONAL_SAFETY: "#eab308",
 		QUALITY_AND_OPERATIONAL_EXCELLENCE: "#f59e0b",
 		REGULATORY_COMPLIANCE: "#dc2626",
 		LEGAL: "#8b5cf6",
 		COMMUNITIES: "#ec4899",
-		PROJECTS: "#6b7280", // Añadido PROJECTS que faltaba
+		PROJECTS: "#6b7280",
 	}
 
 	const areaLabels: Record<keyof typeof AreasValues, string> = {
@@ -185,7 +185,7 @@ export async function getDocumentsChartData() {
 		REGULATORY_COMPLIANCE: "Cumplimiento Normativo",
 		LEGAL: "Jurídica",
 		COMMUNITIES: "Comunidades",
-		PROJECTS: "Proyectos", // Añadido PROJECTS que faltaba,
+		PROJECTS: "Proyectos",
 	}
 
 	return {

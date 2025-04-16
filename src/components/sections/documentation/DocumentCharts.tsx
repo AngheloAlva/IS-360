@@ -1,22 +1,14 @@
 "use client"
 
-import { Cell, Pie, PieChart, Bar, BarChart, Tooltip, XAxis, YAxis, Label } from "recharts"
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts"
 import { useState, useEffect } from "react"
 
 import { getDocumentsChartData } from "@/actions/document-management/getDocumentsChartData"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-	ChartConfig,
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart"
+import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 
-const areaChartConfig = {
-	value: {
-		label: "Documentos",
-	},
+const CHART_CONFIG = {
 	OPERATIONS: {
 		label: "Operaciones",
 		color: "var(--chart-1)",
@@ -104,108 +96,31 @@ export default function DocumentCharts() {
 					<CardTitle>Documentos por Área</CardTitle>
 				</CardHeader>
 				<CardContent>
-					{/* [
-          {
-              "name": "HSEQ",
-              "value": 0,
-              "fill": "#dc2626"
-          },
-          {
-              "name": "Jurídica",
-              "value": 2,
-              "fill": "#8b5cf6"
-          },
-          {
-              "name": "Comunidades",
-              "value": 0,
-              "fill": "#ec4899"
-          },
-          {
-              "name": "Operaciones",
-              "value": 1,
-              "fill": "#2563eb"
-          },
-          {
-              "name": "Instructivos",
-              "value": 0,
-              "fill": "#60a5fa"
-          },
-          {
-              "name": "Medio Ambiente",
-              "value": 0,
-              "fill": "#84cc16"
-          },
-          {
-              "name": "Prevención de Riesgos",
-              "value": 0,
-              "fill": "#eab308"
-          },
-          {
-              "name": "Integridad y Mantención",
-              "value": 0,
-              "fill": "#10b981"
-          },
-          {
-              "name": "Calidad y Excelencia Profesional",
-              "value": 0,
-              "fill": "#f59e0b"
-          }
-      ] */}
-					<div className="flex h-[400px] items-center justify-center">
+					<div className="flex w-full items-center justify-center">
 						{isLoading ? (
 							<div className="text-muted-foreground">Cargando datos...</div>
 						) : areaData.length === 0 ? (
 							<div className="text-muted-foreground">No hay datos disponibles</div>
 						) : (
-							<ChartContainer
-								config={areaChartConfig}
-								className="mx-auto aspect-square max-h-[250px]"
-							>
-								<PieChart>
-									<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-									<Pie
-										data={areaData}
-										dataKey="value"
-										nameKey="name"
-										innerRadius={60}
-										strokeWidth={5}
-									>
-										<Label
-											content={({ viewBox }) => {
-												if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-													const total = areaData.reduce((acc, curr) => acc + curr.value, 0)
-													return (
-														<text
-															x={viewBox.cx}
-															y={viewBox.cy}
-															textAnchor="middle"
-															dominantBaseline="middle"
-														>
-															<tspan
-																x={viewBox.cx}
-																y={viewBox.cy}
-																className="fill-foreground text-3xl font-bold"
-															>
-																{total}
-															</tspan>
-															<tspan
-																x={viewBox.cx}
-																y={(viewBox.cy || 0) + 24}
-																className="fill-muted-foreground"
-															>
-																Documentos
-															</tspan>
-														</text>
-													)
-												}
-											}}
-										/>
-										{areaData.map((entry, index) => (
-											<Cell key={`cell-${index}`} fill={entry.fill} />
-										))}
-									</Pie>
-								</PieChart>
-							</ChartContainer>
+							<div className="h-full w-full">
+								<ChartContainer config={CHART_CONFIG}>
+									<PieChart width={400} height={400}>
+										<Pie
+											label
+											data={areaData}
+											dataKey="value"
+											nameKey="name"
+											innerRadius={60}
+											outerRadius={100}
+										>
+											{areaData.map((entry, index) => (
+												<Cell key={`cell-${index}`} fill={entry.fill} />
+											))}
+										</Pie>
+										<Tooltip />
+									</PieChart>
+								</ChartContainer>
+							</div>
 						)}
 					</div>
 				</CardContent>
