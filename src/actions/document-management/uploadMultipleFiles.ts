@@ -4,24 +4,15 @@ import prisma from "@/lib/prisma"
 
 import type { FileFormSchema } from "@/lib/form-schemas/document-management/file.schema"
 
-export const uploadFile = async (
-	data: FileFormSchema,
-	fileUrl: string,
-	fileSize: number,
-	fileType: string
-) => {
+export const uploadMultipleFiles = async (data: FileFormSchema) => {
 	try {
-		const { folderSlug, userId, ...rest } = data
+		const { folderSlug, userId, files, ...rest } = data
 		let folderId: string | null = null
 
 		if (folderSlug) {
 			const foundFolder = await prisma.folder.findFirst({
-				where: {
-					slug: folderSlug,
-				},
-				select: {
-					id: true,
-				},
+				where: { slug: folderSlug },
+				select: { id: true },
 			})
 
 			if (!foundFolder) {
@@ -35,48 +26,35 @@ export const uploadFile = async (
 		}
 
 		let relations: {
-			folder?: {
-				connect: {
-					id: string
-				}
-			}
-			user: {
-				connect: {
-					id: string
-				}
-			}
+			folder?: { connect: { id: string } }
+			user: { connect: { id: string } }
 		} = {
-			user: {
-				connect: {
-					id: userId,
-				},
-			},
+			user: { connect: { id: userId } },
 		}
 
 		if (folderSlug && folderId !== null) {
 			relations = {
 				...relations,
-				folder: {
-					connect: {
-						id: folderId,
-					},
-				},
+				folder: { connect: { id: folderId } },
 			}
 		}
 
-		const result = await prisma.file.create({
-			data: {
+		const results = await prisma.file.createMany({
+			data: files.map((fileData) => ({
 				...rest,
-				url: fileUrl,
-				size: fileSize,
-				type: fileType,
+				userId,
+				area: rest.area,
+				url: fileData.url,
+				name: fileData.title,
+				size: fileData.fileSize,
+				type: fileData.mimeType,
 				...relations,
-			},
+			})),
 		})
 
 		return {
 			ok: true,
-			data: result,
+			data: results,
 		}
 	} catch (error) {
 		console.error(error)

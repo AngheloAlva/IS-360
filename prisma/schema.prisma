@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum USER_ROLE {
@@ -141,10 +142,11 @@ model Company {
   name String
   rut  String
 
-  users       User[]
-  workOrders  WorkOrder[]
-  workPermits WorkPermit[]
-  vehicles    Vehicle[]
+  users        User[]
+  workOrders   WorkOrder[]
+  workPermits  WorkPermit[]
+  vehicles     Vehicle[]
+  starterBooks StarterBook[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -556,11 +558,13 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  history  FileHistory[]
-  folder   Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId String?
-  user     User          @relation(fields: [userId], references: [id])
-  userId   String
+  history             FileHistory[]
+  folder              Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId            String?
+  starterBookFolder   StarterBookFolder? @relation(fields: [starterBookFolderId], references: [id], onDelete: Cascade)
+  starterBookFolderId String?
+  user                User               @relation(fields: [userId], references: [id])
+  userId              String
 
   @@map("file")
 }
@@ -732,4 +736,41 @@ model EquipmentHistory {
 
   @@unique([id])
   @@map("equipment_history")
+}
+
+enum STARTER_BOOK_FOLDER_TYPE {
+  ENVIRONMENT // Medio ambiente
+  SAFETY // Seguridad
+  OTHER // Otro
+}
+
+model StarterBookFolder {
+  id String @id @default(cuid())
+
+  name        String
+  description String?
+  type        STARTER_BOOK_FOLDER_TYPE
+
+  files File[]
+
+  starterBook   StarterBook @relation(fields: [starterBookId], references: [id])
+  starterBookId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("starter_book_folder")
+}
+
+model StarterBook {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  folders   StarterBookFolder[]
+  company   Company             @relation(fields: [companyId], references: [id])
+  companyId String
+
+  @@map("starter_book")
 }

@@ -12,6 +12,7 @@ interface InputFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label: string
 	className?: string
+	disabled?: boolean
 	control: Control<T>
 	placeholder?: string
 	itemClassName?: string
@@ -26,6 +27,7 @@ export function InputFormField<T extends FieldValues>({
 	placeholder,
 	itemClassName,
 	type = "text",
+	disabled = false,
 }: InputFormFieldProps<T>) {
 	return (
 		<FormField
@@ -37,6 +39,7 @@ export function InputFormField<T extends FieldValues>({
 					<FormControl>
 						<Input
 							type={type}
+							disabled={disabled}
 							className={cn("w-full text-sm", className)}
 							placeholder={placeholder || label}
 							{...field}

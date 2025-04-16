@@ -89,6 +89,7 @@ export function FileExplorerTable({
 		area: areaValue,
 		folderSlug: actualFolderSlug,
 	})
+	console.log(data)
 
 	return (
 		<Table className={cn("rounded-md bg-white p-2", className)}>
@@ -173,7 +174,7 @@ export function FileExplorerTable({
 											rel="noreferrer noopener"
 											className="font-medium hover:underline"
 										>
-											{item?.code?.charAt(0) + "-" + item.name}
+											{item?.code ? item.code.charAt(0) + "-" + item.name : item.name}
 										</Link>
 									</div>
 								</TableCell>

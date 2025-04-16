@@ -13,6 +13,10 @@ export const otcInspectionsSchema = z.object({
 		.string()
 		.nonempty({ message: "Las observaciones de seguridad no pueden estar vacías" }),
 	nonConformities: z.string().optional(),
+	progress: z
+		.string()
+		.regex(/^[0-9]+$/, "Debe ser un número")
+		.optional(),
 })
 
 export type OtcInspectionSchema = z.infer<typeof otcInspectionsSchema>

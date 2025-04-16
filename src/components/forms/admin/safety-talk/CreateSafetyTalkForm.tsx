@@ -104,7 +104,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 
 		try {
 			const slug = generateSlug(values.title)
-			console.log({ values, slug })
+
 			const { ok, message } = await createSafetyTalk({ data: values, slug })
 			console.log({ ok, message })
 

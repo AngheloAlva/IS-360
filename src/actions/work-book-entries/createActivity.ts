@@ -77,7 +77,14 @@ export const createActivity = async ({
 
 			const workOrder = await tx.workOrder.findUnique({
 				where: { id: workOrderId },
-				select: { workProgressStatus: true },
+				select: { workProgressStatus: true, type: true },
+				include: {
+					equipment: {
+						select: {
+							id: true,
+						},
+					},
+				},
 			})
 
 			const updatedProgress = (workOrder?.workProgressStatus || 0) + Number(progress)
@@ -89,6 +96,31 @@ export const createActivity = async ({
 				data: {
 					workProgressStatus: updatedProgress,
 				},
+			})
+
+			workOrder?.equipment.forEach(async (equipment) => {
+				await tx.equipmentHistory.create({
+					data: {
+						equipment: {
+							connect: {
+								id: equipment.id,
+							},
+						},
+						workEntry: {
+							connect: {
+								id: newWorkEntry.id,
+							},
+						},
+						changeType: workOrder?.type || "",
+						description: rest.activityName,
+						status: "",
+						modifiedBy: {
+							connect: {
+								id: userId,
+							},
+						},
+					},
+				})
 			})
 
 			return {

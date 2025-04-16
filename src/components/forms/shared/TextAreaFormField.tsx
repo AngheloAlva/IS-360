@@ -11,6 +11,7 @@ interface TextAreaFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label: string
 	className?: string
+	disabled?: boolean
 	control: Control<T>
 	placeholder?: string
 	itemClassName?: string
@@ -23,6 +24,7 @@ export function TextAreaFormField<T extends FieldValues>({
 	className,
 	placeholder,
 	itemClassName,
+	disabled = false,
 }: TextAreaFormFieldProps<T>) {
 	return (
 		<FormField
@@ -33,8 +35,9 @@ export function TextAreaFormField<T extends FieldValues>({
 					<FormLabel>{label}</FormLabel>
 					<FormControl>
 						<Textarea
-							className={cn("h-24 w-full text-sm", className)}
+							disabled={disabled}
 							placeholder={placeholder || label}
+							className={cn("h-24 w-full text-sm", className)}
 							{...field}
 						/>
 					</FormControl>

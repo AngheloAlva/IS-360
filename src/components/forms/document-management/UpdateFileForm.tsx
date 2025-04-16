@@ -89,7 +89,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 		try {
 			const fileExtension = selectedFile
 				? selectedFile.name.split(".").pop()
-				: values.name.split(".").pop()
+				: values.name?.split(".").pop()
 			const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`
 
 			if (selectedFile) {

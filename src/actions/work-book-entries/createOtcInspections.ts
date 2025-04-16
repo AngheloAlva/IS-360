@@ -19,7 +19,7 @@ export const createOtcInspections = async ({
 	attachment,
 }: CreateOtcInspectionsProps) => {
 	try {
-		const { workOrderId, ...rest } = values
+		const { workOrderId, progress, ...rest } = values
 
 		const workBookEntryConnectionData: {
 			workOrder: { connect: { id: string } }
@@ -50,18 +50,68 @@ export const createOtcInspections = async ({
 			}
 		}
 
-		await prisma.workEntry.create({
-			data: {
-				entryType: "OTC_INSPECTION",
-				...rest,
-				...workBookEntryConnectionData,
-			},
-		})
+		return await prisma.$transaction(async (tx) => {
+			const newWorkEntry = await tx.workEntry.create({
+				data: {
+					entryType: "OTC_INSPECTION",
+					...rest,
+					...workBookEntryConnectionData,
+				},
+			})
 
-		return {
-			ok: true,
-			message: "Inspector creado exitosamente",
-		}
+			const workOrder = await tx.workOrder.findUnique({
+				where: { id: workOrderId },
+				select: { workProgressStatus: true, type: true },
+				include: {
+					equipment: {
+						select: {
+							id: true,
+						},
+					},
+				},
+			})
+
+			const updatedProgress = (workOrder?.workProgressStatus || 0) + Number(progress || 0)
+
+			await tx.workOrder.update({
+				where: {
+					id: workOrderId,
+				},
+				data: {
+					workProgressStatus: updatedProgress,
+				},
+			})
+
+			workOrder?.equipment.forEach(async (equipment) => {
+				await tx.equipmentHistory.create({
+					data: {
+						equipment: {
+							connect: {
+								id: equipment.id,
+							},
+						},
+						workEntry: {
+							connect: {
+								id: newWorkEntry.id,
+							},
+						},
+						changeType: workOrder?.type || "",
+						description: rest.nonConformities || "",
+						status: "",
+						modifiedBy: {
+							connect: {
+								id: userId,
+							},
+						},
+					},
+				})
+			})
+
+			return {
+				ok: true,
+				message: "Inspector creado exitosamente",
+			}
+		})
 	} catch (error) {
 		console.error(error)
 		return {

@@ -1,19 +1,20 @@
 "use client"
 
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
+import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { uploadFile } from "@/actions/document-management/uploadFile"
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { Areas } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 import {
 	fileFormSchema,
 	type FileFormSchema,
+	type FileSchema,
 } from "@/lib/form-schemas/document-management/file.schema"
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
@@ -22,10 +23,9 @@ import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Card, CardContent } from "@/components/ui/card"
-import { Form, FormLabel } from "@/components/ui/form"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Form } from "@/components/ui/form"
 
 interface NewFileFormProps {
 	area: string
@@ -35,9 +35,9 @@ interface NewFileFormProps {
 }
 
 export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormProps) {
-	const [selectedFile, setSelectedFile] = useState<File | null>(null)
-	const [filePreview, setFilePreview] = useState<string | null>(null)
+	const [currentPreview, setCurrentPreview] = useState<number>(0)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [isOneFile, setIsOneFile] = useState(true)
 
 	const router = useRouter()
 
@@ -46,6 +46,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		defaultValues: {
 			userId,
 			name: "",
+			files: [],
 			folderSlug,
 			description: "",
 			expirationDate: undefined,
@@ -54,94 +55,100 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		},
 	})
 
-	const handleFileChange = (file: File | null) => {
-		if (!file) return
+	const { fields, append, remove } = useFieldArray({
+		control: form.control,
+		name: "files",
+	})
+
+	const handleFileChange = async (files: FileList | null) => {
+		if (!files) return
 
 		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt|jpe?g|png|webp|avif|zip|rar|7z)$/i
-		if (!validTypes.test(file.name)) {
-			toast.error("Formato no soportado")
-			return
+
+		// Si hay más de un archivo, desactivar campos de archivo único
+		if (files.length > 1 || fields.length > 0) {
+			setIsOneFile(false)
+		} else {
+			setIsOneFile(true)
 		}
 
-		setSelectedFile(file)
+		for (const file of Array.from(files)) {
+			if (!validTypes.test(file.name)) {
+				toast.error(`Formato no soportado: ${file.name}`, {
+					description:
+						"Solo se permiten archivos PDF, Word, Excel, PowerPoint, Texto, Imágenes, Archivos comprimidos",
+				})
+				continue
+			}
 
-		if (file.type.startsWith("image/")) {
-			const reader = new FileReader()
-			reader.onload = (e) => setFilePreview(e.target?.result as string)
-			reader.readAsDataURL(file)
-		} else {
-			setFilePreview(null)
+			const preview = URL.createObjectURL(file)
+
+			append({
+				file,
+				url: "",
+				preview,
+				type: file.type,
+				title: file.name,
+				fileSize: file.size,
+				mimeType: file.type,
+			} as FileSchema)
 		}
 	}
 
 	const onSubmit = async (values: FileFormSchema) => {
-		if (!selectedFile) return
+		if (fields.length === 0) {
+			toast.error("Por favor, sube al menos un archivo")
+			return
+		}
 
 		setIsSubmitting(true)
 
 		try {
-			const fileExtension = selectedFile.name.split(".").pop()
-			const uniqueFilename = `${Date.now()}-${Math.random()
-				.toString(36)
-				.substring(2, 9)}-${userId.slice(0, 4)}.${fileExtension}`
+			const formData = new FormData()
 
-			// Obtener URL de subida para el contenedor de documentación
-			const response = await fetch("/api/file", {
+			// Agregar los archivos al FormData
+			fields.forEach((fileData) => {
+				formData.append("files", fileData.file)
+			})
+
+			// Agregar el resto de los datos como JSON
+			formData.append(
+				"data",
+				JSON.stringify({
+					...values,
+					files: undefined, // Excluir los archivos del JSON
+				})
+			)
+
+			const result = await fetch("/api/documents/upload-multiple-files", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					filenames: [uniqueFilename],
-					containerType: "documents", // Especificar que es para documentos
-				}),
+				body: formData,
 			})
 
-			if (!response.ok) throw new Error("Error al obtener URL de subida")
+			if (!result.ok) {
+				throw new Error((await result.json()).error)
+			}
 
-			const data = await response.json()
-			if (!data.urls?.[0]) throw new Error("Respuesta inválida del servidor")
-
-			// Subir archivo a Azure Blob Storage
-			const uploadResponse = await fetch(data.urls[0], {
-				method: "PUT",
-				body: selectedFile,
-				headers: {
-					"Content-Type": selectedFile.type,
-					"x-ms-blob-type": "BlockBlob",
-					"x-ms-version": "2020-04-08",
-					"Access-Control-Allow-Origin": "*",
-					"Access-Control-Allow-Methods": "PUT",
-					"Access-Control-Allow-Headers": "*",
-				},
-				mode: "cors",
-				credentials: "omit",
-			})
-
-			if (!uploadResponse.ok) throw new Error("Error al subir el archivo")
-
-			// Obtener la URL base del blob (sin los parámetros SAS)
-			const blobUrl = data.urls[0].split("?")[0]
-
-			// Guardar metadatos en la base de datos
-			console.log("Guardando metadatos...")
-			console.log(values, blobUrl, selectedFile.size, selectedFile.type)
-			const saveResult = await uploadFile(values, blobUrl, selectedFile.size, selectedFile.type)
-
-			if (!saveResult.ok) throw new Error(saveResult.error || "Error al guardar metadatos")
-
-			toast.success("Documento subido correctamente")
-			form.reset()
-			setSelectedFile(null)
-			setFilePreview(null)
-			router.push(backPath || `/dashboard/documentacion/${area}`)
+			toast.success("Archivos subidos correctamente")
+			router.push(backPath || `/documentacion/${area}`)
 		} catch (error) {
 			console.error(error)
-			toast.error("Error al subir documento", {
-				description: error instanceof Error ? error.message : "Intente nuevamente",
-			})
+			toast.error("Error al subir los archivos")
 		} finally {
 			setIsSubmitting(false)
 		}
 	}
+
+	useEffect(() => {
+		if (form.getValues("files").length > 1) {
+			form.setValue("name", "")
+			form.setValue("description", "")
+			setIsOneFile(false)
+		} else {
+			setIsOneFile(true)
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("files")])
 
 	const codeIsOther = form.watch("code") === CodesValues.OTRO
 
@@ -152,6 +159,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 					<CardContent className="grid gap-5">
 						<InputFormField<FileFormSchema>
 							name="name"
+							disabled={!isOneFile}
 							control={form.control}
 							label="Nombre del documento"
 							placeholder="Ej: Informe Técnico 2023"
@@ -160,6 +168,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 						<TextAreaFormField<FileFormSchema>
 							name="description"
 							label="Descripción"
+							disabled={!isOneFile}
 							control={form.control}
 							placeholder="Agregue detalles adicionales..."
 						/>
@@ -182,89 +191,99 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 						)}
 
 						<div className="grid gap-4 md:grid-cols-2">
-							<div className="space-y-4">
-								<FormLabel>Subir documento</FormLabel>
-								<div
-									className={cn(
-										"group relative h-full cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
-										!selectedFile
-											? "border-blue-200 bg-blue-50 hover:border-blue-300"
-											: "border-green-200 bg-green-50"
-									)}
-									onDrop={(e) => {
-										e.preventDefault()
-										handleFileChange(e.dataTransfer.files?.[0] ?? null)
-									}}
-									onDragOver={(e) => e.preventDefault()}
-								>
-									<Input
-										type="file"
-										className="absolute inset-0 h-full w-full opacity-0"
-										onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-										accept=".pdf, image/*, .doc, .docx, .xls, .xlsx"
-									/>
-									<div className="flex flex-col items-center gap-4">
-										<UploadCloud className="h-12 w-12 text-gray-400" />
-										<div>
-											<p className="font-medium text-gray-700">
-												{selectedFile ? "¡Archivo listo!" : "Arrastra tu archivo aquí"}
-											</p>
-											<p className="mt-2 text-sm text-gray-500">
-												Formatos soportados: PDF, DOC, XLS, JPG, PNG
-											</p>
-										</div>
-									</div>
-								</div>
-							</div>
+							<div className="col-span-full">
+								<h3 className="text-lg font-medium">Archivos</h3>
+								<p className="text-muted-foreground text-sm">
+									Puedes subir uno o más archivos, en el caso de subir más de uno, se aplicara el
+									codigo de ISO y fechas a todos los archivos.
+								</p>
 
-							<div className="space-y-4">
-								<FormLabel>Previsualización</FormLabel>
-								<div className="h-full rounded-lg border-2 border-dashed border-gray-200 p-4">
-									{selectedFile ? (
-										<div className="flex h-full flex-col items-center justify-center">
-											{filePreview ? (
-												<>
-													{/* eslint-disable-next-line @next/next/no-img-element */}
-													<img
-														src={filePreview}
-														alt="Previsualización"
-														className="mb-4 max-h-40 object-contain"
-													/>
-													<p className="max-w-full truncate text-sm font-medium">
-														{selectedFile.name}
-													</p>
-												</>
-											) : (
-												<>
-													<div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-														<span className="text-3xl">📄</span>
-													</div>
-													<p className="max-w-full truncate text-sm font-medium">
-														{selectedFile.name}
-													</p>
-													<p className="mt-1 text-xs text-gray-500">
-														{(selectedFile.size / 1024).toFixed(2)} KB
-													</p>
-												</>
-											)}
+								<div className="mt-4 grid gap-4 md:grid-cols-2">
+									<div className="flex w-full items-center justify-center">
+										<label
+											htmlFor="dropzone-file"
+											className="dark:hover:bg-bray-800 flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+										>
+											<div className="flex flex-col items-center justify-center pt-5 pb-6">
+												<UploadCloud className="mb-3 h-10 w-10 text-gray-400" />
+												<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+													<span className="font-semibold">Click para subir</span> o arrastra y
+													suelta
+												</p>
+												<p className="text-xs text-gray-500 dark:text-gray-400">
+													PDF, DOCX, PPTX (MAX. 10MB)
+												</p>
+											</div>
+											<input
+												multiple
+												type="file"
+												className="hidden"
+												id="dropzone-file"
+												onChange={(e) => handleFileChange(e.target.files)}
+												accept=".pdf, .docx, .pptx, .zip, .rar, .7z, .png, .jpg, .jpeg, .gif, .webp, .avif"
+											/>
+										</label>
+									</div>
+
+									<div className="relative h-96 w-full overflow-hidden rounded-lg border bg-white">
+										{fields.length > 0 && (
+											<div className="h-full w-full p-4">
+												<div className="h-full w-full">
+													{fields[currentPreview] && fields[currentPreview].preview ? (
+														<DocViewer
+															documents={[
+																{
+																	uri: fields[currentPreview].preview,
+																	fileName: fields[currentPreview].title,
+																},
+															]}
+															pluginRenderers={DocViewerRenderers}
+															config={{ header: { disableHeader: true } }}
+															className="[&_#pdf-controls]:h-0 [&_#pdf-controls]:w-0 [&_#pdf-controls]:overflow-hidden [&_#pdf-controls]:opacity-0"
+															style={{ height: "100%" }}
+														/>
+													) : (
+														<div className="flex h-full flex-col items-center justify-center">
+															<p className="text-lg font-medium">{fields[currentPreview].title}</p>
+															<p className="text-muted-foreground mt-1 text-sm">
+																{(fields[currentPreview].fileSize / 1024).toFixed(2)} KB
+															</p>
+														</div>
+													)}
+												</div>
+											</div>
+										)}
+
+										{/* Controles de navegación */}
+										<div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+											{fields.map((_, index) => (
+												<button
+													key={index}
+													type="button"
+													className={cn(
+														"h-2 w-2 rounded-full bg-gray-300 transition-all",
+														currentPreview === index && "bg-gray-800"
+													)}
+													onClick={() => setCurrentPreview(index)}
+												/>
+											))}
+										</div>
+
+										{fields.length > 0 && (
 											<Button
 												type="button"
+												size={"icon"}
 												variant={"ghost"}
+												className="hover:bg-error/10 absolute top-2 right-2 h-10 w-10 rounded-full p-1 text-red-600 transition-colors"
 												onClick={() => {
-													setSelectedFile(null)
-													setFilePreview(null)
+													remove(currentPreview)
+													if (currentPreview > 0) setCurrentPreview(currentPreview - 1)
 												}}
-												className="mt-4 flex items-center gap-1 text-red-600 hover:bg-red-100 hover:text-red-700"
 											>
-												<X className="h-4 w-4" />
-												<span className="text-sm">Eliminar</span>
+												<X className="h-5 w-5" />
 											</Button>
-										</div>
-									) : (
-										<div className="flex h-full items-center justify-center text-gray-400">
-											<p>Previsualización del documento</p>
-										</div>
-									)}
+										)}
+									</div>
 								</div>
 							</div>
 						</div>
@@ -288,9 +307,9 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 				</Card>
 
 				<SubmitButton
-					isSubmitting={isSubmitting}
-					disabled={!selectedFile}
 					label="Subir Documento"
+					isSubmitting={isSubmitting}
+					disabled={fields.length === 0}
 				/>
 			</form>
 		</Form>
