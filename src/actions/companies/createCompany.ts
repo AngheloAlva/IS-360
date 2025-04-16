@@ -37,36 +37,81 @@ export const createCompany = async ({
 				},
 			})
 
-			await tx.starterBook.create({
-				data: {
-					company: {
-						connect: {
-							id: company.id,
-						},
+			await tx.rootFolder.createMany({
+				data: [
+					{
+						name: "Datos de la Empresa",
+						slug: "datos-de-la-empresa",
+						type: "COMPANY_INFORMATION",
+						companyId: company.id,
 					},
-					folders: {
-						create: [
-							{
-								name: "Medio Ambiente",
-								type: "ENVIRONMENT",
-								description:
-									"Esta carpeta es para agregar toda información relacionada con el medio ambiente",
-							},
-							{
-								name: "Seguridad",
-								type: "SAFETY",
-								description:
-									"Esta carpeta es para agregar toda información relacionada con la seguridad",
-							},
-							{
-								name: "Otros",
-								type: "OTHER",
-								description:
-									"Esta carpeta es para agregar toda información relacionada con otros temas",
-							},
-						],
+					{
+						name: "MIPER y Plan de Prevención de Riesgos",
+						slug: "miper-y-plan-de-prevencion-de-riesgos",
+						type: "RISK_PREVENTION",
+						companyId: company.id,
 					},
-				},
+					{
+						name: "Procedimientos de Trabajo y Emergencia",
+						slug: "procedimientos-de-trabajo-y-emergencia",
+						type: "WORK_PROCEDURES",
+						companyId: company.id,
+					},
+					{
+						name: "Documentación del Personal",
+						slug: "documentacion-del-personal",
+						type: "PERSONNEL_DOCUMENTS",
+						companyId: company.id,
+					},
+					{
+						name: "Exámenes Ocupacionales",
+						slug: "examenes-ocupacionales",
+						type: "OCCUPATIONAL_EXAMS",
+						companyId: company.id,
+					},
+					{
+						name: "Reglamento Interno de Orden, Higiene y Seguridad (RIOHS)",
+						slug: "reglamento-interno-de-orden-higiene-y-seguridad-riohs",
+						type: "INTERNAL_REGULATIONS",
+						companyId: company.id,
+					},
+					{
+						name: "Obligaciones de Informar (ODI)",
+						slug: "obligaciones-de-informar-odi",
+						type: "INFORMATION_DUTIES",
+						companyId: company.id,
+					},
+					{
+						name: "Entrega de Equipos de Protección Personal (EPP)",
+						slug: "entrega-de-equipos-de-proteccion-personal",
+						type: "PPE_DELIVERY",
+						companyId: company.id,
+					},
+					{
+						name: "Certificados de EPP",
+						slug: "certificados-de-epp",
+						type: "PPE_CERTIFICATES",
+						companyId: company.id,
+					},
+					{
+						name: "Documentación de Vehículos",
+						slug: "documentacion-de-vehiculos",
+						type: "VEHICLES",
+						companyId: company.id,
+					},
+					{
+						name: "Prevencionista de Riesgos",
+						slug: "prevencionista-de-riesgos",
+						type: "SAFETY_ADVISOR",
+						companyId: company.id,
+					},
+					{
+						name: "Documentación Legal",
+						slug: "documentacion-legal",
+						type: "LEGAL",
+						companyId: company.id,
+					},
+				],
 			})
 
 			return {

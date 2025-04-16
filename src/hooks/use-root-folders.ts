@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 
-export interface StarterBook {
+export interface RootFolder {
 	id: string
 	name: string
 	description: string | null
@@ -12,33 +12,33 @@ export interface StarterBook {
 	}
 }
 
-interface UseStarterBooksParams {
+interface UseRootFoldersParams {
 	page?: number
 	limit?: number
 	search?: string
 }
 
-interface StarterBooksResponse {
-	starterBooks: StarterBook[]
+interface RootFoldersResponse {
+	rootFolders: RootFolder[]
 	total: number
 	pages: number
 }
 
-export const useStarterBooks = ({
+export const useRootFolders = ({
 	page = 1,
 	limit = 10,
 	search = "",
-}: UseStarterBooksParams = {}) => {
-	return useQuery<StarterBooksResponse>({
-		queryKey: ["starter-books", { page, limit, search }],
+}: UseRootFoldersParams = {}) => {
+	return useQuery<RootFoldersResponse>({
+		queryKey: ["root-folders", { page, limit, search }],
 		queryFn: async () => {
 			const searchParams = new URLSearchParams()
 			searchParams.set("page", page.toString())
 			searchParams.set("limit", limit.toString())
 			if (search) searchParams.set("search", search)
 
-			const res = await fetch(`/api/starter-book?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching starter books")
+			const res = await fetch(`/api/root-folders?${searchParams.toString()}`)
+			if (!res.ok) throw new Error("Error fetching root folders")
 
 			return res.json()
 		},

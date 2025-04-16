@@ -82,6 +82,7 @@ model User {
   equipmentHistory               EquipmentHistory[]
   fileHistory                    FileHistory[]
   twofactors                     TwoFactor[]
+  rootFolder                     RootFolder[]
 
   @@unique([email])
   @@unique([rut])
@@ -142,11 +143,11 @@ model Company {
   name String
   rut  String
 
-  users        User[]
-  workOrders   WorkOrder[]
-  workPermits  WorkPermit[]
-  vehicles     Vehicle[]
-  starterBooks StarterBook[]
+  users       User[]
+  workOrders  WorkOrder[]
+  workPermits WorkPermit[]
+  vehicles    Vehicle[]
+  rootFolders RootFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -558,13 +559,13 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  history             FileHistory[]
-  folder              Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId            String?
-  starterBookFolder   StarterBookFolder? @relation(fields: [starterBookFolderId], references: [id], onDelete: Cascade)
-  starterBookFolderId String?
-  user                User               @relation(fields: [userId], references: [id])
-  userId              String
+  history      FileHistory[]
+  folder       Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId     String?
+  rootFolder   RootFolder?   @relation(fields: [rootFolderId], references: [id], onDelete: Cascade)
+  rootFolderId String?
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
 
   @@map("file")
 }
@@ -738,39 +739,42 @@ model EquipmentHistory {
   @@map("equipment_history")
 }
 
-enum STARTER_BOOK_FOLDER_TYPE {
-  ENVIRONMENT // Medio ambiente
-  SAFETY // Seguridad
-  OTHER // Otro
+enum ROOT_FOLDER_TYPE {
+  COMPANY_INFORMATION // Datos de la Empresa
+  RISK_PREVENTION // MIPER y Plan de Prevención de Riesgos
+  WORK_PROCEDURES // Procedimientos de Trabajo y Emergencia
+  PERSONNEL_DOCUMENTS // Documentación del Personal
+  OCCUPATIONAL_EXAMS // Exámenes Ocupacionales
+  INTERNAL_REGULATIONS // Reglamento Interno de Orden, Higiene y Seguridad (RIOHS)
+  INFORMATION_DUTIES // Obligaciones de Informar (ODI)
+  PPE_DELIVERY // Entrega de Equipos de Protección Personal (EPP)
+  PPE_CERTIFICATES // Certificados de EPP
+  VEHICLES // Documentación de Vehículos
+  SAFETY_ADVISOR // Prevencionista de Riesgos
+  LEGAL // Documentación Legal
 }
 
-model StarterBookFolder {
-  id String @id @default(cuid())
+model RootFolder {
+  id   String @id @default(cuid())
+  slug String @unique
 
   name        String
   description String?
-  type        STARTER_BOOK_FOLDER_TYPE
-
-  files File[]
-
-  starterBook   StarterBook @relation(fields: [starterBookId], references: [id])
-  starterBookId String
+  type        ROOT_FOLDER_TYPE
+  isRoot      Boolean          @default(false)
+  isActive    Boolean          @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("starter_book_folder")
-}
+  files      File[]
+  parent     RootFolder?  @relation("RootFolderToFolder", fields: [parentId], references: [id])
+  parentId   String?
+  subFolders RootFolder[] @relation("RootFolderToFolder")
+  user       User?        @relation(fields: [userId], references: [id])
+  userId     String?
+  company    Company      @relation(fields: [companyId], references: [id])
+  companyId  String
 
-model StarterBook {
-  id String @id @default(cuid())
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  folders   StarterBookFolder[]
-  company   Company             @relation(fields: [companyId], references: [id])
-  companyId String
-
-  @@map("starter_book")
+  @@map("root_folder")
 }

@@ -2,10 +2,10 @@
 
 import { cn } from "@/lib/utils"
 
-import { StarterBookDataTable } from "./StarterBookDataTable"
+import { RootFolderDataTable } from "./RootFolderDataTable"
 import { useSidebar } from "@/components/ui/sidebar"
 
-export default function MainAdminStarterBooks(): React.ReactElement {
+export default function MainAdminRootFolders(): React.ReactElement {
 	const { state } = useSidebar()
 
 	return (
@@ -18,7 +18,7 @@ export default function MainAdminStarterBooks(): React.ReactElement {
 				}
 			)}
 		>
-			<StarterBookDataTable />
+			<RootFolderDataTable />
 		</div>
 	)
 }

@@ -2,9 +2,9 @@ import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
-import type { StarterBook } from "@/hooks/use-starter-books"
+import type { RootFolder } from "@/hooks/use-root-folders"
 
-export const StarterBookColumns: ColumnDef<StarterBook>[] = [
+export const RootFoldersColumns: ColumnDef<RootFolder>[] = [
 	{
 		accessorKey: "company",
 		header: "Modalidad",

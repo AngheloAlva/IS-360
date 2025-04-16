@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
 
 		const skip = (page - 1) * limit
 
-		const [starterBooks, total] = await Promise.all([
-			prisma.starterBook.findMany({
+		const [rootFolders, total] = await Promise.all([
+			prisma.rootFolder.findMany({
 				where: search
 					? {
 							OR: [
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 					swr: 10,
 				},
 			}),
-			prisma.starterBook.count({
+			prisma.rootFolder.count({
 				where: search
 					? {
 							OR: [
@@ -67,11 +67,11 @@ export async function GET(request: NextRequest) {
 
 		return Response.json({
 			total,
-			starterBooks,
+			rootFolders,
 			pages: Math.ceil(total / limit),
 		})
 	} catch (error) {
-		console.error("[STARTER_BOOK_GET]", error)
+		console.error("[ROOT_FOLDERS_GET]", error)
 		return new Response("Internal Error", { status: 500 })
 	}
 }

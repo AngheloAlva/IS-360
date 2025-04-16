@@ -10,8 +10,8 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
-import { StarterBookColumns } from "./starter-books-columns"
-import { useStarterBooks } from "@/hooks/use-starter-books"
+import { RootFoldersColumns } from "./root-folders-columns"
+import { useRootFolders } from "@/hooks/use-root-folders"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -26,21 +26,21 @@ import {
 	TableHeader,
 } from "@/components/ui/table"
 
-export function StarterBookDataTable() {
+export function RootFolderDataTable() {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading } = useStarterBooks({
+	const { data, isLoading } = useRootFolders({
 		page,
 		search,
 		limit: 10,
 	})
 
 	const table = useReactTable({
-		data: data?.starterBooks ?? [],
-		columns: StarterBookColumns,
+		data: data?.rootFolders ?? [],
+		columns: RootFoldersColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
