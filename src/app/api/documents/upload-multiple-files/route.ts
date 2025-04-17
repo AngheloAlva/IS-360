@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 		const formData = await request.formData()
 		const files = formData.getAll("files") as File[]
 		const data = JSON.parse(formData.get("data") as string) as Omit<FileFormSchema, "files">
-		const { folderSlug, userId, ...rest } = data
+		const { folderSlug, userId, code, otherCode, ...rest } = data
 
 		// Buscar la carpeta si se proporciona un folderSlug
 		let folderId: string | null = null
@@ -73,6 +73,7 @@ export async function POST(request: Request) {
 						name: rest.name || file.name,
 						registrationDate: new Date(),
 						user: { connect: { id: userId } },
+						code: code || otherCode,
 						...(folderId ? { folder: { connect: { id: folderId } } } : {}),
 					},
 				})

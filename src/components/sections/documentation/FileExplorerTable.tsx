@@ -20,6 +20,7 @@ import {
 import { useDocuments } from "@/hooks/use-documents"
 import { cn } from "@/lib/utils"
 
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import {
@@ -32,7 +33,6 @@ import {
 } from "@/components/ui/table"
 
 import type { AREAS, File, Folder } from "@prisma/client"
-import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
 
 interface FileExplorerTableProps {
 	userId: string
