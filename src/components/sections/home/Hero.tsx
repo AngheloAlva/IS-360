@@ -9,7 +9,7 @@ export default function Hero(): React.ReactElement {
 				<div className="max-w-xl text-center sm:text-left">
 					<h1 className="text-3xl font-extrabold text-white sm:text-5xl">
 						Operaciones de
-						<strong className="text-feature block font-extrabold">Ordenes de Trabajo</strong>
+						<strong className="block font-extrabold text-green-600">Ordenes de Trabajo</strong>
 					</h1>
 
 					<p className="mt-4 max-w-lg text-white sm:text-xl/relaxed">
@@ -20,7 +20,7 @@ export default function Hero(): React.ReactElement {
 					<div className="mt-8 flex flex-wrap gap-4 text-center">
 						<Link
 							href="/auth/login"
-							className="bg-feature block w-full rounded-md px-12 py-3 text-sm font-bold tracking-wider text-white shadow-sm hover:brightness-90 focus:ring-3 focus:outline-hidden sm:w-auto"
+							className="block w-full rounded-md bg-green-600 px-12 py-3 text-sm font-bold tracking-wider text-white shadow-sm hover:brightness-90 focus:ring-3 focus:outline-hidden sm:w-auto"
 						>
 							Iniciar Sesión
 						</Link>

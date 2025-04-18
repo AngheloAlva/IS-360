@@ -12,6 +12,7 @@ import { authClient } from "@/lib/auth-client"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "../shared/SubmitButton"
 import { Form } from "@/components/ui/form"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export default function LoginForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -55,25 +56,33 @@ export default function LoginForm(): React.ReactElement {
 	}
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-3">
-				<InputFormField<LoginSchema>
-					control={form.control}
-					name="email"
-					label="Email"
-					placeholder="Email"
-				/>
+		<Card>
+			<CardHeader>
+				<h2 className="text-2xl font-bold">Iniciar Sesión</h2>
+			</CardHeader>
 
-				<InputFormField<LoginSchema>
-					control={form.control}
-					name="password"
-					type="password"
-					label="Contraseña"
-					placeholder="Contraseña"
-				/>
+			<CardContent>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-3">
+						<InputFormField<LoginSchema>
+							control={form.control}
+							name="email"
+							label="Email"
+							placeholder="Email"
+						/>
 
-				<SubmitButton label="Iniciar sesión" isSubmitting={loading} />
-			</form>
-		</Form>
+						<InputFormField<LoginSchema>
+							control={form.control}
+							name="password"
+							type="password"
+							label="Contraseña"
+							placeholder="Contraseña"
+						/>
+
+						<SubmitButton label="Iniciar sesión" isSubmitting={loading} />
+					</form>
+				</Form>
+			</CardContent>
+		</Card>
 	)
 }

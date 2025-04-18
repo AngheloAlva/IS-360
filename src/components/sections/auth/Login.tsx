@@ -4,9 +4,9 @@ import LoginForm from "@/components/forms/auth/LoginForm"
 
 export default function Login(): React.ReactElement {
 	return (
-		<section className="bg-white">
-			<div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-				<section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+		<section className="bg-secondary-background">
+			<div className="min-h-screen lg:grid lg:grid-cols-12">
+				<section className="relative flex h-32 items-end lg:col-span-5 lg:h-full xl:col-span-6">
 					<Image
 						alt="Login"
 						width={1000}
@@ -30,18 +30,18 @@ export default function Login(): React.ReactElement {
 					</div>
 				</section>
 
-				<main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-6 lg:px-16 lg:py-12">
+				<main className="flex items-center justify-center px-6 py-6 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
 					<div className="w-full max-w-md">
-						<div className="relative -mt-16 mb-5 block lg:hidden">
-							<div className="h-fit w-fit bg-white p-1.5">
+						<div className="relative -mt-14 mb-10 block lg:hidden">
+							<div className="bg-background h-fit w-fit p-1.5">
 								<Image src={"/logo.svg"} alt="Logo" width={40} height={40} />
 							</div>
 
-							<h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+							<h1 className="text-text mt-6 text-2xl font-bold sm:text-3xl md:text-4xl">
 								¡Bienvenido de nuevo!
 							</h1>
 
-							<p className="mt-4 leading-relaxed text-gray-500">
+							<p className="text-text/80 mt-2 leading-relaxed">
 								Ingresa tus datos para acceder a tu cuenta.
 							</p>
 						</div>

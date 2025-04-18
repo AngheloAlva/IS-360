@@ -15,7 +15,7 @@ export default function PageName({ externalPath }: { externalPath: boolean }): R
 	const path = pathname.split("/").slice(externalPath ? 1 : 2)
 
 	return (
-		<Breadcrumb>
+		<Breadcrumb className="hidden md:block">
 			<BreadcrumbList>
 				{path.map((item, i) => (
 					<BreadcrumbItem key={i}>

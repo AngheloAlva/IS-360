@@ -146,8 +146,8 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 		<Sidebar collapsible="icon" variant="sidebar" {...props}>
 			<SidebarHeader>
 				<SidebarMenuButton size="lg">
-					<div className="flex aspect-square size-8 items-center justify-center bg-white">
-						<Image src="/logo.svg" width={50} height={50} alt="Logo" />
+					<div className="flex aspect-square size-8 items-center justify-center">
+						<Image alt="Logo" width={50} height={52} src="/logo.svg" />
 					</div>
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-semibold">OTC</span>

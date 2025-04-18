@@ -20,7 +20,7 @@ export default function SubmitButton({
 			size={"lg"}
 			type="submit"
 			disabled={isSubmitting || disabled}
-			className={cn("mt-4 w-full font-bold tracking-wide", className)}
+			className={cn("hover:bg-secondary-background mt-4 w-full font-bold tracking-wide", className)}
 		>
 			{isSubmitting ? (
 				<div role="status" className="flex items-center justify-center">

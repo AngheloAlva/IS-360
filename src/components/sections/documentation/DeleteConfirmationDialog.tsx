@@ -87,7 +87,7 @@ export default function DeleteConfirmationDialog({
 					variant="outline"
 					size={"icon"}
 					onClick={handlePreview}
-					className="border-red-500 bg-white text-red-500 hover:bg-red-500 hover:text-white"
+					className="border-red-500 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white"
 				>
 					<Trash2 className="h-4 w-4" />
 				</Button>

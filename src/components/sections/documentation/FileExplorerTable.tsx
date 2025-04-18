@@ -5,40 +5,33 @@ import { es } from "date-fns/locale"
 import Link from "next/link"
 import {
 	Edit,
-	FileIcon,
+	Info,
+	Sheet,
+	Folder,
 	FileText,
-	ImageIcon,
-	VideoIcon,
-	FolderIcon,
-	FolderCogIcon,
-	FolderLockIcon,
-	FolderCheckIcon,
-	FolderClockIcon,
-	FolderHeartIcon,
+	FolderCog,
+	FolderLock,
+	FolderCheck,
+	FolderClock,
+	FolderHeart,
+	Image as ImageIcon,
 } from "lucide-react"
 
 import { useDocuments } from "@/hooks/use-documents"
 import { cn } from "@/lib/utils"
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import {
-	Table,
-	TableRow,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-} from "@/components/ui/table"
 
-import type { AREAS, File, Folder } from "@prisma/client"
-import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
+import type { AREAS } from "@prisma/client"
 
 interface FileExplorerTableProps {
 	userId: string
-	lastPath?: string
 	areaValue: AREAS
-	className?: string
+	lastPath?: string
 	foldersSlugs: string[]
 	actualFolderSlug?: string | null
 }
@@ -46,42 +39,37 @@ interface FileExplorerTableProps {
 export function FileExplorerTable({
 	userId,
 	lastPath,
-	className,
 	areaValue,
 	foldersSlugs,
 	actualFolderSlug = null,
 }: FileExplorerTableProps) {
-	const getFileIcon = (item: File) => {
-		const type = item.type.split("/")[0]
-
-		switch (type) {
-			case "application":
-				return <FileText className="h-5 w-5 text-red-500" />
-			case "image":
-				return <ImageIcon className="h-5 w-5 text-green-500" />
-			case "video":
-				return <VideoIcon className="h-5 w-5 text-orange-500" />
+	const getFileIcon = (type: string) => {
+		switch (true) {
+			case type.includes("document"):
+				return <FileText className="min-h-6 min-w-6 text-red-600" />
+			case type.includes("image"):
+				return <ImageIcon className="min-h-6 min-w-6 text-blue-600" />
+			case type.includes("excel"):
+				return <Sheet className="min-h-6 min-w-6 text-green-600" />
 			default:
-				return <FileIcon className="h-5 w-5 text-gray-500" />
+				return <FileText className="min-h-6 min-w-6 text-red-600" />
 		}
 	}
 
-	const getFolderIcon = (type: Folder["type"]) => {
-		switch (type) {
-			case "default":
-				return <FolderIcon className="h-5 w-5 text-yellow-500" />
-			case "check":
-				return <FolderCheckIcon className="h-5 w-5 text-green-500" />
-			case "clock":
-				return <FolderClockIcon className="h-5 w-5 text-blue-500" />
-			case "service":
-				return <FolderCogIcon className="h-5 w-5 text-indigo-500" />
-			case "favorite":
-				return <FolderHeartIcon className="h-5 w-5 text-red-500" />
-			case "lock":
-				return <FolderLockIcon className="h-5 w-5 text-gray-500" />
+	const getFolderIcon = (area: string) => {
+		switch (area) {
+			case "DONE":
+				return <FolderCheck className="min-h-6 min-w-6 text-green-600" />
+			case "PENDING":
+				return <FolderClock className="min-h-6 min-w-6 text-purple-600" />
+			case "SETTINGS":
+				return <FolderCog className="min-h-6 min-w-6 text-blue-600" />
+			case "FAVORITES":
+				return <FolderHeart className="min-h-6 min-w-6 text-red-600" />
+			case "PRIVATE":
+				return <FolderLock className="min-h-6 min-w-6 text-gray-600" />
 			default:
-				return <FolderIcon className="h-5 w-5 text-yellow-500" />
+				return <Folder className="min-h-6 min-w-6 text-yellow-600" />
 		}
 	}
 
@@ -89,140 +77,195 @@ export function FileExplorerTable({
 		area: areaValue,
 		folderSlug: actualFolderSlug,
 	})
-	console.log(data)
 
 	return (
-		<Table className={cn("rounded-md bg-white p-2", className)}>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Codigo-Nombre</TableHead>
-					<TableHead>Estatus</TableHead>
-					<TableHead>Descripcion</TableHead>
-					<TableHead>Fecha de Registro</TableHead>
-					<TableHead>Fecha de Expiracion</TableHead>
-					<TableHead>Usuario</TableHead>
-					<TableHead>Revisiones / Actualizacion</TableHead>
-					{<TableHead></TableHead>}
-				</TableRow>
-			</TableHeader>
+		<div className="grid gap-4 sm:grid-cols-2">
+			{isLoading ? (
+				Array.from({ length: 8 }).map((_, index) => (
+					<Card key={index} className="animate-pulse">
+						<CardContent>
+							<Skeleton className="h-20 w-full" />
+						</CardContent>
+					</Card>
+				))
+			) : (
+				<>
+					{data?.folders?.map((item) => (
+						<Card key={item.id} className="relative">
+							<CardContent className="flex flex-col gap-2">
+								<div className="flex items-center gap-2">
+									{getFolderIcon(item.area)}
+									<Link
+										href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug}`}
+										className="pr-6 font-medium hover:underline"
+									>
+										{item.name}
+									</Link>
+								</div>
 
-			<TableBody>
-				{isLoading ? (
-					Array.from({ length: 5 }).map((_, index) => (
-						<TableRow key={index}>
-							<TableCell colSpan={8}>
-								<Skeleton className="h-9 w-full" />
-							</TableCell>
-						</TableRow>
-					))
-				) : (
-					<>
-						{data?.folders?.map((item) => (
-							<TableRow key={item.id}>
-								<TableCell>
-									<div className="flex items-center gap-2">
-										{getFolderIcon(item.type)}
-										<Link
-											href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug}`}
-											className="font-medium hover:underline"
-										>
-											{item.name}
-										</Link>
-									</div>
-								</TableCell>
-								<TableCell></TableCell>
-								<TableCell className="max-w-52 overflow-hidden whitespace-normal">
-									{item.description}
-								</TableCell>
-								<TableCell></TableCell>
-								<TableCell></TableCell>
-								<TableCell>{item.user?.name}</TableCell>
-								<TableCell>
-									{formatDistanceToNow(item.updatedAt, {
-										addSuffix: true,
-										locale: es,
-									})}
-								</TableCell>
+								{item.description && (
+									<p className="text-muted-foreground line-clamp-2 text-sm">{item.description}</p>
+								)}
 
-								{item.userId === userId && (
-									<TableCell className="space-x-1">
-										<Link
-											href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
-										>
+								<div className="absolute top-4 right-4 flex gap-1">
+									<Popover>
+										<PopoverTrigger asChild>
 											<Button
 												size="icon"
-												variant="outline"
-												className="text-primary hover:bg-primary bg-white hover:text-white"
+												className="bg-primary/20 text-text hover:bg-primary h-8 w-8"
 											>
-												<Edit className="h-4 w-4" />
+												<Info className="h-4 w-4" />
 											</Button>
-										</Link>
-										<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
-									</TableCell>
+										</PopoverTrigger>
+										<PopoverContent align="end" className="w-80">
+											<div className="grid gap-2">
+												<div className="space-y-1">
+													<h4 className="font-medium">Información de la carpeta</h4>
+													<p className="text-muted-foreground text-sm">
+														Última actualización:{" "}
+														<span className="font-semibold">
+															{formatDistanceToNow(item.updatedAt, {
+																addSuffix: true,
+																locale: es,
+															})}
+														</span>
+													</p>
+												</div>
+
+												{item.userId === userId && (
+													<div className="mt-4 flex gap-2">
+														<Link
+															href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
+															className="w-full"
+														>
+															<Button className="hover:bg-primary w-full hover:brightness-90">
+																<Edit className="mr-2 h-4 w-4" />
+																Editar
+															</Button>
+														</Link>
+														<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
+													</div>
+												)}
+											</div>
+										</PopoverContent>
+									</Popover>
+								</div>
+							</CardContent>
+						</Card>
+					))}
+
+					{data?.files?.map((item) => (
+						<Card key={item.id} className="relative max-w-full">
+							<CardContent className="flex h-full flex-col justify-between gap-2">
+								<div className="flex items-center gap-2">
+									{getFileIcon(item.type)}
+
+									<Link
+										href={item.url}
+										target="_blank"
+										rel="noreferrer noopener"
+										className="pr-6 font-medium hover:underline"
+									>
+										{item?.code ? item.code.charAt(0) + "-" + item.name : item.name}
+									</Link>
+								</div>
+
+								{item.description && (
+									<p className="text-muted-foreground line-clamp-2 text-sm">{item.description}</p>
 								)}
-							</TableRow>
-						))}
 
-						{data?.files?.map((item) => (
-							<TableRow key={item.id}>
-								<TableCell>
-									<div className="flex items-center gap-2">
-										{getFileIcon(item)}
-										<Link
-											href={item.url}
-											target="_blank"
-											rel="noreferrer noopener"
-											className="font-medium hover:underline"
-										>
-											{item?.code ? item.code.charAt(0) + "-" + item.name : item.name}
-										</Link>
-									</div>
-								</TableCell>
-								<TableCell>
-									{item.expirationDate
-										? item.expirationDate < new Date()
-											? "Expirado"
-											: "Vigente"
-										: "Vigente"}
-								</TableCell>
-								<TableCell>{item.description}</TableCell>
-								<TableCell>{format(item.registrationDate, "dd/MM/yyyy")}</TableCell>
-								<TableCell>
-									{item.expirationDate ? format(item.expirationDate, "dd/MM/yyyy") : "N/A"}
-								</TableCell>
-								<TableCell>{item.user?.name}</TableCell>
-								<TableCell>{item.revisionCount}</TableCell>
+								<div className="text-muted-foreground flex items-center justify-end gap-2 text-xs">
+									<span>{item.revisionCount} revisiones</span>
+									<span>•</span>
+									<span
+										className={cn(
+											"rounded-full px-2 py-1 font-semibold",
+											item.expirationDate && item.expirationDate < new Date()
+												? "bg-red-500/10 text-red-500"
+												: "bg-green-500/10 text-green-500"
+										)}
+									>
+										{item.expirationDate
+											? item.expirationDate < new Date()
+												? "Expirado"
+												: "Vigente"
+											: "Vigente"}
+									</span>
+								</div>
 
-								{item.userId === userId && (
-									<TableCell className="space-x-1">
-										<Link
-											href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
-										>
+								<div className="absolute top-4 right-4 flex gap-1">
+									<Popover>
+										<PopoverTrigger asChild>
 											<Button
 												size="icon"
-												variant="outline"
-												className="text-primary hover:bg-primary bg-white hover:text-white"
+												className="bg-primary/20 text-text hover:bg-primary h-8 w-8"
 											>
-												<Edit className="h-4 w-4" />
+												<Info className="h-4 w-4" />
 											</Button>
-										</Link>
+										</PopoverTrigger>
+										<PopoverContent align="end" className="w-80">
+											<div className="grid gap-2">
+												<div className="space-y-1">
+													<h4 className="font-medium">Información del archivo</h4>
+													<div className="grid gap-1">
+														<p className="text-muted-foreground text-sm">
+															Creado por: <span className="font-semibold">{item.user?.name}</span>
+														</p>
+														<p className="text-muted-foreground text-sm">
+															Fecha de registro:{" "}
+															<span className="font-semibold">
+																{format(item.registrationDate, "dd/MM/yyyy")}
+															</span>
+														</p>
+														<p className="text-muted-foreground text-sm">
+															Fecha de expiración:{" "}
+															{item.expirationDate ? (
+																<span className="font-semibold">
+																	{format(item.expirationDate, "dd/MM/yyyy")}
+																</span>
+															) : (
+																"N/A"
+															)}
+														</p>
+														<p className="text-muted-foreground text-sm">
+															Última actualización:{" "}
+															<span className="font-semibold">
+																{format(item.updatedAt, "dd/MM/yyyy")}
+															</span>
+														</p>
+													</div>
+												</div>
 
-										<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
-									</TableCell>
-								)}
-							</TableRow>
-						))}
+												{item.userId === userId && (
+													<div className="mt-4 flex gap-2">
+														<Link
+															href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
+															className="w-full"
+														>
+															<Button className="hover:bg-primary w-full hover:brightness-90">
+																<Edit className="mr-2 h-4 w-4" />
+																Editar
+															</Button>
+														</Link>
+														<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
+													</div>
+												)}
+											</div>
+										</PopoverContent>
+									</Popover>
+								</div>
+							</CardContent>
+						</Card>
+					))}
 
-						{data?.folders?.length === 0 && data?.files?.length === 0 && (
-							<TableRow>
-								<TableCell colSpan={8} className="py-8 text-center text-gray-500">
-									No hay archivos ni carpetas en esta ubicación
-								</TableCell>
-							</TableRow>
-						)}
-					</>
-				)}
-			</TableBody>
-		</Table>
+					{data?.folders?.length === 0 && data?.files?.length === 0 && (
+						<div className="text-text bg-primary/10 border-primary col-span-full mx-auto flex items-center gap-2 rounded-xl border px-8 py-4 text-center font-medium">
+							<Info className="text-primary h-7 w-7" />
+							No hay archivos ni carpetas en esta ubicación
+						</div>
+					)}
+				</>
+			)}
+		</div>
 	)
 }

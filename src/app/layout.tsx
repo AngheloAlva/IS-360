@@ -19,7 +19,7 @@ export default function RootLayout({
 	return (
 		<html lang="es" suppressHydrationWarning>
 			<body className={`${generalFont.className} font-general antialiased`}>
-				<ThemeProvider enableSystem defaultTheme="system">
+				<ThemeProvider enableSystem defaultTheme="system" attribute="class">
 					{children}
 				</ThemeProvider>
 				<Toaster />
