@@ -1,10 +1,11 @@
 "use server"
 
-import { addDays } from "date-fns"
+import { addDays, format, subDays } from "date-fns"
 
-import prisma from "@/lib/prisma"
 import { AreasValues } from "@/lib/consts/areas"
-import { AREAS } from "@prisma/client"
+import prisma from "@/lib/prisma"
+
+import type { AREAS } from "@prisma/client"
 
 export async function getDocumentsChartData() {
 	// Get documents by area
@@ -16,7 +17,11 @@ export async function getDocumentsChartData() {
 				where: { area, isActive: true },
 				include: {
 					_count: {
-						select: { files: true },
+						select: {
+							files: {
+								where: { isActive: true },
+							},
+						},
 					},
 				},
 				cacheStrategy: {
@@ -188,6 +193,48 @@ export async function getDocumentsChartData() {
 		PROJECTS: "Proyectos",
 	}
 
+	// Get recent file changes
+	const recentChanges = await prisma.fileHistory.findMany({
+		take: 10,
+		orderBy: {
+			modifiedAt: "desc",
+		},
+		include: {
+			file: true,
+			modifiedBy: {
+				select: {
+					name: true,
+					role: true,
+					area: true,
+				},
+			},
+		},
+		cacheStrategy: {
+			ttl: 120,
+			swr: 10,
+		},
+	})
+
+	// Get activity by day (last 7 days)
+	const last7Days = Array.from({ length: 7 }, (_, i) => {
+		const date = subDays(new Date(), i)
+		return format(date, "yyyy-MM-dd")
+	}).reverse()
+
+	const activityByDay = await Promise.all(
+		last7Days.map(async (date) => {
+			const count = await prisma.fileHistory.count({
+				where: {
+					modifiedAt: {
+						gte: new Date(date),
+						lt: addDays(new Date(date), 1),
+					},
+				},
+			})
+			return { date, count }
+		})
+	)
+
 	return {
 		areaData: areaData.map((area: { area: AREAS; _count: { files: number } }) => ({
 			name: areaLabels[area.area as keyof typeof AreasValues],
@@ -227,6 +274,20 @@ export async function getDocumentsChartData() {
 		responsibleData: responsibleData.map((user: { name: string; _count: { files: number } }) => ({
 			name: user.name,
 			value: user._count.files,
+		})),
+		recentChanges: recentChanges.map((change) => ({
+			id: change.id,
+			fileName: change.file.name,
+			previousName: change.previousName,
+			modifiedBy: change.modifiedBy.name,
+			modifiedAt: format(change.modifiedAt, "dd/MM/yyyy HH:mm"),
+			reason: change.reason || "Sin razón especificada",
+			userRole: change.modifiedBy.role,
+			userArea: change.modifiedBy.area,
+		})),
+		activityByDay: activityByDay.map((day) => ({
+			date: format(new Date(day.date), "dd/MM"),
+			changes: day.count,
 		})),
 	}
 }

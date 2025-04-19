@@ -50,7 +50,7 @@ const TreeNode = memo(function TreeNode({
 		<div>
 			<div
 				className={cn(
-					"hover:bg-accent/50 flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-sm",
+					"hover:bg-accent/50 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm",
 					"transition-colors duration-200",
 					{
 						"ml-4": level === 0,
@@ -66,27 +66,27 @@ const TreeNode = memo(function TreeNode({
 				onClick={handleToggle}
 			>
 				{node.type === "folder" && (
-					<div className="flex h-4 w-4 items-center justify-center">
+					<div className="flex h-5 w-5 items-center justify-center">
 						{node.hasChildren &&
 							(expandedNodes.has(node.id) ? (
-								<ChevronDown className="h-4 w-4" />
+								<ChevronDown className="h-5 w-5" />
 							) : (
-								<ChevronRight className="h-4 w-4" />
+								<ChevronRight className="h-5 w-5" />
 							))}
 					</div>
 				)}
 
 				{node.type === "folder" ? (
 					!expandedNodes.has(node.id) ? (
-						<Folder className="h-4 min-h-4 w-4 min-w-4 text-blue-500" />
+						<Folder className="h-5 min-h-5 w-5 min-w-5 text-blue-500" />
 					) : (
-						<FolderOpen className="h-4 min-h-4 w-4 min-w-4 text-blue-800" />
+						<FolderOpen className="h-5 min-h-5 w-5 min-w-5 text-blue-800" />
 					)
 				) : (
-					<File className="text-text ml-4 h-4 min-h-4 w-4 min-w-4" />
+					<File className="ml-5 h-5 min-h-5 w-5 min-w-5 text-sky-500" />
 				)}
 
-				<span className="truncate">
+				<span className="truncate text-base font-semibold">
 					{node.type === "file" && node.url ? (
 						<Link
 							target="_blank"

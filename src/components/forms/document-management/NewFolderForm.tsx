@@ -96,64 +96,85 @@ export default function NewFolderForm({
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full max-w-screen-md">
-				<Card className="w-full">
-					<CardContent className="grid gap-5">
-						<InputFormField<FolderFormSchema>
-							name="name"
-							control={form.control}
-							label="Nombre de la Carpeta"
-							placeholder="Nombre de la Carpeta"
-						/>
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="mx-auto flex w-full max-w-screen-md flex-col gap-5 lg:flex-row"
+			>
+				<div className="lg:w-full">
+					<Card className="w-full">
+						<CardContent className="grid gap-5">
+							<InputFormField<FolderFormSchema>
+								name="name"
+								control={form.control}
+								label="Nombre de la Carpeta"
+								placeholder="Nombre de la Carpeta"
+							/>
 
-						<TextAreaFormField<FolderFormSchema>
-							name="description"
-							control={form.control}
-							label="Descipción de la Carpeta"
-							placeholder="Descipción de la Carpeta"
-						/>
+							<TextAreaFormField<FolderFormSchema>
+								optional
+								name="description"
+								control={form.control}
+								label="Descipción de la Carpeta"
+								placeholder="Descipción de la Carpeta"
+							/>
 
-						<SelectFormField<FolderFormSchema>
-							name="type"
-							options={FolderTypes}
-							control={form.control}
-							label="Tipo de Carpeta"
-							placeholder="Seleccione un tipo"
-						/>
+							<SelectFormField<FolderFormSchema>
+								name="type"
+								options={FolderTypes}
+								control={form.control}
+								label="Tipo de Carpeta"
+								placeholder="Seleccione un tipo"
+							/>
+						</CardContent>
+					</Card>
 
-						<span className="text-muted-foreground mt-4 font-medium underline">
+					<SubmitButton
+						isSubmitting={isSubmitting}
+						label="Crear Carpeta"
+						className="hidden lg:block"
+					/>
+				</div>
+
+				<Card className="lg:w-fit">
+					<CardContent className="flex flex-col items-center justify-center">
+						<span className="text-muted-foreground text-center font-medium underline">
 							Tipos de carpetas
 						</span>
-						<div className="flex flex-wrap items-center justify-between gap-4">
+
+						<div className="mt-4 flex flex-wrap items-center justify-between gap-5 lg:flex-col lg:flex-nowrap">
 							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-								<FolderIcon className="h-5 w-5 text-yellow-500" />
-								<span>Por defecto</span>
+								<FolderIcon className="h-8 w-8 rounded-lg bg-yellow-500/10 p-1.5 text-yellow-500" />
+								<span>Defecto</span>
 							</div>
 							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-								<FolderCheckIcon className="h-5 w-5 text-green-500" />
+								<FolderCheckIcon className="h-8 w-8 rounded-lg bg-green-500/10 p-1.5 text-green-500" />
 								<span>Check</span>
 							</div>
 							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-								<FolderClockIcon className="h-5 w-5 text-blue-500" />
+								<FolderClockIcon className="h-8 w-8 rounded-lg bg-blue-500/10 p-1.5 text-blue-500" />
 								<span>Reloj</span>
 							</div>
 							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-								<FolderCogIcon className="h-5 w-5 text-indigo-500" />
+								<FolderCogIcon className="h-8 w-8 rounded-lg bg-indigo-500/10 p-1.5 text-indigo-500" />
 								<span>Servicio</span>
 							</div>
 							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-								<FolderHeartIcon className="h-5 w-5 text-red-500" />
+								<FolderHeartIcon className="h-8 w-8 rounded-lg bg-red-500/10 p-1.5 text-red-500" />
 								<span>Favorito</span>
 							</div>
 							<div className="text-muted-foreground flex flex-col items-center justify-center text-sm">
-								<FolderLockIcon className="h-5 w-5 text-gray-500" />
+								<FolderLockIcon className="h-8 w-8 rounded-lg bg-gray-500/10 p-1.5 text-gray-500" />
 								<span>Bloqueado</span>
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<SubmitButton isSubmitting={isSubmitting} label="Crear Carpeta" />
+				<SubmitButton
+					isSubmitting={isSubmitting}
+					label="Crear Carpeta"
+					className="block lg:hidden"
+				/>
 			</form>
 		</Form>
 	)

@@ -27,9 +27,9 @@ export default async function AddNewFilePage(props: { searchParams: SearchParams
 
 	return (
 		<>
-			<div className="flex w-full max-w-screen-md items-center justify-start gap-2">
+			<div className="flex w-full items-center justify-start gap-2">
 				<BackButton href={backPath || `/dashboard/documentacion/${area}`} />
-				<h1 className="w-fit text-3xl font-bold">Nuevo Archivo</h1>
+				<h1 className="text-text w-fit text-3xl font-bold">Nuevo Archivo</h1>
 			</div>
 
 			<NewFileForm

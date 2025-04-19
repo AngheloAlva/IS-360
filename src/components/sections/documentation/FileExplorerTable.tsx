@@ -236,20 +236,20 @@ export function FileExplorerTable({
 													</div>
 												</div>
 
-												{item.userId === userId && (
-													<div className="mt-4 flex gap-2">
-														<Link
-															href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
-															className="w-full"
-														>
-															<Button className="hover:bg-primary w-full hover:brightness-90">
-																<Edit className="mr-2 h-4 w-4" />
-																Editar
-															</Button>
-														</Link>
-														<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
-													</div>
-												)}
+												{/* {item.userId === userId && ( */}
+												<div className="mt-4 flex gap-2">
+													<Link
+														href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
+														className="w-full"
+													>
+														<Button className="hover:bg-primary w-full hover:brightness-90">
+															<Edit className="mr-2 h-4 w-4" />
+															Editar
+														</Button>
+													</Link>
+													<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
+												</div>
+												{/* )} */}
 											</div>
 										</PopoverContent>
 									</Popover>

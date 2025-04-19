@@ -12,6 +12,7 @@ interface TextAreaFormFieldProps<T extends FieldValues> {
 	label: string
 	className?: string
 	disabled?: boolean
+	optional?: boolean
 	control: Control<T>
 	placeholder?: string
 	itemClassName?: string
@@ -25,6 +26,7 @@ export function TextAreaFormField<T extends FieldValues>({
 	placeholder,
 	itemClassName,
 	disabled = false,
+	optional = false,
 }: TextAreaFormFieldProps<T>) {
 	return (
 		<FormField
@@ -32,7 +34,10 @@ export function TextAreaFormField<T extends FieldValues>({
 			control={control}
 			render={({ field }) => (
 				<FormItem className={itemClassName}>
-					<FormLabel>{label}</FormLabel>
+					<FormLabel className="gap-1">
+						{label}
+						{optional && <span className="text-muted-foreground"> (opcional)</span>}
+					</FormLabel>
 					<FormControl>
 						<Textarea
 							disabled={disabled}

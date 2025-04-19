@@ -98,7 +98,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						filenames: [uniqueFilename],
-						containerType: "documents", // Especificar que es para documentos
+						containerType: "documents",
 					}),
 				})
 				if (!response.ok) throw new Error("Error al obtener URL de subida")
@@ -106,7 +106,6 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 				const data = await response.json()
 				if (!data.urls?.[0]) throw new Error("Respuesta inválida del servidor")
 
-				// Subir archivo a Azure Blob Storage
 				const uploadResponse = await fetch(data.urls[0], {
 					method: "PUT",
 					body: selectedFile,
@@ -124,11 +123,8 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 
 				if (!uploadResponse.ok) throw new Error("Error al subir el archivo")
 
-				// Obtener la URL base del blob (sin los parámetros SAS)
 				const blobUrl = data.urls[0].split("?")[0]
 
-				// Guardar metadatos en la base de datos
-				console.log(values, blobUrl, selectedFile.size, selectedFile.type)
 				const saveResult = await updateFile({
 					...values,
 					fileId,

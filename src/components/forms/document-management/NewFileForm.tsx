@@ -1,6 +1,5 @@
 "use client"
 
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { UploadCloud, X } from "lucide-react"
@@ -10,7 +9,7 @@ import { toast } from "sonner"
 
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { Areas } from "@/lib/consts/areas"
-import { cn } from "@/lib/utils"
+
 import {
 	fileFormSchema,
 	type FileFormSchema,
@@ -22,8 +21,9 @@ import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
+import { FilePreview } from "@/components/ui/file-preview"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { FileCard } from "@/components/ui/file-card"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 
@@ -35,7 +35,7 @@ interface NewFileFormProps {
 }
 
 export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormProps) {
-	const [currentPreview, setCurrentPreview] = useState<number>(0)
+	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [isOneFile, setIsOneFile] = useState(true)
 
@@ -76,7 +76,7 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 			if (!validTypes.test(file.name)) {
 				toast.error(`Formato no soportado: ${file.name}`, {
 					description:
-						"Solo se permiten archivos PDF, Word, Excel, PowerPoint, Texto, Imágenes, Archivos comprimidos",
+						"Solo se permiten archivos PDF, Word, Excel, PowerPoint, Texto, Imágenes y Archivos comprimidos",
 				})
 				continue
 			}
@@ -106,17 +106,15 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		try {
 			const formData = new FormData()
 
-			// Agregar los archivos al FormData
 			fields.forEach((fileData) => {
 				formData.append("files", fileData.file)
 			})
 
-			// Agregar el resto de los datos como JSON
 			formData.append(
 				"data",
 				JSON.stringify({
 					...values,
-					files: undefined, // Excluir los archivos del JSON
+					files: undefined,
 				})
 			)
 
@@ -153,165 +151,149 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 	const codeIsOther = form.watch("code") === CodesValues.OTRO
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full max-w-screen-md">
-				<Card className="w-full">
-					<CardContent className="grid gap-5">
-						<InputFormField<FileFormSchema>
-							name="name"
-							disabled={!isOneFile}
-							control={form.control}
-							label="Nombre del documento"
-							placeholder="Ej: Informe Técnico 2023"
-						/>
+		<div className="flex w-full flex-col gap-4 lg:flex-row xl:gap-6">
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex w-full flex-col gap-4 xl:gap-6"
+				>
+					<Card className="w-full">
+						<CardContent className="grid gap-5">
+							<div className="grid gap-4">
+								<div className="col-span-full">
+									<h3 className="text-lg font-semibold">Archivos</h3>
+									<p className="text-muted-foreground text-sm">
+										Puedes subir uno o más archivos, en el caso de subir más de uno, se aplicara el
+										codigo de ISO y fechas a todos los archivos.
+									</p>
 
-						<TextAreaFormField<FileFormSchema>
-							name="description"
-							label="Descripción"
-							disabled={!isOneFile}
-							control={form.control}
-							placeholder="Agregue detalles adicionales..."
-						/>
-
-						<SelectFormField<FileFormSchema>
-							name="code"
-							options={CodeOptions}
-							control={form.control}
-							label="Código de ISO"
-							placeholder="Seleccione un código"
-						/>
-
-						{codeIsOther && (
-							<InputFormField<FileFormSchema>
-								name="otherCode"
-								control={form.control}
-								placeholder="Ej: OTRO"
-								label="Otro código de ISO"
-							/>
-						)}
-
-						<div className="grid gap-4 md:grid-cols-2">
-							<div className="col-span-full">
-								<h3 className="text-lg font-medium">Archivos</h3>
-								<p className="text-muted-foreground text-sm">
-									Puedes subir uno o más archivos, en el caso de subir más de uno, se aplicara el
-									codigo de ISO y fechas a todos los archivos.
-								</p>
-
-								<div className="mt-4 grid gap-4 md:grid-cols-2">
-									<div className="flex w-full items-center justify-center">
-										<label
-											htmlFor="dropzone-file"
-											className="dark:hover:bg-bray-800 flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-										>
-											<div className="flex flex-col items-center justify-center pt-5 pb-6">
-												<UploadCloud className="mb-3 h-10 w-10 text-gray-400" />
-												<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-													<span className="font-semibold">Click para subir</span> o arrastra y
-													suelta
-												</p>
-												<p className="text-xs text-gray-500 dark:text-gray-400">
-													PDF, DOCX, PPTX (MAX. 10MB)
-												</p>
-											</div>
-											<input
-												multiple
-												type="file"
-												className="hidden"
-												id="dropzone-file"
-												onChange={(e) => handleFileChange(e.target.files)}
-												accept=".pdf, .docx, .pptx, .zip, .rar, .7z, .png, .jpg, .jpeg, .gif, .webp, .avif"
-											/>
-										</label>
-									</div>
-
-									<div className="relative h-96 w-full overflow-hidden rounded-lg border bg-white">
-										{fields.length > 0 && (
-											<div className="h-full w-full p-4">
-												<div className="h-full w-full">
-													{fields[currentPreview] && fields[currentPreview].preview ? (
-														<DocViewer
-															documents={[
-																{
-																	uri: fields[currentPreview].preview,
-																	fileName: fields[currentPreview].title,
-																},
-															]}
-															pluginRenderers={DocViewerRenderers}
-															config={{ header: { disableHeader: true } }}
-															className="[&_#pdf-controls]:h-0 [&_#pdf-controls]:w-0 [&_#pdf-controls]:overflow-hidden [&_#pdf-controls]:opacity-0"
-															style={{ height: "100%" }}
-														/>
-													) : (
-														<div className="flex h-full flex-col items-center justify-center">
-															<p className="text-lg font-medium">{fields[currentPreview].title}</p>
-															<p className="text-muted-foreground mt-1 text-sm">
-																{(fields[currentPreview].fileSize / 1024).toFixed(2)} KB
-															</p>
-														</div>
-													)}
+									<div className="mt-4 grid gap-4">
+										<div className="flex w-full items-center justify-center">
+											<label
+												htmlFor="dropzone-file"
+												className="dark:hover:bg-bray-800 flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+											>
+												<div className="flex flex-col items-center justify-center pt-5 pb-6">
+													<UploadCloud className="mb-3 h-10 w-10 text-gray-400" />
+													<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+														<span className="font-semibold">Click para subir</span> o arrastra y
+														suelta
+													</p>
+													<p className="text-xs text-gray-500 dark:text-gray-400">
+														PDF, DOCX, PPTX (MAX. 10MB)
+													</p>
 												</div>
-											</div>
-										)}
-
-										{/* Controles de navegación */}
-										<div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
-											{fields.map((_, index) => (
-												<button
-													key={index}
-													type="button"
-													className={cn(
-														"h-2 w-2 rounded-full bg-gray-300 transition-all",
-														currentPreview === index && "bg-gray-800"
-													)}
-													onClick={() => setCurrentPreview(index)}
+												<input
+													multiple
+													type="file"
+													className="hidden"
+													id="dropzone-file"
+													onChange={(e) => handleFileChange(e.target.files)}
+													accept=".pdf, .docx, .pptx, .zip, .rar, .7z, .png, .jpg, .jpeg, .gif, .webp, .avif"
 												/>
-											))}
+											</label>
 										</div>
 
 										{fields.length > 0 && (
-											<Button
-												type="button"
-												size={"icon"}
-												variant={"ghost"}
-												className="hover:bg-error/10 absolute top-2 right-2 h-10 w-10 rounded-full p-1 text-red-600 transition-colors"
-												onClick={() => {
-													remove(currentPreview)
-													if (currentPreview > 0) setCurrentPreview(currentPreview - 1)
-												}}
-											>
-												<X className="h-5 w-5" />
-											</Button>
+											<h3 className="mt-4 text-lg font-semibold">Archivos Seleccionados</h3>
 										)}
+										<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+											{fields.map((field, index) => (
+												<div key={field.id} className="group relative">
+													<FileCard
+														file={field}
+														isSelected={selectedFileIndex === index}
+														onClick={() => setSelectedFileIndex(index)}
+													/>
+													<Button
+														size="icon"
+														type="button"
+														className="invisible absolute top-3 right-3 h-7 w-7 rounded-full bg-red-500/10 text-red-600 transition-colors group-hover:visible hover:bg-red-500/50"
+														onClick={() => {
+															remove(index)
+															if (selectedFileIndex === index) {
+																setSelectedFileIndex(index > 0 ? index - 1 : null)
+															}
+														}}
+													>
+														<X className="h-4 w-4" />
+													</Button>
+												</div>
+											))}
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
+						</CardContent>
+					</Card>
 
-						<Separator className="mt-8" />
+					<Card>
+						<CardContent className="grid gap-6">
+							<h3 className="text-lg font-semibold">Información del o los Documentos</h3>
 
-						<div className="grid gap-4 md:grid-cols-2">
-							<DatePickerFormField<FileFormSchema>
-								name="registrationDate"
-								label="Fecha de Registro"
+							<InputFormField<FileFormSchema>
+								optional
+								name="name"
+								disabled={!isOneFile}
 								control={form.control}
+								label="Nombre del documento"
+								placeholder="Ej: Informe Técnico 2023"
+								description="Puedes dejarlo en blanco y el nombre del archivo será el nombre del documento."
 							/>
 
-							<DatePickerFormField<FileFormSchema>
-								name="expirationDate"
+							<TextAreaFormField<FileFormSchema>
+								optional
+								name="description"
+								label="Descripción"
+								disabled={!isOneFile}
 								control={form.control}
-								label="Fecha de Expiración"
+								placeholder="Agregue detalles adicionales..."
 							/>
-						</div>
-					</CardContent>
-				</Card>
 
-				<SubmitButton
-					label="Subir Documento"
-					isSubmitting={isSubmitting}
-					disabled={fields.length === 0}
-				/>
-			</form>
-		</Form>
+							<SelectFormField<FileFormSchema>
+								name="code"
+								options={CodeOptions}
+								control={form.control}
+								label="Código de ISO"
+								placeholder="Seleccione un código"
+							/>
+
+							{codeIsOther && (
+								<InputFormField<FileFormSchema>
+									name="otherCode"
+									control={form.control}
+									placeholder="Ej: OTRO"
+									label="Otro código de ISO"
+								/>
+							)}
+
+							<div className="grid gap-4 md:grid-cols-2">
+								<DatePickerFormField<FileFormSchema>
+									control={form.control}
+									name="registrationDate"
+									label="Fecha de Registro"
+									description="Fecha en la que se registro el documento originalmente. NO es la fecha de registro en este sistema."
+								/>
+
+								<DatePickerFormField<FileFormSchema>
+									name="expirationDate"
+									control={form.control}
+									label="Fecha de Expiración"
+									itemClassName="h-full flex flex-col items-start"
+								/>
+							</div>
+						</CardContent>
+					</Card>
+
+					<SubmitButton
+						label="Subir Documento"
+						isSubmitting={isSubmitting}
+						disabled={fields.length === 0}
+					/>
+				</form>
+			</Form>
+
+			<FilePreview file={selectedFileIndex !== null ? fields[selectedFileIndex] : null} />
+		</div>
 	)
 }
