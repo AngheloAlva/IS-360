@@ -1,5 +1,32 @@
-import MainAdminUsers from "@/components/sections/admin/users/MainAdminUsers"
+import { Plus } from "lucide-react"
+import Link from "next/link"
+
+import { UsersDataTable } from "@/components/sections/admin/users/UsersDataTable"
+import { UserStatsCards } from "@/components/sections/admin/users/UserStatsCards"
+import { Button } from "@/components/ui/button"
 
 export default function AdminUsersPage(): React.ReactElement {
-	return <MainAdminUsers />
+	return (
+		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
+			<div className="flex items-start justify-between gap-4 md:flex-row">
+				<div className="flex flex-col gap-1">
+					<h1 className="text-text w-fit text-3xl font-bold">Usuarios</h1>
+					<p className="text-text w-fit text-sm sm:text-base">
+						En esta sección puedes gestionar los usuarios de la plataforma.
+					</p>
+				</div>
+
+				<Link href="/admin/dashboard/usuarios/internos/agregar">
+					<Button size={"lg"}>
+						<Plus />
+						<span className="hidden sm:inline">Nuevo Miembro OTC</span>
+					</Button>
+				</Link>
+			</div>
+
+			<UserStatsCards />
+
+			<UsersDataTable />
+		</div>
+	)
 }

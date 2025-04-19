@@ -30,7 +30,7 @@ export function TablePagination<TData>({
 			<div className="flex items-center gap-1">
 				<Button
 					variant="outline"
-					className="text-primary border-primary hover:bg-primary bg-white hover:text-white"
+					className="text-primary border-primary hover:bg-primary"
 					size="sm"
 					onClick={() => onPageChange(1)}
 					disabled={currentPage <= 1 || isLoading}
@@ -39,7 +39,7 @@ export function TablePagination<TData>({
 				</Button>
 				<Button
 					variant="outline"
-					className="text-primary border-primary hover:bg-primary bg-white hover:text-white"
+					className="text-primary border-primary hover:bg-primary"
 					size="sm"
 					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage <= 1 || isLoading}
@@ -48,7 +48,7 @@ export function TablePagination<TData>({
 				</Button>
 				<Button
 					variant="outline"
-					className="text-primary border-primary hover:bg-primary bg-white hover:text-white"
+					className="text-primary border-primary hover:bg-primary"
 					size="sm"
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage >= pageCount || isLoading}
@@ -57,7 +57,7 @@ export function TablePagination<TData>({
 				</Button>
 				<Button
 					variant="outline"
-					className="text-primary border-primary hover:bg-primary bg-white hover:text-white"
+					className="text-primary border-primary hover:bg-primary"
 					size="sm"
 					onClick={() => onPageChange(pageCount)}
 					disabled={currentPage >= pageCount || isLoading}

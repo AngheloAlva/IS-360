@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Edit } from "lucide-react"
+import { Edit } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 
@@ -44,6 +44,10 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		header: "Email",
 	},
 	{
+		accessorKey: "phone",
+		header: "Teléfono",
+	},
+	{
 		accessorKey: "rut",
 		header: "RUT",
 	},
@@ -54,8 +58,8 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const role = row.getValue("role") as USER_ROLE
 			return (
 				<Badge
-					className={cn("border-feature text-feature", {
-						"border-primary text-primary bg-white": role !== "PARTNER_COMPANY",
+					className={cn("border-green-500 bg-green-500/10 text-green-500", {
+						"border-primary text-primary bg-primary/10": role !== "PARTNER_COMPANY",
 					})}
 					variant={role === "PARTNER_COMPANY" ? "outline" : "default"}
 				>
@@ -87,22 +91,16 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const area = row.getValue("area") as keyof typeof AreasLabels
 			if (!area) return null
 
-			return <Badge variant="outline">{AreasLabels[area]}</Badge>
+			return (
+				<Badge variant="outline" className="bg-primary/10">
+					{AreasLabels[area]}
+				</Badge>
+			)
 		},
 	},
 	{
 		accessorKey: "createdAt",
-		header: ({ column }) => {
-			return (
-				<div
-					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					className="hover:text-primary flex cursor-pointer items-center transition-colors"
-				>
-					Fecha de creación
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</div>
-			)
-		},
+		header: "Fecha de creación",
 		cell: ({ row }) => {
 			const date = row.getValue("createdAt")
 			const formattedDate = format(date as Date, "dd/MM/yyyy")
@@ -119,9 +117,11 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const isPartnerCompany =
 				role === USER_ROLES_VALUES.PARTNER_COMPANY || role === USER_ROLES_VALUES.OPERATOR
 
+			if (isPartnerCompany) return null
+
 			return (
 				<Link
-					href={`/admin/dashboard/usuarios/${isPartnerCompany ? "externos" : "internos"}/${id}`}
+					href={`/admin/dashboard/usuarios/internos/editar/${id}`}
 					className="text-primary hover:text-feature text-right font-medium hover:underline"
 				>
 					<Edit className="h-4 w-4" />

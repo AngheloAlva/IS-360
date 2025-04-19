@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
 							{ name: { contains: search, mode: "insensitive" as const } },
 							{ email: { contains: search, mode: "insensitive" as const } },
 							{ rut: { contains: search, mode: "insensitive" as const } },
+							{ company: { name: { contains: search, mode: "insensitive" as const } } },
 						],
 					}
 				: {}),
@@ -35,6 +36,7 @@ export async function GET(req: NextRequest) {
 					name: true,
 					role: true,
 					area: true,
+					phone: true,
 					email: true,
 					createdAt: true,
 					internalRole: true,
