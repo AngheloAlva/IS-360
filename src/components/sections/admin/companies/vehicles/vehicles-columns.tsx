@@ -1,8 +1,9 @@
-import { type ColumnDef } from "@tanstack/react-table"
-import { DotIcon } from "lucide-react"
+import { Star } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Vehicle } from "@/hooks/use-vehicles"
+import { Badge } from "@/components/ui/badge"
+
+import type { ColumnDef } from "@tanstack/react-table"
 
 const VehicleTypeLabels: Record<string, string> = {
 	CAR: "Automóvil",
@@ -53,8 +54,8 @@ export const VehiclesColumns: ColumnDef<Vehicle>[] = [
 		cell: ({ row }) => {
 			const isMain = row.getValue("isMain") as boolean
 			return isMain ? (
-				<Badge variant="default" className="border-primary text-primary bg-white">
-					<DotIcon />
+				<Badge variant="default" className="border-primary text-primary bg-primary/10">
+					<Star className="fill-primary mr-1" />
 					Principal
 				</Badge>
 			) : (

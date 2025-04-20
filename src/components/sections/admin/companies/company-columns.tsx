@@ -11,6 +11,10 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 	{
 		accessorKey: "name",
 		header: "Nombre",
+		cell: ({ row }) => {
+			const name = row.getValue("name") as string
+			return <div className="font-semibold">{name}</div>
+		},
 	},
 	{
 		accessorKey: "rut",
@@ -49,6 +53,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 	},
 	{
 		accessorKey: "actions",
+		header: "Acciones",
 		cell: ({ row }) => {
 			const id = row.original.id
 
@@ -57,7 +62,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 					<Button
 						size={"sm"}
 						variant={"outline"}
-						className="border-feature text-feature hover:bg-feature bg-white hover:text-white"
+						className="border-green-500 bg-green-600 tracking-wider text-white hover:bg-green-800"
 					>
 						<Plus className="mr-2 h-4 w-4" /> Supervisor(es)
 					</Button>

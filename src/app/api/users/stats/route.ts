@@ -19,7 +19,7 @@ export async function GET() {
 				by: ["role"],
 				_count: true,
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 120,
 					swr: 10,
 				},
 			}),
@@ -32,7 +32,7 @@ export async function GET() {
 					area: { not: null },
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 120,
 					swr: 10,
 				},
 			}),
@@ -42,7 +42,7 @@ export async function GET() {
 				by: ["internalRole"],
 				_count: true,
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 120,
 					swr: 10,
 				},
 			}),
@@ -53,7 +53,7 @@ export async function GET() {
 					twoFactorEnabled: true,
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 120,
 					swr: 10,
 				},
 			}),
@@ -89,7 +89,7 @@ export async function GET() {
 				],
 				take: 4,
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 120,
 					swr: 10,
 				},
 			}),
