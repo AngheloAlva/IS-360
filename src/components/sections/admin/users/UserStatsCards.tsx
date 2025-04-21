@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 
 import { UserRolesLabels } from "@/lib/consts/user-roles"
-import { useUserStats } from "@/hooks/useUserStats"
+import { useUserStats } from "@/hooks/users/useUserStats"
 import { AreasLabels } from "@/lib/consts/areas"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

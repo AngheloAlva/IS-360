@@ -2,7 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
-import { useWorkBookEntriesChart } from "@/hooks/charts/use-work-book-entries-chart"
+import { useWorkBookEntriesChart } from "@/hooks/work-orders/use-work-book-entries-chart"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"

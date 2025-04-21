@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
-import type { WorkOrder } from "@/hooks/use-work-order"
+import type { WorkOrder } from "@/hooks/work-orders/use-work-order"
 
 export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	{

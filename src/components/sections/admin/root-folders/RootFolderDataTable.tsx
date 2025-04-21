@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table"
 
 import { RootFoldersColumns } from "./root-folders-columns"
-import { useRootFolders } from "@/hooks/use-root-folders"
+import { useRootFolders } from "@/hooks/documents/use-root-folders"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"

@@ -19,7 +19,7 @@ interface RecentChange {
 	modifiedAt: string
 	reason: string
 	userRole: string
-	userArea: string | null
+	userArea?: string | null
 }
 
 interface RecentChangesTableProps {

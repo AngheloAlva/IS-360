@@ -9,12 +9,13 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import { toast } from "sonner"
 
+import { updateWorkOrderById } from "@/actions/work-orders/updateWorkOrderById"
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { getEquipment } from "@/actions/equipments/getEquipment"
+import { useCompanies } from "@/hooks/companies/use-companies"
 import { getInternalUsers } from "@/actions/users/getUsers"
-import { useCompanies } from "@/hooks/use-companies"
 import { cn } from "@/lib/utils"
 import {
 	updateWorkOrderSchema,
@@ -47,8 +48,7 @@ import {
 } from "@/components/ui/select"
 
 import type { Equipment, User, WorkOrder } from "@prisma/client"
-import type { Company } from "@/hooks/use-companies"
-import { updateWorkOrderById } from "@/actions/work-orders/updateWorkOrderById"
+import type { Company } from "@/hooks/companies/use-companies"
 
 interface UpdateWorkOrderFormProps {
 	workOrder: WorkOrder & { equipment: Equipment[] }

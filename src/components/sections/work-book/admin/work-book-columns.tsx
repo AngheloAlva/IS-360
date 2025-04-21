@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
-import type { WorkBook } from "@/hooks/use-work-books"
+import type { WorkBook } from "@/hooks/work-orders/use-work-books"
 
 export const workBookColumns: ColumnDef<WorkBook>[] = [
 	{

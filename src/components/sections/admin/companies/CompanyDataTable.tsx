@@ -10,7 +10,7 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
-import { useCompanies } from "@/hooks/use-companies"
+import { useCompanies } from "@/hooks/companies/use-companies"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"

@@ -12,8 +12,8 @@ import { createWorkOrder } from "@/actions/work-orders/createWorkOrder"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { getEquipment } from "@/actions/equipments/getEquipment"
+import { useCompanies } from "@/hooks/companies/use-companies"
 import { getInternalUsers } from "@/actions/users/getUsers"
-import { useCompanies } from "@/hooks/use-companies"
 import { cn } from "@/lib/utils"
 import {
 	workOrderSchema,
@@ -46,7 +46,7 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-import type { Company } from "@/hooks/use-companies"
+import type { Company } from "@/hooks/companies/use-companies"
 import type { User } from "@prisma/client"
 
 export default function CreateWorkOrderForm(): React.ReactElement {

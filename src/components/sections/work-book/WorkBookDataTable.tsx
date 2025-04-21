@@ -11,8 +11,11 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { useWorkBooksByCompany, type WorkBookByCompany } from "@/hooks/use-work-books-by-company"
 import { workBookColumns } from "./work-book-columns"
+import {
+	useWorkBooksByCompany,
+	type WorkBookByCompany,
+} from "@/hooks/work-orders/use-work-books-by-company"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"

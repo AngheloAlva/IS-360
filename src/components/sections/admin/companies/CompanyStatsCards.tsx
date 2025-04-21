@@ -2,7 +2,7 @@
 
 import { Clock, HardHat, FileText, Building2, CheckCircle, AlertCircle } from "lucide-react"
 
-import { useCompanyStats } from "@/hooks/useCompanyStats"
+import { useCompanyStats } from "@/hooks/companies/useCompanyStats"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"

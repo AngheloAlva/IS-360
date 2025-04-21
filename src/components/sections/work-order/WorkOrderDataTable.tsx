@@ -14,10 +14,10 @@ import {
 	VisibilityState,
 } from "@tanstack/react-table"
 
+import { useWorkOrders, WorkOrder } from "@/hooks/work-orders/use-work-order"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
-import { useWorkOrders, WorkOrder } from "@/hooks/use-work-order"
-import { useCompanies } from "@/hooks/use-companies"
+import { useCompanies } from "@/hooks/companies/use-companies"
 
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker"
 import { TablePagination } from "@/components/ui/table-pagination"

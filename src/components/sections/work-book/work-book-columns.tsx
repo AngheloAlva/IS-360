@@ -9,7 +9,7 @@ import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 
 import { Progress } from "@/components/ui/progress"
 
-import type { WorkBookByCompany } from "@/hooks/use-work-books-by-company"
+import type { WorkBookByCompany } from "@/hooks/work-orders/use-work-books-by-company"
 import type { Equipment, WorkOrder } from "@prisma/client"
 
 export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [

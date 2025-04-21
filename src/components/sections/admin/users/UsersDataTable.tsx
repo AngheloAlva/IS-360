@@ -10,8 +10,8 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
+import { useUsers } from "@/hooks/users/use-users"
 import { AreasLabels } from "@/lib/consts/areas"
-import { useUsers } from "@/hooks/use-users"
 import { UserColumns } from "./user-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"

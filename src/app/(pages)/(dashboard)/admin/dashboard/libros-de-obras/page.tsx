@@ -3,7 +3,7 @@
 import { BarChart, Clock, FileText, ListChecks } from "lucide-react"
 import { useState } from "react"
 
-import { useWorkBooks } from "@/hooks/use-work-books"
+import { useWorkBooks } from "@/hooks/work-orders/use-work-books"
 import { cn } from "@/lib/utils"
 
 import { WorkBookProgressChart } from "@/components/sections/work-book/admin/charts/WorkBookProgressChart"

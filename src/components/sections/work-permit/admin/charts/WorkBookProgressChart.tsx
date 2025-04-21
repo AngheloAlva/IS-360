@@ -2,7 +2,7 @@
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
-import { useWorkBookProgressChart } from "@/hooks/charts/use-work-book-progress-chart"
+import { useWorkBookProgressChart } from "@/hooks//work-orders/use-work-book-progress-chart"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"

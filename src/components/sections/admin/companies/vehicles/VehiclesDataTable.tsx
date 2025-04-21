@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table"
 
 import { VehiclesColumns } from "./vehicles-columns"
-import { useVehicles } from "@/hooks/use-vehicles"
+import { useVehicles } from "@/hooks/companies/use-vehicles"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"

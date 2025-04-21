@@ -5,7 +5,7 @@ import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { useDocuments } from "@/hooks/use-documents"
+import { useDocuments } from "@/hooks/documents/use-documents"
 import { AREAS } from "@prisma/client"
 
 import {

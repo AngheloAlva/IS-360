@@ -13,7 +13,7 @@ import {
 	TableRow,
 } from "@/components/ui/table"
 
-import type { CompanyUser } from "@/hooks/use-companies"
+import type { CompanyUser } from "@/hooks/companies/use-companies"
 
 interface SafetyTalksInfoProps {
 	users: CompanyUser[]

@@ -17,7 +17,7 @@ import {
 	Image as ImageIcon,
 } from "lucide-react"
 
-import { useDocuments } from "@/hooks/use-documents"
+import { useDocuments } from "@/hooks/documents/use-documents"
 import { cn } from "@/lib/utils"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"

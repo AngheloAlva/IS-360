@@ -3,8 +3,10 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Plus } from "lucide-react"
 import { format } from "date-fns"
-import { Company } from "@/hooks/use-companies"
 import Link from "next/link"
+
+import { Company } from "@/hooks/companies/use-companies"
+
 import { Button } from "@/components/ui/button"
 
 export const CompanyColumns: ColumnDef<Company>[] = [

@@ -1,8 +1,11 @@
 "use client"
 
-import { WorkEntry } from "@/hooks/use-work-entries"
-import { Skeleton } from "@/components/ui/skeleton"
+import { WorkEntry } from "@/hooks/work-orders/use-work-entries"
+import { X } from "lucide-react"
+
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
 import {
 	Drawer,
 	DrawerClose,
@@ -10,8 +13,6 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer"
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
 
 interface WorkBookEntryDetailsProps {
 	entry: WorkEntry | null

@@ -17,8 +17,6 @@ import {
 	Construction,
 } from "lucide-react"
 
-import { useAuthorization } from "@/hooks/useAuthorization"
-
 // import { NavSecondary } from "./navSecondary"
 import { NavInternal } from "./navInternal"
 import { NavMain } from "./navMain"
@@ -134,7 +132,8 @@ interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ session, ...props }: AppSidebarProps) {
-	const { canAccessAdminRoutes, canAccessUserRoutes } = useAuthorization(session)
+	const canAccessAdminRoutes = session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"
+	const canAccessUserRoutes = session.user.role === "USER"
 
 	const navItems = [
 		...(!canAccessAdminRoutes && !canAccessUserRoutes ? data.navMain : []),

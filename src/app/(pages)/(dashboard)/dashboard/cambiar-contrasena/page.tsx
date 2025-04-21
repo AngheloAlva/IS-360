@@ -76,7 +76,7 @@ export default function ChangePasswordPage(): React.ReactElement {
 		<>
 			<div className="mx-auto flex w-full max-w-lg items-center justify-start gap-2">
 				<BackButton href="/dashboard/documentacion" />
-				<h1 className="text-2xl font-bold text-gray-800">Cambiar Contraseña</h1>
+				<h1 className="text-text text-2xl font-bold">Cambiar Contraseña</h1>
 			</div>
 
 			<Card className="w-full max-w-lg">
@@ -128,7 +128,7 @@ export default function ChangePasswordPage(): React.ReactElement {
 							<Button
 								type="submit"
 								size={"lg"}
-								className="w-full rounded-md text-sm"
+								className="hover:bg-primary/80 w-full rounded-md text-sm"
 								disabled={loading}
 							>
 								{loading ? "Cargando..." : "Cambiar Contraseña"}

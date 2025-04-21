@@ -1,6 +1,6 @@
 import { Star } from "lucide-react"
 
-import { Vehicle } from "@/hooks/use-vehicles"
+import { Vehicle } from "@/hooks/companies/use-vehicles"
 import { Badge } from "@/components/ui/badge"
 
 import type { ColumnDef } from "@tanstack/react-table"

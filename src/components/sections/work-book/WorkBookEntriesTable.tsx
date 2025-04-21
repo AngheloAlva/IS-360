@@ -10,7 +10,7 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
-import { useWorkEntries, WorkEntry } from "@/hooks/use-work-entries"
+import { useWorkEntries, WorkEntry } from "@/hooks/work-orders/use-work-entries"
 import { WorkEntryColumns } from "./work-entry-columns"
 import { WorkBookEntryDetails } from "./WorkBookEntryDetails"
 

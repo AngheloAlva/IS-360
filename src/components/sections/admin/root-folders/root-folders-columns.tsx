@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
-import type { RootFolder } from "@/hooks/use-root-folders"
+import type { RootFolder } from "@/hooks/documents/use-root-folders"
 
 export const RootFoldersColumns: ColumnDef<RootFolder>[] = [
 	{

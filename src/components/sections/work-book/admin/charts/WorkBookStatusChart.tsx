@@ -2,7 +2,7 @@
 
 import { Label, Pie, PieChart } from "recharts"
 
-import { useWorkBookStatusChart } from "@/hooks/charts/use-work-book-status-chart"
+import { useWorkBookStatusChart } from "@/hooks/work-orders/use-work-book-status-chart"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
