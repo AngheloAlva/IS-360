@@ -85,6 +85,7 @@ model User {
   fileHistory                    FileHistory[]
   twofactors                     TwoFactor[]
   rootFolder                     RootFolder[]
+  FileComment                    FileComment[]
 
   @@unique([email])
   @@unique([rut])
@@ -577,8 +578,26 @@ model File {
   rootFolderId String?
   user         User          @relation(fields: [userId], references: [id])
   userId       String
+  comments     FileComment[]
 
   @@map("file")
+}
+
+model FileComment {
+  id String @id @default(cuid())
+
+  title   String?
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  file   File   @relation(fields: [fileId], references: [id])
+  fileId String
+
+  @@map("file_comment")
 }
 
 model Counter {

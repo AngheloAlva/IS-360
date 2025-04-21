@@ -27,6 +27,15 @@ export async function GET(req: NextRequest) {
 							name: true,
 						},
 					},
+					comments: {
+						include: {
+							user: {
+								select: {
+									name: true,
+								},
+							},
+						},
+					},
 				},
 			}),
 			prisma.folder.findMany({

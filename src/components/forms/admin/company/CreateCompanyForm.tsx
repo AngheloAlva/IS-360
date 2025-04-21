@@ -8,6 +8,8 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { companySchema, type CompanySchema } from "@/lib/form-schemas/admin/company/company.schema"
+import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
+import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
 import { createCompany } from "@/actions/companies/createCompany"
 import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
@@ -84,7 +86,7 @@ export default function CreateCompanyForm(): React.ReactElement {
 			if (values.supervisors) {
 				const results = await Promise.allSettled(
 					values.supervisors?.map(async (supervisor) => {
-						const temporalPassword = "123456"
+						const temporalPassword = generateTemporalPassword()
 
 						const { data: newUser, error } = await authClient.admin.createUser({
 							name: supervisor.name,
@@ -100,6 +102,12 @@ export default function CreateCompanyForm(): React.ReactElement {
 
 						if (error)
 							throw new Error(`Error al crear usuario ${supervisor.name}: ${error.message}`)
+
+						sendNewUserEmail({
+							name: supervisor.name,
+							email: supervisor.email,
+							password: temporalPassword,
+						})
 						return newUser
 					})
 				)

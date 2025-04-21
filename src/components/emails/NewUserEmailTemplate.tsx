@@ -98,8 +98,8 @@ export const NewUserEmailTemplate: React.FC<Readonly<NewuserEmailTemplateProps>>
 						</Section>
 
 						<Text className="mb-[24px] text-[16px] text-gray-600">
-							Por razones de seguridad, deberá cambiar su contraseña temporal después de iniciar
-							sesión por primera vez.
+							Por razones de seguridad, le recomendamos que cambie su contraseña temporal una vez
+							que inicie sesión y active el 2FA (Doble Factor de Autenticación).
 						</Text>
 
 						<Section className="mb-[32px] text-center">

@@ -25,6 +25,7 @@ import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
+import FileComments from "./FileComments"
 
 import type { AREAS } from "@prisma/client"
 
@@ -200,6 +201,8 @@ export function FileExplorerTable({
 								</div>
 
 								<div className="absolute top-4 right-4 flex gap-1">
+									<FileComments fileId={item.id} lastPath={lastPath} comments={item.comments} />
+
 									<Popover>
 										<PopoverTrigger asChild>
 											<Button

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 
-import { Folder as FolderType, File as FileType, AREAS } from "@prisma/client"
+import { Folder as FolderType, File as FileType, AREAS, FileComment } from "@prisma/client"
 
 export interface Folder extends FolderType {
 	user: {
@@ -12,6 +12,7 @@ export interface File extends FileType {
 	user: {
 		name: string
 	}
+	comments: Array<FileComment & { user: { name: string } }>
 }
 
 interface DocumentsResponse {
