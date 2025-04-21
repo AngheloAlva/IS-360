@@ -2,18 +2,18 @@
 
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { UploadCloud, X } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { UploadCloud, X } from "lucide-react"
 import { toast } from "sonner"
 
+import { uploadMultipleFiles } from "@/actions/document-management/uploadMultipleFiles"
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { Areas } from "@/lib/consts/areas"
-
 import {
 	fileFormSchema,
-	type FileFormSchema,
 	type FileSchema,
+	type FileFormSchema,
 } from "@/lib/form-schemas/document-management/file.schema"
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
@@ -46,7 +46,6 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		defaultValues: {
 			userId,
 			name: "",
-			files: [],
 			folderSlug,
 			description: "",
 			expirationDate: undefined,
@@ -104,34 +103,74 @@ export function NewFileForm({ userId, folderSlug, area, backPath }: NewFileFormP
 		setIsSubmitting(true)
 
 		try {
-			const formData = new FormData()
-
-			fields.forEach((fileData) => {
-				formData.append("files", fileData.file)
+			// Obtener el SAS token y la información del contenedor
+			const sasResponse = await fetch("/api/file", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					filenames: fields.map((field) => {
+						const fileExtension = field.file.name.split(".").pop()
+						return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${userId.slice(0, 4)}.${fileExtension}`
+					}),
+					containerType: "documents",
+				}),
 			})
 
-			formData.append(
-				"data",
-				JSON.stringify({
+			if (!sasResponse.ok) {
+				throw new Error("Error al obtener URLs de subida")
+			}
+
+			const { urls } = await sasResponse.json()
+			if (!urls || urls.length !== fields.length) {
+				throw new Error("Error con las URLs de subida")
+			}
+
+			// Subir archivos a Azure Blob Storage
+			const uploadPromises = fields.map(async (fileData, index) => {
+				const uploadUrl = urls[index]
+				const blobUrl = uploadUrl.split("?")[0] // URL base sin SAS token
+
+				const uploadResponse = await fetch(uploadUrl, {
+					method: "PUT",
+					body: fileData.file,
+					headers: {
+						"Content-Type": fileData.file.type,
+						"x-ms-blob-type": "BlockBlob",
+					},
+				})
+
+				if (!uploadResponse.ok) {
+					throw new Error(`Error al subir archivo: ${fileData.file.name}`)
+				}
+
+				return {
+					url: blobUrl,
+					size: fileData.file.size,
+					type: fileData.file.type,
+					name: values.name || fileData.file.name,
+				}
+			})
+
+			const uploadResults = await Promise.all(uploadPromises)
+
+			// Crear registros en la base de datos usando el server action
+			const dbResponse = await uploadMultipleFiles({
+				values: {
 					...values,
 					files: undefined,
-				})
-			)
-
-			const result = await fetch("/api/documents/upload-multiple-files", {
-				method: "POST",
-				body: formData,
+				},
+				files: uploadResults,
 			})
 
-			if (!result.ok) {
-				throw new Error((await result.json()).error)
+			if (!dbResponse.ok) {
+				throw new Error(dbResponse.error || "Error al guardar en la base de datos")
 			}
 
 			toast.success("Archivos subidos correctamente")
-			router.push(backPath || `/documentacion/${area}`)
+			router.push(backPath || `/dashboard/documentacion/${area}`)
 		} catch (error) {
 			console.error(error)
-			toast.error("Error al subir los archivos")
+			toast.error(error instanceof Error ? error.message : "Error al subir los archivos")
 		} finally {
 			setIsSubmitting(false)
 		}

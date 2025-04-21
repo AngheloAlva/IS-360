@@ -1,14 +1,27 @@
 "use server"
 
+import { FileFormSchema } from "@/lib/form-schemas/document-management/file.schema"
 import prisma from "@/lib/prisma"
+import { AREAS } from "@prisma/client"
 
-import type { FileFormSchema } from "@/lib/form-schemas/document-management/file.schema"
+type FileUploadResult = {
+	url: string
+	size: number
+	type: string
+	name: string
+}
 
-export const uploadMultipleFiles = async (data: FileFormSchema) => {
+interface UploadMultipleFilesProps {
+	values: Omit<FileFormSchema, "files"> & { files: undefined }
+	files: FileUploadResult[]
+}
+
+export async function uploadMultipleFiles({ values, files }: UploadMultipleFilesProps) {
 	try {
-		const { folderSlug, userId, files, ...rest } = data
-		let folderId: string | null = null
+		const { folderSlug, userId, code, otherCode, area, name, description, registrationDate, expirationDate } = values
 
+		// Buscar la carpeta si se proporciona un folderSlug
+		let folderId: string | null = null
 		if (folderSlug) {
 			const foundFolder = await prisma.folder.findFirst({
 				where: { slug: folderSlug },
@@ -16,52 +29,39 @@ export const uploadMultipleFiles = async (data: FileFormSchema) => {
 			})
 
 			if (!foundFolder) {
-				return {
-					ok: false,
-					error: "Carpeta no encontrada",
-				}
+				return { ok: false, error: "Carpeta no encontrada" }
 			}
 
 			folderId = foundFolder.id
 		}
 
-		let relations: {
-			folder?: { connect: { id: string } }
-			user: { connect: { id: string } }
-		} = {
-			user: { connect: { id: userId } },
-		}
+		// Crear registros en la base de datos
+		const results = await Promise.all(
+			files.map(async (file) => {
+				return prisma.file.create({
+					data: {
+						url: file.url,
+						type: file.type,
+						size: file.size,
+						name: name || file.name,
+						area: area as AREAS,
+						description,
+						registrationDate,
+						expirationDate,
+						user: { connect: { id: userId } },
+						code: code || otherCode,
+						...(folderId ? { folder: { connect: { id: folderId } } } : {}),
+					},
+				})
+			})
+		)
 
-		if (folderSlug && folderId !== null) {
-			relations = {
-				...relations,
-				folder: { connect: { id: folderId } },
-			}
-		}
-
-		const results = await prisma.file.createMany({
-			data: files.map((fileData) => ({
-				...rest,
-				userId,
-				area: rest.area,
-				url: fileData.url,
-				name: fileData.title,
-				size: fileData.fileSize,
-				type: fileData.mimeType,
-				...relations,
-			})),
-		})
-
-		return {
-			ok: true,
-			data: results,
-		}
-	} catch (error) {
-		console.error(error)
-
+		return { ok: true, data: results }
+	} catch (error: unknown) {
+		console.error("[UPLOAD_MULTIPLE_FILES]", error)
 		return {
 			ok: false,
-			error: (error as Error).message,
+			error: error instanceof Error ? error.message : "Error interno del servidor",
 		}
 	}
 }

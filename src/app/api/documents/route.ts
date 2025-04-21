@@ -13,7 +13,12 @@ export async function GET(req: NextRequest) {
 		const [files, folders] = await Promise.all([
 			prisma.file.findMany({
 				where: {
-					folder: folderSlug ? { slug: folderSlug } : null,
+					OR: [
+						{
+							folder: folderSlug ? { slug: folderSlug } : null,
+							area,
+						},
+					],
 					isActive: true,
 				},
 				include: {
@@ -22,10 +27,6 @@ export async function GET(req: NextRequest) {
 							name: true,
 						},
 					},
-				},
-				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
 				},
 			}),
 			prisma.folder.findMany({
@@ -36,10 +37,6 @@ export async function GET(req: NextRequest) {
 							name: true,
 						},
 					},
-				},
-				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
 				},
 			}),
 		])

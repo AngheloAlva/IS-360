@@ -9,7 +9,7 @@ export const fileSchema = z.object({
 	type: z.string(),
 	title: z.string(),
 	fileSize: z.number(),
-	mimeType: z.string()
+	mimeType: z.string(),
 })
 
 export const fileFormSchema = z.object({

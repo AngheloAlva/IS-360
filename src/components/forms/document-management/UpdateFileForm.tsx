@@ -4,16 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { UploadCloud, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 import { updateFile } from "@/actions/document-management/updateFile"
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { cn } from "@/lib/utils"
 import {
-	fileFormSchema,
-	type FileFormSchema,
-} from "@/lib/form-schemas/document-management/file.schema"
+	updateFileSchema,
+	type UpdateFileSchema,
+} from "@/lib/form-schemas/document-management/update-file.schema.ts"
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
@@ -41,8 +41,8 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 
 	const router = useRouter()
 
-	const form = useForm<FileFormSchema>({
-		resolver: zodResolver(fileFormSchema),
+	const form = useForm<UpdateFileSchema>({
+		resolver: zodResolver(updateFileSchema),
 		defaultValues: {
 			userId,
 			name: initialData.name,
@@ -83,7 +83,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 		}
 	}
 
-	const onSubmit = async (values: FileFormSchema) => {
+	const onSubmit = async (values: UpdateFileSchema) => {
 		setUploading(true)
 
 		try {
@@ -172,6 +172,10 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 		}
 	}
 
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
+
 	const codeIsOther = form.watch("code") === CodesValues.OTRO
 
 	return (
@@ -179,21 +183,21 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 			<form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full max-w-screen-md">
 				<Card className="w-full">
 					<CardContent className="grid gap-5">
-						<InputFormField<FileFormSchema>
+						<InputFormField<UpdateFileSchema>
 							name="name"
 							control={form.control}
 							label="Nombre del archivo"
 							placeholder="Nombre del archivo"
 						/>
 
-						<TextAreaFormField<FileFormSchema>
+						<TextAreaFormField<UpdateFileSchema>
 							name="description"
 							label="Descripción"
 							control={form.control}
 							placeholder="Descripción"
 						/>
 
-						<SelectFormField<FileFormSchema>
+						<SelectFormField<UpdateFileSchema>
 							name="code"
 							label="Código"
 							placeholder="Código"
@@ -202,7 +206,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 						/>
 
 						{codeIsOther && (
-							<InputFormField<FileFormSchema>
+							<InputFormField<UpdateFileSchema>
 								name="otherCode"
 								control={form.control}
 								placeholder="Ej: OTRO"
@@ -288,13 +292,13 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 						<Separator className="mt-8" />
 
 						<div className="grid gap-4 md:grid-cols-2">
-							<DatePickerFormField<FileFormSchema>
+							<DatePickerFormField<UpdateFileSchema>
 								name="registrationDate"
 								label="Fecha de Registro"
 								control={form.control}
 							/>
 
-							<DatePickerFormField<FileFormSchema>
+							<DatePickerFormField<UpdateFileSchema>
 								name="expirationDate"
 								control={form.control}
 								label="Fecha de Expiración"
