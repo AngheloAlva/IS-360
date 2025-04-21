@@ -1,4 +1,4 @@
-import { ChartBarDecreasing } from "lucide-react"
+import { ChartBarDecreasing, Search } from "lucide-react"
 import Link from "next/link"
 
 import AreasDocumentationTable from "@/components/sections/documentation/AreasDocumentationTable"
@@ -16,12 +16,21 @@ export default function DocumentationPage(): React.ReactElement {
 					</p>
 				</div>
 
-				<Link href="/dashboard/documentacion/estadisticas">
-					<Button size={"lg"}>
-						<ChartBarDecreasing className="min-h-5 min-w-5" />
-						<span className="hidden md:block">Estadísticas</span>
-					</Button>
-				</Link>
+				<div className="flex items-center gap-2">
+					<Link href="/dashboard/documentacion/busqueda">
+						<Button size={"lg"} className="bg-indigo-500 text-white">
+							<Search className="min-h-5 min-w-5" />
+							<span className="hidden md:block">Búsqueda</span>
+						</Button>
+					</Link>
+
+					<Link href="/dashboard/documentacion/estadisticas">
+						<Button size={"lg"}>
+							<ChartBarDecreasing className="min-h-5 min-w-5" />
+							<span className="hidden md:block">Estadísticas</span>
+						</Button>
+					</Link>
+				</div>
 			</div>
 
 			<AreasDocumentationTable />
