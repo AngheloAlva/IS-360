@@ -1,21 +1,21 @@
-import { ChevronLeft, Plus } from "lucide-react"
 import { notFound } from "next/navigation"
-import { format } from "date-fns"
+import { headers } from "next/headers"
+import { Plus } from "lucide-react"
 import Link from "next/link"
 
+import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
-import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_STATUS } from "@prisma/client"
+import { auth } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
+import { RequestWorkBookClosure } from "@/components/sections/work-book/RequestWorkBookClosure"
 import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
-import { Card, CardContent } from "@/components/ui/card"
+import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
+import BackButton from "@/components/shared/BackButton"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { WORK_ORDER_STATUS } from "@prisma/client"
-import { RequestWorkBookClosure } from "@/components/sections/work-book/RequestWorkBookClosure"
 
 export default async function WorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
 	const session = await auth.api.getSession({
@@ -32,72 +32,50 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 	return (
 		<>
-			<div className="flex w-full flex-row items-center justify-between">
-				<div className="flex items-start justify-start gap-1">
-					<Link
-						href="/dashboard/libro-de-obras"
-						className="hover:bg-primary/40 hover:text-primary mt-1 rounded-full transition-colors"
-					>
-						<ChevronLeft />
-					</Link>
+			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+					<div className="flex items-center gap-3">
+						<BackButton href="/admin/dashboard/libros-de-obras" />
 
-					<h1 className="flex flex-col text-2xl font-bold">
-						{data.workName}
-						<span className="text-feature text-base font-medium">{data.otNumber}</span>
-					</h1>
-				</div>
+						<div>
+							<h1 className="text-2xl font-bold">{data.workName || "Libro de Obras no creado"}</h1>
+							<p className="text-feature mt-1 text-base font-medium">{data.otNumber}</p>
+						</div>
+					</div>
 
-				<div className="flex flex-col flex-wrap gap-2">
-					<Badge
-						className={cn("text-sm", {
-							"bg-emerald-500": data.status === "EXPIRED",
-							"bg-purple-500": data.status === "PENDING",
-							"bg-yellow-500": data.status === "IN_PROGRESS",
-							"bg-red-500": data.status === "CANCELLED",
-						})}
-					>
-						<b>Estado:</b> {data.status}
-					</Badge>
+					<div className="flex w-full flex-col items-end gap-2 md:w-64">
+						<Badge
+							className={cn("bg-primary/5 border-primary text-primary", {
+								"border-yellow-500 bg-yellow-500/5 text-yellow-500":
+									data.status === WORK_ORDER_STATUS.PENDING,
+								"border-green-500 bg-green-500/5 text-green-500":
+									data.status === WORK_ORDER_STATUS.COMPLETED,
+								"border-red-500 bg-red-500/5 text-red-500":
+									data.status === WORK_ORDER_STATUS.CANCELLED ||
+									data.status === WORK_ORDER_STATUS.EXPIRED,
+							})}
+						>
+							{WorkOrderStatusLabels[data.status as keyof typeof WorkOrderStatusLabels]}
+						</Badge>
 
-					<div className="flex flex-col">
-						<span className="text-sm">Progreso:</span>
-						<Progress value={data.workProgressStatus} />
+						<div className="flex items-center justify-between gap-4">
+							<span className="text-sm font-medium">Progreso del trabajo:</span>
+							<span className="text-sm font-bold">{data.workProgressStatus}%</span>
+						</div>
+						<Progress
+							value={data.workProgressStatus || 0}
+							className="h-2"
+							indicatorClassName={
+								data.workProgressStatus && data.workProgressStatus > 50
+									? "bg-green-500"
+									: "bg-yellow-500"
+							}
+						/>
 					</div>
 				</div>
 			</div>
 
-			<Card className="w-full">
-				<CardContent>
-					<ul className="text-muted-foreground grid w-full gap-3 md:grid-cols-2">
-						<li>
-							<b>Trabajo Solicitado:</b> <span>{data.workRequest}</span>
-						</li>
-						<li>
-							<b>Tipo de Trabajo:</b> <span>{WORK_ORDER_TYPE_VALUES[data.type]}</span>
-						</li>
-						<li>
-							<b>Contratista:</b> {data.company.name} - {data.company.rut}
-						</li>
-						<li>
-							<b>Fecha de Inicio:</b>{" "}
-							{data.workStartDate && format(data.workStartDate, "dd/MM/yyyy")}
-						</li>
-						<li>
-							<b>Fecha de Término:</b>{" "}
-							{data.estimatedEndDate && format(data.estimatedEndDate, "dd/MM/yyyy")}
-						</li>
-						<li>
-							<b>Ubicación:</b> {data.workLocation}
-						</li>
-						<li>
-							<b>Responsable:</b> {data.supervisor.name} - {data.supervisor.phone}
-						</li>
-						<li>
-							<b>Inspector OTC:</b> {data.responsible.name} - {data.responsible.phone}
-						</li>
-					</ul>
-				</CardContent>
-			</Card>
+			<WorkBookGeneralData data={data} />
 
 			<div className="flex w-full items-center gap-2">
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
@@ -105,7 +83,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				<Link href={`/dashboard/libro-de-obras/${id}/actividades-diarias`} className="ml-auto">
 					<Button
 						size={"lg"}
-						className="border border-blue-500 bg-white text-blue-500 hover:bg-blue-600 hover:text-white"
+						className="border-primary bg-primary hover:bg-primary/80 border text-white"
 					>
 						<span className="hidden lg:block">Actividad Diaria</span>
 						<Plus />
@@ -115,7 +93,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				<Link href={`/dashboard/libro-de-obras/${id}/actividades-adicionales`}>
 					<Button
 						size={"lg"}
-						className="border border-cyan-500 bg-white text-cyan-500 hover:bg-cyan-600 hover:text-white"
+						className="border-cyan-500 bg-cyan-500 text-white hover:bg-cyan-500/80"
 					>
 						<span className="hidden lg:block">Actividad Adicional</span>
 						<Plus />

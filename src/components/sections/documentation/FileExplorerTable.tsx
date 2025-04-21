@@ -143,7 +143,13 @@ export function FileExplorerTable({
 																Editar
 															</Button>
 														</Link>
-														<DeleteConfirmationDialog id={item.id} name={item.name} type="folder" />
+														<DeleteConfirmationDialog
+															id={item.id}
+															name={item.name}
+															type="folder"
+															area={areaValue}
+															folderSlug={actualFolderSlug}
+														/>
 													</div>
 												)}
 											</div>
@@ -247,7 +253,13 @@ export function FileExplorerTable({
 															Editar
 														</Button>
 													</Link>
-													<DeleteConfirmationDialog id={item.id} name={item.name} type="file" />
+													<DeleteConfirmationDialog
+														id={item.id}
+														name={item.name}
+														type="file"
+														area={areaValue}
+														folderSlug={actualFolderSlug}
+													/>
 												</div>
 												{/* )} */}
 											</div>

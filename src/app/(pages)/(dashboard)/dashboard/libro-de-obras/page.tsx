@@ -3,24 +3,16 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
 import WorkBookMain from "@/components/sections/work-book/WorkBookMain"
+import { unauthorized } from "next/navigation"
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
-
-export default async function WorkBooksPage(props: { searchParams: SearchParams }) {
+export default async function WorkBooksPage() {
 	const res = await auth.api.getSession({
 		headers: await headers(),
 	})
 
 	if (!res) {
-		return (
-			<>
-				<p>Acceso denegado</p>
-			</>
-		)
+		return unauthorized()
 	}
 
-	const searchParams = await props.searchParams
-	const page = searchParams.page ? parseInt(searchParams.page as string) : 1
-
-	return <WorkBookMain page={page} companyId={res.user.companyId!} />
+	return <WorkBookMain companyId={res.user.companyId!} />
 }

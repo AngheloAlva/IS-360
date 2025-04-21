@@ -1,23 +1,21 @@
-import { Plus, User, Clock, MapPin, PenTool, Calendar, FileText, Briefcase } from "lucide-react"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import { format } from "date-fns"
+import { Plus } from "lucide-react"
 import Link from "next/link"
 
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
-import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { WORK_ORDER_STATUS } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ApproveWorkBookClosure } from "@/components/sections/work-book/ApproveWorkBookClosure"
 import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
 import BackButton from "@/components/shared/BackButton"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
 
 export default async function AdminWorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
 	const session = await auth.api.getSession({
@@ -33,7 +31,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 	return (
 		<div className="w-full flex-1 space-y-6 p-4">
-			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex items-center gap-3">
 					<BackButton href="/admin/dashboard/libros-de-obras" />
 
@@ -74,135 +72,15 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 				</div>
 			</div>
 
-			<div className="grid gap-6 md:grid-cols-12">
-				<Card className="md:col-span-12">
-					<CardHeader className="pb-3">
-						<CardTitle className="flex items-center gap-2 text-xl">
-							<FileText className="text-primary h-5 w-5" />
-							Detalles de la Orden de Trabajo
-						</CardTitle>
-						<CardDescription>
-							Información detallada sobre el trabajo solicitado y sus especificaciones
-						</CardDescription>
-					</CardHeader>
-
-					<CardContent>
-						<div className="grid gap-6 md:grid-cols-2">
-							<div className="space-y-4">
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-pink-500/10 p-1.5 text-pink-500">
-										<PenTool className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Trabajo Solicitado</p>
-										<p className="font-medium">{data.workRequest}</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-amber-500/10 p-1.5 text-amber-500">
-										<FileText className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Tipo de Trabajo</p>
-										<p className="font-medium">{WorkOrderTypeLabels[data.type]}</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-green-500/10 p-1.5 text-green-500">
-										<Briefcase className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Contratista</p>
-										<p className="font-medium">
-											{data.company.name}{" "}
-											<span className="text-muted-foreground">- {data.company.rut}</span>
-										</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-purple-500/10 p-1.5 text-purple-500">
-										<MapPin className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Ubicación</p>
-										<p className="font-medium">{data.workLocation}</p>
-									</div>
-								</div>
-							</div>
-
-							<div className="space-y-4">
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-indigo-500/10 p-1.5 text-indigo-500">
-										<Calendar className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Fecha de Inicio</p>
-										<p className="font-medium">
-											{data.workStartDate && format(data.workStartDate, "dd/MM/yyyy")}
-										</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-rose-500/10 p-1.5 text-rose-500">
-										<Clock className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Fecha de Término</p>
-										<p className="font-medium">
-											{data.estimatedEndDate && format(data.estimatedEndDate, "dd/MM/yyyy")}
-										</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-cyan-500/10 p-1.5 text-cyan-500">
-										<User className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Responsable</p>
-										<p className="font-medium">
-											{data.supervisor.name}{" "}
-											<span className="text-muted-foreground">- {data.supervisor.phone}</span>
-										</p>
-									</div>
-								</div>
-
-								<div className="flex items-start gap-3">
-									<div className="mt-0.5 rounded-md bg-orange-500/10 p-1.5 text-orange-500">
-										<User className="h-5 w-5" />
-									</div>
-									<div>
-										<p className="text-muted-foreground text-sm font-medium">Inspector OTC</p>
-										<p className="font-medium">
-											{data.responsible.name}{" "}
-											<span className="text-muted-foreground">- {data.responsible.phone}</span>
-										</p>
-									</div>
-								</div>
-							</div>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
+			<WorkBookGeneralData data={data} />
 
 			<div className="flex w-full items-center gap-2">
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
 
-				{session?.user?.role === "SUPERADMIN" &&
-					session.user.isSupervisor &&
-					data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
-						<ApproveWorkBookClosure
-							className="ml-auto"
-							workOrderId={id}
-							userId={session?.user?.id}
-						/>
-					)}
-
-				<Link href={`/admin/dashboard/libros-de-obras/${id}/actividades-diarias`}>
+				<Link
+					href={`/admin/dashboard/libros-de-obras/${id}/actividades-diarias`}
+					className="ml-auto"
+				>
 					<Button
 						size={"lg"}
 						className="border-primary bg-primary hover:bg-primary/80 border text-white"
@@ -232,6 +110,12 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 					</Button>
 				</Link>
 			</div>
+
+			{session?.user?.role === "SUPERADMIN" &&
+				session.user.id === data.responsibleId &&
+				data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
+					<ApproveWorkBookClosure workOrderId={id} userId={session?.user?.id} />
+				)}
 
 			<WorkBookEntriesTable workOrderId={id} />
 		</div>

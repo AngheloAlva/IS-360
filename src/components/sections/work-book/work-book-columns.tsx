@@ -2,7 +2,6 @@
 
 import { ArrowUpDown, Link as LinkIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import Link from "next/link"
 
 import { WORK_ORDER_STATUS_VALUES } from "@/lib/consts/work-order-status"
@@ -10,9 +9,10 @@ import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
 
 import { Progress } from "@/components/ui/progress"
 
+import type { WorkBookByCompany } from "@/hooks/use-work-books-by-company"
 import type { Equipment, WorkOrder } from "@prisma/client"
 
-export const workBookColumns: ColumnDef<WorkOrder>[] = [
+export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 	{
 		accessorKey: "id",
 		header: "",
@@ -86,9 +86,9 @@ export const workBookColumns: ColumnDef<WorkOrder>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			const date = row.getValue("workStartDate")
-			const formattedDate = format(date as Date, "dd/MM/yyyy")
-			return <div>{formattedDate}</div>
+			const date = row.getValue("workStartDate") as string
+			// const formattedDate = format(date as Date, "dd/MM/yyyy")
+			return <div>{date}</div>
 		},
 	},
 	{
@@ -105,9 +105,9 @@ export const workBookColumns: ColumnDef<WorkOrder>[] = [
 			)
 		},
 		cell: ({ row }) => {
-			const date = row.getValue("estimatedEndDate")
-			const formattedDate = format(date as Date, "dd/MM/yyyy")
-			return <div>{formattedDate}</div>
+			const date = row.getValue("estimatedEndDate") as string
+			// const formattedDate = format(date as Date, "dd/MM/yyyy")
+			return <div>{date}</div>
 		},
 	},
 	{

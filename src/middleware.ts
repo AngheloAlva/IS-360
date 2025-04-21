@@ -22,7 +22,10 @@ export default async function authMiddleware(request: NextRequest) {
 	}
 
 	// Proteger rutas de administrador
-	if (request.nextUrl.pathname.startsWith("/admin/dashboard")) {
+	if (
+		request.nextUrl.pathname.startsWith("/admin/dashboard") ||
+		request.nextUrl.pathname.startsWith("/dashboard/documentacion")
+	) {
 		if (session.user.role === "PARTNER_COMPANY") {
 			return NextResponse.redirect(new URL("/dashboard/permiso-de-trabajo", request.url))
 		}

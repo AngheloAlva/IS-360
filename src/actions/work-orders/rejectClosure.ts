@@ -15,7 +15,7 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 			where: { id: userId },
 		})
 		if (!user) {
-			return { ok: false, message: "User not found" }
+			return { ok: false, message: "Usuario no encontrado" }
 		}
 
 		const workOrder = await prisma.workOrder.findUnique({
@@ -31,17 +31,21 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 		})
 
 		if (!workOrder) {
-			return { ok: false, message: "Work order not found" }
+			return { ok: false, message: "Libro de obras no encontrado" }
 		}
 
 		// Verificar que el usuario sea supervisor de OTC
-		if (user.role !== "ADMIN" && user.role !== "SUPERADMIN") {
-			return { ok: false, message: "Forbidden" }
+		if (
+			user.role !== "ADMIN" &&
+			user.role !== "SUPERADMIN" &&
+			user.id !== workOrder.responsibleId
+		) {
+			return { ok: false, message: "No Autorizado" }
 		}
 
 		// Verificar que haya una solicitud de cierre pendiente
 		if (workOrder.status !== "CLOSURE_REQUESTED") {
-			return { ok: false, message: "No closure request pending" }
+			return { ok: false, message: "No hay una solicitud de cierre pendiente" }
 		}
 
 		// Actualizar el estado del libro de obras
@@ -78,6 +82,6 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 		return { ok: true, message: "OK" }
 	} catch (error) {
 		console.error("[WORK_BOOK_REJECT_CLOSURE]", error)
-		return { ok: false, message: "Internal error" }
+		return { ok: false, message: "Error al rechazar el cierre" }
 	}
 }

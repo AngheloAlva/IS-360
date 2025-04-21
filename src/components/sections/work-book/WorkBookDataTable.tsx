@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import {
-	ColumnDef,
 	flexRender,
 	SortingState,
 	useReactTable,
@@ -12,8 +11,11 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { useWorkBooksByCompany, type WorkBookByCompany } from "@/hooks/use-work-books-by-company"
+import { workBookColumns } from "./work-book-columns"
+
+import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import {
@@ -25,23 +27,22 @@ import {
 	TableHeader,
 } from "@/components/ui/table"
 
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[]
-	isLoading: boolean
-	data: TData[]
-}
-
-export function WorkBookDataTable<TData, TValue>({
-	columns,
-	data,
-	isLoading,
-}: DataTableProps<TData, TValue>) {
+export function WorkBookDataTable({ companyId }: { companyId: string }) {
+	const [page, setPage] = useState(1)
+	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
+	const { data, isLoading } = useWorkBooksByCompany({
+		page,
+		search,
+		companyId,
+		limit: 10,
+	})
+
 	const table = useReactTable({
-		data,
-		columns,
+		columns: workBookColumns,
+		data: data?.workBooks ?? [],
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
@@ -57,14 +58,14 @@ export function WorkBookDataTable<TData, TValue>({
 		<section className="flex w-full flex-col gap-4">
 			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
 				<Input
+					value={search}
 					className="w-96"
 					placeholder="Filtrar por Numero de OT..."
-					value={(table.getColumn("otNumber")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("otNumber")?.setFilterValue(event.target.value)}
+					onChange={(e) => setSearch(e.target.value)}
 				/>
 			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
+			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -83,56 +84,33 @@ export function WorkBookDataTable<TData, TValue>({
 					</TableHeader>
 
 					<TableBody>
-						{isLoading ? (
-							Array.from({ length: 10 }).map((_, index) => (
-								<TableRow key={index}>
-									<TableCell className="" colSpan={columns.length}>
-										<Skeleton className="h-9 min-w-5" />
-									</TableCell>
-								</TableRow>
-							))
-						) : table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className="font-medium">
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+						{isLoading
+							? Array.from({ length: 10 }).map((_, index) => (
+									<TableRow key={index}>
+										<TableCell className="" colSpan={8}>
+											<Skeleton className="h-9 min-w-full" />
 										</TableCell>
-									))}
-								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell colSpan={columns.length} className="h-24 text-center">
-									No hay datos
-								</TableCell>
-							</TableRow>
-						)}
+									</TableRow>
+								))
+							: table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className="font-medium">
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))}
 					</TableBody>
 				</Table>
 			</Card>
 
-			<div className="flex w-full items-center justify-end space-x-2">
-				<Button
-					variant="outline"
-					size="sm"
-					className="bg-white"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-				>
-					Anterior
-				</Button>
-
-				<Button
-					variant="outline"
-					size="sm"
-					className="bg-white"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-				>
-					Siguiente
-				</Button>
-			</div>
+			<TablePagination<WorkBookByCompany>
+				table={table}
+				isLoading={isLoading}
+				onPageChange={setPage}
+				pageCount={data?.pages ?? 0}
+			/>
 		</section>
 	)
 }

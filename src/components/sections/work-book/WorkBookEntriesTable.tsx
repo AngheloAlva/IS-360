@@ -140,6 +140,7 @@ export default function WorkBookEntriesTable({
 				onPageChange={setPage}
 				isLoading={isLoading}
 			/>
+
 			<WorkBookEntryDetails
 				entry={selectedEntry}
 				isLoading={false}

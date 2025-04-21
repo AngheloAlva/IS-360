@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { Folder as FolderType, File as FileType, AREAS } from "@prisma/client"
 
@@ -25,7 +25,9 @@ interface UseDocumentsParams {
 }
 
 export const useDocuments = ({ area, folderSlug }: UseDocumentsParams) => {
-	return useQuery<DocumentsResponse>({
+	const queryClient = useQueryClient()
+
+	const query = useQuery<DocumentsResponse>({
 		queryKey: ["documents", { area, folderSlug }],
 		queryFn: async () => {
 			const searchParams = new URLSearchParams()
@@ -37,5 +39,16 @@ export const useDocuments = ({ area, folderSlug }: UseDocumentsParams) => {
 
 			return res.json()
 		},
+		staleTime: 0,
+		gcTime: 1000 * 60 * 5,
 	})
+
+	const invalidateDocuments = () => {
+		return queryClient.invalidateQueries({ queryKey: ["documents", { area, folderSlug }] })
+	}
+
+	return {
+		...query,
+		invalidateDocuments,
+	}
 }

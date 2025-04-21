@@ -5,6 +5,9 @@ import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { useDocuments } from "@/hooks/use-documents"
+import { AREAS } from "@prisma/client"
+
 import {
 	deleteFile,
 	deleteFolder,
@@ -27,14 +30,18 @@ import {
 
 interface DeleteConfirmationDialogProps {
 	id: string
+	area: AREAS
 	name: string
 	type: "file" | "folder"
+	folderSlug: string | null
 }
 
 export default function DeleteConfirmationDialog({
 	id,
 	type,
 	name,
+	area,
+	folderSlug,
 }: DeleteConfirmationDialogProps) {
 	const router = useRouter()
 
@@ -60,6 +67,11 @@ export default function DeleteConfirmationDialog({
 		}
 	}
 
+	const { invalidateDocuments } = useDocuments({
+		area,
+		folderSlug,
+	})
+
 	const handleDelete = async () => {
 		setIsLoading(true)
 		try {
@@ -67,6 +79,7 @@ export default function DeleteConfirmationDialog({
 
 			if (response.success) {
 				toast.success(response.message)
+				await invalidateDocuments()
 				router.refresh()
 			} else {
 				toast.error(response.message)
