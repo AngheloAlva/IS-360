@@ -18,9 +18,10 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 			const entryType = row.getValue("entryType") as ENTRY_TYPE
 			return (
 				<Badge
-					className={cn("border-primary text-primary bg-white", {
-						"border-cyan-500 text-cyan-500": entryType === "ADDITIONAL_ACTIVITY",
-						"border-purple-500 text-purple-500": entryType === "OTC_INSPECTION",
+					className={cn("border-primary text-primary bg-primary/10", {
+						"border-cyan-500 bg-cyan-500/10 text-cyan-500": entryType === "ADDITIONAL_ACTIVITY",
+						"border-purple-500 bg-purple-500/10 text-purple-500": entryType === "OTC_INSPECTION",
+						"border-amber-500 bg-amber-500/10 text-amber-500": entryType === "COMMENT",
 					})}
 				>
 					{WORK_ENTRY_TYPE[entryType]}
@@ -48,7 +49,7 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		header: "Descripción",
 		cell: ({ row }) => {
 			const description = row.getValue("comments") as string
-			return <span className="line-clamp-2">{description}</span>
+			return <p className="max-w-64 truncate">{description}</p>
 		},
 	},
 	{

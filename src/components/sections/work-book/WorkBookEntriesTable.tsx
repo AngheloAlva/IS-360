@@ -12,6 +12,7 @@ import {
 
 import { useWorkEntries, WorkEntry } from "@/hooks/use-work-entries"
 import { WorkEntryColumns } from "./work-entry-columns"
+import { WorkBookEntryDetails } from "./WorkBookEntryDetails"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -31,7 +32,7 @@ export default function WorkBookEntriesTable({
 }: {
 	workOrderId: string
 }): React.ReactElement {
-	console.log("WorkBookEntriesTable received workOrderId:", workOrderId)
+	const [selectedEntry, setSelectedEntry] = useState<WorkEntry | null>(null)
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -43,8 +44,6 @@ export default function WorkBookEntriesTable({
 		limit: 10,
 		workOrderId,
 	})
-
-	console.log(data)
 
 	const table = useReactTable<WorkEntry>({
 		data: data?.entries ?? [],
@@ -66,18 +65,18 @@ export default function WorkBookEntriesTable({
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start gap-4">
+		<section className="flex w-full flex-col gap-4">
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 				<Input
 					type="text"
-					className="w-full sm:w-96"
-					placeholder="Buscar por nombre de actividad o comentarios..."
 					value={search}
+					className="bg-background w-full sm:w-96"
 					onChange={(e) => setSearch(e.target.value)}
+					placeholder="Buscar por nombre de actividad o comentarios..."
 				/>
 			</div>
 
-			<Card className="w-full p-4">
+			<Card className="w-full p-1.5">
 				{isLoading ? (
 					<div className="space-y-2 p-4">
 						<Skeleton className="h-8 w-full" />
@@ -110,7 +109,12 @@ export default function WorkBookEntriesTable({
 						<TableBody>
 							{table.getRowModel().rows?.length ? (
 								table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && "selected"}
+										className="hover:bg-muted/50 cursor-pointer"
+										onClick={() => setSelectedEntry(row.original)}
+									>
 										{row.getVisibleCells().map((cell) => (
 											<TableCell key={cell.id} className="font-medium">
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -135,6 +139,11 @@ export default function WorkBookEntriesTable({
 				pageCount={data?.pages ?? 0}
 				onPageChange={setPage}
 				isLoading={isLoading}
+			/>
+			<WorkBookEntryDetails
+				entry={selectedEntry}
+				isLoading={false}
+				onClose={() => setSelectedEntry(null)}
 			/>
 		</section>
 	)

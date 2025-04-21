@@ -10,10 +10,7 @@ export default async function SafetyTalksPage(): Promise<React.ReactElement> {
 			<div className="flex items-center justify-between">
 				<h1 className="w-fit text-3xl font-bold">Charlas de Seguridad</h1>
 				<Link href="/admin/dashboard/charlas-de-seguridad/agregar" className="md:ml-auto">
-					<Button
-						size={"lg"}
-						className="border-primary text-primary border bg-white hover:text-white"
-					>
+					<Button size={"lg"}>
 						Nueva Charla
 						<Plus className="ml-1" />
 					</Button>

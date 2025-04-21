@@ -33,7 +33,7 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 						id="date"
 						variant={"outline"}
 						className={cn(
-							"border-input w-[300px] justify-start bg-white text-left font-normal",
+							"border-input bg-background w-[300px] justify-start text-left font-normal",
 							!date && "text-muted-foreground"
 						)}
 					>

@@ -4,7 +4,7 @@ import BackButton from "@/components/shared/BackButton"
 export default function CreateUserPage() {
 	return (
 		<>
-			<div className="mx-auto flex w-full max-w-screen-lg items-center justify-start gap-2">
+			<div className="mx-auto flex w-full max-w-screen-xl items-center justify-start gap-2">
 				<BackButton href="/admin/dashboard/equipos" />
 				<h1 className="w-fit text-3xl font-bold">Nuevo Equipo</h1>
 			</div>

@@ -4,6 +4,8 @@ export const WORK_ORDER_STATUS_VALUES = {
 	COMPLETED: "COMPLETED",
 	CANCELLED: "CANCELLED",
 	EXPIRED: "EXPIRED",
+	CLOSURE_REQUESTED: "CLOSURE_REQUESTED",
+	CLOSED: "CLOSED",
 } as const
 
 export const WORK_ORDER_STATUS_VALUES_ARRAY = [
@@ -12,6 +14,8 @@ export const WORK_ORDER_STATUS_VALUES_ARRAY = [
 	WORK_ORDER_STATUS_VALUES.COMPLETED,
 	WORK_ORDER_STATUS_VALUES.CANCELLED,
 	WORK_ORDER_STATUS_VALUES.EXPIRED,
+	WORK_ORDER_STATUS_VALUES.CLOSURE_REQUESTED,
+	WORK_ORDER_STATUS_VALUES.CLOSED,
 ] as const
 
 export const WorkOrderStatusLabels = {
@@ -20,6 +24,8 @@ export const WorkOrderStatusLabels = {
 	COMPLETED: "Completado",
 	CANCELLED: "Cancelado",
 	EXPIRED: "Expirado",
+	CLOSURE_REQUESTED: "Cierre Solicitado",
+	CLOSED: "Cerrado",
 }
 
 export const WorkOrderStatusOptions = [

@@ -103,9 +103,9 @@ export function WorkOrderDataTable() {
 				<h1 className="text-text text-2xl font-bold">Lista de Ordenes de Trabajo</h1>
 
 				<Link href="/admin/dashboard/ordenes-de-trabajo/agregar">
-					<Button className="text-feature border-feature hover:bg-feature border bg-white hover:text-white">
+					<Button size={"lg"}>
 						<Plus className="h-4 w-4" />
-						Agregar Orden de Trabajo
+						Orden de Trabajo
 					</Button>
 				</Link>
 			</div>
@@ -113,7 +113,7 @@ export function WorkOrderDataTable() {
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 				<Input
 					type="text"
-					className="w-full sm:w-64"
+					className="bg-background w-full sm:w-64"
 					placeholder="Buscar por número de OT, trabajo, ubicación..."
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
@@ -129,7 +129,7 @@ export function WorkOrderDataTable() {
 					}}
 					value={typeFilter ?? "all"}
 				>
-					<SelectTrigger className="border-input w-full border bg-white sm:w-fit">
+					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
 						<SelectValue placeholder="Tipo de obra" />
 					</SelectTrigger>
 					<SelectContent>
@@ -155,7 +155,7 @@ export function WorkOrderDataTable() {
 					}}
 					value={companyId ?? "all"}
 				>
-					<SelectTrigger className="border-input w-full border bg-white sm:w-fit">
+					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
 						<SelectValue placeholder="Empresa" />
 					</SelectTrigger>
 					<SelectContent>
@@ -183,7 +183,7 @@ export function WorkOrderDataTable() {
 					}}
 					value={statusFilter ?? "all"}
 				>
-					<SelectTrigger className="border-input w-full border bg-white sm:w-fit">
+					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
 						<SelectValue placeholder="Estado" />
 					</SelectTrigger>
 					<SelectContent>
@@ -201,7 +201,7 @@ export function WorkOrderDataTable() {
 
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button className="text-text border-input hover:bg-input ml-auto border bg-white">
+						<Button className="text-text border-input hover:bg-input bg-background ml-auto border">
 							Columnas <ChevronDown />
 						</Button>
 					</DropdownMenuTrigger>
@@ -225,7 +225,7 @@ export function WorkOrderDataTable() {
 				</DropdownMenu>
 			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none bg-white p-1.5">
+			<Card className="w-full max-w-full overflow-x-scroll rounded-md p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (

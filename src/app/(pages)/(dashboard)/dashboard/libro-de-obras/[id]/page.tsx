@@ -12,8 +12,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { WORK_ORDER_STATUS } from "@prisma/client"
+import { RequestWorkBookClosure } from "@/components/sections/work-book/RequestWorkBookClosure"
 
 export default async function WorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
 	const { id } = await params
 
 	const { data } = await getWorkOrderById(id)
@@ -116,6 +124,13 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 			</div>
 
 			<WorkBookEntriesTable workOrderId={id} />
+
+			{session?.user?.role === "PARTNER_COMPANY" &&
+				session.user.isSupervisor &&
+				data.status !== WORK_ORDER_STATUS.CLOSURE_REQUESTED &&
+				data.status !== WORK_ORDER_STATUS.CLOSED && (
+					<RequestWorkBookClosure workOrderId={id} userId={session?.user?.id} />
+				)}
 		</>
 	)
 }

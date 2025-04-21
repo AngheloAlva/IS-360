@@ -1,12 +1,10 @@
 "use client"
 
-import { CalendarIcon, UploadCloud, X } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { UploadCloud, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
-import { es } from "date-fns/locale"
-import { format } from "date-fns"
 import { toast } from "sonner"
 
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
@@ -22,12 +20,13 @@ import {
 	type WorkOrderSchema,
 } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
+import { SelectFormField } from "@/components/forms/shared/SelectFormField"
+import { InputFormField } from "@/components/forms/shared/InputFormField"
 import MultipleSelector from "@/components/ui/multiselect"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
 import SafetyTalksInfo from "./SafetyTalksInfo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,8 +46,8 @@ import {
 	SelectContent,
 } from "@/components/ui/select"
 
-import type { User } from "@prisma/client"
 import type { Company } from "@/hooks/use-companies"
+import type { User } from "@prisma/client"
 
 export default function CreateWorkOrderForm(): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -145,18 +144,12 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	const handleFileChange = (file: File | null) => {
 		if (!file) return
 
-		// Validación de tamaño (20MB)
-		if (file.size > 20_000_000) {
-			toast.error("Archivo demasiado grande", {
-				description: "El tamaño máximo permitido es 20MB",
-			})
-			return
-		}
-
 		// Validación de tipo
-		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt)$/i
+		const validTypes = /\.(pdf|docx?|xlsx?|pptx?|txt|jpe?g|png|webp|avif|zip|rar|7z)$/i
 		if (!validTypes.test(file.name)) {
-			toast.error("Formato no soportado (solo PDF, DOCX, XLSX, PPTX, TXT)")
+			toast.error(
+				"Formato no soportado (solo PDF, DOCX, XLSX, PPTX, TXT, JPG, PNG, WEBP, AVIF, ZIP, RAR, 7Z)"
+			)
 			return
 		}
 
@@ -289,140 +282,47 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							)}
 						/>
 
-						<FormField
-							control={form.control}
+						<SelectFormField<WorkOrderSchema>
 							name="type"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Tipo de Trabajo</FormLabel>
-
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger className="border-gray-200">
-												<SelectValue placeholder="Seleccione el tipo de trabajo" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent className="text-neutral-700">
-											{WorkOrderTypeOptions.map((option) => (
-												<SelectItem key={option.value} value={option.value}>
-													{option.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Tipo de Trabajo"
+							options={WorkOrderTypeOptions}
+							placeholder="Seleccione el tipo de trabajo"
 						/>
 
-						<FormField
+						<DatePickerFormField<WorkOrderSchema>
 							control={form.control}
 							name="solicitationDate"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Fecha de Solicitud</FormLabel>
-									<Popover>
-										<PopoverTrigger asChild>
-											<FormControl>
-												<Button
-													variant={"outline"}
-													className={cn(
-														"w-full border-gray-200 bg-white pl-3 text-left font-normal",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													{field.value ? (
-														format(field.value, "PPP", { locale: es })
-													) : (
-														<span>Pick a date</span>
-													)}
-													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-												</Button>
-											</FormControl>
-										</PopoverTrigger>
-										<PopoverContent className="w-auto p-0" align="start">
-											<Calendar
-												mode="single"
-												selected={field.value}
-												onSelect={field.onChange}
-												disabled={(date) => date < new Date("1900-01-01")}
-												initialFocus
-											/>
-										</PopoverContent>
-									</Popover>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Fecha de Solicitud"
 						/>
 
-						<FormField
-							control={form.control}
+						<InputFormField<WorkOrderSchema>
 							name="solicitationTime"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Hora de Solicitud</FormLabel>
-									<Input value={field.value} onChange={field.onChange} />
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Hora de Solicitud"
+							control={form.control}
 						/>
 
-						<FormField
-							control={form.control}
+						<InputFormField<WorkOrderSchema>
 							name="workRequest"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Trabajo Solicitado</FormLabel>
-									<Input value={field.value} onChange={field.onChange} />
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Trabajo Solicitado"
+							placeholder="Ingrese el trabajo solicitado"
 						/>
 
-						<FormField
-							control={form.control}
+						<SelectFormField<WorkOrderSchema>
 							name="priority"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Prioridad</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<SelectTrigger>
-											<SelectValue placeholder="Seleccione una prioridad" />
-										</SelectTrigger>
-										<SelectContent>
-											{WorkOrderPriorityOptions.map((option) => (
-												<SelectItem key={option.value} value={option.value}>
-													{option.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Prioridad"
+							control={form.control}
+							options={WorkOrderPriorityOptions}
+							placeholder="Seleccione una prioridad"
 						/>
 
-						<FormField
-							control={form.control}
+						<SelectFormField<WorkOrderSchema>
 							name="capex"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>CAPEX</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<SelectTrigger>
-											<SelectValue placeholder="Seleccione un indicador" />
-										</SelectTrigger>
-										<SelectContent>
-											{WorkOrderCAPEXOptions.map((option) => (
-												<SelectItem key={option.value} value={option.value}>
-													{option.label}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="CAPEX"
+							control={form.control}
+							options={WorkOrderCAPEXOptions}
+							placeholder="Seleccione un indicador"
 						/>
 
 						<FormField
@@ -446,6 +346,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 												}}
 												hideClearAllButton
 												hidePlaceholderWhenSelected
+												className="border-input"
 												emptyIndicator={
 													<p className="text-center text-sm">No hay más equipos disponibles</p>
 												}
@@ -460,16 +361,14 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							)}
 						/>
 
-						<FormField
-							control={form.control}
+						<TextAreaFormField<WorkOrderSchema>
+							optional
+							className="min-h-32"
 							name="workDescription"
-							render={({ field }) => (
-								<FormItem className="flex flex-col md:col-span-2">
-									<FormLabel>Descripción del Trabajo</FormLabel>
-									<Textarea value={field.value} onChange={field.onChange} className="min-h-32" />
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							itemClassName="md:col-span-2"
+							label="Descripción del Trabajo"
+							placeholder="Ingrese la descripción del trabajo"
 						/>
 					</CardContent>
 				</Card>
@@ -561,68 +460,24 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 					<CardContent className="grid gap-x-4 gap-y-5 md:grid-cols-2">
 						<h2 className="text-xl font-bold md:col-span-2">Fechas y Horas</h2>
 
-						<FormField
-							control={form.control}
+						<DatePickerFormField<WorkOrderSchema>
 							name="programDate"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Fecha Programada</FormLabel>
-									<Popover>
-										<PopoverTrigger asChild>
-											<FormControl>
-												<Button
-													variant={"outline"}
-													className={cn(
-														"w-full border-gray-200 bg-white pl-3 text-left font-normal",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													{field.value ? (
-														format(field.value, "PPP", { locale: es })
-													) : (
-														<span>Seleccione una fecha</span>
-													)}
-													<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-												</Button>
-											</FormControl>
-										</PopoverTrigger>
-										<PopoverContent className="w-auto p-0" align="start">
-											<Calendar
-												mode="single"
-												selected={field.value}
-												onSelect={field.onChange}
-												disabled={(date) => date < new Date("1900-01-01")}
-												initialFocus
-											/>
-										</PopoverContent>
-									</Popover>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Fecha Programada"
+							control={form.control}
 						/>
 
-						<FormField
-							control={form.control}
+						<InputFormField<WorkOrderSchema>
+							type="number"
 							name="estimatedHours"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Horas Estimadas</FormLabel>
-									<Input value={field.value} onChange={field.onChange} type="number" min="1" />
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Horas Estimadas"
 						/>
 
-						<FormField
-							control={form.control}
+						<InputFormField<WorkOrderSchema>
+							type="number"
 							name="estimatedDays"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Días Estimados</FormLabel>
-									<Input value={field.value} onChange={field.onChange} type="number" min="1" />
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							label="Días Estimados"
 						/>
 					</CardContent>
 				</Card>
@@ -637,8 +492,8 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 								className={cn(
 									"group relative h-full cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
 									!initReportFile
-										? "border-blue-200 bg-blue-50 hover:border-blue-300"
-										: "border-green-200 bg-green-50"
+										? "border-blue-500 bg-blue-500/10 hover:bg-blue-500/20"
+										: "border-green-500 bg-green-500/10"
 								)}
 								onDrop={(e) => {
 									e.preventDefault()
@@ -655,10 +510,10 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 								<div className="flex flex-col items-center gap-4">
 									<UploadCloud className="h-12 w-12 text-gray-400" />
 									<div>
-										<p className="font-medium text-gray-700">
+										<p className="font-medium">
 											{initReportFile ? "¡Archivo listo!" : "Arrastra tu archivo aquí"}
 										</p>
-										<p className="mt-2 text-sm text-gray-500">
+										<p className="text-muted-foreground mt-2 text-sm">
 											Formatos soportados: PDF, DOC, XLS, JPG, PNG
 										</p>
 									</div>
@@ -668,7 +523,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 
 						<div className="space-y-4">
 							<FormLabel>Previsualización</FormLabel>
-							<div className="h-full rounded-lg border-2 border-dashed border-gray-200 p-4">
+							<div className="h-full rounded-lg border-2 border-dashed p-4">
 								{initReportFile ? (
 									<div className="flex h-full flex-col items-center justify-center">
 										{initReportPreview ? (

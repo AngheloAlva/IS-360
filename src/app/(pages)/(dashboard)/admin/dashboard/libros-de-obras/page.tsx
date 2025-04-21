@@ -50,11 +50,12 @@ const StatCard = ({ title, value, icon: Icon, colorVariant }: StatCardProps) => 
 )
 
 export default function WorkBooksAdminPage() {
+	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
 	const [limit] = useState(10)
-	const [search, setSearch] = useState("")
 
 	const { data, isLoading } = useWorkBooks({ page, limit, search })
+	console.log(data)
 
 	return (
 		<div className="flex w-full flex-col gap-6">
@@ -99,10 +100,10 @@ export default function WorkBooksAdminPage() {
 					{/* Search and Table */}
 					<div className="space-y-4">
 						<Input
-							placeholder="Buscar por nombre, ubicación o número OT..."
 							value={search}
+							className="bg-background max-w-sm"
 							onChange={(e) => setSearch(e.target.value)}
-							className="max-w-sm"
+							placeholder="Buscar por nombre, ubicación o número OT..."
 						/>
 
 						<WorkBookDataTable

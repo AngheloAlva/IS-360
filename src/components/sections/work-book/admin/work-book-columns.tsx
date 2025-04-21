@@ -4,17 +4,15 @@ import { es } from "date-fns/locale"
 import { ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import type { WorkBook } from "@/hooks/use-work-books"
+import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
+import { WORK_ORDER_STATUS } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
-const workOrderStatusMap = {
-	PENDING: { label: "Pendiente", variant: "secondary" as const },
-	IN_PROGRESS: { label: "En progreso", variant: "default" as const },
-	COMPLETED: { label: "Completado", variant: "outline" as const },
-	CANCELLED: { label: "Cancelado", variant: "destructive" as const },
-} as const
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+
+import type { WorkBook } from "@/hooks/use-work-books"
 
 export const workBookColumns: ColumnDef<WorkBook>[] = [
 	{
@@ -62,11 +60,19 @@ export const workBookColumns: ColumnDef<WorkBook>[] = [
 		accessorKey: "status",
 		header: "Estado",
 		cell: ({ row }) => {
-			const status = row.getValue("status") as keyof typeof workOrderStatusMap
+			const status = row.getValue("status") as keyof typeof WorkOrderStatusLabels
 
 			return (
-				<Badge variant={workOrderStatusMap[status].variant}>
-					{workOrderStatusMap[status].label}
+				<Badge
+					className={cn("bg-primary/5 border-primary text-primary", {
+						"border-yellow-500 bg-yellow-500/5 text-yellow-500":
+							status === WORK_ORDER_STATUS.PENDING,
+						"border-green-500 bg-green-500/5 text-green-500":
+							status === WORK_ORDER_STATUS.COMPLETED,
+						"border-red-500 bg-red-500/5 text-red-500": status === WORK_ORDER_STATUS.CANCELLED,
+					})}
+				>
+					{WorkOrderStatusLabels[status]}
 				</Badge>
 			)
 		},

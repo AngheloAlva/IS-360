@@ -70,6 +70,8 @@ model User {
   isSupervisor                   Boolean?
   workOrders                     WorkOrder[]         @relation("WorkOrderResponsible")
   workOrdersAsSupervisor         WorkOrder[]         @relation("WorkOrderSupervisor")
+  requestedClosures              WorkOrder[]         @relation("WorkOrderClosureRequester")
+  approvedClosures               WorkOrder[]         @relation("WorkOrderClosureApprover")
   assignedEntries                WorkEntry[]         @relation("AssignedUsers")
   reportedInEntries              WorkEntry[]         @relation("ReportedUsers")
   createdEntries                 WorkEntry[]         @relation("WorkEntryCreator")
@@ -203,6 +205,8 @@ enum WORK_ORDER_STATUS {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+  CLOSURE_REQUESTED
+  CLOSED
   EXPIRED
 }
 
@@ -253,19 +257,26 @@ model WorkOrder {
   workProgressStatus Int?        @default(0)
   workEntries        WorkEntry[]
 
-  company          Company            @relation(fields: [companyId], references: [id])
-  companyId        String
-  supervisor       User               @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
-  supervisorId     String
-  responsible      User               @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
-  responsibleId    String
-  initReport       Attachment?        @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
-  initReportId     String?            @unique
-  endReport        Attachment?        @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
-  endReportId      String?            @unique
-  workPermits      WorkPermit[]
-  workTrackers     WorkTracker[]
-  equipmentHistory EquipmentHistory[]
+  company               Company            @relation(fields: [companyId], references: [id])
+  companyId             String
+  supervisor            User               @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
+  supervisorId          String
+  responsible           User               @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
+  responsibleId         String
+  initReport            Attachment?        @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
+  initReportId          String?            @unique
+  endReport             Attachment?        @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
+  endReportId           String?            @unique
+  workPermits           WorkPermit[]
+  closureRequestedBy    User?              @relation("WorkOrderClosureRequester", fields: [closureRequestedById], references: [id])
+  closureRequestedById  String?
+  closureRequestedAt    DateTime?
+  closureApprovedBy     User?              @relation("WorkOrderClosureApprover", fields: [closureApprovedById], references: [id])
+  closureApprovedById   String?
+  closureApprovedAt     DateTime?
+  closureRejectedReason String?
+  workTrackers          WorkTracker[]
+  equipmentHistory      EquipmentHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

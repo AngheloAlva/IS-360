@@ -1,6 +1,9 @@
 "use client"
 
-import { type CompanyUser } from "@/hooks/use-companies"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+
+import { Badge } from "@/components/ui/badge"
 import {
 	Table,
 	TableBody,
@@ -9,8 +12,8 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { format } from "date-fns"
+
+import type { CompanyUser } from "@/hooks/use-companies"
 
 interface SafetyTalksInfoProps {
 	users: CompanyUser[]
@@ -42,11 +45,16 @@ export default function SafetyTalksInfo({ users }: SafetyTalksInfoProps) {
 					<TableBody>
 						{allTalks.map((talk) => (
 							<TableRow key={talk.id}>
-								<TableCell>{talk.title}</TableCell>
+								<TableCell className="font-semibold">{talk.title}</TableCell>
 								<TableCell>{talk.minimumScore}%</TableCell>
 								<TableCell>
-									<Badge variant={talk.isPresential ? "default" : "secondary"}>
-										{talk.isPresential ? "Presencial" : "Virtual"}
+									<Badge
+										className={cn({
+											"bg-green-500/10 text-green-500": talk.isPresential,
+											"bg-purple-500/10 text-purple-500": !talk.isPresential,
+										})}
+									>
+										{talk.isPresential ? "Presencial" : "Online"}
 									</Badge>
 								</TableCell>
 								<TableCell>
@@ -58,7 +66,12 @@ export default function SafetyTalksInfo({ users }: SafetyTalksInfoProps) {
 													<span className="text-sm font-medium">{user.name}:</span>
 													{userTalk?.completed ? (
 														<div className="flex items-center gap-2">
-															<Badge variant={userTalk.passed ? "default" : "destructive"}>
+															<Badge
+																className={cn({
+																	"bg-green-500/10 text-green-500": userTalk.passed,
+																	"bg-red-500/10 text-red-500": !userTalk.passed,
+																})}
+															>
 																{userTalk.score}% - {userTalk.passed ? "Aprobado" : "Reprobado"}
 															</Badge>
 															{userTalk.completedAt && (
@@ -68,11 +81,11 @@ export default function SafetyTalksInfo({ users }: SafetyTalksInfoProps) {
 																</span>
 															)}
 															{userTalk.expiresAt && new Date(userTalk.expiresAt) < new Date() && (
-																<Badge variant="destructive">Expirado</Badge>
+																<Badge className="bg-red-500/10 text-red-500">Expirado</Badge>
 															)}
 														</div>
 													) : (
-														<Badge variant="outline">Pendiente</Badge>
+														<Badge className="bg-amber-500/10 text-amber-500">Pendiente</Badge>
 													)}
 												</div>
 											)

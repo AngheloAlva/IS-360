@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 import type { SafetyTalk } from "@/hooks/use-safety-talks"
+import { cn } from "@/lib/utils"
 
 export const SafetyTalkColumns: ColumnDef<SafetyTalk>[] = [
 	{
@@ -43,7 +44,12 @@ export const SafetyTalkColumns: ColumnDef<SafetyTalk>[] = [
 		cell: ({ row }) => {
 			const isPresential: boolean = row.getValue("isPresential")
 			return (
-				<Badge variant={isPresential ? "default" : "secondary"}>
+				<Badge
+					className={cn({
+						"bg-green-500/10 text-green-500": isPresential,
+						"bg-purple-500/10 text-purple-500": !isPresential,
+					})}
+				>
 					{isPresential ? "Presencial" : "Online"}
 				</Badge>
 			)

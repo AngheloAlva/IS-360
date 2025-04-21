@@ -84,7 +84,7 @@ export function EquipmentDataTable() {
 					<Input
 						type="text"
 						value={search}
-						className="w-full sm:w-64"
+						className="bg-background w-full sm:w-72"
 						placeholder="Buscar por nombre, TAG o ubicación..."
 						onChange={(e) => setSearch(e.target.value)}
 					/>

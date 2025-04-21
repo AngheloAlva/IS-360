@@ -77,7 +77,6 @@ export const createActivity = async ({
 
 			const workOrder = await tx.workOrder.findUnique({
 				where: { id: workOrderId },
-				select: { workProgressStatus: true, type: true },
 				include: {
 					equipment: {
 						select: {

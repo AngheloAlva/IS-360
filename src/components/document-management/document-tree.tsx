@@ -86,7 +86,11 @@ const TreeNode = memo(function TreeNode({
 					<File className="ml-5 h-5 min-h-5 w-5 min-w-5 text-sky-500" />
 				)}
 
-				<span className="truncate text-base font-semibold">
+				<span
+					className={cn("truncate text-base font-semibold", {
+						"rounded-sm bg-blue-800/10 px-1": expandedNodes.has(node.id),
+					})}
+				>
 					{node.type === "file" && node.url ? (
 						<Link
 							target="_blank"

@@ -146,6 +146,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 									name="timeLimit"
 									label="Tiempo Límite"
 									control={form.control}
+									className="rounded-r-none"
 								/>
 
 								<Button
@@ -153,7 +154,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 									size={"icon"}
 									type="button"
 									variant={"outline"}
-									className="mt-5.5 disabled:bg-transparent disabled:opacity-100"
+									className="mt-5.5 rounded-l-none disabled:bg-transparent disabled:opacity-100"
 								>
 									min
 								</Button>
@@ -163,15 +164,16 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 								<InputFormField<SafetyTalkSchema>
 									type="number"
 									name="minimumScore"
-									label="Porcentaje Mínimo"
 									control={form.control}
+									label="Porcentaje Mínimo"
+									className="rounded-r-none"
 								/>
 								<Button
 									disabled
 									size={"icon"}
 									type="button"
 									variant={"outline"}
-									className="mt-5.5 disabled:bg-transparent disabled:opacity-100"
+									className="mt-5.5 rounded-l-none disabled:bg-transparent disabled:opacity-100"
 								>
 									%
 								</Button>
@@ -233,7 +235,7 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 									</label>
 								</div>
 
-								<div className="relative h-96 w-full overflow-hidden rounded-lg border bg-white">
+								<div className="bg-secondary-background/40 relative h-96 w-full overflow-hidden rounded-lg border">
 									{resourceFields.length > 0 && (
 										<div className="h-full w-full p-4">
 											<div className="h-full w-full">
