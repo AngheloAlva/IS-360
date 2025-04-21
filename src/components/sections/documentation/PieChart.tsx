@@ -25,7 +25,6 @@ export function PieChart({ data, colors }: PieChartProps) {
 					outerRadius={80}
 					labelLine={false}
 					data={filteredData}
-					label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
 				>
 					{filteredData.map((entry, index) => (
 						<Cell

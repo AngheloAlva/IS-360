@@ -1,16 +1,36 @@
 "use server"
 
 import type { FolderFormSchema } from "@/lib/form-schemas/document-management/folder.schema"
+import { generateSlug } from "@/lib/generateSlug"
 import prisma from "@/lib/prisma"
 
 export const createFolder = async (values: FolderFormSchema) => {
 	try {
 		const { parentSlug, userId, ...rest } = values
 
+		const newFolderSlug = generateSlug(rest.name)
+
 		let parentId: string | null = null
 
+		// Verificar si existe una carpeta con el mismo slug en el mismo nivel
+		const existingFolder = await prisma.folder.findFirst({
+			where: {
+				slug: newFolderSlug,
+				area: rest.area,
+				parentId: parentSlug ? undefined : null, // Si no hay parentSlug, buscar en carpetas raíz
+			},
+		})
+
+		if (existingFolder) {
+			return {
+				ok: false,
+				message:
+					"Ya existe una carpeta con este nombre en este nivel. Intenta con otro nombre por favor",
+			}
+		}
+
 		if (parentSlug) {
-			const foundParentId = await prisma.folder.findFirst({
+			const foundParent = await prisma.folder.findFirst({
 				where: {
 					slug: parentSlug,
 					area: rest.area,
@@ -20,11 +40,11 @@ export const createFolder = async (values: FolderFormSchema) => {
 				},
 			})
 
-			if (!foundParentId) {
-				return { ok: false, message: "Parent folder not found" }
+			if (!foundParent) {
+				return { ok: false, message: "Carpeta padre no encontrada" }
 			}
 
-			parentId = foundParentId.id
+			parentId = foundParent.id
 		}
 
 		let connections: {
@@ -61,10 +81,7 @@ export const createFolder = async (values: FolderFormSchema) => {
 			data: {
 				...rest,
 				...connections,
-				slug: rest.name
-					.toLowerCase()
-					.replace(/\s+/g, "-")
-					.replace(/[^a-z0-9-]/g, ""),
+				slug: newFolderSlug,
 			},
 		})
 

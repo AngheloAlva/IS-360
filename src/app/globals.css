@@ -31,6 +31,16 @@
 	--chart-7: hsl(160 60% 45%);
 	--chart-8: hsl(30 80% 55%);
 	--chart-9: hsl(280 65% 60%);
+	--area-operations: "#2563eb";
+	--area-instructions: "#60a5fa";
+	--area-integrity-and-maintenance: "#10b981";
+	--area-environment: "#84cc16";
+	--area-operational-safety: "#eab308";
+	--area-quality-and-operational-excellence: "#f59e0b";
+	--area-regulatory-compliance: "#dc2626";
+	--area-legal: "#8b5cf6";
+	--area-communities: "#ec4899";
+	--area-projects: "#6b7280";
 }
 
 .dark {

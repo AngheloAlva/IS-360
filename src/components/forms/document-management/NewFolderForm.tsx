@@ -43,6 +43,7 @@ export default function NewFolderForm({
 	isRootFolder?: boolean
 }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [errorMessage, setErrorMessage] = useState("")
 
 	const router = useRouter()
 	const areaValue = Areas[area as keyof typeof Areas].value
@@ -67,7 +68,7 @@ export default function NewFolderForm({
 			const { ok, message } = await createFolder(values)
 
 			if (ok) {
-				toast("Carpeta creada con éxito", {
+				toast.success("Carpeta creada con éxito", {
 					description: message,
 					duration: 5000,
 				})
@@ -78,17 +79,22 @@ export default function NewFolderForm({
 					router.push(`/dashboard/documentacion/${area}`)
 				}
 			} else {
-				toast("Error al crear la carpeta", {
+				toast.error("Error al crear la carpeta", {
 					description: message,
 					duration: 5000,
 				})
+				setErrorMessage(message || "Ocurrió un error al intentar crear la carpeta")
 			}
 		} catch (error) {
 			console.error(error)
-			toast("Error al crear la carpeta", {
-				description: "Ocurrió un error al intentar crear la carpeta",
+			toast.error("Error al crear la carpeta", {
+				description:
+					error instanceof Error ? error.message : "Ocurrió un error al intentar crear la carpeta",
 				duration: 5000,
 			})
+			setErrorMessage(
+				error instanceof Error ? error.message : "Ocurrió un error al intentar crear la carpeta"
+			)
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -103,12 +109,15 @@ export default function NewFolderForm({
 				<div className="lg:w-full">
 					<Card className="w-full">
 						<CardContent className="grid gap-5">
-							<InputFormField<FolderFormSchema>
-								name="name"
-								control={form.control}
-								label="Nombre de la Carpeta"
-								placeholder="Nombre de la Carpeta"
-							/>
+							<div>
+								<InputFormField<FolderFormSchema>
+									name="name"
+									control={form.control}
+									label="Nombre de la Carpeta"
+									placeholder="Nombre de la Carpeta"
+								/>
+								{errorMessage && <span className="text-sm text-red-500">{errorMessage}</span>}
+							</div>
 
 							<TextAreaFormField<FolderFormSchema>
 								optional
@@ -131,7 +140,7 @@ export default function NewFolderForm({
 					<SubmitButton
 						isSubmitting={isSubmitting}
 						label="Crear Carpeta"
-						className="hidden lg:block"
+						className="hover:bg-background hidden lg:block"
 					/>
 				</div>
 
@@ -171,9 +180,9 @@ export default function NewFolderForm({
 				</Card>
 
 				<SubmitButton
-					isSubmitting={isSubmitting}
 					label="Crear Carpeta"
-					className="block lg:hidden"
+					isSubmitting={isSubmitting}
+					className="hover:bg-background block lg:hidden"
 				/>
 			</form>
 		</Form>
