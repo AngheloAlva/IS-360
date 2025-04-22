@@ -55,6 +55,11 @@ const data = {
 			url: "/dashboard/empleados",
 			icon: Users,
 		},
+		{
+			name: "Carpetas de Arranque",
+			url: "/dashboard/carpetas-de-arranque",
+			icon: FileText,
+		},
 	],
 	navAdmin: [
 		{
