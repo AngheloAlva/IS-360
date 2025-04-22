@@ -12,7 +12,7 @@ export const dailyActivitySchema = z.object({
 	personnel: z
 		.array(
 			z.object({
-				userId: z.string(),
+				userId: z.string().nonempty({ message: "El ID del personal no puede estar vacío" }),
 			})
 		)
 		.min(1, { message: "Debe haber al menos un personal" }),

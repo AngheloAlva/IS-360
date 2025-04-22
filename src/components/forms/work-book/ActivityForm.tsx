@@ -131,6 +131,11 @@ export default function ActivityForm({
 	async function onSubmit(values: DailyActivitySchema) {
 		setLoading(true)
 
+		if (!values.personnel.length) {
+			toast.error("Debe haber al menos un personal")
+			return
+		}
+
 		try {
 			if (selectedFile) {
 				const fileExtension = selectedFile.name.split(".").pop()
@@ -394,7 +399,11 @@ export default function ActivityForm({
 					</CardContent>
 				</Card>
 
-				<SubmitButton isSubmitting={loading} label="Crear actividad" />
+				<SubmitButton
+					isSubmitting={loading}
+					className="hover:bg-primary/80"
+					label="Crear actividad"
+				/>
 			</form>
 		</Form>
 	)
