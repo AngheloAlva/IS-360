@@ -96,10 +96,10 @@ export async function GET() {
 		])
 
 		const roleColors = {
-			SUPERADMIN: "bg-red-500",
 			ADMIN: "bg-amber-500",
 			USER: "bg-blue-500",
 			OPERATOR: "bg-green-500",
+			SUPERVISOR: "bg-red-500",
 			PARTNER_COMPANY: "bg-purple-500",
 		}
 

@@ -1,6 +1,6 @@
 import { prismaAdapter } from "better-auth/adapters/prisma"
-import { nextCookies } from "better-auth/next-js"
 import { admin, twoFactor } from "better-auth/plugins"
+import { nextCookies } from "better-auth/next-js"
 import { betterAuth } from "better-auth"
 
 import { USER_ROLES_VALUES } from "./consts/user-roles"
@@ -62,7 +62,7 @@ export const auth = betterAuth({
 	plugins: [
 		nextCookies(),
 		admin({
-			adminRole: [USER_ROLES_VALUES.ADMIN, USER_ROLES_VALUES.SUPERADMIN],
+			adminRole: [USER_ROLES_VALUES.ADMIN, USER_ROLES_VALUES.SUPERVISOR],
 			defaultRole: USER_ROLES_VALUES.PARTNER_COMPANY,
 		}),
 		twoFactor({

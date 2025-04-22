@@ -1,28 +1,28 @@
 export const USER_ROLES_VALUES = {
-	ADMIN: "ADMIN",
-	SUPERADMIN: "SUPERADMIN",
 	USER: "USER",
-	PARTNER_COMPANY: "PARTNER_COMPANY",
+	ADMIN: "ADMIN",
 	OPERATOR: "OPERATOR",
+	SUPERVISOR: "SUPERVISOR",
+	PARTNER_COMPANY: "PARTNER_COMPANY",
 } as const
 
 export const USER_ROLES_VALUES_ARRAY = [
-	USER_ROLES_VALUES.SUPERADMIN,
-	USER_ROLES_VALUES.ADMIN,
 	USER_ROLES_VALUES.USER,
+	USER_ROLES_VALUES.ADMIN,
 	USER_ROLES_VALUES.OPERATOR,
+	USER_ROLES_VALUES.SUPERVISOR,
 	USER_ROLES_VALUES.PARTNER_COMPANY,
 ] as const
 
 export const UserRolesLabels = {
-	SUPERADMIN: "Super Administrador",
+	OPERATOR: "Operador",
 	ADMIN: "Administrador",
 	USER: "Acceso Tecnico",
-	OPERATOR: "Operador",
+	SUPERVISOR: "Supervisor Externo",
 	PARTNER_COMPANY: "Empresa Colaboradora",
 } as const
 
-export const UserRoleOptions = [
+export const InternalUserRoleOptions = [
 	{
 		value: USER_ROLES_VALUES.ADMIN,
 		label: UserRolesLabels.ADMIN,

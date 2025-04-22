@@ -111,7 +111,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 				</Link>
 			</div>
 
-			{session?.user?.role === "SUPERADMIN" &&
+			{session?.user?.role === "ADMIN" &&
 				session.user.id === data.responsibleId &&
 				data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
 					<ApproveWorkBookClosure workOrderId={id} userId={session?.user?.id} />

@@ -8,7 +8,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { INTERNAL_ROLES_LABELS, InternalRoleOptions } from "@/lib/consts/internal-roles"
-import { UserRoleOptions, UserRolesLabels } from "@/lib/consts/user-roles"
+import { InternalUserRoleOptions, UserRolesLabels } from "@/lib/consts/user-roles"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
 import { updateInternalUser } from "@/actions/users/updateUser"
@@ -73,6 +73,21 @@ export default function InternalUserForm({
 				})
 
 				if (!data || error) {
+					if (error.code === "ONLY_ADMINS_CAN_ACCESS_THIS_ENDPOINT") {
+						toast.error("No tienes permiso para crear usuarios", {
+							duration: 5000,
+						})
+						return
+					}
+
+					if (error.code === "USER_ALREADY_EXISTS") {
+						toast.error("El usuario ya existe", {
+							description: "Verifique el RUT del usuario por favor.",
+							duration: 5000,
+						})
+						return
+					}
+
 					toast("Error al crear el usuario", {
 						description:
 							"Por favor, verifique que los datos ingresados sean correctos y que el email o RUT no estén duplicados",
@@ -178,7 +193,7 @@ export default function InternalUserForm({
 								name="role"
 								label="Rol"
 								control={form.control}
-								options={UserRoleOptions}
+								options={InternalUserRoleOptions}
 								placeholder="Selecciona un rol"
 							/>
 

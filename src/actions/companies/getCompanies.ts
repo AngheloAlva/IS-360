@@ -52,9 +52,9 @@ export const getCompanies = async (
 	}
 }
 
-export const getCompaniesByUserId = async (userId: string) => {
+export const getCompanyByUserId = async (userId: string) => {
 	try {
-		const companies = await prisma.company.findMany({
+		const company = await prisma.company.findFirst({
 			where: {
 				users: {
 					some: {
@@ -66,7 +66,7 @@ export const getCompaniesByUserId = async (userId: string) => {
 
 		return {
 			ok: true,
-			data: companies,
+			data: company,
 		}
 	} catch (error) {
 		console.log(error)

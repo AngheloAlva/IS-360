@@ -103,6 +103,11 @@ export default function CreateCompanyForm(): React.ReactElement {
 						if (error)
 							throw new Error(`Error al crear usuario ${supervisor.name}: ${error.message}`)
 
+						await authClient.admin.setRole({
+							userId: newUser.user.id,
+							role: USER_ROLES_VALUES.SUPERVISOR,
+						})
+
 						sendNewUserEmail({
 							name: supervisor.name,
 							email: supervisor.email,

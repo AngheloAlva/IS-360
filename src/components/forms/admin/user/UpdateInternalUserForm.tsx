@@ -8,7 +8,7 @@ import { toast } from "sonner"
 
 import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { updateInternalUser } from "@/actions/users/updateUser"
-import { UserRoleOptions } from "@/lib/consts/user-roles"
+import { InternalUserRoleOptions } from "@/lib/consts/user-roles"
 import { AreaOptions } from "@/lib/consts/areas"
 import {
 	internalUserSchema,
@@ -102,7 +102,7 @@ export default function UpdateInternalUserForm({
 							name="role"
 							label="Rol"
 							control={form.control}
-							options={UserRoleOptions}
+							options={InternalUserRoleOptions}
 						/>
 
 						<SelectFormField<InternalUserSchema>

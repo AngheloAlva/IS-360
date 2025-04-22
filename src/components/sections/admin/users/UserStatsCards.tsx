@@ -3,7 +3,6 @@
 import {
 	Users,
 	Clock,
-	Shield,
 	UserCog,
 	HardHat,
 	Briefcase,
@@ -176,7 +175,6 @@ export function UserStatsCards() {
 								<div className="min-w-0 flex-1">
 									<p className="truncate text-sm font-medium">{user.name}</p>
 									<p className="text-muted-foreground flex items-center gap-1 text-xs">
-										{user.role === "SUPERADMIN" && <Shield className="h-3 w-3" />}
 										{user.role === "ADMIN" && <UserCog className="h-3 w-3" />}
 										{user.role === "OPERATOR" && <HardHat className="h-3 w-3" />}
 										{user.role === "USER" && <UserCheck className="h-3 w-3" />}

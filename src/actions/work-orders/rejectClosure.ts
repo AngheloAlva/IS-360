@@ -35,11 +35,7 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 		}
 
 		// Verificar que el usuario sea supervisor de OTC
-		if (
-			user.role !== "ADMIN" &&
-			user.role !== "SUPERADMIN" &&
-			user.id !== workOrder.responsibleId
-		) {
+		if (user.role !== "ADMIN" && user.id !== workOrder.responsibleId) {
 			return { ok: false, message: "No Autorizado" }
 		}
 

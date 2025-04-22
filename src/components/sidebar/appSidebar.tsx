@@ -3,8 +3,8 @@
 import Image from "next/image"
 import {
 	Send,
-	User,
 	Siren,
+	Users,
 	Wrench,
 	FileText,
 	LifeBuoy,
@@ -49,6 +49,11 @@ const data = {
 			name: "Libro de Obras",
 			url: "/dashboard/libro-de-obras",
 			icon: BookCopy,
+		},
+		{
+			name: "Empleados",
+			url: "/dashboard/empleados",
+			icon: Users,
 		},
 	],
 	navAdmin: [
@@ -123,7 +128,7 @@ const navInternal = [
 	{
 		name: "Usuarios",
 		url: "/admin/dashboard/usuarios",
-		icon: User,
+		icon: Users,
 	},
 ]
 
@@ -132,7 +137,7 @@ interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ session, ...props }: AppSidebarProps) {
-	const canAccessAdminRoutes = session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"
+	const canAccessAdminRoutes = session.user.role === "ADMIN"
 	const canAccessUserRoutes = session.user.role === "USER"
 
 	const navItems = [

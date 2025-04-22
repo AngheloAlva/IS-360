@@ -53,7 +53,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size="lg"
-							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+							className="data-[state=open]:bg-primary/70 hover:bg-primary/70 data-[state=open]:text-white"
 						>
 							<Avatar className="h-8 w-8 rounded-lg">
 								<AvatarFallback className="text-primary rounded-md">

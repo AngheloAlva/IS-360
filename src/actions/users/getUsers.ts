@@ -89,7 +89,7 @@ export const getInternalUsers = async (limit: number, page: number) => {
 			skip: (page - 1) * limit,
 			where: {
 				role: {
-					in: ["ADMIN", "SUPERADMIN", "USER"],
+					in: ["ADMIN", "USER"],
 				},
 			},
 			orderBy: {
