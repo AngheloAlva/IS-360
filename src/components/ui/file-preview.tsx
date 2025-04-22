@@ -4,7 +4,7 @@ import { FileText, FileSpreadsheet, FileImage } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
 
-import { formatBytes, getFileExtension } from "@/lib/utils"
+import { cn, formatBytes, getFileExtension } from "@/lib/utils"
 
 import { Card, CardContent, CardHeader, CardTitle } from "./card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
@@ -13,14 +13,16 @@ import type { FileSchema } from "@/lib/form-schemas/document-management/file.sch
 
 interface FilePreviewProps {
 	file: FileSchema | null
+	className?: string
 }
 
-export function FilePreview({ file }: FilePreviewProps) {
+export function FilePreview({ file, className }: FilePreviewProps) {
 	const [activeTab, setActiveTab] = useState("preview")
+	console.log(file)
 
 	if (!file)
 		return (
-			<Card className="h-fit min-w-72 xl:min-w-[30rem]">
+			<Card className={cn("h-fit min-w-72 xl:min-w-[30rem]", className)}>
 				<CardHeader>
 					<CardTitle className="text-lg font-medium">Vista Previa</CardTitle>
 				</CardHeader>
@@ -33,7 +35,7 @@ export function FilePreview({ file }: FilePreviewProps) {
 		)
 
 	return (
-		<Card className="h-fit min-w-72 xl:min-w-[30rem]">
+		<Card className={cn("h-fit min-w-72 xl:min-w-[30rem]", className)}>
 			<CardHeader>
 				<CardTitle className="text-lg font-medium">Vista Previa</CardTitle>
 			</CardHeader>

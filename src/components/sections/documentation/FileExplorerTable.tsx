@@ -14,6 +14,7 @@ import {
 	FolderCheck,
 	FolderClock,
 	FolderHeart,
+	FileArchive,
 	Image as ImageIcon,
 } from "lucide-react"
 
@@ -33,25 +34,33 @@ interface FileExplorerTableProps {
 	userId: string
 	areaValue: AREAS
 	lastPath?: string
+	backPath?: string
 	foldersSlugs: string[]
-	actualFolderSlug?: string | null
+	actualFolderId?: string | null
 }
 
 export function FileExplorerTable({
 	userId,
 	lastPath,
+	backPath,
 	areaValue,
 	foldersSlugs,
-	actualFolderSlug = null,
+	actualFolderId = null,
 }: FileExplorerTableProps) {
 	const getFileIcon = (type: string) => {
 		switch (true) {
-			case type.includes("document"):
+			case type.includes("pdf"):
 				return <FileText className="min-h-6 min-w-6 text-red-600" />
 			case type.includes("image"):
-				return <ImageIcon className="min-h-6 min-w-6 text-blue-600" />
+				return <ImageIcon className="min-h-6 min-w-6 text-yellow-600" />
 			case type.includes("excel"):
 				return <Sheet className="min-h-6 min-w-6 text-green-600" />
+			case type.includes("sheet"):
+				return <Sheet className="min-h-6 min-w-6 text-green-600" />
+			case type.includes("zip"):
+				return <FileArchive className="min-h-6 min-w-6 text-purple-600" />
+			case type.includes("word"):
+				return <FileText className="min-h-6 min-w-6 text-blue-600" />
 			default:
 				return <FileText className="min-h-6 min-w-6 text-red-600" />
 		}
@@ -76,7 +85,7 @@ export function FileExplorerTable({
 
 	const { data, isLoading } = useDocuments({
 		area: areaValue,
-		folderSlug: actualFolderSlug,
+		folderId: actualFolderId,
 	})
 
 	return (
@@ -97,7 +106,7 @@ export function FileExplorerTable({
 								<div className="flex items-center gap-2">
 									{getFolderIcon(item.area)}
 									<Link
-										href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug}`}
+										href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug + "_" + item.id}`}
 										className="pr-6 font-medium hover:underline"
 									>
 										{item.name}
@@ -107,6 +116,15 @@ export function FileExplorerTable({
 								{item.description && (
 									<p className="text-muted-foreground line-clamp-2 text-sm">{item.description}</p>
 								)}
+
+								<div className="mt-2 flex w-full items-center justify-end">
+									<span className={cn("w-fit rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-500", {
+										"bg-amber-500/10 text-amber-500": item._count.files > 10,
+										"bg-red-500/10 text-red-500": item._count.files > 15
+									})}>
+										{item._count.files} archivos
+									</span>
+								</div>
 
 								<div className="absolute top-4 right-4 flex gap-1">
 									<Popover>
@@ -123,6 +141,9 @@ export function FileExplorerTable({
 												<div className="space-y-1">
 													<h4 className="font-medium">Información de la carpeta</h4>
 													<p className="text-muted-foreground text-sm">
+														Creado por: <span className="font-semibold">{item.user?.name}</span>
+													</p>
+													<p className="text-muted-foreground text-sm">
 														Última actualización:{" "}
 														<span className="font-semibold">
 															{formatDistanceToNow(item.updatedAt, {
@@ -136,7 +157,7 @@ export function FileExplorerTable({
 												{item.userId === userId && (
 													<div className="mt-4 flex gap-2">
 														<Link
-															href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}`}
+															href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
 															className="w-full"
 														>
 															<Button className="hover:bg-primary w-full hover:brightness-90">
@@ -149,7 +170,7 @@ export function FileExplorerTable({
 															name={item.name}
 															type="folder"
 															area={areaValue}
-															folderSlug={actualFolderSlug}
+															folderId={actualFolderId}
 														/>
 													</div>
 												)}
@@ -248,7 +269,7 @@ export function FileExplorerTable({
 												{/* {item.userId === userId && ( */}
 												<div className="mt-4 flex gap-2">
 													<Link
-														href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}`}
+														href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
 														className="w-full"
 													>
 														<Button className="hover:bg-primary w-full hover:brightness-90">
@@ -257,11 +278,11 @@ export function FileExplorerTable({
 														</Button>
 													</Link>
 													<DeleteConfirmationDialog
+														type="file"
 														id={item.id}
 														name={item.name}
-														type="file"
 														area={areaValue}
-														folderSlug={actualFolderSlug}
+														folderId={actualFolderId}
 													/>
 												</div>
 												{/* )} */}
@@ -274,9 +295,11 @@ export function FileExplorerTable({
 					))}
 
 					{data?.folders?.length === 0 && data?.files?.length === 0 && (
-						<div className="text-text bg-primary/10 border-primary col-span-full mx-auto flex items-center gap-2 rounded-xl border px-8 py-4 text-center font-medium">
+
+						<div className="text-text bg-primary/10 border-primary mx-auto col-span-full mt-20 flex items-center gap-2 rounded-xl border px-8 py-4 text-center font-medium">
 							<Info className="text-primary h-7 w-7" />
 							No hay archivos ni carpetas en esta ubicación
+
 						</div>
 					)}
 				</>

@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
 						}
 					: {}),
 				isActive: true,
+				isExternal: false,
 			},
 			include: {
 				user: {

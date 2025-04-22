@@ -22,7 +22,7 @@ export default async function AddNewFilePage(props: { searchParams: SearchParams
 
 	const searchParams = await props.searchParams
 	const area = searchParams.area as string
-	const parentFolderSlug = searchParams.parentFolderSlug as string | undefined
+	const parentFolderId = searchParams.parentFolderId as string | undefined
 	const backPath = searchParams.backPath as string | undefined
 
 	return (
@@ -36,7 +36,7 @@ export default async function AddNewFilePage(props: { searchParams: SearchParams
 				area={area}
 				backPath={backPath}
 				userId={res.user.id}
-				folderSlug={parentFolderSlug}
+				parentFolderId={parentFolderId}
 			/>
 		</>
 	)

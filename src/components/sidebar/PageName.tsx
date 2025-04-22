@@ -17,12 +17,17 @@ export default function PageName({ externalPath }: { externalPath: boolean }): R
 	return (
 		<Breadcrumb className="hidden md:block">
 			<BreadcrumbList>
-				{path.map((item, i) => (
-					<BreadcrumbItem key={i}>
-						<BreadcrumbPage className="capitalize">{item.split("-").join(" ")}</BreadcrumbPage>
-						{i < path.length - 1 && <BreadcrumbSeparator />}
-					</BreadcrumbItem>
-				))}
+				{path.map((item, i) => {
+					const slug = item.split("_")
+					const name = slug[0].split("-").join(" ")
+
+					return (
+						<BreadcrumbItem key={i}>
+							<BreadcrumbPage className="capitalize">{name}</BreadcrumbPage>
+							{i < path.length - 1 && <BreadcrumbSeparator />}
+						</BreadcrumbItem>
+					)
+				})}
 			</BreadcrumbList>
 		</Breadcrumb>
 	)

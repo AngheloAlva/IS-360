@@ -12,7 +12,7 @@ export const folderFormSchema = z.object({
 	area: z.enum(AreasValuesArray, { message: "El área es requerida" }),
 	type: z.string().optional(),
 
-	parentSlug: z.string().optional(),
+	parentFolderId: z.string().optional(),
 })
 
 export type FolderFormSchema = z.infer<typeof folderFormSchema>

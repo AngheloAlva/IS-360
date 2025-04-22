@@ -415,14 +415,20 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 				return commandProps.filter
 			}
 
-			if (creatable) {
-				return (value: string, search: string) => {
-					return value.toLowerCase().includes(search.toLowerCase()) ? 1 : -1
-				}
+			return (value: string, search: string) => {
+				const option = Object.values(options)
+					.flat()
+					.find((opt) => opt.value === value)
+
+				if (!option) return -1
+
+				const label = option.label.toLowerCase()
+				const searchLower = search.toLowerCase()
+
+				if (label.includes(searchLower)) return 1
+				return -1
 			}
-			// Using default filter in `cmdk`. We don&lsquo;t have to provide it.
-			return undefined
-		}, [creatable, commandProps?.filter])
+		}, [options, commandProps?.filter])
 
 		return (
 			<Command
@@ -440,7 +446,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 			>
 				<div
 					className={cn(
-						"focus-within:border-ring focus-within:ring-ring/50 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive relative min-h-[38px] rounded-md border border-gray-200 text-sm text-neutral-700 transition-[color,box-shadow] outline-none focus-within:ring-[3px] has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
+						"focus-within:border-ring focus-within:ring-ring/50 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive border-input relative min-h-[38px] rounded-md border text-sm text-neutral-700 transition-[color,box-shadow] outline-none focus-within:ring-[3px] has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
 						{
 							"p-1": selected.length !== 0,
 							"cursor-text": !disabled && selected.length !== 0,
@@ -510,7 +516,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 							}}
 							placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? "" : placeholder}
 							className={cn(
-								"placeholder:text-muted-foreground/70 flex-1 bg-transparent outline-hidden disabled:cursor-not-allowed",
+								"placeholder:text-muted-foreground/70 text-text flex-1 bg-transparent outline-hidden disabled:cursor-not-allowed",
 								{
 									"w-full": hidePlaceholderWhenSelected,
 									"px-3 py-2": selected.length === 0,
@@ -542,7 +548,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 				<div className="relative">
 					<div
 						className={cn(
-							"absolute top-2 z-10 w-full overflow-hidden rounded-md border border-gray-200 text-neutral-700",
+							"border-input absolute top-2 z-10 w-full overflow-hidden rounded-md border text-neutral-700",
 							"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
 							!open && "hidden"
 						)}

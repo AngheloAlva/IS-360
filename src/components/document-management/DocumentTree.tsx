@@ -38,11 +38,11 @@ const TreeNode = memo(function TreeNode({
 	expandedNodes: Set<string>
 	loadingNodes: Set<string>
 	loadedNodes: Record<string, TreeNode[]>
-	onToggle: (nodeId: string, slug?: string) => void
+	onToggle: (nodeId: string) => void
 }) {
 	const handleToggle = useCallback(() => {
 		if (node.type === "folder") {
-			onToggle(node.id, node.slug)
+			onToggle(node.id)
 		}
 	}, [node, onToggle])
 
@@ -144,10 +144,10 @@ const useFetchTreeData = (areaValue: string) => {
 	const [loadingNodes, setLoadingNodes] = useState<Set<string>>(new Set())
 
 	const fetchNodeData = useCallback(
-		async (nodeId: string, slug?: string | null) => {
+		async (nodeId: string | null) => {
 			try {
 				const response = await fetch(
-					`/api/document-management/tree?area=${areaValue}${slug ? `&folderSlug=${slug}` : ""}`
+					`/api/document-management/tree?area=${areaValue}${nodeId ? `&folderId=${nodeId}` : ""}`
 				)
 				if (!response.ok) throw new Error("Error fetching node data")
 				const data = await response.json()
@@ -167,7 +167,7 @@ const useFetchTreeData = (areaValue: string) => {
 	)
 
 	const toggleNode = useCallback(
-		async (nodeId: string, slug?: string) => {
+		async (nodeId: string) => {
 			setExpandedNodes((prev) => {
 				const newExpanded = new Set(prev)
 				if (prev.has(nodeId)) {
@@ -180,7 +180,7 @@ const useFetchTreeData = (areaValue: string) => {
 
 			if (!loadedNodes[nodeId]) {
 				setLoadingNodes((prev) => new Set([...prev, nodeId]))
-				const { folders, files } = await fetchNodeData(nodeId, slug)
+				const { folders, files } = await fetchNodeData(nodeId)
 				setLoadedNodes((prev) => ({ ...prev, [nodeId]: [...folders, ...files] }))
 				setLoadingNodes((prev) => {
 					const newLoading = new Set(prev)
@@ -194,7 +194,7 @@ const useFetchTreeData = (areaValue: string) => {
 
 	useEffect(() => {
 		const initializeTree = async () => {
-			const { folders, files } = await fetchNodeData("root", null)
+			const { folders, files } = await fetchNodeData(null)
 			setLoadedNodes((prev) => ({ ...prev, root: [...folders, ...files] }))
 		}
 

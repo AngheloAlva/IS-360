@@ -33,7 +33,7 @@ interface DeleteConfirmationDialogProps {
 	area: AREAS
 	name: string
 	type: "file" | "folder"
-	folderSlug: string | null
+	folderId: string | null
 }
 
 export default function DeleteConfirmationDialog({
@@ -41,7 +41,7 @@ export default function DeleteConfirmationDialog({
 	type,
 	name,
 	area,
-	folderSlug,
+	folderId,
 }: DeleteConfirmationDialogProps) {
 	const router = useRouter()
 
@@ -69,7 +69,7 @@ export default function DeleteConfirmationDialog({
 
 	const { invalidateDocuments } = useDocuments({
 		area,
-		folderSlug,
+		folderId,
 	})
 
 	const handleDelete = async () => {

@@ -5,6 +5,7 @@ import { getFileById } from "@/actions/document-management/getFiles"
 import { auth } from "@/lib/auth"
 
 import { UpdateFileForm } from "@/components/forms/document-management/UpdateFileForm"
+import BackButton from "@/components/shared/BackButton"
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 type Params = Promise<{ fileId: string }>
@@ -29,11 +30,16 @@ export default async function UpdateFilePage(props: {
 	}
 
 	const searchParams = await props.searchParams
+	const area = searchParams.area as string
 	const lastPath = searchParams.lastPath as string | undefined
+	const backPath = searchParams.backPath as string | undefined
 
 	return (
 		<>
-			<h1 className="w-fit text-3xl font-bold">Actualizar Archivo</h1>
+			<div className="flex w-full items-center justify-start gap-2">
+				<BackButton href={backPath || `/dashboard/documentacion/${area}`} />
+				<h1 className="text-text w-fit text-3xl font-bold">Actualizar Archivo</h1>
+			</div>
 
 			<UpdateFileForm fileId={fileId} lastPath={lastPath} userId={res.user.id} initialData={data} />
 		</>

@@ -6,6 +6,9 @@ export interface Folder extends FolderType {
 	user: {
 		name: string
 	}
+	_count: {
+		files: number
+	}
 }
 
 export interface File extends FileType {
@@ -22,18 +25,18 @@ interface DocumentsResponse {
 
 interface UseDocumentsParams {
 	area: AREAS
-	folderSlug: string | null
+	folderId: string | null
 }
 
-export const useDocuments = ({ area, folderSlug }: UseDocumentsParams) => {
+export const useDocuments = ({ area, folderId }: UseDocumentsParams) => {
 	const queryClient = useQueryClient()
 
 	const query = useQuery<DocumentsResponse>({
-		queryKey: ["documents", { area, folderSlug }],
+		queryKey: ["documents", { area, folderId }],
 		queryFn: async () => {
 			const searchParams = new URLSearchParams()
 			searchParams.set("area", area.toString())
-			if (folderSlug) searchParams.set("folderSlug", folderSlug)
+			if (folderId) searchParams.set("folderId", folderId)
 
 			const res = await fetch(`/api/documents?${searchParams.toString()}`)
 			if (!res.ok) throw new Error("Error fetching documents")
@@ -45,7 +48,7 @@ export const useDocuments = ({ area, folderSlug }: UseDocumentsParams) => {
 	})
 
 	const invalidateDocuments = () => {
-		return queryClient.invalidateQueries({ queryKey: ["documents", { area, folderSlug }] })
+		return queryClient.invalidateQueries({ queryKey: ["documents", { area, folderId }] })
 	}
 
 	return {

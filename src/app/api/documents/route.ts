@@ -8,17 +8,18 @@ export async function GET(req: NextRequest) {
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const area = searchParams.get("area") as AREAS
-		const folderSlug = searchParams.get("folderSlug") || null
+		const folderId = searchParams.get("folderId") || null
 
 		const [files, folders] = await Promise.all([
 			prisma.file.findMany({
 				where: {
 					OR: [
 						{
-							folder: folderSlug ? { slug: folderSlug } : null,
+							folder: folderId ? { id: folderId } : null,
 							area,
 						},
 					],
+					isExternal: false,
 					isActive: true,
 				},
 				include: {
@@ -39,11 +40,23 @@ export async function GET(req: NextRequest) {
 				},
 			}),
 			prisma.folder.findMany({
-				where: { area, parent: folderSlug ? { slug: folderSlug } : null, isActive: true },
+				where: {
+					area,
+					parent: folderId ? { id: folderId } : null,
+					isActive: true,
+					isExternal: false,
+				},
 				include: {
 					user: {
 						select: {
 							name: true,
+						},
+					},
+					_count: {
+						select: {
+							files: {
+								where: { isActive: true },
+							},
 						},
 					},
 				},

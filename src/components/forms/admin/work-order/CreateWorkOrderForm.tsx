@@ -123,7 +123,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 
 			const equipments = data.map((equipment) => ({
 				value: equipment.id,
-				label: equipment.tag + " - " + equipment.name,
+				label: equipment.name,
 			}))
 
 			setEquipments(equipments)

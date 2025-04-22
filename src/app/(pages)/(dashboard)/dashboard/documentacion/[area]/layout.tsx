@@ -1,4 +1,4 @@
-import { DocumentTree } from "@/components/document-management/document-tree"
+import { DocumentTree } from "@/components/document-management/DocumentTree"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 
 type Params = Promise<{ area: string }>

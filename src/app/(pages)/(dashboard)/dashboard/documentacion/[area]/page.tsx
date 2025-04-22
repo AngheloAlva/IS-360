@@ -59,6 +59,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 				areaValue={areaValue}
 				foldersSlugs={[area]}
 				userId={data.user.id}
+				backPath="/dashboard/documentacion"
 				lastPath={"/dashboard/documentacion/" + area}
 			/>
 

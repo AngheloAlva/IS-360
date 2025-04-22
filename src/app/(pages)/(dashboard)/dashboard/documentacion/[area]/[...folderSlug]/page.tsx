@@ -18,7 +18,7 @@ interface PageProps {
 }
 
 export default async function DocumentsFilesPage({ params }: PageProps) {
-	const { area, folderSlug } = await params
+	const { area, folderSlug: fullFolderSlugs } = await params
 
 	const data = await auth.api.getSession({
 		headers: await headers(),
@@ -28,18 +28,20 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 		return notFound()
 	}
 
+	const folderId = fullFolderSlugs[fullFolderSlugs.length - 1].split("_")[1]
+
 	const areaName = Areas[area as keyof typeof Areas]["title"]
 	const areaValue = Areas[area as keyof typeof Areas]["value"]
-	const lastFolder = folderSlug[folderSlug.length - 1]
+	const lastFolder = fullFolderSlugs[fullFolderSlugs.length - 1].split("_")[0]
 
 	const backPath =
-		folderSlug.length >= 1
-			? `/dashboard/documentacion/${area}/${folderSlug.slice(0, -1).join("/")}`
+		fullFolderSlugs.length >= 1
+			? `/dashboard/documentacion/${area}/${fullFolderSlugs.slice(0, -1).join("/")}`
 			: `/dashboard/documentacion/${area}`
 
 	const lastPath =
-		folderSlug.length >= 1
-			? `/dashboard/documentacion/${area}/${folderSlug.join("/")}`
+		fullFolderSlugs.length >= 1
+			? `/dashboard/documentacion/${area}/${fullFolderSlugs.join("/")}`
 			: `/dashboard/documentacion/${area}`
 
 	return (
@@ -53,7 +55,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 
 				<div className="hidden gap-2 md:flex md:gap-3">
 					<Link
-						href={`/dashboard/documentacion/nuevo-archivo?area=${area}&parentFolderSlug=${lastFolder}&backPath=${lastPath}`}
+						href={`/dashboard/documentacion/nuevo-archivo?area=${area}&parentFolderId=${folderId}&backPath=${lastPath}`}
 					>
 						<Button size={"lg"} className="bg-green-600 text-white">
 							<UploadIcon className="h-4 w-4" />
@@ -62,7 +64,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 					</Link>
 
 					<Link
-						href={`/dashboard/documentacion/nueva-carpeta?area=${area}&isRootFolder=false&parentFolderSlug=${lastFolder}&backPath=${lastPath}`}
+						href={`/dashboard/documentacion/nueva-carpeta?area=${area}&isRootFolder=false&parentFolderId=${folderId}&backPath=${lastPath}`}
 					>
 						<Button size={"lg"}>
 							<FolderIcon className="h-4 w-4" />
@@ -74,15 +76,16 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 
 			<FileExplorerTable
 				lastPath={lastPath}
+				backPath={backPath}
 				areaValue={areaValue}
 				userId={data.user.id}
-				actualFolderSlug={lastFolder}
-				foldersSlugs={[area, ...folderSlug]}
+				actualFolderId={folderId}
+				foldersSlugs={[area, ...fullFolderSlugs]}
 			/>
 
 			<div className="mx-auto mt-6 flex items-center justify-center gap-2 md:hidden md:gap-3">
 				<Link
-					href={`/dashboard/documentacion/nuevo-archivo?area=${area}&parentFolderSlug=${lastFolder}&backPath=${lastPath}`}
+					href={`/dashboard/documentacion/nuevo-archivo?area=${area}&parentFolderId=${lastFolder}&backPath=${lastPath}`}
 					className="w-1/2 sm:w-fit"
 				>
 					<Button size={"lg"} className="w-full bg-green-600 text-xs text-white sm:text-sm">

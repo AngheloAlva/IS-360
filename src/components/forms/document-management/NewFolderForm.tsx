@@ -33,14 +33,14 @@ export default function NewFolderForm({
 	area,
 	userId,
 	backPath,
-	parentSlug,
+	parentFolderId,
 	isRootFolder = false,
 }: {
 	area: string
 	userId: string
 	backPath?: string
-	parentSlug?: string
 	isRootFolder?: boolean
+	parentFolderId?: string
 }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [errorMessage, setErrorMessage] = useState("")
@@ -57,7 +57,7 @@ export default function NewFolderForm({
 			type: "default",
 			description: "",
 			root: isRootFolder,
-			parentSlug: parentSlug || "",
+			parentFolderId: parentFolderId || "",
 		},
 	})
 

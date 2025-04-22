@@ -1,4 +1,4 @@
-import { FileFormSchema } from "@/lib/form-schemas/document-management/file.schema"
+import { FileFormSchema } from "@/lib/form-schemas/document-management/new-file.schema"
 import prisma from "@/lib/prisma"
 
 export async function POST(request: Request) {
@@ -6,22 +6,7 @@ export async function POST(request: Request) {
 		const formData = await request.formData()
 		const files = formData.getAll("files") as File[]
 		const data = JSON.parse(formData.get("data") as string) as Omit<FileFormSchema, "files">
-		const { folderSlug, userId, code, otherCode, ...rest } = data
-
-		// Buscar la carpeta si se proporciona un folderSlug
-		let folderId: string | null = null
-		if (folderSlug) {
-			const foundFolder = await prisma.folder.findFirst({
-				where: { slug: folderSlug },
-				select: { id: true },
-			})
-
-			if (!foundFolder) {
-				return Response.json({ error: "Carpeta no encontrada" }, { status: 404 })
-			}
-
-			folderId = foundFolder.id
-		}
+		const { parentFolderId, userId, code, otherCode, ...rest } = data
 
 		// Subir archivos a Azure y crear registros en la base de datos
 		const results = await Promise.all(
@@ -74,7 +59,7 @@ export async function POST(request: Request) {
 						registrationDate: new Date(),
 						user: { connect: { id: userId } },
 						code: code || otherCode,
-						...(folderId ? { folder: { connect: { id: folderId } } } : {}),
+						...(parentFolderId ? { folder: { connect: { id: parentFolderId } } } : {}),
 					},
 				})
 			})

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma"
 
 import type { UpdateFileSchema } from "@/lib/form-schemas/document-management/update-file.schema.ts"
 
-interface UpdateFileParams extends UpdateFileSchema {
+interface UpdateFileParams extends Omit<UpdateFileSchema, "file"> {
 	fileId: string
 	url: string
 	size: number

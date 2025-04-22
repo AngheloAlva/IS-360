@@ -24,7 +24,7 @@ export default async function AddNewFolderPage(props: { searchParams: SearchPara
 	const searchParams = await props.searchParams
 	const area = searchParams.area as keyof typeof Areas
 	const isRootFolder = Boolean(searchParams.isRootFolder)
-	const parentFolderSlug = searchParams.parentFolderSlug as string | undefined
+	const parentFolderId = searchParams.parentFolderId as string | undefined
 	const backPath = searchParams.backPath as string | undefined
 
 	return (
@@ -39,7 +39,7 @@ export default async function AddNewFolderPage(props: { searchParams: SearchPara
 				backPath={backPath}
 				userId={res.user.id}
 				isRootFolder={isRootFolder}
-				parentSlug={parentFolderSlug}
+				parentFolderId={parentFolderId}
 			/>
 		</>
 	)

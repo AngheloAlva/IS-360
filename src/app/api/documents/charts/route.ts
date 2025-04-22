@@ -15,7 +15,7 @@ export async function GET() {
 	const areaData = await Promise.all(
 		areas.map(async (area) => {
 			const count = await prisma.folder.findMany({
-				where: { area, isActive: true },
+				where: { area, isActive: true, isExternal: false },
 				include: {
 					_count: {
 						select: {

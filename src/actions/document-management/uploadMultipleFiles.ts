@@ -1,6 +1,6 @@
 "use server"
 
-import { FileFormSchema } from "@/lib/form-schemas/document-management/file.schema"
+import { FileFormSchema } from "@/lib/form-schemas/document-management/new-file.schema"
 import prisma from "@/lib/prisma"
 import { AREAS } from "@prisma/client"
 
@@ -18,13 +18,23 @@ interface UploadMultipleFilesProps {
 
 export async function uploadMultipleFiles({ values, files }: UploadMultipleFilesProps) {
 	try {
-		const { folderSlug, userId, code, otherCode, area, name, description, registrationDate, expirationDate } = values
+		const {
+			area,
+			name,
+			code,
+			userId,
+			otherCode,
+			description,
+			expirationDate,
+			parentFolderId,
+			registrationDate,
+		} = values
 
 		// Buscar la carpeta si se proporciona un folderSlug
 		let folderId: string | null = null
-		if (folderSlug) {
+		if (parentFolderId) {
 			const foundFolder = await prisma.folder.findFirst({
-				where: { slug: folderSlug },
+				where: { id: parentFolderId },
 				select: { id: true },
 			})
 
@@ -40,16 +50,16 @@ export async function uploadMultipleFiles({ values, files }: UploadMultipleFiles
 			files.map(async (file) => {
 				return prisma.file.create({
 					data: {
+						description,
 						url: file.url,
+						expirationDate,
 						type: file.type,
 						size: file.size,
-						name: name || file.name,
-						area: area as AREAS,
-						description,
 						registrationDate,
-						expirationDate,
-						user: { connect: { id: userId } },
+						area: area as AREAS,
+						name: name || file.name,
 						code: code || otherCode,
+						user: { connect: { id: userId } },
 						...(folderId ? { folder: { connect: { id: folderId } } } : {}),
 					},
 				})

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
 	try {
 		const searchParams = request.nextUrl.searchParams
 		const area = searchParams.get("area")
-		const folderSlug = searchParams.get("folderSlug")
+		const folderId = searchParams.get("folderId")
 
 		if (!area) {
 			return Response.json({ error: "Area is required" }, { status: 400 })
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 		const folders = await prisma.folder.findMany({
 			where: {
 				area: area as AREAS,
-				parent: folderSlug ? { slug: folderSlug } : null,
+				parentId: folderId || null,
 				isActive: true,
 			},
 			select: {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 		const files = await prisma.file.findMany({
 			where: {
-				folder: folderSlug ? { slug: folderSlug } : null,
+				folderId: folderId || null,
 				area: area as AREAS,
 				isActive: true,
 			},

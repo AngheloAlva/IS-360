@@ -1,23 +1,21 @@
 "use server"
 
-import type { FolderFormSchema } from "@/lib/form-schemas/document-management/folder.schema"
 import { generateSlug } from "@/lib/generateSlug"
 import prisma from "@/lib/prisma"
 
+import type { FolderFormSchema } from "@/lib/form-schemas/document-management/folder.schema"
+
 export const createFolder = async (values: FolderFormSchema) => {
 	try {
-		const { parentSlug, userId, ...rest } = values
+		const { parentFolderId, userId, ...rest } = values
 
 		const newFolderSlug = generateSlug(rest.name)
 
-		let parentId: string | null = null
-
-		// Verificar si existe una carpeta con el mismo slug en el mismo nivel
 		const existingFolder = await prisma.folder.findFirst({
 			where: {
-				slug: newFolderSlug,
 				area: rest.area,
-				parentId: parentSlug ? undefined : null, // Si no hay parentSlug, buscar en carpetas raíz
+				slug: newFolderSlug,
+				parentId: parentFolderId || null,
 			},
 		})
 
@@ -29,58 +27,21 @@ export const createFolder = async (values: FolderFormSchema) => {
 			}
 		}
 
-		if (parentSlug) {
-			const foundParent = await prisma.folder.findFirst({
-				where: {
-					slug: parentSlug,
-					area: rest.area,
-				},
-				select: {
-					id: true,
-				},
-			})
-
-			if (!foundParent) {
-				return { ok: false, message: "Carpeta padre no encontrada" }
-			}
-
-			parentId = foundParent.id
-		}
-
-		let connections: {
-			user: {
-				connect: {
-					id: string
-				}
-			}
-			parent?: {
-				connect: {
-					id: string
-				}
-			}
-		} = {
-			user: {
-				connect: {
-					id: userId,
-				},
-			},
-		}
-
-		if (parentSlug && parentId !== null) {
-			connections = {
-				...connections,
-				parent: {
-					connect: {
-						id: parentId,
-					},
-				},
-			}
-		}
-
 		const folder = await prisma.folder.create({
 			data: {
 				...rest,
-				...connections,
+				...(parentFolderId && {
+					parent: {
+						connect: {
+							id: parentFolderId,
+						},
+					},
+				}),
+				user: {
+					connect: {
+						id: userId,
+					},
+				},
 				slug: newFolderSlug,
 			},
 		})
