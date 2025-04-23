@@ -1,9 +1,9 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { useState } from "react"
 import { toast } from "sonner"
 
 import { updateFile } from "@/actions/document-management/updateFile"
@@ -22,7 +22,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import type { File as PrismaFile } from "@prisma/client"
 import SubmitButton from "../shared/SubmitButton"
 import { Form } from "@/components/ui/form"
-import { uploadFilesToCloud } from "@/lib/upload-files"
+import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 import { FilePreview } from "@/components/ui/file-preview"
 
 interface UpdateFileFormProps {
@@ -64,27 +64,35 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 		const file = values.file[0]
 
 		try {
-			const uploadResult = await uploadFilesToCloud({
-				containerType: 'documents',
-				files: [file],
-				randomString: userId,
-				secondaryName: values.name,
-			})
+			let uploadResult: UploadResult[] | undefined
+
+			if (file.file) {
+				const uploadResultTemp = await uploadFilesToCloud({
+					containerType: 'documents',
+					files: [file],
+					randomString: userId,
+					secondaryName: values.name,
+				})
+
+				if (!uploadResultTemp[0].url) throw new Error("Error al subir el archivo")
+
+				uploadResult = uploadResultTemp
+			}
 
 			const saveResult = await updateFile({
 				fileId,
 				userId,
 				code: values.code,
 				name: values.name,
-				url: uploadResult[0].url,
-				size: uploadResult[0].size,
-				type: uploadResult[0].type,
 				otherCode: values.otherCode,
 				previousUrl: initialData.url,
 				previousName: initialData.name,
 				description: values.description,
 				expirationDate: values.expirationDate,
 				registrationDate: values.registrationDate,
+				url: uploadResult ? uploadResult[0].url : initialData.url,
+				size: uploadResult ? uploadResult[0].size : initialData.size,
+				type: uploadResult ? uploadResult[0].type : initialData.type,
 			})
 
 			if (!saveResult.ok) throw new Error(saveResult.error || "Error al guardar metadatos")
@@ -101,10 +109,6 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 			setUploading(false)
 		}
 	}
-
-	useEffect(() => {
-		console.log(form.formState.errors)
-	}, [form.formState.errors])
 
 	const codeIsOther = form.watch("code") === CodesValues.OTRO
 

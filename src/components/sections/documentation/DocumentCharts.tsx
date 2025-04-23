@@ -4,6 +4,7 @@ import { useDocumentsCharts } from "@/hooks/documents/use-documents-charts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DocumentExpirationBarChart } from "./DocumentExpirationBarChart"
 import { RecentChangesTable } from "./RecentChangesTable"
 import { LineChart } from "./LineChart"
 import { PieChart } from "./PieChart"
@@ -12,7 +13,6 @@ import { Metadata } from "./Metadata"
 
 export default function DocumentCharts() {
 	const { data } = useDocumentsCharts()
-	console.log(data)
 
 	return (
 		<div className="w-full flex-1 space-y-4">
@@ -91,7 +91,7 @@ export default function DocumentCharts() {
 								<CardDescription>Documentos por período de vencimiento</CardDescription>
 							</CardHeader>
 							<CardContent className="pl-2">
-								<BarChart
+								<DocumentExpirationBarChart
 									data={data?.expirationData || []}
 									colors={[
 										"#dc2626",

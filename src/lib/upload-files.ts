@@ -7,7 +7,7 @@ interface UploadFilesToCloudProps {
 	containerType: "documents" | "files"
 }
 
-interface UploadResult {
+export interface UploadResult {
 	url: string
 	size: number
 	type: string

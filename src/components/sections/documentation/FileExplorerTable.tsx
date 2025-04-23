@@ -28,22 +28,24 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import FileComments from "./FileComments"
 
-import type { AREAS } from "@prisma/client"
+import { type AREAS, MODULES, USER_ROLE } from "@prisma/client"
 
 interface FileExplorerTableProps {
-	userId: string
 	areaValue: AREAS
 	lastPath?: string
 	backPath?: string
 	foldersSlugs: string[]
+	userRole?: USER_ROLE | null
+	userModules?: MODULES[] | null
 	actualFolderId?: string | null
 }
 
 export function FileExplorerTable({
-	userId,
 	lastPath,
 	backPath,
+	userRole,
 	areaValue,
+	userModules,
 	foldersSlugs,
 	actualFolderId = null,
 }: FileExplorerTableProps) {
@@ -154,26 +156,27 @@ export function FileExplorerTable({
 													</p>
 												</div>
 
-												{item.userId === userId && (
-													<div className="mt-4 flex gap-2">
-														<Link
-															href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
-															className="w-full"
-														>
-															<Button className="hover:bg-primary w-full hover:brightness-90">
-																<Edit className="mr-2 h-4 w-4" />
-																Editar
-															</Button>
-														</Link>
-														<DeleteConfirmationDialog
-															id={item.id}
-															name={item.name}
-															type="folder"
-															area={areaValue}
-															folderId={actualFolderId}
-														/>
-													</div>
-												)}
+												{userRole && userModules && (
+													userRole === USER_ROLE.ADMIN && (userModules.includes(MODULES.DOCUMENTATION) || userModules.includes(MODULES.ALL)) && (
+														<div className="mt-4 flex gap-2">
+															<Link
+																href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
+																className="w-full"
+															>
+																<Button className="hover:bg-primary w-full hover:brightness-90">
+																	<Edit className="mr-2 h-4 w-4" />
+																	Editar
+																</Button>
+															</Link>
+															<DeleteConfirmationDialog
+																id={item.id}
+																name={item.name}
+																type="folder"
+																area={areaValue}
+																folderId={actualFolderId}
+															/>
+														</div>
+													))}
 											</div>
 										</PopoverContent>
 									</Popover>
@@ -266,26 +269,29 @@ export function FileExplorerTable({
 													</div>
 												</div>
 
-												{/* {item.userId === userId && ( */}
-												<div className="mt-4 flex gap-2">
-													<Link
-														href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
-														className="w-full"
-													>
-														<Button className="hover:bg-primary w-full hover:brightness-90">
-															<Edit className="mr-2 h-4 w-4" />
-															Editar
-														</Button>
-													</Link>
-													<DeleteConfirmationDialog
-														type="file"
-														id={item.id}
-														name={item.name}
-														area={areaValue}
-														folderId={actualFolderId}
-													/>
-												</div>
-												{/* )} */}
+
+												{userRole && userModules && (
+													userRole === USER_ROLE.ADMIN && (userModules.includes(MODULES.DOCUMENTATION) || userModules.includes(MODULES.ALL)) && (
+
+														<div className="mt-4 flex gap-2">
+															<Link
+																href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
+																className="w-full"
+															>
+																<Button className="hover:bg-primary w-full hover:brightness-90">
+																	<Edit className="mr-2 h-4 w-4" />
+																	Editar
+																</Button>
+															</Link>
+															<DeleteConfirmationDialog
+																type="file"
+																id={item.id}
+																name={item.name}
+																area={areaValue}
+																folderId={actualFolderId}
+															/>
+														</div>
+													))}
 											</div>
 										</PopoverContent>
 									</Popover>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip } from "recharts"
+import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip, Legend } from "recharts"
 
 import { Card } from "@/components/ui/card"
 
@@ -18,12 +18,11 @@ export function PieChart({ data, colors }: PieChartProps) {
 			<RechartsPieChart>
 				<Pie
 					cx="50%"
-					cy="50%"
+					cy="45%"
 					fill="#8884d8"
 					nameKey="name"
 					dataKey="value"
 					outerRadius={80}
-					labelLine={false}
 					data={filteredData}
 				>
 					{filteredData.map((entry, index) => (
@@ -38,6 +37,15 @@ export function PieChart({ data, colors }: PieChartProps) {
 						/>
 					))}
 				</Pie>
+
+				<Legend
+					lang="es"
+
+					align="center"
+					layout="horizontal"
+					className="text-sm"
+					verticalAlign="bottom"
+				/>
 
 				<Tooltip
 					content={({ active, payload }) => {

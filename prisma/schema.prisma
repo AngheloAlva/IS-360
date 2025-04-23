@@ -40,6 +40,15 @@ enum AREAS {
   PROJECTS // Proyectos
 }
 
+enum MODULES {
+  ALL // Todo
+  EQUIPMENT // Equipos
+  SAFETY_TALK // Charlas de seguridad
+  WORK_ORDERS // Ordenes de Trabajo
+  WORK_PERMITS // Permisos de Trabajo
+  DOCUMENTATION // Documentacion
+}
+
 model User {
   id               String            @id
   name             String
@@ -49,6 +58,7 @@ model User {
   phone            String?
   createdAt        DateTime
   updatedAt        DateTime
+  modules          MODULES[]
   role             USER_ROLE         @default(PARTNER_COMPANY)
   internalRole     OTC_INTERNAL_ROLE @default(NONE)
   area             AREAS?

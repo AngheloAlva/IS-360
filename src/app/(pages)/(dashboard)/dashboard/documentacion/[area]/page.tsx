@@ -10,6 +10,8 @@ import { FileExplorerTable } from "@/components/sections/documentation/FileExplo
 import BackButton from "@/components/shared/BackButton"
 import { Button } from "@/components/ui/button"
 
+import type { MODULES, USER_ROLE } from "@prisma/client"
+
 interface PageProps {
 	params: Promise<{
 		area: string
@@ -58,7 +60,8 @@ export default async function AreaRootPage({ params }: PageProps) {
 			<FileExplorerTable
 				areaValue={areaValue}
 				foldersSlugs={[area]}
-				userId={data.user.id}
+				userRole={data.user.role as USER_ROLE}
+				userModules={data.user.modules as MODULES[]}
 				backPath="/dashboard/documentacion"
 				lastPath={"/dashboard/documentacion/" + area}
 			/>

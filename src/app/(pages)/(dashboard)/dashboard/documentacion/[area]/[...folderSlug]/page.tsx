@@ -10,6 +10,8 @@ import { FileExplorerTable } from "@/components/sections/documentation/FileExplo
 import BackButton from "@/components/shared/BackButton"
 import { Button } from "@/components/ui/button"
 
+import type { MODULES, USER_ROLE } from "@prisma/client"
+
 interface PageProps {
 	params: Promise<{
 		area: string
@@ -78,9 +80,10 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 				lastPath={lastPath}
 				backPath={backPath}
 				areaValue={areaValue}
-				userId={data.user.id}
 				actualFolderId={folderId}
+				userRole={data.user.role as USER_ROLE}
 				foldersSlugs={[area, ...fullFolderSlugs]}
+				userModules={data.user.modules as MODULES[]}
 			/>
 
 			<div className="mx-auto mt-6 flex items-center justify-center gap-2 md:hidden md:gap-3">

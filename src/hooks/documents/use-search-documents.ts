@@ -16,16 +16,18 @@ interface UseDocumentsParams {
 	page: number
 	limit: number
 	search: string
+	expiration?: string
 }
 
-export const useSearchDocuments = ({ page, limit, search }: UseDocumentsParams) => {
+export const useSearchDocuments = ({ page, limit, search, expiration = "all" }: UseDocumentsParams) => {
 	return useQuery<DocumentsResponse>({
-		queryKey: ["documents", { search }],
+		queryKey: ["documents", { search, expiration }],
 		queryFn: async () => {
 			const searchParams = new URLSearchParams()
 			searchParams.set("limit", limit.toString())
 			searchParams.set("page", page.toString())
 			searchParams.set("search", search)
+			searchParams.set("expiration", expiration)
 
 			const res = await fetch(`/api/documents/search?${searchParams.toString()}`)
 			if (!res.ok) throw new Error("Error fetching documents")

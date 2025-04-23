@@ -59,6 +59,10 @@ export const updateFile = async ({
 			},
 		})
 
+		if (url === previousUrl) {
+			return { ok: true, data: updatedFile }
+		}
+
 		await prisma.fileHistory.create({
 			data: {
 				file: {

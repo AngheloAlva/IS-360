@@ -7,6 +7,7 @@ import { AreasValues } from "@/lib/consts/areas"
 import prisma from "@/lib/prisma"
 
 import type { AREAS } from "@prisma/client"
+import { DocumentExpirations } from "@/lib/consts/document-expirations"
 
 export async function GET() {
 	// Get documents by area
@@ -244,31 +245,38 @@ export async function GET() {
 		})),
 		expirationData: [
 			{
-				name: "Vencido",
+				id: DocumentExpirations[0].id,
+				name: DocumentExpirations[0].name,
 				value: expirationData[0],
 			},
 			{
-				name: "Vence esta semana",
+				id: DocumentExpirations[1].id,
+				name: DocumentExpirations[1].name,
 				value: expirationData[1],
 			},
 			{
-				name: "Vence en 8-15 días",
+				id: DocumentExpirations[2].id,
+				name: DocumentExpirations[2].name,
 				value: expirationData[2],
 			},
 			{
-				name: "Vence en 16-30 días",
+				id: DocumentExpirations[3].id,
+				name: DocumentExpirations[3].name,
 				value: expirationData[3],
 			},
 			{
-				name: "Vence en 31-60 días",
+				id: DocumentExpirations[4].id,
+				name: DocumentExpirations[4].name,
 				value: expirationData[4],
 			},
 			{
-				name: "Vence en 61-90 días",
+				id: DocumentExpirations[5].id,
+				name: DocumentExpirations[5].name,
 				value: expirationData[5],
 			},
 			{
-				name: "Vence después de 90 días",
+				id: DocumentExpirations[6].id,
+				name: DocumentExpirations[6].name,
 				value: expirationData[6],
 			},
 		],

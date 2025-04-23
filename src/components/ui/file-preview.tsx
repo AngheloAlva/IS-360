@@ -18,7 +18,6 @@ interface FilePreviewProps {
 
 export function FilePreview({ file, className }: FilePreviewProps) {
 	const [activeTab, setActiveTab] = useState("preview")
-	console.log(file)
 
 	if (!file)
 		return (

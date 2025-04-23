@@ -7,6 +7,7 @@ export interface AreaDaum {
 }
 
 export interface ExpirationDaum {
+	id: string
 	name: string
 	value: number
 }

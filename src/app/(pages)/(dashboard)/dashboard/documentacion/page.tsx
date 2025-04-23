@@ -20,7 +20,7 @@ export default function DocumentationPage(): React.ReactElement {
 					<Link href="/dashboard/documentacion/busqueda">
 						<Button size={"lg"} className="bg-indigo-500 text-white">
 							<Search className="min-h-5 min-w-5" />
-							<span className="hidden md:block">Búsqueda</span>
+							<span className="hidden md:block">Búsqueda y Vencimiento</span>
 						</Button>
 					</Link>
 
