@@ -23,7 +23,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const role = row.getValue("role") as string
 			const isSupervisor = row.getValue("isSupervisor") as boolean
 
-			if (role !== "PARTNER_COMPANY") {
+			if (role !== USER_ROLE.SUPERVISOR && role !== USER_ROLE.PARTNER_COMPANY) {
 				return <div>OTC</div>
 			}
 

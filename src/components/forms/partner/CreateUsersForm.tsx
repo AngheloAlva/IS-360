@@ -73,13 +73,13 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 					if (error) {
 						switch (error.code) {
 							case "ONLY_ADMINS_CAN_ACCESS_THIS_ENDPOINT":
-								throw new Error("No tienes permiso para crear usuarios")
+								throw new Error("No tienes permiso para crear colaboradores")
 							case "USER_ALREADY_EXISTS":
 								throw new Error(
-									`El usuario ${employee.name} ya existe. Verifique el RUT y el correo.`
+									`El colaborador ${employee.name} ya existe. Verifique el RUT y el correo.`
 								)
 							default:
-								throw new Error(`Error al crear usuario ${employee.name}: ${error.message}`)
+								throw new Error(`Error al crear colaborador ${employee.name}: ${error.message}`)
 						}
 					}
 
@@ -101,22 +101,22 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 
 			if (errors.length > 0) {
 				const errorMessages = errors.map((error) => error.reason.message)
-				throw new Error(`Errores al crear usuarios:\n${errorMessages.join("\n")}`)
+				throw new Error(`Errores al crear colaboradores:\n${errorMessages.join("\n")}`)
 			}
 
-			toast.success("Usuarios creados exitosamente", {
-				description: `${successes.length} usuarios han sido creados y se les ha enviado un correo con sus credenciales.`,
+			toast.success("Colaboradores creados exitosamente", {
+				description: `${successes.length} colaboradores han sido creados y se les ha enviado un correo con sus credenciales.`,
 				duration: 5000,
 			})
 
-			router.push("/dashboard/empleados")
+			router.push("/dashboard/colaboradores")
 		} catch (error) {
 			console.error(error)
-			toast.error("Error al crear usuarios", {
+			toast.error("Error al crear colaboradores", {
 				description:
 					error instanceof Error
 						? error.message
-						: "Ocurrió un error al intentar crear los usuarios",
+						: "Ocurrió un error al intentar crear los colaboradores",
 				duration: 5000,
 			})
 		} finally {
@@ -132,8 +132,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
-							<BackButton href="/dashboard/empleados" />
-							<h2 className="text-2xl font-semibold">Crear Usuarios</h2>
+							<BackButton href="/dashboard/colaboradores" />
+							<h2 className="text-2xl font-semibold">Crear Colaborador(es)</h2>
 						</div>
 
 						<Button
@@ -149,7 +149,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 							}}
 						>
 							<Plus className="h-4 w-4" />
-							Agregar Usuario
+							Agregar Colaborador
 						</Button>
 					</div>
 
@@ -159,7 +159,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 								<CardContent>
 									<div className="grid gap-5 xl:grid-cols-2">
 										<div className="flex items-center justify-between xl:col-span-2">
-											<h3 className="text-lg font-semibold">Usuario #{index + 1}</h3>
+											<h3 className="text-lg font-semibold">Colaborador #{index + 1}</h3>
 
 											{index !== 0 && (
 												<Button
@@ -214,7 +214,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 
 										<div className="space-y-1 text-center">
 											<h3 className="text-xl font-semibold">
-												{formValues.employees[index].name || "Nombre del Empleado"}
+												{formValues.employees[index].name || "Nombre del Colaborador"}
 											</h3>
 											<p className="text-muted-foreground text-sm">
 												{formValues.employees[index].email || "correo@ejemplo.com"}
@@ -238,7 +238,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 					))}
 
 					<SubmitButton
-						label="Crear usuario(s)"
+						label="Crear Colaborador(es)"
 						isSubmitting={isSubmitting}
 						className="hover:bg-primary/80"
 					/>

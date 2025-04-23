@@ -12,6 +12,7 @@ export const updateFileSchema = z.object({
 	expirationDate: z.date().optional(),
 	name: z.string().optional(),
 	description: z.string().optional(),
+	revisionCount: z.string().optional(),
 
 	file: z.array(fileSchema).min(1).max(1),
 })

@@ -51,8 +51,8 @@ const data = {
 			icon: BookCopy,
 		},
 		{
-			name: "Empleados",
-			url: "/dashboard/empleados",
+			name: "Colaboradores",
+			url: "/dashboard/colaboradores",
 			icon: Users,
 		},
 		{

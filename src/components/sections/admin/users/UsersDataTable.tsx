@@ -78,7 +78,7 @@ export function UsersDataTable() {
 					<Input
 						type="text"
 						className="bg-background w-full sm:w-80"
-						placeholder="Buscar por Nombre, Empresa, Email o RUT..."
+						placeholder="Buscar por Nombre, Email o RUT..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
 					/>

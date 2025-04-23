@@ -46,6 +46,7 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 			name: initialData.name,
 			code: initialData.code ?? undefined,
 			description: initialData.description || "",
+			revisionCount: `${initialData.revisionCount}`,
 			registrationDate: initialData.registrationDate,
 			expirationDate: initialData.expirationDate || undefined,
 			file: [{
@@ -162,6 +163,14 @@ export function UpdateFileForm({ fileId, initialData, userId, lastPath }: Update
 									label="Otro código de clasificación"
 								/>
 							)}
+
+							<InputFormField<UpdateFileSchema>
+								type="number"
+								name="revisionCount"
+								control={form.control}
+								label="Número de Revisión"
+								placeholder="Número de Revisión"
+							/>
 
 							<div className="grid gap-4 md:grid-cols-2">
 								<DatePickerFormField<UpdateFileSchema>

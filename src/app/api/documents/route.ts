@@ -38,6 +38,9 @@ export async function GET(req: NextRequest) {
 						},
 					},
 				},
+				orderBy: {
+					name: "asc",
+				},
 			}),
 			prisma.folder.findMany({
 				where: {
@@ -59,6 +62,9 @@ export async function GET(req: NextRequest) {
 							},
 						},
 					},
+				},
+				orderBy: {
+					name: "asc",
 				},
 			}),
 		])

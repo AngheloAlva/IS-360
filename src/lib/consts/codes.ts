@@ -1,9 +1,11 @@
 export const CodesValues = {
+	PROCEDIMIENTO: "PROCEDIMIENTO",
 	INSTRUCTIVO: "INSTRUCTIVO",
 	FORMULARIO: "FORMULARIO",
-	PROCEDIMIENTO: "PROCEDIMIENTO",
 	RESPALDO: "RESPALDO",
+	REGISTRO: "REGISTRO",
 	PLANILLA: "PLANILLA",
+	FORMATO: "FORMATO",
 	OTRO: "OTRO",
 } as const
 
@@ -13,6 +15,8 @@ export const CodesValuesArray = [
 	CodesValues.PROCEDIMIENTO,
 	CodesValues.RESPALDO,
 	CodesValues.PLANILLA,
+	CodesValues.REGISTRO,
+	CodesValues.FORMATO,
 ] as const
 
 export const CodeOptions = [
@@ -21,5 +25,7 @@ export const CodeOptions = [
 	{ value: CodesValues.PROCEDIMIENTO, label: "Procedimiento" },
 	{ value: CodesValues.RESPALDO, label: "Respaldo" },
 	{ value: CodesValues.PLANILLA, label: "Planilla" },
+	{ value: CodesValues.REGISTRO, label: "Registro" },
+	{ value: CodesValues.FORMATO, label: "Formato" },
 	{ value: CodesValues.OTRO, label: "Otro" },
 ]

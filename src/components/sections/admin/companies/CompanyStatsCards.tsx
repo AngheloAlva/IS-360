@@ -46,7 +46,7 @@ export default function CompanyStatsCards() {
 								<div className="w-full">
 									<div className="mb-1 flex justify-between text-xs">
 										<span>{company.name}</span>
-										<span>{company.employees} empleados</span>
+										<span>{company.employees} colaboradores</span>
 									</div>
 									<Progress
 										value={(company.employees / stats.companiesBySize[0].employees) * 100}
@@ -109,15 +109,14 @@ export default function CompanyStatsCards() {
 						{stats.recentWorkOrders.map((order) => (
 							<div key={order.id} className="flex items-center gap-2 p-3">
 								<div
-									className={`flex h-8 w-8 items-center justify-center rounded-full ${
-										order.status === "COMPLETED"
+									className={`flex h-8 w-8 items-center justify-center rounded-full ${order.status === "COMPLETED"
 											? "bg-green-100"
 											: order.status === "IN_PROGRESS"
 												? "bg-blue-100"
 												: order.status === "PENDING"
 													? "bg-amber-100"
 													: "bg-red-100"
-									}`}
+										}`}
 								>
 									{order.status === "COMPLETED" ? (
 										<CheckCircle className="h-4 w-4 text-green-600" />

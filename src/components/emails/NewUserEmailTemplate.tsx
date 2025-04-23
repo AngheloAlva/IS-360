@@ -70,7 +70,7 @@ export const NewUserEmailTemplate: React.FC<Readonly<NewuserEmailTemplateProps>>
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-blue-600">{systemUrl}</Text>
+									<Button href={systemUrl} className="mb-[8px] ml-auto text-[16px] text-blue-600">{systemUrl}</Button>
 								</Column>
 							</Row>
 

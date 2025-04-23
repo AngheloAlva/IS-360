@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
 					comments: true,
 					createdAt: true,
 					entryType: true,
+					attachments: true,
 					// OTC Inspection fields
 					supervisionComments: true,
 					safetyObservations: true,

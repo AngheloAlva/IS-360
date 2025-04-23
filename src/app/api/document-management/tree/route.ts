@@ -39,6 +39,9 @@ export async function GET(request: NextRequest) {
 					},
 				},
 			},
+			orderBy: {
+				name: "asc",
+			},
 			cacheStrategy: {
 				ttl: 60,
 				swr: 10,
@@ -56,6 +59,9 @@ export async function GET(request: NextRequest) {
 				url: true,
 				name: true,
 				code: true,
+			},
+			orderBy: {
+				name: "asc",
 			},
 			cacheStrategy: {
 				ttl: 60,

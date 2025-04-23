@@ -7,8 +7,8 @@ import { auth } from "@/lib/auth"
 import CreateUsersForm from "@/components/forms/partner/CreateUsersForm"
 
 export const metadata: Metadata = {
-	title: "Crear Usuarios",
-	description: "Crea nuevos usuarios para tu empresa",
+	title: "Crear Colaborador(es)",
+	description: "Crea nuevos colaboradores para tu empresa",
 }
 
 export default async function CreateUsersPage(): Promise<React.ReactElement> {

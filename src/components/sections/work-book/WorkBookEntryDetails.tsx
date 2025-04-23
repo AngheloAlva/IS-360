@@ -1,7 +1,7 @@
 "use client"
 
 import { WorkEntry } from "@/hooks/work-orders/use-work-entries"
-import { X } from "lucide-react"
+import { ExternalLink, X } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -13,6 +13,7 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer"
+import Link from "next/link"
 
 interface WorkBookEntryDetailsProps {
 	entry: WorkEntry | null
@@ -121,6 +122,24 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 									))}
 								</div>
 							</div>
+
+							{entry.attachments.length > 0 && (
+								<div className="space-y-2">
+									<h4 className="font-semibold">Archivos Adjuntos</h4>
+									{entry.attachments.map((attachment) => (
+										<Link
+											target="_blank"
+											key={attachment.name}
+											href={attachment.url}
+											rel="noopener noreferrer"
+											className="text-primary text-sm hover:underline flex items-center gap-1 flex-nowrap"
+										>
+											{attachment.name}
+											<ExternalLink className="h-4 w-4" />
+										</Link>
+									))}
+								</div>
+							)}
 						</div>
 					) : null}
 				</ScrollArea>

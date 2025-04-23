@@ -349,6 +349,7 @@ export default function CreateCompanyForm(): React.ReactElement {
 
 					<SubmitButton
 						isSubmitting={loading}
+						className="hover:bg-primary/80"
 						label={`Crear empresa${needAddVehicle ? " y vehículo(s)" : ""}`}
 					/>
 				</form>

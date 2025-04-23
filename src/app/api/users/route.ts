@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
 
-import type { User } from "@prisma/client"
+import { USER_ROLE } from "@prisma/client"
+import prisma from "@/lib/prisma"
 
 export async function GET(req: NextRequest) {
 	try {
@@ -9,22 +9,20 @@ export async function GET(req: NextRequest) {
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
-		const role = searchParams.get("role")
 
 		const skip = (page - 1) * limit
 
 		const where = {
+			role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
 			...(search
 				? {
 						OR: [
 							{ name: { contains: search, mode: "insensitive" as const } },
 							{ email: { contains: search, mode: "insensitive" as const } },
 							{ rut: { contains: search, mode: "insensitive" as const } },
-							{ company: { name: { contains: search, mode: "insensitive" as const } } },
 						],
 					}
 				: {}),
-			...(role ? { role: role as User["role"] } : {}),
 		}
 
 		const [users, total] = await Promise.all([

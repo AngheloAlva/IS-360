@@ -1,5 +1,7 @@
-import prisma from "@/lib/prisma"
 import { NextResponse } from "next/server"
+
+import { USER_ROLE } from "@prisma/client"
+import prisma from "@/lib/prisma"
 
 export async function GET() {
 	try {
@@ -17,6 +19,9 @@ export async function GET() {
 			// Users by role
 			prisma.user.groupBy({
 				by: ["role"],
+				where: {
+					role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
+				},
 				_count: true,
 				cacheStrategy: {
 					ttl: 120,

@@ -27,6 +27,11 @@ export interface WorkEntry {
 	assignedUsers: {
 		name: string
 	}[]
+	attachments: {
+		url: string
+		name: string
+		createdAt: string
+	}[]
 }
 
 interface UseWorkEntriesParams {
