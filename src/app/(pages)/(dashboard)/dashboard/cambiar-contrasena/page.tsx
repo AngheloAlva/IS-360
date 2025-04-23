@@ -27,7 +27,7 @@ const changePasswordSchema = z.object({
 	newPassword: z
 		.string()
 		.min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
-		.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
+		.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/, {
 			message:
 				"La contraseña debe contener al menos 8 caracteres, una mayúscula, un número y un carácter especial",
 		}),

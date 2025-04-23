@@ -13,7 +13,10 @@ import {
 import { Card } from "@/components/ui/card"
 
 interface LineChartProps {
-	data: Array<{ date: string; changes: number }>
+	data: {
+		date: string
+		cambios: number
+	}[]
 }
 
 export function LineChart({ data }: LineChartProps) {
@@ -38,11 +41,12 @@ export function LineChart({ data }: LineChartProps) {
 				/>
 				<Line
 					type="monotone"
-					dataKey="changes"
+					dataKey="cambios"
 					stroke="#2563eb"
 					strokeWidth={2}
 					dot={{ r: 4, fill: "#2563eb" }}
 					activeDot={{ r: 6 }}
+					name="Cambios"
 				/>
 			</RechartsLineChart>
 		</ResponsiveContainer>

@@ -186,7 +186,7 @@ export default function InternalUserForm({
 								name="phone"
 								label="Teléfono"
 								control={form.control}
-								placeholder="+56 9 XXXX XXXX"
+								placeholder="9 XXXX XXXX"
 							/>
 
 							<SelectFormField<InternalUserSchema>
@@ -244,7 +244,7 @@ export default function InternalUserForm({
 							</div>
 							<div className="flex justify-between text-sm">
 								<span className="text-muted-foreground">Teléfono:</span>
-								<span>{formValues.phone || "+56 X XXXX XXXX"}</span>
+								<span>{formValues.phone || "9 XXXX XXXX"}</span>
 							</div>
 							<div className="flex justify-between text-sm">
 								<span className="text-muted-foreground">Rol:</span>

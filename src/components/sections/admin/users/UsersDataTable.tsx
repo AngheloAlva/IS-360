@@ -132,21 +132,21 @@ export function UsersDataTable() {
 					<TableBody>
 						{isLoading
 							? Array.from({ length: 10 }).map((_, index) => (
-									<TableRow key={index}>
-										<TableCell className="" colSpan={8}>
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-									</TableRow>
-								))
+								<TableRow key={index}>
+									<TableCell className="" colSpan={10}>
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+								</TableRow>
+							))
 							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className="font-medium">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))}
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="font-medium">
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+									))}
+								</TableRow>
+							))}
 					</TableBody>
 				</Table>
 			</Card>

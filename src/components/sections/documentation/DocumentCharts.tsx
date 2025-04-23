@@ -4,11 +4,12 @@ import { useDocumentsCharts } from "@/hooks/documents/use-documents-charts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { BarChart } from "./BarChart"
+import { PieChart } from "./PieChart"
 import { DocumentExpirationBarChart } from "./DocumentExpirationBarChart"
 import { RecentChangesTable } from "./RecentChangesTable"
+import { ActivityLineChart } from "./ActivityLineChart"
 import { LineChart } from "./LineChart"
-import { PieChart } from "./PieChart"
-import { BarChart } from "./BarChart"
 import { Metadata } from "./Metadata"
 
 export default function DocumentCharts() {
@@ -63,11 +64,11 @@ export default function DocumentCharts() {
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						<Card className="col-span-2">
 							<CardHeader>
-								<CardTitle>Distribución por Áreas</CardTitle>
-								<CardDescription>Cantidad de documentos por área</CardDescription>
+								<CardTitle>Actividad de Documentación</CardTitle>
+								<CardDescription>Creación de carpetas y archivos en los últimos 30 días</CardDescription>
 							</CardHeader>
 							<CardContent className="pl-2">
-								<BarChart data={data?.areaData || []} />
+								<ActivityLineChart data={data?.activityByDay || []} />
 							</CardContent>
 						</Card>
 
@@ -158,20 +159,20 @@ export default function DocumentCharts() {
 				</TabsContent>
 
 				<TabsContent value="actividad" className="space-y-4">
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-						<Card className="col-span-full lg:col-span-4">
+					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+						<Card className="col-span-full lg:col-span-2">
 							<CardHeader>
-								<CardTitle>Actividad Diaria</CardTitle>
-								<CardDescription>Cambios registrados en los últimos 7 días</CardDescription>
+								<CardTitle>Cambios por Día</CardTitle>
+								<CardDescription>Modificaciones realizadas en los últimos 30 días</CardDescription>
 							</CardHeader>
-							<CardContent>
-								<LineChart data={data?.activityByDay || []} />
+							<CardContent className="pl-2">
+								<LineChart data={data?.changesPerDay || []} />
 							</CardContent>
 						</Card>
-						<Card className="col-span-full lg:col-span-3">
+						<Card className="col-span-full lg:col-span-1">
 							<CardHeader>
-								<CardTitle>Cambios Recientes</CardTitle>
-								<CardDescription>Últimas modificaciones realizadas</CardDescription>
+								<CardTitle>Últimas modificaciones</CardTitle>
+								<CardDescription>Últimas modificaciones realizadas a documentos</CardDescription>
 							</CardHeader>
 							<CardContent>
 								<RecentChangesTable data={data?.recentChanges || []} />

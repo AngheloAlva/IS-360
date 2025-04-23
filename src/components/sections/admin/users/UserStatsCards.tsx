@@ -134,18 +134,18 @@ export function UserStatsCards() {
 						))}
 					</div>
 
-					<div>
+					<div className="space-y-1.5">
 						<div className="text-muted-foreground flex items-center justify-between text-xs">
 							<span>Áreas más pobladas:</span>
 							<span>{AreasLabels[userData.usersByArea[0]?.area as keyof typeof AreasLabels]}</span>
 						</div>
 						<div className="text-muted-foreground flex items-center justify-between text-xs">
 							<span>Áreas menos pobladas:</span>
-							<span>
+							<span className="text-end">
 								{
 									AreasLabels[
-										userData.usersByArea[userData.usersByArea.length - 1]
-											?.area as keyof typeof AreasLabels
+									userData.usersByArea[userData.usersByArea.length - 1]
+										?.area as keyof typeof AreasLabels
 									]
 								}
 							</span>

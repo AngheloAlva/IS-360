@@ -30,7 +30,13 @@ export interface RecentChange {
 
 export interface ActivityByDay {
 	date: string
-	changes: number
+	archivos: number
+	carpetas: number
+}
+
+export interface ChangesPerDay {
+	date: string
+	cambios: number
 }
 
 interface DocumentsChartsResponse {
@@ -39,6 +45,7 @@ interface DocumentsChartsResponse {
 	responsibleData: ResponsibleDaum[]
 	recentChanges: RecentChange[]
 	activityByDay: ActivityByDay[]
+	changesPerDay: ChangesPerDay[]
 }
 
 export const useDocumentsCharts = () => {

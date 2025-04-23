@@ -217,25 +217,64 @@ export async function GET() {
 		},
 	})
 
-	// Get activity by day (last 7 days)
-	const last7Days = Array.from({ length: 7 }, (_, i) => {
+	// Get activity by day (last 30 days)
+	const last30Days = Array.from({ length: 30 }, (_, i) => {
 		const date = subDays(new Date(), i)
 		return format(date, "yyyy-MM-dd")
 	}).reverse()
 
-	const activityByDay = await Promise.all(
-		last7Days.map(async (date) => {
-			const count = await prisma.fileHistory.count({
-				where: {
-					modifiedAt: {
-						gte: new Date(date),
-						lt: addDays(new Date(date), 1),
-					},
-				},
+	const [activityByDay, changesPerDay] = await Promise.all([
+		// Activity (files and folders created)
+		Promise.all(
+			last30Days.map(async (date) => {
+				const [filesCount, foldersCount] = await Promise.all([
+					// Files created on this day
+					prisma.file.count({
+						where: {
+							createdAt: {
+								gte: new Date(date),
+								lt: addDays(new Date(date), 1),
+							},
+							isActive: true,
+						},
+						cacheStrategy: { ttl: 120, swr: 10 },
+					}),
+					// Folders created on this day
+					prisma.folder.count({
+						where: {
+							createdAt: {
+								gte: new Date(date),
+								lt: addDays(new Date(date), 1),
+							},
+							isActive: true,
+						},
+						cacheStrategy: { ttl: 120, swr: 10 },
+					}),
+				])
+
+				return { 
+					date, 
+					files: filesCount,
+					folders: foldersCount
+				}
 			})
-			return { date, count }
-		})
-	)
+		),
+		// Changes per day
+		Promise.all(
+			last30Days.map(async (date) => {
+				const count = await prisma.fileHistory.count({
+					where: {
+						modifiedAt: {
+							gte: new Date(date),
+							lt: addDays(new Date(date), 1),
+						},
+					},
+					cacheStrategy: { ttl: 120, swr: 10 },
+				})
+				return { date, changes: count }
+			})
+		)
+	])
 
 	return NextResponse.json({
 		areaData: areaData.map((area: { area: AREAS; _count: { files: number } }) => ({
@@ -296,7 +335,12 @@ export async function GET() {
 		})),
 		activityByDay: activityByDay.map((day) => ({
 			date: format(new Date(day.date), "dd/MM"),
-			changes: day.count,
+			archivos: day.files,
+			carpetas: day.folders,
+		})),
+		changesPerDay: changesPerDay.map((day) => ({
+			date: format(new Date(day.date), "dd/MM"),
+			cambios: day.changes,
 		})),
 	})
 }
