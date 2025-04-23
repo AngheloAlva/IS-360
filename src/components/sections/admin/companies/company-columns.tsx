@@ -60,20 +60,11 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 			const id = row.original.id
 
 			return (
-				// <Link href={`/admin/dashboard/empresas/${id}/supervisores/agregar`}>
-				// 	<Button
-				// 		size={"sm"}
-				// 		variant={"outline"}
-				// 		className="border-green-500 bg-green-600 tracking-wider text-white hover:bg-green-800"
-				// 	>
-				// 		<Plus className="mr-2 h-4 w-4" /> Supervisor(es)
-				// 	</Button>
-				// </Link>
 				<Link href={`/admin/dashboard/empresas/${id}`}>
 					<Button
 						size={"sm"}
 						variant={"outline"}
-						className="border-green-500 bg-green-600 tracking-wider text-white hover:text-white hover:bg-green-800"
+						className="hover:border-green-500 border-transparent bg-transparent tracking-wider text-green-500 shadow-none hover:text-white hover:bg-green-800"
 					>
 						Ver más
 						<ChevronRight className="mt-0.5 h-4 w-4" />

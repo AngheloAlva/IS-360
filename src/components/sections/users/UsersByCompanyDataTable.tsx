@@ -63,7 +63,7 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 	return (
 		<section className="mt-4 flex w-full flex-col items-start gap-4">
 			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
-				<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>
+				<h2 className="text-text mb-4 text-2xl font-bold">Lista de Usuarios</h2>
 
 				<div className="my-4 flex flex-col gap-2 lg:my-0 lg:flex-row">
 					<Input
@@ -97,21 +97,21 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 					<TableBody>
 						{isLoading
 							? Array.from({ length: 10 }).map((_, index) => (
-									<TableRow key={index}>
-										<TableCell className="" colSpan={8}>
-											<Skeleton className="h-9 min-w-full" />
-										</TableCell>
-									</TableRow>
-								))
+								<TableRow key={index}>
+									<TableCell className="" colSpan={8}>
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+								</TableRow>
+							))
 							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className="font-medium">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))}
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="font-medium">
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+									))}
+								</TableRow>
+							))}
 					</TableBody>
 				</Table>
 			</Card>

@@ -1,11 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 
+import type { USER_ROLE } from "@prisma/client"
+
 export interface UsersByCompany {
 	id: string
 	rut: string
 	name: string
 	phone: string
 	email: string
+	role: USER_ROLE
 }
 
 interface UsersResponse {

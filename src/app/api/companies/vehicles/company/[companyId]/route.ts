@@ -8,37 +8,37 @@ export async function GET(
 ) {
 	try {
 		const companyId = (await params).companyId
-
 		const searchParams = req.nextUrl.searchParams
+
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
 
 		const skip = (page - 1) * limit
 
-		// Get statistics
-		const [users, total] = await Promise.all([
-			// Fetch work books with pagination
-			prisma.user.findMany({
+		const [vehicles, total] = await Promise.all([
+			prisma.vehicle.findMany({
 				where: {
 					companyId,
 					...(search
 						? {
 								OR: [
-									{ name: { contains: search, mode: "insensitive" as const } },
-									{ email: { contains: search, mode: "insensitive" as const } },
-									{ rut: { contains: search, mode: "insensitive" as const } },
+									{ model: { contains: search, mode: "insensitive" as const } },
+									{ plate: { contains: search, mode: "insensitive" as const } },
+									{ brand: { contains: search, mode: "insensitive" as const } },
 								],
 							}
 						: {}),
 				},
 				select: {
 					id: true,
-					rut: true,
-					name: true,
-					role: true,
-					phone: true,
-					email: true,
+					year: true,
+					type: true,
+					model: true,
+					plate: true,
+					brand: true,
+					color: true,
+					isMain: true,
 				},
 				skip,
 				take: limit,
@@ -46,16 +46,15 @@ export async function GET(
 					createdAt: "desc",
 				},
 			}),
-			// Get total count
-			prisma.user.count({
+			prisma.vehicle.count({
 				where: {
 					companyId,
 					...(search
 						? {
 								OR: [
-									{ name: { contains: search, mode: "insensitive" as const } },
-									{ email: { contains: search, mode: "insensitive" as const } },
-									{ rut: { contains: search, mode: "insensitive" as const } },
+									{ model: { contains: search, mode: "insensitive" as const } },
+									{ plate: { contains: search, mode: "insensitive" as const } },
+									{ brand: { contains: search, mode: "insensitive" as const } },
 								],
 							}
 						: {}),
@@ -65,11 +64,11 @@ export async function GET(
 
 		return NextResponse.json({
 			total,
-			users,
+			vehicles,
 			pages: Math.ceil(total / limit),
 		})
 	} catch (error) {
-		console.error("[USERS_GET]", error)
-		return NextResponse.json({ error: "Error fetching users" }, { status: 500 })
+		console.error("[VEHICLES_GET]", error)
+		return NextResponse.json({ error: "Error fetching vehicles" }, { status: 500 })
 	}
 }

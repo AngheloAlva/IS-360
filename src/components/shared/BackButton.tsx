@@ -17,7 +17,7 @@ export default function BackButton({ href, className }: BackButtonProps): React.
 				className
 			)}
 		>
-			<ChevronLeft className="h-6 w-6" />
+			<ChevronLeft className="h-full w-full" />
 			<span className="sr-only">Atrás</span>
 		</Link>
 	)

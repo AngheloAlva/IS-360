@@ -118,7 +118,7 @@ export default function CreateExternalSupervisorsForm({
 				>
 					<div className="mt-4 flex items-center justify-between md:col-span-2">
 						<div className="mx-auto flex w-full max-w-screen-lg items-center justify-start gap-2">
-							<BackButton href="/admin/dashboard/empresas" />
+							<BackButton href={`/admin/dashboard/empresas/${companyId}`} />
 							<h1 className="w-fit text-3xl font-bold">Nuevos Supervisores</h1>
 						</div>
 
