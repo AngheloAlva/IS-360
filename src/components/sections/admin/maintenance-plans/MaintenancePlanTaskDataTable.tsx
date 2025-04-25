@@ -1,10 +1,8 @@
 "use client"
 
-import { ArrowLeft, Download } from "lucide-react"
 import { useSearchParams } from "next/navigation"
+import { ArrowLeft } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
-import * as XLSX from "xlsx"
 import {
 	flexRender,
 	SortingState,
@@ -15,8 +13,8 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { useEquipments, WorkEquipment, fetchAllEquipments } from "@/hooks/use-equipments"
-import { EquipmentColumns } from "./equipment-columns"
+import { type MaintenancePlanTask, useMaintenancePlanTasks } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
+import { MaintenancePlanTaskColumns } from "./maintenance-plan-task-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -31,62 +29,26 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
-import Spinner from "@/components/shared/Spinner"
 
-export function EquipmentDataTable() {
+export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string }) {
 	const searchParams = useSearchParams()
 	const parentId = searchParams.get("parentId")
 
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
-	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-	const [exportLoading, setExportLoading] = useState(false)
 	const [sorting, setSorting] = useState<SortingState>([])
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-	const { data, isLoading } = useEquipments({
+	const { data, isLoading } = useMaintenancePlanTasks({
 		page,
 		search,
-		parentId,
+		planSlug,
 		limit: 15,
 	})
 
-	const handleExportToExcel = async () => {
-		try {
-			setExportLoading(true)
-			const equipments = await fetchAllEquipments(parentId)
-			if (!equipments?.length) {
-				toast.error("No hay equipos para exportar")
-				return
-			}
-
-			const workbook = XLSX.utils.book_new()
-			const worksheet = XLSX.utils.json_to_sheet(equipments.map((equipment: WorkEquipment) => ({
-				'TAG': equipment.tag,
-				'Nombre': equipment.name,
-				'Ubicación': equipment.location,
-				'Descripción': equipment.description,
-				'Estado': equipment.isOperational ? 'Operativo' : 'No Operativo',
-				'Tipo': equipment.type || 'N/A',
-				'Órdenes de Trabajo': equipment._count.workOrders,
-				'Equipos Hijos': equipment._count.children,
-				'Fecha de Creación': new Date(equipment.createdAt).toLocaleDateString(),
-				'Última Actualización': new Date(equipment.updatedAt).toLocaleDateString()
-			})))
-
-			XLSX.utils.book_append_sheet(workbook, worksheet, 'Equipos')
-			XLSX.writeFile(workbook, 'equipos.xlsx')
-			toast.success("Equipos exportados exitosamente")
-		} catch (error) {
-			console.error("[EXPORT_EXCEL]", error)
-			toast.error("Error al exportar equipos")
-		} finally {
-			setExportLoading(false)
-		}
-	}
-
-	const table = useReactTable<WorkEquipment>({
-		data: data?.equipments ?? [],
-		columns: EquipmentColumns,
+	const table = useReactTable<MaintenancePlanTask>({
+		data: data?.tasks ?? [],
+		columns: MaintenancePlanTaskColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
@@ -122,23 +84,10 @@ export function EquipmentDataTable() {
 					<Input
 						type="text"
 						value={search}
-						className="bg-background w-full sm:w-72"
-						placeholder="Buscar por nombre, TAG o ubicación..."
 						onChange={(e) => setSearch(e.target.value)}
+						className="bg-background ml-auto w-full sm:w-72"
+						placeholder="Buscar por nombre, descripcion, o equipo..."
 					/>
-
-					<Button
-						className="ml-auto bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500"
-						onClick={handleExportToExcel}
-						disabled={isLoading || exportLoading || !data?.equipments.length}
-					>
-						{exportLoading ? (
-							<Spinner />
-						) : (
-							<Download className="mr-2 h-4 w-4" />
-						)}
-						Exportar a Excel
-					</Button>
 				</div>
 			</div>
 

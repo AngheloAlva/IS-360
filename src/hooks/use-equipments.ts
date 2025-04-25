@@ -1,5 +1,18 @@
 import { useQuery } from "@tanstack/react-query"
 
+export async function fetchAllEquipments(parentId: string | null = null) {
+	const searchParams = new URLSearchParams()
+	searchParams.set("page", "1")
+	searchParams.set("limit", "1000")
+	if (parentId) searchParams.set("parentId", parentId)
+
+	const res = await fetch(`/api/equipments?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching equipments")
+
+	const data = await res.json()
+	return data.equipments
+}
+
 export interface WorkEquipment {
 	id: string
 	name: string

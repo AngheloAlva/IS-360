@@ -1,24 +1,30 @@
-"use client"
+import { Plus } from "lucide-react"
+import Link from "next/link"
 
-import { Construction } from "lucide-react"
+import { MaintenancePlanDataTable } from "@/components/sections/admin/maintenance-plans/MaintenancePlanDataTable"
+import { Button } from "@/components/ui/button"
 
 export default function MaintenancePlansPage() {
 	return (
-		<div className="flex min-h-[85vh] flex-col items-center justify-center gap-4 p-4">
-			<Construction className="text-primary h-24 w-24 animate-pulse" />
-			<h1 className="text-primary text-2xl font-bold">Módulo en Construcción</h1>
-			<p className="text-muted-foreground max-w-lg text-center">
-				Este módulo está actualmente en desarrollo. Pronto estará disponible con nuevas
-				funcionalidades.
-			</p>
+		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
+			<div className="flex items-start justify-between gap-4 md:flex-row">
+				<div className="flex flex-col gap-1">
+					<h1 className="text-text w-fit text-3xl font-bold">Planes de Mantenimiento</h1>
+					<p className="text-text w-fit text-sm sm:text-base">
+						En esta sección puedes gestionar los planes de mantenimiento de la plataforma.
+					</p>
+				</div>
 
-			<p className="text-muted-foreground text-center">
-				Atentamente,
-				<br />
-				<span className="text-primary font-semibold underline decoration-wavy">
-					Ingenieria Simple
-				</span>
-			</p>
+				<Link href="/admin/dashboard/planes-de-mantenimiento/agregar">
+					<Button size={"lg"} className="bg-primary text-white hover:bg-primary/80">
+						<Plus />
+						Plan
+						<span className="hidden sm:inline"> de Mantenimiento</span>
+					</Button>
+				</Link>
+			</div>
+
+			<MaintenancePlanDataTable />
 		</div>
 	)
 }

@@ -26,6 +26,7 @@ interface DatePickerFormFieldProps<T extends FieldValues> {
 	control: Control<T>
 	description?: string
 	itemClassName?: string
+	disabledCondition?: (date: Date) => boolean
 }
 
 export function DatePickerFormField<T extends FieldValues>({
@@ -36,6 +37,7 @@ export function DatePickerFormField<T extends FieldValues>({
 	description,
 	itemClassName,
 	optional = false,
+	disabledCondition,
 }: DatePickerFormFieldProps<T>) {
 	return (
 		<FormField
@@ -74,6 +76,7 @@ export function DatePickerFormField<T extends FieldValues>({
 								mode="single"
 								selected={field.value}
 								onSelect={field.onChange}
+								disabled={disabledCondition}
 							/>
 						</PopoverContent>
 					</Popover>

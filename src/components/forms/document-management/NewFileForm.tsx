@@ -95,7 +95,6 @@ export function NewFileForm({ userId, parentFolderId, area, backPath }: NewFileF
 	}
 
 	useEffect(() => {
-		console.log(form.getValues("files"))
 		if (form.getValues("files").length > 1) {
 			form.setValue("name", "")
 			form.setValue("description", "")
