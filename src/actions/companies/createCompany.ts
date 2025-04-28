@@ -21,18 +21,19 @@ export const createCompany = async ({
 }: CreateCompanyProps): Promise<CreateCompanyResponse> => {
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { vehicles, addVehicle, supervisors, ...rest } = values
+		const { vehicles, supervisors, ...rest } = values
 
 		const company = await prisma.company.create({
 			data: {
 				...rest,
-				vehicles: {
-					create:
-						vehicles?.map((vehicle) => ({
+				...(vehicles && {
+					vehicles: {
+						create: vehicles.map((vehicle) => ({
 							...vehicle,
 							year: Number(vehicle.year),
-						})) ?? [],
-				},
+						})),
+					},
+				}),
 			},
 		})
 

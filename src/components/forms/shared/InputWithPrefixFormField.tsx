@@ -15,11 +15,12 @@ import {
 import type { Control, FieldValues, Path } from "react-hook-form"
 import type { HTMLInputTypeAttribute } from "react"
 
-interface InputFormFieldProps<T extends FieldValues> {
+interface InputWithPrefixFormFieldProps<T extends FieldValues> {
 	min?: number
 	max?: number
 	label: string
 	name: Path<T>
+	prefix: string
 	className?: string
 	disabled?: boolean
 	optional?: boolean
@@ -30,11 +31,12 @@ interface InputFormFieldProps<T extends FieldValues> {
 	type?: HTMLInputTypeAttribute
 }
 
-export function InputFormField<T extends FieldValues>({
+export function InputWithPrefixFormField<T extends FieldValues>({
 	min,
 	max,
 	name,
 	label,
+	prefix,
 	control,
 	className,
 	placeholder,
@@ -43,7 +45,7 @@ export function InputFormField<T extends FieldValues>({
 	type = "text",
 	disabled = false,
 	optional = false,
-}: InputFormFieldProps<T>) {
+}: InputWithPrefixFormFieldProps<T>) {
 	return (
 		<FormField
 			name={name}
@@ -54,17 +56,25 @@ export function InputFormField<T extends FieldValues>({
 						{label}
 						{optional && <span className="text-muted-foreground"> (opcional)</span>}
 					</FormLabel>
-					<FormControl>
-						<Input
-							min={min}
-							max={max}
-							type={type}
-							disabled={disabled}
-							className={cn("w-full text-sm", className)}
-							placeholder={placeholder || label}
-							{...field}
-						/>
-					</FormControl>
+
+					<div className="flex items-center">
+						<div className="flex px-1 bg-input/30 text-sm border-r-0 text-muted-foreground h-full rounded-l-md border items-center">
+							{prefix}
+						</div>
+						<FormControl>
+							<Input
+								min={min}
+								max={max}
+								type={type}
+								disabled={disabled}
+								className={cn("w-full rounded-l-none text-sm", className)}
+								placeholder={placeholder || label}
+								{...field}
+							/>
+						</FormControl>
+
+					</div>
+
 					{description && <FormDescription>{description}</FormDescription>}
 					<FormMessage />
 				</FormItem>

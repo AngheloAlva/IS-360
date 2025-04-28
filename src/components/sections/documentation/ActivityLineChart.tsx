@@ -28,7 +28,7 @@ export function ActivityLineChart({ data }: ActivityLineChartProps) {
 					axisLine={false}
 					tickFormatter={(value) => `${value}`}
 				/>
-				<Tooltip />
+				<Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--input)', borderRadius: '10px' }} />
 				<Line
 					type="monotone"
 					dataKey="archivos"

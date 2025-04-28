@@ -18,14 +18,14 @@ export default function DocumentationPage(): React.ReactElement {
 
 				<div className="flex items-center gap-2">
 					<Link href="/dashboard/documentacion/busqueda">
-						<Button size={"lg"} className="bg-indigo-500 text-white">
+						<Button size={"lg"} className="bg-indigo-500 hover:bg-indigo-600 text-white hover:text-white">
 							<Search className="min-h-5 min-w-5" />
-							<span className="hidden md:block">Búsqueda y Vencimiento</span>
+							<span className="hidden lg:block">Búsqueda y Vencimiento</span>
 						</Button>
 					</Link>
 
 					<Link href="/dashboard/documentacion/estadisticas">
-						<Button size={"lg"}>
+						<Button size={"lg"} className="hover:bg-primary/80 hover:text-white">
 							<ChartBarDecreasing className="min-h-5 min-w-5" />
 							<span className="hidden md:block">Estadísticas</span>
 						</Button>

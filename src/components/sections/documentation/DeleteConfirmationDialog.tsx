@@ -5,9 +5,6 @@ import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { useDocuments } from "@/hooks/documents/use-documents"
-import { AREAS } from "@prisma/client"
-
 import {
 	deleteFile,
 	deleteFolder,
@@ -25,23 +22,18 @@ import {
 	AlertDialogHeader,
 	AlertDialogContent,
 	AlertDialogTrigger,
-	AlertDialogDescription,
 } from "@/components/ui/alert-dialog"
 
 interface DeleteConfirmationDialogProps {
 	id: string
-	area: AREAS
 	name: string
 	type: "file" | "folder"
-	folderId: string | null
 }
 
 export default function DeleteConfirmationDialog({
 	id,
 	type,
 	name,
-	area,
-	folderId,
 }: DeleteConfirmationDialogProps) {
 	const router = useRouter()
 
@@ -67,11 +59,6 @@ export default function DeleteConfirmationDialog({
 		}
 	}
 
-	const { invalidateDocuments } = useDocuments({
-		area,
-		folderId,
-	})
-
 	const handleDelete = async () => {
 		setIsLoading(true)
 		try {
@@ -79,7 +66,6 @@ export default function DeleteConfirmationDialog({
 
 			if (response.success) {
 				toast.success(response.message)
-				await invalidateDocuments()
 				router.refresh()
 			} else {
 				toast.error(response.message)
@@ -112,7 +98,7 @@ export default function DeleteConfirmationDialog({
 						{name}&quot;?
 					</AlertDialogTitle>
 
-					<AlertDialogDescription className="space-y-2">
+					<div className="space-y-2">
 						{isPreviewLoading ? (
 							<Skeleton className="h-32 w-full" />
 						) : (
@@ -146,7 +132,7 @@ export default function DeleteConfirmationDialog({
 								</>
 							)
 						)}
-					</AlertDialogDescription>
+					</div>
 				</AlertDialogHeader>
 
 				<AlertDialogFooter>

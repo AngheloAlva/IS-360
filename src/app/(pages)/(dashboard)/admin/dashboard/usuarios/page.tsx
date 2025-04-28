@@ -1,9 +1,6 @@
-import { Plus } from "lucide-react"
-import Link from "next/link"
-
+import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { UsersDataTable } from "@/components/sections/admin/users/UsersDataTable"
 import { UserStatsCards } from "@/components/sections/admin/users/UserStatsCards"
-import { Button } from "@/components/ui/button"
 
 export default function AdminUsersPage(): React.ReactElement {
 	return (
@@ -16,12 +13,13 @@ export default function AdminUsersPage(): React.ReactElement {
 					</p>
 				</div>
 
-				<Link href="/admin/dashboard/usuarios/internos/agregar">
+				<InternalUserFormSheet />
+				{/* <Link href="/admin/dashboard/usuarios/internos/agregar">
 					<Button size={"lg"}>
 						<Plus />
 						<span className="hidden sm:inline">Nuevo Miembro OTC</span>
 					</Button>
-				</Link>
+				</Link> */}
 			</div>
 
 			<UserStatsCards />

@@ -4,7 +4,6 @@ import { format, formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 import Link from "next/link"
 import {
-	Edit,
 	Info,
 	Sheet,
 	Folder,
@@ -21,6 +20,8 @@ import {
 import { useDocuments } from "@/hooks/documents/use-documents"
 import { cn } from "@/lib/utils"
 
+import { UpdateFileFormSheet } from "@/components/forms/document-management/UpdateFileFormSheet"
+import UpdateFolderFormSheet from "@/components/forms/document-management/UpdateFolderFormSheet"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,24 +32,26 @@ import FileComments from "./FileComments"
 import { type AREAS, MODULES, USER_ROLE } from "@prisma/client"
 
 interface FileExplorerTableProps {
+	userId: string
 	areaValue: AREAS
-	lastPath?: string
-	backPath?: string
 	foldersSlugs: string[]
 	userRole?: USER_ROLE | null
 	userModules?: MODULES[] | null
 	actualFolderId?: string | null
 }
 
-export function FileExplorerTable({
-	lastPath,
-	backPath,
+export function FileExplorer({
+	userId,
 	userRole,
 	areaValue,
 	userModules,
 	foldersSlugs,
 	actualFolderId = null,
 }: FileExplorerTableProps) {
+	const canEdit =
+		userRole === USER_ROLE.ADMIN &&
+		(userModules?.includes(MODULES.DOCUMENTATION) || userModules?.includes(MODULES.ALL))
+
 	const getFileIcon = (type: string) => {
 		switch (true) {
 			case type.includes("pdf"):
@@ -120,10 +123,15 @@ export function FileExplorerTable({
 								)}
 
 								<div className="mt-2 flex w-full items-center justify-end">
-									<span className={cn("w-fit rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-500", {
-										"bg-amber-500/10 text-amber-500": item._count.files > 10,
-										"bg-red-500/10 text-red-500": item._count.files > 15
-									})}>
+									<span
+										className={cn(
+											"w-fit rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-500",
+											{
+												"bg-amber-500/10 text-amber-500": item._count.files > 10,
+												"bg-red-500/10 text-red-500": item._count.files > 15,
+											}
+										)}
+									>
 										{item._count.files} archivos
 									</span>
 								</div>
@@ -156,27 +164,20 @@ export function FileExplorerTable({
 													</p>
 												</div>
 
-												{userRole && userModules && (
-													userRole === USER_ROLE.ADMIN && (userModules.includes(MODULES.DOCUMENTATION) || userModules.includes(MODULES.ALL)) && (
+												{userRole &&
+													userModules &&
+													userRole === USER_ROLE.ADMIN &&
+													(userModules.includes(MODULES.DOCUMENTATION) ||
+														userModules.includes(MODULES.ALL)) && (
 														<div className="mt-4 flex gap-2">
-															<Link
-																href={`/dashboard/documentacion/actualizar-carpeta/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
-																className="w-full"
-															>
-																<Button className="hover:bg-primary w-full hover:brightness-90">
-																	<Edit className="mr-2 h-4 w-4" />
-																	Editar
-																</Button>
-															</Link>
+															<UpdateFolderFormSheet userId={userId} oldFolder={item} />
 															<DeleteConfirmationDialog
 																id={item.id}
-																name={item.name}
 																type="folder"
-																area={areaValue}
-																folderId={actualFolderId}
+																name={item.name}
 															/>
 														</div>
-													))}
+													)}
 											</div>
 										</PopoverContent>
 									</Popover>
@@ -225,7 +226,7 @@ export function FileExplorerTable({
 								</div>
 
 								<div className="absolute top-4 right-4 flex gap-1">
-									<FileComments fileId={item.id} lastPath={lastPath} comments={item.comments} />
+									<FileComments fileId={item.id} comments={item.comments} userId={userId} />
 
 									<Popover>
 										<PopoverTrigger asChild>
@@ -269,29 +270,16 @@ export function FileExplorerTable({
 													</div>
 												</div>
 
-
-												{userRole && userModules && (
-													userRole === USER_ROLE.ADMIN && (userModules.includes(MODULES.DOCUMENTATION) || userModules.includes(MODULES.ALL)) && (
-
-														<div className="mt-4 flex gap-2">
-															<Link
-																href={`/dashboard/documentacion/actualizar-archivo/${item.id}?lastPath=${lastPath}&backPath=${backPath}&area=${areaValue}`}
-																className="w-full"
-															>
-																<Button className="hover:bg-primary w-full hover:brightness-90">
-																	<Edit className="mr-2 h-4 w-4" />
-																	Editar
-																</Button>
-															</Link>
-															<DeleteConfirmationDialog
-																type="file"
-																id={item.id}
-																name={item.name}
-																area={areaValue}
-																folderId={actualFolderId}
-															/>
-														</div>
-													))}
+												{userRole && userModules && canEdit && (
+													<div className="mt-4 flex gap-2">
+														<UpdateFileFormSheet
+															fileId={item.id}
+															userId={userId}
+															initialData={item}
+														/>
+														<DeleteConfirmationDialog type="file" id={item.id} name={item.name} />
+													</div>
+												)}
 											</div>
 										</PopoverContent>
 									</Popover>
@@ -301,11 +289,9 @@ export function FileExplorerTable({
 					))}
 
 					{data?.folders?.length === 0 && data?.files?.length === 0 && (
-
-						<div className="text-text bg-primary/10 border-primary mx-auto col-span-full mt-20 flex items-center gap-2 rounded-xl border px-8 py-4 text-center font-medium">
+						<div className="text-text bg-primary/10 border-primary col-span-full mx-auto mt-20 flex items-center gap-2 rounded-xl border px-8 py-4 text-center font-medium">
 							<Info className="text-primary h-7 w-7" />
 							No hay archivos ni carpetas en esta ubicación
-
 						</div>
 					)}
 				</>

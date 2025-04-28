@@ -1,12 +1,12 @@
 import { z } from "zod"
 
 import { rutRegex } from "../../rutRegex"
+import { VEHICLE_TYPE_ARRAY } from "@/lib/consts/vehicle-type"
 
 export const companySchema = z.object({
 	name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
 	rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
 
-	addVehicle: z.boolean().optional(),
 	vehicles: z
 		.array(
 			z.object({
@@ -19,7 +19,7 @@ export const companySchema = z.object({
 						message: "El año debe ser mayor o igual a 2000",
 					}),
 				brand: z.string().min(2, { message: "La marca debe tener al menos 2 caracteres" }),
-				type: z.enum(["CAR", "TRUCK", "MOTORCYCLE", "BUS", "TRACTOR", "TRAILER", "OTHER"]),
+				type: z.enum(VEHICLE_TYPE_ARRAY),
 				color: z.string().optional(),
 				isMain: z.boolean().optional(),
 			})

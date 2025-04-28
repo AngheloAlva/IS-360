@@ -47,7 +47,7 @@ export function UsersDataTable() {
 	const { data, isLoading } = useUsers({
 		page,
 		search,
-		limit: 10,
+		limit: 15,
 	})
 
 	const table = useReactTable<ApiUser>({

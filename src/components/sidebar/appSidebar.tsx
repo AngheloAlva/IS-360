@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import {
+	Home,
 	Send,
 	Siren,
 	Users,
@@ -36,6 +37,11 @@ import type { Session } from "@/lib/auth"
 const data = {
 	navMain: [
 		{
+			name: "Inicio",
+			url: "/dashboard/inicio",
+			icon: Home,
+		},
+		{
 			name: "Seguridad",
 			url: "/dashboard/charlas-de-seguridad",
 			icon: MonitorPlay,
@@ -62,6 +68,11 @@ const data = {
 		},
 	],
 	navAdmin: [
+		{
+			name: "Inicio",
+			url: "/admin/dashboard/inicio",
+			icon: Home,
+		},
 		{
 			name: "Planes de Mantenimiento",
 			url: "/admin/dashboard/planes-de-mantenimiento",

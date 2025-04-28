@@ -1,7 +1,7 @@
-import { ChevronRight, MessageSquareText } from "lucide-react"
+import { MessageSquareText } from "lucide-react"
 import { format } from "date-fns"
-import Link from "next/link"
 
+import NewCommentFormSheet from "@/components/forms/document-management/NewCommentFormSheet"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 
@@ -9,12 +9,12 @@ import type { FileComment } from "@prisma/client"
 
 export default function FileComments({
 	fileId,
-	lastPath,
 	comments,
+	userId,
 }: {
 	fileId: string
-	lastPath?: string
 	comments: Array<FileComment & { user: { name: string } }>
+	userId: string
 }): React.ReactElement {
 	return (
 		<Popover>
@@ -44,13 +44,7 @@ export default function FileComments({
 					)}
 				</div>
 
-				<Link
-					href={`/dashboard/documentacion/nuevo-comentario/${fileId}?lastPath=${lastPath}`}
-					className="text-primary mt-2 flex items-center gap-1 hover:underline"
-				>
-					Agregar comentario
-					<ChevronRight className="mt-1 h-4 w-4" />
-				</Link>
+				<NewCommentFormSheet fileId={fileId} userId={userId} />
 			</PopoverContent>
 		</Popover>
 	)

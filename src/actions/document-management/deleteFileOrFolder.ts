@@ -34,9 +34,14 @@ async function getRecursiveFolderContents(folderId: string) {
 
 export async function deleteFile(fileId: string): Promise<DeleteResponse> {
 	try {
+		const file = await prisma.file.findUnique({
+			where: { id: fileId },
+		})
+		if (!file) return { success: false, message: "Archivo no encontrado" }
+
 		await prisma.file.update({
 			where: { id: fileId },
-			data: { isActive: false },
+			data: { isActive: false, name: "(Eliminado) " + file.name },
 		})
 
 		return {
@@ -57,15 +62,27 @@ export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
 	try {
 		const contents = await getRecursiveFolderContents(folderId)
 
-		// Marcar todos los archivos como inactivos
-		await prisma.file.updateMany({
+		const folder = await prisma.folder.findUnique({
+			where: { id: folderId },
+		})
+		if (!folder) return { success: false, message: "Carpeta no encontrada" }
+
+		const files = await prisma.file.findMany({
 			where: {
 				id: {
 					in: contents.files.map((file) => file.id),
 				},
 			},
-			data: { isActive: false },
 		})
+
+		if (files.length > 0) {
+			files.forEach((file) => {
+				prisma.file.update({
+					where: { id: file.id },
+					data: { isActive: false, name: "(Eliminado) " + file.name },
+				})
+			})
+		}
 
 		// Marcar todas las carpetas como inactivas
 		await prisma.folder.updateMany({
@@ -74,7 +91,11 @@ export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
 					in: contents.folders.map((folder) => folder.id),
 				},
 			},
-			data: { isActive: false },
+			data: {
+				isActive: false,
+				slug: "eliminado-" + folder.slug,
+				name: "(Eliminado) " + folder.name,
+			},
 		})
 
 		return {

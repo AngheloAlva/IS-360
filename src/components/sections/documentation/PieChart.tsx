@@ -10,7 +10,6 @@ interface PieChartProps {
 }
 
 export function PieChart({ data, colors }: PieChartProps) {
-	// Filtrar datos con valor > 0 para el gráfico circular
 	const filteredData = data.filter((item) => item.value > 0)
 	const total = filteredData.reduce((acc, item) => acc + item.value, 0)
 
@@ -51,7 +50,6 @@ export function PieChart({ data, colors }: PieChartProps) {
 				<Tooltip
 					content={({ active, payload }) => {
 						if (active && payload && payload.length) {
-							console.log(payload)
 							return (
 								<Card className="bg-background flex flex-col gap-1 rounded-sm border px-3 py-2 shadow-sm">
 									<div className="text-base font-semibold">{payload[0].payload.name}</div>

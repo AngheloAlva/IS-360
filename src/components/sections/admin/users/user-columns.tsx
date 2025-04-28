@@ -59,9 +59,8 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			return (
 				<Badge
 					className={cn("border-green-500 bg-green-500/10 text-green-500", {
-						"border-primary text-primary bg-primary/10": role !== "PARTNER_COMPANY",
+						"border-purple-500 text-purple-500 bg-purple-500/10": role === USER_ROLE.ADMIN,
 					})}
-					variant={role === "PARTNER_COMPANY" ? "outline" : "default"}
 				>
 					{UserRolesLabels[role]}
 				</Badge>

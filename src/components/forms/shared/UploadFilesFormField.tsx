@@ -1,5 +1,6 @@
 "use client"
 
+import { useFieldArray, type Control } from "react-hook-form"
 import { UploadCloud, X } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -9,7 +10,6 @@ import { cn } from "@/lib/utils"
 import { FileCard } from "@/components/ui/file-card"
 import { Button } from "@/components/ui/button"
 
-import { useFieldArray, type Control } from "react-hook-form"
 import type { ArrayPath, FieldValues } from "react-hook-form"
 
 interface UploadFilesFieldProps<T extends FieldValues> {
@@ -89,11 +89,10 @@ export default function UploadFilesFormField<T extends FieldValues>({
 				<label
 					htmlFor={`${name}`}
 					className={cn(
-						"flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600",
+						"flex h-96 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-500/10 transition-colors hover:bg-gray-100/20",
 						{
-							"border-purple-500 bg-purple-400 dark:border-purple-500 dark:bg-purple-950/50":
-								isDragging,
-							"opacity-50": !isMultiple && fields.length > 0,
+							"border-purple-500 bg-purple-400/10": isDragging,
+							"border-green-500/50 bg-green-500/10": fields.length > 0,
 						},
 						labelClassName
 					)}
@@ -120,13 +119,34 @@ export default function UploadFilesFormField<T extends FieldValues>({
 					}}
 				>
 					<div className="flex flex-col items-center justify-center pt-5 pb-6">
-						<UploadCloud className="mb-3 h-10 w-10 text-gray-400" />
-						<p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-							<span className="font-semibold">Click para subir</span> o arrastra y suelta
-						</p>
-						<p className="text-xs text-gray-500 dark:text-gray-400">
-							PDF, DOCX, PPTX (MAX. {maxFileSize}MB)
-						</p>
+						<UploadCloud
+							className={cn("mb-3 h-10 w-10 text-gray-400", {
+								"text-purple-500": isDragging,
+								"text-green-500": fields.length > 0,
+							})}
+						/>
+						{fields.length === 0 ? (
+							<p className="mb-2 text-sm text-gray-500">
+								<span className="font-semibold">Click para subir</span> o arrastra y suelta
+							</p>
+						) : (
+							<>
+								<p className="mb-2 font-bold text-green-500">
+									{fields.length} {fields.length === 1 ? "archivo" : "archivos"} seleccionados
+								</p>
+								{isMultiple ? (
+									<p className="mb-2 text-sm text-gray-500">
+										<span className="font-semibold">Click para subir más</span> o arrastra y suelta
+									</p>
+								) : (
+									<p className="mb-2 text-sm text-gray-500">
+										<span className="font-semibold text-red-500">Elimina el archivo actual</span>{" "}
+										para subir otro
+									</p>
+								)}
+							</>
+						)}
+						<p className="text-xs text-gray-500">PDF, DOCX, PPTX (MAX. {maxFileSize}MB)</p>
 					</div>
 					<input
 						id={name}
@@ -139,14 +159,31 @@ export default function UploadFilesFormField<T extends FieldValues>({
 				</label>
 			</div>
 
-			{fields.length > 0 && <h3 className="mt-4 text-lg font-semibold">Archivos Seleccionados</h3>}
-			<div className={cn("grid gap-4 sm:grid-cols-2 xl:grid-cols-3", className)}>
+			{fields.length > 0 && (
+				<Button
+					type="button"
+					className="border border-red-500 bg-red-500/10 text-red-600 transition-colors group-hover:visible hover:bg-red-500/50 lg:hidden"
+					onClick={() => remove()}
+				>
+					<X className="h-4 w-4" />
+					Eliminar todos los archivos
+				</Button>
+			)}
+
+			<div className={cn("grid grid-cols-2 gap-4 xl:grid-cols-3", className)}>
+				{fields.length > 0 && (
+					<h3 className="text-lg font-semibold lg:col-span-2 xl:col-span-3">
+						Archivos Seleccionados
+					</h3>
+				)}
 				{fields.map((field, index: number) => (
 					<div key={field.id} className="group relative">
 						<FileCard
 							file={field as T[ArrayPath<T>]}
 							isSelected={selectedFileIndex === index}
-							onClick={() => { setSelectedFileIndex(index) }}
+							onClick={() => {
+								setSelectedFileIndex(index)
+							}}
 						/>
 						<Button
 							size="icon"

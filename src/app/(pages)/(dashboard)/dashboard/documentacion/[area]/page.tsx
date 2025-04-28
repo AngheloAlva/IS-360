@@ -1,14 +1,13 @@
-import { FolderIcon, UploadIcon } from "lucide-react"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import Link from "next/link"
 
 import { Areas } from "@/lib/consts/areas"
 import { auth } from "@/lib/auth"
 
-import { FileExplorerTable } from "@/components/sections/documentation/FileExplorerTable"
+import NewFolderFormSheet from "@/components/forms/document-management/NewFolderFormSheet"
+import { NewFileFormSheet } from "@/components/forms/document-management/NewFileFormSheet"
+import { FileExplorer } from "@/components/sections/documentation/FileExplorer"
 import BackButton from "@/components/shared/BackButton"
-import { Button } from "@/components/ui/button"
 
 import type { MODULES, USER_ROLE } from "@prisma/client"
 
@@ -40,53 +39,20 @@ export default async function AreaRootPage({ params }: PageProps) {
 					<h1 className="text-text text-3xl font-bold">{areaName}</h1>
 				</div>
 
-				<div className="hidden gap-2 md:flex md:gap-3">
-					<Link href={`/dashboard/documentacion/nuevo-archivo?area=${areaKey}`}>
-						<Button size={"lg"} className="bg-green-600 text-white">
-							<UploadIcon className="h-4 w-4" />
-							<span className="hidden font-medium sm:block">Subir Archivo</span>
-						</Button>
-					</Link>
+				<div className="ml-auto flex gap-2">
+					<NewFileFormSheet area={areaKey} userId={data.user.id} />
 
-					<Link href={`/dashboard/documentacion/nueva-carpeta?area=${areaKey}&isRootFolder=true`}>
-						<Button size={"lg"}>
-							<FolderIcon className="h-4 w-4" />
-							<span className="hidden font-medium sm:block">Nueva Carpeta</span>
-						</Button>
-					</Link>
+					<NewFolderFormSheet area={areaKey} userId={data.user.id} />
 				</div>
 			</div>
 
-			<FileExplorerTable
+			<FileExplorer
 				areaValue={areaValue}
 				foldersSlugs={[area]}
+				userId={data.user.id}
 				userRole={data.user.role as USER_ROLE}
 				userModules={data.user.modules as MODULES[]}
-				backPath="/dashboard/documentacion"
-				lastPath={"/dashboard/documentacion/" + area}
 			/>
-
-			<div className="mx-auto mt-6 flex items-center justify-center gap-2 md:hidden md:gap-3">
-				<Link
-					href={`/dashboard/documentacion/nuevo-archivo?area=${areaKey}`}
-					className="w-1/2 sm:w-fit"
-				>
-					<Button size={"lg"} className="w-full bg-green-600 text-xs text-white sm:text-sm">
-						<UploadIcon className="h-4 w-4" />
-						<span className="font-medium">Subir Archivo</span>
-					</Button>
-				</Link>
-
-				<Link
-					href={`/dashboard/documentacion/nueva-carpeta?area=${areaKey}&isRootFolder=true`}
-					className="w-1/2 sm:w-fit"
-				>
-					<Button size={"lg"} className="w-full text-xs sm:text-sm">
-						<FolderIcon className="h-4 w-4" />
-						<span className="font-medium">Nueva Carpeta</span>
-					</Button>
-				</Link>
-			</div>
 		</div>
 	)
 }

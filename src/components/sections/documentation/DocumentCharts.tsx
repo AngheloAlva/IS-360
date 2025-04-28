@@ -13,33 +13,37 @@ import { LineChart } from "./LineChart"
 import { Metadata } from "./Metadata"
 
 export default function DocumentCharts() {
-	const { data } = useDocumentsCharts()
+	const { data, isLoading } = useDocumentsCharts()
 
 	return (
 		<div className="w-full flex-1 space-y-4">
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				<Metadata
+					isLoading={isLoading}
 					title="Total Documentos"
-					value={data?.areaData.reduce((acc, item) => acc + item.value, 0) || 0}
 					description="Documentos registrados"
 					className="border-blue-500 bg-blue-500/10"
+					value={data?.areaData.reduce((acc, item) => acc + item.value, 0) || 0}
 				/>
 				<Metadata
+					isLoading={isLoading}
 					title="Documentos Vencidos"
-					value={data?.expirationData.find((item) => item.name === "Vencidos")?.value || 0}
 					description="Requieren atención inmediata"
 					className="border-red-500 bg-red-500/10"
+					value={data?.expirationData.find((item) => item.name === "Vencidos")?.value || 0}
 				/>
 				<Metadata
 					title="Responsables"
-					value={data?.responsibleData.length || 0}
+					isLoading={isLoading}
 					description="Personas a cargo"
+					value={data?.responsibleData.length || 0}
 					className="border-green-500 bg-green-500/10"
 				/>
 				<Metadata
+					isLoading={isLoading}
 					title="Cambios Recientes"
-					value={data?.recentChanges.length || 0}
 					description="En los últimos 7 días"
+					value={data?.recentChanges.length || 0}
 					className="border-yellow-500 bg-yellow-500/10"
 				/>
 			</div>
