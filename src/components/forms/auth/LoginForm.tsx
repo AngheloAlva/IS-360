@@ -41,7 +41,7 @@ export default function LoginForm(): React.ReactElement {
 					if (ctx.data.twoFactorRedirect) {
 						router.push("/auth/2fa")
 					} else {
-						router.push("/dashboard/documentacion")
+						router.push("/admin/dashboard/inicio")
 					}
 				},
 				onError: (ctx) => {
