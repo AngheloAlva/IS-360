@@ -4,16 +4,13 @@ import prisma from "@/lib/prisma"
 
 import type { DailyActivitySchema } from "@/lib/form-schemas/work-book/daily-activity.schema"
 import type { ENTRY_TYPE } from "@prisma/client"
+import { UploadResult as UploadFileResult } from "@/lib/upload-files"
 
 interface CreateActivityProps {
 	userId: string
 	entryType: ENTRY_TYPE
 	values: DailyActivitySchema
-	attachment?: {
-		fileType: string
-		fileUrl: string
-		name: string
-	}
+	attachment?: UploadFileResult[]
 }
 
 export const createActivity = async ({
@@ -55,13 +52,11 @@ export const createActivity = async ({
 
 			if (attachment) {
 				workBookEntryConnectionData.attachments = {
-					create: [
-						{
-							type: attachment.fileType,
-							url: attachment.fileUrl,
-							name: attachment.name,
-						},
-					],
+					create: attachment.map((attachment) => ({
+						type: attachment.type,
+						url: attachment.url,
+						name: attachment.name,
+					})),
 				}
 			}
 

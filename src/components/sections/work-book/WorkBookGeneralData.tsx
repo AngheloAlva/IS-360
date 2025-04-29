@@ -84,7 +84,7 @@ export default function WorkBookGeneralData({
 								<div>
 									<p className="text-muted-foreground text-sm font-medium">Fecha de Inicio</p>
 									<p className="font-medium">
-										{data.workStartDate && format(data.workStartDate, "dd/MM/yyyy")}
+										{data.workStartDate ? format(data.workStartDate, "dd/MM/yyyy") : "No iniciada"}
 									</p>
 								</div>
 							</div>
@@ -96,7 +96,9 @@ export default function WorkBookGeneralData({
 								<div>
 									<p className="text-muted-foreground text-sm font-medium">Fecha de Término</p>
 									<p className="font-medium">
-										{data.estimatedEndDate && format(data.estimatedEndDate, "dd/MM/yyyy")}
+										{data.estimatedEndDate
+											? format(data.estimatedEndDate, "dd/MM/yyyy")
+											: "No terminada"}
 									</p>
 								</div>
 							</div>

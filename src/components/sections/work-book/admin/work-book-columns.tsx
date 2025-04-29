@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowUpRight } from "lucide-react"
+import { format } from "date-fns"
 import Link from "next/link"
 
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
@@ -9,7 +8,6 @@ import { WORK_ORDER_STATUS } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 import type { WorkBook } from "@/hooks/work-orders/use-work-books"
@@ -20,8 +18,16 @@ export const workBookColumns: ColumnDef<WorkBook>[] = [
 		header: "N° OT",
 		cell: ({ row }) => {
 			const otNumber = row.getValue("otNumber") as string
+			const id = row.original.id
 
-			return <div className="font-medium">{otNumber}</div>
+			return (
+				<Link
+					href={`/admin/dashboard/libros-de-obras/${id}`}
+					className="text-primary hover:text-feature text-right font-medium hover:underline"
+				>
+					{otNumber}
+				</Link>
+			)
 		},
 	},
 	{
@@ -106,20 +112,6 @@ export const workBookColumns: ColumnDef<WorkBook>[] = [
 			const count = row.getValue("_count") as { workEntries: number }
 
 			return <div className="font-medium">{count.workEntries}</div>
-		},
-	},
-	{
-		id: "actions",
-		cell: ({ row }) => {
-			const { id } = row.original
-
-			return (
-				<Button className="text-primary bg-primary/10 hover:bg-primary/50" size="icon" asChild>
-					<Link href={`/admin/dashboard/libros-de-obras/${id}`}>
-						<ArrowUpRight className="h-4 w-4" />
-					</Link>
-				</Button>
-			)
 		},
 	},
 ]

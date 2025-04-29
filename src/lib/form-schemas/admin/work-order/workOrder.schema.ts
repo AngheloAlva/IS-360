@@ -1,8 +1,10 @@
+import { z } from "zod"
+
 import { WORK_ORDER_PRIORITY_VALUES_ARRAY } from "@/lib/consts/work-order-priority"
 import { WORK_ORDER_STATUS_VALUES_ARRAY } from "@/lib/consts/work-order-status"
 import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
-import { z } from "zod"
+import { fileSchema } from "../../document-management/file.schema"
 
 export const workOrderSchema = z.object({
 	type: z.enum(WORK_ORDER_TYPE_VALUES_ARRAY, { message: "El tipo no es válido" }),
@@ -36,6 +38,7 @@ export const workOrderSchema = z.object({
 	requiresBreak: z.boolean().optional(),
 	breakDays: z.string().optional(),
 	estimatedEndDate: z.date({ message: "La fecha de fin estimada no es válida" }).optional(),
+	file: z.array(fileSchema),
 
 	companyId: z.string().nonempty({ message: "La empresa no puede estar vacía" }),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),

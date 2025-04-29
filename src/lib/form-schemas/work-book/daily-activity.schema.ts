@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { fileSchema } from "../document-management/file.schema"
+
 export const dailyActivitySchema = z.object({
 	workOrderId: z.string(),
 
@@ -16,6 +18,7 @@ export const dailyActivitySchema = z.object({
 			})
 		)
 		.min(1, { message: "Debe haber al menos un personal" }),
+	files: z.array(fileSchema),
 })
 
 export type DailyActivitySchema = z.infer<typeof dailyActivitySchema>

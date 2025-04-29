@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import {
 	Table,
+	TableRow,
 	TableBody,
 	TableCell,
 	TableHead,
 	TableHeader,
-	TableRow,
 } from "@/components/ui/table"
 
 import type { CompanyUser } from "@/hooks/companies/use-companies"
@@ -30,7 +30,7 @@ export default function SafetyTalksInfo({ users }: SafetyTalksInfoProps) {
 	})
 
 	return (
-		<div className="mt-6 w-full md:col-span-2">
+		<div className="bg-secondary-background/50 w-full rounded-lg p-2 shadow sm:col-span-2">
 			<h3 className="mb-4 text-lg font-medium">Estado de Charlas de Seguridad</h3>
 			<div className="overflow-x-auto">
 				<Table>

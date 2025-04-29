@@ -1,16 +1,14 @@
 "use server"
 
-import type { OtcInspectionSchema } from "@/lib/form-schemas/work-book/otc-inspections.schema"
+import { UploadResult as UploadFilesResult } from "@/lib/upload-files"
 import prisma from "@/lib/prisma"
+
+import type { OtcInspectionSchema } from "@/lib/form-schemas/work-book/otc-inspections.schema"
 
 interface CreateOtcInspectionsProps {
 	userId: string
 	values: OtcInspectionSchema
-	attachment?: {
-		fileType: string
-		fileUrl: string
-		name: string
-	}
+	attachment?: UploadFilesResult[]
 }
 
 export const createOtcInspections = async ({
@@ -40,13 +38,11 @@ export const createOtcInspections = async ({
 
 		if (attachment) {
 			workBookEntryConnectionData.attachments = {
-				create: [
-					{
-						type: attachment.fileType,
-						url: attachment.fileUrl,
-						name: attachment.name,
-					},
-				],
+				create: attachment.map((attachment) => ({
+					type: attachment.type,
+					url: attachment.url,
+					name: attachment.name,
+				})),
 			}
 		}
 

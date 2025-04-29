@@ -4,14 +4,11 @@ import { generateOTNumber } from "@/actions/work-orders/generateOTNumber"
 import prisma from "@/lib/prisma"
 
 import type { WorkOrderSchema } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
+import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
 
 interface CreateWorkOrderProps {
 	values: WorkOrderSchema
-	initReportFile?: {
-		fileType: string
-		fileName: string
-		fileUrl: string
-	}
+	initReportFile?: FileUploadResult
 }
 
 export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrderProps) => {
@@ -42,9 +39,9 @@ export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrde
 					? {
 							initReport: {
 								create: {
-									url: initReportFile.fileUrl,
-									name: initReportFile.fileName,
-									type: initReportFile.fileType,
+									url: initReportFile.url,
+									name: initReportFile.name,
+									type: initReportFile.type,
 								},
 							},
 						}

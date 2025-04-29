@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
-import ActivityForm from "@/components/forms/work-book/ActivityForm"
+import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
 import BackButton from "@/components/shared/BackButton"
 
 export default async function CreateDailyActivityPage({

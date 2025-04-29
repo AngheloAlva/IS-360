@@ -1,10 +1,13 @@
-import { Plus } from "lucide-react"
-import Link from "next/link"
-
 import { MaintenancePlanDataTable } from "@/components/sections/admin/maintenance-plans/MaintenancePlanDataTable"
-import { Button } from "@/components/ui/button"
+import MaintenancePlanForm from "@/components/forms/maintenance-plan/MaintenancePlanForm"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 
-export default function MaintenancePlansPage() {
+export default async function MaintenancePlansPage() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+	if (!session?.user?.id) return null
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<div className="flex items-start justify-between gap-4 md:flex-row">
@@ -15,13 +18,7 @@ export default function MaintenancePlansPage() {
 					</p>
 				</div>
 
-				<Link href="/admin/dashboard/planes-de-mantenimiento/agregar">
-					<Button size={"lg"} className="bg-primary text-white hover:bg-primary/80">
-						<Plus />
-						Plan
-						<span className="hidden sm:inline"> de Mantenimiento</span>
-					</Button>
-				</Link>
+				<MaintenancePlanForm userId={session.user.id} />
 			</div>
 
 			<MaintenancePlanDataTable />

@@ -1,17 +1,16 @@
 "use client"
 
-import { ChevronDown, Plus } from "lucide-react"
 import { DateRange } from "react-day-picker"
+import { ChevronDown } from "lucide-react"
 import { useState } from "react"
-import Link from "next/link"
 import {
 	flexRender,
 	SortingState,
 	useReactTable,
+	VisibilityState,
 	getCoreRowModel,
 	ColumnFiltersState,
 	getFilteredRowModel,
-	VisibilityState,
 } from "@tanstack/react-table"
 
 import { useWorkOrders, WorkOrder } from "@/hooks/work-orders/use-work-order"
@@ -19,6 +18,7 @@ import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/hooks/companies/use-companies"
 
+import CreateWorkOrderForm from "@/components/forms/admin/work-order/CreateWorkOrderForm"
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker"
 import { TablePagination } from "@/components/ui/table-pagination"
 import { workOrderColumns } from "./work-order-columns"
@@ -102,12 +102,7 @@ export function WorkOrderDataTable() {
 			<div className="flex w-full items-center justify-between">
 				<h1 className="text-text text-2xl font-bold">Lista de Ordenes de Trabajo</h1>
 
-				<Link href="/admin/dashboard/ordenes-de-trabajo/agregar">
-					<Button size={"lg"}>
-						<Plus className="h-4 w-4" />
-						Orden de Trabajo
-					</Button>
-				</Link>
+				<CreateWorkOrderForm />
 			</div>
 
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">

@@ -1,3 +1,5 @@
+import { fileSchema } from "../document-management/file.schema"
+
 import { z } from "zod"
 
 export const otcInspectionsSchema = z.object({
@@ -17,6 +19,7 @@ export const otcInspectionsSchema = z.object({
 		.string()
 		.regex(/^[0-9]+$/, "Debe ser un número")
 		.optional(),
+	files: z.array(fileSchema),
 })
 
 export type OtcInspectionSchema = z.infer<typeof otcInspectionsSchema>

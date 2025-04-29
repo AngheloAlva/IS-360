@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import { Plus } from "lucide-react"
-import Link from "next/link"
 
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
@@ -11,11 +9,12 @@ import { cn } from "@/lib/utils"
 
 import { ApproveWorkBookClosure } from "@/components/sections/work-book/ApproveWorkBookClosure"
 import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
+import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
+import OtcInspectorForm from "@/components/forms/work-book/OtcInspectorForm"
+import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
 import BackButton from "@/components/shared/BackButton"
 import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
 
 export default async function AdminWorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
 	const session = await auth.api.getSession({
@@ -25,7 +24,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 	const { data } = await getWorkOrderById(id)
 
-	if (!data) {
+	if (!data || !session?.user) {
 		return notFound()
 	}
 
@@ -74,41 +73,20 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 			<WorkBookGeneralData data={data} />
 
-			<div className="flex w-full items-center gap-2">
+			<div className="flex w-full items-center justify-between gap-2">
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
 
-				<Link
-					href={`/admin/dashboard/libros-de-obras/${id}/actividades-diarias`}
-					className="ml-auto"
-				>
-					<Button
-						size={"lg"}
-						className="border-primary bg-primary hover:bg-primary/80 border text-white"
-					>
-						<Plus />
-						<span className="hidden lg:block">Actividad Diaria</span>
-					</Button>
-				</Link>
+				<div className="flex gap-2">
+					<ActivityForm entryType="DAILY_ACTIVITY" workOrderId={id} userId={session.user?.id} />
 
-				<Link href={`/admin/dashboard/libros-de-obras/${id}/actividades-adicionales`}>
-					<Button
-						size={"lg"}
-						className="border border-cyan-500 bg-cyan-500 text-white hover:bg-cyan-600"
-					>
-						<Plus />
-						<span className="hidden lg:block">Actividad Adicional</span>
-					</Button>
-				</Link>
+					<ActivityForm
+						entryType="ADDITIONAL_ACTIVITY"
+						workOrderId={id}
+						userId={session.user?.id}
+					/>
 
-				<Link href={`/admin/dashboard/libros-de-obras/${id}/inspeccion-otc`}>
-					<Button
-						size={"lg"}
-						className="border border-purple-500 bg-purple-500 text-white hover:bg-purple-600"
-					>
-						<Plus />
-						<span className="hidden lg:block">Inspección</span>
-					</Button>
-				</Link>
+					<OtcInspectorForm userId={session.user?.id} workOrderId={id} />
+				</div>
 			</div>
 
 			{session?.user?.role === "ADMIN" &&

@@ -47,6 +47,7 @@ enum MODULES {
   WORK_ORDERS // Ordenes de Trabajo
   WORK_PERMITS // Permisos de Trabajo
   DOCUMENTATION // Documentacion
+  NONE // Sin módulo
 }
 
 model User {
@@ -103,6 +104,13 @@ model User {
   @@unique([email])
   @@unique([rut])
   @@map("user")
+}
+
+model RutCounter {
+  id    String @id @default("rut_counter")
+  value Int    @default(1)
+
+  @@map("rut_counter")
 }
 
 model TwoFactor {
