@@ -1,7 +1,8 @@
 "use server"
 
-import type { WorkBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
 import prisma from "@/lib/prisma"
+
+import type { WorkBookSchema } from "@/lib/form-schemas/work-book/work-book.schema"
 
 interface UpdateWorkOrderLikeBook {
 	id: string
@@ -15,6 +16,7 @@ export const updateWorkOrderLikeBook = async ({ id, values }: UpdateWorkOrderLik
 				id,
 			},
 			data: {
+				isWorkBookInit: true,
 				workName: values.workName,
 				workLocation: values.workLocation,
 				workStartDate: values.workStartDate,

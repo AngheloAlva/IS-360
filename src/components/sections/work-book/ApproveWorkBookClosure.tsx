@@ -54,10 +54,14 @@ export function ApproveWorkBookClosure({
 				})
 
 				if (!response.ok) {
-					throw new Error("Error al aprobar el cierre")
+					throw new Error(response.message)
 				}
 
-				toast.success("El libro de obras ha sido cerrado exitosamente")
+				toast.success("El libro de obras ha sido cerrado exitosamente", {
+					description:
+						"Se ha actualizado el estado del libro de obras y enviado un correo al supervisor que solicitó el cierre",
+					duration: 5000,
+				})
 				setIsOpen(false)
 				router.refresh()
 				return
@@ -70,15 +74,19 @@ export function ApproveWorkBookClosure({
 			})
 
 			if (!response.ok) {
-				console.error("[WORK_BOOK_REJECT_CLOSURE]", response)
-				throw new Error(`Error al rechazar el cierre`)
+				throw new Error(response.message)
 			}
 
-			toast.success("La solicitud de cierre ha sido rechazada")
+			toast.success("La solicitud de cierre ha sido rechazada", {
+				description:
+					"Se ha actualizado el estado del libro de obras y enviado un correo al supervisor que solicitó el cierre",
+				duration: 5000,
+			})
 
 			setIsOpen(false)
 			router.refresh()
-		} catch {
+		} catch (error) {
+			console.error("[WORK_BOOK_REJECT_CLOSURE]", error)
 			toast.error(`No se pudo ${action === "approve" ? "aprobar" : "rechazar"} el cierre`)
 		} finally {
 			setIsLoading(false)

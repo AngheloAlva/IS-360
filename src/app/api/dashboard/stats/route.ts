@@ -10,7 +10,7 @@ export async function GET() {
 			prisma.$transaction([
 				prisma.workOrder.count(),
 				prisma.workOrder.count({
-					where: { status: WORK_ORDER_STATUS.PENDING },
+					where: { status: WORK_ORDER_STATUS.PLANNED },
 				}),
 				prisma.workOrder.count({
 					where: { status: WORK_ORDER_STATUS.IN_PROGRESS },
@@ -87,7 +87,7 @@ export async function GET() {
 		return NextResponse.json({
 			workOrders: {
 				total: totalOts,
-				pending: pendingOts,
+				planning: pendingOts,
 				inProgress: inProgressOts,
 				byType: otsByType.map((item) => ({
 					type: item.type,

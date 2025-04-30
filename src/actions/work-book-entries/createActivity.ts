@@ -1,10 +1,10 @@
 "use server"
 
+import { UploadResult as UploadFileResult } from "@/lib/upload-files"
 import prisma from "@/lib/prisma"
 
 import type { DailyActivitySchema } from "@/lib/form-schemas/work-book/daily-activity.schema"
 import type { ENTRY_TYPE } from "@prisma/client"
-import { UploadResult as UploadFileResult } from "@/lib/upload-files"
 
 interface CreateActivityProps {
 	userId: string
@@ -89,6 +89,7 @@ export const createActivity = async ({
 				},
 				data: {
 					workProgressStatus: updatedProgress,
+					status: "IN_PROGRESS",
 				},
 			})
 

@@ -42,14 +42,17 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 				<div className="flex w-full flex-col items-end gap-2 md:w-64">
 					<Badge
-						className={cn("bg-primary/5 border-primary text-primary", {
-							"border-yellow-500 bg-yellow-500/5 text-yellow-500":
+						className={cn("border-slate-500 bg-slate-500/10 text-slate-500", {
+							"border-purple-500 bg-purple-500/10 text-purple-500":
+								data.status === WORK_ORDER_STATUS.IN_PROGRESS,
+							"border-cyan-500 bg-cyan-500/10 text-cyan-500":
+								data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
+							"border-yellow-500 bg-yellow-500/10 text-yellow-500":
 								data.status === WORK_ORDER_STATUS.PENDING,
-							"border-green-500 bg-green-500/5 text-green-500":
+							"border-green-500 bg-green-500/10 text-green-500":
 								data.status === WORK_ORDER_STATUS.COMPLETED,
-							"border-red-500 bg-red-500/5 text-red-500":
-								data.status === WORK_ORDER_STATUS.CANCELLED ||
-								data.status === WORK_ORDER_STATUS.EXPIRED,
+							"border-red-500 bg-red-500/10 text-red-500":
+								data.status === WORK_ORDER_STATUS.CANCELLED,
 						})}
 					>
 						{WorkOrderStatusLabels[data.status as keyof typeof WorkOrderStatusLabels]}
@@ -77,23 +80,32 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
 
 				<div className="flex gap-2">
-					<ActivityForm entryType="DAILY_ACTIVITY" workOrderId={id} userId={session.user?.id} />
+					{data.status !== "COMPLETED" && (
+						<>
+							<ActivityForm
+								workOrderId={id}
+								userId={session.user?.id}
+								entryType="DAILY_ACTIVITY"
+								actualProgress={data.workProgressStatus || 0}
+							/>
 
-					<ActivityForm
-						entryType="ADDITIONAL_ACTIVITY"
-						workOrderId={id}
-						userId={session.user?.id}
-					/>
+							<ActivityForm
+								workOrderId={id}
+								userId={session.user?.id}
+								entryType="ADDITIONAL_ACTIVITY"
+								actualProgress={data.workProgressStatus || 0}
+							/>
 
-					<OtcInspectorForm userId={session.user?.id} workOrderId={id} />
+							<OtcInspectorForm userId={session.user?.id} workOrderId={id} />
+
+							{session.user.id === data.responsibleId &&
+								data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
+									<ApproveWorkBookClosure workOrderId={id} userId={session?.user?.id} />
+								)}
+						</>
+					)}
 				</div>
 			</div>
-
-			{session?.user?.role === "ADMIN" &&
-				session.user.id === data.responsibleId &&
-				data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
-					<ApproveWorkBookClosure workOrderId={id} userId={session?.user?.id} />
-				)}
 
 			<WorkBookEntriesTable workOrderId={id} />
 		</div>

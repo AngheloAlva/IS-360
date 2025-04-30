@@ -34,11 +34,6 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 			return { ok: false, message: "Libro de obras no encontrado" }
 		}
 
-		// Verificar que el usuario sea supervisor de OTC
-		if (user.role !== "ADMIN" && user.id !== workOrder.responsibleId) {
-			return { ok: false, message: "No Autorizado" }
-		}
-
 		// Verificar que haya una solicitud de cierre pendiente
 		if (workOrder.status !== "CLOSURE_REQUESTED") {
 			return { ok: false, message: "No hay una solicitud de cierre pendiente" }

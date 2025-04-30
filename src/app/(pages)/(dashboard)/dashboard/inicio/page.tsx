@@ -1,6 +1,6 @@
 import { ConstructionIcon } from "lucide-react"
 
-export default function BootFolderPage(): React.ReactElement {
+export default function HomePage(): React.ReactElement {
 	return (
 		<div className="flex min-h-[85vh] flex-col items-center justify-center gap-4 p-4">
 			<ConstructionIcon className="text-primary h-24 w-24 animate-pulse" />

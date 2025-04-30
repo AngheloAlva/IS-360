@@ -88,13 +88,16 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 
 			return (
 				<Badge
-					className={cn("bg-primary/5 border-primary text-primary", {
-						"border-yellow-500 bg-yellow-500/5 text-yellow-500":
+					className={cn("border-slate-500 bg-slate-500/10 text-slate-500", {
+						"border-purple-500 bg-purple-500/10 text-purple-500":
+							status === WORK_ORDER_STATUS.IN_PROGRESS,
+						"border-cyan-500 bg-cyan-500/10 text-cyan-500":
+							status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
+						"border-yellow-500 bg-yellow-500/10 text-yellow-500":
 							status === WORK_ORDER_STATUS.PENDING,
-						"border-green-500 bg-green-500/5 text-green-500":
+						"border-green-500 bg-green-500/10 text-green-500":
 							status === WORK_ORDER_STATUS.COMPLETED,
-						"border-red-500 bg-red-500/5 text-red-500":
-							status === WORK_ORDER_STATUS.CANCELLED || status === WORK_ORDER_STATUS.EXPIRED,
+						"border-red-500 bg-red-500/10 text-red-500": status === WORK_ORDER_STATUS.CANCELLED,
 					})}
 				>
 					{WorkOrderStatusLabels[status]}

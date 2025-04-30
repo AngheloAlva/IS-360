@@ -150,7 +150,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	}, [form.watch("estimatedHours")])
 
 	async function onSubmit(values: WorkOrderSchema) {
-		const initReportFile = form.getValues("file")[0]
+		const initReportFile = form.getValues("file")?.[0]
 
 		setIsSubmitting(true)
 
@@ -167,8 +167,12 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 					secondaryName: values.workRequest + "-" + initReportFile.title,
 					files: [initReportFile],
 				})
+
 				const { ok, message } = await createWorkOrder({
-					values,
+					values: {
+						...values,
+						file: undefined,
+					},
 					initReportFile: uploadResult[0],
 				})
 
@@ -307,7 +311,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							control={form.control}
 							name="equipment"
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className="sm:col-span-2">
 									<FormLabel>Equipo(s)</FormLabel>
 									<FormControl>
 										{isEquipmentsLoading ? (

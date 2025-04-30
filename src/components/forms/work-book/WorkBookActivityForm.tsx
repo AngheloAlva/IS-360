@@ -39,10 +39,12 @@ import {
 import type { ENTRY_TYPE, User } from "@prisma/client"
 
 export default function ActivityForm({
+	actualProgress,
 	workOrderId,
 	entryType,
 	userId,
 }: {
+	actualProgress: number
 	entryType: ENTRY_TYPE
 	workOrderId: string
 	userId: string
@@ -117,8 +119,19 @@ export default function ActivityForm({
 			return
 		}
 
+		const newProgress = Number(values.progress) + actualProgress
+
+		if (newProgress > 100) {
+			toast.error("El progreso no puede superar el 100%", {
+				description: "El progreso actual es de " + actualProgress + "%",
+				duration: 5000,
+			})
+			setIsSubmitting(false)
+			return
+		}
+
 		try {
-			if (files.length > 0) {
+			if (files && files.length > 0) {
 				const uploadResults = await uploadFilesToCloud({
 					files,
 					randomString: userId,
@@ -136,7 +149,10 @@ export default function ActivityForm({
 				if (!ok) throw new Error(message)
 			} else {
 				const { ok, message } = await createActivity({
-					values,
+					values: {
+						...values,
+						files: undefined,
+					},
 					userId,
 					entryType,
 				})
@@ -213,12 +229,14 @@ export default function ActivityForm({
 								control={form.control}
 								label="Hora de Inicio"
 								name="activityStartTime"
+								itemClassName="content-start"
 							/>
 
 							<InputFormField<DailyActivitySchema>
 								name="activityEndTime"
 								control={form.control}
 								label="Hora de Fin"
+								itemClassName="content-start"
 							/>
 
 							<InputWithPrefixFormField<DailyActivitySchema>
@@ -230,6 +248,7 @@ export default function ActivityForm({
 								control={form.control}
 								placeholder="Progreso"
 								label="Progreso Realizado (%)"
+								description={`Progreso actual: ${actualProgress}%`}
 							/>
 						</div>
 

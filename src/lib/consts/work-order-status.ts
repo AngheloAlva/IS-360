@@ -1,11 +1,10 @@
 export const WORK_ORDER_STATUS_VALUES = {
+	PLANNED: "PLANNED",
 	PENDING: "PENDING",
-	IN_PROGRESS: "IN_PROGRESS",
 	COMPLETED: "COMPLETED",
 	CANCELLED: "CANCELLED",
-	EXPIRED: "EXPIRED",
+	IN_PROGRESS: "IN_PROGRESS",
 	CLOSURE_REQUESTED: "CLOSURE_REQUESTED",
-	CLOSED: "CLOSED",
 } as const
 
 export const WORK_ORDER_STATUS_VALUES_ARRAY = [
@@ -13,9 +12,8 @@ export const WORK_ORDER_STATUS_VALUES_ARRAY = [
 	WORK_ORDER_STATUS_VALUES.IN_PROGRESS,
 	WORK_ORDER_STATUS_VALUES.COMPLETED,
 	WORK_ORDER_STATUS_VALUES.CANCELLED,
-	WORK_ORDER_STATUS_VALUES.EXPIRED,
 	WORK_ORDER_STATUS_VALUES.CLOSURE_REQUESTED,
-	WORK_ORDER_STATUS_VALUES.CLOSED,
+	WORK_ORDER_STATUS_VALUES.PLANNED,
 ] as const
 
 export const WorkOrderStatusLabels = {
@@ -25,7 +23,7 @@ export const WorkOrderStatusLabels = {
 	CANCELLED: "Cancelado",
 	EXPIRED: "Expirado",
 	CLOSURE_REQUESTED: "Cierre Solicitado",
-	CLOSED: "Cerrado",
+	PLANNED: "Planificado",
 }
 
 export const WorkOrderStatusOptions = [
@@ -46,7 +44,11 @@ export const WorkOrderStatusOptions = [
 		label: "Cancelado",
 	},
 	{
-		value: WORK_ORDER_STATUS_VALUES.EXPIRED,
-		label: "Expirado",
+		value: WORK_ORDER_STATUS_VALUES.CLOSURE_REQUESTED,
+		label: "Cierre Solicitado",
+	},
+	{
+		value: WORK_ORDER_STATUS_VALUES.PLANNED,
+		label: "Planificado",
 	},
 ]

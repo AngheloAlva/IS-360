@@ -19,7 +19,7 @@ export const otcInspectionsSchema = z.object({
 		.string()
 		.regex(/^[0-9]+$/, "Debe ser un número")
 		.optional(),
-	files: z.array(fileSchema),
+	files: z.array(fileSchema).optional(),
 })
 
 export type OtcInspectionSchema = z.infer<typeof otcInspectionsSchema>

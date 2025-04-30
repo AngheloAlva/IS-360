@@ -5,7 +5,7 @@ import { fileSchema } from "../document-management/file.schema"
 export const dailyActivitySchema = z.object({
 	workOrderId: z.string(),
 
-	comments: z.string().nonempty({ message: "Los comentarios no pueden estar vacíos" }),
+	comments: z.string().optional(),
 	executionDate: z.date({ message: "La fecha de ejecución no es válida" }),
 	activityStartTime: z.string().nonempty({ message: "La hora de inicio no puede estar vacía" }),
 	activityEndTime: z.string().nonempty({ message: "La hora de fin no puede estar vacía" }),
@@ -18,7 +18,7 @@ export const dailyActivitySchema = z.object({
 			})
 		)
 		.min(1, { message: "Debe haber al menos un personal" }),
-	files: z.array(fileSchema),
+	files: z.array(fileSchema).optional(),
 })
 
 export type DailyActivitySchema = z.infer<typeof dailyActivitySchema>

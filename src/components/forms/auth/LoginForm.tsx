@@ -9,10 +9,11 @@ import { toast } from "sonner"
 import { type LoginSchema, loginSchema } from "@/lib/form-schemas/auth/login-schema"
 import { authClient } from "@/lib/auth-client"
 
+import ResetPasswordConfirmation from "@/components/sections/auth/ResetPasswordConfirmation"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "../shared/SubmitButton"
 import { Form } from "@/components/ui/form"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export default function LoginForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -46,7 +47,7 @@ export default function LoginForm(): React.ReactElement {
 				},
 				onError: (ctx) => {
 					setLoading(false)
-					toast("Error", {
+					toast.error("Error", {
 						description: ctx.error.message,
 						duration: 4000,
 					})
@@ -83,6 +84,10 @@ export default function LoginForm(): React.ReactElement {
 					</form>
 				</Form>
 			</CardContent>
+
+			<CardFooter>
+				<ResetPasswordConfirmation />
+			</CardFooter>
 		</Card>
 	)
 }

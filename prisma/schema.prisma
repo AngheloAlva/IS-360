@@ -224,13 +224,12 @@ model Verification {
 }
 
 enum WORK_ORDER_STATUS {
+  PLANNED
   PENDING
-  IN_PROGRESS
   COMPLETED
   CANCELLED
+  IN_PROGRESS
   CLOSURE_REQUESTED
-  CLOSED
-  EXPIRED
 }
 
 enum WORK_ORDER_TYPE {
@@ -257,7 +256,7 @@ model WorkOrder {
   otNumber String
 
   type             WORK_ORDER_TYPE
-  status           WORK_ORDER_STATUS   @default(PENDING)
+  status           WORK_ORDER_STATUS   @default(PLANNED)
   solicitationDate DateTime
   solicitationTime String
   workRequest      String
@@ -272,6 +271,7 @@ model WorkOrder {
   breakDays        Int?
   estimatedEndDate DateTime?
   isWorkBook       Boolean
+  isWorkBookInit   Boolean             @default(false)
 
   // Work book data
   workName           String?

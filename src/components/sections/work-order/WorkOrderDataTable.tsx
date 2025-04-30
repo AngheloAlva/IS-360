@@ -40,6 +40,7 @@ import {
 	SelectGroup,
 	SelectItem,
 	SelectLabel,
+	SelectSeparator,
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select"
@@ -130,6 +131,7 @@ export function WorkOrderDataTable() {
 					<SelectContent>
 						<SelectGroup>
 							<SelectLabel>Tipo de obra</SelectLabel>
+							<SelectSeparator />
 							<SelectItem value="all">Todos los tipos</SelectItem>
 							{WorkOrderTypeOptions.map((type) => (
 								<SelectItem key={type.value} value={type.value}>
@@ -156,6 +158,7 @@ export function WorkOrderDataTable() {
 					<SelectContent>
 						<SelectGroup>
 							<SelectLabel>Empresa</SelectLabel>
+							<SelectSeparator />
 							<SelectItem value="all">Todas las empresas</SelectItem>
 							{companies?.companies?.map((company) => (
 								<SelectItem key={company.id} value={company.id}>
@@ -184,6 +187,7 @@ export function WorkOrderDataTable() {
 					<SelectContent>
 						<SelectGroup>
 							<SelectLabel>Estado</SelectLabel>
+							<SelectSeparator />
 							<SelectItem value="all">Todos los estados</SelectItem>
 							{WorkOrderStatusOptions.map((status) => (
 								<SelectItem key={status.value} value={status.value}>

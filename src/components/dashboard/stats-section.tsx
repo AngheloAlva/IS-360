@@ -81,7 +81,7 @@ export function StatsSection({ data, isLoading }: StatsSectionProps) {
 				value={data?.workOrders.total.toString() ?? "--"}
 				className="hover:border-amber-500 hover:bg-amber-500/10"
 				icon={<BookOpen className="h-12 w-12 rounded-lg bg-amber-500/10 p-2 text-amber-500" />}
-				description={`${data?.workOrders.pending} pendientes, ${data?.workOrders.inProgress} en progreso`}
+				description={`${data?.workOrders.planning} planeadas, ${data?.workOrders.inProgress} en progreso`}
 			/>
 			<DashboardStatsCard
 				loading={isLoading}

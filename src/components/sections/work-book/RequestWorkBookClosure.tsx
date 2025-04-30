@@ -17,6 +17,7 @@ import {
 	AlertDialogDescription,
 } from "@/components/ui/alert-dialog"
 import { requestClosure } from "@/actions/work-orders/requestClosure"
+import { CheckCircleIcon } from "lucide-react"
 
 interface RequestWorkBookClosureProps {
 	userId: string
@@ -26,8 +27,8 @@ interface RequestWorkBookClosureProps {
 
 export function RequestWorkBookClosure({
 	userId,
-	workOrderId,
 	isDisabled,
+	workOrderId,
 }: RequestWorkBookClosureProps) {
 	const [isLoading, setIsLoading] = useState(false)
 	const router = useRouter()
@@ -38,13 +39,14 @@ export function RequestWorkBookClosure({
 			const response = await requestClosure({ userId, workBookId: workOrderId })
 
 			if (!response.ok) {
-				throw new Error("Error al solicitar el cierre")
+				throw new Error(response.message)
 			}
 
 			toast.success("La solicitud de cierre ha sido enviada al supervisor de OTC")
 
 			router.refresh()
-		} catch {
+		} catch (error) {
+			console.error("[WORK_BOOK_REQUEST_CLOSURE]", error)
 			toast.error("No se pudo enviar la solicitud de cierre")
 		} finally {
 			setIsLoading(false)
@@ -54,8 +56,14 @@ export function RequestWorkBookClosure({
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
-				<Button variant="default" className="gap-2" disabled={isDisabled || isLoading}>
+				<Button
+					variant="default"
+					size="lg"
+					className="gap-2 bg-teal-500 font-semibold tracking-wide hover:bg-teal-600"
+					disabled={isDisabled || isLoading}
+				>
 					{isLoading ? "Solicitando..." : "Solicitar Cierre"}
+					<CheckCircleIcon className="h-4 w-4" />
 				</Button>
 			</AlertDialogTrigger>
 			<AlertDialogContent>
@@ -68,7 +76,13 @@ export function RequestWorkBookClosure({
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancelar</AlertDialogCancel>
-					<AlertDialogAction onClick={handleRequestClosure}>Solicitar Cierre</AlertDialogAction>
+					<AlertDialogAction
+						onClick={handleRequestClosure}
+						className="gap-2 bg-teal-500 font-semibold tracking-wide hover:bg-teal-600"
+					>
+						Solicitar Cierre
+						<CheckCircleIcon className="h-4 w-4" />
+					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>

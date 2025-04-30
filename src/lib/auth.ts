@@ -15,6 +15,14 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true,
+		sendResetPassword: async ({ user, url }) => {
+			await resend.emails.send({
+				from: "anghelo.alva@ingenieriasimple.cl",
+				to: [user.email],
+				subject: `Restablecimiento de contraseña para OTC 360`,
+				text: `Ingresa al siguiente link para restablecer tu contraseña: ${url}`,
+			})
+		},
 	},
 	session: {
 		cookieCache: {

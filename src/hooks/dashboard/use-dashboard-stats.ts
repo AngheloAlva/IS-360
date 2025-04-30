@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 interface WorkOrderStats {
 	total: number
-	pending: number
+	planning: number
 	inProgress: number
 	byType: Array<{
 		type: string

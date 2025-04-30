@@ -1,44 +1,35 @@
 "use client"
 
-import { ArrowUpDown, Link as LinkIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 
-import { WORK_ORDER_STATUS_VALUES } from "@/lib/consts/work-order-status"
-import { WORK_ORDER_TYPE_VALUES } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_STATUS, type WORK_ORDER_TYPE } from "@prisma/client"
+import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
+import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 
 import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
 
 import type { WorkBookByCompany } from "@/hooks/work-orders/use-work-books-by-company"
-import type { Equipment, WorkOrder } from "@prisma/client"
 
 export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
-	{
-		accessorKey: "id",
-		header: "",
-		cell: ({ row }) => {
-			const id = row.getValue("id")
-			return (
-				<Link
-					href={`/dashboard/libro-de-obras/${id}`}
-					className="text-primary hover:text-feature text-right font-medium hover:underline"
-				>
-					<LinkIcon className="h-4 w-4" />
-				</Link>
-			)
-		},
-	},
 	{
 		accessorKey: "otNumber",
 		header: "OT",
 		cell: ({ row }) => {
 			const otNumber = row.getValue("otNumber") as string
-			return <div>{otNumber}</div>
+			const id = row.original.id
+			return (
+				<Link
+					href={`/dashboard/libro-de-obras/${id}`}
+					className="text-primary hover:text-feature font-medium hover:underline"
+				>
+					{otNumber}
+				</Link>
+			)
 		},
-	},
-	{
-		accessorKey: "company.name",
-		header: "Contratante",
 	},
 	{
 		accessorKey: "supervisor.name",
@@ -46,18 +37,74 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 	},
 	{
 		accessorKey: "responsible.name",
-		header: "Responsable de obra",
+		header: "Responsable de OTC",
 	},
 	{
 		accessorKey: "workName",
 		header: "Nombre de obra",
 	},
 	{
+		accessorKey: "workStartDate",
+		header: "Fecha de inicio",
+		cell: ({ row }) => {
+			const date = row.getValue("workStartDate") as Date | null
+			const formattedDate = date ? format(date, "dd/MM/yyyy") : "No iniciada"
+			return <div>{formattedDate}</div>
+		},
+	},
+	{
+		accessorKey: "estimatedEndDate",
+		header: "Fecha estimada de término",
+		cell: ({ row }) => {
+			const date = row.getValue("estimatedEndDate") as Date | null
+			const formattedDate = date ? format(date, "dd/MM/yyyy") : ""
+			return <div>{formattedDate}</div>
+		},
+	},
+	{
+		accessorKey: "status",
+		header: "Estado",
+		cell: ({ row }) => {
+			const status = row.getValue("status") as WORK_ORDER_STATUS
+			return (
+				<Badge
+					className={cn("border-slate-500 bg-slate-500/10 text-slate-500", {
+						"border-purple-500 bg-purple-500/10 text-purple-500":
+							status === WORK_ORDER_STATUS.IN_PROGRESS,
+						"border-cyan-500 bg-cyan-500/10 text-cyan-500":
+							status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
+						"border-yellow-500 bg-yellow-500/10 text-yellow-500":
+							status === WORK_ORDER_STATUS.PENDING,
+						"border-green-500 bg-green-500/10 text-green-500":
+							status === WORK_ORDER_STATUS.COMPLETED,
+						"border-red-500 bg-red-500/10 text-red-500": status === WORK_ORDER_STATUS.CANCELLED,
+					})}
+				>
+					{WorkOrderStatusLabels[status]}
+				</Badge>
+			)
+		},
+	},
+	{
+		accessorKey: "workProgressStatus",
+		header: "Estado de avance",
+		cell: ({ row }) => {
+			const status = row.getValue("workProgressStatus") as number
+			return <Progress value={status} />
+		},
+	},
+	{
 		accessorKey: "equipment",
 		header: "Equipo(s)",
 		cell: ({ row }) => {
-			const equipment = row.getValue("equipment") as Equipment[]
-			return <div>{equipment?.map((e) => e.name).join(", ")}</div>
+			const equipment = row.original.equipment
+			return (
+				<ul>
+					{equipment.map((e) => (
+						<li key={e.name}>{e.name}</li>
+					))}
+				</ul>
+			)
 		},
 	},
 	{
@@ -68,62 +115,8 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 		accessorKey: "type",
 		header: "Tipo de obra",
 		cell: ({ row }) => {
-			const type = row.getValue("type") as WorkOrder["type"]
-			return <div>{WORK_ORDER_TYPE_VALUES[type]}</div>
-		},
-	},
-	{
-		accessorKey: "workStartDate",
-		header: ({ column }) => {
-			return (
-				<div
-					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					className="hover:text-primary flex cursor-pointer items-center transition-colors"
-				>
-					Fecha de inicio
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</div>
-			)
-		},
-		cell: ({ row }) => {
-			const date = row.getValue("workStartDate") as string
-			// const formattedDate = format(date as Date, "dd/MM/yyyy")
-			return <div>{date}</div>
-		},
-	},
-	{
-		accessorKey: "estimatedEndDate",
-		header: ({ column }) => {
-			return (
-				<div
-					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					className="hover:text-primary flex cursor-pointer items-center transition-colors"
-				>
-					Fecha estimada de término
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</div>
-			)
-		},
-		cell: ({ row }) => {
-			const date = row.getValue("estimatedEndDate") as string
-			// const formattedDate = format(date as Date, "dd/MM/yyyy")
-			return <div>{date}</div>
-		},
-	},
-	{
-		accessorKey: "status",
-		header: "Estado",
-		cell: ({ row }) => {
-			const status = row.getValue("status") as WorkOrder["status"]
-			return <div>{WORK_ORDER_STATUS_VALUES[status]}</div>
-		},
-	},
-	{
-		accessorKey: "workProgressStatus",
-		header: "Estado de avance",
-		cell: ({ row }) => {
-			const status = row.getValue("workProgressStatus") as WorkOrder["workProgressStatus"]
-			return <Progress value={status} />
+			const type = row.getValue("type") as WORK_ORDER_TYPE
+			return <div>{WorkOrderTypeLabels[type]}</div>
 		},
 	},
 ]

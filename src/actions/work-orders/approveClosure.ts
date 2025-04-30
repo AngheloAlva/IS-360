@@ -40,14 +40,6 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 			}
 		}
 
-		// Verificar que el usuario sea supervisor de OTC
-		if (!user.isSupervisor || user.role !== "ADMIN") {
-			return {
-				ok: false,
-				message: "Forbidden",
-			}
-		}
-
 		// Verificar que haya una solicitud de cierre pendiente
 		if (workOrder.status !== "CLOSURE_REQUESTED") {
 			return {
@@ -60,7 +52,7 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 		await prisma.workOrder.update({
 			where: { id: workBookId },
 			data: {
-				status: "CLOSED",
+				status: "COMPLETED",
 				closureApprovedById: userId,
 				closureApprovedAt: new Date(),
 			},

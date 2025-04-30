@@ -29,6 +29,7 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
+import { InfoIcon } from "lucide-react"
 
 export function WorkBookDataTable({ companyId }: { companyId: string }) {
 	const [page, setPage] = useState(1)
@@ -41,6 +42,7 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 		search,
 		companyId,
 		limit: 10,
+		onlyBooks: true,
 	})
 
 	const table = useReactTable({
@@ -62,7 +64,7 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
 				<Input
 					value={search}
-					className="w-96"
+					className="bg-background w-96"
 					placeholder="Filtrar por Numero de OT..."
 					onChange={(e) => setSearch(e.target.value)}
 				/>
@@ -87,23 +89,34 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
-							? Array.from({ length: 10 }).map((_, index) => (
-									<TableRow key={index}>
-										<TableCell className="" colSpan={8}>
-											<Skeleton className="h-9 min-w-full" />
+						{isLoading ? (
+							Array.from({ length: 10 }).map((_, index) => (
+								<TableRow key={index}>
+									<TableCell className="" colSpan={12}>
+										<Skeleton className="h-9 min-w-full" />
+									</TableCell>
+								</TableRow>
+							))
+						) : table.getRowModel().rows.length === 0 ? (
+							<TableRow>
+								<TableCell colSpan={12} className="h-24 text-center font-semibold">
+									<div className="flex w-full items-center justify-center gap-2">
+										<InfoIcon className="h-5 w-5" />
+										No hay libros de obras registrados
+									</div>
+								</TableCell>
+							</TableRow>
+						) : (
+							table.getRowModel().rows.map((row) => (
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="font-medium">
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
 										</TableCell>
-									</TableRow>
-								))
-							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className="font-medium">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))}
+									))}
+								</TableRow>
+							))
+						)}
 					</TableBody>
 				</Table>
 			</Card>

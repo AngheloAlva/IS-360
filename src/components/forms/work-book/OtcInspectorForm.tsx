@@ -62,7 +62,7 @@ export default function OtcInspectorForm({
 		const files = form.getValues("files")
 
 		try {
-			if (files.length > 0) {
+			if (files && files.length > 0) {
 				const uploadResults = await uploadFilesToCloud({
 					files,
 					containerType: "files",
@@ -71,7 +71,10 @@ export default function OtcInspectorForm({
 				})
 
 				const { ok, message } = await createOtcInspections({
-					values,
+					values: {
+						...values,
+						files: undefined,
+					},
 					userId,
 					attachment: uploadResults,
 				})
@@ -79,7 +82,10 @@ export default function OtcInspectorForm({
 				if (!ok) throw new Error(message)
 			} else {
 				const { ok, message } = await createOtcInspections({
-					values,
+					values: {
+						...values,
+						files: undefined,
+					},
 					userId,
 				})
 

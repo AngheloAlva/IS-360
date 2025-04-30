@@ -1,6 +1,7 @@
 "use server"
 
 import { generateOTNumber } from "@/actions/work-orders/generateOTNumber"
+import { sendNewWorkOrderEmail } from "./sendNewWorkOrderEmail"
 import prisma from "@/lib/prisma"
 
 import type { WorkOrderSchema } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
@@ -13,10 +14,11 @@ interface CreateWorkOrderProps {
 
 export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrderProps) => {
 	try {
-		const { supervisorId, responsibleId, companyId, breakDays, equipment, ...rest } = values
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { supervisorId, responsibleId, companyId, file, breakDays, equipment, ...rest } = values
 		const otNumber = await generateOTNumber()
 
-		await prisma.workOrder.create({
+		const newWorkOrder = await prisma.workOrder.create({
 			data: {
 				otNumber,
 				responsible: {
@@ -54,6 +56,57 @@ export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrde
 				breakDays: breakDays ? +breakDays : 0,
 				equipment: {
 					connect: equipment.map((id) => ({ id })),
+				},
+			},
+		})
+
+		const workOrder = await prisma.workOrder.findUnique({
+			where: {
+				id: newWorkOrder.id,
+			},
+			include: {
+				responsible: {
+					select: {
+						name: true,
+					},
+				},
+				supervisor: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
+				equipment: {
+					select: {
+						name: true,
+					},
+				},
+			},
+		})
+
+		if (!workOrder) {
+			return {
+				ok: false,
+				message: "Error al crear el orden de trabajo",
+			}
+		}
+
+		sendNewWorkOrderEmail({
+			workOrder: {
+				otNumber: workOrder.otNumber,
+				type: workOrder.type,
+				priority: workOrder.priority,
+				equipment: workOrder.equipment,
+				programDate: workOrder.programDate,
+				estimatedDays: +workOrder.estimatedDays,
+				estimatedHours: +workOrder.estimatedHours,
+				responsible: {
+					name: workOrder.responsible.name,
+				},
+				workDescription: workOrder.workDescription,
+				supervisor: {
+					name: workOrder.supervisor.name,
+					email: workOrder.supervisor.email,
 				},
 			},
 		})

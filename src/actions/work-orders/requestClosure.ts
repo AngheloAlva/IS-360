@@ -25,8 +25,24 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 		const workOrder = await prisma.workOrder.findUnique({
 			where: { id: workBookId },
 			include: {
-				supervisor: true,
-				company: true,
+				supervisor: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
+				company: {
+					select: {
+						name: true,
+						rut: true,
+					},
+				},
+				responsible: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
 			},
 		})
 
@@ -38,7 +54,7 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 		}
 
 		// Verificar que el usuario sea supervisor de la empresa colaboradora
-		if (!user.isSupervisor || user.role !== "PARTNER_COMPANY") {
+		if (user.role !== "SUPERVISOR") {
 			return {
 				ok: false,
 				message: "Forbidden",
@@ -66,14 +82,14 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 		})
 
 		// Enviar correo al supervisor de OTC
-		if (workOrder.supervisor?.email) {
+		if (workOrder.responsible.email) {
 			await sendRequestClosureEmail({
 				workOrderId: workOrder.id,
 				supervisorName: user.name,
-				email: workOrder.supervisor.email,
+				email: workOrder.responsible.email,
 				workOrderNumber: workOrder.otNumber,
-				companyName: workOrder.company.name,
 				workOrderName: `Libro de Obras ${workOrder.otNumber}`,
+				companyName: workOrder.company.name + " - " + workOrder.company.rut,
 			})
 		}
 

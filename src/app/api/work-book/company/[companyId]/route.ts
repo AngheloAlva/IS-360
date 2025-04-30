@@ -13,16 +13,17 @@ export async function GET(
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
+		const onlyBooks = searchParams.get("onlyBooks") === "true"
+		console.log(onlyBooks)
 
 		const skip = (page - 1) * limit
 
-		// Get statistics
 		const [workBooks, total] = await Promise.all([
-			// Fetch work books with pagination
 			prisma.workOrder.findMany({
 				where: {
 					isWorkBook: true,
 					companyId,
+					isWorkBookInit: onlyBooks,
 					...(search
 						? {
 								OR: [
@@ -35,10 +36,17 @@ export async function GET(
 				},
 				select: {
 					id: true,
+					type: true,
 					otNumber: true,
 					workName: true,
+					priority: true,
+					workRequest: true,
+					programDate: true,
 					workLocation: true,
 					workStartDate: true,
+					estimatedDays: true,
+					estimatedHours: true,
+					workDescription: true,
 					workProgressStatus: true,
 					status: true,
 					solicitationDate: true,
@@ -64,6 +72,11 @@ export async function GET(
 							role: true,
 						},
 					},
+					equipment: {
+						select: {
+							name: true,
+						},
+					},
 					_count: {
 						select: {
 							workEntries: true,
@@ -80,10 +93,11 @@ export async function GET(
 					swr: 10,
 				},
 			}),
-			// Get total count
 			prisma.workOrder.count({
 				where: {
 					isWorkBook: true,
+					companyId,
+					isWorkBookInit: onlyBooks,
 					...(search
 						? {
 								OR: [
