@@ -2,7 +2,14 @@
 
 import { cn } from "@/lib/utils"
 
-import { FormItem, FormLabel, FormField, FormControl, FormMessage } from "@/components/ui/form"
+import {
+	FormItem,
+	FormLabel,
+	FormField,
+	FormControl,
+	FormMessage,
+	FormDescription,
+} from "@/components/ui/form"
 import {
 	Select,
 	SelectItem,
@@ -19,6 +26,7 @@ interface SelectFormFieldProps<T extends FieldValues> {
 	className?: string
 	control: Control<T>
 	placeholder?: string
+	description?: string
 	itemClassName?: string
 	options: { value: string; label: string }[]
 }
@@ -29,6 +37,7 @@ export function SelectFormField<T extends FieldValues>({
 	options,
 	control,
 	className,
+	description,
 	placeholder,
 	itemClassName,
 }: SelectFormFieldProps<T>) {
@@ -55,6 +64,7 @@ export function SelectFormField<T extends FieldValues>({
 							</SelectContent>
 						</Select>
 					</FormControl>
+					<FormDescription>{description}</FormDescription>
 					<FormMessage />
 				</FormItem>
 			)}

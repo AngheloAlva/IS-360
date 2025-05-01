@@ -9,13 +9,14 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
+import { LinkIcon } from "lucide-react"
 
 export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	{
 		accessorKey: "responsible",
 		header: "Responsable",
 		cell: ({ row }) => {
-			const responsible = row.original.responsible as MaintenancePlanTask['responsible']
+			const responsible = row.original.responsible as MaintenancePlanTask["responsible"]
 			return <span>{responsible.name}</span>
 		},
 	},
@@ -23,8 +24,9 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		accessorKey: "company",
 		header: "Empresa",
 		cell: ({ row }) => {
-			const company = row.original.company as MaintenancePlanTask['company']
-			const isInternal = row.original.isInternalResponsible as MaintenancePlanTask['isInternalResponsible']
+			const company = row.original.company as MaintenancePlanTask["company"]
+			const isInternal = row.original
+				.isInternalResponsible as MaintenancePlanTask["isInternalResponsible"]
 			return <span>{isInternal ? "OTC" : company.name}</span>
 		},
 	},
@@ -37,15 +39,19 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		header: "Descripción",
 		cell: ({ row }) => {
 			const description = row.getValue("description") as string
-			return <p className="max-w-64 w-64 text-wrap">{description}</p>
+			return <p className="w-64 max-w-64 text-wrap">{description}</p>
 		},
 	},
 	{
 		accessorKey: "frequency",
 		header: "Frecuencia",
 		cell: ({ row }) => {
-			const frequency = row.getValue("frequency") as MaintenancePlanTask['frequency']
-			return <Badge className="bg-primary/10 border-primary text-primary">{TaskFrequencyLabels[frequency]}</Badge>
+			const frequency = row.getValue("frequency") as MaintenancePlanTask["frequency"]
+			return (
+				<Badge className="border-purple-500 bg-purple-500/10 text-purple-500">
+					{TaskFrequencyLabels[frequency]}
+				</Badge>
+			)
 		},
 	},
 	{
@@ -55,42 +61,56 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 			const nextDate = row.getValue("nextDate") as Date
 			const leftDays = differenceInDays(new Date(nextDate), new Date())
 
-			return <Badge className={cn({
-				"bg-green-500/10 border-green-500 text-green-500": leftDays > 0,
-				"bg-amber-500/10 border-amber-500 text-amber-500": leftDays <= 15,
-				"bg-red-500/10 border-red-500 text-red-500": leftDays <= 0
-			})}>{format(new Date(nextDate), "dd-MM-yyyy")}</Badge>
+			return (
+				<Badge
+					className={cn({
+						"border-green-500 bg-green-500/10 text-green-500": leftDays > 0,
+						"border-amber-500 bg-amber-500/10 text-amber-500": leftDays <= 15,
+						"border-red-500 bg-red-500/10 text-red-500": leftDays <= 0,
+					})}
+				>
+					{format(new Date(nextDate), "dd-MM-yyyy")}
+				</Badge>
+			)
 		},
 	},
 	{
 		accessorKey: "equipment",
 		header: "Equipo",
 		cell: ({ row }) => {
-			const equipment = row.original.equipment as MaintenancePlanTask['equipment']
+			const equipment = row.original.equipment as MaintenancePlanTask["equipment"]
 			return <span>{equipment.name}</span>
 		},
 	},
 	{
-		accessorKey: 'attachments',
+		accessorKey: "attachments",
 		header: "Adjuntos",
 		cell: ({ row }) => {
-			const attachments = row.original.attachments as MaintenancePlanTask['attachments']
-			return <ul className="flex flex-col gap-1">
-				{attachments.map((attachment) => (
-					<li key={attachment.id}>
-						<Link href={attachment.url} target="_blank" rel="noopener noreferrer" className="underline text-primary">
-							{attachment.name}
-						</Link>
-					</li>
-				))}
-			</ul>
-		}
+			const attachments = row.original.attachments as MaintenancePlanTask["attachments"]
+			return (
+				<ul className="flex flex-col gap-1">
+					{attachments.map((attachment) => (
+						<li key={attachment.id}>
+							<Link
+								href={attachment.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-primary flex items-center gap-1 hover:underline"
+							>
+								{attachment.name}
+								<LinkIcon className="size-4" />
+							</Link>
+						</li>
+					))}
+				</ul>
+			)
+		},
 	},
 	{
 		accessorKey: "createdBy",
 		header: "Creado por",
 		cell: ({ row }) => {
-			const createdBy = row.original.createdBy as MaintenancePlanTask['createdBy']
+			const createdBy = row.original.createdBy as MaintenancePlanTask["createdBy"]
 			return <span>{createdBy.name}</span>
 		},
 	},

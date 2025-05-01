@@ -5,100 +5,80 @@ import prisma from "@/lib/prisma"
 
 export async function GET() {
 	try {
-		const [
-			totalUsers,
-			usersByRole,
-			usersByArea,
-			usersByInternalRole,
-			twoFactorEnabled,
-			recentlyActiveUsers,
-		] = await Promise.all([
-			// Total users
-			prisma.user.count(),
+		const [totalUsers, usersByRole, usersByArea, twoFactorEnabled, recentlyActiveUsers] =
+			await Promise.all([
+				// Total users
+				prisma.user.count(),
 
-			// Users by role
-			prisma.user.groupBy({
-				by: ["role"],
-				where: {
-					role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
-				},
-				_count: true,
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
-				},
-			}),
-
-			// Users by area
-			prisma.user.groupBy({
-				by: ["area"],
-				_count: true,
-				where: {
-					area: { not: null },
-				},
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
-				},
-			}),
-
-			// Users by internal role
-			prisma.user.groupBy({
-				by: ["internalRole"],
-				_count: true,
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
-				},
-			}),
-
-			// Users with 2FA enabled
-			prisma.user.count({
-				where: {
-					twoFactorEnabled: true,
-				},
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
-				},
-			}),
-
-			// Recently active users
-			prisma.user.findMany({
-				where: {
-					sessions: {
-						some: {},
+				// Users by role
+				prisma.user.groupBy({
+					by: ["role"],
+					where: {
+						role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
 					},
-				},
-				select: {
-					id: true,
-					name: true,
-					role: true,
-					image: true,
-					sessions: {
-						orderBy: {
-							updatedAt: "desc",
-						},
-						take: 1,
-						select: {
-							updatedAt: true,
-						},
+					_count: true,
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
 					},
-				},
-				orderBy: [
-					{
+				}),
+
+				// Users by area
+				prisma.user.groupBy({
+					by: ["area"],
+					_count: true,
+					where: {
+						area: { not: null },
+					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
+				}),
+
+				// Users with 2FA enabled
+				prisma.user.count({
+					where: {
+						twoFactorEnabled: true,
+					},
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
+				}),
+
+				// Recently active users
+				prisma.user.findMany({
+					where: {
 						sessions: {
-							_count: "desc",
+							some: {},
 						},
 					},
-				],
-				take: 4,
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
-				},
-			}),
-		])
+					select: {
+						id: true,
+						name: true,
+						role: true,
+						image: true,
+						sessions: {
+							orderBy: {
+								updatedAt: "desc",
+							},
+							take: 1,
+							select: {
+								updatedAt: true,
+							},
+						},
+					},
+					orderBy: {
+						updatedAt: "desc",
+					},
+					take: 3,
+					cacheStrategy: {
+						ttl: 120,
+						swr: 10,
+					},
+				}),
+			])
 
 		const roleColors = {
 			ADMIN: "bg-amber-500",
@@ -120,13 +100,6 @@ export async function GET() {
 			(area: { area: string | null; _count: number }) => ({
 				area: area.area,
 				count: area._count,
-			})
-		)
-
-		const formattedUsersByInternalRole = usersByInternalRole.map(
-			(role: { internalRole: string; _count: number }) => ({
-				role: role.internalRole,
-				count: role._count,
 			})
 		)
 
@@ -169,7 +142,6 @@ export async function GET() {
 			usersByArea: formattedUsersByArea.sort(
 				(a: { count: number }, b: { count: number }) => b.count - a.count
 			),
-			usersByInternalRole: formattedUsersByInternalRole,
 			twoFactorEnabled,
 			recentlyActiveUsers: formattedRecentUsers,
 		})

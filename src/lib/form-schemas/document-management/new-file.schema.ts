@@ -1,13 +1,13 @@
 import { z } from "zod"
 
-import { AreasValuesArray } from "@/lib/consts/areas"
+import { DocumentAreasValuesArray } from "@/lib/consts/areas"
 import { fileSchema } from "./file.schema"
 
 export const fileFormSchema = z.object({
 	userId: z.string(),
 	parentFolderId: z.string().optional(),
 
-	area: z.enum(AreasValuesArray, { message: "El área es requerido" }),
+	area: z.enum(DocumentAreasValuesArray, { message: "El área es requerido" }),
 	code: z.string({ message: "El código es requerido" }),
 	otherCode: z.string().optional(),
 	registrationDate: z.date({ message: "La fecha de registro es requerida" }),

@@ -6,12 +6,12 @@ import { PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { UserAreaOptions, UserAreasValuesArray } from "@/lib/consts/areas"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
 import { InternalUserRoleOptions } from "@/lib/consts/user-roles"
-import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { updateInternalUser } from "@/actions/users/updateUser"
-import { AreaOptions } from "@/lib/consts/areas"
+import { ModuleOptions } from "@/lib/consts/modules"
 import { authClient } from "@/lib/auth-client"
 import {
 	internalUserSchema,
@@ -53,10 +53,13 @@ export default function InternalUserFormSheet({
 			email: initialData?.email || "",
 			phone: initialData?.phone || "",
 			role: initialData?.role || "USER",
-			area: initialData?.area || undefined,
-			internalRole: initialData?.internalRole || "NONE",
+			modules: initialData?.modules || [],
+			internalRole: initialData?.internalRole || "",
+			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
 		},
 	})
+
+	// TODO: Agregar campo de modulos permitidos y permitir editar
 
 	async function onSubmit(values: InternalUserSchema) {
 		setLoading(true)
@@ -74,6 +77,7 @@ export default function InternalUserFormSheet({
 						rut: values.rut,
 						area: values.area,
 						phone: values.phone,
+						modules: values.modules,
 						internalRole: values.internalRole,
 					},
 				})
@@ -152,26 +156,31 @@ export default function InternalUserFormSheet({
 		}
 	}
 
-
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
-			<SheetTrigger className="bg-primary text-white h-10 rounded-md px-3 text-sm flex items-center justify-center gap-1 hover:bg-primary/80" onClick={() => setOpen(true)}>
+			<SheetTrigger
+				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				onClick={() => setOpen(true)}
+			>
 				<PlusIcon className="h-4 w-4" />
-				<span className="hidden sm:inline text-nowrap">Nuevo Miembro</span>
+				<span className="hidden text-nowrap sm:inline">Nuevo Usuario</span>
 			</SheetTrigger>
 
-			<SheetContent className="sm:max-w-md gap-0">
+			<SheetContent className="gap-0 sm:max-w-md">
 				<SheetHeader>
-					<SheetTitle>
-						{initialData ? "Editar Miembro OTC" : "Nuevo Miembro OTC"}
-					</SheetTitle>
+					<SheetTitle>{initialData ? "Editar Usuario" : "Nuevo Usuario"}</SheetTitle>
 					<SheetDescription>
-						{initialData ? "" : "Al crear un nuevo usuario, se le enviará un correo electrónico con su contraseña temporal para acceder al sistema."}
+						{initialData
+							? ""
+							: "Al crear un nuevo usuario, se le enviará un correo electrónico con su contraseña temporal para acceder al sistema."}
 					</SheetDescription>
 				</SheetHeader>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="grid sm:grid-cols-2 pt-4 gap-y-5 gap-x-2 px-4">
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="grid gap-x-2 gap-y-5 px-4 pt-4 sm:grid-cols-2"
+					>
 						<InputFormField<InternalUserSchema>
 							name="name"
 							label="Nombre"
@@ -207,26 +216,35 @@ export default function InternalUserFormSheet({
 							placeholder="Selecciona un rol"
 						/>
 
-						<SelectFormField<InternalUserSchema>
-							label="Cargo"
+						<InputFormField<InternalUserSchema>
 							name="internalRole"
+							label="Cargo"
 							control={form.control}
-							options={InternalRoleOptions}
-							placeholder="Selecciona un cargo"
+							placeholder="Cargo del usuario"
 						/>
 
 						<SelectFormField<InternalUserSchema>
 							name="area"
 							label="Área"
-							options={AreaOptions}
 							control={form.control}
+							options={UserAreaOptions}
 							placeholder="Selecciona un área"
+						/>
+
+						<SelectFormField<InternalUserSchema>
+							name="modules"
+							label="Módulos"
+							control={form.control}
+							options={ModuleOptions}
+							itemClassName="sm:col-span-2"
+							placeholder="Selecciona módulos"
+							description="Estos son los modulos en los cuales el usuario podra crear, editar, o eliminar."
 						/>
 
 						<SubmitButton
 							isSubmitting={loading}
 							label={initialData ? "Actualizar Usuario" : "Crear Usuario"}
-							className="hover:bg-primary mt-5 sm:col-span-2 hover:text-white hover:brightness-90"
+							className="hover:bg-primary mt-5 hover:text-white hover:brightness-90 sm:col-span-2"
 						/>
 					</form>
 				</Form>

@@ -8,9 +8,9 @@ import { UploadIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { uploadMultipleFiles } from "@/actions/document-management/uploadMultipleFiles"
+import { Areas, type DocumentAreasValuesArray } from "@/lib/consts/areas"
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { uploadFilesToCloud } from "@/lib/upload-files"
-import { Areas } from "@/lib/consts/areas"
 import {
 	fileFormSchema,
 	type FileFormSchema,
@@ -35,9 +35,9 @@ import {
 } from "@/components/ui/sheet"
 
 interface NewFileFormProps {
-	area: string
 	userId: string
 	parentFolderId?: string
+	area: keyof typeof Areas
 }
 
 export function NewFileFormSheet({ userId, parentFolderId, area }: NewFileFormProps) {
@@ -57,7 +57,7 @@ export function NewFileFormSheet({ userId, parentFolderId, area }: NewFileFormPr
 			description: "",
 			expirationDate: undefined,
 			registrationDate: new Date(),
-			area: Areas[area as keyof typeof Areas].value,
+			area: Areas[area].value as (typeof DocumentAreasValuesArray)[number],
 		},
 	})
 

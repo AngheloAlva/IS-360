@@ -26,7 +26,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 	const areaData = Areas[area as keyof typeof Areas]
 	if (!areaData) return notFound()
 
-	const areaKey = area
+	const areaKey = area as keyof typeof Areas
 	const areaName = areaData.title
 	const areaValue = areaData.value
 

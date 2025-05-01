@@ -3,15 +3,15 @@
 import { addDays, format, subDays } from "date-fns"
 import { NextResponse } from "next/server"
 
-import { AreasValues } from "@/lib/consts/areas"
+import { type DocumentAreasValues, DocumentAreasValuesArray } from "@/lib/consts/areas"
+import { DocumentExpirations } from "@/lib/consts/document-expirations"
 import prisma from "@/lib/prisma"
 
 import type { AREAS } from "@prisma/client"
-import { DocumentExpirations } from "@/lib/consts/document-expirations"
 
 export async function GET() {
 	// Get documents by area
-	const areas = Object.values(AreasValues)
+	const areas = DocumentAreasValuesArray
 
 	const areaData = await Promise.all(
 		areas.map(async (area) => {
@@ -169,7 +169,7 @@ export async function GET() {
 		},
 	})
 
-	const areaColors: Record<keyof typeof AreasValues, string> = {
+	const areaColors: Record<keyof typeof DocumentAreasValues, string> = {
 		OPERATIONS: "#2563eb",
 		INSTRUCTIONS: "#60a5fa",
 		INTEGRITY_AND_MAINTENANCE: "#10b981",
@@ -182,7 +182,7 @@ export async function GET() {
 		PROJECTS: "#6b7280",
 	}
 
-	const areaLabels: Record<keyof typeof AreasValues, string> = {
+	const areaLabels: Record<keyof typeof DocumentAreasValues, string> = {
 		OPERATIONS: "Operaciones",
 		INSTRUCTIONS: "Instructivos",
 		INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
@@ -252,10 +252,10 @@ export async function GET() {
 					}),
 				])
 
-				return { 
-					date, 
+				return {
+					date,
 					files: filesCount,
-					folders: foldersCount
+					folders: foldersCount,
 				}
 			})
 		),
@@ -273,14 +273,14 @@ export async function GET() {
 				})
 				return { date, changes: count }
 			})
-		)
+		),
 	])
 
 	return NextResponse.json({
 		areaData: areaData.map((area: { area: AREAS; _count: { files: number } }) => ({
-			name: areaLabels[area.area as keyof typeof AreasValues],
+			name: areaLabels[area.area as keyof typeof DocumentAreasValues],
 			value: area._count.files,
-			fill: areaColors[area.area as keyof typeof AreasValues],
+			fill: areaColors[area.area as keyof typeof DocumentAreasValues],
 		})),
 		expirationData: [
 			{

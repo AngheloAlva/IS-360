@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sheet"
 
 import type { Folder } from "@prisma/client"
+import { DocumentAreasValuesArray } from "@/lib/consts/areas"
 
 export default function UpdateFolderFormSheet({
 	userId,
@@ -47,11 +48,11 @@ export default function UpdateFolderFormSheet({
 		resolver: zodResolver(folderFormSchema),
 		defaultValues: {
 			userId,
-			area: oldFolder.area,
 			name: oldFolder.name,
 			type: oldFolder.type,
 			root: oldFolder.root,
 			description: oldFolder.description || "",
+			area: oldFolder.area as (typeof DocumentAreasValuesArray)[number],
 		},
 	})
 

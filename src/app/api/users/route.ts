@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
 					area: true,
 					phone: true,
 					email: true,
+					modules: true,
 					createdAt: true,
 					internalRole: true,
 					isSupervisor: true,

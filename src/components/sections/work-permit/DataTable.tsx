@@ -59,14 +59,14 @@ export function DataTable<TData, TValue>({
 			<div className="flex w-fit flex-col flex-wrap items-start gap-2 py-4 md:w-full md:flex-row">
 				<Input
 					type="number"
-					className="w-96"
+					className="bg-background w-96"
 					placeholder="Filtrar por Numero de OT..."
 					value={(table.getColumn("otNumber")?.getFilterValue() as string) ?? ""}
 					onChange={(event) => table.getColumn("otNumber")?.setFilterValue(event.target.value)}
 				/>
 
 				<Input
-					className="w-96"
+					className="bg-background w-96"
 					placeholder="Filtrar por Empresa ejecutora..."
 					value={(table.getColumn("executanCompany")?.getFilterValue() as string) ?? ""}
 					onChange={(event) =>
@@ -82,7 +82,7 @@ export function DataTable<TData, TValue>({
 				</Link>
 			</div>
 
-			<div className="w-full max-w-full overflow-x-scroll rounded-md border">
+			<div className="bg-background w-full max-w-full overflow-x-scroll rounded-md border">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (

@@ -16,17 +16,6 @@ enum USER_ROLE {
   PARTNER_COMPANY
 }
 
-enum OTC_INTERNAL_ROLE {
-  GENERAL_SUPERVISOR
-  AREA_SUPERVISOR
-  PREVENTION_OFFICER
-  OPERATIONS_MANAGER
-  MAINTENANCE_SUPERVISOR
-  ENVIRONMENTAL_SUPERVISOR
-  QUALITY_SUPERVISOR
-  NONE
-}
-
 enum AREAS {
   OPERATIONS // Operaciones
   INSTRUCTIONS // Instructivos
@@ -38,6 +27,10 @@ enum AREAS {
   LEGAL // Juridica
   COMMUNITIES // Comunidades (periodistas?)
   PROJECTS // Proyectos
+  PURCHASING // Compras
+  ADMINISTRATION_AND_FINANCES // Administración y Finanzas
+  IT // Informática
+  GERENCY // Gerencia
 }
 
 enum MODULES {
@@ -51,7 +44,7 @@ enum MODULES {
 }
 
 model User {
-  id               String            @id
+  id               String    @id
   name             String
   email            String
   emailVerified    Boolean
@@ -60,8 +53,8 @@ model User {
   createdAt        DateTime
   updatedAt        DateTime
   modules          MODULES[]
-  role             USER_ROLE         @default(PARTNER_COMPANY)
-  internalRole     OTC_INTERNAL_ROLE @default(NONE)
+  role             USER_ROLE @default(PARTNER_COMPANY)
+  internalRole     String?
   area             AREAS?
   banned           Boolean?
   banReason        String?

@@ -49,9 +49,17 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 				</div>
 
 				<div className="ml-auto flex gap-2">
-					<NewFileFormSheet area={area} userId={data.user.id} parentFolderId={folderId} />
+					<NewFileFormSheet
+						area={area as keyof typeof Areas}
+						userId={data.user.id}
+						parentFolderId={folderId}
+					/>
 
-					<NewFolderFormSheet area={area} userId={data.user.id} parentFolderId={folderId} />
+					<NewFolderFormSheet
+						area={area as keyof typeof Areas}
+						userId={data.user.id}
+						parentFolderId={folderId}
+					/>
 				</div>
 			</div>
 

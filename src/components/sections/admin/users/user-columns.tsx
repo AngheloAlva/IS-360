@@ -6,14 +6,14 @@ import { format } from "date-fns"
 import Link from "next/link"
 
 import { USER_ROLES_VALUES, UserRolesLabels } from "@/lib/consts/user-roles"
-import { InternalRoleOptions } from "@/lib/consts/internal-roles"
+import { type MODULES, USER_ROLE } from "@prisma/client"
+import { ModulesLabels } from "@/lib/consts/modules"
 import { AreasLabels } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 
 import { Badge } from "@/components/ui/badge"
 
 import type { ApiUser } from "@/types/user"
-import { USER_ROLE } from "@prisma/client"
 
 export const UserColumns: ColumnDef<ApiUser>[] = [
 	{
@@ -59,7 +59,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			return (
 				<Badge
 					className={cn("border-green-500 bg-green-500/10 text-green-500", {
-						"border-purple-500 text-purple-500 bg-purple-500/10": role === USER_ROLE.ADMIN,
+						"border-purple-500 bg-purple-500/10 text-purple-500": role === USER_ROLE.ADMIN,
 					})}
 				>
 					{UserRolesLabels[role]}
@@ -69,15 +69,10 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 	},
 	{
 		accessorKey: "internalRole",
-		header: "Rol Interno",
+		header: "Cargo",
 		cell: ({ row }) => {
-			const role = row.getValue("role") as string
-			if (role === "PARTNER_COMPANY") return null
-
 			const internalRole = row.getValue("internalRole") as string
-			const roleLabel =
-				InternalRoleOptions.find((r) => r.value === internalRole)?.label || internalRole
-			return roleLabel === "Ninguno" ? null : <Badge variant="secondary">{roleLabel}</Badge>
+			return <Badge variant="secondary">{internalRole}</Badge>
 		},
 	},
 	{
@@ -94,6 +89,20 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 				<Badge variant="outline" className="bg-primary/10">
 					{AreasLabels[area]}
 				</Badge>
+			)
+		},
+	},
+	{
+		accessorKey: "modules",
+		header: "Módulos",
+		cell: ({ row }) => {
+			const modules = row.getValue("modules") as MODULES[]
+			return (
+				<ul>
+					{modules.map((module) => (
+						<li key={module}>{ModulesLabels[module]}</li>
+					))}
+				</ul>
 			)
 		},
 	},

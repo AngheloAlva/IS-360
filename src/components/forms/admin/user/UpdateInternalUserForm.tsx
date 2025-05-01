@@ -6,10 +6,9 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { InternalRoleOptions } from "@/lib/consts/internal-roles"
 import { updateInternalUser } from "@/actions/users/updateUser"
 import { InternalUserRoleOptions } from "@/lib/consts/user-roles"
-import { AreaOptions } from "@/lib/consts/areas"
+import { AreaOptions, UserAreasValuesArray } from "@/lib/consts/areas"
 import {
 	internalUserSchema,
 	type InternalUserSchema,
@@ -23,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Form } from "@/components/ui/form"
 
 import type { User } from "@prisma/client"
+import { ModuleOptions } from "@/lib/consts/modules"
 
 interface InternalUserFormProps {
 	user: User
@@ -40,10 +40,10 @@ export default function UpdateInternalUserForm({
 		defaultValues: {
 			rut: user.rut,
 			name: user.name,
-			area: user.area,
 			role: user.role,
 			email: user.email,
-			internalRole: user.internalRole,
+			internalRole: user.internalRole || undefined,
+			area: user.area as (typeof UserAreasValuesArray)[number],
 		},
 	})
 
@@ -105,11 +105,11 @@ export default function UpdateInternalUserForm({
 							options={InternalUserRoleOptions}
 						/>
 
-						<SelectFormField<InternalUserSchema>
+						<InputFormField<InternalUserSchema>
 							name="internalRole"
 							label="Rol Interno"
 							control={form.control}
-							options={InternalRoleOptions}
+							placeholder="Rol interno del usuario"
 						/>
 
 						<SelectFormField<InternalUserSchema>
@@ -117,6 +117,16 @@ export default function UpdateInternalUserForm({
 							label="Área"
 							control={form.control}
 							options={AreaOptions}
+						/>
+
+						<SelectFormField<InternalUserSchema>
+							name="modules"
+							control={form.control}
+							options={ModuleOptions}
+							label="Modulos Permitidos"
+							itemClassName="sm:col-span-2"
+							placeholder="Selecciona uno o mas modulos"
+							description="Estos son los modulos en los cuales el usuario podra crear, editar, o eliminar."
 						/>
 
 						<SubmitButton

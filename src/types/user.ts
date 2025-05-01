@@ -1,13 +1,13 @@
-import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
-import { OTC_INTERNAL_ROLES_VALUES } from "@/lib/consts/internal-roles"
+import { MODULES, USER_ROLE } from "@prisma/client"
 
 export interface ApiUser {
 	id: string
 	name: string
 	email: string
 	rut: string
-	role: keyof typeof USER_ROLES_VALUES
-	internalRole: keyof typeof OTC_INTERNAL_ROLES_VALUES
+	role: USER_ROLE
+	internalRole: string
+	modules: MODULES[]
 	area: string | null
 	createdAt: string
 	isSupervisor: boolean

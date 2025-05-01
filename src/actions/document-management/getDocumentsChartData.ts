@@ -2,14 +2,14 @@
 
 import { addDays, format, subDays } from "date-fns"
 
-import { AreasValues } from "@/lib/consts/areas"
+import { DocumentAreasValues } from "@/lib/consts/areas"
 import prisma from "@/lib/prisma"
 
 import type { AREAS } from "@prisma/client"
 
 export async function getDocumentsChartData() {
 	// Get documents by area
-	const areas = Object.values(AreasValues)
+	const areas = Object.values(DocumentAreasValues)
 
 	const areaData = await Promise.all(
 		areas.map(async (area) => {
@@ -167,7 +167,7 @@ export async function getDocumentsChartData() {
 		},
 	})
 
-	const areaColors: Record<keyof typeof AreasValues, string> = {
+	const areaColors: Record<keyof typeof DocumentAreasValues, string> = {
 		OPERATIONS: "#2563eb",
 		INSTRUCTIONS: "#60a5fa",
 		INTEGRITY_AND_MAINTENANCE: "#10b981",
@@ -180,7 +180,7 @@ export async function getDocumentsChartData() {
 		PROJECTS: "#6b7280",
 	}
 
-	const areaLabels: Record<keyof typeof AreasValues, string> = {
+	const areaLabels: Record<keyof typeof DocumentAreasValues, string> = {
 		OPERATIONS: "Operaciones",
 		INSTRUCTIONS: "Instructivos",
 		INTEGRITY_AND_MAINTENANCE: "Integridad y Mantención",
@@ -237,9 +237,9 @@ export async function getDocumentsChartData() {
 
 	return {
 		areaData: areaData.map((area: { area: AREAS; _count: { files: number } }) => ({
-			name: areaLabels[area.area as keyof typeof AreasValues],
+			name: areaLabels[area.area as keyof typeof DocumentAreasValues],
 			value: area._count.files,
-			fill: areaColors[area.area as keyof typeof AreasValues],
+			fill: areaColors[area.area as keyof typeof DocumentAreasValues],
 		})),
 		expirationData: [
 			{

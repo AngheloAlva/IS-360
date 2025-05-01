@@ -21,7 +21,7 @@ export default function DashboardHomePage() {
 				<div className="absolute inset-0 bg-black/30" />
 
 				<div className="relative z-10 text-center text-white">
-					<h1 className="text-4xl font-bold drop-shadow-2xl">Bienvenido al OTC 360</h1>
+					<h1 className="text-4xl font-bold drop-shadow-2xl">Bienvenido a OTC 360</h1>
 					<p className="mt-2 text-lg drop-shadow-2xl">
 						Gestiona y supervisa todos los distintos modulos de la plataforma.
 					</p>

@@ -28,6 +28,10 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 		return notFound()
 	}
 
+	const canAddActivities =
+		data.status === WORK_ORDER_STATUS.IN_PROGRESS || data.status === WORK_ORDER_STATUS.PLANNED
+	const canClose = session.user.role === USER_ROLE.SUPERVISOR && data.workProgressStatus === 100
+
 	return (
 		<>
 			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -82,9 +86,9 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
 
 				<div className="flex gap-2">
-					{data.status === WORK_ORDER_STATUS.IN_PROGRESS && (
+					{canAddActivities && (
 						<>
-							{session.user.role === USER_ROLE.SUPERVISOR && data.workProgressStatus === 100 ? (
+							{canClose ? (
 								<RequestWorkBookClosure workOrderId={id} userId={session?.user?.id} />
 							) : (
 								<>
@@ -92,13 +96,6 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 										workOrderId={id}
 										userId={session.user?.id}
 										entryType="DAILY_ACTIVITY"
-										actualProgress={data.workProgressStatus || 0}
-									/>
-
-									<ActivityForm
-										workOrderId={id}
-										userId={session.user?.id}
-										entryType="ADDITIONAL_ACTIVITY"
 										actualProgress={data.workProgressStatus || 0}
 									/>
 								</>

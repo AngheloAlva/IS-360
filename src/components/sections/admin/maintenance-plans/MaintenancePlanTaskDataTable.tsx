@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, InfoIcon } from "lucide-react"
 import { useState } from "react"
 import {
 	flexRender,
@@ -13,7 +13,10 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { type MaintenancePlanTask, useMaintenancePlanTasks } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
+import {
+	type MaintenancePlanTask,
+	useMaintenancePlanTasks,
+} from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
 import { MaintenancePlanTaskColumns } from "./maintenance-plan-task-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
@@ -69,7 +72,7 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
 			<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
-				<div className="flex items-center w-full gap-4">
+				<div className="flex w-full items-center gap-4">
 					{parentId && (
 						<Button
 							variant="ghost"
@@ -110,15 +113,16 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
-							? Array.from({ length: 10 }).map((_, index) => (
+						{isLoading ? (
+							Array.from({ length: 10 }).map((_, index) => (
 								<TableRow key={index}>
-									<TableCell colSpan={9}>
+									<TableCell colSpan={10}>
 										<Skeleton className="h-6.5 min-w-full" />
 									</TableCell>
 								</TableRow>
 							))
-							: table.getRowModel().rows.map((row) => (
+						) : table.getRowModel().rows.length > 0 ? (
+							table.getRowModel().rows.map((row) => (
 								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>
@@ -126,7 +130,17 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 										</TableCell>
 									))}
 								</TableRow>
-							))}
+							))
+						) : (
+							<TableRow>
+								<TableCell colSpan={10} className="h-24">
+									<div className="flex w-full items-center justify-center gap-2 font-semibold">
+										<InfoIcon className="mr-2 h-4 w-4" />
+										No hay tareas asignadas
+									</div>
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
 			</Card>
