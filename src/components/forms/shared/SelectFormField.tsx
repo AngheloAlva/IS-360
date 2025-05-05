@@ -48,23 +48,21 @@ export function SelectFormField<T extends FieldValues>({
 			render={({ field }) => (
 				<FormItem className={itemClassName}>
 					<FormLabel>{label}</FormLabel>
-					<FormControl>
-						<Select onValueChange={field.onChange} defaultValue={field.value}>
-							<FormControl>
-								<SelectTrigger className={cn("w-full text-sm", className)}>
-									<SelectValue placeholder={placeholder || label} />
-								</SelectTrigger>
-							</FormControl>
-							<SelectContent>
-								{options.map((option) => (
-									<SelectItem key={option.value} value={option.value}>
-										{option.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</FormControl>
-					<FormDescription>{description}</FormDescription>
+					<Select onValueChange={field.onChange} defaultValue={field.value}>
+						<FormControl>
+							<SelectTrigger className={cn("w-full text-sm", className)}>
+								<SelectValue placeholder={placeholder || label} />
+							</SelectTrigger>
+						</FormControl>
+						<SelectContent>
+							{options.map((option) => (
+								<SelectItem key={option.value} value={option.value}>
+									{option.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					{description && <FormDescription>{description}</FormDescription>}
 					<FormMessage />
 				</FormItem>
 			)}

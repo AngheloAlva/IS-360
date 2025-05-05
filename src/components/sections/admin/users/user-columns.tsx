@@ -1,16 +1,15 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Edit } from "lucide-react"
 import { format } from "date-fns"
-import Link from "next/link"
 
-import { USER_ROLES_VALUES, UserRolesLabels } from "@/lib/consts/user-roles"
+import { UserRolesLabels } from "@/lib/consts/user-roles"
 import { type MODULES, USER_ROLE } from "@prisma/client"
 import { ModulesLabels } from "@/lib/consts/modules"
 import { AreasLabels } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 
+import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { Badge } from "@/components/ui/badge"
 
 import type { ApiUser } from "@/types/user"
@@ -119,22 +118,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		accessorKey: "id",
 		header: "",
 		cell: ({ row }) => {
-			const id = row.getValue("id")
-			const role = row.getValue("role")
-
-			const isPartnerCompany =
-				role === USER_ROLES_VALUES.PARTNER_COMPANY || role === USER_ROLES_VALUES.OPERATOR
-
-			if (isPartnerCompany) return null
-
-			return (
-				<Link
-					href={`/admin/dashboard/usuarios/internos/editar/${id}`}
-					className="text-primary hover:text-feature text-right font-medium hover:underline"
-				>
-					<Edit className="h-4 w-4" />
-				</Link>
-			)
+			return <InternalUserFormSheet initialData={row.original} />
 		},
 	},
 ]

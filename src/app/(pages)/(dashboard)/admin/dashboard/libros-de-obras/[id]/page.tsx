@@ -84,16 +84,16 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 						<>
 							<ActivityForm
 								workOrderId={id}
+								startDate={new Date()}
 								userId={session.user?.id}
 								entryType="DAILY_ACTIVITY"
-								actualProgress={data.workProgressStatus || 0}
 							/>
 
 							<ActivityForm
 								workOrderId={id}
+								startDate={new Date()}
 								userId={session.user?.id}
 								entryType="ADDITIONAL_ACTIVITY"
-								actualProgress={data.workProgressStatus || 0}
 							/>
 
 							<OtcInspectorForm userId={session.user?.id} workOrderId={id} />

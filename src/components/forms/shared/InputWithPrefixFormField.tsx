@@ -58,7 +58,7 @@ export function InputWithPrefixFormField<T extends FieldValues>({
 					</FormLabel>
 
 					<div className="flex items-center">
-						<div className="flex px-1 bg-input/30 text-sm border-r-0 text-muted-foreground h-full rounded-l-md border items-center">
+						<div className="bg-input/30 text-muted-foreground flex h-9 items-center rounded-l-md border border-r-0 px-1 text-sm">
 							{prefix}
 						</div>
 						<FormControl>
@@ -72,7 +72,6 @@ export function InputWithPrefixFormField<T extends FieldValues>({
 								{...field}
 							/>
 						</FormControl>
-
 					</div>
 
 					{description && <FormDescription>{description}</FormDescription>}

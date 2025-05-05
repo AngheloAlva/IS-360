@@ -77,7 +77,6 @@ model User {
   requestedClosures              WorkOrder[]           @relation("WorkOrderClosureRequester")
   approvedClosures               WorkOrder[]           @relation("WorkOrderClosureApprover")
   assignedEntries                WorkEntry[]           @relation("AssignedUsers")
-  reportedInEntries              WorkEntry[]           @relation("ReportedUsers")
   createdEntries                 WorkEntry[]           @relation("WorkEntryCreator")
   signedEntries                  WorkEntry[]           @relation("WorkEntrySigner")
   workEntries                    WorkEntry[]           @relation("WorkEntryApproval")
@@ -270,7 +269,7 @@ model WorkOrder {
   workName           String?
   workLocation       String?
   workStartDate      DateTime?
-  workProgressStatus Int?        @default(0)
+  workProgressStatus Float?      @default(0) // Cambiado a Float para precisión en el porcentaje
   workEntries        WorkEntry[]
 
   company               Company              @relation(fields: [companyId], references: [id])
@@ -295,6 +294,7 @@ model WorkOrder {
   equipmentHistory      EquipmentHistory[]
   MaintenancePlanTask   MaintenancePlanTask? @relation(fields: [maintenancePlanTaskId], references: [id])
   maintenancePlanTaskId String?
+  milestones            Milestone[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -302,6 +302,52 @@ model WorkOrder {
   @@unique([id])
   @@unique([otNumber])
   @@map("work_order")
+}
+
+model Milestone {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  order       Int       @default(0)
+  isCompleted Boolean   @default(false)
+  progress    Float     @default(0)
+  weight      Float     @default(1)
+  startDate   DateTime?
+  endDate     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workOrder   WorkOrder       @relation(fields: [workOrderId], references: [id])
+  workOrderId String
+  tasks       MilestoneTask[]
+
+  @@unique([id])
+  @@index([workOrderId, order])
+  @@map("milestone")
+}
+
+model MilestoneTask {
+  id                String      @id @default(cuid())
+  name              String
+  description       String?
+  order             Int         @default(0)
+  isCompleted       Boolean     @default(false)
+  plannedDate       DateTime?
+  activityStartTime String?
+  activityEndTime   String?
+  estimatedHours    Float?
+  estimatedPeople   Int?
+  completedAt       DateTime?
+  completedBy       String?
+  comments          String?
+  milestone         Milestone   @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  milestoneId       String
+  workEntries       WorkEntry[]
+
+  @@unique([id])
+  @@index([milestoneId])
+  @@map("milestone_task")
 }
 
 model Equipment {
@@ -377,61 +423,50 @@ enum APPROVAL_STATUS {
 }
 
 model WorkEntry {
-  id                String     @id @default(cuid())
-  entryType         ENTRY_TYPE
-  isFavorite        Boolean    @default(false)
-  hasAttachments    Boolean    @default(false)
-  executionDate     DateTime   @default(now())
-  activityName      String?
-  activityStartTime String?
-  activityEndTime   String?
-  comments          String?
+  id                   String             @id @default(cuid())
+  entryType            ENTRY_TYPE
+  isFavorite           Boolean            @default(false)
+  hasAttachments       Boolean            @default(false)
+  executionDate        DateTime           @default(now())
+  activityName         String?
+  activityStartTime    String?
+  activityEndTime      String?
+  progressContribution Float? // Cuánto contribuye esta actividad al progreso de la tarea (0-100)
+  comments             String?
+  supervisionComments  String?
+  safetyObservations   String?
+  nonConformities      String?
+  inspectorName        String?
+  recommendations      String?
+  others               String?
+  noteStatus           NOTE_STATUS?       @default(PENDING)
+  notificationSent     Boolean            @default(false)
+  acknowledgedAt       DateTime?
+  resolvedAt           DateTime?
+  approvalStatus       APPROVAL_STATUS?   @default(PENDING)
+  approvalDate         DateTime?
+  approvalBy           User?              @relation("WorkEntryApproval", fields: [approvalById], references: [id])
+  approvalById         String?
+  createdAt            DateTime           @default(now())
+  createdBy            User               @relation("WorkEntryCreator", fields: [createdById], references: [id])
+  createdById          String
+  signedAt             DateTime?
+  signedBy             User?              @relation("WorkEntrySigner", fields: [signedById], references: [id])
+  signedById           String?
+  workOrder            WorkOrder          @relation(fields: [workOrderId], references: [id])
+  workOrderId          String
+  milestoneTask        MilestoneTask?     @relation(fields: [milestoneTaskId], references: [id])
+  milestoneTaskId      String?
+  assignedUsers        User[]             @relation(name: "AssignedUsers")
+  referencedEntry      WorkEntry?         @relation("EntryReferences", fields: [referencedEntryId], references: [id])
+  referencedEntryId    String?
+  referencedBy         WorkEntry[]        @relation("EntryReferences")
+  equipmentHistory     EquipmentHistory[]
+  attachments          Attachment[]
 
-  // Campos de OtcInspection
-  supervisionComments String?
-  safetyObservations  String?
-  nonConformities     String?
-  inspectorName       String?
-  recommendations     String?
-  others              String?
-
-  // Campos para notas de usuario
-  noteStatus       NOTE_STATUS?     @default(PENDING)
-  notificationSent Boolean          @default(false)
-  acknowledgedAt   DateTime?
-  resolvedAt       DateTime?
-  approvalStatus   APPROVAL_STATUS? @default(PENDING)
-  approvalDate     DateTime?
-  approvalBy       User?            @relation("WorkEntryApproval", fields: [approvalById], references: [id])
-  approvalById     String?
-
-  createdAt   DateTime @default(now())
-  createdBy   User     @relation("WorkEntryCreator", fields: [createdById], references: [id])
-  createdById String
-
-  // En caso de que sea un comentario, el usuario que lo firma
-  signedAt   DateTime?
-  signedBy   User?     @relation("WorkEntrySigner", fields: [signedById], references: [id])
-  signedById String?
-
-  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
-  workOrderId String
-
-  // Relaciones con usuarios asignados y reportados
-  assignedUsers User[] @relation(name: "AssignedUsers")
-  reportedUsers User[] @relation(name: "ReportedUsers")
-
-  // For comments/references to other entries
-  referencedEntry   WorkEntry?         @relation("EntryReferences", fields: [referencedEntryId], references: [id])
-  referencedEntryId String?
-  referencedBy      WorkEntry[]        @relation("EntryReferences")
-  equipmentHistory  EquipmentHistory[]
-
-  attachments Attachment[]
-
-  // For efficient chronological listing
   @@unique([id])
   @@index([workOrderId, createdAt])
+  @@index([milestoneTaskId])
   @@map("work_book_entry")
 }
 

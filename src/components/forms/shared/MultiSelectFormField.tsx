@@ -1,6 +1,13 @@
 "use client"
 
-import { FormItem, FormLabel, FormField, FormControl, FormMessage } from "@/components/ui/form"
+import {
+	FormItem,
+	FormLabel,
+	FormField,
+	FormControl,
+	FormMessage,
+	FormDescription,
+} from "@/components/ui/form"
 import MultipleSelector from "@/components/ui/multiselect"
 
 import type { Control, FieldValues, Path } from "react-hook-form"
@@ -11,6 +18,7 @@ interface MultiSelectFormFieldProps<T extends FieldValues> {
 	className?: string
 	control: Control<T>
 	placeholder?: string
+	description?: string
 	itemClassName?: string
 	options: { value: string; label: string }[]
 }
@@ -22,6 +30,7 @@ export function MultiSelectFormField<T extends FieldValues>({
 	control,
 	className,
 	placeholder,
+	description,
 	itemClassName,
 }: MultiSelectFormFieldProps<T>) {
 	return (
@@ -50,6 +59,7 @@ export function MultiSelectFormField<T extends FieldValues>({
 							}}
 						/>
 					</FormControl>
+					{description && <FormDescription>{description}</FormDescription>}
 					<FormMessage />
 				</FormItem>
 			)}

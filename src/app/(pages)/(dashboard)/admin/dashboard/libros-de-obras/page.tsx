@@ -69,7 +69,6 @@ export default function WorkBooksAdminPage() {
 				</TabsList>
 
 				<TabsContent value="overview" className="space-y-6">
-					{/* General Statistics */}
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 						<StatCard
 							colorVariant="blue"
@@ -97,7 +96,6 @@ export default function WorkBooksAdminPage() {
 						/>
 					</div>
 
-					{/* Search and Table */}
 					<div className="space-y-4">
 						<Input
 							value={search}
@@ -119,7 +117,6 @@ export default function WorkBooksAdminPage() {
 				</TabsContent>
 
 				<TabsContent value="stats" className="space-y-6">
-					{/* Detailed Statistics */}
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						<Card className="p-6">
 							<h3 className="mb-4 font-semibold">Distribución por Estado</h3>

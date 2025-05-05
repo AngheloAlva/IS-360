@@ -105,7 +105,6 @@ export const getWorkOrderById = async (id: string) => {
 					include: {
 						createdBy: true,
 						assignedUsers: true,
-						reportedUsers: true,
 					},
 				},
 				company: {
@@ -131,6 +130,16 @@ export const getWorkOrderById = async (id: string) => {
 					},
 				},
 				equipment: true,
+				milestones: {
+					select: {
+						startDate: true,
+					},
+				},
+				_count: {
+					select: {
+						milestones: true,
+					},
+				},
 			},
 			cacheStrategy: {
 				ttl: 60,

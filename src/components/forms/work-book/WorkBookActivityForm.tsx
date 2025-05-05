@@ -18,7 +18,6 @@ import {
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
-import { InputWithPrefixFormField } from "../shared/InputWithPrefixFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import UploadFilesFormField from "../shared/UploadFilesFormField"
@@ -39,14 +38,14 @@ import {
 import type { ENTRY_TYPE, User } from "@prisma/client"
 
 export default function ActivityForm({
-	actualProgress,
 	workOrderId,
 	entryType,
+	startDate,
 	userId,
 }: {
-	actualProgress: number
 	entryType: ENTRY_TYPE
 	workOrderId: string
+	startDate: Date
 	userId: string
 }): React.ReactElement {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
@@ -60,21 +59,12 @@ export default function ActivityForm({
 	const form = useForm<DailyActivitySchema>({
 		resolver: zodResolver(dailyActivitySchema),
 		defaultValues: {
+			workOrderId,
 			comments: "",
-			progress: "",
 			activityName: "",
 			activityEndTime: "",
 			activityStartTime: "",
-			executionDate: new Date(),
-			personnel: [
-				{
-					userId: "",
-				},
-				{
-					userId: "",
-				},
-			],
-			workOrderId,
+			executionDate: startDate,
 		},
 	})
 
@@ -116,17 +106,6 @@ export default function ActivityForm({
 
 		if (!values.personnel.length) {
 			toast.error("Debe haber al menos un personal")
-			return
-		}
-
-		const newProgress = Number(values.progress) + actualProgress
-
-		if (newProgress > 100) {
-			toast.error("El progreso no puede superar el 100%", {
-				description: "El progreso actual es de " + actualProgress + "%",
-				duration: 5000,
-			})
-			setIsSubmitting(false)
 			return
 		}
 
@@ -222,35 +201,24 @@ export default function ActivityForm({
 							control={form.control}
 							label="Fecha de Ejecución"
 							itemClassName="sm:col-span-1"
+							disabledCondition={(date) => date < startDate}
 						/>
 
-						<div className="flex gap-2 sm:col-span-2">
-							<InputFormField<DailyActivitySchema>
-								control={form.control}
-								label="Hora de Inicio"
-								name="activityStartTime"
-								itemClassName="content-start"
-							/>
+						<InputFormField<DailyActivitySchema>
+							control={form.control}
+							label="Hora de Inicio"
+							name="activityStartTime"
+							itemClassName="content-start"
+						/>
 
-							<InputFormField<DailyActivitySchema>
-								name="activityEndTime"
-								control={form.control}
-								label="Hora de Fin"
-								itemClassName="content-start"
-							/>
+						<InputFormField<DailyActivitySchema>
+							name="activityEndTime"
+							control={form.control}
+							label="Hora de Fin"
+							itemClassName="content-start"
+						/>
 
-							<InputWithPrefixFormField<DailyActivitySchema>
-								min={0}
-								max={100}
-								prefix={"%"}
-								type="number"
-								name="progress"
-								control={form.control}
-								placeholder="Progreso"
-								label="Progreso Realizado (%)"
-								description={`Progreso actual: ${actualProgress}%`}
-							/>
-						</div>
+						<Separator className="my-4 sm:col-span-2" />
 
 						<TextAreaFormField<DailyActivitySchema>
 							name="comments"

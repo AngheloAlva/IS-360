@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils"
 import { RequestWorkBookClosure } from "@/components/sections/work-book/RequestWorkBookClosure"
 import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
 import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
+import WorkBookMilestones from "@/components/sections/work-book/WorkBookMilestones"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
 import BackButton from "@/components/shared/BackButton"
 import { Progress } from "@/components/ui/progress"
@@ -65,7 +67,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 						<div className="flex items-center justify-between gap-4">
 							<span className="text-sm font-medium">Progreso del trabajo:</span>
-							<span className="text-sm font-bold">{data.workProgressStatus}%</span>
+							<span className="text-sm font-bold">{data.workProgressStatus?.toFixed(0)}%</span>
 						</div>
 						<Progress
 							value={data.workProgressStatus || 0}
@@ -82,30 +84,49 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 			<WorkBookGeneralData data={data} />
 
-			<div className="flex w-full items-center justify-between gap-2">
-				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
+			<Tabs defaultValue="milestones" className="w-full">
+				{data._count.milestones > 0 && (
+					<TabsList className="mb-6 h-11 w-full">
+						<TabsTrigger value="milestones" className="h-9">
+							Hitos y Tareas
+						</TabsTrigger>
+						<TabsTrigger value="activities" className="h-9">
+							Actividades Diarias
+						</TabsTrigger>
+					</TabsList>
+				)}
 
-				<div className="flex gap-2">
-					{canAddActivities && (
-						<>
-							{canClose ? (
-								<RequestWorkBookClosure workOrderId={id} userId={session?.user?.id} />
-							) : (
+				<TabsContent value="milestones">
+					<WorkBookMilestones workOrderId={id} userRole={session.user.role as USER_ROLE} />
+				</TabsContent>
+
+				<TabsContent value="activities">
+					<div className="flex w-full items-center justify-between gap-2">
+						<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
+
+						<div className="flex gap-2">
+							{canAddActivities && (
 								<>
-									<ActivityForm
-										workOrderId={id}
-										userId={session.user?.id}
-										entryType="DAILY_ACTIVITY"
-										actualProgress={data.workProgressStatus || 0}
-									/>
+									{canClose ? (
+										<RequestWorkBookClosure workOrderId={id} userId={session?.user?.id} />
+									) : (
+										<>
+											<ActivityForm
+												workOrderId={id}
+												userId={session.user?.id}
+												entryType="DAILY_ACTIVITY"
+												startDate={data.milestones[0]?.startDate || new Date()}
+											/>
+										</>
+									)}
 								</>
 							)}
-						</>
-					)}
-				</div>
-			</div>
+						</div>
+					</div>
 
-			<WorkBookEntriesTable workOrderId={id} />
+					<WorkBookEntriesTable workOrderId={id} />
+				</TabsContent>
+			</Tabs>
 		</>
 	)
 }

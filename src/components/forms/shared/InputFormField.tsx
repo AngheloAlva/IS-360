@@ -19,20 +19,22 @@ interface InputFormFieldProps<T extends FieldValues> {
 	min?: number
 	max?: number
 	label: string
+	step?: number
 	name: Path<T>
-	className?: string
 	disabled?: boolean
 	optional?: boolean
 	control: Control<T>
 	placeholder?: string
 	description?: string
-	itemClassName?: string
 	type?: HTMLInputTypeAttribute
+	className?: React.ComponentProps<"div">["className"]
+	itemClassName?: React.ComponentProps<"div">["className"]
 }
 
 export function InputFormField<T extends FieldValues>({
 	min,
 	max,
+	step,
 	name,
 	label,
 	control,
@@ -59,6 +61,7 @@ export function InputFormField<T extends FieldValues>({
 							min={min}
 							max={max}
 							type={type}
+							step={step}
 							disabled={disabled}
 							className={cn("w-full text-sm", className)}
 							placeholder={placeholder || label}

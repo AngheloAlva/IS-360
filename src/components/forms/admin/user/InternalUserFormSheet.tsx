@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { PlusIcon } from "lucide-react"
+import { EditIcon, PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -18,7 +18,8 @@ import {
 	type InternalUserSchema,
 } from "@/lib/form-schemas/admin/user/internalUser.schema"
 
-import { InputWithPrefixFormField } from "../../shared/InputWithPrefixFormField"
+import { InputWithPrefixFormField } from "@/components/forms/shared/InputWithPrefixFormField"
+import { MultiSelectFormField } from "@/components/forms/shared/MultiSelectFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import { RutFormField } from "@/components/forms/shared/RutFormField"
@@ -33,10 +34,10 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet"
 
-import type { User } from "@prisma/client"
+import type { ApiUser } from "@/types/user"
 
 interface InternalUserFormProps {
-	initialData?: User
+	initialData?: ApiUser
 }
 
 export default function InternalUserFormSheet({
@@ -162,8 +163,8 @@ export default function InternalUserFormSheet({
 				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
 				onClick={() => setOpen(true)}
 			>
-				<PlusIcon className="h-4 w-4" />
-				<span className="hidden text-nowrap sm:inline">Nuevo Usuario</span>
+				{initialData ? <EditIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
+				<span className="hidden text-nowrap sm:inline">{!initialData && "Nuevo Usuario"}</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">
@@ -195,8 +196,9 @@ export default function InternalUserFormSheet({
 							type="email"
 							label="Email"
 							control={form.control}
-							placeholder="correo@ejemplo.com"
 							itemClassName="sm:col-span-2"
+							placeholder="correo@ejemplo.com"
+							disabled={!!initialData}
 						/>
 
 						<InputWithPrefixFormField<InternalUserSchema>
@@ -231,7 +233,7 @@ export default function InternalUserFormSheet({
 							placeholder="Selecciona un área"
 						/>
 
-						<SelectFormField<InternalUserSchema>
+						<MultiSelectFormField<InternalUserSchema>
 							name="modules"
 							label="Módulos"
 							control={form.control}

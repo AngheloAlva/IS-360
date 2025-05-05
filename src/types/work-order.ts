@@ -11,9 +11,4 @@ export interface WorkEntry extends WorkEntryPrisma {
 		role: string
 		internalRole: string
 	}[]
-	reportedUsers?: {
-		name: string
-		role: string
-		internalRole: string
-	}[]
 }

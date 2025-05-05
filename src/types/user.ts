@@ -6,6 +6,7 @@ export interface ApiUser {
 	email: string
 	rut: string
 	role: USER_ROLE
+	phone: string
 	internalRole: string
 	modules: MODULES[]
 	area: string | null
