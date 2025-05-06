@@ -162,7 +162,7 @@ export default function UploadFilesFormField<T extends FieldValues>({
 			{fields.length > 0 && (
 				<Button
 					type="button"
-					className="border border-red-500 bg-red-500/10 text-red-600 transition-colors group-hover:visible hover:bg-red-500/50 lg:hidden"
+					className="border border-red-500 bg-red-500/10 text-red-600 transition-colors group-hover:visible hover:bg-red-500/50"
 					onClick={() => remove()}
 				>
 					<X className="h-4 w-4" />

@@ -13,7 +13,10 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { type MaintenancePlan, useMaintenancePlans } from "@/hooks/maintenance-plans/use-maintenance-plans"
+import {
+	type MaintenancePlan,
+	useMaintenancePlans,
+} from "@/hooks/maintenance-plans/use-maintenance-plans"
 import { MaintenancePlanColumns } from "./maintenance-plan-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
@@ -44,7 +47,6 @@ export function MaintenancePlanDataTable() {
 		search,
 		limit: 15,
 	})
-	console.log(data)
 
 	const table = useReactTable<MaintenancePlan>({
 		data: data?.maintenancePlans ?? [],
@@ -69,7 +71,7 @@ export function MaintenancePlanDataTable() {
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
 			<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
-				<div className="flex items-center w-full gap-4">
+				<div className="flex w-full items-center gap-4">
 					{parentId && (
 						<Button
 							variant="ghost"
@@ -112,21 +114,21 @@ export function MaintenancePlanDataTable() {
 					<TableBody>
 						{isLoading
 							? Array.from({ length: 10 }).map((_, index) => (
-								<TableRow key={index}>
-									<TableCell colSpan={9}>
-										<Skeleton className="h-6.5 min-w-full" />
-									</TableCell>
-								</TableRow>
-							))
-							: table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									<TableRow key={index}>
+										<TableCell colSpan={9}>
+											<Skeleton className="h-6.5 min-w-full" />
 										</TableCell>
-									))}
-								</TableRow>
-							))}
+									</TableRow>
+								))
+							: table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id}>
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))}
 					</TableBody>
 				</Table>
 			</Card>

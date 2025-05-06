@@ -4,10 +4,13 @@ import { format } from "date-fns"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { RequestWorkBookClosure } from "./RequestWorkBookClosure"
 
 import type { WorkOrder } from "@prisma/client"
 
 interface WorkBookGeneralDataProps {
+	userId: string
+	canClose: boolean
 	data: WorkOrder & { company: { name: string; rut: string } } & {
 		supervisor: { name: string; phone: string | null }
 	} & { responsible: { name: string; phone: string | null } }
@@ -15,18 +18,24 @@ interface WorkBookGeneralDataProps {
 
 export default function WorkBookGeneralData({
 	data,
+	userId,
+	canClose,
 }: WorkBookGeneralDataProps): React.ReactElement {
 	return (
 		<div className="grid w-full gap-6 md:grid-cols-12">
 			<Card className="md:col-span-12">
-				<CardHeader className="pb-3">
-					<CardTitle className="flex items-center gap-2 text-xl">
-						<FileText className="text-primary h-5 w-5" />
-						Detalles de la Orden de Trabajo
-					</CardTitle>
-					<CardDescription>
-						Información detallada sobre el trabajo solicitado y sus especificaciones
-					</CardDescription>
+				<CardHeader className="flex flex-row items-center justify-between pb-3">
+					<div>
+						<CardTitle className="flex items-center gap-2 text-xl">
+							<FileText className="text-primary h-5 w-5" />
+							Detalles de la Orden de Trabajo
+						</CardTitle>
+						<CardDescription>
+							Información detallada sobre el trabajo solicitado y sus especificaciones
+						</CardDescription>
+					</div>
+
+					{canClose && <RequestWorkBookClosure workOrderId={data.id} userId={userId} />}
 				</CardHeader>
 
 				<CardContent>

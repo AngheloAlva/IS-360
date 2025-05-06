@@ -17,7 +17,6 @@ export async function createSafetyTalk({
 }: CreateSafetyTalkProps): Promise<{ ok: boolean; message: string }> {
 	try {
 		const validatedData = safetyTalkSchema.parse(data)
-		console.log(validatedData)
 
 		const safetyTalk = await prisma.safetyTalk.create({
 			data: {
@@ -57,8 +56,6 @@ export async function createSafetyTalk({
 				// },
 			},
 		})
-
-		console.log(safetyTalk)
 
 		if (!safetyTalk) {
 			throw new Error("No se pudo crear la charla de seguridad")

@@ -1,30 +1,40 @@
 "use client"
 
-import { useState } from "react"
+import { ClockIcon, UsersIcon, CalendarIcon, ListCheckIcon, CheckCircleIcon } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import { ClockIcon, UsersIcon, CalendarIcon, ListCheckIcon, CheckCircleIcon } from "lucide-react"
+import { useState } from "react"
+import { toast } from "sonner"
 
 import { completeMilestoneTask } from "@/actions/work-orders/manage-milestones"
+import { uploadFilesToCloud } from "@/lib/upload-files"
 import { cn } from "@/lib/utils"
+import {
+	confirmActivitySchema,
+	ConfirmActivitySchema,
+} from "@/lib/form-schemas/work-book/confirm-activity.schema"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import UploadFilesFormField from "@/components/forms/shared/UploadFilesFormField"
+import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
+import { InputFormField } from "@/components/forms/shared/InputFormField"
+import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Form } from "../form"
 import {
 	Sheet,
-	SheetContent,
-	SheetHeader,
 	SheetTitle,
-	SheetDescription,
+	SheetHeader,
 	SheetFooter,
+	SheetContent,
+	SheetDescription,
 } from "@/components/ui/sheet"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 interface MilestoneTask {
 	id: string
@@ -60,52 +70,81 @@ interface MilestoneCardsProps {
 	milestones: Milestone[]
 }
 
-interface TaskFormData {
-	activityStartTime: string
-	activityEndTime: string
-	comments: string
-}
-
 export default function MilestoneCards({ milestones }: MilestoneCardsProps) {
+	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [selectedTask, setSelectedTask] = useState<MilestoneTask | null>(null)
 	const [taskFormOpen, setTaskFormOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [formData, setFormData] = useState<TaskFormData>({
-		activityStartTime: "",
-		activityEndTime: "",
-		comments: "",
+
+	const form = useForm<ConfirmActivitySchema>({
+		resolver: zodResolver(confirmActivitySchema),
+		defaultValues: {
+			executionDate: new Date(),
+			activityStartTime: "",
+			activityEndTime: "",
+			comments: "",
+		},
 	})
+
 	const router = useRouter()
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { name, value } = e.target
-		setFormData((prev) => ({ ...prev, [name]: value }))
-	}
-
-	const handleCompleteTask = async () => {
+	const onSubmit = async (values: ConfirmActivitySchema) => {
 		if (!selectedTask) return
+
+		const files = form.getValues("files")
 
 		try {
 			setIsSubmitting(true)
 
-			const result = await completeMilestoneTask(selectedTask.id, {
-				activityStartTime: formData.activityStartTime,
-				activityEndTime: formData.activityEndTime,
-				comments: formData.comments,
-			})
-
-			if (result.ok) {
-				toast.success("Actividad completada", {
-					description:
-						"La actividad se ha marcado como completada y se ha registrado en el libro de obras.",
+			if (files && files.length > 0) {
+				const uploadResults = await uploadFilesToCloud({
+					files,
+					containerType: "files",
+					randomString: selectedTask.id,
+					secondaryName: selectedTask.name,
 				})
 
-				setTaskFormOpen(false)
-				router.refresh()
+				const result = await completeMilestoneTask(
+					selectedTask.id,
+					{
+						...values,
+						files: undefined,
+					},
+					uploadResults
+				)
+
+				if (result.ok) {
+					toast.success("Actividad completada", {
+						description:
+							"La actividad se ha marcado como completada y se ha registrado en el libro de obras.",
+					})
+
+					setTaskFormOpen(false)
+					router.refresh()
+				} else {
+					toast.error("Error al completar la actividad", {
+						description: result.message,
+					})
+				}
 			} else {
-				toast.error("Error al completar la actividad", {
-					description: result.message,
+				const result = await completeMilestoneTask(selectedTask.id, {
+					...values,
+					files: undefined,
 				})
+
+				if (result.ok) {
+					toast.success("Actividad completada", {
+						description:
+							"La actividad se ha marcado como completada y se ha registrado en el libro de obras.",
+					})
+
+					setTaskFormOpen(false)
+					router.refresh()
+				} else {
+					toast.error("Error al completar la actividad", {
+						description: result.message,
+					})
+				}
 			}
 		} catch (error) {
 			console.error(error)
@@ -129,11 +168,10 @@ export default function MilestoneCards({ milestones }: MilestoneCardsProps) {
 
 	const openTaskForm = (task: MilestoneTask) => {
 		setSelectedTask(task)
-		setFormData({
-			activityStartTime: task.activityStartTime || "08:00",
-			activityEndTime: task.activityEndTime || "18:00",
-			comments: task.comments || "",
-		})
+		form.setValue("activityStartTime", task.activityStartTime || "")
+		form.setValue("executionDate", task.plannedDate ? new Date(task.plannedDate) : new Date())
+		form.setValue("activityEndTime", task.activityEndTime || "")
+		form.setValue("comments", task.comments || "")
 		setTaskFormOpen(true)
 	}
 
@@ -222,7 +260,7 @@ export default function MilestoneCards({ milestones }: MilestoneCardsProps) {
 												<div
 													key={task.id}
 													className={cn("rounded-lg border p-3", {
-														"border-green-200 bg-green-50": task.isCompleted,
+														"border-green-500/50 bg-green-500/10": task.isCompleted,
 														"border-input": !task.isCompleted,
 													})}
 												>
@@ -257,8 +295,8 @@ export default function MilestoneCards({ milestones }: MilestoneCardsProps) {
 
 														{!task.isCompleted && (
 															<Button
-																variant="outline"
 																size="sm"
+																variant="outline"
 																className="border-green-500/50 bg-green-500/10 text-green-600 shadow-none hover:bg-green-500/20"
 																onClick={() => openTaskForm(task)}
 															>
@@ -280,7 +318,6 @@ export default function MilestoneCards({ milestones }: MilestoneCardsProps) {
 																	<CalendarIcon className="h-3 w-3" />
 																	<div>
 																		<span className="text-xs">
-																			Fecha planificada:{" "}
 																			{format(new Date(task.plannedDate), "dd MMM yyyy", {
 																				locale: es,
 																			})}
@@ -338,68 +375,77 @@ export default function MilestoneCards({ milestones }: MilestoneCardsProps) {
 			</div>
 
 			<Sheet open={taskFormOpen} onOpenChange={setTaskFormOpen}>
-				<SheetContent className="sm:max-w-md">
-					<SheetHeader>
-						<SheetTitle>Completar actividad</SheetTitle>
+				<SheetContent className="gap-0 sm:max-w-md">
+					<SheetHeader className="shadow">
+						<SheetTitle>Completar actividad: {selectedTask?.name}</SheetTitle>
 						<SheetDescription>
-							Complete los detalles para registrar esta actividad en el libro de obras.
+							Revisa los detalles de la actividad y modifica los campos si es necesario.
 						</SheetDescription>
 					</SheetHeader>
 
-					<div className="grid gap-4 p-4 pt-0">
-						<div className="grid gap-2">
-							<Label htmlFor="taskName" className="text-base font-medium">
-								Actividad: {selectedTask?.name}
-							</Label>
-						</div>
-
-						<div className="grid grid-cols-2 gap-x-2 gap-y-5">
-							<div className="grid gap-2">
-								<Label htmlFor="activityStartTime">Hora de inicio</Label>
-								<Input
-									id="activityStartTime"
-									name="activityStartTime"
-									value={formData.activityStartTime}
-									onChange={handleChange}
-								/>
-							</div>
-							<div className="grid gap-2">
-								<Label htmlFor="activityEndTime">Hora de término</Label>
-								<Input
-									id="activityEndTime"
-									name="activityEndTime"
-									value={formData.activityEndTime}
-									onChange={handleChange}
-								/>
-							</div>
-						</div>
-
-						<div className="grid gap-2">
-							<Label htmlFor="comments">Comentarios adicionales</Label>
-							<Textarea
-								id="comments"
-								name="comments"
-								className="min-h-28"
-								placeholder="Detalles sobre la actividad realizada..."
-								value={formData.comments}
-								onChange={handleChange}
-								rows={4}
-							/>
-						</div>
-					</div>
-
-					<SheetFooter>
-						<Button
-							variant="outline"
-							onClick={() => setTaskFormOpen(false)}
-							disabled={isSubmitting}
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="grid gap-4 overflow-y-auto py-4"
 						>
-							Cancelar
-						</Button>
-						<Button onClick={handleCompleteTask} disabled={isSubmitting}>
-							{isSubmitting ? "Guardando..." : "Completar y guardar"}
-						</Button>
-					</SheetFooter>
+							<div className="grid h-full gap-4 px-2 pb-6 sm:grid-cols-2">
+								<InputFormField<ConfirmActivitySchema>
+									control={form.control}
+									label="Hora de inicio"
+									name="activityStartTime"
+								/>
+
+								<InputFormField<ConfirmActivitySchema>
+									control={form.control}
+									label="Hora de término"
+									name="activityEndTime"
+								/>
+
+								<DatePickerFormField<ConfirmActivitySchema>
+									name="executionDate"
+									control={form.control}
+									label="Fecha de ejecución"
+									itemClassName="sm:col-span-2"
+								/>
+
+								<TextAreaFormField<ConfirmActivitySchema>
+									name="comments"
+									label="Comentarios"
+									className="min-h-32"
+									control={form.control}
+									itemClassName="sm:col-span-2"
+								/>
+
+								<UploadFilesFormField<ConfirmActivitySchema>
+									name="files"
+									isMultiple={true}
+									maxFileSize={500}
+									className="hidden"
+									control={form.control}
+									selectedFileIndex={selectedFileIndex}
+									containerClassName="w-full sm:col-span-2"
+									setSelectedFileIndex={setSelectedFileIndex}
+								/>
+							</div>
+
+							<SheetFooter className="gap-0">
+								<Button
+									type="button"
+									variant="outline"
+									disabled={isSubmitting}
+									onClick={() => setTaskFormOpen(false)}
+								>
+									Cancelar
+								</Button>
+
+								<SubmitButton
+									label="Completar actividad"
+									isSubmitting={isSubmitting}
+									className="hover:bg-primary/80"
+								/>
+							</SheetFooter>
+						</form>
+					</Form>
 				</SheetContent>
 			</Sheet>
 		</>

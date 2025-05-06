@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
 
 		const urls = await Promise.all(
 			filenames.map(async (filename) => {
-				console.log(`Generando URL SAS para: ${filename}`)
 				const blobClient = containerClient.getBlockBlobClient(filename)
 				const permissions = new BlobSASPermissions()
 				permissions.write = true
@@ -44,7 +43,6 @@ export async function POST(request: NextRequest) {
 					contentDisposition: "attachment",
 				})
 
-				console.log(`URL SAS generada exitosamente para: ${filename}`)
 				return url
 			})
 		)
@@ -74,10 +72,8 @@ export async function GET(request: NextRequest) {
 		const containerName =
 			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
 
-		console.log(`Usando contenedor: ${containerName}`)
 		const containerClient = blobServiceClient.getContainerClient(containerName)
 
-		console.log(`Generando URL SAS para: ${filename}`)
 		const blobClient = containerClient.getBlockBlobClient(filename)
 		const permissions = new BlobSASPermissions()
 		permissions.read = true
@@ -87,7 +83,6 @@ export async function GET(request: NextRequest) {
 			expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
 		})
 
-		console.log(`URL SAS generada exitosamente para: ${filename}`)
 		return Response.json({ url })
 	} catch (error: unknown) {
 		console.error("Error en GET /api/file:", error)

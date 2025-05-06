@@ -14,7 +14,6 @@ export async function GET(
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
 		const onlyBooks = searchParams.get("onlyBooks") === "true"
-		console.log(onlyBooks)
 
 		const skip = (page - 1) * limit
 

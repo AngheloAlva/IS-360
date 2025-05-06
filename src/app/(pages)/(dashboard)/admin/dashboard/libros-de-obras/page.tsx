@@ -55,7 +55,6 @@ export default function WorkBooksAdminPage() {
 	const [limit] = useState(10)
 
 	const { data, isLoading } = useWorkBooks({ page, limit, search })
-	console.log(data)
 
 	return (
 		<div className="flex w-full flex-col gap-6">

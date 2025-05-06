@@ -4,17 +4,13 @@ import { revalidatePath } from "next/cache"
 
 import prisma from "@/lib/prisma"
 
+import type { ConfirmActivitySchema } from "@/lib/form-schemas/work-book/confirm-activity.schema"
 import type { WorkBookMilestonesSchema } from "@/lib/form-schemas/work-book/milestones.schema"
+import type { UploadResult as UploadFileResult } from "@/lib/upload-files"
 
 interface SaveMilestonesResponse {
 	ok: boolean
 	message: string
-}
-
-interface CompleteTaskData {
-	activityStartTime: string
-	activityEndTime: string
-	comments: string
 }
 
 export async function createMilestones(
@@ -87,7 +83,11 @@ export async function createMilestones(
 	}
 }
 
-export async function completeMilestoneTask(taskId: string, data: CompleteTaskData) {
+export async function completeMilestoneTask(
+	taskId: string,
+	data: ConfirmActivitySchema,
+	files?: UploadFileResult[]
+) {
 	try {
 		// Nota: La autenticación debe ser manejada desde el componente cliente
 		// Aquí asumimos que si se llama a esta función, la autenticación ya fue validada
@@ -156,6 +156,15 @@ export async function completeMilestoneTask(taskId: string, data: CompleteTaskDa
 				createdBy: { connect: { id: admin.id } },
 				signedBy: { connect: { id: admin.id } },
 				signedAt: new Date(),
+				...(files && {
+					attachments: {
+						create: files?.map((file) => ({
+							url: file.url,
+							type: file.type,
+							name: file.name,
+						})),
+					},
+				}),
 			},
 		})
 

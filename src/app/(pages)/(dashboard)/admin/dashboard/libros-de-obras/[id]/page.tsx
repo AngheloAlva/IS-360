@@ -74,7 +74,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 				</div>
 			</div>
 
-			<WorkBookGeneralData data={data} />
+			<WorkBookGeneralData canClose={false} userId={session.user.id} data={data} />
 
 			<div className="flex w-full items-center justify-between gap-2">
 				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>

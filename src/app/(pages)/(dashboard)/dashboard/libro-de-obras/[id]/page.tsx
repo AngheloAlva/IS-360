@@ -7,7 +7,6 @@ import { USER_ROLE, WORK_ORDER_STATUS } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
-import { RequestWorkBookClosure } from "@/components/sections/work-book/RequestWorkBookClosure"
 import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
 import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
 import WorkBookMilestones from "@/components/sections/work-book/WorkBookMilestones"
@@ -39,7 +38,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex items-center gap-3">
-						<BackButton href="/admin/dashboard/libros-de-obras" />
+						<BackButton href="/dashboard/libro-de-obras" />
 
 						<div>
 							<h1 className="text-2xl font-bold">{data.workName}</h1>
@@ -82,7 +81,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				</div>
 			</div>
 
-			<WorkBookGeneralData data={data} />
+			<WorkBookGeneralData data={data} userId={session?.user?.id} canClose={canClose} />
 
 			<Tabs defaultValue="milestones" className="w-full">
 				{data._count.milestones > 0 && (
@@ -107,17 +106,13 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 						<div className="flex gap-2">
 							{canAddActivities && (
 								<>
-									{canClose ? (
-										<RequestWorkBookClosure workOrderId={id} userId={session?.user?.id} />
-									) : (
-										<>
-											<ActivityForm
-												workOrderId={id}
-												userId={session.user?.id}
-												entryType="DAILY_ACTIVITY"
-												startDate={data.milestones[0]?.startDate || new Date()}
-											/>
-										</>
+									{!canClose && (
+										<ActivityForm
+											workOrderId={id}
+											userId={session.user?.id}
+											entryType="DAILY_ACTIVITY"
+											startDate={data.milestones[0]?.startDate || new Date()}
+										/>
 									)}
 								</>
 							)}

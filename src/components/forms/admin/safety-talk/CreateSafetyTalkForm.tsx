@@ -106,7 +106,6 @@ export default function CreateSafetyTalkForm(): React.ReactElement {
 			const slug = generateSlug(values.title)
 
 			const { ok, message } = await createSafetyTalk({ data: values, slug })
-			console.log({ ok, message })
 
 			if (ok) {
 				toast("Charla de seguridad creada exitosamente", {

@@ -41,14 +41,12 @@ export default function OtpForm(): React.ReactElement {
 				onRequest: () => {
 					setLoading(true)
 				},
-				onSuccess: (ctx) => {
-					console.log(ctx)
+				onSuccess: () => {
 					toast("Se ha verificado el codigo de verificacion correctamente.")
 					router.push("/dashboard/documentacion")
 				},
-				onError: (ctx) => {
+				onError: () => {
 					setLoading(false)
-					console.log(ctx)
 					toast.error("Ha ocurrido un error al verificar el codigo de verificacion.")
 				},
 			}
