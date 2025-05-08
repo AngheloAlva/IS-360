@@ -7,7 +7,7 @@ import {
 
 import type { NextRequest } from "next/server"
 
-type ContainerType = "documents" | "files"
+type ContainerType = "documents" | "files" | "startup"
 
 export async function POST(request: NextRequest) {
 	const {

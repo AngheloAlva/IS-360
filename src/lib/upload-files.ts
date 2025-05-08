@@ -4,7 +4,7 @@ interface UploadFilesToCloudProps {
 	files: FileSchema[]
 	randomString: string
 	secondaryName?: string
-	containerType: "documents" | "files"
+	containerType: "documents" | "files" | "startup"
 }
 
 export interface UploadResult {

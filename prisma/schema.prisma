@@ -69,29 +69,32 @@ model User {
   workTrackers                   WorkTracker[]
   safetyTalks                    UserSafetyTalk[]
   workApplications               WorkApplication[]
-  company                        Company?              @relation(fields: [companyId], references: [id])
+  company                        Company?                 @relation(fields: [companyId], references: [id])
   companyId                      String?
   isSupervisor                   Boolean?
-  workOrders                     WorkOrder[]           @relation("WorkOrderResponsible")
-  workOrdersAsSupervisor         WorkOrder[]           @relation("WorkOrderSupervisor")
-  requestedClosures              WorkOrder[]           @relation("WorkOrderClosureRequester")
-  approvedClosures               WorkOrder[]           @relation("WorkOrderClosureApprover")
-  assignedEntries                WorkEntry[]           @relation("AssignedUsers")
-  createdEntries                 WorkEntry[]           @relation("WorkEntryCreator")
-  signedEntries                  WorkEntry[]           @relation("WorkEntrySigner")
-  workEntries                    WorkEntry[]           @relation("WorkEntryApproval")
-  workPermitsAsParticipant       WorkPermit[]          @relation("WorkPermitParticipants")
-  workPermitsAsPreventionOfficer WorkPermit[]          @relation("PreventionOfficer")
-  workPermits                    WorkPermit[]          @relation("WorkPermitUser")
+  workOrders                     WorkOrder[]              @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor         WorkOrder[]              @relation("WorkOrderSupervisor")
+  requestedClosures              WorkOrder[]              @relation("WorkOrderClosureRequester")
+  approvedClosures               WorkOrder[]              @relation("WorkOrderClosureApprover")
+  assignedEntries                WorkEntry[]              @relation("AssignedUsers")
+  createdEntries                 WorkEntry[]              @relation("WorkEntryCreator")
+  signedEntries                  WorkEntry[]              @relation("WorkEntrySigner")
+  workEntries                    WorkEntry[]              @relation("WorkEntryApproval")
+  workPermitsAsParticipant       WorkPermit[]             @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer WorkPermit[]             @relation("PreventionOfficer")
+  workPermits                    WorkPermit[]             @relation("WorkPermitUser")
   attachmentsHistory             AttachmentHistory[]
   equipmentHistory               EquipmentHistory[]
   fileHistory                    FileHistory[]
   twofactors                     TwoFactor[]
-  rootFolder                     RootFolder[]
   FileComment                    FileComment[]
   MaintenancePlan                MaintenancePlan[]
-  MaintenancePlanTask            MaintenancePlanTask[] @relation("MaintenancePlanTaskResponsible")
-  MaintenancePlanTaskCreatedBy   MaintenancePlanTask[] @relation("MaintenancePlanTaskCreatedBy")
+  MaintenancePlanTask            MaintenancePlanTask[]    @relation("MaintenancePlanTaskResponsible")
+  MaintenancePlanTaskCreatedBy   MaintenancePlanTask[]    @relation("MaintenancePlanTaskCreatedBy")
+  reviewedGeneralFolders         GeneralStartupFolder[]   @relation("GeneralStartupFolderReviewer")
+  reviewedWorkOrderFolders       WorkOrderStartupFolder[] @relation("WorkOrderStartupFolderReviewer")
+  submittedGeneralFolders        GeneralStartupFolder[]   @relation("GeneralStartupFolderSubmittedBy")
+  submittedWorkOrderFolders      WorkOrderStartupFolder[] @relation("WorkOrderStartupFolderSubmittedBy")
 
   @@unique([email])
   @@unique([rut])
@@ -159,12 +162,12 @@ model Company {
   name String
   rut  String
 
-  users               User[]
-  workOrders          WorkOrder[]
-  workPermits         WorkPermit[]
-  vehicles            Vehicle[]
-  rootFolders         RootFolder[]
-  MaintenancePlanTask MaintenancePlanTask[]
+  users                 User[]
+  workOrders            WorkOrder[]
+  workPermits           WorkPermit[]
+  vehicles              Vehicle[]
+  MaintenancePlanTask   MaintenancePlanTask[]
+  generalStartupFolders GeneralStartupFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -272,29 +275,30 @@ model WorkOrder {
   workProgressStatus Float?      @default(0) // Cambiado a Float para precisión en el porcentaje
   workEntries        WorkEntry[]
 
-  company               Company              @relation(fields: [companyId], references: [id])
+  company               Company                 @relation(fields: [companyId], references: [id])
   companyId             String
-  supervisor            User                 @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
+  supervisor            User                    @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
   supervisorId          String
-  responsible           User                 @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
+  responsible           User                    @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
   responsibleId         String
-  initReport            Attachment?          @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
-  initReportId          String?              @unique
-  endReport             Attachment?          @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
-  endReportId           String?              @unique
+  initReport            Attachment?             @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
+  initReportId          String?                 @unique
+  endReport             Attachment?             @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
+  endReportId           String?                 @unique
   workPermits           WorkPermit[]
-  closureRequestedBy    User?                @relation("WorkOrderClosureRequester", fields: [closureRequestedById], references: [id])
+  closureRequestedBy    User?                   @relation("WorkOrderClosureRequester", fields: [closureRequestedById], references: [id])
   closureRequestedById  String?
   closureRequestedAt    DateTime?
-  closureApprovedBy     User?                @relation("WorkOrderClosureApprover", fields: [closureApprovedById], references: [id])
+  closureApprovedBy     User?                   @relation("WorkOrderClosureApprover", fields: [closureApprovedById], references: [id])
   closureApprovedById   String?
   closureApprovedAt     DateTime?
   closureRejectedReason String?
   workTrackers          WorkTracker[]
   equipmentHistory      EquipmentHistory[]
-  MaintenancePlanTask   MaintenancePlanTask? @relation(fields: [maintenancePlanTaskId], references: [id])
+  MaintenancePlanTask   MaintenancePlanTask?    @relation(fields: [maintenancePlanTaskId], references: [id])
   maintenancePlanTaskId String?
   milestones            Milestone[]
+  startupFolder         WorkOrderStartupFolder?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -627,14 +631,12 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  history      FileHistory[]
-  folder       Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId     String?
-  rootFolder   RootFolder?   @relation(fields: [rootFolderId], references: [id], onDelete: Cascade)
-  rootFolderId String?
-  user         User          @relation(fields: [userId], references: [id])
-  userId       String
-  comments     FileComment[]
+  history  FileHistory[]
+  folder   Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId String?
+  user     User          @relation(fields: [userId], references: [id])
+  userId   String
+  comments FileComment[]
 
   @@map("file")
 }
@@ -825,46 +827,6 @@ model EquipmentHistory {
   @@map("equipment_history")
 }
 
-enum ROOT_FOLDER_TYPE {
-  COMPANY_INFORMATION // Datos de la Empresa
-  RISK_PREVENTION // MIPER y Plan de Prevención de Riesgos
-  WORK_PROCEDURES // Procedimientos de Trabajo y Emergencia
-  PERSONNEL_DOCUMENTS // Documentación del Personal
-  OCCUPATIONAL_EXAMS // Exámenes Ocupacionales
-  INTERNAL_REGULATIONS // Reglamento Interno de Orden, Higiene y Seguridad (RIOHS)
-  INFORMATION_DUTIES // Obligaciones de Informar (ODI)
-  PPE_DELIVERY // Entrega de Equipos de Protección Personal (EPP)
-  PPE_CERTIFICATES // Certificados de EPP
-  VEHICLES // Documentación de Vehículos
-  SAFETY_ADVISOR // Prevencionista de Riesgos
-  LEGAL // Documentación Legal
-}
-
-model RootFolder {
-  id   String @id @default(cuid())
-  slug String @unique
-
-  name        String
-  description String?
-  type        ROOT_FOLDER_TYPE
-  isRoot      Boolean          @default(false)
-  isActive    Boolean          @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  files      File[]
-  parent     RootFolder?  @relation("RootFolderToFolder", fields: [parentId], references: [id])
-  parentId   String?
-  subFolders RootFolder[] @relation("RootFolderToFolder")
-  user       User?        @relation(fields: [userId], references: [id])
-  userId     String?
-  company    Company      @relation(fields: [companyId], references: [id])
-  companyId  String
-
-  @@map("root_folder")
-}
-
 enum PLAN_FREQUENCY {
   MONTHLY
   BIMONTHLY
@@ -927,4 +889,160 @@ model MaintenancePlanTask {
   workOrders        WorkOrder[]
 
   @@map("maintenance_plan_task")
+}
+
+enum ReviewStatus {
+  DRAFT // Carpeta todavía en fase de edición
+  SUBMITTED // Contratista la marcó como lista para revisión
+  APPROVED // Revisor de OTC la marcó como completa
+  REJECTED // Revisor de OTC encontró elementos faltantes/incompletos
+}
+
+enum CompanyDocumentType {
+  COMPANY_FILE // Ficha de empresa
+  MUTUAL_AGREEMENT // Mutual/Mutualidad
+  REGULATIONS // Reglamento
+  ORGANIZATION_CHART // Organigrama
+  PREVENTION_PLAN // Plan de prevención
+  OTHER // Otros documentos
+}
+
+enum WorkerDocumentType {
+  ID_CARD // Cédula de identidad
+  CONTRACT // Contrato
+  SOCIAL_SECURITY // Previsión social
+  HEALTH_EXAM // Examen de salud
+  TRAINING_CERT // Certificado de capacitación
+  OTHER // Otros documentos
+}
+
+enum VehicleDocumentType {
+  REGISTRATION // Permiso de circulación
+  TECHNICAL_REVIEW // Revisión técnica
+  INSURANCE // Seguro
+  DRIVER_LICENSE // Licencia de conducir
+  OTHER // Otros documentos
+}
+
+enum EnvironmentalDocType {
+  WASTE_MANAGEMENT // Gestión de residuos
+  SPILL_CONTROL // Control de derrames
+  ENVIRONMENTAL_PERMIT // Permiso ambiental
+  CHEMICAL_HANDLING // Manejo de químicos
+  OTHER // Otros documentos
+}
+
+model GeneralStartupFolder {
+  id          String       @id @default(uuid())
+  status      ReviewStatus @default(DRAFT)
+  reviewNotes String?
+  reviewedAt  DateTime?
+  submittedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  documents     CompanyDocument[]
+  company       Company           @relation(fields: [companyId], references: [id])
+  companyId     String
+  reviewer      User?             @relation("GeneralStartupFolderReviewer", fields: [reviewedById], references: [id])
+  reviewedById  String?
+  submittedById String?
+  submittedBy   User?             @relation("GeneralStartupFolderSubmittedBy", fields: [submittedById], references: [id])
+
+  @@map("general_startup_folder")
+}
+
+model WorkOrderStartupFolder {
+  id          String       @id @default(uuid())
+  status      ReviewStatus @default(DRAFT)
+  reviewNotes String?
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  reviewedById   String?
+  workOrder      WorkOrder               @relation(fields: [workOrderId], references: [id])
+  workOrderId    String                  @unique
+  reviewer       User?                   @relation("WorkOrderStartupFolderReviewer", fields: [reviewedById], references: [id])
+  submittedById  String?
+  submittedBy    User?                   @relation("WorkOrderStartupFolderSubmittedBy", fields: [submittedById], references: [id])
+  workers        WorkerDocument[]
+  vehicles       VehicleDocument[]
+  procedures     ProcedureDocument[]
+  environmentals EnvironmentalDocument[]
+
+  @@map("work_order_startup_folder")
+}
+
+model CompanyDocument {
+  id         String              @id @default(uuid())
+  type       CompanyDocumentType
+  name       String
+  url        String
+  fileType   String
+  uploadedAt DateTime            @default(now())
+
+  folder   GeneralStartupFolder @relation(fields: [folderId], references: [id])
+  folderId String
+
+  @@map("company_document")
+}
+
+model WorkerDocument {
+  id         String             @id @default(uuid())
+  type       WorkerDocumentType
+  name       String
+  url        String
+  fileType   String
+  uploadedAt DateTime           @default(now())
+
+  folder   WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
+  folderId String
+  workerId String?
+
+  @@map("worker_document")
+}
+
+model VehicleDocument {
+  id         String              @id @default(uuid())
+  type       VehicleDocumentType
+  name       String
+  url        String
+  fileType   String
+  uploadedAt DateTime            @default(now())
+
+  folder    WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
+  folderId  String
+  vehicleId String?
+
+  @@map("vehicle_document")
+}
+
+model ProcedureDocument {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  url         String
+  fileType    String
+  uploadedAt  DateTime @default(now())
+
+  folder   WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
+  folderId String
+
+  @@map("procedure_document")
+}
+
+model EnvironmentalDocument {
+  id         String               @id @default(uuid())
+  type       EnvironmentalDocType
+  name       String
+  url        String
+  fileType   String
+  uploadedAt DateTime             @default(now())
+
+  folder   WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
+  folderId String
+
+  @@map("environmental_document")
 }

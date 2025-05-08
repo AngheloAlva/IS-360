@@ -1,6 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
+import { createGeneralStartupFolder } from "@/actions/startup-folders/createGeneralStartupFolder"
 
 import type { CompanySchema } from "@/lib/form-schemas/admin/company/company.schema"
 
@@ -36,6 +37,9 @@ export const createCompany = async ({
 				}),
 			},
 		})
+
+		// Crear la carpeta de arranque general automáticamente
+		await createGeneralStartupFolder({ companyId: company.id })
 
 		return {
 			ok: true,

@@ -61,11 +61,11 @@ const data = {
 			url: "/dashboard/colaboradores",
 			icon: Users,
 		},
-		{
-			name: "Carpetas de Arranque",
-			url: "/dashboard/carpetas-de-arranque",
-			icon: FileText,
-		},
+		// {
+		// 	name: "Carpetas de Arranque",
+		// 	url: "/dashboard/carpetas-de-arranque",
+		// 	icon: FileText,
+		// },
 	],
 	navAdmin: [
 		{
