@@ -7,10 +7,10 @@ import {
 	Siren,
 	Users,
 	Wrench,
+	Folders,
 	FileText,
 	LifeBuoy,
 	BookCopy,
-	BookUser,
 	Building2,
 	FileSearch,
 	LayoutList,
@@ -18,7 +18,7 @@ import {
 	Construction,
 } from "lucide-react"
 
-// import { NavSecondary } from "./navSecondary"
+import { NavSecondary } from "./navSecondary"
 import { NavInternal } from "./navInternal"
 import { NavMain } from "./navMain"
 import { NavUser } from "./navUser"
@@ -61,11 +61,11 @@ const data = {
 			url: "/dashboard/colaboradores",
 			icon: Users,
 		},
-		// {
-		// 	name: "Carpetas de Arranque",
-		// 	url: "/dashboard/carpetas-de-arranque",
-		// 	icon: FileText,
-		// },
+		{
+			name: "Carpetas de Arranque",
+			url: "/dashboard/carpetas-de-arranque",
+			icon: Folders,
+		},
 	],
 	navAdmin: [
 		{
@@ -86,7 +86,7 @@ const data = {
 		{
 			name: "Carpetas de Arranques",
 			url: "/admin/dashboard/carpetas-de-arranques",
-			icon: BookUser,
+			icon: Folders,
 		},
 		{
 			name: "Permisos de Trabajo",
@@ -180,7 +180,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 				<NavMain navItems={navItems} />
 				{canAccessAdminRoutes && <NavInternal navItems={navInternal} />}
 
-				{/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+				<NavSecondary items={data.navSecondary} className="mt-auto" />
 			</SidebarContent>
 
 			<SidebarFooter>

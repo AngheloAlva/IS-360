@@ -95,6 +95,11 @@ model User {
   reviewedWorkOrderFolders       WorkOrderStartupFolder[] @relation("WorkOrderStartupFolderReviewer")
   submittedGeneralFolders        GeneralStartupFolder[]   @relation("GeneralStartupFolderSubmittedBy")
   submittedWorkOrderFolders      WorkOrderStartupFolder[] @relation("WorkOrderStartupFolderSubmittedBy")
+  uploadedCompanyDocuments       CompanyDocument[]
+  uploadedWorkerDocuments        WorkerDocument[]
+  uploadedVehicleDocuments       VehicleDocument[]
+  uploadedProcedureDocuments     ProcedureDocument[]
+  uploadedEnvironmentalDocuments EnvironmentalDocument[]
 
   @@unique([email])
   @@unique([rut])
@@ -157,10 +162,10 @@ model Account {
 }
 
 model Company {
-  id String @id @default(cuid())
-
-  name String
-  rut  String
+  id    String  @id @default(cuid())
+  name  String
+  rut   String
+  image String?
 
   users                 User[]
   workOrders            WorkOrder[]
@@ -899,37 +904,96 @@ enum ReviewStatus {
 }
 
 enum CompanyDocumentType {
-  COMPANY_FILE // Ficha de empresa
-  MUTUAL_AGREEMENT // Mutual/Mutualidad
-  REGULATIONS // Reglamento
+  // Basic Information / Información Básica
+  COMPANY_INFO // Ficha empresa
+  STAFF_LIST // Nómina de personal
+  GANTT_CHART // Carta Gantt
+  MUTUAL // Certificado de adhesión a mutualidad
+  INTERNAL_REGULATION // Reglamento interno
+  ACCIDENT_RATE // Certificado de siniestralidad
+
+  // Procedures and Others / Procedimientos y Otros
+  RISK_MATRIX // Matriz de Identificación de peligros y evaluación de Riesgos
+  PREVENTION_PLAN // Plan de Prevención de riesgos
+  WORK_PROCEDURE // Procedimiento de trabajos
+  EMERGENCY_PROCEDURE // Procedimientos de Emergencia
+  TOOLS_MAINTENANCE // Programa de Mantención de Herramientas y Equipos
+  PPE_CERTIFICATION // Certificación de elementos de Protección Personal
+  HARASSMENT_PROCEDURE // Procedimiento de Acoso Laboral, Sexual y Violencia
   ORGANIZATION_CHART // Organigrama
-  PREVENTION_PLAN // Plan de prevención
+
   OTHER // Otros documentos
 }
 
 enum WorkerDocumentType {
   ID_CARD // Cédula de identidad
-  CONTRACT // Contrato
-  SOCIAL_SECURITY // Previsión social
-  HEALTH_EXAM // Examen de salud
-  TRAINING_CERT // Certificado de capacitación
+  CONTRACT // Contrato de Trabajo
+  INTERNAL_REGULATION_RECEIPT // Entrega de Reglamento Interno
+  RISK_INFORMATION // Inducción de Riesgos Laborales (IRL)
+  DRIVING_LICENSE // Licencias de conducir
+  HEALTH_EXAM // Examen médico vigente
+  PSYCHOTECHNICAL_EXAM // Examen Psico sensotécnico
+  RISK_MATRIX_TRAINING // Capacitación de la matriz de identificación de peligros
+  WORK_PROCEDURE_TRAINING // Capacitación del procedimiento de trabajo
+  EMERGENCY_PROCEDURE_TRAINING // Capacitación del Procedimiento de Emergencia
+  DEFENSIVE_DRIVING_TRAINING // Capacitación curso manejo defensivo
+  MOUNTAIN_DEFENSIVE_DRIVING // Curso de manejo defensivo en alta montaña
+  TOOLS_MAINTENANCE_TRAINING // Capacitación del procedimiento de Mantención de Herramientas
+  HARASSMENT_TRAINING // Capacitación de la Ley Karin
+  PPE_RECEIPT // Entrega de Elementos de Protección personal
+  PREVENTION_EXPERT // Experto en Prevención de riesgos
+  HIGH_RISK_TRAINING // Cursos para trabajos de alto riesgo
+  ENVIRONMENTAL_TRAINING // Capacitaciones ambientales
   OTHER // Otros documentos
 }
 
 enum VehicleDocumentType {
-  REGISTRATION // Permiso de circulación
+  EQUIPMENT_FILE // Ficha de equipos
+  VEHICLE_REGISTRATION // Inscripción del Vehículo Motorizado (Padrón)
+  CIRCULATION_PERMIT // Permiso de circulación
   TECHNICAL_REVIEW // Revisión técnica
-  INSURANCE // Seguro
-  DRIVER_LICENSE // Licencia de conducir
+  INSURANCE // Seguro Obligatorio
+  CHECKLIST // Lista de chequeo previa al ingreso
+  HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos peligrosos
+  NON_HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos No peligrosos
+  LIQUID_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos domésticos líquidos
   OTHER // Otros documentos
 }
 
 enum EnvironmentalDocType {
-  WASTE_MANAGEMENT // Gestión de residuos
-  SPILL_CONTROL // Control de derrames
-  ENVIRONMENTAL_PERMIT // Permiso ambiental
-  CHEMICAL_HANDLING // Manejo de químicos
+  ENVIRONMENTAL_PLAN // Plan de Gestión ambiental
+  SPILL_PREVENTION // Procedimiento de Prevención y control de derrames
+  WASTE_MANAGEMENT // Procedimiento de manejo de residuos
+  ENVIRONMENTAL_MATRIX // Matriz de identificación y evaluación de aspectos ambientales
+  RECT_CERTIFICATE // Certificado RECT
+  WATER_CERTIFICATE // Certificado compra de agua potable
+  WATER_FACTORY_RESOLUTION // Resolución sanitaria fábrica de botellones de agua
+  DINING_RESOLUTION // Resolución sanitaria comedor
+  CHEMICAL_TOILET_CONTRACT // Contrato servicio de limpieza de baños químicos
+  SAFETY_DATA_SHEET // Hojas de datos de seguridad de sustancias químicas
+
+  // For fixed contracts > 3 months
+  LAYOUT_PLAN // Plano layout de instalación de faenas
+  ELECTRICAL_DECLARATION // TE 1, Declaración de instalación eléctrica
+  GAS_DECLARATION // TC 6, Declaración de instalaciones interiores de gas
+  PEST_CONTROL_RESOLUTION // Resolución sanitaria de control de plagas
+  PEST_CONTROL_CERTIFICATE // Certificado mensual de desratización, desinsectación y sanitización
+  HAZARDOUS_STORAGE_CHECKLIST // Check list de Bodega de almacenamiento
+  HAZARDOUS_INVENTORY // Inventario mensual de sustancias peligrosas
+  FUEL_CONSUMPTION // Planilla de registro de consumo de combustible
+  WATER_CONSUMPTION // Planilla de registro mensual de consumo de agua
+
   OTHER // Otros documentos
+}
+
+enum DocumentSubcategory {
+  BASIC_INFO
+  PROCEDURES
+  ENVIRONMENTAL
+  VEHICLES
+  PERSONNEL
+  FIXED_CONTRACTS
+  OTHER
 }
 
 model GeneralStartupFolder {
@@ -976,12 +1040,15 @@ model WorkOrderStartupFolder {
 }
 
 model CompanyDocument {
-  id         String              @id @default(uuid())
-  type       CompanyDocumentType
-  name       String
-  url        String
-  fileType   String
-  uploadedAt DateTime            @default(now())
+  id           String              @id @default(uuid())
+  type         CompanyDocumentType
+  name         String
+  url          String
+  fileType     String
+  uploadedAt   DateTime            @default(now())
+  subcategory  DocumentSubcategory
+  uploadedById String?
+  uploadedBy   User?               @relation(fields: [uploadedById], references: [id])
 
   folder   GeneralStartupFolder @relation(fields: [folderId], references: [id])
   folderId String
@@ -990,12 +1057,15 @@ model CompanyDocument {
 }
 
 model WorkerDocument {
-  id         String             @id @default(uuid())
-  type       WorkerDocumentType
-  name       String
-  url        String
-  fileType   String
-  uploadedAt DateTime           @default(now())
+  id           String              @id @default(uuid())
+  type         WorkerDocumentType
+  name         String
+  url          String
+  fileType     String
+  uploadedAt   DateTime            @default(now())
+  subcategory  DocumentSubcategory
+  uploadedById String?
+  uploadedBy   User?               @relation(fields: [uploadedById], references: [id])
 
   folder   WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
   folderId String
@@ -1005,12 +1075,15 @@ model WorkerDocument {
 }
 
 model VehicleDocument {
-  id         String              @id @default(uuid())
-  type       VehicleDocumentType
-  name       String
-  url        String
-  fileType   String
-  uploadedAt DateTime            @default(now())
+  id           String              @id @default(uuid())
+  type         VehicleDocumentType
+  name         String
+  url          String
+  fileType     String
+  uploadedAt   DateTime            @default(now())
+  subcategory  DocumentSubcategory
+  uploadedById String?
+  uploadedBy   User?               @relation(fields: [uploadedById], references: [id])
 
   folder    WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
   folderId  String
@@ -1020,12 +1093,15 @@ model VehicleDocument {
 }
 
 model ProcedureDocument {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  url         String
-  fileType    String
-  uploadedAt  DateTime @default(now())
+  id           String              @id @default(uuid())
+  name         String
+  description  String?
+  url          String
+  fileType     String
+  uploadedAt   DateTime            @default(now())
+  subcategory  DocumentSubcategory
+  uploadedById String?
+  uploadedBy   User?               @relation(fields: [uploadedById], references: [id])
 
   folder   WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
   folderId String
@@ -1034,12 +1110,15 @@ model ProcedureDocument {
 }
 
 model EnvironmentalDocument {
-  id         String               @id @default(uuid())
-  type       EnvironmentalDocType
-  name       String
-  url        String
-  fileType   String
-  uploadedAt DateTime             @default(now())
+  id           String               @id @default(uuid())
+  type         EnvironmentalDocType
+  name         String
+  url          String
+  fileType     String
+  uploadedAt   DateTime             @default(now())
+  subcategory  DocumentSubcategory
+  uploadedById String?
+  uploadedBy   User?                @relation(fields: [uploadedById], references: [id])
 
   folder   WorkOrderStartupFolder @relation(fields: [folderId], references: [id])
   folderId String

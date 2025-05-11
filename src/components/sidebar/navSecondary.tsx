@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import {
 	SidebarMenu,
 	SidebarGroup,
@@ -6,7 +8,7 @@ import {
 	SidebarGroupContent,
 } from "@/components/ui/sidebar"
 
-import { type LucideIcon } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 export function NavSecondary({
 	items,
@@ -29,12 +31,12 @@ export function NavSecondary({
 								size="sm"
 								className="hover:bg-primary/5 hover:text-primary"
 							>
-								{/* <a href={item.url}> */}
-								<div>
-									<item.icon />
-									<span>{item.title}</span>
-								</div>
-								{/* </a> */}
+								<Link href={item.url}>
+									<div className="flex gap-1 [&>svg]:size-4">
+										<item.icon />
+										<span>{item.title}</span>
+									</div>
+								</Link>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					))}

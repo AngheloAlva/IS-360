@@ -1,21 +1,33 @@
 "use client"
 
-import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { Upload } from "lucide-react"
+import { toast } from "sonner"
+
+import { uploadFilesToCloud } from "@/lib/upload-files"
+import {
+	uploadStartupFolderDocumentSchema,
+	type UploadStartupFolderDocumentSchema,
+} from "@/lib/form-schemas/startup-folder/new-file.schema"
+
+import UploadFilesFormField from "@/components/forms/shared/UploadFilesFormField"
+import { InputFormField } from "@/components/forms/shared/InputFormField"
+import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Form } from "@/components/ui/form"
 import {
 	Sheet,
+	SheetTitle,
+	SheetHeader,
+	SheetTrigger,
 	SheetContent,
 	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
 } from "@/components/ui/sheet"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Upload, Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import { uploadFilesToCloud } from "@/lib/upload-files"
-import { useQueryClient } from "@tanstack/react-query"
+
 import type {
 	CompanyDocumentType,
 	WorkerDocumentType,
@@ -33,27 +45,56 @@ interface UploadStartupFolderDocumentFormProps {
 		| VehicleDocumentType
 		| EnvironmentalDocType
 		| string
+	isUpdate: boolean
 	documentId?: string
 	currentUrl?: string
-	isUpdate: boolean
+	subcategory:
+		| "OTHER"
+		| "VEHICLES"
+		| "PERSONNEL"
+		| "BASIC_INFO"
+		| "PROCEDURES"
+		| "ENVIRONMENTAL"
+		| "FIXED_CONTRACTS"
 }
 
 export function UploadStartupFolderDocumentForm({
 	type,
 	folderId,
-	documentName,
-	documentType,
+	isUpdate,
 	documentId,
 	currentUrl,
-	isUpdate,
+	subcategory,
+	documentName,
+	documentType,
 }: UploadStartupFolderDocumentFormProps) {
-	const [open, setOpen] = useState(false)
-	const [file, setFile] = useState<File | null>(null)
+	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isUploading, setIsUploading] = useState(false)
+	const [open, setOpen] = useState(false)
+
 	const queryClient = useQueryClient()
 
-	async function onSubmit(e: React.FormEvent) {
-		e.preventDefault()
+	const form = useForm<UploadStartupFolderDocumentSchema>({
+		resolver: zodResolver(uploadStartupFolderDocumentSchema),
+		defaultValues: {
+			folderId,
+			name: documentName,
+			files: isUpdate
+				? [
+						{
+							url: currentUrl,
+							file: undefined,
+							title: documentName,
+							preview: currentUrl,
+						},
+					]
+				: [],
+			subcategory,
+		},
+	})
+
+	async function onSubmit(values: UploadStartupFolderDocumentSchema) {
+		const file = form.getValues("files")[0]
 
 		if (!file) {
 			toast.error("Por favor selecciona un archivo")
@@ -63,53 +104,161 @@ export function UploadStartupFolderDocumentForm({
 		setIsUploading(true)
 
 		try {
-			// 1. Subir el archivo a Azure con el contenedor 'startup'
 			const uploadResults = await uploadFilesToCloud({
+				files: [file],
 				randomString: folderId,
 				containerType: "startup",
 				secondaryName: documentName,
-				files: [{
-					file,
-					url: '',
-					preview: '',
-					type: file.type,
-					title: file.name,
-					fileSize: file.size,
-					mimeType: file.type
-				}]
 			})
-			
+
 			if (!uploadResults || uploadResults.length === 0) {
 				throw new Error("Error al subir el archivo")
 			}
-			
+
 			const uploadedFile = uploadResults[0]
 
-			// 2. Guardar el documento en la base de datos
-			const endpoint = `/api/startup-folders/documents/${type}`
-			const method = isUpdate ? "PUT" : "POST"
-			const body = isUpdate
-				? {
-						documentId,
-						url: uploadedFile.url,
-					}
-				: {
-						folderId,
-						name: documentName,
-						type: documentType,
-						url: uploadedFile.url,
-					}
+			let result: { ok: boolean; message?: string }
 
-			const response = await fetch(endpoint, {
-				method,
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(body),
-			})
+			switch (type) {
+				case "company":
+					if (isUpdate && documentId) {
+						const { updateCompanyDocument } = await import(
+							"@/actions/startup-folders/documents/company"
+						)
+						result = await updateCompanyDocument({
+							data: { documentId, file: [] },
+							uploadedFile,
+						})
+					} else {
+						const { createCompanyDocument } = await import(
+							"@/actions/startup-folders/documents/company"
+						)
+						result = await createCompanyDocument({
+							data: {
+								folderId,
+								files: [],
+								subcategory,
+								name: values.name || documentName,
+							},
+							documentType: documentType as CompanyDocumentType,
+							uploadedFile,
+						})
+					}
+					break
 
-			if (!response.ok) {
-				throw new Error(`Error al ${isUpdate ? "actualizar" : "guardar"} el documento`)
+				case "worker":
+					// Importa e invoca la server action para documentos de trabajadores
+					if (isUpdate && documentId) {
+						const { updateWorkerDocument } = await import(
+							"@/actions/startup-folders/documents/worker"
+						)
+						result = await updateWorkerDocument({
+							data: { documentId, file: [] },
+							file: uploadedFile,
+						})
+					} else {
+						const { createWorkerDocument } = await import(
+							"@/actions/startup-folders/documents/worker"
+						)
+						result = await createWorkerDocument({
+							data: {
+								folderId,
+								files: [],
+								subcategory,
+								name: values.name || documentName,
+							},
+							documentType: documentType as WorkerDocumentType,
+							file: uploadedFile,
+						})
+					}
+					break
+
+				case "vehicle":
+					// Importa e invoca la server action para documentos de vehículos
+					if (isUpdate && documentId) {
+						const { updateVehicleDocument } = await import(
+							"@/actions/startup-folders/documents/vehicle"
+						)
+						result = await updateVehicleDocument({
+							data: { documentId, file: [] },
+							uploadedFile,
+						})
+					} else {
+						const { createVehicleDocument } = await import(
+							"@/actions/startup-folders/documents/vehicle"
+						)
+						result = await createVehicleDocument({
+							data: {
+								folderId,
+								files: [],
+								subcategory,
+								name: values.name || documentName,
+							},
+							documentType: documentType as VehicleDocumentType,
+							uploadedFile,
+						})
+					}
+					break
+
+				case "procedure":
+					if (isUpdate && documentId) {
+						const { updateProcedureDocument } = await import(
+							"@/actions/startup-folders/documents/procedure"
+						)
+						result = await updateProcedureDocument({
+							data: { documentId, file: [] },
+							uploadedFile,
+						})
+					} else {
+						const { createProcedureDocument } = await import(
+							"@/actions/startup-folders/documents/procedure"
+						)
+						result = await createProcedureDocument({
+							data: {
+								folderId,
+								files: [],
+								subcategory,
+								name: values.name || documentName,
+							},
+							uploadedFile,
+						})
+					}
+					break
+
+				case "environmental":
+					if (isUpdate && documentId) {
+						const { updateEnvironmentalDocument } = await import(
+							"@/actions/startup-folders/documents/environmental"
+						)
+						result = await updateEnvironmentalDocument({
+							data: { documentId, file: [] },
+							uploadedFile,
+						})
+					} else {
+						const { createEnvironmentalDocument } = await import(
+							"@/actions/startup-folders/documents/environmental"
+						)
+						result = await createEnvironmentalDocument({
+							data: {
+								folderId,
+								files: [],
+								subcategory,
+								name: values.name || documentName,
+							},
+							uploadedFile,
+							documentType: documentType as EnvironmentalDocType,
+						})
+					}
+					break
+
+				default:
+					throw new Error("Tipo de documento no soportado")
+			}
+
+			if (!result.ok) {
+				throw new Error(
+					result.message || `Error al ${isUpdate ? "actualizar" : "guardar"} el documento`
+				)
 			}
 
 			// 3. Mostrar mensaje de éxito
@@ -124,7 +273,6 @@ export function UploadStartupFolderDocumentForm({
 			})
 
 			setOpen(false)
-			setFile(null)
 		} catch (error) {
 			console.error(error)
 			toast.error("Ocurrió un error al procesar el documento")
@@ -133,22 +281,25 @@ export function UploadStartupFolderDocumentForm({
 		}
 	}
 
-	function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-		if (e.target.files && e.target.files.length > 0) {
-			setFile(e.target.files[0])
-		}
-	}
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
-				<Button size="sm" variant={isUpdate ? "outline" : "default"}>
+				<Button
+					size="sm"
+					variant={isUpdate ? "outline" : "default"}
+					className={`${!isUpdate && "bg-primary/80 hover:bg-primary hover:text-white"}`}
+				>
 					<Upload className="mr-1 h-4 w-4" />
 					{isUpdate ? "Actualizar" : "Subir"}
 				</Button>
 			</SheetTrigger>
-			<SheetContent>
-				<SheetHeader>
+
+			<SheetContent className="overflow-y-scroll pb-14">
+				<SheetHeader className="shadow">
 					<SheetTitle>{isUpdate ? "Actualizar documento" : "Subir documento"}</SheetTitle>
 					<SheetDescription>
 						{isUpdate
@@ -156,64 +307,57 @@ export function UploadStartupFolderDocumentForm({
 							: "Sube el documento requerido para la carpeta de arranque"}
 					</SheetDescription>
 				</SheetHeader>
-				<form onSubmit={onSubmit} className="space-y-4 pt-4">
-					<div className="space-y-2">
-						<Label htmlFor="document-name">Nombre del documento</Label>
-						<Input id="document-name" value={documentName} disabled />
-					</div>
 
-					<div className="space-y-2">
-						<Label htmlFor="document-file">Archivo</Label>
-						<Input
-							id="document-file"
-							type="file"
-							onChange={handleFileChange}
-							accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-x-3 gap-y-6 px-4">
+						<InputFormField<UploadStartupFolderDocumentSchema>
+							name="name"
+							control={form.control}
+							label="Nombre del documento"
 						/>
-						<p className="text-muted-foreground text-xs">
-							Formatos aceptados: PDF, Word, Excel, JPG, PNG
-						</p>
-					</div>
 
-					{file && (
-						<div className="bg-muted rounded-md p-3">
-							<p className="text-sm font-medium">Archivo seleccionado:</p>
-							<p className="text-sm">{file.name}</p>
-							<p className="text-muted-foreground text-xs">
-								{(file.size / 1024 / 1024).toFixed(2)} MB
-							</p>
+						<div className="space-y-2">
+							<Label htmlFor="document-file">Archivo</Label>
+							<UploadFilesFormField
+								name="files"
+								maxFileSize={200}
+								isMultiple={false}
+								control={form.control}
+								className="hidden lg:grid"
+								containerClassName="w-full"
+								selectedFileIndex={selectedFileIndex}
+								setSelectedFileIndex={setSelectedFileIndex}
+							/>
 						</div>
-					)}
 
-					{isUpdate && currentUrl && (
-						<div className="bg-muted rounded-md p-3">
-							<p className="text-sm font-medium">Documento actual:</p>
-							<a
-								href={currentUrl}
-								target="_blank"
-								rel="noreferrer"
-								className="text-sm break-all text-blue-600 hover:underline"
+						{isUpdate && currentUrl && (
+							<div className="bg-muted rounded-md p-3">
+								<p className="text-sm font-medium">Documento actual:</p>
+								<a
+									href={currentUrl}
+									target="_blank"
+									rel="noreferrer"
+									className="text-sm break-all text-blue-600 hover:underline"
+								>
+									Ver documento
+								</a>
+							</div>
+						)}
+
+						<div className="flex flex-col justify-end space-x-2">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setOpen(false)}
+								disabled={isUploading}
 							>
-								Ver documento
-							</a>
-						</div>
-					)}
+								Cancelar
+							</Button>
 
-					<div className="flex justify-end space-x-2 pt-4">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setOpen(false)}
-							disabled={isUploading}
-						>
-							Cancelar
-						</Button>
-						<Button type="submit" disabled={!file || isUploading}>
-							{isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-							{isUploading ? "Subiendo..." : isUpdate ? "Actualizar" : "Subir"}
-						</Button>
-					</div>
-				</form>
+							<SubmitButton label="Subir documento" isSubmitting={isUploading} />
+						</div>
+					</form>
+				</Form>
 			</SheetContent>
 		</Sheet>
 	)

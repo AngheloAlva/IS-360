@@ -1,8 +1,9 @@
 "use server"
 
-import prisma from "@/lib/prisma"
 import { WORK_ORDER_STARTUP_FOLDER_STRUCTURE } from "@/lib/consts/startup-folders"
-import { WorkerDocumentType, VehicleDocumentType, EnvironmentalDocType } from "@prisma/client"
+import prisma from "@/lib/prisma"
+
+import type { VehicleDocumentType, EnvironmentalDocType } from "@prisma/client"
 
 interface CreateWorkOrderStartupFolderProps {
 	workOrderId: string
@@ -24,33 +25,19 @@ export const createWorkOrderStartupFolder = async ({
 			},
 		})
 
-		// Crear documentos para Personal Asignado
-		const workerDocuments = WORK_ORDER_STARTUP_FOLDER_STRUCTURE.assignedPersonnel.documents.map(
-			(doc) => ({
-				type: doc.type as WorkerDocumentType,
-				folderId: workOrderFolder.id,
-				fileType: doc.fileType,
-				name: doc.name,
-				url: "", // Url vacía inicialmente, se llenará cuando suban el documento
-			})
-		)
-
-		if (workerDocuments.length > 0) {
-			await prisma.workerDocument.createMany({
-				data: workerDocuments,
-			})
-		}
+		// NO creamos documentos para trabajadores automáticamente
+		// Estos se crearán cuando se agreguen trabajadores específicos a la orden de trabajo
 
 		// Crear documentos para Vehículos y Equipos
-		const vehicleDocuments = WORK_ORDER_STARTUP_FOLDER_STRUCTURE.vehiclesAndEquipment.documents.map(
-			(doc) => ({
-				folderId: workOrderFolder.id,
-				type: doc.type as VehicleDocumentType,
-				fileType: doc.fileType,
-				name: doc.name,
-				url: "", // Url vacía inicialmente
-			})
-		)
+		const vehicleSection = WORK_ORDER_STARTUP_FOLDER_STRUCTURE.vehiclesAndEquipment
+		const vehicleDocuments = vehicleSection.documents.map((doc) => ({
+			folderId: workOrderFolder.id,
+			type: doc.type as VehicleDocumentType,
+			fileType: doc.fileType,
+			name: doc.name,
+			url: "", // Url vacía inicialmente
+			subcategory: vehicleSection.subcategory,
+		}))
 
 		if (vehicleDocuments.length > 0) {
 			await prisma.vehicleDocument.createMany({
@@ -58,17 +45,16 @@ export const createWorkOrderStartupFolder = async ({
 			})
 		}
 
-		// Crear documentos para Procedimientos Específicos - Nota: estos ya tienen description en vez de type
-		const procedureDocuments = [
-			...WORK_ORDER_STARTUP_FOLDER_STRUCTURE.specificProcedures.documents,
-			...WORK_ORDER_STARTUP_FOLDER_STRUCTURE.occupationalHealthAndSafety.documents,
-		].map((doc) => ({
+		// Crear documentos para Procedimientos Específicos
+		const procedureSection = WORK_ORDER_STARTUP_FOLDER_STRUCTURE.specificProcedures
+		const procedureDocuments = procedureSection.documents.map((doc) => ({
 			description:
 				doc.description || `Documento ${doc.required ? "requerido" : "opcional"} para el trabajo`,
 			folderId: workOrderFolder.id,
 			name: doc.name,
 			fileType: doc.fileType,
 			url: "", // Url vacía inicialmente
+			subcategory: procedureSection.subcategory,
 		}))
 
 		if (procedureDocuments.length > 0) {
@@ -78,15 +64,15 @@ export const createWorkOrderStartupFolder = async ({
 		}
 
 		// Crear documentos para Medio Ambiente
-		const environmentalDocuments = WORK_ORDER_STARTUP_FOLDER_STRUCTURE.environment.documents.map(
-			(doc) => ({
-				type: doc.type as EnvironmentalDocType,
-				folderId: workOrderFolder.id,
-				fileType: doc.fileType,
-				name: doc.name,
-				url: "", // Url vacía inicialmente
-			})
-		)
+		const environmentSection = WORK_ORDER_STARTUP_FOLDER_STRUCTURE.environment
+		const environmentalDocuments = environmentSection.documents.map((doc) => ({
+			type: doc.type as EnvironmentalDocType,
+			folderId: workOrderFolder.id,
+			fileType: doc.fileType,
+			name: doc.name,
+			url: "", // Url vacía inicialmente
+			subcategory: environmentSection.subcategory,
+		}))
 
 		if (environmentalDocuments.length > 0) {
 			await prisma.environmentalDocument.createMany({

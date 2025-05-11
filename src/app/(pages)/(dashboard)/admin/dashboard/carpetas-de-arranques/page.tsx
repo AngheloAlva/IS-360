@@ -2,11 +2,10 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { useEffect, useState } from "react"
 
-import { WorkOrderStartupFoldersList } from "@/components/sections/startup-folders/WorkOrderStartupFoldersList"
-import { GeneralStartupFoldersList } from "@/components/sections/startup-folders/GeneralStartupFoldersList"
+import { AdminWorkOrderStartupFoldersList } from "@/components/sections/startup-folders/admin/AdminWorkOrderStartupFoldersList"
+import { AdminGeneralStartupFoldersList } from "@/components/sections/startup-folders/admin/AdminGeneralStartupFoldersList"
 
 export default function StartupFoldersPage() {
 	const [activeTab, setActiveTab] = useState("general")
@@ -29,7 +28,7 @@ export default function StartupFoldersPage() {
 	}
 
 	return (
-		<div className="container mx-auto py-6">
+		<div className="w-full flex-1">
 			<div className="mb-8">
 				<h1 className="text-4xl font-bold">Carpetas de Arranque</h1>
 				<p className="text-muted-foreground mt-2">
@@ -38,40 +37,42 @@ export default function StartupFoldersPage() {
 			</div>
 
 			<Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-				<TabsList className="grid w-full max-w-md grid-cols-2">
-					<TabsTrigger value="general">Carpeta General</TabsTrigger>
-					<TabsTrigger value="workorders">Carpetas por Orden de Trabajo</TabsTrigger>
+				<TabsList className="h-11 w-full">
+					<TabsTrigger value="general" className="h-9">
+						General
+					</TabsTrigger>
+					<TabsTrigger value="workorders" className="h-9">
+						Ordenes de Trabajo
+					</TabsTrigger>
 				</TabsList>
 
-				<div className="mt-6">
-					<TabsContent value="general" className="space-y-4">
-						<Card>
-							<CardContent className="pt-6">
-								<h2 className="text-2xl font-semibold">Carpeta General de Empresa</h2>
-								<p className="text-muted-foreground text-sm">
-									Esta carpeta contiene documentación general de tu empresa que aplica a todas las
-									órdenes de trabajo
-								</p>
-								<Separator className="my-4" />
-								<GeneralStartupFoldersList />
-							</CardContent>
-						</Card>
-					</TabsContent>
+				<TabsContent value="general" className="space-y-4">
+					<Card>
+						<CardContent>
+							<h2 className="text-2xl font-semibold">Carpeta General de Empresa</h2>
+							<p className="text-muted-foreground mb-6 text-sm">
+								Esta carpeta contiene documentación general de tu empresa que aplica a todas las
+								órdenes de trabajo
+							</p>
 
-					<TabsContent value="workorders" className="space-y-4">
-						<Card>
-							<CardContent className="pt-6">
-								<h2 className="text-2xl font-semibold">Carpetas por Orden de Trabajo</h2>
-								<p className="text-muted-foreground text-sm">
-									Cada orden de trabajo tiene una carpeta específica con los documentos necesarios
-									para ese trabajo
-								</p>
-								<Separator className="my-4" />
-								<WorkOrderStartupFoldersList />
-							</CardContent>
-						</Card>
-					</TabsContent>
-				</div>
+							<AdminGeneralStartupFoldersList />
+						</CardContent>
+					</Card>
+				</TabsContent>
+
+				<TabsContent value="workorders" className="space-y-4">
+					<Card>
+						<CardContent>
+							<h2 className="text-2xl font-semibold">Carpetas por Orden de Trabajo</h2>
+							<p className="text-muted-foreground mb-6 text-sm">
+								Cada orden de trabajo tiene una carpeta específica con los documentos necesarios
+								para ese trabajo
+							</p>
+
+							<AdminWorkOrderStartupFoldersList />
+						</CardContent>
+					</Card>
+				</TabsContent>
 			</Tabs>
 		</div>
 	)

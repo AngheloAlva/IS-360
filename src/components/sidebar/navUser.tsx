@@ -1,13 +1,6 @@
 "use client"
 
-import {
-	Building,
-	ChevronsUpDown,
-	LogOut,
-	RectangleEllipsis,
-	ShieldMinus,
-	ShieldPlus,
-} from "lucide-react"
+import { Building, ChevronsUpDown, LogOut, UserIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -90,23 +83,10 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 						<DropdownMenuSeparator />
 
 						<DropdownMenuGroup>
-							{!session.user.twoFactorEnabled ? (
-								<Link href="/dashboard/activate-2fa">
-									<DropdownMenuItem>
-										<ShieldPlus />
-										Activar 2FA
-									</DropdownMenuItem>
-								</Link>
-							) : (
-								<DropdownMenuItem disabled>
-									<ShieldMinus />
-									Desactivar 2FA
-								</DropdownMenuItem>
-							)}
-							<Link href="/dashboard/cambiar-contrasena">
+							<Link href="/dashboard/mi-cuenta">
 								<DropdownMenuItem>
-									<RectangleEllipsis />
-									Cambiar Contraseña
+									<UserIcon />
+									Mi Cuenta
 								</DropdownMenuItem>
 							</Link>
 						</DropdownMenuGroup>

@@ -26,6 +26,10 @@ export const uploadFilesToCloud = async ({
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({
 			filenames: files.map((field) => {
+				if (!field.file) {
+					throw new Error("No se pudo obtener el archivo")
+				}
+
 				const fileExtension = field.file.name.split(".").pop()
 				return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${randomString.slice(0, 4)}.${fileExtension}`
 			}),
@@ -44,6 +48,10 @@ export const uploadFilesToCloud = async ({
 
 	// Subir archivos a Azure Blob Storage
 	const uploadPromises = files.map(async (fileData, index) => {
+		if (!fileData.file) {
+			throw new Error("No se pudo obtener el archivo")
+		}
+
 		const uploadUrl = urls[index]
 		const blobUrl = uploadUrl.split("?")[0] // URL base sin SAS token
 

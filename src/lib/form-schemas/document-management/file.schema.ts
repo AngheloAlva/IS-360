@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const fileSchema = z.object({
-	file: z.instanceof(File),
+	file: z.instanceof(File).optional(),
 	url: z.string(),
 	preview: z.string(),
 	type: z.string(),

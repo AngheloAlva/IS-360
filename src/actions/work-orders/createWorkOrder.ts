@@ -1,8 +1,8 @@
 "use server"
 
+import { createWorkOrderStartupFolder } from "@/actions/startup-folders/createWorkOrderStartupFolder"
 import { generateOTNumber } from "@/actions/work-orders/generateOTNumber"
 import { sendNewWorkOrderEmail } from "./sendNewWorkOrderEmail"
-import { createWorkOrderStartupFolder } from "@/actions/startup-folders/createWorkOrderStartupFolder"
 import prisma from "@/lib/prisma"
 
 import type { WorkOrderSchema } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
@@ -92,7 +92,6 @@ export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrde
 			}
 		}
 
-		// Crear la carpeta de arranque para la orden de trabajo
 		await createWorkOrderStartupFolder({ workOrderId: workOrder.id })
 
 		sendNewWorkOrderEmail({

@@ -25,15 +25,16 @@ export const createGeneralStartupFolder = async ({
 		})
 
 		// Luego crea los documentos base para la carpeta
-		const documentsToCreate = Object.values(GENERAL_STARTUP_FOLDER_STRUCTURE)
-			.flatMap((section) => section.documents)
-			.map((doc) => ({
+		// Agrupa documentos por sección para asignar la subcategoría correcta
+		const documentsToCreate = Object.entries(GENERAL_STARTUP_FOLDER_STRUCTURE)
+			.flatMap(([, section]) => section.documents.map(doc => ({
 				folderId: generalFolder.id,
 				type: doc.type as CompanyDocumentType,
 				fileType: doc.fileType,
 				name: doc.name,
 				url: "", // Url vacía inicialmente, se llenará cuando suban el documento
-			}))
+				subcategory: section.subcategory // Agrega la subcategoría según la sección
+			})))
 
 		if (documentsToCreate.length > 0) {
 			await prisma.companyDocument.createMany({

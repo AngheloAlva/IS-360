@@ -155,7 +155,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 		setIsSubmitting(true)
 
 		try {
-			if (initReportFile) {
+			if (initReportFile && initReportFile.file) {
 				const fileExtension = initReportFile.file.name.split(".").pop()
 				const uniqueFilename = `${Date.now()}-${Math.random()
 					.toString(36)

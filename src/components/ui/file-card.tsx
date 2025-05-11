@@ -9,16 +9,16 @@ import { Card } from "./card"
 import type { FileSchema } from "@/lib/form-schemas/document-management/file.schema"
 
 interface FileCardProps {
-	file: FileSchema
+	file: Partial<FileSchema>
 	isSelected: boolean
 	onClick: () => void
 }
 
 export function FileCard({ file, isSelected, onClick }: FileCardProps) {
 	const getIcon = () => {
-		if (file.type.startsWith("image/"))
+		if (file?.type?.startsWith("image/"))
 			return <ImageIcon className="h-10 w-10 rounded-lg bg-yellow-500/20 p-1.5 text-yellow-500" />
-		return file.type === "application/pdf" ? (
+		return file?.type === "application/pdf" ? (
 			<FileText className="h-10 w-10 rounded-lg bg-red-500/20 p-1.5 text-red-500" />
 		) : (
 			<File className="h-10 w-10 rounded-lg bg-blue-500/20 p-1.5 text-blue-500" />
@@ -26,7 +26,7 @@ export function FileCard({ file, isSelected, onClick }: FileCardProps) {
 	}
 
 	const Icon = getIcon()
-	const size = formatBytes(file.fileSize)
+	const size = file.fileSize ? formatBytes(file.fileSize) : ""
 
 	return (
 		<Card
@@ -45,7 +45,7 @@ export function FileCard({ file, isSelected, onClick }: FileCardProps) {
 							"font-bold": isSelected,
 						})}
 					>
-						{file.title.length > 20
+						{file.title && file.title.length > 20
 							? file.title.substring(0, 15) + "..." + getFileExtension(file.title)
 							: file.title}
 					</p>
