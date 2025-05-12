@@ -17,6 +17,7 @@ interface UploadFilesFieldProps<T extends FieldValues> {
 	name: ArrayPath<T>
 	control: Control<T>
 	isMultiple?: boolean
+	canPreview?: boolean
 	maxFileSize?: number
 	labelClassName?: string
 	acceptedFileTypes?: RegExp
@@ -31,6 +32,7 @@ export default function UploadFilesFormField<T extends FieldValues>({
 	className,
 	labelClassName,
 	maxFileSize = 10,
+	canPreview = true,
 	isMultiple = true,
 	acceptedFileTypes,
 	selectedFileIndex,
@@ -51,8 +53,7 @@ export default function UploadFilesFormField<T extends FieldValues>({
 			if (acceptedFileTypes) {
 				if (!acceptedFileTypes.test(file.name)) {
 					toast.error(`Formato no soportado: ${file.name}`, {
-						description:
-							"Solo se permiten archivos PDF, Word, Excel, PowerPoint, Texto, Imágenes y Archivos comprimidos",
+						description: `Solo se permiten archivos ${acceptedFileTypes.toString().replaceAll(",", ", ")}`,
 					})
 					continue
 				}
@@ -172,9 +173,7 @@ export default function UploadFilesFormField<T extends FieldValues>({
 
 			<div className={cn("grid grid-cols-2 gap-4 xl:grid-cols-3", className)}>
 				{fields.length > 0 && (
-					<h3 className="text-lg font-semibold lg:col-span-2 xl:col-span-3">
-						Archivos Seleccionados
-					</h3>
+					<h3 className="col-span-2 text-lg font-semibold xl:col-span-3">Archivos Seleccionados</h3>
 				)}
 				{fields.map((field, index: number) => (
 					<div key={field.id} className="group relative">
@@ -184,6 +183,7 @@ export default function UploadFilesFormField<T extends FieldValues>({
 							onClick={() => {
 								setSelectedFileIndex(index)
 							}}
+							canPreview={canPreview}
 						/>
 						<Button
 							size="icon"

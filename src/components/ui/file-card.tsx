@@ -12,9 +12,10 @@ interface FileCardProps {
 	file: Partial<FileSchema>
 	isSelected: boolean
 	onClick: () => void
+	canPreview: boolean
 }
 
-export function FileCard({ file, isSelected, onClick }: FileCardProps) {
+export function FileCard({ file, isSelected, onClick, canPreview }: FileCardProps) {
 	const getIcon = () => {
 		if (file?.type?.startsWith("image/"))
 			return <ImageIcon className="h-10 w-10 rounded-lg bg-yellow-500/20 p-1.5 text-yellow-500" />
@@ -34,7 +35,11 @@ export function FileCard({ file, isSelected, onClick }: FileCardProps) {
 				"h-full cursor-pointer border border-dashed border-green-500 bg-green-500/10 p-4 transition-all",
 				{ "border-green-500 bg-green-500/40": isSelected }
 			)}
-			onClick={onClick}
+			onClick={() => {
+				if (canPreview) {
+					onClick()
+				}
+			}}
 		>
 			<div className="flex flex-col items-center gap-3 text-center">
 				{Icon}
