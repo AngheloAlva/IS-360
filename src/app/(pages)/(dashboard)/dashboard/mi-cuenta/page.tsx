@@ -1,14 +1,27 @@
 import { ShieldCheckIcon, ShieldEllipsisIcon, UserIcon, UserLockIcon } from "lucide-react"
+import { unauthorized } from "next/navigation"
+import { headers } from "next/headers"
+
+import { auth } from "@/lib/auth"
 
 import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ChangePasswordForm from "@/components/forms/auth/ChangePasswordForm"
 import Activate2FAForm from "@/components/forms/auth/Activate2FAForm"
+import { ProfileForm } from "@/components/forms/auth/ProfileForm"
 
-export default function AccountPage(): React.ReactElement {
+export default async function AccountPage(): Promise<React.ReactElement> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user) {
+		unauthorized()
+	}
+
 	return (
 		<>
-			<div className="mx-auto flex w-full max-w-2xl items-center justify-start gap-2">
+			<div className="mx-auto flex w-full max-w-3xl items-center justify-start gap-2">
 				<UserIcon className="text-primary bg-primary/10 size-10 rounded-lg p-1" />
 
 				<div className="flex flex-col">
@@ -19,7 +32,7 @@ export default function AccountPage(): React.ReactElement {
 				</div>
 			</div>
 
-			<Tabs defaultValue="personal" className="mx-auto flex w-full max-w-2xl flex-row gap-4">
+			<Tabs defaultValue="personal" className="mx-auto flex w-full max-w-3xl flex-row gap-4">
 				<TabsList className="bg-background flex h-fit flex-col justify-start gap-1">
 					<TabsTrigger
 						className="data-[state=active]:bg-primary w-full justify-start py-2 font-bold tracking-wide data-[state=active]:text-white"
@@ -41,7 +54,7 @@ export default function AccountPage(): React.ReactElement {
 					</TabsTrigger>
 				</TabsList>
 
-				<Card className="w-full max-w-2xl">
+				<Card className="w-full">
 					<TabsContent value="personal">
 						<CardHeader className="flex flex-row items-start justify-between gap-2">
 							<div className="space-y-1">
@@ -53,7 +66,9 @@ export default function AccountPage(): React.ReactElement {
 							<UserLockIcon className="bg-primary/10 text-primary size-10 min-w-10 rounded-md p-1" />
 						</CardHeader>
 
-						<CardContent className="pt-6"></CardContent>
+						<CardContent className="pt-6">
+							<ProfileForm user={session.user} />
+						</CardContent>
 					</TabsContent>
 
 					<TabsContent value="password">

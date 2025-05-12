@@ -6,7 +6,7 @@ import Link from "next/link"
 
 import { authClient } from "@/lib/auth-client"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
 	DropdownMenu,
 	DropdownMenuItem,
@@ -49,6 +49,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 							className="data-[state=open]:bg-primary/70 hover:bg-primary/70 data-[state=open]:text-white"
 						>
 							<Avatar className="h-8 w-8 rounded-lg">
+								<AvatarImage src={session?.user.image || ""} />
 								<AvatarFallback className="text-primary rounded-md">
 									<Building />
 								</AvatarFallback>
@@ -69,6 +70,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 						<DropdownMenuLabel className="p-0 font-normal">
 							<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 								<Avatar className="h-8 w-8 rounded-lg">
+									<AvatarImage src={session?.user.image || ""} />
 									<AvatarFallback className="rounded-lg">
 										<Building />
 									</AvatarFallback>
