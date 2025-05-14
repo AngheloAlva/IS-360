@@ -3,7 +3,7 @@ import { headers } from "next/headers"
 
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
-import { WORK_ORDER_STATUS } from "@prisma/client"
+import { USER_ROLE, WORK_ORDER_STATUS } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
@@ -15,6 +15,9 @@ import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
 import BackButton from "@/components/shared/BackButton"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import WorkBookMilestones from "@/components/sections/work-book/WorkBookMilestones"
+import { subDays } from "date-fns"
 
 export default async function AdminWorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
 	const session = await auth.api.getSession({
@@ -76,38 +79,62 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 			<WorkBookGeneralData canClose={false} userId={session.user.id} data={data} />
 
-			<div className="flex w-full items-center justify-between gap-2">
-				<h2 className="text-text text-2xl font-bold">Lista de Actividades</h2>
+			<Tabs defaultValue="milestones" className="w-full">
+				{data._count.milestones > 0 && (
+					<TabsList className="mb-6 h-11 w-full">
+						<TabsTrigger value="milestones" className="h-9">
+							Hitos y Tareas
+						</TabsTrigger>
+						<TabsTrigger value="activities" className="h-9">
+							Actividades Diarias
+						</TabsTrigger>
+					</TabsList>
+				)}
 
-				<div className="flex gap-2">
-					{data.status !== "COMPLETED" && (
-						<>
-							<ActivityForm
-								workOrderId={id}
-								startDate={new Date()}
-								userId={session.user?.id}
-								entryType="DAILY_ACTIVITY"
-							/>
+				<TabsContent value="milestones">
+					<WorkBookMilestones
+						workOrderId={id}
+						userId={session.user.id}
+						userRole={session.user.role as USER_ROLE}
+						workOrderStartDate={subDays(data.workStartDate || new Date(), 1)}
+					/>
+				</TabsContent>
 
-							<ActivityForm
-								workOrderId={id}
-								startDate={new Date()}
-								userId={session.user?.id}
-								entryType="ADDITIONAL_ACTIVITY"
-							/>
+				<TabsContent value="activities">
+					<div className="flex w-full items-center justify-between gap-2">
+						<h2 className="text-text mb-2 text-2xl font-bold">Lista de Actividades</h2>
 
-							<OtcInspectorForm userId={session.user?.id} workOrderId={id} />
+						<div className="flex gap-2">
+							{data.status !== "COMPLETED" && (
+								<>
+									<ActivityForm
+										workOrderId={id}
+										startDate={new Date()}
+										userId={session.user?.id}
+										entryType="DAILY_ACTIVITY"
+									/>
 
-							{session.user.id === data.responsibleId &&
-								data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
-									<ApproveWorkBookClosure workOrderId={id} userId={session?.user?.id} />
-								)}
-						</>
-					)}
-				</div>
-			</div>
+									<ActivityForm
+										workOrderId={id}
+										startDate={new Date()}
+										userId={session.user?.id}
+										entryType="ADDITIONAL_ACTIVITY"
+									/>
 
-			<WorkBookEntriesTable workOrderId={id} />
+									<OtcInspectorForm userId={session.user?.id} workOrderId={id} />
+
+									{session.user.id === data.responsibleId &&
+										data.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
+											<ApproveWorkBookClosure workOrderId={id} userId={session?.user?.id} />
+										)}
+								</>
+							)}
+						</div>
+					</div>
+
+					<WorkBookEntriesTable workOrderId={id} />
+				</TabsContent>
+			</Tabs>
 		</div>
 	)
 }

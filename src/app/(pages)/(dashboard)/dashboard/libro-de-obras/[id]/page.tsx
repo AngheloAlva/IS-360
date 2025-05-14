@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
+import { subDays } from "date-fns"
 
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
@@ -96,7 +97,12 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				)}
 
 				<TabsContent value="milestones">
-					<WorkBookMilestones workOrderId={id} userRole={session.user.role as USER_ROLE} />
+					<WorkBookMilestones
+						workOrderId={id}
+						userId={session.user.id}
+						userRole={session.user.role as USER_ROLE}
+						workOrderStartDate={subDays(data.workStartDate || new Date(), 1)}
+					/>
 				</TabsContent>
 
 				<TabsContent value="activities">

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
+import { useWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
 import { createActivity } from "@/actions/work-book-entries/createActivity"
 import { getUsersByWorkOrderId } from "@/actions/users/getUsers"
 import { uploadFilesToCloud } from "@/lib/upload-files"
@@ -16,6 +17,7 @@ import {
 	dailyActivitySchema,
 } from "@/lib/form-schemas/work-book/daily-activity.schema"
 
+import { TimePickerFormField } from "@/components/forms/shared/TimePickerFormField"
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
@@ -38,21 +40,26 @@ import {
 import type { ENTRY_TYPE, User } from "@prisma/client"
 
 export default function ActivityForm({
-	workOrderId,
-	entryType,
-	startDate,
 	userId,
+	startDate,
+	entryType,
+	workOrderId,
 }: {
-	entryType: ENTRY_TYPE
-	workOrderId: string
-	startDate: Date
 	userId: string
+	startDate: Date
+	workOrderId: string
+	entryType: ENTRY_TYPE
 }): React.ReactElement {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [loadingUsers, setLoadingUsers] = useState(false)
 	const [users, setUsers] = useState<User[]>([])
 	const [open, setOpen] = useState(false)
+
+	const { data: milestones, isLoading: isLoadingMilestones } = useWorkBookMilestones({
+		workOrderId,
+		showAll: false,
+	})
 
 	const router = useRouter()
 
@@ -65,6 +72,14 @@ export default function ActivityForm({
 			activityEndTime: "",
 			activityStartTime: "",
 			executionDate: startDate,
+			personnel: [
+				{
+					userId: "",
+				},
+				{
+					userId: "",
+				},
+			],
 		},
 	})
 
@@ -119,7 +134,10 @@ export default function ActivityForm({
 				})
 
 				const { ok, message } = await createActivity({
-					values,
+					values: {
+						...values,
+						files: undefined,
+					},
 					userId,
 					entryType,
 					attachment: uploadResults,
@@ -204,21 +222,38 @@ export default function ActivityForm({
 							disabledCondition={(date) => date < startDate}
 						/>
 
-						<InputFormField<DailyActivitySchema>
+						<TimePickerFormField<DailyActivitySchema>
 							control={form.control}
 							label="Hora de Inicio"
 							name="activityStartTime"
 							itemClassName="content-start"
 						/>
 
-						<InputFormField<DailyActivitySchema>
+						<TimePickerFormField<DailyActivitySchema>
 							name="activityEndTime"
 							control={form.control}
 							label="Hora de Fin"
 							itemClassName="content-start"
 						/>
 
-						<Separator className="my-4 sm:col-span-2" />
+						{isLoadingMilestones ? (
+							<Skeleton className="h-10 w-full rounded-md sm:col-span-2" />
+						) : (
+							<SelectFormField<DailyActivitySchema>
+								options={
+									milestones?.milestones.map((milestone) => ({
+										value: milestone.id,
+										label: milestone.name,
+									})) || []
+								}
+								name="milestoneId"
+								control={form.control}
+								label="Hito Relacionado"
+								placeholder="Selecciona un hito"
+								itemClassName="sm:col-span-2 mt-2"
+								description="Selecciona un hito para relacionar la actividad con un hito específico."
+							/>
+						)}
 
 						<TextAreaFormField<DailyActivitySchema>
 							name="comments"

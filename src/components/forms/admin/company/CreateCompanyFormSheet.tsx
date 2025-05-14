@@ -153,25 +153,27 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
-			<SheetTrigger className="bg-primary text-white h-10 rounded-md px-3 text-sm flex items-center justify-center gap-1 hover:bg-primary/80" onClick={() => setOpen(true)}>
+			<SheetTrigger
+				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				onClick={() => setOpen(true)}
+			>
 				<PlusIcon className="h-4 w-4" />
 				<span className="hidden sm:inline">Nueva Empresa</span>
 			</SheetTrigger>
 
-			<SheetContent className="sm:max-w-md gap-0">
+			<SheetContent className="gap-0 sm:max-w-md">
 				<SheetHeader className="shadow">
-					<SheetTitle>
-						Nueva Empresa
-					</SheetTitle>
+					<SheetTitle>Nueva Empresa</SheetTitle>
 					<SheetDescription>
-						Complete los campos para crear una nueva empresa, en el caso de agregar un supervisor le enviará un correo con su contraseña temporal para que pueda iniciar sesión.
+						Complete los campos para crear una nueva empresa, en el caso de agregar un supervisor le
+						enviará un correo con su contraseña temporal para que pueda iniciar sesión.
 					</SheetDescription>
 				</SheetHeader>
 
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="flex w-full flex-col pt-4 gap-4 overflow-y-scroll pb-16 px-4"
+						className="flex w-full flex-col gap-4 overflow-y-scroll px-4 pt-4 pb-16"
 					>
 						<InputFormField<CompanySchema>
 							name="name"
@@ -190,34 +192,92 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 						<Separator className="my-2" />
 
 						<div>
-
-							<h3 className="text-sm font-semibold">
-								Vehículos y Supervisores
-							</h3>
-							<p className="text-sm text-muted-foreground">
-								Puedes agregar vehículos y supervisores para la empresa. De igual manera podrás agregarlos más tarde.
+							<h3 className="text-sm font-semibold">Vehículos y Supervisores</h3>
+							<p className="text-muted-foreground text-sm">
+								Puedes agregar vehículos y supervisores para la empresa. De igual manera podrás
+								agregarlos más tarde.
 							</p>
 						</div>
 
-						<Tabs defaultValue="vehicles" className="w-full mt-1">
+						<Tabs defaultValue="vehicles" className="mt-1 w-full">
 							<TabsList className="w-full rounded-sm">
-								<TabsTrigger className="rounded-sm" value="vehicles">Vehículos</TabsTrigger>
-								<TabsTrigger className="rounded-sm" value="supervisors">Supervisores</TabsTrigger>
+								<TabsTrigger className="rounded-sm" value="supervisors">
+									Supervisores
+								</TabsTrigger>
+								<TabsTrigger className="rounded-sm" value="vehicles">
+									Vehículos
+								</TabsTrigger>
 							</TabsList>
-
-							<TabsContent value="vehicles" className="w-full flex flex-col gap-y-4 pt-2 space-y-4">
-								{vehiclesFields.map((field, index) => (
-									<div className="grid gap-y-4 gap-x-2 sm:grid-cols-2" key={field.id}>
+							<TabsContent
+								value="supervisors"
+								className="flex w-full flex-col space-y-4 gap-y-4 pt-2"
+							>
+								{supervisorsFields.map((field, index) => (
+									<div key={field.id} className="grid gap-x-2 gap-y-4 sm:grid-cols-2">
 										<div className="flex items-center justify-between sm:col-span-2">
-											<h3 className="text-sm  font-semibold flex items-center gap-1">
+											<h4 className="flex items-center gap-1 text-sm font-medium">
+												<IdCard className="h-4.5 w-4.5" />
+												Datos del Supervisor {index + 1}
+											</h4>
+
+											<Button
+												type="button"
+												className="text-text w-fit bg-transparent shadow-none hover:text-red-500"
+												onClick={() => removeSupervisor(index)}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</div>
+
+										<InputFormField<CompanySchema>
+											name={`supervisors.${index}.name`}
+											label="Nombre"
+											control={form.control}
+											placeholder="Nombre del supervisor"
+										/>
+
+										<RutFormField<CompanySchema>
+											name={`supervisors.${index}.rut`}
+											label="RUT"
+											control={form.control}
+											placeholder="RUT del supervisor"
+										/>
+
+										<InputFormField<CompanySchema>
+											name={`supervisors.${index}.email`}
+											label="Email"
+											control={form.control}
+											placeholder="Email del supervisor"
+											itemClassName="sm:col-span-2"
+										/>
+									</div>
+								))}
+
+								<Button
+									type="button"
+									onClick={() =>
+										appendSupervisor({ name: "", email: "", rut: "", isSupervisor: true })
+									}
+									className="text-primary w-fit bg-transparent shadow-none hover:underline"
+								>
+									<PlusCircleIcon className="h-4 w-4" />
+									Añadir Supervisor
+								</Button>
+							</TabsContent>
+
+							<TabsContent value="vehicles" className="flex w-full flex-col space-y-4 gap-y-4 pt-2">
+								{vehiclesFields.map((field, index) => (
+									<div className="grid gap-x-2 gap-y-4 sm:grid-cols-2" key={field.id}>
+										<div className="flex items-center justify-between sm:col-span-2">
+											<h3 className="flex items-center gap-1 text-sm font-semibold">
 												<Car className="h-4.5 w-4.5" />
 												Vehículo {index === 0 ? "Principal" : index + 1}
 											</h3>
 
 											<Button
 												type="button"
-												size={'icon'}
-												className="shadow-none bg-transparent hover:text-red-500 text-text"
+												size={"icon"}
+												className="text-text bg-transparent shadow-none hover:text-red-500"
 												onClick={() => removeVehicle(index)}
 											>
 												<Trash2 />
@@ -272,7 +332,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 
 								<Button
 									type="button"
-									className="bg-transparent hover:underline shadow-none text-primary w-fit"
+									className="text-primary w-fit bg-transparent shadow-none hover:underline"
 									onClick={() =>
 										appendVehicle({
 											plate: "",
@@ -289,63 +349,6 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 									Añadir Vehículo
 								</Button>
 							</TabsContent>
-
-							<TabsContent value="supervisors" className="w-full flex flex-col gap-y-4 pt-2 space-y-4">
-								{supervisorsFields.map((field, index) => (
-									<div
-										key={field.id}
-										className="grid gap-y-4 gap-x-2 sm:grid-cols-2"
-									>
-										<div className="flex items-center justify-between sm:col-span-2">
-											<h4 className="text-sm font-medium flex items-center gap-1">
-												<IdCard className="h-4.5 w-4.5" />
-												Datos del Supervisor {index + 1}
-											</h4>
-
-											<Button
-												type="button"
-												className="w-fit bg-transparent hover:text-red-500 text-text shadow-none"
-												onClick={() => removeSupervisor(index)}
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</div>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.name`}
-											label="Nombre"
-											control={form.control}
-											placeholder="Nombre del supervisor"
-										/>
-
-										<RutFormField<CompanySchema>
-											name={`supervisors.${index}.rut`}
-											label="RUT"
-											control={form.control}
-											placeholder="RUT del supervisor"
-										/>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.email`}
-											label="Email"
-											control={form.control}
-											placeholder="Email del supervisor"
-											itemClassName="sm:col-span-2"
-										/>
-									</div>
-								))}
-
-								<Button
-									type="button"
-									onClick={() =>
-										appendSupervisor({ name: "", email: "", rut: "", isSupervisor: true })
-									}
-									className="bg-transparent hover:underline shadow-none text-primary w-fit"
-								>
-									<PlusCircleIcon className="h-4 w-4" />
-									Añadir Supervisor
-								</Button>
-							</TabsContent>
 						</Tabs>
 
 						<Separator className="my-2" />
@@ -357,7 +360,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 						/>
 					</form>
 				</Form>
-			</SheetContent >
-		</Sheet >
+			</SheetContent>
+		</Sheet>
 	)
 }

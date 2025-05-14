@@ -3,24 +3,30 @@
 import { useWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
 import { USER_ROLE } from "@prisma/client"
 
+import MilestoneCards from "@/components/sections/work-book/MilestoneCards"
 import MilestonesForm from "@/components/forms/work-book/MilestonesForm"
-import MilestoneCards from "@/components/ui/work-book/MilestoneCards"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface WorkBookMilestonesProps {
-	workOrderId: string
+	userId: string
 	userRole: USER_ROLE
+	workOrderId: string
+	workOrderStartDate: Date
 }
 
-export default function WorkBookMilestones({ workOrderId, userRole }: WorkBookMilestonesProps) {
-	const { data, isLoading, isError } = useWorkBookMilestones(workOrderId)
+export default function WorkBookMilestones({
+	userId,
+	userRole,
+	workOrderId,
+	workOrderStartDate,
+}: WorkBookMilestonesProps) {
+	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
 
 	if (isLoading) {
 		return (
 			<div className="w-full space-y-4">
 				<div className="flex items-center justify-between">
 					<h2 className="text-2xl font-bold">Hitos y Actividades</h2>
-					{userRole === USER_ROLE.SUPERVISOR && <Skeleton className="h-10 w-40" />}
 				</div>
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{[...Array(3)].map((_, index) => (
@@ -47,11 +53,11 @@ export default function WorkBookMilestones({ workOrderId, userRole }: WorkBookMi
 			<div className="flex items-center justify-between">
 				<h2 className="text-2xl font-bold">Hitos y Actividades</h2>
 				{userRole === USER_ROLE.SUPERVISOR && data?.milestones.length === 0 && (
-					<MilestonesForm workOrderId={workOrderId} />
+					<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
 				)}
 			</div>
 
-			<MilestoneCards milestones={data?.milestones || []} />
+			<MilestoneCards userId={userId} userRole={userRole} milestones={data?.milestones || []} />
 		</div>
 	)
 }

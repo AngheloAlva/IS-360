@@ -1,18 +1,5 @@
 import { z } from "zod"
 
-export const milestoneTaskSchema = z.object({
-	id: z.string().optional(),
-	name: z.string().nonempty({ message: "El nombre de la tarea no puede estar vacío" }),
-	description: z.string().optional(),
-	order: z.string().optional(),
-	isCompleted: z.boolean().optional().default(false),
-	estimatedHours: z.string().optional(),
-	estimatedPeople: z.string().optional(),
-	plannedDate: z.date().optional(),
-	activityStartTime: z.string().optional(),
-	activityEndTime: z.string().optional(),
-})
-
 export const milestoneSchema = z
 	.object({
 		id: z.string().optional(),
@@ -30,9 +17,6 @@ export const milestoneSchema = z
 		),
 		startDate: z.date().optional(),
 		endDate: z.date().optional(),
-		tasks: z.array(milestoneTaskSchema).min(1, {
-			message: "Debe agregar al menos una tarea al hito",
-		}),
 	})
 	.refine(
 		(data) => {
@@ -46,29 +30,6 @@ export const milestoneSchema = z
 			path: ["endDate"],
 		}
 	)
-	.superRefine((data, ctx) => {
-		if (data.startDate) {
-			const startDate = data.startDate
-			if (data.tasks.some((task) => task.plannedDate && task.plannedDate < startDate)) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: "Hay tareas planeadas para antes que la fecha de inicio del hito",
-					path: ["startDate"],
-				})
-			}
-		}
-
-		if (data.endDate) {
-			const endDate = data.endDate
-			if (data.tasks.some((task) => task.plannedDate && task.plannedDate > endDate)) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					message: "Hay tareas planeadas para después de la fecha de finalización del hito",
-					path: ["endDate"],
-				})
-			}
-		}
-	})
 
 export const workBookMilestonesSchema = z
 	.object({
@@ -91,6 +52,5 @@ export const workBookMilestonesSchema = z
 		}
 	})
 
-export type MilestoneTaskSchema = z.infer<typeof milestoneTaskSchema>
-export type MilestoneSchema = z.infer<typeof milestoneSchema>
 export type WorkBookMilestonesSchema = z.infer<typeof workBookMilestonesSchema>
+export type MilestoneSchema = z.infer<typeof milestoneSchema>

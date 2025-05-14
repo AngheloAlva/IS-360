@@ -78,7 +78,7 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		header: "Fecha de creación",
 		cell: ({ row }) => {
 			const date = row.getValue("createdAt") as string
-			return format(new Date(date), "PPp", { locale: es })
+			return format(new Date(date), "PPP", { locale: es })
 		},
 	},
 ]

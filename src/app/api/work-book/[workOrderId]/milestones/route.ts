@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { MILESTONE_STATUS } from "@prisma/client"
 
 export async function GET(
 	request: NextRequest,
@@ -8,20 +9,39 @@ export async function GET(
 	try {
 		const { workOrderId } = await params
 
-		// Validate workOrderId
+		const searchParams = request.nextUrl.searchParams
+		const showAll = searchParams.get("showAll") === "true"
+
 		if (!workOrderId) {
 			return NextResponse.json({ error: "El ID del libro de obras es requerido" }, { status: 400 })
 		}
 
-		// Fetch milestones with their tasks for the given workOrderId
 		const milestones = await prisma.milestone.findMany({
 			where: {
 				workOrderId,
+				...(!showAll && {
+					status: {
+						in: [MILESTONE_STATUS.IN_PROGRESS, MILESTONE_STATUS.PENDING],
+					},
+				}),
 			},
 			include: {
-				tasks: {
+				activities: {
 					orderBy: {
-						order: "asc",
+						executionDate: "asc",
+					},
+					select: {
+						id: true,
+						comments: true,
+						activityName: true,
+						executionDate: true,
+						activityEndTime: true,
+						activityStartTime: true,
+						_count: {
+							select: {
+								assignedUsers: true,
+							},
+						},
 					},
 				},
 			},
@@ -30,20 +50,7 @@ export async function GET(
 			},
 		})
 
-		// Proporcionar valores predeterminados para los nuevos campos
-		const enrichedMilestones = milestones.map((milestone) => ({
-			...milestone,
-			tasks: milestone.tasks.map((task) => ({
-				...task,
-				// Proporcionar valores predeterminados para los nuevos campos
-				currentProgress: task.isCompleted ? 100 : 0,
-				completedHours: 0,
-				weight: 1,
-				autoComplete: true,
-			})),
-		}))
-
-		return NextResponse.json({ milestones: enrichedMilestones })
+		return NextResponse.json({ milestones })
 	} catch (error) {
 		console.error("Error fetching milestones:", error)
 		return NextResponse.json({ error: "Error al obtener los hitos" }, { status: 500 })

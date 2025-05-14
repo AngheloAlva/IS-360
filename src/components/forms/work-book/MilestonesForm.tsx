@@ -1,19 +1,13 @@
 "use client"
 
 import { type FieldError, useFieldArray, useForm } from "react-hook-form"
+import { Trash2Icon, MilestoneIcon, PlusCircleIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
-import {
-	Trash2Icon,
-	ListCheckIcon,
-	MilestoneIcon,
-	PlusCircleIcon,
-	ChevronRightIcon,
-} from "lucide-react"
 
-import { createMilestones } from "@/actions/work-orders/manage-milestones"
+import { createMilestones } from "@/actions/work-orders/milestone/create-milestones"
 import { cn } from "@/lib/utils"
 import {
 	workBookMilestonesSchema,
@@ -26,7 +20,6 @@ import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { Form, FormDescription, FormMessage } from "@/components/ui/form"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
-import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import {
 	Sheet,
@@ -39,12 +32,14 @@ import {
 
 interface MilestonesFormProps {
 	workOrderId: string
+	workOrderStartDate: Date
 }
 
-export default function MilestonesForm({ workOrderId }: MilestonesFormProps) {
+export default function MilestonesForm({ workOrderId, workOrderStartDate }: MilestonesFormProps) {
 	const [loading, setLoading] = useState<boolean>(false)
 	const [activeTab, setActiveTab] = useState("0")
 	const [open, setOpen] = useState(false)
+
 	const router = useRouter()
 
 	const form = useForm<WorkBookMilestonesSchema>({
@@ -56,12 +51,6 @@ export default function MilestonesForm({ workOrderId }: MilestonesFormProps) {
 					name: "",
 					description: "",
 					weight: "0",
-					tasks: [
-						{
-							name: "",
-							description: "",
-						},
-					],
 				},
 			],
 		},
@@ -118,19 +107,19 @@ export default function MilestonesForm({ workOrderId }: MilestonesFormProps) {
 				<span className="hidden sm:inline">Agregar Hitos</span>
 			</SheetTrigger>
 
-			<SheetContent side="right" className="gap-0 sm:max-w-[50dvw]">
+			<SheetContent side="right" className="gap-0 sm:max-w-[70dvw] lg:max-w-[50dvw]">
 				<SheetHeader className="shadow">
-					<SheetTitle>Agregar Hitos y Actividades</SheetTitle>
+					<SheetTitle>Agregar Hitos</SheetTitle>
 					<SheetDescription>
-						Gestione los hitos y actividades para el libro de obras. Cada hito debe tener al menos
-						una actividad. La suma de los pesos de los hitos debe ser exactamente 100%.
+						Gestione los hitos para el libro de obras. Podrá agregar actividades diarias despues y
+						relacionarlas con los hitos.
 					</SheetDescription>
 				</SheetHeader>
 
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="space-y-6 overflow-y-auto px-4 pb-14"
+						className="h-fit space-y-6 overflow-y-auto px-4 pb-24"
 					>
 						{form.formState.errors.milestones &&
 							form.formState.errors.milestones.length &&
@@ -152,7 +141,7 @@ export default function MilestonesForm({ workOrderId }: MilestonesFormProps) {
 							className="flex min-h-full flex-col gap-4 md:flex-row"
 						>
 							<div className="md:w-1/4">
-								<TabsList className="flex h-auto w-full flex-row justify-start gap-1 bg-transparent p-0 pt-4 md:flex-col">
+								<TabsList className="grid h-auto w-full grid-cols-2 justify-start gap-1 bg-transparent p-0 pt-4 md:flex md:flex-col">
 									{milestoneFields.map((field, index) => (
 										<TabsTrigger
 											key={field.id}
@@ -194,13 +183,12 @@ export default function MilestonesForm({ workOrderId }: MilestonesFormProps) {
 									<Button
 										type="button"
 										variant="ghost"
-										className="text-primary mt-2 w-full"
+										className="text-primary col-span-2 mt-2 w-full"
 										onClick={() => {
 											milestoneAppend({
 												name: "",
 												weight: "0",
 												description: "",
-												tasks: [{ name: "", isCompleted: false, description: "" }],
 											})
 											setActiveTab(milestoneFields.length.toString())
 										}}
@@ -214,15 +202,17 @@ export default function MilestonesForm({ workOrderId }: MilestonesFormProps) {
 							<div className="border-l-0 pl-0 md:w-3/4 md:border-l md:pl-4">
 								{milestoneFields.map((field, index) => (
 									<TabsContent key={field.id} value={index.toString()} className="m-0 pt-4">
-										<MilestoneForm form={form} index={index} />
+										<MilestoneForm
+											form={form}
+											index={index}
+											workOrderStartDate={workOrderStartDate}
+										/>
 									</TabsContent>
 								))}
 							</div>
 						</Tabs>
 
-						<Separator className="mb-6" />
-
-						<SubmitButton isSubmitting={loading} label="Guardar Hitos y Actividades" />
+						<SubmitButton isSubmitting={loading} label="Guardar Hitos" />
 					</form>
 				</Form>
 			</SheetContent>
@@ -234,14 +224,10 @@ interface MilestoneFormProps {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	form: any
 	index: number
+	workOrderStartDate: Date
 }
 
-function MilestoneForm({ form, index }: MilestoneFormProps) {
-	const { fields, append, remove } = useFieldArray({
-		control: form.control,
-		name: `milestones.${index}.tasks`,
-	})
-
+function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) {
 	const startDateError = form.formState.errors.milestones?.[index]?.startDate?.message
 	const endDateError = form.formState.errors.milestones?.[index]?.endDate?.message
 
@@ -286,6 +272,7 @@ function MilestoneForm({ form, index }: MilestoneFormProps) {
 						control={form.control}
 						label="Fecha de inicio"
 						name={`milestones.${index}.startDate`}
+						disabledCondition={(date) => date < workOrderStartDate}
 					/>
 
 					<DatePickerFormField<WorkBookMilestonesSchema>
@@ -300,109 +287,6 @@ function MilestoneForm({ form, index }: MilestoneFormProps) {
 					control={form.control}
 					name={`milestones.${index}.description`}
 				/>
-			</div>
-
-			<Separator />
-
-			<div className="space-y-5">
-				<div className="flex flex-col md:flex-row md:items-center md:justify-between">
-					<h3 className="flex items-center gap-x-2 text-lg font-bold">
-						Actividades del Hito
-						<ListCheckIcon className="size-5" />
-					</h3>
-					<FormDescription className="mt-0">Debe agregar al menos una actividad</FormDescription>
-				</div>
-
-				<div className="space-y-5">
-					{fields.map((field, taskIndex) => (
-						<div key={field.id}>
-							<div className="pb-2">
-								<div className="flex items-center justify-between">
-									<h3 className="flex items-center text-base font-semibold">
-										<ChevronRightIcon className="size-4" /> Actividad {taskIndex + 1}
-									</h3>
-									{fields.length > 1 && (
-										<Button
-											type="button"
-											variant="ghost"
-											size="icon"
-											onClick={() => remove(taskIndex)}
-										>
-											<Trash2Icon className="h-4 w-4" />
-										</Button>
-									)}
-								</div>
-							</div>
-
-							<div className="space-y-4">
-								<div className="grid grid-cols-1 gap-x-3 gap-y-5 md:grid-cols-2">
-									<InputFormField<WorkBookMilestonesSchema>
-										control={form.control}
-										label="Nombre de la Actividad"
-										name={`milestones.${index}.tasks.${taskIndex}.name`}
-									/>
-
-									<div className="grid grid-cols-2 gap-2">
-										<InputFormField<WorkBookMilestonesSchema>
-											placeholder="Horas"
-											control={form.control}
-											label="Horas estimadas"
-											name={`milestones.${index}.tasks.${taskIndex}.estimatedHours`}
-										/>
-
-										<InputFormField<WorkBookMilestonesSchema>
-											label="Personas"
-											control={form.control}
-											name={`milestones.${index}.tasks.${taskIndex}.estimatedPeople`}
-										/>
-									</div>
-
-									<DatePickerFormField<WorkBookMilestonesSchema>
-										control={form.control}
-										label="Fecha planeada"
-										name={`milestones.${index}.tasks.${taskIndex}.plannedDate`}
-									/>
-
-									<div className="grid grid-cols-2 gap-2">
-										<InputFormField<WorkBookMilestonesSchema>
-											control={form.control}
-											label="Hora inicio"
-											name={`milestones.${index}.tasks.${taskIndex}.activityStartTime`}
-											placeholder="08:00"
-										/>
-										<InputFormField<WorkBookMilestonesSchema>
-											control={form.control}
-											label="Hora fin"
-											name={`milestones.${index}.tasks.${taskIndex}.activityEndTime`}
-											placeholder="17:00"
-										/>
-									</div>
-								</div>
-
-								<TextAreaFormField<WorkBookMilestonesSchema>
-									label="Descripción"
-									control={form.control}
-									name={`milestones.${index}.tasks.${taskIndex}.description`}
-								/>
-							</div>
-						</div>
-					))}
-
-					<Button
-						type="button"
-						variant="ghost"
-						className="text-primary w-full"
-						onClick={() =>
-							append({
-								name: "",
-								description: "",
-							})
-						}
-					>
-						<PlusCircleIcon className="h-4 w-4" />
-						Agregar Actividad
-					</Button>
-				</div>
 			</div>
 		</div>
 	)

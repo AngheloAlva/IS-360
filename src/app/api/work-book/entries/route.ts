@@ -51,7 +51,6 @@ export async function GET(req: NextRequest) {
 					others: true,
 					// Status fields
 					noteStatus: true,
-					approvalStatus: true,
 					approvalDate: true,
 					createdBy: {
 						select: {

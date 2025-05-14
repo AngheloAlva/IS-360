@@ -4,6 +4,7 @@ import { fileSchema } from "../document-management/file.schema"
 
 export const dailyActivitySchema = z.object({
 	workOrderId: z.string(),
+	milestoneId: z.string(),
 
 	comments: z.string().optional(),
 	executionDate: z.date({ message: "La fecha de ejecución no es válida" }),
