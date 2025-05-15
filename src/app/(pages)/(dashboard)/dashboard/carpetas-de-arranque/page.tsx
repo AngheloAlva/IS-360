@@ -21,13 +21,6 @@ export default async function StartupFoldersPage() {
 
 	return (
 		<div className="w-full flex-1 space-y-6">
-			<div>
-				<h1 className="text-2xl font-bold">Carpetas de Arranque</h1>
-				<p className="text-muted-foreground">
-					Gestione la documentación necesaria para trabajar con nosotros
-				</p>
-			</div>
-
 			<StartupFolderOverview userId={session.user.id} companyId={session.user.companyId} />
 		</div>
 	)

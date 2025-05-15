@@ -1,6 +1,6 @@
 "use server"
 
-import { createGeneralStartupFolder } from "@/actions/startup-folders/createGeneralStartupFolder"
+import { createGeneralStartupFolder } from "@/actions/startup-folders/createStartupFolder"
 import prisma from "@/lib/prisma"
 
 import type { CompanySchema } from "@/lib/form-schemas/admin/company/company.schema"

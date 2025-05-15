@@ -1,28 +1,21 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import { WORK_ORDER_WORKER_STARTUP_FOLDER_STRUCTURE } from "@/lib/consts/startup-folders"
-import { WorkerDocumentType } from "@prisma/client"
+import { WORKER_STRUCTURE } from "@/lib/consts/startup-folders-structure"
+import { DocumentCategory, WorkerDocumentType } from "@prisma/client"
 
 interface AddWorkerToWorkOrderProps {
-	workOrderId: string
 	folderId: string
 	name: string
 	rut: string
 }
 
-export const addWorkerToWorkOrder = async ({
-	workOrderId,
-	folderId,
-	name,
-	rut,
-}: AddWorkerToWorkOrderProps) => {
+export const addWorkerToWorkOrder = async ({ folderId, name, rut }: AddWorkerToWorkOrderProps) => {
 	try {
 		// Verificar si la carpeta existe
-		const folderExists = await prisma.workOrderStartupFolder.findUnique({
+		const folderExists = await prisma.startupFolder.findUnique({
 			where: {
 				id: folderId,
-				workOrderId: workOrderId,
 			},
 		})
 
@@ -47,17 +40,17 @@ export const addWorkerToWorkOrder = async ({
 		const workerIdentifier = `${name} (${rut})`
 
 		// Obtener la configuración de documentos necesarios para un trabajador
-		const workerSection = WORK_ORDER_WORKER_STARTUP_FOLDER_STRUCTURE.workerDocumentation
+		const workerSection = WORKER_STRUCTURE.documents
 
 		// Crear documentos para el trabajador
-		const workerDocuments = workerSection.documents.map((doc) => ({
+		const workerDocuments = workerSection.map((doc) => ({
 			type: doc.type as WorkerDocumentType,
 			folderId,
-			fileType: doc.fileType,
+			fileType: "FILE",
+			category: DocumentCategory.PERSONNEL,
 			// Usamos el nombre original del documento y añadimos el identificador del trabajador
 			name: `${doc.name} - ${workerIdentifier}`,
 			url: "", // Url vacía inicialmente, se llenará cuando suban el documento
-			subcategory: workerSection.subcategory,
 		}))
 
 		// Crear los documentos en la base de datos

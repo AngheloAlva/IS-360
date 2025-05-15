@@ -29,44 +29,31 @@ import {
 } from "@/components/ui/sheet"
 
 import type {
-	CompanyDocumentType,
+	DocumentCategory,
 	WorkerDocumentType,
+	CompanyDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
 } from "@prisma/client"
 
 interface UploadStartupFolderDocumentFormProps {
-	type: "company" | "worker" | "vehicle" | "procedure" | "environmental"
 	folderId: string
 	documentName: string
-	documentType:
-		| CompanyDocumentType
-		| WorkerDocumentType
-		| VehicleDocumentType
-		| EnvironmentalDocType
-		| string
+	type: CompanyDocumentType | WorkerDocumentType | VehicleDocumentType | EnvironmentalDocType
 	isUpdate: boolean
 	documentId?: string
 	currentUrl?: string
-	subcategory:
-		| "OTHER"
-		| "VEHICLES"
-		| "PERSONNEL"
-		| "BASIC_INFO"
-		| "PROCEDURES"
-		| "ENVIRONMENTAL"
-		| "FIXED_CONTRACTS"
+	category: DocumentCategory
 }
 
 export function UploadStartupFolderDocumentForm({
 	type,
 	folderId,
 	isUpdate,
+	category,
 	documentId,
 	currentUrl,
-	subcategory,
 	documentName,
-	documentType,
 }: UploadStartupFolderDocumentFormProps) {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isUploading, setIsUploading] = useState(false)
@@ -89,7 +76,7 @@ export function UploadStartupFolderDocumentForm({
 						},
 					]
 				: [],
-			subcategory,
+			type,
 		},
 	})
 
@@ -119,34 +106,33 @@ export function UploadStartupFolderDocumentForm({
 
 			let result: { ok: boolean; message?: string }
 
-			switch (type) {
-				case "company":
+			switch (category) {
+				case "SAFETY_AND_HEALTH":
 					if (isUpdate && documentId) {
-						const { updateCompanyDocument } = await import(
-							"@/actions/startup-folders/documents/company"
+						const { updateSafetyAndHealthDocument } = await import(
+							"@/actions/startup-folders/documents/safety-and-health"
 						)
-						result = await updateCompanyDocument({
+						result = await updateSafetyAndHealthDocument({
 							data: { documentId, file: [] },
 							uploadedFile,
 						})
 					} else {
-						const { createCompanyDocument } = await import(
-							"@/actions/startup-folders/documents/company"
+						const { createSafetyAndHealthDocument } = await import(
+							"@/actions/startup-folders/documents/safety-and-health"
 						)
-						result = await createCompanyDocument({
+						result = await createSafetyAndHealthDocument({
 							data: {
+								type,
 								folderId,
 								files: [],
-								subcategory,
 								name: values.name || documentName,
 							},
-							documentType: documentType as CompanyDocumentType,
 							uploadedFile,
 						})
 					}
 					break
 
-				case "worker":
+				case "PERSONNEL":
 					// Importa e invoca la server action para documentos de trabajadores
 					if (isUpdate && documentId) {
 						const { updateWorkerDocument } = await import(
@@ -162,18 +148,17 @@ export function UploadStartupFolderDocumentForm({
 						)
 						result = await createWorkerDocument({
 							data: {
+								type,
 								folderId,
 								files: [],
-								subcategory,
 								name: values.name || documentName,
 							},
-							documentType: documentType as WorkerDocumentType,
 							file: uploadedFile,
 						})
 					}
 					break
 
-				case "vehicle":
+				case "VEHICLES":
 					// Importa e invoca la server action para documentos de vehículos
 					if (isUpdate && documentId) {
 						const { updateVehicleDocument } = await import(
@@ -189,35 +174,9 @@ export function UploadStartupFolderDocumentForm({
 						)
 						result = await createVehicleDocument({
 							data: {
+								type,
 								folderId,
 								files: [],
-								subcategory,
-								name: values.name || documentName,
-							},
-							documentType: documentType as VehicleDocumentType,
-							uploadedFile,
-						})
-					}
-					break
-
-				case "procedure":
-					if (isUpdate && documentId) {
-						const { updateProcedureDocument } = await import(
-							"@/actions/startup-folders/documents/procedure"
-						)
-						result = await updateProcedureDocument({
-							data: { documentId, file: [] },
-							uploadedFile,
-						})
-					} else {
-						const { createProcedureDocument } = await import(
-							"@/actions/startup-folders/documents/procedure"
-						)
-						result = await createProcedureDocument({
-							data: {
-								folderId,
-								files: [],
-								subcategory,
 								name: values.name || documentName,
 							},
 							uploadedFile,
@@ -225,7 +184,7 @@ export function UploadStartupFolderDocumentForm({
 					}
 					break
 
-				case "environmental":
+				case "ENVIRONMENTAL":
 					if (isUpdate && documentId) {
 						const { updateEnvironmentalDocument } = await import(
 							"@/actions/startup-folders/documents/environmental"
@@ -240,13 +199,12 @@ export function UploadStartupFolderDocumentForm({
 						)
 						result = await createEnvironmentalDocument({
 							data: {
+								type,
 								folderId,
 								files: [],
-								subcategory,
 								name: values.name || documentName,
 							},
 							uploadedFile,
-							documentType: documentType as EnvironmentalDocType,
 						})
 					}
 					break

@@ -8,25 +8,16 @@ import type { EnvironmentalDocType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createEnvironmentalDocument = async ({
-	data: { name, folderId, subcategory },
-	documentType,
+	data: { name, folderId, type },
 	uploadedFile,
 }: {
 	data: UploadStartupFolderDocumentSchema
-	documentType: EnvironmentalDocType
 	uploadedFile: UploadResult
 }) => {
 	try {
-		const folder = await prisma.workOrderStartupFolder.findUnique({
+		const folder = await prisma.startupFolder.findUnique({
 			where: {
 				id: folderId,
-			},
-			include: {
-				workOrder: {
-					include: {
-						company: true,
-					},
-				},
 			},
 		})
 
@@ -47,11 +38,11 @@ export const createEnvironmentalDocument = async ({
 		const document = await prisma.environmentalDocument.create({
 			data: {
 				name: name || "",
-				type: documentType,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
-				subcategory: subcategory,
+				category: "ENVIRONMENTAL",
 				fileType: uploadedFile.type,
+				type: type as EnvironmentalDocType,
 				folder: {
 					connect: {
 						id: folderId,
@@ -81,15 +72,7 @@ export const updateEnvironmentalDocument = async ({
 				id: documentId,
 			},
 			include: {
-				folder: {
-					include: {
-						workOrder: {
-							include: {
-								company: true,
-							},
-						},
-					},
-				},
+				folder: true,
 			},
 		})
 

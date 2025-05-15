@@ -1,6 +1,5 @@
 "use server"
 
-import { createWorkOrderStartupFolder } from "@/actions/startup-folders/createWorkOrderStartupFolder"
 import { generateOTNumber } from "@/actions/work-orders/generateOTNumber"
 import { sendNewWorkOrderEmail } from "./sendNewWorkOrderEmail"
 import prisma from "@/lib/prisma"
@@ -91,8 +90,6 @@ export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrde
 				message: "Error al crear el orden de trabajo",
 			}
 		}
-
-		await createWorkOrderStartupFolder({ workOrderId: workOrder.id })
 
 		sendNewWorkOrderEmail({
 			workOrder: {

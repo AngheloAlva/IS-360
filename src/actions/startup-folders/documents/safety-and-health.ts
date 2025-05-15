@@ -1,29 +1,26 @@
 "use server"
 
+import { CompanyDocumentType } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
 import type { UploadResult } from "@/lib/upload-files"
 
-export const createProcedureDocument = async ({
-	data: { name, folderId, subcategory },
+export const createSafetyAndHealthDocument = async ({
+	data: { name, folderId, type },
 	uploadedFile,
 }: {
 	data: UploadStartupFolderDocumentSchema
 	uploadedFile: UploadResult
 }) => {
 	try {
-		const folder = await prisma.workOrderStartupFolder.findUnique({
+		const folder = await prisma.startupFolder.findUnique({
 			where: {
 				id: folderId,
 			},
 			include: {
-				workOrder: {
-					include: {
-						company: true,
-					},
-				},
+				company: true,
 			},
 		})
 
@@ -39,19 +36,19 @@ export const createProcedureDocument = async ({
 			}
 		}
 
-		// Crear el documento
-		const document = await prisma.procedureDocument.create({
+		const document = await prisma.companyDocument.create({
 			data: {
-				name: name || "",
-				url: uploadedFile.url,
-				uploadedAt: new Date(),
-				subcategory: subcategory,
-				fileType: uploadedFile.type,
 				folder: {
 					connect: {
 						id: folderId,
 					},
 				},
+				fileType: "FILE",
+				name: name || "",
+				url: uploadedFile.url,
+				uploadedAt: new Date(),
+				category: "SAFETY_AND_HEALTH",
+				type: type as CompanyDocumentType,
 			},
 		})
 
@@ -62,26 +59,22 @@ export const createProcedureDocument = async ({
 	}
 }
 
-export const updateProcedureDocument = async ({
-	uploadedFile,
+export const updateSafetyAndHealthDocument = async ({
 	data: { documentId },
+	uploadedFile,
 }: {
-	uploadedFile: UploadResult
 	data: UpdateStartupFolderDocumentSchema
+	uploadedFile: UploadResult
 }) => {
 	try {
-		const existingDocument = await prisma.procedureDocument.findUnique({
+		const existingDocument = await prisma.companyDocument.findUnique({
 			where: {
 				id: documentId,
 			},
 			include: {
 				folder: {
 					include: {
-						workOrder: {
-							include: {
-								company: true,
-							},
-						},
+						company: true,
 					},
 				},
 			},
@@ -91,7 +84,6 @@ export const updateProcedureDocument = async ({
 			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		// Verificar que la carpeta esté en estado DRAFT o REJECTED para poder modificar documentos
 		if (
 			existingDocument.folder.status !== "DRAFT" &&
 			existingDocument.folder.status !== "REJECTED"
@@ -103,8 +95,7 @@ export const updateProcedureDocument = async ({
 			}
 		}
 
-		// Actualizar el documento
-		const updatedDocument = await prisma.procedureDocument.update({
+		const updatedDocument = await prisma.companyDocument.update({
 			where: {
 				id: documentId,
 			},

@@ -8,26 +8,17 @@ import type { WorkerDocumentType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createWorkerDocument = async ({
-	data: { folderId, name, subcategory },
-	documentType,
+	data: { folderId, name, type },
 	file,
 }: {
 	data: UploadStartupFolderDocumentSchema
-	documentType: WorkerDocumentType
 	file: UploadResult
 }) => {
 	try {
 		// Verificar que la carpeta exista y que el usuario tenga permisos
-		const folder = await prisma.workOrderStartupFolder.findUnique({
+		const folder = await prisma.workerDocument.findUnique({
 			where: {
 				id: folderId,
-			},
-			include: {
-				workOrder: {
-					include: {
-						company: true,
-					},
-				},
 			},
 		})
 
@@ -52,13 +43,12 @@ export const createWorkerDocument = async ({
 						id: folderId,
 					},
 				},
-				workerId: "",
 				name: name || "",
 				url: file.url,
-				type: documentType,
 				fileType: file.type,
+				category: "PERSONNEL",
 				uploadedAt: new Date(),
-				subcategory: subcategory,
+				type: type as WorkerDocumentType,
 			},
 		})
 

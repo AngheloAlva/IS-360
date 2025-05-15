@@ -8,25 +8,16 @@ import type { VehicleDocumentType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createVehicleDocument = async ({
-	data: { folderId, name, subcategory },
-	documentType,
+	data: { folderId, name, type },
 	uploadedFile,
 }: {
 	data: UploadStartupFolderDocumentSchema
-	documentType: VehicleDocumentType
 	uploadedFile: UploadResult
 }) => {
 	try {
-		const folder = await prisma.workOrderStartupFolder.findUnique({
+		const folder = await prisma.startupFolder.findUnique({
 			where: {
 				id: folderId,
-			},
-			include: {
-				workOrder: {
-					include: {
-						company: true,
-					},
-				},
 			},
 		})
 
@@ -52,11 +43,11 @@ export const createVehicleDocument = async ({
 					},
 				},
 				name: name || "",
-				type: documentType,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
-				subcategory: subcategory,
+				category: "VEHICLES",
 				fileType: uploadedFile.type,
+				type: type as VehicleDocumentType,
 			},
 		})
 
@@ -80,15 +71,7 @@ export const updateVehicleDocument = async ({
 				id: documentId,
 			},
 			include: {
-				folder: {
-					include: {
-						workOrder: {
-							include: {
-								company: true,
-							},
-						},
-					},
-				},
+				folder: true,
 			},
 		})
 

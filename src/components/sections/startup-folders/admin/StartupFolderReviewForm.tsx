@@ -2,27 +2,24 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { GeneralStartupFolderWithDocuments } from "@/hooks/startup-folders/use-general-startup-folder"
+import { StartupFolderWithDocuments } from "@/hooks/startup-folders/use-startup-folder"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle, CheckCircle2, Loader2, ThumbsDown, ThumbsUp } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
-import { format } from "date-fns"
+// import { format } from "date-fns"
 import { Label } from "@/components/ui/label"
-import { es } from "date-fns/locale"
+// import { es } from "date-fns/locale"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from "sonner"
 
-interface GeneralStartupFolderReviewFormProps {
-	folder: GeneralStartupFolderWithDocuments
+interface StartupFolderReviewFormProps {
+	folder: StartupFolderWithDocuments
 	userId: string
 }
 
-export function GeneralStartupFolderReviewForm({
-	folder,
-	userId,
-}: GeneralStartupFolderReviewFormProps) {
+export function StartupFolderReviewForm({ folder, userId }: StartupFolderReviewFormProps) {
 	const [approvalStatus, setApprovalStatus] = useState<"APPROVED" | "REJECTED" | null>(null)
 	const [comments, setComments] = useState("")
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -105,11 +102,11 @@ export function GeneralStartupFolderReviewForm({
 							</div>
 							<div className="flex items-center">
 								<span className="w-28 font-medium">Enviado el:</span>
-								<span>
+								{/* <span>
 									{folder.submittedAt
 										? format(new Date(folder.submittedAt), "PPP 'a las' p", { locale: es })
 										: "No enviado aún"}
-								</span>
+								</span> */}
 							</div>
 							<div className="flex items-center">
 								<span className="w-28 font-medium">Enviado por:</span>
