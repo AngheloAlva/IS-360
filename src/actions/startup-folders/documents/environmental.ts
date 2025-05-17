@@ -8,11 +8,13 @@ import type { EnvironmentalDocType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createEnvironmentalDocument = async ({
-	data: { name, folderId, type },
+	data: { name, folderId, type, expirationDate, documentId },
 	uploadedFile,
+	userId,
 }: {
 	data: UploadStartupFolderDocumentSchema
 	uploadedFile: UploadResult
+	userId: string
 }) => {
 	try {
 		const folder = await prisma.startupFolder.findUnique({
@@ -35,14 +37,23 @@ export const createEnvironmentalDocument = async ({
 		}
 
 		// Crear el documento
-		const document = await prisma.environmentalDocument.create({
+		const document = await prisma.environmentalDocument.update({
+			where: {
+				id: documentId,
+			},
 			data: {
+				expirationDate,
 				name: name || "",
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
 				category: "ENVIRONMENTAL",
 				fileType: uploadedFile.type,
 				type: type as EnvironmentalDocType,
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 				folder: {
 					connect: {
 						id: folderId,
@@ -60,11 +71,13 @@ export const createEnvironmentalDocument = async ({
 
 // PUT: Actualizar un documento existente
 export const updateEnvironmentalDocument = async ({
-	data: { documentId },
+	data: { documentId, expirationDate },
 	uploadedFile,
+	userId,
 }: {
 	data: UpdateStartupFolderDocumentSchema
 	uploadedFile: UploadResult
+	userId: string
 }) => {
 	try {
 		const existingDocument = await prisma.environmentalDocument.findUnique({
@@ -98,8 +111,14 @@ export const updateEnvironmentalDocument = async ({
 				id: documentId,
 			},
 			data: {
+				expirationDate,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		})
 

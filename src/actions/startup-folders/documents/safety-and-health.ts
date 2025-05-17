@@ -8,11 +8,13 @@ import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/start
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createSafetyAndHealthDocument = async ({
-	data: { name, folderId, type },
+	data: { name, folderId, type, expirationDate, documentId },
 	uploadedFile,
+	userId,
 }: {
 	data: UploadStartupFolderDocumentSchema
 	uploadedFile: UploadResult
+	userId: string
 }) => {
 	try {
 		const folder = await prisma.startupFolder.findUnique({
@@ -36,8 +38,12 @@ export const createSafetyAndHealthDocument = async ({
 			}
 		}
 
-		const document = await prisma.companyDocument.create({
+		const document = await prisma.companyDocument.update({
+			where: {
+				id: documentId,
+			},
 			data: {
+				expirationDate,
 				folder: {
 					connect: {
 						id: folderId,
@@ -49,6 +55,11 @@ export const createSafetyAndHealthDocument = async ({
 				uploadedAt: new Date(),
 				category: "SAFETY_AND_HEALTH",
 				type: type as CompanyDocumentType,
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		})
 
@@ -60,11 +71,13 @@ export const createSafetyAndHealthDocument = async ({
 }
 
 export const updateSafetyAndHealthDocument = async ({
-	data: { documentId },
+	data: { documentId, expirationDate },
 	uploadedFile,
+	userId,
 }: {
 	data: UpdateStartupFolderDocumentSchema
 	uploadedFile: UploadResult
+	userId: string
 }) => {
 	try {
 		const existingDocument = await prisma.companyDocument.findUnique({
@@ -100,8 +113,14 @@ export const updateSafetyAndHealthDocument = async ({
 				id: documentId,
 			},
 			data: {
+				expirationDate,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		})
 

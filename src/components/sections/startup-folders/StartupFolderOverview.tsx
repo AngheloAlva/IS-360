@@ -2,13 +2,17 @@
 
 import { Files, Building2 } from "lucide-react"
 
+import { FOLDER_REVIEW_STATUS_LABEL } from "@/lib/consts/folder-review-status"
 import { useStartupFolder } from "@/hooks/startup-folders/use-startup-folder"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
-import { StartupFolderDocuments } from "./StartupFolderDocuments"
 import { Badge } from "@/components/ui/badge"
-import { FOLDER_REVIEW_STATUS_LABEL } from "@/lib/consts/folder-review-status"
+import { Accordion } from "@/components/ui/accordion"
+import SafetyAndHealthDocuments from "./documents/SafetyAndHealthDocuments"
+import EnvironmentalDocuments from "./documents/EnvironmentalDocuments"
+import VehicleDocuments from "./documents/VehicleDocuments"
+import WorkerDocuments from "./documents/WorkerDocuments"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -16,6 +20,7 @@ interface StartupFolderOverviewProps {
 }
 
 export default function StartupFolderOverview({
+	userId,
 	companyId,
 }: StartupFolderOverviewProps): React.ReactElement {
 	const {
@@ -59,6 +64,7 @@ export default function StartupFolderOverview({
 							<div className="flex items-center gap-2">
 								<Building2 className="text-muted-foreground h-5 w-5" />
 								<h2 className="text-2xl font-semibold tracking-tight">Carpeta de Arranque</h2>
+								<Badge>{FOLDER_REVIEW_STATUS_LABEL[folders?.status || "DRAFT"]}</Badge>
 							</div>
 							<p className="text-muted-foreground mt-1">
 								Esta carpeta contiene la documentación requerida de tu empresa
@@ -66,8 +72,6 @@ export default function StartupFolderOverview({
 						</div>
 
 						<div className="flex flex-col items-end gap-2">
-							<Badge>{FOLDER_REVIEW_STATUS_LABEL[folders?.status || "DRAFT"]}</Badge>
-
 							<div className="text-muted-foreground flex min-w-fit flex-wrap items-start gap-1 gap-x-4 text-sm lg:flex-col lg:flex-nowrap lg:items-center xl:flex-row">
 								<div className="flex items-center text-nowrap lg:w-full">
 									<div className="mr-2 size-3 rounded-full bg-green-500"></div>
@@ -86,7 +90,32 @@ export default function StartupFolderOverview({
 					</div>
 
 					{folders && folders.companyDocuments?.length > 0 ? (
-						<StartupFolderDocuments folder={folders} isEditable={canEditDocuments} />
+						<div className="space-y-6">
+							<Accordion type="multiple">
+								<SafetyAndHealthDocuments
+									folder={folders}
+									isEditable={canEditDocuments}
+									userId={userId}
+								/>
+								<EnvironmentalDocuments
+									folder={folders}
+									isEditable={canEditDocuments}
+									userId={userId}
+								/>
+								<VehicleDocuments
+									userId={userId}
+									startupFolderId={folders.id}
+									isEditable={canEditDocuments}
+									folders={folders.vehiclesFolders}
+								/>
+								<WorkerDocuments
+									userId={userId}
+									startupFolderId={folders.id}
+									isEditable={canEditDocuments}
+									folders={folders.workersFolders}
+								/>
+							</Accordion>
+						</div>
 					) : (
 						<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
 							<Files className="text-muted-foreground h-8 w-8" />

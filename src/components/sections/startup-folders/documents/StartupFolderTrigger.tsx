@@ -1,0 +1,73 @@
+import { AlertCircle, CheckCircle2, Info } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { AccordionTrigger } from "@/components/ui/accordion"
+import { Progress } from "@/components/ui/progress"
+
+export default function StartupFolderTrigger({
+	title,
+	totalDocs,
+	completedDocs,
+	requiredPending,
+	progressPercentage,
+	sectionDescription,
+}: {
+	title: string
+	totalDocs: number
+	completedDocs: number
+	requiredPending: number
+	progressPercentage: number
+	sectionDescription: string
+}): React.ReactElement {
+	return (
+		<AccordionTrigger className="cursor-pointer items-center py-4 hover:no-underline">
+			<div className="flex w-full items-center justify-between pr-4">
+				<div className="flex items-center">
+					<div
+						className={cn(
+							"mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-500/10 text-red-500",
+							{
+								"bg-green-500/10 text-green-500": completedDocs === totalDocs,
+							}
+						)}
+					>
+						{completedDocs === totalDocs ? (
+							<CheckCircle2 className="h-5 w-5" />
+						) : (
+							<AlertCircle className="h-5 w-5" />
+						)}
+					</div>
+					<div className="flex flex-col items-start">
+						<div className="flex items-center gap-0.5">
+							<h3 className="mr-1 text-left font-medium">{title}</h3>
+							<Tooltip delayDuration={200}>
+								<TooltipTrigger className="mt-0.5 flex items-center" asChild>
+									<Info className="text-muted-foreground h-4 w-4 cursor-help" />
+								</TooltipTrigger>
+								<TooltipContent>
+									<p className="max-w-xs text-balance">{sectionDescription}</p>
+								</TooltipContent>
+							</Tooltip>
+						</div>
+
+						<p className="text-muted-foreground text-left text-sm">
+							{completedDocs} de {totalDocs} documentos agregados
+						</p>
+					</div>
+				</div>
+
+				<Progress
+					value={progressPercentage}
+					className="w-24"
+					indicatorClassName={cn({
+						"bg-green-500/50": completedDocs === totalDocs,
+						"bg-red-500/50": requiredPending > 0,
+						"bg-amber-500/50": requiredPending === 0,
+					})}
+				/>
+			</div>
+		</AccordionTrigger>
+	)
+}

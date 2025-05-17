@@ -1,0 +1,84 @@
+"use server"
+
+import { WORKER_STRUCTURE } from "@/lib/consts/startup-folders-structure"
+import prisma from "@/lib/prisma"
+
+import type { WorkerDocumentType } from "@prisma/client"
+
+export const createUserStartupFolder = async (userId: string) => {
+	try {
+		const user = await prisma.user.findUnique({
+			where: {
+				id: userId,
+			},
+			select: {
+				id: true,
+				companyId: true,
+			},
+		})
+
+		if (!user || !user.companyId) {
+			return {
+				ok: false,
+				message: "Usuario no encontrado",
+			}
+		}
+
+		const startupFolder = await prisma.startupFolder.findFirst({
+			where: {
+				companyId: user.companyId,
+			},
+			select: {
+				id: true,
+			},
+		})
+
+		if (!startupFolder) {
+			return {
+				ok: false,
+				message: "No se encontró la carpeta inicial",
+			}
+		}
+
+		await prisma.workerFolder.create({
+			data: {
+				worker: {
+					connect: {
+						id: userId,
+					},
+				},
+				startupFolder: {
+					connect: {
+						id: startupFolder.id,
+					},
+				},
+				documents: {
+					create: WORKER_STRUCTURE.documents.map((doc) => ({
+						url: "",
+						name: doc.name,
+						fileType: "FILE",
+						required: doc.required,
+						category: WORKER_STRUCTURE.category,
+						type: doc.type as WorkerDocumentType,
+						folder: {
+							connect: {
+								id: startupFolder.id,
+							},
+						},
+					})),
+				},
+			},
+		})
+
+		return {
+			ok: true,
+			message: "Carpeta inicial creada exitosamente",
+		}
+	} catch (error) {
+		console.error("[CREATE_USER_STARTUP_FOLDER]", error)
+		return {
+			ok: false,
+			message: "Error al crear la carpeta inicial",
+		}
+	}
+}

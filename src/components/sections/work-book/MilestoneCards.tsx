@@ -169,7 +169,7 @@ export default function MilestoneCards({ userId, userRole, milestones }: Milesto
 							</div>
 
 							{milestone.closureComment && (
-								<div className="mt-auto flex items-center gap-2">
+								<div className="mt-auto mb-2 flex items-center gap-2">
 									<InfoIcon
 										className={cn("h-4 min-h-4 w-4 min-w-4", {
 											"text-green-500": milestone.status === MILESTONE_STATUS.COMPLETED,

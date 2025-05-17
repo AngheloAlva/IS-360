@@ -95,7 +95,7 @@ model User {
   reviewedCompanyDocuments       CompanyDocument[]       @relation("CompanyDocumentReviewer")
   uploadedWorkerDocuments        WorkerDocument[]        @relation("WorkerDocumentUploadedBy")
   reviewedWorkerDocuments        WorkerDocument[]        @relation("WorkerDocumentReviewer")
-  workerDocuments                WorkerDocument[]        @relation("WorkerDocumentWorker")
+  workerFolders                  WorkerFolder[]
   uploadedVehicleDocuments       VehicleDocument[]       @relation("VehicleDocumentUploadedBy")
   reviewedVehicleDocuments       VehicleDocument[]       @relation("VehicleDocumentReviewer")
   uploadedProcedureDocuments     ProcedureDocument[]     @relation("ProcedureDocumentUploadedBy")
@@ -209,10 +209,10 @@ model Vehicle {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company          Company           @relation(fields: [companyId], references: [id])
-  companyId        String
-  workPermits      WorkPermit[]
-  vehicleDocuments VehicleDocument[]
+  company         Company         @relation(fields: [companyId], references: [id])
+  companyId       String
+  workPermits     WorkPermit[]
+  vehiclesFolders VehicleFolder[]
 
   @@map("vehicle")
 }
@@ -889,6 +889,7 @@ enum ReviewStatus {
   SUBMITTED // Enviado
   APPROVED // Aprovado
   REJECTED // Rechazado
+  EXPIRED // Expirado
 }
 
 enum CompanyDocumentType {
@@ -914,10 +915,10 @@ enum CompanyDocumentType {
 }
 
 enum WorkerDocumentType {
-  ID_CARD // Cédula de identidad
   CONTRACT // Contrato de Trabajo
   INTERNAL_REGULATION_RECEIPT // Entrega de Reglamento Interno
   RISK_INFORMATION // Inducción de Riesgos Laborales (IRL)
+  ID_CARD // Cédula de identidad
   DRIVING_LICENSE // Licencias de conducir
   HEALTH_EXAM // Examen médico vigente
   PSYCHOTECHNICAL_EXAM // Examen Psico sensotécnico
@@ -977,11 +978,15 @@ enum DocumentCategory {
 }
 
 model StartupFolder {
-  id        String       @id @default(uuid())
-  status    ReviewStatus @default(DRAFT)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id                           String       @id @default(uuid())
+  status                       ReviewStatus @default(DRAFT)
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+  submittedAt                  DateTime?
+  additionalNotificationEmails String[]
 
+  workersFolders          WorkerFolder[]
+  vehiclesFolders         VehicleFolder[]
   company                 Company                 @relation(fields: [companyId], references: [id])
   companyId               String
   workOrder               WorkOrder?              @relation(fields: [workOrderId], references: [id])
@@ -1019,6 +1024,23 @@ model CompanyDocument {
   @@map("company_document")
 }
 
+model WorkerFolder {
+  id          String       @id @default(cuid())
+  status      ReviewStatus @default(DRAFT)
+  submittedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  workerId        String
+  startupFolderId String
+  worker          User             @relation(fields: [workerId], references: [id])
+  startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
+  documents       WorkerDocument[]
+
+  @@unique([workerId, startupFolderId])
+  @@map("worker_folders")
+}
+
 model WorkerDocument {
   id             String             @id @default(uuid())
   type           WorkerDocumentType
@@ -1033,17 +1055,33 @@ model WorkerDocument {
   submittedAt    DateTime?
   expirationDate DateTime?
 
-  reviewerId   String?
-  reviewer     User?   @relation("WorkerDocumentReviewer", fields: [reviewerId], references: [id])
-  uploadedById String?
-  uploadedBy   User?   @relation("WorkerDocumentUploadedBy", fields: [uploadedById], references: [id])
-
-  folder   StartupFolder @relation(fields: [folderId], references: [id])
-  folderId String
-  workerId String?
-  worker   User?         @relation("WorkerDocumentWorker", fields: [workerId], references: [id])
+  workerFolderId String
+  workerFolder   WorkerFolder  @relation(fields: [workerFolderId], references: [id])
+  reviewerId     String?
+  reviewer       User?         @relation("WorkerDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?         @relation("WorkerDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folder         StartupFolder @relation(fields: [folderId], references: [id])
+  folderId       String
 
   @@map("worker_document")
+}
+
+model VehicleFolder {
+  id          String       @id @default(cuid())
+  status      ReviewStatus @default(DRAFT)
+  submittedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  vehicleId       String
+  startupFolderId String
+  vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
+  startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
+  documents       VehicleDocument[]
+
+  @@unique([vehicleId, startupFolderId])
+  @@map("vehicle_folders")
 }
 
 model VehicleDocument {
@@ -1065,23 +1103,24 @@ model VehicleDocument {
   uploadedById String?
   uploadedBy   User?   @relation("VehicleDocumentUploadedBy", fields: [uploadedById], references: [id])
 
-  vehicleId String?
-  vehicle   Vehicle?      @relation(fields: [vehicleId], references: [id])
-  folder    StartupFolder @relation(fields: [folderId], references: [id])
-  folderId  String
+  vehicleFolderId String?
+  vehicleFolder   VehicleFolder? @relation(fields: [vehicleFolderId], references: [id])
+  folder          StartupFolder  @relation(fields: [folderId], references: [id])
+  folderId        String
 
   @@map("vehicle_document")
 }
 
 model ProcedureDocument {
-  id             String           @id @default(uuid())
+  id             String              @id @default(uuid())
+  type           CompanyDocumentType
   name           String
   description    String?
   url            String
   fileType       String
-  uploadedAt     DateTime         @default(now())
+  uploadedAt     DateTime            @default(now())
   category       DocumentCategory
-  status         ReviewStatus     @default(DRAFT)
+  status         ReviewStatus        @default(DRAFT)
   reviewNotes    String?
   reviewedAt     DateTime?
   submittedAt    DateTime?

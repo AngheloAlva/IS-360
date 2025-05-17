@@ -8,11 +8,13 @@ import type { VehicleDocumentType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createVehicleDocument = async ({
-	data: { folderId, name, type },
+	data: { folderId, name, type, expirationDate, vehicleId, documentId },
 	uploadedFile,
+	userId,
 }: {
-	data: UploadStartupFolderDocumentSchema
+	data: UploadStartupFolderDocumentSchema // This schema now includes vehicleId?: string
 	uploadedFile: UploadResult
+	userId: string
 }) => {
 	try {
 		const folder = await prisma.startupFolder.findUnique({
@@ -35,8 +37,12 @@ export const createVehicleDocument = async ({
 		}
 
 		// Crear el documento
-		const document = await prisma.vehicleDocument.create({
+		const document = await prisma.vehicleDocument.update({
+			where: {
+				id: documentId,
+			},
 			data: {
+				expirationDate,
 				folder: {
 					connect: {
 						id: folderId,
@@ -48,6 +54,12 @@ export const createVehicleDocument = async ({
 				category: "VEHICLES",
 				fileType: uploadedFile.type,
 				type: type as VehicleDocumentType,
+				...(vehicleId && { vehicle: { connect: { id: vehicleId } } }), // Conditionally connect vehicle
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		})
 
@@ -59,11 +71,13 @@ export const createVehicleDocument = async ({
 }
 
 export const updateVehicleDocument = async ({
-	data: { documentId },
+	data: { documentId, expirationDate },
 	uploadedFile,
+	userId,
 }: {
 	data: UpdateStartupFolderDocumentSchema
 	uploadedFile: UploadResult
+	userId: string
 }) => {
 	try {
 		const existingDocument = await prisma.vehicleDocument.findUnique({
@@ -97,8 +111,14 @@ export const updateVehicleDocument = async ({
 				id: documentId,
 			},
 			data: {
+				expirationDate,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		})
 

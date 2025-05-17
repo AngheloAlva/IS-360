@@ -347,7 +347,7 @@ export const WORKER_STRUCTURE: StartupFolderStructure = {
 				"Curso de manejo defensivo en alta montaña, para quienes realicen labores de inspección o mantención del ducto en trayecto hacia Buta Mallín.",
 		},
 		{
-			type: WorkerDocumentType.MOUNTAIN_DEFENSIVE_DRIVING,
+			type: WorkerDocumentType.TOOLS_MAINTENANCE_TRAINING,
 			name: "Registro de capacitacion del procedimiento de Mantencion de herramientas y equipos",
 			required: true,
 			description:

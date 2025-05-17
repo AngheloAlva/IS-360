@@ -1,32 +1,53 @@
 import { useQuery } from "@tanstack/react-query"
 
 import type {
+	User,
+	ReviewStatus,
 	StartupFolder,
 	WorkerDocument,
 	CompanyDocument,
 	VehicleDocument,
-	ProcedureDocument,
 	EnvironmentalDocument,
+	Vehicle,
 } from "@prisma/client"
 
-export interface StartupFolderWithDocuments extends StartupFolder {
+export interface WorkerFolderWithDocuments {
+	id: string
+	status: ReviewStatus
+	submittedAt: Date | null
+	workerId: string
+	worker: User
+	documents: WorkerDocument[]
+	startupFolderId: string
+	createdAt: Date
+	updatedAt: Date
+}
+
+export interface VehicleFolderWithDocuments {
+	id: string
+	status: ReviewStatus
+	submittedAt: Date | null
+	vehicleId: string
+	vehicle: Vehicle
+	documents: VehicleDocument[]
+	startupFolderId: string
+	createdAt: Date
+	updatedAt: Date
+}
+
+export interface StartupFolderWithDocuments extends Omit<StartupFolder, "workerFolders"> {
 	company: {
 		name: string
 		rut: string
 	}
-	companyDocuments: (CompanyDocument & {
-		uploadedBy?: {
-			name: string
-		}
-	})[]
 	reviewComments?: string | null
 	submittedBy?: {
 		name: string
 	} | null
 	environmentalsDocuments: EnvironmentalDocument[]
-	proceduresDocuments: ProcedureDocument[]
-	workersDocuments: WorkerDocument[]
-	vehiclesDocuments: VehicleDocument[]
+	companyDocuments: CompanyDocument[]
+	workersFolders: WorkerFolderWithDocuments[]
+	vehiclesFolders: VehicleFolderWithDocuments[]
 }
 
 interface UseStartupFolderParams {

@@ -5,4 +5,5 @@ export const FOLDER_REVIEW_STATUS_LABEL = {
 	[ReviewStatus.SUBMITTED]: "En revisión",
 	[ReviewStatus.APPROVED]: "Aprobado",
 	[ReviewStatus.REJECTED]: "Rechazado",
+	[ReviewStatus.EXPIRED]: "Expirado",
 }

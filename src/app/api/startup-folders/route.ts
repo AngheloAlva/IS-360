@@ -45,14 +45,35 @@ export async function GET(req: NextRequest) {
 						name: "asc",
 					},
 				},
-				workersDocuments: {
+				workersFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+						worker: {
+							select: {
+								id: true,
+								name: true,
+								email: true,
+							},
+						},
+					},
 					orderBy: {
-						name: "asc",
+						worker: {
+							name: "asc",
+						},
 					},
 				},
-				vehiclesDocuments: {
-					orderBy: {
-						name: "asc",
+				vehiclesFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+						vehicle: true,
 					},
 				},
 			},

@@ -35,22 +35,30 @@ import type {
 	VehicleDocumentType,
 	EnvironmentalDocType,
 } from "@prisma/client"
+import { addYears } from "date-fns"
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 
 interface UploadStartupFolderDocumentFormProps {
+	userId: string
 	folderId: string
 	documentName: string
 	type: CompanyDocumentType | WorkerDocumentType | VehicleDocumentType | EnvironmentalDocType
 	isUpdate: boolean
-	documentId?: string
+	documentId: string
 	currentUrl?: string
 	category: DocumentCategory
+	workerId?: string
+	vehicleId?: string
 }
 
 export function UploadStartupFolderDocumentForm({
 	type,
+	userId,
+	workerId,
 	folderId,
 	isUpdate,
 	category,
+	vehicleId,
 	documentId,
 	currentUrl,
 	documentName,
@@ -64,8 +72,11 @@ export function UploadStartupFolderDocumentForm({
 	const form = useForm<UploadStartupFolderDocumentSchema>({
 		resolver: zodResolver(uploadStartupFolderDocumentSchema),
 		defaultValues: {
+			type,
 			folderId,
+			documentId,
 			name: documentName,
+			expirationDate: addYears(new Date(), 1),
 			files: isUpdate
 				? [
 						{
@@ -76,7 +87,6 @@ export function UploadStartupFolderDocumentForm({
 						},
 					]
 				: [],
-			type,
 		},
 	})
 
@@ -113,8 +123,9 @@ export function UploadStartupFolderDocumentForm({
 							"@/actions/startup-folders/documents/safety-and-health"
 						)
 						result = await updateSafetyAndHealthDocument({
-							data: { documentId, file: [] },
+							data: { documentId, file: [], expirationDate: values.expirationDate },
 							uploadedFile,
+							userId,
 						})
 					} else {
 						const { createSafetyAndHealthDocument } = await import(
@@ -125,48 +136,57 @@ export function UploadStartupFolderDocumentForm({
 								type,
 								folderId,
 								files: [],
+								documentId,
 								name: values.name || documentName,
+								expirationDate: values.expirationDate,
 							},
 							uploadedFile,
+							userId,
 						})
 					}
 					break
 
 				case "PERSONNEL":
-					// Importa e invoca la server action para documentos de trabajadores
 					if (isUpdate && documentId) {
 						const { updateWorkerDocument } = await import(
 							"@/actions/startup-folders/documents/worker"
 						)
+						if (!workerId) throw new Error("Worker ID is required for updating worker document.")
 						result = await updateWorkerDocument({
-							data: { documentId, file: [] },
+							data: { documentId, expirationDate: values.expirationDate, file: [] },
 							file: uploadedFile,
+							userId,
 						})
 					} else {
 						const { createWorkerDocument } = await import(
 							"@/actions/startup-folders/documents/worker"
 						)
+						if (!workerId) throw new Error("Worker ID is required for creating worker document.")
 						result = await createWorkerDocument({
 							data: {
-								type,
 								folderId,
-								files: [],
+								workerId,
+								documentId,
+								files: values.files,
+								type: type as WorkerDocumentType,
 								name: values.name || documentName,
+								expirationDate: values.expirationDate,
 							},
 							file: uploadedFile,
+							userId,
 						})
 					}
 					break
 
 				case "VEHICLES":
-					// Importa e invoca la server action para documentos de vehículos
 					if (isUpdate && documentId) {
 						const { updateVehicleDocument } = await import(
 							"@/actions/startup-folders/documents/vehicle"
 						)
 						result = await updateVehicleDocument({
-							data: { documentId, file: [] },
+							data: { documentId, file: [], expirationDate: values.expirationDate },
 							uploadedFile,
+							userId,
 						})
 					} else {
 						const { createVehicleDocument } = await import(
@@ -177,9 +197,13 @@ export function UploadStartupFolderDocumentForm({
 								type,
 								folderId,
 								files: [],
+								vehicleId,
+								documentId,
 								name: values.name || documentName,
+								expirationDate: values.expirationDate,
 							},
 							uploadedFile,
+							userId,
 						})
 					}
 					break
@@ -190,8 +214,9 @@ export function UploadStartupFolderDocumentForm({
 							"@/actions/startup-folders/documents/environmental"
 						)
 						result = await updateEnvironmentalDocument({
-							data: { documentId, file: [] },
+							data: { documentId, file: [], expirationDate: values.expirationDate },
 							uploadedFile,
+							userId,
 						})
 					} else {
 						const { createEnvironmentalDocument } = await import(
@@ -202,9 +227,12 @@ export function UploadStartupFolderDocumentForm({
 								type,
 								folderId,
 								files: [],
+								documentId,
 								name: values.name || documentName,
+								expirationDate: values.expirationDate,
 							},
 							uploadedFile,
+							userId,
 						})
 					}
 					break
@@ -272,6 +300,13 @@ export function UploadStartupFolderDocumentForm({
 							name="name"
 							control={form.control}
 							label="Nombre del documento"
+						/>
+
+						<DatePickerFormField<UploadStartupFolderDocumentSchema>
+							name="expirationDate"
+							control={form.control}
+							label="Fecha de vencimiento"
+							disabledCondition={(date) => date < new Date()}
 						/>
 
 						<div className="space-y-2">

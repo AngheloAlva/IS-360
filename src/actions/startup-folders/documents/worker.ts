@@ -8,15 +8,20 @@ import type { WorkerDocumentType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createWorkerDocument = async ({
-	data: { folderId, name, type },
+	data: { folderId, name, type, expirationDate, workerId, documentId },
 	file,
+	userId,
 }: {
 	data: UploadStartupFolderDocumentSchema
 	file: UploadResult
+	userId: string
 }) => {
 	try {
-		// Verificar que la carpeta exista y que el usuario tenga permisos
-		const folder = await prisma.workerDocument.findUnique({
+		if (!workerId) {
+			return { ok: false, message: "ID de trabajador es requerido" }
+		}
+
+		const folder = await prisma.startupFolder.findUnique({
 			where: {
 				id: folderId,
 			},
@@ -26,7 +31,6 @@ export const createWorkerDocument = async ({
 			return { ok: false, message: "Carpeta no encontrada" }
 		}
 
-		// Verificar que la carpeta esté en estado DRAFT o REJECTED para poder modificar documentos
 		if (folder.status !== "DRAFT" && folder.status !== "REJECTED") {
 			return {
 				ok: false,
@@ -35,9 +39,32 @@ export const createWorkerDocument = async ({
 			}
 		}
 
+		// Buscar o crear la carpeta del trabajador
+		const workerFolder = await prisma.workerFolder.findUnique({
+			where: {
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
+			},
+		})
+
+		if (!workerFolder) {
+			return { ok: false, message: "Carpeta de trabajador no encontrada" }
+		}
+
 		// Crear el documento
-		const document = await prisma.workerDocument.create({
+		const document = await prisma.workerDocument.update({
+			where: {
+				id: documentId,
+			},
 			data: {
+				expirationDate,
+				workerFolder: {
+					connect: {
+						id: workerFolder.id,
+					},
+				},
 				folder: {
 					connect: {
 						id: folderId,
@@ -49,6 +76,11 @@ export const createWorkerDocument = async ({
 				category: "PERSONNEL",
 				uploadedAt: new Date(),
 				type: type as WorkerDocumentType,
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
 			},
 		})
 
@@ -61,10 +93,12 @@ export const createWorkerDocument = async ({
 
 export const updateWorkerDocument = async ({
 	file,
-	data: { documentId },
+	data: { documentId, expirationDate },
+	userId,
 }: {
 	file: UploadResult
 	data: UpdateStartupFolderDocumentSchema
+	userId: string
 }) => {
 	try {
 		const existingDocument = await prisma.workerDocument.findUnique({
@@ -72,13 +106,10 @@ export const updateWorkerDocument = async ({
 				id: documentId,
 			},
 			include: {
-				folder: {
+				folder: true,
+				workerFolder: {
 					include: {
-						workOrder: {
-							include: {
-								company: true,
-							},
-						},
+						worker: true,
 					},
 				},
 			},
@@ -88,7 +119,10 @@ export const updateWorkerDocument = async ({
 			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		// Verificar que la carpeta esté en estado DRAFT o REJECTED para poder modificar documentos
+		if (!existingDocument.workerFolder) {
+			return { ok: false, message: "Carpeta de trabajador no encontrada" }
+		}
+
 		if (
 			existingDocument.folder.status !== "DRAFT" &&
 			existingDocument.folder.status !== "REJECTED"
@@ -106,8 +140,22 @@ export const updateWorkerDocument = async ({
 				id: documentId,
 			},
 			data: {
+				expirationDate,
 				url: file.url,
+				fileType: file.type,
 				uploadedAt: new Date(),
+				uploadedBy: {
+					connect: {
+						id: userId,
+					},
+				},
+			},
+			include: {
+				workerFolder: {
+					include: {
+						worker: true,
+					},
+				},
 			},
 		})
 

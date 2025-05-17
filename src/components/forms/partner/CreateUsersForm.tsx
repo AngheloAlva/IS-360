@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { createUserStartupFolder } from "@/actions/users/createUserStartupFolder"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
-import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
+import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
 import {
@@ -88,6 +89,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						email: employee.email,
 						password: temporalPassword,
 					})
+
+					await createUserStartupFolder(newUser.user.id)
 					return newUser
 				})
 			)

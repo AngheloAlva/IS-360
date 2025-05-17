@@ -9,7 +9,7 @@ import { toast } from "sonner"
 
 import { companySchema, type CompanySchema } from "@/lib/form-schemas/admin/company/company.schema"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
-import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
+import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { createCompany } from "@/actions/companies/createCompany"
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-type"
 import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"

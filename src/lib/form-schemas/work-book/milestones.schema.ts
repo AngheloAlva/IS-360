@@ -12,7 +12,7 @@ export const milestoneSchema = z
 				return !isNaN(num) && num > 0
 			},
 			{
-				message: "El peso del hito debe ser un número mayor a 0",
+				message: "El porcentaje del hito debe ser un número mayor a 0",
 			}
 		),
 		startDate: z.date().optional(),

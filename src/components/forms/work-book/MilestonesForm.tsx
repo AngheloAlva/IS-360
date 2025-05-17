@@ -263,7 +263,7 @@ function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) 
 						min={1}
 						step={0.1}
 						type="number"
-						label="Peso del Hito"
+						label="Porcentaje del Hito"
 						control={form.control}
 						name={`milestones.${index}.weight`}
 					/>

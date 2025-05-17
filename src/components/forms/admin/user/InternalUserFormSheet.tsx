@@ -8,7 +8,7 @@ import { toast } from "sonner"
 
 import { UserAreaOptions, UserAreasValuesArray } from "@/lib/consts/areas"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
-import { sendNewUserEmail } from "@/actions/emails/sendRequestEmail"
+import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { InternalUserRoleOptions } from "@/lib/consts/user-roles"
 import { updateInternalUser } from "@/actions/users/updateUser"
 import { ModuleOptions } from "@/lib/consts/modules"
