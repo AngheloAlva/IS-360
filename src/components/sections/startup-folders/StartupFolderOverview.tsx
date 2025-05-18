@@ -6,13 +6,13 @@ import { FOLDER_REVIEW_STATUS_LABEL } from "@/lib/consts/folder-review-status"
 import { useStartupFolder } from "@/hooks/startup-folders/use-startup-folder"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
-import { Accordion } from "@/components/ui/accordion"
 import SafetyAndHealthDocuments from "./documents/SafetyAndHealthDocuments"
 import EnvironmentalDocuments from "./documents/EnvironmentalDocuments"
 import VehicleDocuments from "./documents/VehicleDocuments"
 import WorkerDocuments from "./documents/WorkerDocuments"
+import { Accordion } from "@/components/ui/accordion"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -107,12 +107,14 @@ export default function StartupFolderOverview({
 									startupFolderId={folders.id}
 									isEditable={canEditDocuments}
 									folders={folders.vehiclesFolders}
+									equipmentDocuments={folders.vehiclesDocuments}
 								/>
 								<WorkerDocuments
 									userId={userId}
 									startupFolderId={folders.id}
 									isEditable={canEditDocuments}
 									folders={folders.workersFolders}
+									additionalNotificationEmails={folders.additionalNotificationEmails}
 								/>
 							</Accordion>
 						</div>

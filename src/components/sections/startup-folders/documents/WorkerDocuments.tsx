@@ -24,6 +24,7 @@ interface WorkerDocumentsProps {
 	userId: string
 	isEditable: boolean
 	startupFolderId: string
+	additionalNotificationEmails: string[]
 	folders: StartupFolderWithDocuments["workersFolders"]
 }
 
@@ -32,6 +33,7 @@ export default function WorkerDocuments({
 	folders,
 	isEditable,
 	startupFolderId,
+	additionalNotificationEmails,
 }: WorkerDocumentsProps): React.ReactElement {
 	const totalExpectedDocsPerWorker = WORKER_STRUCTURE.documents.length
 	let overallUploadedDocsCount = 0
@@ -310,9 +312,9 @@ export default function WorkerDocuments({
 
 			<SubmitReviewRequestDialog
 				disabled={!isEditable}
-				currentUserId={userId}
 				folderId={startupFolderId}
 				folderName={WORKER_STRUCTURE.title}
+				additionalNotificationEmails={additionalNotificationEmails}
 			/>
 		</div>
 	)

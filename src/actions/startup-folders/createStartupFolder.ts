@@ -1,19 +1,18 @@
 "use server"
 
+import { CompanyDocumentType, EnvironmentalDocType, VehicleDocumentType } from "@prisma/client"
 import prisma from "@/lib/prisma"
 import {
+	VEHICLE_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
-import { CompanyDocumentType, EnvironmentalDocType } from "@prisma/client"
 
-interface CreateGeneralStartupFolderProps {
+interface CreateStartupFolderProps {
 	companyId: string
 }
 
-export const createGeneralStartupFolder = async ({
-	companyId,
-}: CreateGeneralStartupFolderProps) => {
+export const createStartupFolder = async ({ companyId }: CreateStartupFolderProps) => {
 	try {
 		// Primero crea la carpeta general
 		const generalFolder = await prisma.startupFolder.create({
@@ -41,6 +40,10 @@ export const createGeneralStartupFolder = async ({
 			category: SAFETY_AND_HEALTH_STRUCTURE.category,
 		}))
 
+		const vehiclesDocumentsToCreate = VEHICLE_STRUCTURE.documents.find(
+			(doc) => doc.type === VehicleDocumentType.EQUIPMENT_FILE
+		)
+
 		await prisma.companyDocument.createMany({
 			data: safetyAndHealthDocumentsToCreate.map((doc) => ({
 				...doc,
@@ -53,6 +56,17 @@ export const createGeneralStartupFolder = async ({
 				...doc,
 				type: doc.type as EnvironmentalDocType,
 			})),
+		})
+
+		await prisma.vehicleDocument.create({
+			data: {
+				url: "",
+				fileType: "FILE",
+				folderId: generalFolder.id,
+				category: VEHICLE_STRUCTURE.category,
+				type: VehicleDocumentType.EQUIPMENT_FILE,
+				name: vehiclesDocumentsToCreate?.name || "",
+			},
 		})
 
 		return {

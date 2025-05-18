@@ -2,13 +2,13 @@ import { useQuery } from "@tanstack/react-query"
 
 import type {
 	User,
+	Vehicle,
 	ReviewStatus,
-	StartupFolder,
 	WorkerDocument,
 	CompanyDocument,
 	VehicleDocument,
 	EnvironmentalDocument,
-	Vehicle,
+	StartupFolder,
 } from "@prisma/client"
 
 export interface WorkerFolderWithDocuments {
@@ -35,7 +35,7 @@ export interface VehicleFolderWithDocuments {
 	updatedAt: Date
 }
 
-export interface StartupFolderWithDocuments extends Omit<StartupFolder, "workerFolders"> {
+export interface StartupFolderWithDocuments extends StartupFolder {
 	company: {
 		name: string
 		rut: string
@@ -46,8 +46,10 @@ export interface StartupFolderWithDocuments extends Omit<StartupFolder, "workerF
 	} | null
 	environmentalsDocuments: EnvironmentalDocument[]
 	companyDocuments: CompanyDocument[]
+	vehiclesDocuments: VehicleDocument[]
 	workersFolders: WorkerFolderWithDocuments[]
 	vehiclesFolders: VehicleFolderWithDocuments[]
+	additionalNotificationEmails: string[]
 }
 
 interface UseStartupFolderParams {

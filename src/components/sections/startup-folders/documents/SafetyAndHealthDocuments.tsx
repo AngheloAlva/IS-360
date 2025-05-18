@@ -184,7 +184,7 @@ export default function SafetyAndHealthDocuments({
 				folderId={folder.id}
 				disabled={!isEditable}
 				folderName={SAFETY_AND_HEALTH_STRUCTURE.title}
-				currentUserId={userId}
+				additionalNotificationEmails={folder.additionalNotificationEmails}
 			/>
 		</div>
 	)

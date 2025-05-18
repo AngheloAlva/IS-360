@@ -31,7 +31,7 @@ interface SubmitReviewRequestDialogProps {
 	folderName: string
 	disabled?: boolean
 	onReviewSubmitSuccess?: () => void
-	currentUserId: string
+	additionalNotificationEmails?: string[]
 }
 
 export function SubmitReviewRequestDialog({
@@ -39,7 +39,7 @@ export function SubmitReviewRequestDialog({
 	disabled,
 	folderName,
 	onReviewSubmitSuccess,
-	currentUserId,
+	additionalNotificationEmails,
 }: SubmitReviewRequestDialogProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -50,7 +50,7 @@ export function SubmitReviewRequestDialog({
 		resolver: zodResolver(submitReviewRequestSchema),
 		defaultValues: {
 			folderId: folderId,
-			notificationEmails: "",
+			notificationEmails: additionalNotificationEmails?.join(", ") || "",
 		},
 	})
 
@@ -100,7 +100,7 @@ export function SubmitReviewRequestDialog({
 
 		try {
 			// Submit with the parsed email array and current user ID
-			const result = await submitForReview(currentUserId, emails, data.folderId)
+			const result = await submitForReview(emails, data.folderId)
 
 			if (result.ok) {
 				toast.success(result.message || "Solicitud de revisión enviada con éxito.")

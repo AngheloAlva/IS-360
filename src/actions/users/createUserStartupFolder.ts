@@ -57,7 +57,6 @@ export const createUserStartupFolder = async (userId: string) => {
 						url: "",
 						name: doc.name,
 						fileType: "FILE",
-						required: doc.required,
 						category: WORKER_STRUCTURE.category,
 						type: doc.type as WorkerDocumentType,
 						folder: {

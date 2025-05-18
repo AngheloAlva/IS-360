@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { VehicleDocumentType } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
 	try {
@@ -64,6 +65,11 @@ export async function GET(req: NextRequest) {
 						worker: {
 							name: "asc",
 						},
+					},
+				},
+				vehiclesDocuments: {
+					where: {
+						type: VehicleDocumentType.EQUIPMENT_FILE,
 					},
 				},
 				vehiclesFolders: {

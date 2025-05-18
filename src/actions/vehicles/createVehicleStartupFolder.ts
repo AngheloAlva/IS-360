@@ -3,7 +3,7 @@
 import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import prisma from "@/lib/prisma"
 
-import type { VehicleDocumentType } from "@prisma/client"
+import { VehicleDocumentType } from "@prisma/client"
 
 export const createVehicleStartupFolder = async (vehicleId: string) => {
 	try {
@@ -40,6 +40,26 @@ export const createVehicleStartupFolder = async (vehicleId: string) => {
 			}
 		}
 
+		const documentsToCreate = VEHICLE_STRUCTURE.documents
+			.map((doc) => {
+				if (doc.type === VehicleDocumentType.EQUIPMENT_FILE) return
+
+				return {
+					url: "",
+					name: doc.name,
+					fileType: "FILE",
+					required: doc.required,
+					category: VEHICLE_STRUCTURE.category,
+					type: doc.type as VehicleDocumentType,
+					folder: {
+						connect: {
+							id: startupFolder.id,
+						},
+					},
+				}
+			})
+			.filter((doc) => doc !== undefined)
+
 		await prisma.vehicleFolder.create({
 			data: {
 				vehicle: {
@@ -52,21 +72,11 @@ export const createVehicleStartupFolder = async (vehicleId: string) => {
 						id: startupFolder.id,
 					},
 				},
-				documents: {
-					create: VEHICLE_STRUCTURE.documents.map((doc) => ({
-						url: "",
-						name: doc.name,
-						fileType: "FILE",
-						required: doc.required,
-						category: VEHICLE_STRUCTURE.category,
-						type: doc.type as VehicleDocumentType,
-						folder: {
-							connect: {
-								id: startupFolder.id,
-							},
-						},
-					})),
-				},
+				...(documentsToCreate.length > 0 && {
+					documents: {
+						create: documentsToCreate,
+					},
+				}),
 			},
 		})
 

@@ -168,8 +168,8 @@ export default function EnvironmentalDocuments({
 			<SubmitReviewRequestDialog
 				folderId={folder.id}
 				disabled={!isEditable}
-				currentUserId={userId}
 				folderName={ENVIRONMENTAL_STRUCTURE.title}
+				additionalNotificationEmails={folder.additionalNotificationEmails}
 			/>
 		</div>
 	)
