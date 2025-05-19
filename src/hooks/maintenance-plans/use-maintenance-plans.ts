@@ -4,7 +4,6 @@ export interface MaintenancePlan {
 	id: string
 	name: string
 	slug: string
-	description: string
 	equipment: {
 		name: string
 		tag: string

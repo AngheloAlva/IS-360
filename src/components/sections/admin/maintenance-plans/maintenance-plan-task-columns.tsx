@@ -3,32 +3,26 @@
 import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
 import { differenceInDays, format } from "date-fns"
 import { ColumnDef } from "@tanstack/react-table"
+import { LinkIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
+import CreateMaintenancePlanTaskWorkOrderForm from "@/components/forms/admin/work-order/CreateMaintenancePlanTaskWorkOrderForm"
 import { Badge } from "@/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
-import { LinkIcon } from "lucide-react"
 
 export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	{
-		accessorKey: "responsible",
-		header: "Responsable",
-		cell: ({ row }) => {
-			const responsible = row.original.responsible as MaintenancePlanTask["responsible"]
-			return <span>{responsible.name}</span>
-		},
-	},
-	{
-		accessorKey: "company",
-		header: "Empresa",
-		cell: ({ row }) => {
-			const company = row.original.company as MaintenancePlanTask["company"]
-			const isInternal = row.original
-				.isInternalResponsible as MaintenancePlanTask["isInternalResponsible"]
-			return <span>{isInternal ? "OTC" : company.name}</span>
-		},
+		accessorKey: "createWorkOrder",
+		header: "",
+		cell: ({ row }) => (
+			<CreateMaintenancePlanTaskWorkOrderForm
+				equipmentId={row.original.equipment.id}
+				equipmentName={row.original.equipment.name}
+				maintenancePlanTaskId={row.original.id}
+			/>
+		),
 	},
 	{
 		accessorKey: "name",
@@ -39,7 +33,15 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		header: "Descripción",
 		cell: ({ row }) => {
 			const description = row.getValue("description") as string
-			return <p className="w-64 max-w-64 text-wrap">{description}</p>
+			return <p className="max-w-64 text-wrap">{description || "-"}</p>
+		},
+	},
+	{
+		accessorKey: "_count",
+		header: "Ordenes de Trabajo Creadas",
+		cell: ({ row }) => {
+			const count = row.getValue("_count") as MaintenancePlanTask["_count"]
+			return <span>{count.workOrders}</span>
 		},
 	},
 	{

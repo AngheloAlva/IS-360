@@ -17,9 +17,9 @@ export const createMaintenancePlan = async ({ values }: CreateMaintenancePlanVal
 		await prisma.maintenancePlan.create({
 			data: {
 				slug: planSlug,
+				description: "",
 				name: values.name,
 				location: values.location,
-				description: values.description,
 				equipment: {
 					connect: {
 						id: values.equipmentId,

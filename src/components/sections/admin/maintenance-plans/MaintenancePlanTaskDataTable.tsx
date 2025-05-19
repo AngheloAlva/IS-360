@@ -88,7 +88,7 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 						type="text"
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className="bg-background ml-auto w-full sm:w-72"
+						className="bg-background ml-auto w-full"
 						placeholder="Buscar por nombre, descripcion, o equipo..."
 					/>
 				</div>

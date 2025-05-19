@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { addWeeks } from "date-fns"
 
 import prisma from "@/lib/prisma"
 
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest) {
 	const search = searchParams.get("search") ?? ""
 
 	const skip = (page - 1) * limit
+	const nextWeek = addWeeks(new Date(), 1)
 
 	try {
 		const [maintenancePlans, total] = await Promise.all([
@@ -25,7 +27,6 @@ export async function GET(request: NextRequest) {
 					id: true,
 					name: true,
 					slug: true,
-					description: true,
 					createdAt: true,
 					createdBy: {
 						select: {
@@ -40,12 +41,19 @@ export async function GET(request: NextRequest) {
 					},
 					_count: {
 						select: {
-							task: true,
+							task: {
+								where: {
+									nextDate: {
+										lte: nextWeek,
+										gte: new Date(),
+									},
+								},
+							},
 						},
 					},
 				},
 				take: limit,
-				orderBy: { createdAt: "desc" },
+				orderBy: { createdAt: "asc" },
 				cacheStrategy: {
 					ttl: 120,
 					swr: 10,

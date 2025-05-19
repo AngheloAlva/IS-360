@@ -10,17 +10,11 @@ export interface MaintenancePlanTask {
 	createdAt: Date
 	frequency: PLAN_FREQUENCY
 	description: string
-	isInternalResponsible: boolean
-	company: {
-		name: string
-	}
-	responsible: {
-		name: string
-	}
 	createdBy: {
 		name: string
 	}
 	equipment: {
+		id: string
 		name: string
 	}
 	attachments: {
@@ -28,6 +22,9 @@ export interface MaintenancePlanTask {
 		name: string
 		url: string
 	}[]
+	_count: {
+		workOrders: number
+	}
 }
 
 interface UseMaintenancePlansTasksParams {

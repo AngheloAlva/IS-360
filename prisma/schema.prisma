@@ -89,8 +89,7 @@ model User {
   twofactors                     TwoFactor[]
   FileComment                    FileComment[]
   MaintenancePlan                MaintenancePlan[]
-  MaintenancePlanTask            MaintenancePlanTask[]     @relation("MaintenancePlanTaskResponsible")
-  MaintenancePlanTaskCreatedBy   MaintenancePlanTask[]     @relation("MaintenancePlanTaskCreatedBy")
+  MaintenancePlanTask            MaintenancePlanTask[]
   approvedMilestones             Milestone[]               @relation("MilestoneApprover")
   requestedMilestones            Milestone[]               @relation("MilestoneRequestedBy")
   safetyAndHealthFolders         SafetyAndHealthFolder[]
@@ -169,12 +168,11 @@ model Company {
   rut   String
   image String?
 
-  users               User[]
-  workOrders          WorkOrder[]
-  workPermits         WorkPermit[]
-  vehicles            Vehicle[]
-  MaintenancePlanTask MaintenancePlanTask[]
-  StartupFolders      StartupFolder[]
+  users          User[]
+  workOrders     WorkOrder[]
+  workPermits    WorkPermit[]
+  vehicles       Vehicle[]
+  StartupFolders StartupFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -851,32 +849,22 @@ model MaintenancePlan {
 }
 
 model MaintenancePlanTask {
-  id                    String              @id @default(cuid())
-  slug                  String              @unique
-  name                  String
-  description           String
-  frequency             PLAN_FREQUENCY
-  workOrderType         WORK_ORDER_TYPE
-  workOrderCapex        WORK_ORDER_CAPEX
-  workOrderPriority     WORK_ORDER_PRIORITY
-  nextDate              DateTime
-  estimatedDays         Int
-  estimatedHours        Int
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
-  isInternalResponsible Boolean
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  name        String
+  description String?
+  frequency   PLAN_FREQUENCY
+  nextDate    DateTime
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   equipment         Equipment       @relation(fields: [equipmentId], references: [id])
   equipmentId       String
   attachments       Attachment[]
   maintenancePlan   MaintenancePlan @relation(fields: [maintenancePlanId], references: [id])
   maintenancePlanId String
-  responsible       User            @relation("MaintenancePlanTaskResponsible", fields: [responsibleId], references: [id])
-  responsibleId     String
-  createdBy         User            @relation("MaintenancePlanTaskCreatedBy", fields: [createdById], references: [id])
+  createdBy         User            @relation(fields: [createdById], references: [id])
   createdById       String
-  company           Company         @relation(fields: [companyId], references: [id])
-  companyId         String
   workOrders        WorkOrder[]
 
   @@map("maintenance_plan_task")

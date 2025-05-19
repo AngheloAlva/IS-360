@@ -51,20 +51,10 @@ export async function GET(
 					nextDate: true,
 					createdAt: true,
 					description: true,
-					isInternalResponsible: true,
 					frequency: true,
-					responsible: {
-						select: {
-							name: true,
-						},
-					},
-					company: {
-						select: {
-							name: true,
-						},
-					},
 					equipment: {
 						select: {
+							id: true,
 							name: true,
 						},
 					},
@@ -78,6 +68,11 @@ export async function GET(
 							id: true,
 							name: true,
 							url: true,
+						},
+					},
+					_count: {
+						select: {
+							workOrders: true,
 						},
 					},
 				},

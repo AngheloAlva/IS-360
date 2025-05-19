@@ -1,9 +1,9 @@
 "use server"
 
+import { generateSlug } from "@/lib/generateSlug"
 import prisma from "@/lib/prisma"
 
 import type { MaintenancePlanTaskSchema } from "@/lib/form-schemas/maintenance-plan/maintenance-plan-task.schema"
-import { generateSlug } from "@/lib/generateSlug"
 
 interface CreateMaintenancePlanTaskValues {
 	values: MaintenancePlanTaskSchema
@@ -35,12 +35,6 @@ export const createMaintenancePlanTask = async ({ values }: CreateMaintenancePla
 				name: values.name,
 				frequency: values.frequency,
 				description: values.description,
-				workOrderType: values.workOrderType,
-				estimatedDays: +values.estimatedDays,
-				workOrderCapex: values.workOrderCapex,
-				estimatedHours: +values.estimatedHours,
-				workOrderPriority: values.workOrderPriority,
-				isInternalResponsible: values.isInternalResponsible,
 				maintenancePlan: {
 					connect: {
 						id: maintenancePlan.id,
@@ -50,16 +44,6 @@ export const createMaintenancePlanTask = async ({ values }: CreateMaintenancePla
 				equipment: {
 					connect: {
 						id: values.equipmentId,
-					},
-				},
-				company: {
-					connect: {
-						id: values.companyId,
-					},
-				},
-				responsible: {
-					connect: {
-						id: values.responsibleId,
 					},
 				},
 				createdBy: {
