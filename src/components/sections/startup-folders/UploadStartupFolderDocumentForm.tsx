@@ -1,10 +1,10 @@
 "use client"
 
-import { useQueryClient } from "@tanstack/react-query"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Upload } from "lucide-react"
+import { addYears } from "date-fns"
+import { useState } from "react"
 import { toast } from "sonner"
 
 import { uploadFilesToCloud } from "@/lib/upload-files"
@@ -13,6 +13,7 @@ import {
 	type UploadStartupFolderDocumentSchema,
 } from "@/lib/form-schemas/startup-folder/new-file.schema"
 
+import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 import UploadFilesFormField from "@/components/forms/shared/UploadFilesFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
@@ -31,18 +32,20 @@ import {
 import type {
 	DocumentCategory,
 	WorkerDocumentType,
-	CompanyDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	SafetyAndHealthDocumentType,
 } from "@prisma/client"
-import { addYears } from "date-fns"
-import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 
 interface UploadStartupFolderDocumentFormProps {
 	userId: string
 	folderId: string
 	documentName: string
-	type: CompanyDocumentType | WorkerDocumentType | VehicleDocumentType | EnvironmentalDocType
+	type:
+		| WorkerDocumentType
+		| VehicleDocumentType
+		| EnvironmentalDocType
+		| SafetyAndHealthDocumentType
 	isUpdate: boolean
 	documentId: string
 	currentUrl?: string
@@ -66,8 +69,6 @@ export function UploadStartupFolderDocumentForm({
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isUploading, setIsUploading] = useState(false)
 	const [open, setOpen] = useState(false)
-
-	const queryClient = useQueryClient()
 
 	const form = useForm<UploadStartupFolderDocumentSchema>({
 		resolver: zodResolver(uploadStartupFolderDocumentSchema),
@@ -250,13 +251,7 @@ export function UploadStartupFolderDocumentForm({
 			// 3. Mostrar mensaje de éxito
 			toast.success(`Documento ${isUpdate ? "actualizado" : "subido"} correctamente`)
 
-			// 4. Refrescar los datos
-			queryClient.invalidateQueries({
-				queryKey: ["generalStartupFolder", folderId],
-			})
-			queryClient.invalidateQueries({
-				queryKey: ["workOrderStartupFolder", folderId],
-			})
+			window.location.reload()
 
 			setOpen(false)
 		} catch (error) {
@@ -266,10 +261,6 @@ export function UploadStartupFolderDocumentForm({
 			setIsUploading(false)
 		}
 	}
-
-	useEffect(() => {
-		console.log(form.formState.errors)
-	}, [form.formState.errors])
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>

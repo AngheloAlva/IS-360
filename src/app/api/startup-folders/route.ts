@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
-import { VehicleDocumentType } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
 	try {
@@ -31,19 +30,28 @@ export async function GET(req: NextRequest) {
 						rut: true,
 					},
 				},
-				companyDocuments: {
+				safetyAndHealthFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+					},
 					orderBy: {
-						name: "asc",
+						createdAt: "asc",
 					},
 				},
-				environmentalsDocuments: {
-					orderBy: {
-						name: "asc",
+				environmentalFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
 					},
-				},
-				proceduresDocuments: {
 					orderBy: {
-						name: "asc",
+						createdAt: "asc",
 					},
 				},
 				workersFolders: {
@@ -65,11 +73,6 @@ export async function GET(req: NextRequest) {
 						worker: {
 							name: "asc",
 						},
-					},
-				},
-				vehiclesDocuments: {
-					where: {
-						type: VehicleDocumentType.EQUIPMENT_FILE,
 					},
 				},
 				vehiclesFolders: {

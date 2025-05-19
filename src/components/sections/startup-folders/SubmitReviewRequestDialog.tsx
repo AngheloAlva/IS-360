@@ -5,7 +5,6 @@ import { Send } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { submitForReview } from "@/actions/startup-folders/submit-for-review"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
 	submitReviewRequestSchema,
@@ -28,18 +27,18 @@ import {
 
 interface SubmitReviewRequestDialogProps {
 	folderId: string
+	disabled: boolean
 	folderName: string
-	disabled?: boolean
 	onReviewSubmitSuccess?: () => void
-	additionalNotificationEmails?: string[]
+	folderType: "WORKER" | "VEHICLE" | "ENVIRONMENTAL" | "SAFETY_AND_HEALTH"
 }
 
 export function SubmitReviewRequestDialog({
 	folderId,
 	disabled,
 	folderName,
+	folderType,
 	onReviewSubmitSuccess,
-	additionalNotificationEmails,
 }: SubmitReviewRequestDialogProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -50,7 +49,7 @@ export function SubmitReviewRequestDialog({
 		resolver: zodResolver(submitReviewRequestSchema),
 		defaultValues: {
 			folderId: folderId,
-			notificationEmails: additionalNotificationEmails?.join(", ") || "",
+			notificationEmails: "",
 		},
 	})
 
@@ -99,8 +98,46 @@ export function SubmitReviewRequestDialog({
 		toast.info("Enviando solicitud de revisión...")
 
 		try {
-			// Submit with the parsed email array and current user ID
-			const result = await submitForReview(emails, data.folderId)
+			let result: { ok: boolean; message?: string }
+
+			if (folderType === "WORKER") {
+				const { submitWorkerDocumentForReview } = await import(
+					"@/actions/startup-folders/documents/worker"
+				)
+				result = await submitWorkerDocumentForReview({
+					emails,
+					folderId,
+				})
+			} else if (folderType === "VEHICLE") {
+				const { submitVehicleDocumentForReview } = await import(
+					"@/actions/startup-folders/documents/vehicle"
+				)
+				result = await submitVehicleDocumentForReview({
+					emails,
+					folderId,
+				})
+			} else if (folderType === "ENVIRONMENTAL") {
+				const { submitEnvironmentalDocumentForReview } = await import(
+					"@/actions/startup-folders/documents/environmental"
+				)
+				result = await submitEnvironmentalDocumentForReview({
+					emails,
+					folderId,
+				})
+			} else if (folderType === "SAFETY_AND_HEALTH") {
+				const { submitSafetyAndHealthDocumentForReview } = await import(
+					"@/actions/startup-folders/documents/safety-and-health"
+				)
+				result = await submitSafetyAndHealthDocumentForReview({
+					emails,
+					folderId,
+				})
+			} else {
+				result = {
+					ok: false,
+					message: "Error al enviar la solicitud.",
+				}
+			}
 
 			if (result.ok) {
 				toast.success(result.message || "Solicitud de revisión enviada con éxito.")

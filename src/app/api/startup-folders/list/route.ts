@@ -3,40 +3,95 @@ import prisma from "@/lib/prisma"
 
 export async function GET(req: NextRequest) {
 	try {
-		// Temporalmente sin verificación de autenticación
-		const companyId = req.nextUrl.searchParams.get("companyId")
+		const searchParams = req.nextUrl.searchParams
+		const search = searchParams.get("search") || ""
 
-		// Obtenemos las carpetas de arranque generales
-		const generalStartupFolders = await prisma.startupFolder.findMany({
+		const startupFolder = await prisma.startupFolder.findMany({
 			where: {
-				// Si el usuario es partner company, solo devolvemos las carpetas de su empresa
-				...(companyId ? { companyId } : {}),
+				...(search
+					? {
+							OR: [
+								{ company: { name: { contains: search, mode: "insensitive" as const } } },
+								{ company: { rut: { contains: search, mode: "insensitive" as const } } },
+							],
+						}
+					: {}),
 			},
 			include: {
 				company: {
 					select: {
+						id: true,
 						name: true,
 						rut: true,
+						image: true,
 					},
 				},
-				_count: {
-					select: {
-						companyDocuments: true,
-						environmentalsDocuments: true,
-						proceduresDocuments: true,
-						workersDocuments: true,
-						vehiclesDocuments: true,
+				safetyAndHealthFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+					},
+					orderBy: {
+						createdAt: "asc",
 					},
 				},
-			},
-			orderBy: {
-				companyId: "asc",
+				environmentalFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+					},
+					orderBy: {
+						createdAt: "asc",
+					},
+				},
+				workersFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+						worker: {
+							select: {
+								id: true,
+								name: true,
+								email: true,
+							},
+						},
+					},
+					orderBy: {
+						worker: {
+							name: "asc",
+						},
+					},
+				},
+				vehiclesFolders: {
+					include: {
+						documents: {
+							orderBy: {
+								name: "asc",
+							},
+						},
+						vehicle: true,
+					},
+				},
 			},
 		})
 
-		return NextResponse.json(generalStartupFolders)
+		// Si no existe la carpeta, devolvemos error
+		if (!startupFolder) {
+			return new NextResponse("General startup folder not found", { status: 404 })
+		}
+
+		return NextResponse.json(startupFolder)
 	} catch (error) {
-		console.error("[GENERAL_STARTUP_FOLDERS_LIST_GET]", error)
+		console.error("[GENERAL_STARTUP_FOLDER_GET]", error)
 		return new NextResponse("Internal Error", { status: 500 })
 	}
 }

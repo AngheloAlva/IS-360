@@ -1,9 +1,9 @@
 import {
 	DocumentCategory,
 	WorkerDocumentType,
-	CompanyDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	SafetyAndHealthDocumentType,
 } from "@prisma/client"
 
 export interface StartupFolderStructure {
@@ -14,7 +14,11 @@ export interface StartupFolderStructure {
 		name: string
 		required: boolean
 		description?: string
-		type: CompanyDocumentType | VehicleDocumentType | WorkerDocumentType | EnvironmentalDocType
+		type:
+			| SafetyAndHealthDocumentType
+			| VehicleDocumentType
+			| WorkerDocumentType
+			| EnvironmentalDocType
 	}[]
 }
 
@@ -24,109 +28,103 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 	description: "Documentación relacionada con seguridad y salud ocupacional.",
 	documents: [
 		{
-			type: CompanyDocumentType.COMPANY_INFO,
+			type: SafetyAndHealthDocumentType.COMPANY_INFO,
 			name: "Ficha empresa",
 			required: true,
 			description:
 				"Archivo que debe contener Nombre y Rut de la empresa, dirección, datos del representante legal y responsables.",
 		},
 		{
-			type: CompanyDocumentType.GANTT_CHART,
+			type: SafetyAndHealthDocumentType.GANTT_CHART,
 			name: "Carta Gantt del Trabajo",
 			required: true,
 			description: "Cronograma detallado del proyecto con sus etapas y plazos.",
 		},
 		{
-			type: CompanyDocumentType.MUTUAL,
+			type: SafetyAndHealthDocumentType.MUTUAL,
 			name: "Certificado de adhesión a Mutualidad",
 			required: true,
 			description: "Comprobante oficial de afiliación a una mutualidad de seguridad.",
 		},
 		{
-			type: CompanyDocumentType.INTERNAL_REGULATION,
+			type: SafetyAndHealthDocumentType.INTERNAL_REGULATION,
 			name: "Reglamento Interno de orden higiene y seguridad",
 			required: true,
 			description:
 				"Reglamento actualizado según DS 44 y ley Karin, con comprobante de presentación a la Dirección del Trabajo.",
 		},
 		{
-			type: CompanyDocumentType.ACCIDENT_RATE,
+			type: SafetyAndHealthDocumentType.ACCIDENT_RATE,
 			name: "Certificado de siniestralidad de mutualidad (1 año)",
 			required: true,
 			description: "Certificado que muestra la tasa de siniestralidad laboral del último año.",
 		},
 		{
-			type: CompanyDocumentType.ORGANIZATION_CHART,
+			type: SafetyAndHealthDocumentType.ORGANIZATION_CHART,
 			name: "Organigrama de la Empresa",
 			required: true,
 			description: "Estructura jerárquica y organizacional de la empresa.",
 		},
 		{
-			type: CompanyDocumentType.RISK_MATRIX,
+			type: SafetyAndHealthDocumentType.RISK_MATRIX,
 			name: "Matriz de Identificación de peligros y evaluación de Riesgos",
 			required: true,
 			description:
 				"Documento que identifica los peligros y evalúa los riesgos asociados a las actividades en OTC.",
 		},
 		{
-			type: CompanyDocumentType.PREVENTION_PLAN,
+			type: SafetyAndHealthDocumentType.PREVENTION_PLAN,
 			name: "Plan de Prevención de Riesgos",
 			required: true,
 			description: "Plan detallado de medidas preventivas concordante con la matriz de riesgos.",
 		},
 		{
-			type: CompanyDocumentType.WORK_PROCEDURE,
+			type: SafetyAndHealthDocumentType.WORK_PROCEDURE,
 			name: "Procedimiento de Trabajo",
 			required: true,
 			description:
 				"Procedimientos específicos para trabajos que se realizarán en OTC, con antigüedad no mayor a un año.",
 		},
 		{
-			type: CompanyDocumentType.EMERGENCY_PROCEDURE,
+			type: SafetyAndHealthDocumentType.EMERGENCY_PROCEDURE,
 			name: "Procedimiento de Emergencia",
 			required: true,
 			description: "Protocolos a seguir en caso de emergencias, incidentes o accidentes.",
 		},
 		{
-			type: CompanyDocumentType.TOOLS_MAINTENANCE,
+			type: SafetyAndHealthDocumentType.TOOLS_MAINTENANCE,
 			name: "Programa de mantención de herramientas y equipos",
 			required: true,
 			description: "Plan de mantenimiento preventivo y correctivo para herramientas y equipos.",
 		},
 		{
-			type: CompanyDocumentType.PPE_CERTIFICATION,
+			type: SafetyAndHealthDocumentType.PPE_CERTIFICATION,
 			name: "Certificación de EPP",
 			required: true,
 			description: "Certificados que garantizan la calidad y seguridad de los EPP utilizados.",
 		},
 		{
-			type: CompanyDocumentType.HARASSMENT_PROCEDURE,
+			type: SafetyAndHealthDocumentType.HARASSMENT_PROCEDURE,
 			name: "Procedimiento de Acoso Laboral, Sexual y Violencia en el Trabajo",
 			required: true,
 			description:
 				"Procedimiento según Ley N°21.643 (Ley Karin) con detalles del proceso de denuncia e investigación.",
 		},
 		{
-			type: CompanyDocumentType.SAFE_WORK,
+			type: SafetyAndHealthDocumentType.SAFE_WORK,
 			name: "Procedimientos de trabajo seguro",
 			required: true,
 			description:
 				"Procedimientos específicos para trabajos que se realizarán en OTC, con antigüedad no mayor a un año.",
 		},
 		{
-			type: CompanyDocumentType.RISK_ANALYSIS,
+			type: SafetyAndHealthDocumentType.RISK_ANALYSIS,
 			name: "Análisis de riesgos por actividad",
 			required: true,
 			description: "Documento que identifica aspectos ambientales y evalúa sus impactos.",
 		},
 		{
-			type: CompanyDocumentType.EMERGENCY_PROCEDURE,
-			name: "Procedimiento de emergencia",
-			required: true,
-			description: "Protocolos a seguir en caso de emergencias, incidentes o accidentes.",
-		},
-		{
-			type: CompanyDocumentType.WORK_PERMIT,
+			type: SafetyAndHealthDocumentType.WORK_PERMIT,
 			name: "Permisos de trabajo (en caso de aplicar)",
 			description: "Documento opcional para el trabajo",
 			required: true,

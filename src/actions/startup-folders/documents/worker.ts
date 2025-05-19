@@ -1,10 +1,11 @@
 "use server"
 
+import { ReviewStatus, type WorkerDocumentType } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { z } from "zod"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
-import type { WorkerDocumentType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createWorkerDocument = async ({
@@ -21,9 +22,12 @@ export const createWorkerDocument = async ({
 			return { ok: false, message: "ID de trabajador es requerido" }
 		}
 
-		const folder = await prisma.startupFolder.findUnique({
+		const folder = await prisma.workerFolder.findUnique({
 			where: {
-				id: folderId,
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
 			},
 		})
 
@@ -60,19 +64,8 @@ export const createWorkerDocument = async ({
 			},
 			data: {
 				expirationDate,
-				workerFolder: {
-					connect: {
-						id: workerFolder.id,
-					},
-				},
-				folder: {
-					connect: {
-						id: folderId,
-					},
-				},
 				name: name || "",
 				url: file.url,
-				fileType: file.type,
 				category: "PERSONNEL",
 				uploadedAt: new Date(),
 				type: type as WorkerDocumentType,
@@ -107,11 +100,6 @@ export const updateWorkerDocument = async ({
 			},
 			include: {
 				folder: true,
-				workerFolder: {
-					include: {
-						worker: true,
-					},
-				},
 			},
 		})
 
@@ -119,7 +107,7 @@ export const updateWorkerDocument = async ({
 			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		if (!existingDocument.workerFolder) {
+		if (!existingDocument.folder) {
 			return { ok: false, message: "Carpeta de trabajador no encontrada" }
 		}
 
@@ -142,18 +130,10 @@ export const updateWorkerDocument = async ({
 			data: {
 				expirationDate,
 				url: file.url,
-				fileType: file.type,
 				uploadedAt: new Date(),
 				uploadedBy: {
 					connect: {
 						id: userId,
-					},
-				},
-			},
-			include: {
-				workerFolder: {
-					include: {
-						worker: true,
 					},
 				},
 			},
@@ -163,5 +143,92 @@ export const updateWorkerDocument = async ({
 	} catch (error) {
 		console.error("Error al actualizar documento:", error)
 		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}
+
+export const submitWorkerDocumentForReview = async ({
+	emails,
+	folderId,
+}: {
+	emails: string[]
+	folderId: string
+}) => {
+	if (!emails || emails.length === 0) {
+		return {
+			ok: false,
+			message: "Por favor, ingresa al menos un correo electrónico.",
+		}
+	}
+
+	try {
+		const folder = await prisma.workerFolder.findUnique({
+			where: { id: folderId },
+			include: {
+				startupFolder: {
+					select: {
+						id: true,
+					},
+				},
+			},
+		})
+
+		if (!folder) {
+			return { ok: false, message: "Carpeta no encontrada." }
+		}
+
+		if (folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED) {
+			return {
+				ok: false,
+				message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+			}
+		}
+
+		await prisma.$transaction(async (tx) => {
+			const folders = await tx.workerFolder.findMany({
+				where: {
+					startupFolderId: folder.startupFolder.id,
+				},
+				select: {
+					id: true,
+				},
+			})
+
+			await tx.workerFolder.updateMany({
+				where: { startupFolderId: folder.startupFolder.id },
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+					additionalNotificationEmails: emails,
+				},
+			})
+
+			folders.forEach(async (folder) => {
+				await tx.workerDocument.updateMany({
+					where: {
+						folderId: folder.id,
+					},
+					data: {
+						submittedAt: new Date(),
+						status: ReviewStatus.SUBMITTED,
+					},
+				})
+			})
+		})
+
+		// TODO: Send emails to OTC members
+
+		return {
+			ok: true,
+			message: "La carpeta ha sido enviada a revisión correctamente.",
+		}
+	} catch (error) {
+		console.error("Error al enviar la carpeta a revisión:", error)
+		if (error instanceof z.ZodError) {
+			return {
+				ok: false,
+				message: "Error de validación: " + error.errors.map((e) => e.message).join(", "),
+			}
+		}
+		return { ok: false, message: "Ocurrió un error en el servidor." }
 	}
 }

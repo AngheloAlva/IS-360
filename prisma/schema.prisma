@@ -69,41 +69,39 @@ model User {
   workTrackers                   WorkTracker[]
   safetyTalks                    UserSafetyTalk[]
   workApplications               WorkApplication[]
-  company                        Company?                @relation(fields: [companyId], references: [id])
+  company                        Company?                  @relation(fields: [companyId], references: [id])
   companyId                      String?
   isSupervisor                   Boolean?
-  workOrders                     WorkOrder[]             @relation("WorkOrderResponsible")
-  workOrdersAsSupervisor         WorkOrder[]             @relation("WorkOrderSupervisor")
-  requestedClosures              WorkOrder[]             @relation("WorkOrderClosureRequester")
-  approvedClosures               WorkOrder[]             @relation("WorkOrderClosureApprover")
-  assignedEntries                WorkEntry[]             @relation("AssignedUsers")
-  createdEntries                 WorkEntry[]             @relation("WorkEntryCreator")
-  signedEntries                  WorkEntry[]             @relation("WorkEntrySigner")
-  workEntries                    WorkEntry[]             @relation("WorkEntryApproval")
-  workPermitsAsParticipant       WorkPermit[]            @relation("WorkPermitParticipants")
-  workPermitsAsPreventionOfficer WorkPermit[]            @relation("PreventionOfficer")
-  workPermits                    WorkPermit[]            @relation("WorkPermitUser")
+  workOrders                     WorkOrder[]               @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor         WorkOrder[]               @relation("WorkOrderSupervisor")
+  requestedClosures              WorkOrder[]               @relation("WorkOrderClosureRequester")
+  approvedClosures               WorkOrder[]               @relation("WorkOrderClosureApprover")
+  assignedEntries                WorkEntry[]               @relation("AssignedUsers")
+  createdEntries                 WorkEntry[]               @relation("WorkEntryCreator")
+  signedEntries                  WorkEntry[]               @relation("WorkEntrySigner")
+  workEntries                    WorkEntry[]               @relation("WorkEntryApproval")
+  workPermitsAsParticipant       WorkPermit[]              @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer WorkPermit[]              @relation("PreventionOfficer")
+  workPermits                    WorkPermit[]              @relation("WorkPermitUser")
   attachmentsHistory             AttachmentHistory[]
   equipmentHistory               EquipmentHistory[]
   fileHistory                    FileHistory[]
   twofactors                     TwoFactor[]
   FileComment                    FileComment[]
   MaintenancePlan                MaintenancePlan[]
-  MaintenancePlanTask            MaintenancePlanTask[]   @relation("MaintenancePlanTaskResponsible")
-  MaintenancePlanTaskCreatedBy   MaintenancePlanTask[]   @relation("MaintenancePlanTaskCreatedBy")
-  uploadedCompanyDocuments       CompanyDocument[]       @relation("CompanyDocumentUploadedBy")
-  reviewedCompanyDocuments       CompanyDocument[]       @relation("CompanyDocumentReviewer")
-  uploadedWorkerDocuments        WorkerDocument[]        @relation("WorkerDocumentUploadedBy")
-  reviewedWorkerDocuments        WorkerDocument[]        @relation("WorkerDocumentReviewer")
-  workerFolders                  WorkerFolder[]
-  uploadedVehicleDocuments       VehicleDocument[]       @relation("VehicleDocumentUploadedBy")
-  reviewedVehicleDocuments       VehicleDocument[]       @relation("VehicleDocumentReviewer")
-  uploadedProcedureDocuments     ProcedureDocument[]     @relation("ProcedureDocumentUploadedBy")
-  reviewedProcedureDocuments     ProcedureDocument[]     @relation("ProcedureDocumentReviewer")
-  uploadedEnvironmentalDocuments EnvironmentalDocument[] @relation("EnvironmentalDocumentUploadedBy")
-  reviewedEnvironmentalDocuments EnvironmentalDocument[] @relation("EnvironmentalDocumentReviewer")
-  approvedMilestones             Milestone[]             @relation("MilestoneApprover")
-  requestedMilestones            Milestone[]             @relation("MilestoneRequestedBy")
+  MaintenancePlanTask            MaintenancePlanTask[]     @relation("MaintenancePlanTaskResponsible")
+  MaintenancePlanTaskCreatedBy   MaintenancePlanTask[]     @relation("MaintenancePlanTaskCreatedBy")
+  approvedMilestones             Milestone[]               @relation("MilestoneApprover")
+  requestedMilestones            Milestone[]               @relation("MilestoneRequestedBy")
+  safetyAndHealthFolders         SafetyAndHealthFolder[]
+  safetyAndHealthDocuments       SafetyAndHealthDocument[]
+  workerFolder                   WorkerFolder[]            @relation("WorkerFolderWorker")
+  workerFolderReviewer           WorkerFolder[]            @relation("WorkerFolderReviewer")
+  workerDocument                 WorkerDocument[]
+  vehicleFolder                  VehicleFolder[]
+  vehicleDocument                VehicleDocument[]
+  environmentalFolder            EnvironmentalFolder[]
+  environmentalDocument          EnvironmentalDocument[]
 
   @@unique([email])
   @@unique([rut])
@@ -171,12 +169,12 @@ model Company {
   rut   String
   image String?
 
-  users                 User[]
-  workOrders            WorkOrder[]
-  workPermits           WorkPermit[]
-  vehicles              Vehicle[]
-  MaintenancePlanTask   MaintenancePlanTask[]
-  generalStartupFolders StartupFolder[]
+  users               User[]
+  workOrders          WorkOrder[]
+  workPermits         WorkPermit[]
+  vehicles            Vehicle[]
+  MaintenancePlanTask MaintenancePlanTask[]
+  StartupFolders      StartupFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -892,7 +890,7 @@ enum ReviewStatus {
   EXPIRED // Expirado
 }
 
-enum CompanyDocumentType {
+enum SafetyAndHealthDocumentType {
   // Información Básica
   COMPANY_INFO // Ficha empresa
   STAFF_LIST // Nómina de personal
@@ -978,62 +976,74 @@ enum DocumentCategory {
 }
 
 model StartupFolder {
-  id                           String       @id @default(uuid())
-  status                       ReviewStatus @default(DRAFT)
-  createdAt                    DateTime     @default(now())
-  updatedAt                    DateTime     @updatedAt
-  submittedAt                  DateTime?
-  additionalNotificationEmails String[]
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  workersFolders          WorkerFolder[]
-  vehiclesFolders         VehicleFolder[]
-  company                 Company                 @relation(fields: [companyId], references: [id])
-  companyId               String
-  workOrder               WorkOrder?              @relation(fields: [workOrderId], references: [id])
-  workOrderId             String?                 @unique
-  workersDocuments        WorkerDocument[]
-  vehiclesDocuments       VehicleDocument[]
-  proceduresDocuments     ProcedureDocument[]
-  companyDocuments        CompanyDocument[]
-  environmentalsDocuments EnvironmentalDocument[]
+  workersFolders         WorkerFolder[]
+  vehiclesFolders        VehicleFolder[]
+  safetyAndHealthFolders SafetyAndHealthFolder[]
+  environmentalFolders   EnvironmentalFolder[]
+  company                Company                 @relation(fields: [companyId], references: [id])
+  companyId              String
+  workOrder              WorkOrder?              @relation(fields: [workOrderId], references: [id])
+  workOrderId            String?                 @unique
 
   @@map("startup_folder")
 }
 
-model CompanyDocument {
-  id             String              @id @default(uuid())
-  type           CompanyDocumentType
+model SafetyAndHealthFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?                     @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder             @relation(fields: [startupFolderId], references: [id])
+  documents       SafetyAndHealthDocument[]
+
+  @@unique([startupFolderId])
+  @@map("safety_and_health_folder")
+}
+
+model SafetyAndHealthDocument {
+  id             String                      @id @default(uuid())
+  type           SafetyAndHealthDocumentType
   name           String
   url            String
-  fileType       String
-  uploadedAt     DateTime            @default(now())
+  uploadedAt     DateTime                    @default(now())
   category       DocumentCategory
-  status         ReviewStatus        @default(DRAFT)
+  status         ReviewStatus                @default(DRAFT)
   reviewNotes    String?
   reviewedAt     DateTime?
   submittedAt    DateTime?
   expirationDate DateTime?
 
-  reviewerId   String?
-  reviewer     User?         @relation("CompanyDocumentReviewer", fields: [reviewerId], references: [id])
   uploadedById String?
-  uploadedBy   User?         @relation("CompanyDocumentUploadedBy", fields: [uploadedById], references: [id])
+  uploadedBy   User?                 @relation(fields: [uploadedById], references: [id])
   folderId     String
-  folder       StartupFolder @relation(fields: [folderId], references: [id])
+  folder       SafetyAndHealthFolder @relation(fields: [folderId], references: [id])
 
-  @@map("company_document")
+  @@map("safety_and_health_document")
 }
 
 model WorkerFolder {
-  id          String       @id @default(cuid())
-  status      ReviewStatus @default(DRAFT)
-  submittedAt DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
 
+  reviewerId      String?
+  reviewer        User?            @relation("WorkerFolderReviewer", fields: [reviewerId], references: [id])
   workerId        String
+  worker          User             @relation("WorkerFolderWorker", fields: [workerId], references: [id])
   startupFolderId String
-  worker          User             @relation(fields: [workerId], references: [id])
   startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
   documents       WorkerDocument[]
 
@@ -1046,7 +1056,6 @@ model WorkerDocument {
   type           WorkerDocumentType
   name           String
   url            String
-  fileType       String
   uploadedAt     DateTime           @default(now())
   category       DocumentCategory
   status         ReviewStatus       @default(DRAFT)
@@ -1055,27 +1064,26 @@ model WorkerDocument {
   submittedAt    DateTime?
   expirationDate DateTime?
 
-  workerFolderId String
-  workerFolder   WorkerFolder  @relation(fields: [workerFolderId], references: [id])
-  reviewerId     String?
-  reviewer       User?         @relation("WorkerDocumentReviewer", fields: [reviewerId], references: [id])
-  uploadedById   String?
-  uploadedBy     User?         @relation("WorkerDocumentUploadedBy", fields: [uploadedById], references: [id])
-  folder         StartupFolder @relation(fields: [folderId], references: [id])
-  folderId       String
+  uploadedById String?
+  uploadedBy   User?        @relation(fields: [uploadedById], references: [id])
+  folder       WorkerFolder @relation(fields: [folderId], references: [id])
+  folderId     String
 
   @@map("worker_document")
 }
 
 model VehicleFolder {
-  id          String       @id @default(cuid())
-  status      ReviewStatus @default(DRAFT)
-  submittedAt DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
 
   vehicleId       String
   startupFolderId String
+  reviewerId      String?
+  reviewer        User?             @relation(fields: [reviewerId], references: [id])
   vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
   startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
   documents       VehicleDocument[]
@@ -1089,7 +1097,6 @@ model VehicleDocument {
   type           VehicleDocumentType
   name           String
   url            String
-  fileType       String
   uploadedAt     DateTime            @default(now())
   category       DocumentCategory
   status         ReviewStatus        @default(DRAFT)
@@ -1098,43 +1105,30 @@ model VehicleDocument {
   submittedAt    DateTime?
   expirationDate DateTime?
 
-  reviewerId   String?
-  reviewer     User?   @relation("VehicleDocumentReviewer", fields: [reviewerId], references: [id])
   uploadedById String?
-  uploadedBy   User?   @relation("VehicleDocumentUploadedBy", fields: [uploadedById], references: [id])
-
-  vehicleFolderId String?
-  vehicleFolder   VehicleFolder? @relation(fields: [vehicleFolderId], references: [id])
-  folder          StartupFolder  @relation(fields: [folderId], references: [id])
-  folderId        String
+  uploadedBy   User?         @relation(fields: [uploadedById], references: [id])
+  folderId     String
+  folder       VehicleFolder @relation(fields: [folderId], references: [id])
 
   @@map("vehicle_document")
 }
 
-model ProcedureDocument {
-  id             String              @id @default(uuid())
-  type           CompanyDocumentType
-  name           String
-  description    String?
-  url            String
-  fileType       String
-  uploadedAt     DateTime            @default(now())
-  category       DocumentCategory
-  status         ReviewStatus        @default(DRAFT)
-  reviewNotes    String?
-  reviewedAt     DateTime?
-  submittedAt    DateTime?
-  expirationDate DateTime?
+model EnvironmentalFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
 
-  reviewerId   String?
-  reviewer     User?   @relation("ProcedureDocumentReviewer", fields: [reviewerId], references: [id])
-  uploadedById String?
-  uploadedBy   User?   @relation("ProcedureDocumentUploadedBy", fields: [uploadedById], references: [id])
+  reviewerId      String?
+  reviewer        User?                   @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder           @relation(fields: [startupFolderId], references: [id])
+  documents       EnvironmentalDocument[]
 
-  folder   StartupFolder @relation(fields: [folderId], references: [id])
-  folderId String
-
-  @@map("procedure_document")
+  @@unique([startupFolderId])
+  @@map("environmental_folder")
 }
 
 model EnvironmentalDocument {
@@ -1142,7 +1136,6 @@ model EnvironmentalDocument {
   type           EnvironmentalDocType
   name           String
   url            String
-  fileType       String
   uploadedAt     DateTime             @default(now())
   category       DocumentCategory
   status         ReviewStatus         @default(DRAFT)
@@ -1151,13 +1144,10 @@ model EnvironmentalDocument {
   submittedAt    DateTime?
   expirationDate DateTime?
 
-  reviewerId   String?
-  reviewer     User?   @relation("EnvironmentalDocumentReviewer", fields: [reviewerId], references: [id])
   uploadedById String?
-  uploadedBy   User?   @relation("EnvironmentalDocumentUploadedBy", fields: [uploadedById], references: [id])
-
-  folder   StartupFolder @relation(fields: [folderId], references: [id])
-  folderId String
+  uploadedBy   User?               @relation(fields: [uploadedById], references: [id])
+  folderId     String
+  folder       EnvironmentalFolder @relation(fields: [folderId], references: [id])
 
   @@map("environmental_document")
 }

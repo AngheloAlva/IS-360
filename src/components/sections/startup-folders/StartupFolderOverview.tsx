@@ -2,7 +2,6 @@
 
 import { Files, Building2 } from "lucide-react"
 
-import { FOLDER_REVIEW_STATUS_LABEL } from "@/lib/consts/folder-review-status"
 import { useStartupFolder } from "@/hooks/startup-folders/use-startup-folder"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -12,19 +11,20 @@ import VehicleDocuments from "./documents/VehicleDocuments"
 import WorkerDocuments from "./documents/WorkerDocuments"
 import { Accordion } from "@/components/ui/accordion"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
 
 interface StartupFolderOverviewProps {
 	userId: string
 	companyId: string
+	isOtcMember?: boolean
 }
 
 export default function StartupFolderOverview({
 	userId,
 	companyId,
+	isOtcMember,
 }: StartupFolderOverviewProps): React.ReactElement {
 	const {
-		data: folders,
+		data: startupFolder,
 		isLoading: isLoadingFolders,
 		error,
 	} = useStartupFolder({
@@ -52,9 +52,6 @@ export default function StartupFolderOverview({
 		)
 	}
 
-	const canEditDocuments =
-		(folders && (folders.status === "DRAFT" || folders.status === "REJECTED")) || false
-
 	return (
 		<div className="w-full space-y-4">
 			<div>
@@ -64,7 +61,6 @@ export default function StartupFolderOverview({
 							<div className="flex items-center gap-2">
 								<Building2 className="text-muted-foreground h-5 w-5" />
 								<h2 className="text-2xl font-semibold tracking-tight">Carpeta de Arranque</h2>
-								<Badge>{FOLDER_REVIEW_STATUS_LABEL[folders?.status || "DRAFT"]}</Badge>
 							</div>
 							<p className="text-muted-foreground mt-1">
 								Esta carpeta contiene la documentación requerida de tu empresa
@@ -89,32 +85,30 @@ export default function StartupFolderOverview({
 						</div>
 					</div>
 
-					{folders && folders.companyDocuments?.length > 0 ? (
+					{startupFolder ? (
 						<div className="space-y-6">
 							<Accordion type="multiple">
 								<SafetyAndHealthDocuments
-									folder={folders}
-									isEditable={canEditDocuments}
 									userId={userId}
+									isOtcMember={isOtcMember ?? false}
+									folder={startupFolder.safetyAndHealthFolders[0]}
 								/>
 								<EnvironmentalDocuments
-									folder={folders}
-									isEditable={canEditDocuments}
 									userId={userId}
+									isOtcMember={isOtcMember ?? false}
+									folder={startupFolder.environmentalFolders[0]}
 								/>
 								<VehicleDocuments
 									userId={userId}
-									startupFolderId={folders.id}
-									isEditable={canEditDocuments}
-									folders={folders.vehiclesFolders}
-									equipmentDocuments={folders.vehiclesDocuments}
+									isOtcMember={isOtcMember ?? false}
+									startupFolderId={startupFolder.id}
+									folders={startupFolder.vehiclesFolders}
 								/>
 								<WorkerDocuments
 									userId={userId}
-									startupFolderId={folders.id}
-									isEditable={canEditDocuments}
-									folders={folders.workersFolders}
-									additionalNotificationEmails={folders.additionalNotificationEmails}
+									isOtcMember={isOtcMember ?? false}
+									startupFolderId={startupFolder.id}
+									folders={startupFolder.workersFolders}
 								/>
 							</Accordion>
 						</div>

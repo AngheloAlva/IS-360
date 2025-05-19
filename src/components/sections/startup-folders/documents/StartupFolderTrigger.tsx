@@ -1,43 +1,46 @@
-import { AlertCircle, CheckCircle2, Info } from "lucide-react"
+import { Info } from "lucide-react"
 
+import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { SendStartupFolderReview } from "../admin/SendStartupFolderReview"
 import { AccordionTrigger } from "@/components/ui/accordion"
 import { Progress } from "@/components/ui/progress"
 
 export default function StartupFolderTrigger({
+	icon,
 	title,
+	userId,
+	status,
+	folderId,
+	category,
 	totalDocs,
+	isOtcMember,
 	completedDocs,
 	requiredPending,
 	progressPercentage,
 	sectionDescription,
 }: {
 	title: string
+	userId: string
+	folderId: string
 	totalDocs: number
+	isOtcMember: boolean
+	status: ReviewStatus
 	completedDocs: number
+	icon: React.ReactNode
 	requiredPending: number
 	progressPercentage: number
 	sectionDescription: string
+	category: DocumentCategory
 }): React.ReactElement {
 	return (
 		<AccordionTrigger className="cursor-pointer items-center py-4 hover:no-underline">
 			<div className="flex w-full items-center justify-between pr-4">
 				<div className="flex items-center">
-					<div
-						className={cn(
-							"mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-500/10 text-red-500",
-							{
-								"bg-green-500/10 text-green-500": completedDocs === totalDocs,
-							}
-						)}
-					>
-						{completedDocs === totalDocs ? (
-							<CheckCircle2 className="h-5 w-5" />
-						) : (
-							<AlertCircle className="h-5 w-5" />
-						)}
+					<div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/10 text-teal-500">
+						{icon}
 					</div>
 					<div className="flex flex-col items-start">
 						<div className="flex items-center gap-0.5">
@@ -58,15 +61,26 @@ export default function StartupFolderTrigger({
 					</div>
 				</div>
 
-				<Progress
-					value={progressPercentage}
-					className="w-24"
-					indicatorClassName={cn({
-						"bg-green-500/50": completedDocs === totalDocs,
-						"bg-red-500/50": requiredPending > 0,
-						"bg-amber-500/50": requiredPending === 0,
-					})}
-				/>
+				<div className="flex items-center gap-2">
+					<Progress
+						value={progressPercentage}
+						className="w-24"
+						indicatorClassName={cn({
+							"bg-green-500/50": completedDocs === totalDocs,
+							"bg-red-500/50": requiredPending > 0,
+							"bg-amber-500/50": requiredPending === 0,
+						})}
+					/>
+
+					{isOtcMember && status === ReviewStatus.SUBMITTED && (
+						<SendStartupFolderReview
+							title={title}
+							userId={userId}
+							folderId={folderId}
+							category={category}
+						/>
+					)}
+				</div>
 			</div>
 		</AccordionTrigger>
 	)

@@ -7,14 +7,14 @@ import {
 import {
 	ReviewStatus,
 	WorkerDocument,
-	CompanyDocument,
 	VehicleDocument,
 	DocumentCategory,
 	WorkerDocumentType,
-	CompanyDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	EnvironmentalDocument,
+	SafetyAndHealthDocumentType,
+	SafetyAndHealthDocument,
 } from "@prisma/client"
 
 export const getDocumentStatus = (
@@ -23,11 +23,19 @@ export const getDocumentStatus = (
 		| WorkerDocumentType
 		| VehicleDocumentType
 		| EnvironmentalDocType
-		| CompanyDocumentType,
-	documents: WorkerDocument[] | VehicleDocument[] | CompanyDocument[] | EnvironmentalDocument[]
+		| SafetyAndHealthDocumentType,
+	documents:
+		| WorkerDocument[]
+		| VehicleDocument[]
+		| SafetyAndHealthDocument[]
+		| EnvironmentalDocument[]
 ) => {
-	let document: WorkerDocument | VehicleDocument | CompanyDocument | EnvironmentalDocument | null =
-		null
+	let document:
+		| WorkerDocument
+		| VehicleDocument
+		| SafetyAndHealthDocument
+		| EnvironmentalDocument
+		| null = null
 	let isRequired = false
 	let description = ""
 	let status: ReviewStatus = ReviewStatus.DRAFT

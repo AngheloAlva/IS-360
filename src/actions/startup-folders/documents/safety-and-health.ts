@@ -1,11 +1,12 @@
 "use server"
 
-import { CompanyDocumentType } from "@prisma/client"
+import { ReviewStatus, SafetyAndHealthDocumentType } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
 import type { UploadResult } from "@/lib/upload-files"
+import { z } from "zod"
 
 export const createSafetyAndHealthDocument = async ({
 	data: { name, folderId, type, expirationDate, documentId },
@@ -17,12 +18,9 @@ export const createSafetyAndHealthDocument = async ({
 	userId: string
 }) => {
 	try {
-		const folder = await prisma.startupFolder.findUnique({
+		const folder = await prisma.safetyAndHealthFolder.findUnique({
 			where: {
 				id: folderId,
-			},
-			include: {
-				company: true,
 			},
 		})
 
@@ -38,7 +36,7 @@ export const createSafetyAndHealthDocument = async ({
 			}
 		}
 
-		const document = await prisma.companyDocument.update({
+		const document = await prisma.safetyAndHealthDocument.update({
 			where: {
 				id: documentId,
 			},
@@ -49,12 +47,11 @@ export const createSafetyAndHealthDocument = async ({
 						id: folderId,
 					},
 				},
-				fileType: "FILE",
 				name: name || "",
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
 				category: "SAFETY_AND_HEALTH",
-				type: type as CompanyDocumentType,
+				type: type as SafetyAndHealthDocumentType,
 				uploadedBy: {
 					connect: {
 						id: userId,
@@ -80,14 +77,14 @@ export const updateSafetyAndHealthDocument = async ({
 	userId: string
 }) => {
 	try {
-		const existingDocument = await prisma.companyDocument.findUnique({
+		const existingDocument = await prisma.safetyAndHealthDocument.findUnique({
 			where: {
 				id: documentId,
 			},
 			include: {
 				folder: {
-					include: {
-						company: true,
+					select: {
+						status: true,
 					},
 				},
 			},
@@ -108,7 +105,7 @@ export const updateSafetyAndHealthDocument = async ({
 			}
 		}
 
-		const updatedDocument = await prisma.companyDocument.update({
+		const updatedDocument = await prisma.safetyAndHealthDocument.update({
 			where: {
 				id: documentId,
 			},
@@ -128,5 +125,73 @@ export const updateSafetyAndHealthDocument = async ({
 	} catch (error) {
 		console.error("Error al actualizar documento:", error)
 		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}
+
+export const submitSafetyAndHealthDocumentForReview = async ({
+	emails,
+	folderId,
+}: {
+	emails: string[]
+	folderId: string
+}) => {
+	if (!emails || emails.length === 0) {
+		return {
+			ok: false,
+			message: "Por favor, ingresa al menos un correo electrónico.",
+		}
+	}
+
+	try {
+		const folder = await prisma.safetyAndHealthFolder.findUnique({
+			where: { id: folderId },
+		})
+
+		if (!folder) {
+			return { ok: false, message: "Carpeta no encontrada." }
+		}
+
+		if (folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED) {
+			return {
+				ok: false,
+				message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en Borrador o Rechazada pueden ser enviadas.`,
+			}
+		}
+
+		await Promise.all([
+			prisma.safetyAndHealthFolder.update({
+				where: { id: folderId },
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+					additionalNotificationEmails: emails,
+				},
+			}),
+			prisma.safetyAndHealthDocument.updateMany({
+				where: {
+					folderId,
+				},
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+				},
+			}),
+		])
+
+		// TODO: Send emails to OTC members
+
+		return {
+			ok: true,
+			message: "La carpeta ha sido enviada a revisión correctamente.",
+		}
+	} catch (error) {
+		console.error("Error al enviar la carpeta a revisión:", error)
+		if (error instanceof z.ZodError) {
+			return {
+				ok: false,
+				message: "Error de validación: " + error.errors.map((e) => e.message).join(", "),
+			}
+		}
+		return { ok: false, message: "Ocurrió un error en el servidor." }
 	}
 }

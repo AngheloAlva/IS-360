@@ -1,10 +1,11 @@
 "use server"
 
+import { ReviewStatus, type VehicleDocumentType } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { z } from "zod"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
-import type { VehicleDocumentType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createVehicleDocument = async ({
@@ -17,7 +18,7 @@ export const createVehicleDocument = async ({
 	userId: string
 }) => {
 	try {
-		const folder = await prisma.startupFolder.findUnique({
+		const folder = await prisma.vehicleFolder.findUnique({
 			where: {
 				id: folderId,
 			},
@@ -27,7 +28,6 @@ export const createVehicleDocument = async ({
 			return { ok: false, message: "Carpeta no encontrada" }
 		}
 
-		// Verificar que la carpeta esté en estado DRAFT o REJECTED para poder modificar documentos
 		if (folder.status !== "DRAFT" && folder.status !== "REJECTED") {
 			return {
 				ok: false,
@@ -36,7 +36,6 @@ export const createVehicleDocument = async ({
 			}
 		}
 
-		// Crear el documento
 		const document = await prisma.vehicleDocument.update({
 			where: {
 				id: documentId,
@@ -52,7 +51,6 @@ export const createVehicleDocument = async ({
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
 				category: "VEHICLES",
-				fileType: uploadedFile.type,
 				type: type as VehicleDocumentType,
 				...(vehicleId && { vehicle: { connect: { id: vehicleId } } }), // Conditionally connect vehicle
 				uploadedBy: {
@@ -126,5 +124,73 @@ export const updateVehicleDocument = async ({
 	} catch (error) {
 		console.error("Error al actualizar documento:", error)
 		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}
+
+export const submitVehicleDocumentForReview = async ({
+	emails,
+	folderId,
+}: {
+	emails: string[]
+	folderId: string
+}) => {
+	if (!emails || emails.length === 0) {
+		return {
+			ok: false,
+			message: "Por favor, ingresa al menos un correo electrónico.",
+		}
+	}
+
+	try {
+		const folder = await prisma.vehicleFolder.findUnique({
+			where: { id: folderId },
+		})
+
+		if (!folder) {
+			return { ok: false, message: "Carpeta no encontrada." }
+		}
+
+		if (folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED) {
+			return {
+				ok: false,
+				message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+			}
+		}
+
+		await Promise.all([
+			prisma.vehicleFolder.update({
+				where: { id: folderId },
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+					additionalNotificationEmails: emails,
+				},
+			}),
+			prisma.vehicleDocument.updateMany({
+				where: {
+					folderId,
+				},
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+				},
+			}),
+		])
+
+		// TODO: Send emails to OTC members
+
+		return {
+			ok: true,
+			message: "La carpeta ha sido enviada a revisión correctamente.",
+		}
+	} catch (error) {
+		console.error("Error al enviar la carpeta a revisión:", error)
+		if (error instanceof z.ZodError) {
+			return {
+				ok: false,
+				message: "Error de validación: " + error.errors.map((e) => e.message).join(", "),
+			}
+		}
+		return { ok: false, message: "Ocurrió un error en el servidor." }
 	}
 }
