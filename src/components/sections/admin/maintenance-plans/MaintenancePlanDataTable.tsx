@@ -1,7 +1,5 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
 import { useState } from "react"
 import {
 	flexRender,
@@ -13,15 +11,14 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { MaintenancePlanColumns } from "./maintenance-plan-columns"
 import {
 	type MaintenancePlan,
 	useMaintenancePlans,
 } from "@/hooks/maintenance-plans/use-maintenance-plans"
-import { MaintenancePlanColumns } from "./maintenance-plan-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import {
@@ -34,9 +31,6 @@ import {
 } from "@/components/ui/table"
 
 export function MaintenancePlanDataTable() {
-	const searchParams = useSearchParams()
-	const parentId = searchParams.get("parentId")
-
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -72,21 +66,10 @@ export function MaintenancePlanDataTable() {
 		<section className="flex w-full flex-col items-start gap-4">
 			<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex w-full items-center gap-4">
-					{parentId && (
-						<Button
-							variant="ghost"
-							onClick={() => {
-								window.location.href = "/admin/dashboard/equipos"
-							}}
-						>
-							<ArrowLeft className="mr-2 h-4 w-4" />
-							Volver a Equipos Principales
-						</Button>
-					)}
 					<Input
 						type="text"
 						value={search}
-						className="bg-background ml-auto w-full sm:w-72"
+						className="bg-background w-full"
 						placeholder="Buscar por nombre, equipo, o descripcion..."
 						onChange={(e) => setSearch(e.target.value)}
 					/>

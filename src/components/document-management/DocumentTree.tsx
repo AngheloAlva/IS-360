@@ -8,6 +8,7 @@ import { Areas } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 
 import { Skeleton } from "@/components/ui/skeleton"
+import { useRouter } from "next/navigation"
 
 type TreeNode = {
 	id: string
@@ -25,20 +26,24 @@ type DocumentTreeProps = {
 
 const TreeNode = memo(function TreeNode({
 	node,
+	area,
 	level,
 	nodes,
-	expandedNodes,
-	loadingNodes,
-	loadedNodes,
+	router,
 	onToggle,
+	loadedNodes,
+	loadingNodes,
+	expandedNodes,
 }: {
-	node: TreeNode
+	area: string
 	level: number
+	node: TreeNode
 	nodes: TreeNode[]
-	expandedNodes: Set<string>
 	loadingNodes: Set<string>
-	loadedNodes: Record<string, TreeNode[]>
+	expandedNodes: Set<string>
 	onToggle: (nodeId: string) => void
+	router: ReturnType<typeof useRouter>
+	loadedNodes: Record<string, TreeNode[]>
 }) {
 	const handleToggle = useCallback(() => {
 		if (node.type === "folder") {
@@ -46,9 +51,18 @@ const TreeNode = memo(function TreeNode({
 		}
 	}, [node, onToggle])
 
+	const handleFolderDoubleClick = useCallback(() => {
+		if (node.type === "folder") {
+			if (!area) return
+
+			router.push(`/dashboard/documentacion/${area}/${node.slug + "_" + node.id}`)
+		}
+	}, [node, router, area])
+
 	return (
 		<div>
 			<div
+				onDoubleClick={handleFolderDoubleClick}
 				className={cn(
 					"hover:bg-accent/50 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm",
 					"transition-colors duration-200",
@@ -120,8 +134,10 @@ const TreeNode = memo(function TreeNode({
 						<div className="space-y-1">
 							{nodes.map((child) => (
 								<TreeNode
-									key={child.id}
+									area={area}
 									node={child}
+									key={child.id}
+									router={router}
 									level={level + 1}
 									nodes={loadedNodes[child.id] || []}
 									expandedNodes={expandedNodes}
@@ -208,6 +224,8 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 	const areaValue = Areas[area as keyof typeof Areas]?.value
 	const { expandedNodes, loadedNodes, loadingNodes, toggleNode } = useFetchTreeData(areaValue)
 
+	const router = useRouter()
+
 	const rootNodes = useMemo(() => loadedNodes.root || [], [loadedNodes.root])
 
 	return (
@@ -227,9 +245,11 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 				<div className="space-y-1 pr-2">
 					{rootNodes.map((node) => (
 						<TreeNode
-							key={node.id}
-							node={node}
 							level={0}
+							node={node}
+							area={area}
+							key={node.id}
+							router={router}
 							nodes={loadedNodes[node.id] || []}
 							expandedNodes={expandedNodes}
 							loadingNodes={loadingNodes}

@@ -112,10 +112,9 @@ export default function MaintenancePlanForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
-				<Button size={"lg"} className="bg-primary hover:bg-primary/80 text-white">
+				<Button size={"lg"} className="bg-primary hover:bg-primary/80 gap-1 text-white">
 					<Plus />
-					Plan
-					<span className="hidden sm:inline"> de Mantenimiento</span>
+					Plan <span className="hidden sm:inline">de Mantenimiento</span>
 				</Button>
 			</SheetTrigger>
 
