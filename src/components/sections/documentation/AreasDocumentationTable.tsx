@@ -45,7 +45,7 @@ export default function AreasDocumentationTable(): React.ReactElement {
 						<Link key={index} href={`/dashboard/documentacion/${key}`}>
 							<Card
 								className={cn(
-									"group border-transparent transition-all duration-300 hover:scale-[1.01] hover:shadow-md",
+									"group h-full border-transparent transition-all duration-300 hover:scale-[1.01] hover:shadow-md",
 									area.className
 								)}
 							>

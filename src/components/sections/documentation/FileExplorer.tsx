@@ -43,11 +43,12 @@ interface FileExplorerTableProps {
 export function FileExplorer({
 	userId,
 	areaValue,
-	userModules,
 	foldersSlugs,
 	actualFolderId = null,
 }: FileExplorerTableProps) {
-	const canEdit = userModules?.includes(MODULES.DOCUMENTATION) || userModules?.includes(MODULES.ALL)
+	const canEdit = (userCreatorId: string) => {
+		return userCreatorId === userId
+	}
 
 	const getFileIcon = (type: string) => {
 		switch (true) {
@@ -161,7 +162,7 @@ export function FileExplorer({
 													</p>
 												</div>
 
-												{canEdit && (
+												{canEdit(item.userId) && (
 													<div className="mt-4 flex gap-2">
 														<UpdateFolderFormSheet userId={userId} oldFolder={item} />
 														<DeleteConfirmationDialog id={item.id} type="folder" name={item.name} />
@@ -259,7 +260,7 @@ export function FileExplorer({
 													</div>
 												</div>
 
-												{canEdit && (
+												{canEdit(item.userId) && (
 													<div className="mt-4 flex gap-2">
 														<UpdateFileFormSheet
 															fileId={item.id}

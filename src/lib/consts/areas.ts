@@ -57,6 +57,13 @@ export const UserAreasValuesArray = [
 ] as const
 
 export const Areas = {
+	"proyectos": {
+		title: "Proyectos",
+		value: AREAS.PROJECTS,
+		description:
+			"Gestiona y supervisa los proyectos de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
+		className: "text-sky-500 hover:bg-sky-500/10 border-sky-500",
+	},
 	"calidad-y-excelencia-operacional": {
 		title: "Calidad y Excelencia Operacional",
 		value: AREAS.QUALITY_AND_OPERATIONAL_EXCELLENCE,
@@ -112,13 +119,6 @@ export const Areas = {
 		description:
 			"Gestiona y supervisa las actividades diarias de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
 		className: "text-teal-500 hover:bg-teal-500/10 hover:border-teal-500",
-	},
-	"proyectos": {
-		title: "Proyectos",
-		value: AREAS.PROJECTS,
-		description:
-			"Gestiona y supervisa los proyectos de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
-		className: "text-sky-500 hover:bg-sky-500/10 border-sky-500",
 	},
 	"seguridad-operacional": {
 		title: "Seguridad Operacional",
