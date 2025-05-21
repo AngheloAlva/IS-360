@@ -55,6 +55,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		header: "Rol",
 		cell: ({ row }) => {
 			const role = row.getValue("role") as USER_ROLE
+
 			return (
 				<Badge
 					className={cn("border-green-500 bg-green-500/10 text-green-500", {
@@ -71,6 +72,9 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		header: "Cargo",
 		cell: ({ row }) => {
 			const internalRole = row.getValue("internalRole") as string
+
+			if (!internalRole) return null
+
 			return <Badge variant="secondary">{internalRole}</Badge>
 		},
 	},

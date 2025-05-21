@@ -13,6 +13,7 @@ import {
 import { useCompanies } from "@/hooks/companies/use-companies"
 
 import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CompanyColumns } from "./company-columns"
 import { Input } from "@/components/ui/input"
@@ -32,7 +33,7 @@ export function CompanyDataTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading } = useCompanies({
+	const { data, isLoading, refetch, isFetching } = useCompanies({
 		page,
 		search,
 		limit: 10,
@@ -62,16 +63,21 @@ export function CompanyDataTable() {
 			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
 				<h2 className="text-text- text-2xl font-semibold">Lista de Empresas</h2>
 
-				<Input
-					type="text"
-					value={search}
-					className="ml-auto w-fit lg:w-72 bg-background"
-					placeholder="Buscar por Nombre o RUT..."
-					onChange={(e) => setSearch(e.target.value)}
-				/>
+				<div className="ml-auto flex items-center gap-2">
+					<Input
+						onChange={(e) => {
+							setSearch(e.target.value)
+							setPage(1)
+						}}
+						value={search}
+						placeholder="Buscar por Nombre o RUT..."
+						className="bg-background ml-auto w-fit lg:w-72"
+					/>
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
+				</div>
 			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
+			<Card className="w-full max-w-full rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -90,23 +96,23 @@ export function CompanyDataTable() {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
+						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
-								<TableRow key={index}>
-									<TableCell className="" colSpan={8}>
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-								</TableRow>
-							))
-							: table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className="font-medium">
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									<TableRow key={index}>
+										<TableCell colSpan={8}>
+											<Skeleton className="h-9 min-w-full" />
 										</TableCell>
-									))}
-								</TableRow>
-							))}
+									</TableRow>
+								))
+							: table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className="font-medium">
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))}
 					</TableBody>
 				</Table>
 			</Card>

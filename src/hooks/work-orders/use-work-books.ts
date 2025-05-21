@@ -1,11 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
-
-interface WorkBookStats {
-	activeCount: number
-	completedCount: number
-	totalEntries: number
-	avgProgress: number
-}
+import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
 export interface WorkBook {
 	id: string
@@ -16,6 +9,10 @@ export interface WorkBook {
 	workProgressStatus: number | null
 	status: string
 	solicitationDate: string
+	equipment: {
+		id: string
+		name: string
+	}[]
 	company: {
 		id: string
 		name: string
@@ -38,26 +35,40 @@ export interface WorkBook {
 	}
 }
 
-interface WorkBooksResponse {
+export interface WorkBooksResponse {
 	workBooks: WorkBook[]
 	total: number
 	pages: number
-	stats: WorkBookStats
 }
 
-export const useWorkBooks = ({ page = 1, limit = 10, search = "" }) => {
-	return useQuery<WorkBooksResponse>({
-		queryKey: ["workBooks", { page, limit, search }],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			searchParams.set("page", page.toString())
-			searchParams.set("limit", limit.toString())
-			if (search) searchParams.set("search", search)
+export interface UseWorkBooksParams {
+	page?: number
+	limit?: number
+	search?: string
+}
 
-			const res = await fetch(`/api/work-book?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching work books")
+export const fetchWorkBooks: QueryFunction<
+	WorkBooksResponse,
+	readonly ["workBooks", { page: number; limit: number; search: string }]
+> = async ({ queryKey }) => {
+	const [, { page, limit, search }] = queryKey
 
-			return res.json()
-		},
+	const searchParams = new URLSearchParams()
+	searchParams.set("page", page.toString())
+	searchParams.set("limit", limit.toString())
+	if (search) searchParams.set("search", search)
+
+	const res = await fetch(`/api/work-book?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching work books")
+
+	return res.json()
+}
+
+export const useWorkBooks = ({ page = 1, limit = 10, search = "" }: UseWorkBooksParams = {}) => {
+	const queryKey = ["workBooks", { page, limit, search }] as const
+
+	return useQuery({
+		queryKey,
+		queryFn: fetchWorkBooks,
 	})
 }

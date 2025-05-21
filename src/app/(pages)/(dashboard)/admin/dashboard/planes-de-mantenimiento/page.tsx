@@ -14,7 +14,7 @@ export default async function MaintenancePlansPage() {
 				<div className="flex flex-col gap-1">
 					<h1 className="text-text w-fit text-3xl font-bold">Planes de Mantenimiento</h1>
 					<p className="text-text w-fit text-sm sm:text-base">
-						En esta sección puedes gestionar los planes de mantenimiento de la plataforma.
+						En este modulo puedes gestionar los planes de mantenimiento de la plataforma.
 					</p>
 				</div>
 

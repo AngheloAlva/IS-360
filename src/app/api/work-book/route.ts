@@ -12,8 +12,7 @@ export async function GET(req: NextRequest) {
 		const skip = (page - 1) * limit
 
 		// Get statistics
-		const [workBooks, total, stats] = await Promise.all([
-			// Fetch work books with pagination
+		const [workBooks, total] = await Promise.all([
 			prisma.workOrder.findMany({
 				where: {
 					isWorkBook: true,
@@ -58,6 +57,12 @@ export async function GET(req: NextRequest) {
 							role: true,
 						},
 					},
+					equipment: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
 					_count: {
 						select: {
 							workEntries: true,
@@ -93,70 +98,12 @@ export async function GET(req: NextRequest) {
 					swr: 10,
 				},
 			}),
-			// Get statistics
-			prisma.$transaction([
-				// Total active work books
-				prisma.workOrder.count({
-					where: {
-						isWorkBook: true,
-						status: { in: ["IN_PROGRESS", "PENDING"] },
-					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
-				// Total completed work books
-				prisma.workOrder.count({
-					where: {
-						isWorkBook: true,
-						status: "COMPLETED",
-					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
-				// Total entries in all work books
-				prisma.workEntry.count({
-					where: {
-						workOrder: {
-							isWorkBook: true,
-						},
-					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
-				// Average entries per work book
-				prisma.workOrder.aggregate({
-					where: {
-						isWorkBook: true,
-					},
-					_avg: {
-						workProgressStatus: true,
-					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
-			]),
 		])
-
-		const [activeCount, completedCount, totalEntries, avgProgress] = stats
 
 		return NextResponse.json({
 			workBooks,
 			total,
 			pages: Math.ceil(total / limit),
-			stats: {
-				activeCount,
-				completedCount,
-				totalEntries,
-				avgProgress: avgProgress._avg.workProgressStatus || 0,
-			},
 		})
 	} catch (error) {
 		console.error("[WORK_BOOKS_GET]", error)

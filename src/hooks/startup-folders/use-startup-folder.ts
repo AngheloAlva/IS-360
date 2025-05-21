@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { QueryFunction, useQuery } from "@tanstack/react-query"
 
 import type {
 	Vehicle,
@@ -45,19 +45,35 @@ interface UseStartupFolderParams {
 	folderId?: string
 }
 
+export const fetchStartupFolder: QueryFunction<
+	StartupFolderWithDocuments,
+	readonly ["startupFolder", { companyId?: string; folderId?: string }]
+> = async ({ queryKey }) => {
+	const [, { companyId, folderId }] = queryKey
+
+	const searchParams = new URLSearchParams()
+	if (companyId) {
+		searchParams.set("companyId", companyId)
+	} else if (folderId) {
+		searchParams.set("folderId", folderId)
+	}
+
+	const res = await fetch(`/api/startup-folders?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching general startup folder")
+
+	return res.json()
+}
+
 export const useStartupFolder = ({ companyId, folderId }: UseStartupFolderParams) => {
-	return useQuery<StartupFolderWithDocuments>({
-		queryKey: ["startupFolder", companyId || folderId],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			if (companyId) searchParams.set("companyId", companyId)
-			if (folderId) searchParams.set("folderId", folderId)
+	const queryKey = [
+		"startupFolder",
+		{ companyId: `company-${companyId}`, folderId: folderId },
+	] as const
 
-			const res = await fetch(`/api/startup-folders?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching general startup folder")
-
-			return res.json()
-		},
+	return useQuery({
+		queryKey,
+		queryFn: fetchStartupFolder,
+		enabled: !!companyId || !!folderId,
 	})
 }
 
@@ -65,17 +81,26 @@ interface UseStartupFoldersListParams {
 	search?: string
 }
 
+export const fetchStartupFoldersList: QueryFunction<
+	StartupFolderWithDocuments[],
+	readonly ["startupFolders", string | undefined]
+> = async ({ queryKey }) => {
+	const [, search] = queryKey
+
+	const searchParams = new URLSearchParams()
+	if (search) searchParams.set("search", search)
+
+	const res = await fetch(`/api/startup-folders/list?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching general startup folders")
+
+	return res.json()
+}
+
 export const useStartupFoldersList = ({ search }: UseStartupFoldersListParams) => {
-	return useQuery<StartupFolderWithDocuments[]>({
-		queryKey: ["startupFolders", search],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			if (search) searchParams.set("search", search)
+	const queryKey = ["startupFolders", search] as const
 
-			const res = await fetch(`/api/startup-folders/list?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching general startup folders")
-
-			return res.json()
-		},
+	return useQuery({
+		queryKey,
+		queryFn: fetchStartupFoldersList,
 	})
 }

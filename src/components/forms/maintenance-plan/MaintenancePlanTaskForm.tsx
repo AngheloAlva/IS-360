@@ -2,7 +2,6 @@
 
 import { Check, ChevronsUpDown, Plus } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -10,6 +9,7 @@ import { toast } from "sonner"
 import { createMaintenancePlanTask } from "@/actions/maintenance-plan-task/createMaintenancePlanTask"
 import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 import { useEquipments } from "@/hooks/use-equipments"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
 	maintenancePlanTaskSchema,
@@ -63,8 +63,6 @@ export default function MaintenancePlanTaskForm({
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
-	const router = useRouter()
-
 	const form = useForm<MaintenancePlanTaskSchema>({
 		resolver: zodResolver(maintenancePlanTaskSchema),
 		defaultValues: {
@@ -93,7 +91,9 @@ export default function MaintenancePlanTaskForm({
 					duration: 3000,
 				})
 				setOpen(false)
-				router.refresh()
+				queryClient.invalidateQueries({
+					queryKey: ["maintenance-plans-tasks", { planSlug: maintenancePlanSlug }],
+				})
 				form.reset()
 			} else {
 				toast.error("Error al crear la tarea de mantenimiento", {

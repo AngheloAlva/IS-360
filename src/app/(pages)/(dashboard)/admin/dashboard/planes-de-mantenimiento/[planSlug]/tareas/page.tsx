@@ -24,7 +24,7 @@ export default async function MaintenancePlansPage({
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<div className="flex items-start justify-between gap-4 md:flex-row">
 				<div className="flex items-start gap-2">
-					<BackButton href="/admin/dashboard/planes-de-mantenimiento" className="mt-1" />
+					<BackButton href="/admin/dashboard/planes-de-mantenimiento" className="mt-1 min-w-fit" />
 
 					<div className="flex flex-col gap-1">
 						<h1 className="text-text w-fit text-3xl font-bold capitalize">

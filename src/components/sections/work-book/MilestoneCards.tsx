@@ -24,12 +24,19 @@ interface MilestoneCardsProps {
 export default function MilestoneCards({ userId, userRole, milestones }: MilestoneCardsProps) {
 	if (milestones.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center p-8 text-center">
+			<div className="bg-primary/10 border-primary flex flex-col items-center justify-center rounded-md border p-8 text-center">
 				<h3 className="text-lg font-medium">No hay hitos definidos</h3>
-				<p className="text-muted-foreground mt-2">
-					Utiliza el botón &quot;Agregar Hitos&quot; para agregar hitos y actividades a este libro
-					de obras.
-				</p>
+
+				{userRole === USER_ROLE.ADMIN || userRole === USER_ROLE.USER ? (
+					<p className="text-muted-foreground mt-2">
+						El supervisor de la obra debe agregar hitos y actividades a este libro de obras.
+					</p>
+				) : (
+					<p className="text-muted-foreground mt-2">
+						Utiliza el botón &quot;Agregar Hitos&quot; para agregar hitos y actividades a este libro
+						de obras.
+					</p>
+				)}
 			</div>
 		)
 	}

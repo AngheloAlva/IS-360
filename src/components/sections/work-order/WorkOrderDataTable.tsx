@@ -21,6 +21,7 @@ import { useCompanies } from "@/hooks/companies/use-companies"
 import CreateWorkOrderForm from "@/components/forms/admin/work-order/CreateWorkOrderForm"
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker"
 import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { workOrderColumns } from "./work-order-columns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
@@ -65,7 +66,7 @@ export function WorkOrderDataTable() {
 
 	const { data: companies } = useCompanies()
 
-	const { data, isLoading } = useWorkOrders({
+	const { data, isLoading, refetch, isFetching } = useWorkOrders({
 		page,
 		search,
 		limit: 10,
@@ -98,22 +99,31 @@ export function WorkOrderDataTable() {
 		manualPagination: true,
 		pageCount: data?.pages ?? 0,
 	})
+
 	return (
-		<section className="flex w-full flex-col items-start gap-4">
+		<section className="flex w-full flex-col items-start gap-6">
 			<div className="flex w-full items-center justify-between">
-				<h1 className="text-text text-2xl font-bold">Lista de Ordenes de Trabajo</h1>
+				<div>
+					<h1 className="text-text text-2xl font-bold">Lista de Ordenes de Trabajo</h1>
+					<p className="text-muted-foreground">Visualiza y gestiona todas las ordenes de trabajo</p>
+				</div>
 
 				<CreateWorkOrderForm />
 			</div>
 
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
-				<Input
-					type="text"
-					className="bg-background w-full sm:w-64"
-					placeholder="Buscar por número de OT, trabajo, ubicación..."
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-				/>
+				<div className="flex items-center gap-2">
+					<Input
+						type="text"
+						className="bg-background w-full sm:w-64"
+						placeholder="Buscar por número de OT, trabajo, ubicación..."
+						value={search}
+						onChange={(e) => {
+							setSearch(e.target.value)
+							setPage(1)
+						}}
+					/>
+				</div>
 
 				<Select
 					onValueChange={(value) => {
@@ -222,9 +232,11 @@ export function WorkOrderDataTable() {
 							})}
 					</DropdownMenuContent>
 				</DropdownMenu>
+
+				<RefreshButton refetch={refetch} isFetching={isFetching} />
 			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md p-1.5">
+			<Card className="w-full max-w-full rounded-md p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -243,11 +255,11 @@ export function WorkOrderDataTable() {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
+						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell className="" colSpan={15}>
-											<Skeleton className="h-9 min-w-full" />
+										<TableCell className="" colSpan={17}>
+											<Skeleton className="h-10 min-w-full" />
 										</TableCell>
 									</TableRow>
 								))

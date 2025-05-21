@@ -20,6 +20,7 @@ import {
 import { MaintenancePlanTaskColumns } from "./maintenance-plan-task-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,7 +43,7 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-	const { data, isLoading } = useMaintenancePlanTasks({
+	const { data, isLoading, refetch, isFetching } = useMaintenancePlanTasks({
 		page,
 		search,
 		planSlug,
@@ -71,30 +72,34 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
-				<div className="flex w-full items-center gap-4">
-					{parentId && (
-						<Button
-							variant="ghost"
-							onClick={() => {
-								window.location.href = "/admin/dashboard/equipos"
-							}}
-						>
-							<ArrowLeft className="mr-2 h-4 w-4" />
-							Volver a Equipos Principales
-						</Button>
-					)}
-					<Input
-						type="text"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						className="bg-background ml-auto w-full"
-						placeholder="Buscar por nombre, descripcion, o equipo..."
-					/>
-				</div>
+			<div className="flex w-full flex-row items-start gap-2 md:items-center md:justify-between">
+				{parentId && (
+					<Button
+						variant="ghost"
+						onClick={() => {
+							window.location.href = "/admin/dashboard/equipos"
+						}}
+					>
+						<ArrowLeft className="mr-2 h-4 w-4" />
+						Volver a Equipos Principales
+					</Button>
+				)}
+
+				<Input
+					type="text"
+					value={search}
+					onChange={(e) => {
+						setSearch(e.target.value)
+						setPage(1)
+					}}
+					className="bg-background w-full lg:w-80"
+					placeholder="Buscar por nombre, descripcion, o equipo..."
+				/>
+
+				<RefreshButton refetch={refetch} isFetching={isFetching} />
 			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
+			<Card className="w-full max-w-full rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -113,11 +118,11 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 					</TableHeader>
 
 					<TableBody>
-						{isLoading ? (
+						{isLoading || isFetching ? (
 							Array.from({ length: 10 }).map((_, index) => (
 								<TableRow key={index}>
 									<TableCell colSpan={10}>
-										<Skeleton className="h-6.5 min-w-full" />
+										<Skeleton className="h-8 min-w-full" />
 									</TableCell>
 								</TableRow>
 							))

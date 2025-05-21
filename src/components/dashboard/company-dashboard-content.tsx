@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DashboardStatsCard } from "@/components/dashboard/stats-card"
 
 interface CompanyDashboardContentProps {
-	companyId?: string
+	companyId: string
 }
 
 export function CompanyDashboardContent({ companyId }: CompanyDashboardContentProps) {

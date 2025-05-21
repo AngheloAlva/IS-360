@@ -3,7 +3,6 @@
 import { Car, IdCard, PlusCircleIcon, PlusIcon, Trash2 } from "lucide-react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -13,6 +12,7 @@ import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { createCompany } from "@/actions/companies/createCompany"
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-type"
 import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
+import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
 
 import { ColorPickerFormField } from "@/components/forms/shared/ColorPickerFormField"
@@ -38,8 +38,6 @@ import type { User } from "@prisma/client"
 export default function CreateCompanyFormSheet(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const form = useForm<CompanySchema>({
 		resolver: zodResolver(companySchema),
@@ -139,7 +137,9 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 				duration: 3000,
 			})
 
-			router.push("/admin/dashboard/empresas")
+			queryClient.invalidateQueries({
+				queryKey: ["companies"],
+			})
 		} catch (error) {
 			console.log(error)
 			toast.error("Error al crear la empresa", {

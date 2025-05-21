@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
 interface CompanyStats {
 	totalCompanies: number
@@ -24,13 +24,14 @@ interface CompanyStats {
 export const useCompanyStats = () => {
 	return useQuery<CompanyStats>({
 		queryKey: ["companyStats"],
-		queryFn: async () => {
-			const response = await fetch("/api/companies/stats")
-			if (!response.ok) {
-				throw new Error("Error fetching company stats")
-			}
-			return response.json()
-		},
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		queryFn: (fn) => fetchCompanyStats({ ...fn, queryKey: ["companyStats"] }),
 	})
+}
+
+export const fetchCompanyStats: QueryFunction<CompanyStats, ["companyStats"]> = async () => {
+	const response = await fetch("/api/companies/stats")
+	if (!response.ok) {
+		throw new Error("Error fetching company stats")
+	}
+	return response.json()
 }

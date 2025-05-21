@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
 export interface MaintenancePlan {
 	id: string
@@ -36,16 +36,26 @@ export const useMaintenancePlans = ({
 }: UseMaintenancePlansParams = {}) => {
 	return useQuery<MaintenancePlansResponse>({
 		queryKey: ["maintenance-plans", { page, limit, search }],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			searchParams.set("page", page.toString())
-			searchParams.set("limit", limit.toString())
-			if (search) searchParams.set("search", search)
-
-			const res = await fetch(`/api/maintenance-plan?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching maintenance plans")
-
-			return res.json()
-		},
+		queryFn: (fn) =>
+			fetchMaintenancePlans({ ...fn, queryKey: ["maintenance-plans", { page, limit, search }] }),
 	})
+}
+
+export const fetchMaintenancePlans: QueryFunction<
+	MaintenancePlansResponse,
+	["maintenance-plans", { page: number; limit: number; search: string }]
+> = async ({ queryKey }) => {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [_, { page, limit, search }]: [string, { page: number; limit: number; search: string }] =
+		queryKey
+
+	const searchParams = new URLSearchParams()
+	searchParams.set("page", page.toString())
+	searchParams.set("limit", limit.toString())
+	if (search) searchParams.set("search", search)
+
+	const res = await fetch(`/api/maintenance-plan?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching maintenance plans")
+
+	return res.json()
 }

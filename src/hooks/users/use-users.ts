@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, type QueryFunction } from "@tanstack/react-query"
 
 import type { ApiUser } from "@/types/user"
 
@@ -23,17 +23,31 @@ export const useUsers = ({
 }: UseUsersParams = {}) => {
 	return useQuery<UsersResponse>({
 		queryKey: ["users", { page, limit, search, showOnlyInternal }],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			searchParams.set("page", page.toString())
-			searchParams.set("limit", limit.toString())
-			if (search) searchParams.set("search", search)
-			if (showOnlyInternal) searchParams.set("showOnlyInternal", "true")
-
-			const res = await fetch(`/api/users?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching users")
-
-			return res.json()
-		},
+		queryFn: (fn) =>
+			fetchUsers({
+				...fn,
+				queryKey: ["users", { page, limit, search, showOnlyInternal }],
+			}),
 	})
+}
+
+export const fetchUsers: QueryFunction<UsersResponse, ["users", UseUsersParams]> = async ({
+	queryKey,
+}) => {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [_, { page, limit, search, showOnlyInternal }]: [
+		string,
+		{ page?: number; limit?: number; search?: string; showOnlyInternal?: boolean },
+	] = queryKey
+
+	const searchParams = new URLSearchParams()
+	searchParams.set("page", page?.toString() || "1")
+	searchParams.set("limit", limit?.toString() || "10")
+	if (search) searchParams.set("search", search)
+	if (showOnlyInternal) searchParams.set("showOnlyInternal", "true")
+
+	const res = await fetch(`/api/users?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching users")
+
+	return res.json()
 }

@@ -52,8 +52,7 @@ export async function GET(req: NextRequest) {
 					createdAt: "desc",
 				},
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 			prisma.user.count({

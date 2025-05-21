@@ -14,6 +14,7 @@ import { useSafetyTalks } from "@/hooks/use-safety-talks"
 import { SafetyTalkColumns } from "./safety-talk-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -32,7 +33,7 @@ export function SafetyTalkDataTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading } = useSafetyTalks({
+	const { data, isLoading, refetch, isFetching } = useSafetyTalks({
 		page,
 		search,
 		limit: 10,
@@ -59,16 +60,19 @@ export function SafetyTalkDataTable() {
 
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
-				<h2 className="text-text- text-2xl font-semibold">Lista de Charlas</h2>
-
+			<div className="flex w-full items-center justify-between gap-2">
 				<Input
 					type="text"
 					value={search}
-					className="bg-background ml-auto w-fit"
+					onChange={(e) => {
+						setSearch(e.target.value)
+						setPage(1)
+					}}
 					placeholder="Buscar por título o tipo..."
-					onChange={(e) => setSearch(e.target.value)}
+					className="bg-background w-full lg:w-72"
 				/>
+
+				<RefreshButton refetch={refetch} isFetching={isFetching} />
 			</div>
 
 			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
@@ -90,7 +94,7 @@ export function SafetyTalkDataTable() {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
+						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
 										<TableCell className="" colSpan={8}>

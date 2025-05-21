@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { QueryFunction, useQuery } from "@tanstack/react-query"
 import { DateRange } from "react-day-picker"
 
 interface WorkOrderStats {
@@ -73,6 +73,39 @@ interface WorkOrdersResponse {
 	stats: WorkOrderStats
 }
 
+export const fetchWorkOrders: QueryFunction<
+	WorkOrdersResponse,
+	readonly [
+		"workOrders",
+		{
+			page: number
+			limit: number
+			search: string
+			typeFilter: string | null
+			statusFilter: string | null
+			companyId: string | null
+			dateRange: DateRange | null
+		},
+	]
+> = async ({ queryKey }) => {
+	const [, { page, limit, search, typeFilter, statusFilter, companyId, dateRange }] = queryKey
+
+	const searchParams = new URLSearchParams()
+	searchParams.set("page", page.toString())
+	searchParams.set("limit", limit.toString())
+	if (search) searchParams.set("search", search)
+	if (typeFilter) searchParams.set("typeFilter", typeFilter)
+	if (statusFilter) searchParams.set("statusFilter", statusFilter)
+	if (companyId) searchParams.set("companyId", companyId)
+	if (dateRange?.from) searchParams.set("startDate", dateRange.from.toISOString())
+	if (dateRange?.to) searchParams.set("endDate", dateRange.to.toISOString())
+
+	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching work orders")
+
+	return res.json()
+}
+
 export const useWorkOrders = ({
 	page = 1,
 	limit = 10,
@@ -82,26 +115,13 @@ export const useWorkOrders = ({
 	companyId = null,
 	dateRange = null,
 }: WorkOrdersParams) => {
+	const queryKey = [
+		"workOrders",
+		{ page, limit, search, typeFilter, statusFilter, companyId, dateRange },
+	] as const
+
 	return useQuery<WorkOrdersResponse>({
-		queryKey: [
-			"workOrders",
-			{ page, limit, search, typeFilter, statusFilter, companyId, dateRange },
-		],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			searchParams.set("page", page.toString())
-			searchParams.set("limit", limit.toString())
-			if (search) searchParams.set("search", search)
-			if (typeFilter) searchParams.set("typeFilter", typeFilter)
-			if (statusFilter) searchParams.set("statusFilter", statusFilter)
-			if (companyId) searchParams.set("companyId", companyId)
-			if (dateRange?.from) searchParams.set("startDate", dateRange.from.toISOString())
-			if (dateRange?.to) searchParams.set("endDate", dateRange.to.toISOString())
-
-			const res = await fetch(`/api/work-order?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching work orders")
-
-			return res.json()
-		},
+		queryKey,
+		queryFn: (fn) => fetchWorkOrders({ ...fn, queryKey }),
 	})
 }

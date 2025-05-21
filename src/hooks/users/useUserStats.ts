@@ -36,6 +36,5 @@ export function useUserStats() {
 			}
 			return response.json()
 		},
-		staleTime: 1000 * 60 * 2,
 	})
 }

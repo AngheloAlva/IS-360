@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/sheet"
 
 import type { ApiUser } from "@/types/user"
+import { cn } from "@/lib/utils"
+import { queryClient } from "@/lib/queryClient"
 
 interface InternalUserFormProps {
 	initialData?: ApiUser
@@ -124,6 +126,9 @@ export default function InternalUserFormSheet({
 					})
 
 					setOpen(false)
+					queryClient.invalidateQueries({
+						queryKey: ["users", { showOnlyInternal: true }],
+					})
 				} else {
 					toast.error("Error al crear el usuario", {
 						description: "Ocurrió un error al intentar crear el usuario",
@@ -139,6 +144,9 @@ export default function InternalUserFormSheet({
 						duration: 3000,
 					})
 					setOpen(false)
+					queryClient.invalidateQueries({
+						queryKey: ["users"],
+					})
 				} else {
 					toast.error("Error al actualizar el usuario", {
 						description: "Ocurrió un error al intentar actualizar el usuario",
@@ -160,7 +168,12 @@ export default function InternalUserFormSheet({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className={cn(
+					"bg-primary hover:bg-primary/80 flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-sm text-white",
+					{
+						"bg-primary/10 text-primary hover:textwhi size-8 gap-0 p-1": initialData,
+					}
+				)}
 				onClick={() => setOpen(true)}
 			>
 				{initialData ? <EditIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}

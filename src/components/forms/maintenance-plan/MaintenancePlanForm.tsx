@@ -2,7 +2,6 @@
 
 import { Check, ChevronsUpDown, Plus } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -10,6 +9,7 @@ import { toast } from "sonner"
 import { createMaintenancePlan } from "@/actions/maintenance-plan-task/createMaintenancePlan"
 import { PlanLocationOptions } from "@/lib/consts/plan-location"
 import { useEquipments } from "@/hooks/use-equipments"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
 	maintenancePlanSchema,
@@ -57,8 +57,6 @@ export default function MaintenancePlanForm({
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
-	const router = useRouter()
-
 	const form = useForm<MaintenancePlanSchema>({
 		resolver: zodResolver(maintenancePlanSchema),
 		defaultValues: {
@@ -81,8 +79,11 @@ export default function MaintenancePlanForm({
 					description: "El plan de mantenimiento ha sido creado exitosamente",
 					duration: 3000,
 				})
+
 				setOpen(false)
-				router.refresh()
+				queryClient.invalidateQueries({
+					queryKey: ["maintenance-plans"],
+				})
 				form.reset()
 			} else {
 				if (code === "NAME_ALREADY_EXISTS") {

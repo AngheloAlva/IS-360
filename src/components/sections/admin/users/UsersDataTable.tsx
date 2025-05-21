@@ -15,6 +15,7 @@ import { AreasLabels } from "@/lib/consts/areas"
 import { UserColumns } from "./user-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -44,7 +45,7 @@ export function UsersDataTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading } = useUsers({
+	const { data, isLoading, refetch, isFetching } = useUsers({
 		page,
 		search,
 		limit: 15,
@@ -108,10 +109,12 @@ export function UsersDataTable() {
 							</SelectGroup>
 						</SelectContent>
 					</Select>
+
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
 				</div>
 			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none p-1.5">
+			<Card className="w-full max-w-full rounded-md border-none p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -130,23 +133,23 @@ export function UsersDataTable() {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading
-							? Array.from({ length: 10 }).map((_, index) => (
-								<TableRow key={index}>
-									<TableCell className="" colSpan={10}>
-										<Skeleton className="h-9 min-w-full" />
-									</TableCell>
-								</TableRow>
-							))
-							: table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id} className="font-medium">
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+						{isLoading || isFetching
+							? Array.from({ length: 15 }).map((_, index) => (
+									<TableRow key={index}>
+										<TableCell className="" colSpan={11}>
+											<Skeleton className="h-10 min-w-full" />
 										</TableCell>
-									))}
-								</TableRow>
-							))}
+									</TableRow>
+								))
+							: table.getRowModel().rows.map((row) => (
+									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className="font-medium">
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))}
 					</TableBody>
 				</Table>
 			</Card>

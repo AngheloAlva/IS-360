@@ -7,8 +7,6 @@ import Link from "next/link"
 
 import { Company } from "@/hooks/companies/use-companies"
 
-import { Button } from "@/components/ui/button"
-
 export const CompanyColumns: ColumnDef<Company>[] = [
 	{
 		accessorKey: "name",
@@ -60,15 +58,12 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 			const id = row.original.id
 
 			return (
-				<Link href={`/admin/dashboard/empresas/${id}`}>
-					<Button
-						size={"sm"}
-						variant={"outline"}
-						className="hover:border-green-500 border-transparent bg-transparent tracking-wider text-green-500 shadow-none hover:text-white hover:bg-green-800"
-					>
-						Ver más
-						<ChevronRight className="mt-0.5 h-4 w-4" />
-					</Button>
+				<Link
+					href={`/admin/dashboard/empresas/${id}`}
+					className="flex items-center border-transparent bg-transparent tracking-wider text-green-500 shadow-none hover:underline"
+				>
+					Ver más
+					<ChevronRight className="mt-0.5 h-4 w-4" />
 				</Link>
 			)
 		},

@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-import Link from "next/link"
 
 import type { MaintenancePlan } from "@/hooks/maintenance-plans/use-maintenance-plans"
 
@@ -10,19 +9,6 @@ export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
 	{
 		accessorKey: "name",
 		header: "Nombre",
-		cell: ({ row }) => {
-			const name = row.getValue("name") as string
-			const slug = row.original.slug as string
-
-			return (
-				<Link
-					href={`/admin/dashboard/planes-de-mantenimiento/${slug}/tareas`}
-					className="text-primary hover:text-feature text-right font-medium hover:underline"
-				>
-					{name}
-				</Link>
-			)
-		},
 	},
 	{
 		accessorKey: "equipment",

@@ -9,10 +9,11 @@ export default async function DashboardHomePage() {
 		headers: await headers(),
 	})
 
-	if (!session?.user) {
+	if (!session?.user?.companyId) {
 		return notFound()
 	}
-	const companyId = session.user?.companyId || undefined
+
+	const companyId = session.user.companyId
 
 	return <CompanyDashboardContent companyId={companyId} />
 }

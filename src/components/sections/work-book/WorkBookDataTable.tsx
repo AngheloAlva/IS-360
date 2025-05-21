@@ -18,6 +18,7 @@ import {
 } from "@/hooks/work-orders/use-work-books-by-company"
 
 import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -37,7 +38,7 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading } = useWorkBooksByCompany({
+	const { data, isLoading, refetch, isFetching } = useWorkBooksByCompany({
 		page,
 		search,
 		companyId,
@@ -61,13 +62,16 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 
 	return (
 		<section className="flex w-full flex-col gap-4">
-			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
-				<Input
-					value={search}
-					className="bg-background w-96"
-					placeholder="Filtrar por Numero de OT..."
-					onChange={(e) => setSearch(e.target.value)}
-				/>
+			<div className="flex w-full flex-col items-start justify-between gap-2 lg:flex-row">
+				<div className="flex w-full items-center gap-2">
+					<Input
+						value={search}
+						className="bg-background w-96"
+						placeholder="Filtrar por Numero de OT..."
+						onChange={(e) => setSearch(e.target.value)}
+					/>
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
+				</div>
 			</div>
 
 			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none p-1.5">
