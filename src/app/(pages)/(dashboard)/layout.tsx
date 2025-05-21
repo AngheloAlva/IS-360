@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 
@@ -32,6 +33,8 @@ export default async function AdminDashboardLayout({
 					<main className="bg-secondary-background flex min-h-full flex-col items-center gap-8 p-4 pb-20 lg:p-8 lg:pb-32">
 						{children}
 					</main>
+
+					<ReactQueryDevtools />
 				</SidebarInset>
 			</SidebarProvider>
 		</QueryProvider>

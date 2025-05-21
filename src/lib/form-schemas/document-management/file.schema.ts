@@ -7,7 +7,7 @@ export const fileSchema = z.object({
 	type: z.string(),
 	title: z.string(),
 	fileSize: z.number(),
-	mimeType: z.string(),
+	mimeType: z.string().optional(),
 })
 
 export type FileSchema = z.infer<typeof fileSchema>

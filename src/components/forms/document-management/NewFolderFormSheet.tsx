@@ -8,6 +8,7 @@ import { toast } from "sonner"
 
 import { createFolder } from "@/actions/document-management/createFolder"
 import { FolderTypes as FolderTypesConst } from "@/lib/consts/folder-types"
+import { queryClient } from "@/lib/queryClient"
 import { Areas } from "@/lib/consts/areas"
 import {
 	folderFormSchema,
@@ -19,7 +20,6 @@ import FolderTypes from "@/components/forms/document-management/FolderTypes"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
-import { useRouter } from "next/navigation"
 import { Form } from "@/components/ui/form"
 import {
 	Sheet,
@@ -44,8 +44,6 @@ export default function NewFolderForm({
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [errorMessage, setErrorMessage] = useState("")
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const areaValue = Areas[area as keyof typeof Areas].value
 
@@ -75,7 +73,9 @@ export default function NewFolderForm({
 				})
 
 				setOpen(false)
-				router.refresh()
+				queryClient.invalidateQueries({
+					queryKey: ["documents", { area: areaValue, folderId: parentFolderId }],
+				})
 			} else {
 				toast.error("Error al crear la carpeta", {
 					description: message,

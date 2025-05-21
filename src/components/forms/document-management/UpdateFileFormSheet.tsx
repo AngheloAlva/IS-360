@@ -1,10 +1,10 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { EditIcon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
@@ -21,6 +21,7 @@ import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import UploadFilesFormField from "../shared/UploadFilesFormField"
 import { FilePreview } from "@/components/ui/file-preview"
+import { Separator } from "@/components/ui/separator"
 import SubmitButton from "../shared/SubmitButton"
 import { Form } from "@/components/ui/form"
 import {
@@ -32,21 +33,28 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet"
 
-import type { File as PrismaFile } from "@prisma/client"
-import { Separator } from "@/components/ui/separator"
+import type { AREAS, File as PrismaFile } from "@prisma/client"
 
 interface UpdateFileFormProps {
 	userId: string
 	fileId: string
+	areaValue: AREAS
 	initialData: PrismaFile
+	parentFolderId?: string
 }
 
-export function UpdateFileFormSheet({ userId, fileId, initialData }: UpdateFileFormProps) {
+export function UpdateFileFormSheet({
+	userId,
+	fileId,
+	initialData,
+	areaValue,
+	parentFolderId,
+}: UpdateFileFormProps) {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [uploading, setUploading] = useState(false)
 	const [open, setOpen] = useState(false)
 
-	const router = useRouter()
+	const queryClient = useQueryClient()
 
 	const form = useForm<UpdateFileSchema>({
 		resolver: zodResolver(updateFileSchema),
@@ -57,8 +65,8 @@ export function UpdateFileFormSheet({ userId, fileId, initialData }: UpdateFileF
 			code: initialData.code ?? undefined,
 			description: initialData.description || "",
 			revisionCount: `${initialData.revisionCount}`,
-			registrationDate: initialData.registrationDate,
-			expirationDate: initialData.expirationDate || undefined,
+			registrationDate: new Date(initialData.registrationDate),
+			expirationDate: initialData.expirationDate ? new Date(initialData.expirationDate) : undefined,
 			file: [
 				{
 					file: undefined,
@@ -76,7 +84,7 @@ export function UpdateFileFormSheet({ userId, fileId, initialData }: UpdateFileF
 		setUploading(true)
 		const file = values.file[0]
 
-		if (!file.file) {
+		if (!file) {
 			toast.error("Por favor, sube al menos un archivo")
 			return
 		}
@@ -122,7 +130,9 @@ export function UpdateFileFormSheet({ userId, fileId, initialData }: UpdateFileF
 
 			toast.success("Documento subido correctamente")
 			setOpen(false)
-			router.refresh()
+			queryClient.invalidateQueries({
+				queryKey: ["documents", { area: areaValue, folderId: parentFolderId }],
+			})
 		} catch (error) {
 			console.error(error)
 			toast.error("Error al subir el documento", {
@@ -135,6 +145,10 @@ export function UpdateFileFormSheet({ userId, fileId, initialData }: UpdateFileF
 	}
 
 	const codeIsOther = form.watch("code") === CodesValues.OTRO
+
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>

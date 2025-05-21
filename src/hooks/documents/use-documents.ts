@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { QueryFunction, useQuery } from "@tanstack/react-query"
 
 import { Folder as FolderType, File as FileType, AREAS, FileComment } from "@prisma/client"
 
@@ -31,17 +31,23 @@ interface UseDocumentsParams {
 export const useDocuments = ({ area, folderId }: UseDocumentsParams) => {
 	return useQuery<DocumentsResponse>({
 		queryKey: ["documents", { area, folderId }],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			searchParams.set("area", area.toString())
-			if (folderId) searchParams.set("folderId", folderId)
-
-			const res = await fetch(`/api/documents?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching documents")
-
-			return res.json()
-		},
-		staleTime: 0,
-		gcTime: 0,
+		queryFn: (fn) => fetchDocuments({ ...fn, queryKey: ["documents", { area, folderId }] }),
 	})
+}
+
+export const fetchDocuments: QueryFunction<
+	DocumentsResponse,
+	["documents", { area: AREAS; folderId: string | null }]
+> = async ({ queryKey }) => {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [_, { area, folderId }]: [string, { area: AREAS; folderId: string | null }] = queryKey
+
+	const searchParams = new URLSearchParams()
+	searchParams.set("area", area.toString())
+	if (folderId) searchParams.set("folderId", folderId)
+
+	const res = await fetch(`/api/documents?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching documents")
+
+	return res.json()
 }

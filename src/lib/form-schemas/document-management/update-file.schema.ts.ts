@@ -14,7 +14,7 @@ export const updateFileSchema = z.object({
 	description: z.string().optional(),
 	revisionCount: z.string().optional(),
 
-	file: z.array(fileSchema).min(1).max(1),
+	file: z.array(fileSchema),
 })
 
 export type UpdateFileSchema = z.infer<typeof updateFileSchema>

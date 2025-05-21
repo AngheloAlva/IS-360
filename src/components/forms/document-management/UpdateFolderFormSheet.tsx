@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { EditIcon } from "lucide-react"
 import { useState } from "react"
@@ -9,6 +8,8 @@ import { toast } from "sonner"
 
 import { FolderTypes as FolderTypesConst } from "@/lib/consts/folder-types"
 import { updateFolder } from "@/actions/document-management/updateFolder"
+import { DocumentAreasValuesArray } from "@/lib/consts/areas"
+import { queryClient } from "@/lib/queryClient"
 import {
 	folderFormSchema,
 	type FolderFormSchema,
@@ -30,7 +31,6 @@ import {
 } from "@/components/ui/sheet"
 
 import type { Folder } from "@prisma/client"
-import { DocumentAreasValuesArray } from "@/lib/consts/areas"
 
 export default function UpdateFolderFormSheet({
 	userId,
@@ -41,8 +41,6 @@ export default function UpdateFolderFormSheet({
 }): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const form = useForm<FolderFormSchema>({
 		resolver: zodResolver(folderFormSchema),
@@ -69,7 +67,10 @@ export default function UpdateFolderFormSheet({
 				})
 
 				setOpen(false)
-				router.refresh()
+				console.log(oldFolder)
+				queryClient.invalidateQueries({
+					queryKey: ["documents", { area: oldFolder.area, folderId: oldFolder.parentId }],
+				})
 			} else {
 				toast("Error al actualizar la carpeta", {
 					description: message,

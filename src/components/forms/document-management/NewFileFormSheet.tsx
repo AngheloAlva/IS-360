@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { UploadIcon } from "lucide-react"
 import { toast } from "sonner"
@@ -11,6 +10,7 @@ import { uploadMultipleFiles } from "@/actions/document-management/uploadMultipl
 import { Areas, type DocumentAreasValuesArray } from "@/lib/consts/areas"
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { uploadFilesToCloud } from "@/lib/upload-files"
+import { queryClient } from "@/lib/queryClient"
 import {
 	fileFormSchema,
 	type FileFormSchema,
@@ -34,19 +34,20 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet"
 
+import type { AREAS } from "@prisma/client"
+
 interface NewFileFormProps {
 	userId: string
 	parentFolderId?: string
 	area: keyof typeof Areas
+	areaValue: AREAS
 }
 
-export function NewFileFormSheet({ userId, parentFolderId, area }: NewFileFormProps) {
+export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: NewFileFormProps) {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [isOneFile, setIsOneFile] = useState(true)
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const form = useForm<FileFormSchema>({
 		resolver: zodResolver(fileFormSchema),
@@ -94,7 +95,9 @@ export function NewFileFormSheet({ userId, parentFolderId, area }: NewFileFormPr
 
 			toast.success("Archivos subidos correctamente")
 			setOpen(false)
-			router.refresh()
+			queryClient.invalidateQueries({
+				queryKey: ["documents", { area: areaValue, folderId: parentFolderId }],
+			})
 		} catch (error) {
 			console.error(error)
 			toast.error(error instanceof Error ? error.message : "Error al subir los archivos")

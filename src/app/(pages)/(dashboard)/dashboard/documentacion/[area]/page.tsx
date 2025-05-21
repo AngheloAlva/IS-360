@@ -40,16 +40,16 @@ export default async function AreaRootPage({ params }: PageProps) {
 				</div>
 
 				<div className="ml-auto flex gap-2">
-					<NewFileFormSheet area={areaKey} userId={data.user.id} />
+					<NewFileFormSheet areaValue={areaValue} area={areaKey} userId={data.user.id} />
 
 					<NewFolderFormSheet area={areaKey} userId={data.user.id} />
 				</div>
 			</div>
 
 			<FileExplorer
+				userId={data.user.id}
 				areaValue={areaValue}
 				foldersSlugs={[area]}
-				userId={data.user.id}
 				userRole={data.user.role as USER_ROLE}
 				userModules={data.user.modules as MODULES[]}
 			/>

@@ -17,7 +17,8 @@ import {
 	Image as ImageIcon,
 } from "lucide-react"
 
-import { useDocuments } from "@/hooks/documents/use-documents"
+import { fetchDocuments, useDocuments } from "@/hooks/documents/use-documents"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 
 import { UpdateFileFormSheet } from "@/components/forms/document-management/UpdateFileFormSheet"
@@ -91,6 +92,14 @@ export function FileExplorer({
 		folderId: actualFolderId,
 	})
 
+	const prefetchFolder = (folderId: string | null) => {
+		return queryClient.prefetchQuery({
+			queryKey: ["documents", { area: areaValue, folderId }],
+			queryFn: fetchDocuments,
+			staleTime: 5 * 60 * 1000,
+		})
+	}
+
 	return (
 		<div className="grid gap-4 sm:grid-cols-2">
 			{isLoading ? (
@@ -104,11 +113,12 @@ export function FileExplorer({
 			) : (
 				<>
 					{data?.folders?.map((item) => (
-						<Card key={item.id} className="relative">
+						<Card key={item.id} className="relative" onMouseEnter={() => prefetchFolder(item.id)}>
 							<CardContent className="flex flex-col gap-2">
 								<div className="flex items-center gap-2">
 									{getFolderIcon(item.area)}
 									<Link
+										prefetch={true}
 										href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug + "_" + item.id}`}
 										className="pr-6 font-medium hover:underline"
 									>
@@ -263,9 +273,11 @@ export function FileExplorer({
 												{canEdit(item.userId) && (
 													<div className="mt-4 flex gap-2">
 														<UpdateFileFormSheet
-															fileId={item.id}
 															userId={userId}
+															fileId={item.id}
 															initialData={item}
+															areaValue={areaValue}
+															parentFolderId={item.folderId || undefined}
 														/>
 														<DeleteConfirmationDialog type="file" id={item.id} name={item.name} />
 													</div>
