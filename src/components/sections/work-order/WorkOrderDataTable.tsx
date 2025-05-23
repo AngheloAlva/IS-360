@@ -1,6 +1,7 @@
 "use client"
 
 import { DateRange } from "react-day-picker"
+import { useRouter } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 import { useState } from "react"
 import {
@@ -13,10 +14,13 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
+import { fetchWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
 import { useWorkOrders, WorkOrder } from "@/hooks/work-orders/use-work-order"
+import { fetchWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/hooks/companies/use-companies"
+import { queryClient } from "@/lib/queryClient"
 
 import CreateWorkOrderForm from "@/components/forms/admin/work-order/CreateWorkOrderForm"
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker"
@@ -65,6 +69,7 @@ export function WorkOrderDataTable() {
 	const [rowSelection, setRowSelection] = useState({})
 
 	const { data: companies } = useCompanies()
+	const router = useRouter()
 
 	const { data, isLoading, refetch, isFetching } = useWorkOrders({
 		page,
@@ -100,6 +105,32 @@ export function WorkOrderDataTable() {
 		pageCount: data?.pages ?? 0,
 	})
 
+	const handleRowClick = (workOrderId: string) => {
+		router.push(`/admin/dashboard/libros-de-obras/${workOrderId}`)
+	}
+
+	const prefetchWorkBookById = (workOrderId: string) => {
+		queryClient.prefetchQuery({
+			queryKey: ["workBooks", { workOrderId }],
+			queryFn: (fn) =>
+				fetchWorkBookById({
+					...fn,
+					queryKey: ["workBooks", { workOrderId }],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+
+		queryClient.prefetchQuery({
+			queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+			queryFn: (fn) =>
+				fetchWorkBookMilestones({
+					...fn,
+					queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+	}
+
 	return (
 		<section className="flex w-full flex-col items-start gap-6">
 			<div className="flex w-full items-center justify-between">
@@ -114,14 +145,14 @@ export function WorkOrderDataTable() {
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 				<div className="flex items-center gap-2">
 					<Input
-						type="text"
-						className="bg-background w-full sm:w-64"
-						placeholder="Buscar por número de OT, trabajo, ubicación..."
-						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value)
 							setPage(1)
 						}}
+						type="text"
+						className="bg-background w-full sm:w-64"
+						placeholder="Buscar por número de OT, trabajo, ubicación..."
+						value={search}
 					/>
 				</div>
 
@@ -264,7 +295,13 @@ export function WorkOrderDataTable() {
 									</TableRow>
 								))
 							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									<TableRow
+										key={row.id}
+										className="cursor-pointer"
+										data-state={row.getIsSelected() && "selected"}
+										onClick={() => handleRowClick(row.original.id)}
+										onMouseEnter={() => prefetchWorkBookById(row.original.id)}
+									>
 										{row.getVisibleCells().map((cell) => (
 											<TableCell key={cell.id} className="font-medium">
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}

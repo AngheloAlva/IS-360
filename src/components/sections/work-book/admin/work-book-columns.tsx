@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import Link from "next/link"
 
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { WORK_ORDER_STATUS } from "@prisma/client"
@@ -16,19 +15,6 @@ export const workBookColumns: ColumnDef<WorkBook>[] = [
 	{
 		accessorKey: "otNumber",
 		header: "N° OT",
-		cell: ({ row }) => {
-			const otNumber = row.getValue("otNumber") as string
-			const id = row.original.id
-
-			return (
-				<Link
-					href={`/admin/dashboard/libros-de-obras/${id}`}
-					className="text-primary hover:text-feature text-right font-medium hover:underline"
-				>
-					{otNumber}
-				</Link>
-			)
-		},
 	},
 	{
 		accessorKey: "workName",

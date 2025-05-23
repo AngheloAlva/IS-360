@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { QueryFunction, useQuery } from "@tanstack/react-query"
 
 import type { MILESTONE_STATUS } from "@prisma/client"
 
@@ -29,6 +29,28 @@ export interface Milestone {
 	}>
 }
 
+export const fetchWorkBookMilestones: QueryFunction<
+	MilestonesResponse,
+	readonly ["workBookMilestones", { workOrderId: string; showAll?: boolean }]
+> = async ({ queryKey }) => {
+	const [, { workOrderId, showAll }] = queryKey
+
+	if (!workOrderId) {
+		throw new Error("WorkOrder ID is required")
+	}
+
+	const searchParams = new URLSearchParams()
+	if (showAll) searchParams.set("showAll", showAll.toString())
+
+	const res = await fetch(`/api/work-book/${workOrderId}/milestones?${searchParams.toString()}`)
+
+	if (!res.ok) {
+		throw new Error("Error fetching milestones")
+	}
+
+	return res.json()
+}
+
 interface MilestoneParams {
 	workOrderId: string
 	showAll?: boolean
@@ -40,23 +62,12 @@ interface MilestonesResponse {
 
 export const useWorkBookMilestones = ({ workOrderId, showAll }: MilestoneParams) => {
 	return useQuery<MilestonesResponse>({
-		queryKey: ["workBookMilestones", workOrderId, showAll],
-		queryFn: async () => {
-			if (!workOrderId) {
-				throw new Error("WorkOrder ID is required")
-			}
-
-			const searchParams = new URLSearchParams()
-			if (showAll) searchParams.set("showAll", showAll.toString())
-
-			const res = await fetch(`/api/work-book/${workOrderId}/milestones?${searchParams.toString()}`)
-
-			if (!res.ok) {
-				throw new Error("Error fetching milestones")
-			}
-
-			return res.json()
-		},
+		queryKey: ["workBookMilestones", { workOrderId, showAll }],
+		queryFn: (fn) =>
+			fetchWorkBookMilestones({
+				...fn,
+				queryKey: ["workBookMilestones", { workOrderId, showAll }],
+			}),
 		enabled: !!workOrderId,
 	})
 }

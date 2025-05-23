@@ -31,6 +31,10 @@ import {
 	TableHeader,
 } from "@/components/ui/table"
 import { InfoIcon } from "lucide-react"
+import { queryClient } from "@/lib/queryClient"
+import { fetchWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
+import { fetchWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
+import { useRouter } from "next/navigation"
 
 export function WorkBookDataTable({ companyId }: { companyId: string }) {
 	const [page, setPage] = useState(1)
@@ -60,15 +64,46 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 		},
 	})
 
+	const router = useRouter()
+
+	const handleRowClick = (workOrderId: string) => {
+		router.push(`/dashboard/libro-de-obras/${workOrderId}`)
+	}
+
+	const prefetchWorkBookById = (workOrderId: string) => {
+		queryClient.prefetchQuery({
+			queryKey: ["workBooks", { workOrderId }],
+			queryFn: (fn) =>
+				fetchWorkBookById({
+					...fn,
+					queryKey: ["workBooks", { workOrderId }],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+
+		queryClient.prefetchQuery({
+			queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+			queryFn: (fn) =>
+				fetchWorkBookMilestones({
+					...fn,
+					queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+	}
+
 	return (
 		<section className="flex w-full flex-col gap-4">
 			<div className="flex w-full flex-col items-start justify-between gap-2 lg:flex-row">
-				<div className="flex w-full items-center gap-2">
+				<div className="flex w-full items-center justify-between gap-2">
 					<Input
 						value={search}
-						className="bg-background w-96"
+						className="bg-background w-full sm:w-80"
 						placeholder="Filtrar por Numero de OT..."
-						onChange={(e) => setSearch(e.target.value)}
+						onChange={(e) => {
+							setSearch(e.target.value)
+							setPage(1)
+						}}
 					/>
 					<RefreshButton refetch={refetch} isFetching={isFetching} />
 				</div>
@@ -93,7 +128,7 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading ? (
+						{isLoading || isFetching ? (
 							Array.from({ length: 10 }).map((_, index) => (
 								<TableRow key={index}>
 									<TableCell className="" colSpan={12}>
@@ -112,7 +147,13 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 							</TableRow>
 						) : (
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+								<TableRow
+									key={row.id}
+									className="cursor-pointer"
+									data-state={row.getIsSelected() && "selected"}
+									onClick={() => handleRowClick(row.original.id)}
+									onMouseEnter={() => prefetchWorkBookById(row.original.id)}
+								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id} className="font-medium">
 											{flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -6,14 +6,12 @@ import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RequestWorkBookClosure } from "./RequestWorkBookClosure"
 
-import type { WorkOrder } from "@prisma/client"
+import type { WorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 
 interface WorkBookGeneralDataProps {
 	userId: string
 	canClose: boolean
-	data: WorkOrder & { company: { name: string; rut: string } } & {
-		supervisor: { name: string; phone: string | null }
-	} & { responsible: { name: string; phone: string | null } }
+	data: WorkBookById
 }
 
 export default function WorkBookGeneralData({

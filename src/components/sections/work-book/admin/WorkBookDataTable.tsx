@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import {
 	flexRender,
@@ -8,8 +9,11 @@ import {
 	type ColumnFiltersState,
 } from "@tanstack/react-table"
 
+import { fetchWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
 import { useWorkBooks, WorkBook } from "@/hooks/work-orders/use-work-books"
+import { fetchWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 import { workBookColumns } from "./work-book-columns"
+import { queryClient } from "@/lib/queryClient"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
@@ -56,18 +60,49 @@ export function WorkBookDataTable() {
 		pageCount: data?.pages ?? 0,
 	})
 
+	const router = useRouter()
+
+	const handleRowClick = (workOrderId: string) => {
+		router.push(`/admin/dashboard/libros-de-obras/${workOrderId}`)
+	}
+
+	const prefetchWorkBookById = (workOrderId: string) => {
+		queryClient.prefetchQuery({
+			queryKey: ["workBooks", { workOrderId }],
+			queryFn: (fn) =>
+				fetchWorkBookById({
+					...fn,
+					queryKey: ["workBooks", { workOrderId }],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+
+		queryClient.prefetchQuery({
+			queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+			queryFn: (fn) =>
+				fetchWorkBookMilestones({
+					...fn,
+					queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+	}
+
 	return (
 		<section className="mt-4 flex w-full flex-col items-start gap-4">
 			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
 				<h2 className="text-text text-2xl font-bold">Lista de Libros de Obras</h2>
 
-				<div className="my-4 flex flex-col gap-2 lg:my-0 lg:flex-row">
+				<div className="my-4 flex w-full items-center justify-between gap-2 lg:my-0">
 					<Input
 						type="text"
 						value={search}
 						className="bg-background w-full sm:w-80"
+						onChange={(e) => {
+							setPage(1)
+							setSearch(e.target.value)
+						}}
 						placeholder="Buscar por nombre o número de folio..."
-						onChange={(e) => setSearch(e.target.value)}
 					/>
 
 					<RefreshButton refetch={refetch} isFetching={isFetching} />
@@ -97,7 +132,13 @@ export function WorkBookDataTable() {
 									</TableRow>
 								))
 							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									<TableRow
+										key={row.id}
+										className="cursor-pointer"
+										data-state={row.getIsSelected() && "selected"}
+										onClick={() => handleRowClick(row.original.id)}
+										onMouseEnter={() => prefetchWorkBookById(row.original.id)}
+									>
 										{row.getVisibleCells().map((cell) => (
 											<TableCell key={cell.id} className="font-medium">
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
