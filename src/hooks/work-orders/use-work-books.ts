@@ -13,7 +13,7 @@ export interface WorkBook {
 		id: string
 		name: string
 	}[]
-	company: {
+	company?: {
 		id: string
 		name: string
 		logo: string | null

@@ -72,10 +72,10 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 		if (workOrder.closureRequestedBy?.email) {
 			await sendApproveClosureEmail({
 				supervisorName: user.name,
-				companyName: workOrder.company.name,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: workOrder.workName || "",
 				email: workOrder.closureRequestedBy.email,
+				companyName: workOrder?.company?.name || "Interno",
 			})
 		}
 

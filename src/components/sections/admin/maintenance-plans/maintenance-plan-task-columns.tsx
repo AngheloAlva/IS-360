@@ -11,6 +11,7 @@ import CreateMaintenancePlanTaskWorkOrderForm from "@/components/forms/admin/wor
 import { Badge } from "@/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
+import { PLAN_FREQUENCY } from "@prisma/client"
 
 export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	{
@@ -19,8 +20,8 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		cell: ({ row }) => (
 			<CreateMaintenancePlanTaskWorkOrderForm
 				equipmentId={row.original.equipment.id}
-				equipmentName={row.original.equipment.name}
 				maintenancePlanTaskId={row.original.id}
+				equipmentName={row.original.equipment.name}
 			/>
 		),
 	},
@@ -50,7 +51,16 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		cell: ({ row }) => {
 			const frequency = row.getValue("frequency") as MaintenancePlanTask["frequency"]
 			return (
-				<Badge className="border-purple-500 bg-purple-500/10 text-purple-500">
+				<Badge
+					className={cn("border-purple-500 bg-purple-500/10 text-purple-500", {
+						"border-red-500 bg-red-500/10 text-red-500": frequency === PLAN_FREQUENCY.YEARLY,
+						"border-amber-500 bg-amber-500/10 text-amber-500":
+							frequency === PLAN_FREQUENCY.FOURMONTHLY,
+						"border-teal-500 bg-teal-500/10 text-teal-500": frequency === PLAN_FREQUENCY.QUARTERLY,
+						"border-blue-500 bg-blue-500/10 text-blue-500": frequency === PLAN_FREQUENCY.BIMONTHLY,
+						"border-green-500 bg-green-500/10 text-green-500": frequency === PLAN_FREQUENCY.MONTHLY,
+					})}
+				>
 					{TaskFrequencyLabels[frequency]}
 				</Badge>
 			)

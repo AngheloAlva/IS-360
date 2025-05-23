@@ -27,12 +27,12 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		accessorKey: "company",
 		header: "Empresa - Supervisor",
 		cell: ({ row }) => {
-			const company = row.getValue("company") as { name: string }
-			const supervisor = row.original.supervisor as { name: string }
+			const company = row.getValue("company") as { name: string } | null
+			const supervisor = row.original.supervisor as { name: string } | null
 
 			return (
 				<div className="font-medium">
-					{company.name} - {supervisor.name}
+					{company?.name ? company.name : "Interno"} - {supervisor?.name}
 				</div>
 			)
 		},

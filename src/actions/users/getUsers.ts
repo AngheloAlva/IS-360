@@ -82,7 +82,7 @@ export const getUserById = async (userId: string) => {
 	}
 }
 
-export const getInternalUsers = async (limit: number, page: number) => {
+export const getOtcUsers = async (limit: number, page: number) => {
 	try {
 		const users = await prisma.user.findMany({
 			take: limit,

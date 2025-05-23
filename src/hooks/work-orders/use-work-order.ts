@@ -34,7 +34,7 @@ export interface WorkOrder {
 		id: string
 		name: string
 	}
-	company: {
+	company?: {
 		id: string
 		name: string
 		logo: string | null

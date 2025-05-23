@@ -4,12 +4,17 @@ import { generateSlug } from "@/lib/generateSlug"
 import prisma from "@/lib/prisma"
 
 import type { MaintenancePlanTaskSchema } from "@/lib/form-schemas/maintenance-plan/maintenance-plan-task.schema"
+import type { UploadResult } from "@/lib/upload-files"
 
 interface CreateMaintenancePlanTaskValues {
 	values: MaintenancePlanTaskSchema
+	attachments: UploadResult[]
 }
 
-export const createMaintenancePlanTask = async ({ values }: CreateMaintenancePlanTaskValues) => {
+export const createMaintenancePlanTask = async ({
+	values,
+	attachments,
+}: CreateMaintenancePlanTaskValues) => {
 	try {
 		const maintenancePlan = await prisma.maintenancePlan.findUnique({
 			where: {
@@ -52,7 +57,7 @@ export const createMaintenancePlanTask = async ({ values }: CreateMaintenancePla
 					},
 				},
 				attachments: {
-					create: values.attachments.map((attachment) => ({
+					create: attachments.map((attachment) => ({
 						name: values.name,
 						url: attachment.url,
 						type: attachment.type,

@@ -5,6 +5,8 @@ import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
 
 export const workOrderSchemaByTask = z.object({
+	isInternalResponsible: z.boolean().optional(),
+
 	type: z.enum(WORK_ORDER_TYPE_VALUES_ARRAY, { message: "El tipo no es válido" }),
 	solicitationDate: z.date().optional(),
 	solicitationTime: z.string().optional(),
@@ -31,7 +33,7 @@ export const workOrderSchemaByTask = z.object({
 	breakDays: z.string().optional(),
 	estimatedEndDate: z.date({ message: "La fecha de fin estimada no es válida" }).optional(),
 
-	companyId: z.string().nonempty({ message: "La empresa no puede estar vacía" }),
+	companyId: z.string().optional(),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),
 	responsibleId: z.string().nonempty({ message: "El responsable no puede estar vacío" }),
 })

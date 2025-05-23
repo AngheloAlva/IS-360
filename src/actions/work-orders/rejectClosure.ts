@@ -63,10 +63,10 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 			await sendRejectClosureEmail({
 				rejectionReason: reason,
 				supervisorName: user.name,
-				companyName: workOrder.company.name,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: workOrder.workName || "",
 				email: workOrder.closureRequestedBy.email,
+				companyName: workOrder?.company?.name || "Interno",
 			})
 		}
 

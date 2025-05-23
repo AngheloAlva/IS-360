@@ -9,11 +9,13 @@ export async function GET(req: NextRequest) {
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
+		const showOnlyInternal = searchParams.get("showOnlyInternal") === "true"
 
 		const skip = (page - 1) * limit
 
 		const where = {
 			role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
+			...(showOnlyInternal ? { internal: { not: true } } : {}),
 			...(search
 				? {
 						OR: [
@@ -58,8 +60,7 @@ export async function GET(req: NextRequest) {
 			prisma.user.count({
 				where,
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 15,
 				},
 			}),
 		])

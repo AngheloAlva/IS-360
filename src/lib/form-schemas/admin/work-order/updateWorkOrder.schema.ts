@@ -38,7 +38,7 @@ export const updateWorkOrderSchema = z.object({
 		.string()
 		.regex(/^([0-9]|[1-9][0-9]|100)$/, { message: "El progreso debe ser un número entre 0 y 100" }),
 
-	companyId: z.string().nonempty({ message: "La empresa no puede estar vacía" }),
+	companyId: z.string().optional(),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),
 	responsibleId: z.string().nonempty({ message: "El responsable no puede estar vacío" }),
 })

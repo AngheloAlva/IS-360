@@ -3,11 +3,11 @@
 import { type FieldError, useFieldArray, useForm } from "react-hook-form"
 import { Trash2Icon, MilestoneIcon, PlusCircleIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { createMilestones } from "@/actions/work-orders/milestone/create-milestones"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
 	workBookMilestonesSchema,
@@ -39,8 +39,6 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 	const [loading, setLoading] = useState<boolean>(false)
 	const [activeTab, setActiveTab] = useState("0")
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const form = useForm<WorkBookMilestonesSchema>({
 		resolver: zodResolver(workBookMilestonesSchema),
@@ -78,7 +76,9 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 				})
 
 				setOpen(false)
-				router.refresh()
+				queryClient.invalidateQueries({
+					queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+				})
 			} else {
 				toast.error("Error al guardar los hitos", {
 					description: result.message,

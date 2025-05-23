@@ -2,44 +2,34 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { createWorkOrderByTask } from "@/actions/maintenance-plan-task/createWorkOrderByTask"
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/hooks/companies/use-companies"
-import { getInternalUsers } from "@/actions/users/getUsers"
+import { getOtcUsers } from "@/actions/users/getUsers"
+import { useUsers } from "@/hooks/users/use-users"
+import { queryClient } from "@/lib/queryClient"
 import {
 	workOrderSchemaByTask,
 	type WorkOrderSchemaByTask,
 } from "@/lib/form-schemas/maintenance-plan/work-order-by-task.schema"
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import { SelectWithSearchFormField } from "../../shared/SelectWithSearchFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
-import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
+import { Form, FormItem, FormLabel } from "@/components/ui/form"
+import { SelectFormField } from "../../shared/SelectFormField"
+import { SwitchFormField } from "../../shared/SwitchFormField"
 import { Separator } from "@/components/ui/separator"
 import SubmitButton from "../../shared/SubmitButton"
-import { Skeleton } from "@/components/ui/skeleton"
 import SafetyTalksInfo from "./SafetyTalksInfo"
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormField,
-	FormControl,
-	FormMessage,
-} from "@/components/ui/form"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectTrigger,
-	SelectContent,
-} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 import {
 	Sheet,
 	SheetTitle,
@@ -51,8 +41,6 @@ import {
 
 import type { Company } from "@/hooks/companies/use-companies"
 import type { User } from "@prisma/client"
-import { Input } from "@/components/ui/input"
-import { createWorkOrderByTask } from "@/actions/maintenance-plan-task/createWorkOrderByTask"
 
 interface CreateMaintenancePlanTaskWorkOrderFormProps {
 	equipmentId: string
@@ -67,37 +55,41 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 }: CreateMaintenancePlanTaskWorkOrderFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
-	const [isInternalUsersLoading, setIsInternalUsersLoading] = useState<boolean>(false)
-	const [internalUsers, setInternalUsers] = useState<User[]>([])
+	const [otcUsers, setOtcUsers] = useState<User[]>([])
 	const [open, setOpen] = useState(false)
 
-	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
-
-	const router = useRouter()
+	const { data: companiesData } = useCompanies({ limit: 100 })
+	const { data: internalUsersData } = useUsers({
+		showOnlyInternal: true,
+		limit: 100,
+	})
 
 	const form = useForm<WorkOrderSchemaByTask>({
 		resolver: zodResolver(workOrderSchemaByTask),
 		defaultValues: {
 			companyId: "",
 			breakDays: "0",
+			type: undefined,
 			workRequest: "",
 			supervisorId: "",
+			capex: undefined,
 			responsibleId: "",
 			estimatedDays: "0",
 			estimatedHours: "0",
 			workDescription: "",
+			priority: undefined,
 			requiresBreak: false,
 			programDate: new Date(),
 			estimatedEndDate: new Date(),
 			solicitationDate: new Date(),
+			isInternalResponsible: false,
 			solicitationTime: new Date().toTimeString().split(" ")[0],
 		},
 	})
 
 	useEffect(() => {
 		const fetchInternalUsers = async () => {
-			setIsInternalUsersLoading(true)
-			const { data, ok } = await getInternalUsers(100, 1)
+			const { data, ok } = await getOtcUsers(100, 1)
 
 			if (!ok || !data) {
 				toast("Error al cargar los usuarios internos", {
@@ -107,8 +99,7 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 				return
 			}
 
-			setInternalUsers(data)
-			setIsInternalUsersLoading(false)
+			setOtcUsers(data)
 		}
 
 		void fetchInternalUsers()
@@ -136,7 +127,9 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 
 			toast.success("Solicitud creada exitosamente")
 			setOpen(false)
-			router.refresh()
+			queryClient.invalidateQueries({
+				queryKey: ["work-orders", equipmentId],
+			})
 			form.reset()
 		} catch (error) {
 			console.error(error)
@@ -147,6 +140,8 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 			setIsSubmitting(false)
 		}
 	}
+
+	const isInternalResponsible = form.watch("isInternalResponsible")
 
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
@@ -178,39 +173,14 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 							</span>
 						</div>
 
-						<FormField
-							control={form.control}
+						<SelectWithSearchFormField<WorkOrderSchemaByTask>
 							name="responsibleId"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Responsable de OTC</FormLabel>
-									{isInternalUsersLoading ? (
-										<FormControl>
-											<Skeleton className="h-10 w-full" />
-										</FormControl>
-									) : (
-										<Select
-											disabled={!internalUsers}
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder="Selecciona un responsable" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{internalUsers.map((user) => (
-													<SelectItem key={user.id} value={user.id}>
-														{user.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									)}
-									<FormMessage />
-								</FormItem>
-							)}
+							control={form.control}
+							options={otcUsers.map((user) => ({
+								value: user.id,
+								label: user.name,
+							}))}
+							label="Responsable de OTC"
 						/>
 
 						<SelectFormField<WorkOrderSchemaByTask>
@@ -262,83 +232,75 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 						<Separator className="my-2 sm:col-span-2" />
 
 						<div className="sm:col-span-2">
-							<h2 className="text-xl font-bold">Empresa Colaboradora</h2>
+							<h2 className="text-xl font-bold">Empresa Colaboradora | Responsable</h2>
 							<span className="text-muted-foreground text-sm">
-								Sólo se muestran las empresas que tengan uno o más supervisores asignados
+								Sólo se muestran las empresas que tengan uno o más supervisores asignados.
 							</span>
 						</div>
 
-						<FormField
+						<SwitchFormField<WorkOrderSchemaByTask>
 							control={form.control}
-							name="companyId"
-							render={() => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Empresa Responsable</FormLabel>
-									<Select
-										disabled={isCompaniesLoading}
-										onValueChange={(value) => {
-											const company = companiesData?.companies.find((c) => c.id === value)
-											setSelectedCompany(company)
-											form.setValue("companyId", value)
-										}}
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Selecciona una empresa" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{isCompaniesLoading ? (
-												<div className="flex w-full items-center justify-center p-4">
-													<Skeleton className="h-4 w-full" />
-												</div>
-											) : (
-												companiesData?.companies.map((company) => (
-													<SelectItem key={company.id} value={company.id}>
-														{company.name}
-													</SelectItem>
-												))
-											)}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Responsable Interno"
+							name="isInternalResponsible"
+							itemClassName="sm:col-span-2"
+							onCheckedChange={(checked) => {
+								form.setValue("isInternalResponsible", checked)
+								form.setValue("companyId", "")
+								form.setValue("supervisorId", "")
+								setSelectedCompany(undefined)
+							}}
 						/>
-						{selectedCompany && (
-							<FormField
-								control={form.control}
-								name="supervisorId"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Supervisor</FormLabel>
-										<Select
-											disabled={!selectedCompany}
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder="Selecciona un supervisor" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{selectedCompany?.users
-													.filter((user) => user.isSupervisor)
-													.map((user) => (
-														<SelectItem key={user.id} value={user.id}>
-															{user.name}
-														</SelectItem>
-													))}
-											</SelectContent>
-										</Select>
-										<FormMessage />
-									</FormItem>
+
+						{!isInternalResponsible ? (
+							<>
+								<SelectWithSearchFormField<WorkOrderSchemaByTask>
+									name="companyId"
+									control={form.control}
+									options={
+										companiesData?.companies.map((company) => ({
+											value: company.id,
+											label: company.name,
+										})) ?? []
+									}
+									label="Empresa Responsable"
+									onChange={(value) => {
+										setSelectedCompany(
+											companiesData?.companies.find((company) => company.id === value)
+										)
+									}}
+								/>
+
+								{selectedCompany && (
+									<SelectWithSearchFormField<WorkOrderSchemaByTask>
+										name="supervisorId"
+										control={form.control}
+										options={
+											selectedCompany?.users
+												.filter((user) => user.isSupervisor)
+												.map((user) => ({
+													value: user.id,
+													label: user.name,
+												})) ?? []
+										}
+										label="Supervisor"
+									/>
 								)}
+
+								{selectedCompany && <SafetyTalksInfo users={selectedCompany.users} />}
+							</>
+						) : (
+							<SelectWithSearchFormField<WorkOrderSchemaByTask>
+								name="supervisorId"
+								control={form.control}
+								options={
+									internalUsersData?.users.map((user) => ({
+										value: user.id,
+										label: user.name,
+									})) ?? []
+								}
+								label="Responsable Interno"
 							/>
 						)}
-
-						{selectedCompany && <SafetyTalksInfo users={selectedCompany.users} />}
 
 						<Separator className="my-2 sm:col-span-2" />
 

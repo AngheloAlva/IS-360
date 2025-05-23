@@ -20,7 +20,7 @@ export interface WorkBookByCompany {
 	equipment: {
 		name: string
 	}[]
-	company: {
+	company?: {
 		id: string
 		name: string
 		logo: string | null

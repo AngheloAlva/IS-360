@@ -70,17 +70,17 @@ export function FileExplorer({
 		}
 	}
 
-	const getFolderIcon = (area: string) => {
-		switch (area) {
-			case "DONE":
+	const getFolderIcon = (type: string) => {
+		switch (type) {
+			case "check":
 				return <FolderCheck className="min-h-6 min-w-6 text-green-600" />
-			case "PENDING":
+			case "clock":
 				return <FolderClock className="min-h-6 min-w-6 text-purple-600" />
-			case "SETTINGS":
+			case "service":
 				return <FolderCog className="min-h-6 min-w-6 text-blue-600" />
-			case "FAVORITES":
+			case "favorite":
 				return <FolderHeart className="min-h-6 min-w-6 text-red-600" />
-			case "PRIVATE":
+			case "lock":
 				return <FolderLock className="min-h-6 min-w-6 text-gray-600" />
 			default:
 				return <Folder className="min-h-6 min-w-6 text-yellow-600" />
@@ -116,7 +116,7 @@ export function FileExplorer({
 						<Card key={item.id} className="relative" onMouseEnter={() => prefetchFolder(item.id)}>
 							<CardContent className="flex flex-col gap-2">
 								<div className="flex items-center gap-2">
-									{getFolderIcon(item.area)}
+									{getFolderIcon(item.type)}
 									<Link
 										prefetch={true}
 										href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug + "_" + item.id}`}

@@ -13,7 +13,7 @@ import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { getEquipment } from "@/actions/equipments/getEquipment"
 import { useCompanies } from "@/hooks/companies/use-companies"
-import { getInternalUsers } from "@/actions/users/getUsers"
+import { getOtcUsers } from "@/actions/users/getUsers"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import {
 	workOrderSchema,
@@ -99,7 +99,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	useEffect(() => {
 		const fetchInternalUsers = async () => {
 			setIsInternalUsersLoading(true)
-			const { data, ok } = await getInternalUsers(100, 1)
+			const { data, ok } = await getOtcUsers(100, 1)
 
 			if (!ok || !data) {
 				toast("Error al cargar los usuarios internos", {

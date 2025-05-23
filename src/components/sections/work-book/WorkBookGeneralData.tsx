@@ -66,8 +66,10 @@ export default function WorkBookGeneralData({
 								<div>
 									<p className="text-muted-foreground text-sm font-medium">Contratista</p>
 									<p className="font-medium">
-										{data.company.name}{" "}
-										<span className="text-muted-foreground">- {data.company.rut}</span>
+										{data.company?.name ? data.company.name : "Interno"}{" "}
+										<span className="text-muted-foreground">
+											{data.company?.rut && " - " + data.company.rut}
+										</span>
 									</p>
 								</div>
 							</div>

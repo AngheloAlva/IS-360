@@ -89,7 +89,9 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 				email: workOrder.responsible.email,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: `Libro de Obras ${workOrder.otNumber}`,
-				companyName: workOrder.company.name + " - " + workOrder.company.rut,
+				companyName: workOrder.company
+					? workOrder.company.name + " - " + workOrder.company.rut
+					: "Interno",
 			})
 		}
 

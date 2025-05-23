@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma"
 import type { WorkOrderSchemaByTask } from "@/lib/form-schemas/maintenance-plan/work-order-by-task.schema"
 import { sendNewWorkOrderEmail } from "../work-orders/sendNewWorkOrderEmail"
 import { addMonths } from "date-fns"
+import { PLAN_FREQUENCY } from "@prisma/client"
 
 interface CreateWorkOrderProps {
 	equipmentId?: string
@@ -27,6 +28,7 @@ export const createWorkOrderByTask = async ({
 				id: true,
 				nextDate: true,
 				frequency: true,
+				attachments: true,
 			},
 		})
 
@@ -44,6 +46,8 @@ export const createWorkOrderByTask = async ({
 			breakDays,
 			solicitationDate,
 			solicitationTime,
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			isInternalResponsible,
 			...rest
 		} = values
 		const otNumber = await generateOTNumber()
@@ -63,11 +67,15 @@ export const createWorkOrderByTask = async ({
 						id: supervisorId,
 					},
 				},
-				company: {
-					connect: {
-						id: companyId,
-					},
-				},
+				...(companyId
+					? {
+							company: {
+								connect: {
+									id: companyId,
+								},
+							},
+						}
+					: {}),
 				...rest,
 				isWorkBook: true,
 				estimatedDays: +rest.estimatedDays,
@@ -85,15 +93,45 @@ export const createWorkOrderByTask = async ({
 						id: equipmentId,
 					},
 				},
+				manualDocuments: {
+					connect: maintenancePlanTask.attachments.map((attachment) => ({
+						id: attachment.id,
+					})),
+				},
 			},
 		})
+
+		let nextDate: Date
+
+		switch (maintenancePlanTask.frequency) {
+			case PLAN_FREQUENCY.MONTHLY:
+				nextDate = addMonths(maintenancePlanTask.nextDate, 1)
+				break
+			case PLAN_FREQUENCY.BIMONTHLY:
+				nextDate = addMonths(maintenancePlanTask.nextDate, 2)
+				break
+			case PLAN_FREQUENCY.QUARTERLY:
+				nextDate = addMonths(maintenancePlanTask.nextDate, 3)
+				break
+			case PLAN_FREQUENCY.FOURMONTHLY:
+				nextDate = addMonths(maintenancePlanTask.nextDate, 4)
+				break
+			case PLAN_FREQUENCY.BIANNUAL:
+				nextDate = addMonths(maintenancePlanTask.nextDate, 6)
+				break
+			case PLAN_FREQUENCY.YEARLY:
+				nextDate = addMonths(maintenancePlanTask.nextDate, 12)
+				break
+			default:
+				nextDate = maintenancePlanTask.nextDate
+		}
 
 		await prisma.maintenancePlanTask.update({
 			where: {
 				id: maintenancePlanTask.id,
 			},
 			data: {
-				nextDate: addMonths(maintenancePlanTask.nextDate, 1),
+				nextDate: nextDate,
 			},
 		})
 

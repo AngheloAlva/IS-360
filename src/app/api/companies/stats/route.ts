@@ -81,9 +81,9 @@ export async function GET() {
 
 		const formattedRecentWorkOrders = recentWorkOrders.map((order) => ({
 			id: order.id,
-			company: order.company.name,
 			type: order.type,
 			status: order.status,
+			company: order?.company?.name || "Interno",
 			date: order.solicitationDate.toLocaleDateString("es-CL"),
 		}))
 

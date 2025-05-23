@@ -86,9 +86,9 @@ export const workBookColumns: ColumnDef<WorkBook>[] = [
 		accessorKey: "company",
 		header: "Empresa",
 		cell: ({ row }) => {
-			const company = row.getValue("company") as { name: string }
+			const company = row.getValue("company") as { name: string | null }
 
-			return <div className="font-medium">{company.name}</div>
+			return <div className="font-medium">{company?.name || "Interno"}</div>
 		},
 	},
 	{

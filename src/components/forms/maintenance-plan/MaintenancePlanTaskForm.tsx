@@ -1,38 +1,30 @@
 "use client"
 
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { Plus } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { createMaintenancePlanTask } from "@/actions/maintenance-plan-task/createMaintenancePlanTask"
+import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 import { useEquipments } from "@/hooks/use-equipments"
 import { queryClient } from "@/lib/queryClient"
-import { cn } from "@/lib/utils"
 import {
 	maintenancePlanTaskSchema,
 	type MaintenancePlanTaskSchema,
 } from "@/lib/form-schemas/maintenance-plan/maintenance-plan-task.schema"
 
+import { SelectWithSearchFormField } from "../shared/SelectWithSearchFormField"
 import { DatePickerFormField } from "../shared/DatePickerFormField"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import UploadFilesFormField from "../shared/UploadFilesFormField"
 import { TextAreaFormField } from "../shared/TextAreaFormField"
 import { SelectFormField } from "../shared/SelectFormField"
 import { InputFormField } from "../shared/InputFormField"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Form, FormLabel } from "@/components/ui/form"
 import SubmitButton from "../shared/SubmitButton"
 import { Button } from "@/components/ui/button"
-import {
-	Form,
-	FormItem,
-	FormField,
-	FormLabel,
-	FormMessage,
-	FormControl,
-} from "@/components/ui/form"
 import {
 	Sheet,
 	SheetTitle,
@@ -41,14 +33,6 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/components/ui/sheet"
-import {
-	Command,
-	CommandList,
-	CommandItem,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-} from "@/components/ui/command"
 
 interface MaintenancePlanTaskFormProps {
 	maintenancePlanSlug: string
@@ -77,13 +61,30 @@ export default function MaintenancePlanTaskForm({
 		},
 	})
 
-	const { data: equipmentsData, isLoading: isEquipmentsLoading } = useEquipments({ limit: 1000 })
+	const { data: equipmentsData } = useEquipments({ limit: 1000 })
 
 	const onSubmit = async (values: MaintenancePlanTaskSchema) => {
 		setIsSubmitting(true)
 
+		let uploadResults: UploadResult[] = []
+
+		if (values.attachments.length > 0) {
+			uploadResults = await uploadFilesToCloud({
+				randomString: userId,
+				containerType: "files",
+				files: values.attachments,
+				secondaryName: values.name,
+			})
+		}
+
 		try {
-			const { ok, message } = await createMaintenancePlanTask({ values })
+			const { ok, message } = await createMaintenancePlanTask({
+				values: {
+					...values,
+					attachments: [],
+				},
+				attachments: uploadResults,
+			})
 
 			if (ok) {
 				toast.success("Tarea de mantenimiento creada exitosamente", {
@@ -152,71 +153,16 @@ export default function MaintenancePlanTaskForm({
 							className="sm:col-span-2"
 						/>
 
-						<FormField
-							control={form.control}
+						<SelectWithSearchFormField<MaintenancePlanTaskSchema>
 							name="equipmentId"
-							render={({ field }) => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Equipo</FormLabel>
-									<Popover modal>
-										<PopoverTrigger asChild>
-											<FormControl>
-												<Button
-													variant="outline"
-													role="combobox"
-													className={cn(
-														"justify-between overflow-hidden",
-														!field.value && "text-muted-foreground"
-													)}
-												>
-													{field.value
-														? equipmentsData?.equipments?.find(
-																(equipment) => equipment.id === field.value
-															)?.name
-														: "Seleccionar equipo"}
-													<ChevronsUpDown className="opacity-50" />
-												</Button>
-											</FormControl>
-										</PopoverTrigger>
-										<PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
-											<Command>
-												<CommandInput placeholder="Buscar equipo..." className="h-9" />
-
-												<CommandList>
-													<CommandEmpty>No equipo encontrado.</CommandEmpty>
-													<CommandGroup>
-														{isEquipmentsLoading ? (
-															<Skeleton className="h-9 w-full" />
-														) : (
-															equipmentsData?.equipments?.map((equipment) => (
-																<CommandItem
-																	value={equipment.name}
-																	key={equipment.id}
-																	onSelect={() => {
-																		form.setValue("equipmentId", equipment.id)
-																	}}
-																	className={cn({
-																		"bg-primary": equipment.id === field.value,
-																	})}
-																>
-																	{equipment.name}
-																	<Check
-																		className={cn(
-																			"ml-auto text-white",
-																			equipment.id === field.value ? "opacity-100" : "opacity-0"
-																		)}
-																	/>
-																</CommandItem>
-															))
-														)}
-													</CommandGroup>
-												</CommandList>
-											</Command>
-										</PopoverContent>
-									</Popover>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Equipo"
+							control={form.control}
+							options={
+								equipmentsData?.equipments?.map((equipment) => ({
+									value: equipment.id,
+									label: equipment.name,
+								})) || []
+							}
 						/>
 
 						<SelectFormField<MaintenancePlanTaskSchema>
@@ -241,12 +187,13 @@ export default function MaintenancePlanTaskForm({
 							placeholder="Descripción de la tarea"
 						/>
 
+						<FormLabel>Archivos adjuntos</FormLabel>
 						<UploadFilesFormField<MaintenancePlanTaskSchema>
 							name="attachments"
 							control={form.control}
+							containerClassName="sm:col-span-2"
 							selectedFileIndex={selectedFileIndex}
 							setSelectedFileIndex={setSelectedFileIndex}
-							containerClassName="sm:col-span-2"
 						/>
 
 						<SubmitButton

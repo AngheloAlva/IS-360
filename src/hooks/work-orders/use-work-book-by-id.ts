@@ -12,7 +12,7 @@ export interface WorkBookById extends WorkOrder {
 			assignedUsers: true
 		}
 	}
-	company: {
+	company?: {
 		id: string
 		rut: string
 		name: string

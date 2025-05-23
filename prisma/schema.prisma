@@ -61,6 +61,7 @@ model User {
   banExpires       DateTime?
   rut              String
   twoFactorEnabled Boolean?
+  internal         Boolean   @default(false)
 
   sessions                       Session[]
   accounts                       Account[]
@@ -256,23 +257,24 @@ model WorkOrder {
   id       String @id @default(cuid())
   otNumber String
 
-  type             WORK_ORDER_TYPE
-  status           WORK_ORDER_STATUS   @default(PLANNED)
-  solicitationDate DateTime
-  solicitationTime String
-  workRequest      String
-  workDescription  String?
-  priority         WORK_ORDER_PRIORITY
-  capex            WORK_ORDER_CAPEX?
-  equipment        Equipment[]
-  programDate      DateTime
-  estimatedHours   Float
-  estimatedDays    Float
-  requiresBreak    Boolean
-  breakDays        Int?
-  estimatedEndDate DateTime?
-  isWorkBook       Boolean
-  isWorkBookInit   Boolean             @default(false)
+  type                  WORK_ORDER_TYPE
+  status                WORK_ORDER_STATUS   @default(PLANNED)
+  solicitationDate      DateTime
+  solicitationTime      String
+  workRequest           String
+  workDescription       String?
+  priority              WORK_ORDER_PRIORITY
+  capex                 WORK_ORDER_CAPEX?
+  equipment             Equipment[]
+  programDate           DateTime
+  estimatedHours        Float
+  estimatedDays         Float
+  requiresBreak         Boolean
+  breakDays             Int?
+  estimatedEndDate      DateTime?
+  isWorkBook            Boolean
+  isWorkBookInit        Boolean             @default(false)
+  isInternalResponsible Boolean             @default(false)
 
   // Work book data
   workName           String?
@@ -281,12 +283,13 @@ model WorkOrder {
   workProgressStatus Float?      @default(0) // Cambiado a Float para precisión en el porcentaje
   workEntries        WorkEntry[]
 
-  company               Company              @relation(fields: [companyId], references: [id])
-  companyId             String
+  company               Company?             @relation(fields: [companyId], references: [id])
+  companyId             String?
   supervisor            User                 @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
   supervisorId          String
   responsible           User                 @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
   responsibleId         String
+  manualDocuments       Attachment[]         @relation("WorkOrderManualDocuments")
   initReport            Attachment?          @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
   initReportId          String?              @unique
   endReport             Attachment?          @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
@@ -501,6 +504,7 @@ model Attachment {
   workEntryId           String?
   workTracker           WorkTracker?         @relation(fields: [workTrackerId], references: [id])
   workTrackerId         String?
+  manualDocuments       WorkOrder[]          @relation("WorkOrderManualDocuments")
   initReport            WorkOrder?           @relation("WorkOrderInitReport")
   initReportId          String?              @unique
   endReport             WorkOrder?           @relation("WorkOrderEndReport")

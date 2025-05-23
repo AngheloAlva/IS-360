@@ -4,13 +4,13 @@ import { PlusCircleIcon, PlusIcon, TrashIcon } from "lucide-react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { useWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
 import { createActivity } from "@/actions/work-book-entries/createActivity"
 import { getUsersByWorkOrderId } from "@/actions/users/getUsers"
 import { uploadFilesToCloud } from "@/lib/upload-files"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
 	type DailyActivitySchema,
@@ -60,8 +60,6 @@ export default function ActivityForm({
 		workOrderId,
 		showAll: false,
 	})
-
-	const router = useRouter()
 
 	const form = useForm<DailyActivitySchema>({
 		resolver: zodResolver(dailyActivitySchema),
@@ -160,7 +158,9 @@ export default function ActivityForm({
 			toast.success("Actividad creada correctamente")
 			setOpen(false)
 			form.reset()
-			router.refresh()
+			queryClient.invalidateQueries({
+				queryKey: ["work-entries", { workOrderId }],
+			})
 		} catch (error) {
 			console.error(error)
 			toast.error("Error al crear actividad", {

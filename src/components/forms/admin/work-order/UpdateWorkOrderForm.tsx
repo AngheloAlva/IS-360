@@ -15,7 +15,7 @@ import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { getEquipment } from "@/actions/equipments/getEquipment"
 import { useCompanies } from "@/hooks/companies/use-companies"
-import { getInternalUsers } from "@/actions/users/getUsers"
+import { getOtcUsers } from "@/actions/users/getUsers"
 import { cn } from "@/lib/utils"
 import {
 	updateWorkOrderSchema,
@@ -79,13 +79,13 @@ export default function UpdateWorkOrderForm({
 			type: workOrder.type,
 			status: workOrder.status,
 			priority: workOrder.priority,
-			companyId: workOrder.companyId,
 			workRequest: workOrder.workRequest,
 			breakDays: `${workOrder.breakDays}`,
 			capex: workOrder.capex ?? undefined,
 			supervisorId: workOrder.supervisorId,
 			responsibleId: workOrder.responsibleId,
 			estimatedDays: `${workOrder.estimatedDays}`,
+			companyId: workOrder.companyId || undefined,
 			programDate: new Date(workOrder.programDate),
 			estimatedHours: `${workOrder.estimatedHours}`,
 			requiresBreak: workOrder.requiresBreak ?? false,
@@ -109,7 +109,7 @@ export default function UpdateWorkOrderForm({
 	useEffect(() => {
 		const fetchInternalUsers = async () => {
 			setIsInternalUsersLoading(true)
-			const { data, ok } = await getInternalUsers(100, 1)
+			const { data, ok } = await getOtcUsers(100, 1)
 
 			if (!ok || !data) {
 				toast("Error al cargar los usuarios internos", {
@@ -459,7 +459,7 @@ export default function UpdateWorkOrderForm({
 											setSelectedCompany(company)
 											form.setValue("companyId", value)
 										}}
-										defaultValue={workOrder.companyId}
+										defaultValue={workOrder.companyId ?? ""}
 									>
 										<FormControl>
 											<SelectTrigger>
