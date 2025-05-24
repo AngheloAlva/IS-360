@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { PLAN_FREQUENCY } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 
@@ -12,6 +13,9 @@ export async function GET(
 	const limit = parseInt(searchParams.get("limit") ?? "10")
 	const page = parseInt(searchParams.get("page") ?? "1")
 	const search = searchParams.get("search") ?? ""
+	const frequency = searchParams.get("frequency") ?? ""
+	const nextDateFrom = searchParams.get("nextDateFrom") ?? ""
+	const nextDateTo = searchParams.get("nextDateTo") ?? ""
 
 	const skip = (page - 1) * limit
 
@@ -38,10 +42,21 @@ export async function GET(
 					maintenancePlanId: maintenancePlan.id,
 					...(search
 						? {
-								name: { contains: search, mode: "insensitive" },
-								description: { contains: search, mode: "insensitive" },
-								equipment: { name: { contains: search, mode: "insensitive" } },
-							}
+								OR: [
+									{ name: { contains: search, mode: "insensitive" } },
+									{ description: { contains: search, mode: "insensitive" } },
+									{ equipment: { name: { contains: search, mode: "insensitive" } } },
+								],
+						  }
+						: {}),
+					...(frequency
+						? { frequency: frequency as PLAN_FREQUENCY }
+						: {}),
+					...(nextDateFrom
+						? { nextDate: { gte: new Date(nextDateFrom) } }
+						: {}),
+					...(nextDateTo
+						? { nextDate: { ...(nextDateFrom ? { gte: new Date(nextDateFrom) } : {}), lte: new Date(nextDateTo) } }
 						: {}),
 				},
 				select: {
@@ -85,14 +100,27 @@ export async function GET(
 				},
 			}),
 			await prisma.maintenancePlanTask.count({
-				where: search
-					? {
-							maintenancePlanId: maintenancePlan.id,
-							name: { contains: search, mode: "insensitive" },
-							description: { contains: search, mode: "insensitive" },
-							equipment: { name: { contains: search, mode: "insensitive" } },
-						}
-					: {},
+				where: {
+					maintenancePlanId: maintenancePlan.id,
+					...(search
+						? {
+								OR: [
+									{ name: { contains: search, mode: "insensitive" } },
+									{ description: { contains: search, mode: "insensitive" } },
+									{ equipment: { name: { contains: search, mode: "insensitive" } } },
+								],
+						  }
+						: {}),
+					...(frequency
+						? { frequency: frequency as PLAN_FREQUENCY }
+						: {}),
+					...(nextDateFrom
+						? { nextDate: { gte: new Date(nextDateFrom) } }
+						: {}),
+					...(nextDateTo
+						? { nextDate: { ...(nextDateFrom ? { gte: new Date(nextDateFrom) } : {}), lte: new Date(nextDateTo) } }
+						: {}),
+				},
 				cacheStrategy: {
 					ttl: 120,
 					swr: 10,

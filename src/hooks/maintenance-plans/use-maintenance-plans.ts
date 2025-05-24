@@ -21,6 +21,7 @@ interface UseMaintenancePlansParams {
 	page?: number
 	limit?: number
 	search?: string
+	location?: string
 }
 
 interface MaintenancePlansResponse {
@@ -33,26 +34,28 @@ export const useMaintenancePlans = ({
 	page = 1,
 	limit = 10,
 	search = "",
+	location = "",
 }: UseMaintenancePlansParams = {}) => {
 	return useQuery<MaintenancePlansResponse>({
-		queryKey: ["maintenance-plans", { page, limit, search }],
+		queryKey: ["maintenance-plans", { page, limit, search, location }],
 		queryFn: (fn) =>
-			fetchMaintenancePlans({ ...fn, queryKey: ["maintenance-plans", { page, limit, search }] }),
+			fetchMaintenancePlans({ ...fn, queryKey: ["maintenance-plans", { page, limit, search, location }] }),
 	})
 }
 
 export const fetchMaintenancePlans: QueryFunction<
 	MaintenancePlansResponse,
-	["maintenance-plans", { page: number; limit: number; search: string }]
+	["maintenance-plans", { page: number; limit: number; search: string; location: string }]
 > = async ({ queryKey }) => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [_, { page, limit, search }]: [string, { page: number; limit: number; search: string }] =
+	const [_, { page, limit, search, location }]: [string, { page: number; limit: number; search: string; location: string }] =
 		queryKey
 
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())
 	searchParams.set("limit", limit.toString())
 	if (search) searchParams.set("search", search)
+	if (location) searchParams.set("location", location)
 
 	const res = await fetch(`/api/maintenance-plan?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching maintenance plans")

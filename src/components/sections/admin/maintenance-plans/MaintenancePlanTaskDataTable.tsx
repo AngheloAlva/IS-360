@@ -1,8 +1,10 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft, InfoIcon } from "lucide-react"
+import { ArrowLeft, InfoIcon, CalendarIcon } from "lucide-react"
 import { useState } from "react"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 import {
 	flexRender,
 	SortingState,
@@ -18,6 +20,7 @@ import {
 	useMaintenancePlanTasks,
 } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
 import { MaintenancePlanTaskColumns } from "./maintenance-plan-task-columns"
+import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
@@ -25,6 +28,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
 import {
 	Table,
 	TableRow,
@@ -40,6 +52,9 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
+	const [frequency, setFrequency] = useState("")
+	const [nextDateFrom, setNextDateFrom] = useState<Date | undefined>(undefined)
+	const [nextDateTo, setNextDateTo] = useState<Date | undefined>(undefined)
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -47,6 +62,9 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 		page,
 		search,
 		planSlug,
+		frequency,
+		nextDateFrom: nextDateFrom ? format(nextDateFrom, "yyyy-MM-dd") : "",
+		nextDateTo: nextDateTo ? format(nextDateTo, "yyyy-MM-dd") : "",
 		limit: 15,
 	})
 
@@ -72,7 +90,7 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-row items-start gap-2 md:items-center md:justify-between">
+			<div className="flex w-full flex-col gap-4">
 				{parentId && (
 					<Button
 						variant="ghost"
@@ -85,18 +103,110 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 					</Button>
 				)}
 
-				<Input
-					type="text"
-					value={search}
-					onChange={(e) => {
-						setSearch(e.target.value)
-						setPage(1)
-					}}
-					className="bg-background w-full lg:w-80"
-					placeholder="Buscar por nombre, descripcion, o equipo..."
-				/>
+				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+					<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
+						<Input
+							type="text"
+							value={search}
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+							className="bg-background w-full md:w-64"
+							placeholder="Buscar por nombre o equipo..."
+						/>
 
-				<RefreshButton refetch={refetch} isFetching={isFetching} />
+						<Select
+							value={frequency}
+							onValueChange={(value) => {
+								setFrequency(value)
+								setPage(1)
+							}}
+						>
+							<SelectTrigger className="bg-background w-full md:w-40">
+								<SelectValue placeholder="Frecuencia" />
+							</SelectTrigger>
+							<SelectContent>
+								{/* <SelectItem value="">Todas</SelectItem> */}
+								{TaskFrequencyOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
+				</div>
+
+				<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
+					<div className="flex items-center gap-2">
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									className={`w-full justify-start text-left font-normal md:w-52 ${!nextDateFrom && "text-muted-foreground"}`}
+								>
+									<CalendarIcon className="mr-2 h-4 w-4" />
+									{nextDateFrom ? format(nextDateFrom, "PPP", { locale: es }) : "Fecha inicial"}
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent className="w-auto p-0">
+								<Calendar
+									mode="single"
+									selected={nextDateFrom}
+									onSelect={(date) => {
+										setNextDateFrom(date)
+										setPage(1)
+									}}
+									initialFocus
+								/>
+							</PopoverContent>
+						</Popover>
+
+						<Popover>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									className={`w-full justify-start text-left font-normal md:w-52 ${!nextDateTo && "text-muted-foreground"}`}
+								>
+									<CalendarIcon className="mr-2 h-4 w-4" />
+									{nextDateTo ? format(nextDateTo, "PPP", { locale: es }) : "Fecha final"}
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent className="w-auto p-0">
+								<Calendar
+									mode="single"
+									selected={nextDateTo}
+									onSelect={(date) => {
+										setNextDateTo(date)
+										setPage(1)
+									}}
+									initialFocus
+									disabled={(date) => (nextDateFrom ? date < nextDateFrom : false)}
+								/>
+							</PopoverContent>
+						</Popover>
+
+						{(nextDateFrom || nextDateTo || frequency) && (
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() => {
+									setNextDateFrom(undefined)
+									setNextDateTo(undefined)
+									setFrequency("")
+									setPage(1)
+								}}
+							>
+								Limpiar filtros
+							</Button>
+						)}
+					</div>
+				</div>
 			</div>
 
 			<Card className="w-full max-w-full rounded-md border p-1.5">

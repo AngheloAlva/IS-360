@@ -12,7 +12,9 @@ import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { InternalUserRoleOptions } from "@/lib/consts/user-roles"
 import { updateInternalUser } from "@/actions/users/updateUser"
 import { ModuleOptions } from "@/lib/consts/modules"
+import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
+import { cn } from "@/lib/utils"
 import {
 	internalUserSchema,
 	type InternalUserSchema,
@@ -35,8 +37,6 @@ import {
 } from "@/components/ui/sheet"
 
 import type { ApiUser } from "@/types/user"
-import { cn } from "@/lib/utils"
-import { queryClient } from "@/lib/queryClient"
 
 interface InternalUserFormProps {
 	initialData?: ApiUser
@@ -61,8 +61,6 @@ export default function InternalUserFormSheet({
 			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
 		},
 	})
-
-	// TODO: Agregar campo de modulos permitidos y permitir editar
 
 	async function onSubmit(values: InternalUserSchema) {
 		setLoading(true)

@@ -36,6 +36,7 @@ import type {
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
+import { queryClient } from "@/lib/queryClient"
 
 interface UploadStartupFolderDocumentFormProps {
 	userId: string
@@ -51,6 +52,7 @@ interface UploadStartupFolderDocumentFormProps {
 	currentUrl?: string
 	category: DocumentCategory
 	workerId?: string
+	companyId: string
 	vehicleId?: string
 }
 
@@ -62,6 +64,7 @@ export function UploadStartupFolderDocumentForm({
 	isUpdate,
 	category,
 	vehicleId,
+	companyId,
 	documentId,
 	currentUrl,
 	documentName,
@@ -251,7 +254,9 @@ export function UploadStartupFolderDocumentForm({
 			// 3. Mostrar mensaje de éxito
 			toast.success(`Documento ${isUpdate ? "actualizado" : "subido"} correctamente`)
 
-			window.location.reload()
+			queryClient.invalidateQueries({
+				queryKey: ["startupFolder", { companyId }],
+			})
 
 			setOpen(false)
 		} catch (error) {

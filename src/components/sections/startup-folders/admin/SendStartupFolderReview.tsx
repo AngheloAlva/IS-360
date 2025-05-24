@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { sendFolderReview } from "@/actions/startup-folders/send-folder-review"
 import { DocumentCategory } from "@prisma/client"
+import { queryClient } from "@/lib/queryClient"
 
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -25,14 +26,16 @@ interface SendStartupFolderReviewProps {
 	title: string
 	userId: string
 	folderId: string
+	companyId: string
 	category: DocumentCategory
 }
 
 export function SendStartupFolderReview({
 	title,
 	userId,
-	category,
 	folderId,
+	category,
+	companyId,
 }: SendStartupFolderReviewProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [isApproved, setIsApproved] = useState(false)
@@ -58,6 +61,10 @@ export function SendStartupFolderReview({
 			// Mostrar mensaje de éxito
 			toast("Carpeta enviada para revisión", {
 				description: "La empresa contratista ha sido notificada sobre la aprobación",
+			})
+
+			queryClient.invalidateQueries({
+				queryKey: ["startupFolder", { companyId }],
 			})
 
 			setIsOpen(false)

@@ -1,12 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { PlusCircleIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { EditIcon } from "lucide-react"
 import { toast } from "sonner"
 
-import { createEquipment } from "@/actions/equipments/createEquipment"
+import { useEquipment, type WorkEquipment } from "@/hooks/use-equipments"
+import { updateEquipment } from "@/actions/equipments/updateEquipment"
 import { queryClient } from "@/lib/queryClient"
 import {
 	equipmentSchema,
@@ -28,19 +29,19 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet"
 
-import type { WorkEquipment } from "@/hooks/use-equipments"
-
-interface CreateEquipmentFormProps {
-	parentId?: string
+interface EditEquipmentFormProps {
+	id: string
 	equipments: WorkEquipment[]
 }
 
-export default function CreateEquipmentForm({
-	parentId,
+export default function EditEquipmentForm({
+	id,
 	equipments,
-}: CreateEquipmentFormProps): React.ReactElement {
+}: EditEquipmentFormProps): React.ReactElement {
 	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
+
+	const { data: equipment } = useEquipment(id)
 
 	const form = useForm<EquipmentSchema>({
 		resolver: zodResolver(equipmentSchema),
@@ -50,38 +51,50 @@ export default function CreateEquipmentForm({
 			type: "",
 			location: "",
 			description: "",
-			parentId: parentId,
+			parentId: "",
 			isOperational: true,
 		},
 	})
+
+	useEffect(() => {
+		if (equipment) {
+			form.reset({
+				name: equipment.name,
+				tag: equipment.tag,
+				type: equipment.type || "",
+				location: equipment.location,
+				description: equipment.description || "",
+				parentId: equipment.parent?.id || "",
+				isOperational: equipment.isOperational,
+			})
+		}
+	}, [equipment, form])
 
 	async function onSubmit(values: EquipmentSchema) {
 		setLoading(true)
 
 		try {
-			const { ok, message } = await createEquipment({ values })
+			const { ok, message } = await updateEquipment({ id, values })
 
 			if (!ok) {
-				toast("Error al crear el equipo", {
+				toast("Error al actualizar el equipo", {
 					description: message,
 					duration: 5000,
 				})
 				return
 			}
 
-			toast("Equipo creado exitosamente", {
+			toast("Equipo actualizado exitosamente", {
 				duration: 3000,
 			})
 
-			setOpen(false)
-			form.reset()
 			queryClient.invalidateQueries({
 				queryKey: ["equipment"],
 			})
 		} catch (error) {
 			console.log(error)
-			toast("Error al crear el equipo", {
-				description: "Ocurrió un error al intentar crear el equipo",
+			toast("Error al actualizar el equipo", {
+				description: "Ocurrió un error al intentar actualizar el equipo",
 				duration: 5000,
 			})
 		} finally {
@@ -92,17 +105,16 @@ export default function CreateEquipmentForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className="bg-primary/20 hover:bg-primary/80 flex size-9 cursor-pointer items-center justify-center rounded-md px-2.5 text-sm text-white"
 				onClick={() => setOpen(true)}
 			>
-				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden text-nowrap sm:inline">Nuevo Equipo</span>
+				<EditIcon className="size-5" />
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">
 				<SheetHeader className="shadow">
-					<SheetTitle>Nuevo Equipo</SheetTitle>
-					<SheetDescription>Complete el formulario para crear un nuevo equipo.</SheetDescription>
+					<SheetTitle>Editar Equipo</SheetTitle>
+					<SheetDescription>Complete el formulario para editar el equipo.</SheetDescription>
 				</SheetHeader>
 
 				<Form {...form}>
@@ -128,46 +140,50 @@ export default function CreateEquipmentForm({
 						<InputFormField<EquipmentSchema>
 							name="location"
 							label="Ubicación"
-							control={form.control}
 							placeholder="Ubicación del equipo"
+							control={form.control}
 						/>
 
 						<InputFormField<EquipmentSchema>
 							name="type"
 							label="Tipo de equipo"
-							control={form.control}
 							placeholder="Tipo de equipo"
+							control={form.control}
 						/>
 
 						<SelectWithSearchFormField<EquipmentSchema>
 							name="parentId"
 							label="Equipo Padre"
 							control={form.control}
-							itemClassName="sm:col-span-2"
 							placeholder="Seleccione un equipo padre (opcional)"
-							options={equipments.map((parent) => ({
-								label: `${parent.tag} - ${parent.name}`,
-								value: parent.id,
-							}))}
+							options={
+								equipments
+									? equipments.map((parent) => ({
+											label: `${parent.tag} - ${parent.name}`,
+											value: parent.id,
+										}))
+									: []
+							}
+							itemClassName="md:col-span-2"
 						/>
 
 						<TextAreaFormField<EquipmentSchema>
 							name="description"
 							label="Descripción"
 							control={form.control}
-							itemClassName="md:col-span-2"
 							placeholder="Descripción del equipo"
+							itemClassName="md:col-span-2"
 						/>
 
 						<SwitchFormField<EquipmentSchema>
 							name="isOperational"
+							label="¿Está operativo?"
 							control={form.control}
-							label="¿Esta operativo?"
 							itemClassName="flex flex-row items-center gap-2"
 						/>
 
 						<SubmitButton
-							label="Crear Equipo"
+							label="Guardar Cambios"
 							isSubmitting={loading}
 							className="mt-4 w-full sm:col-span-2"
 						/>

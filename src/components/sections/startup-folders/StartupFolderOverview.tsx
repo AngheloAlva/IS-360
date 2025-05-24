@@ -90,22 +90,31 @@ export default function StartupFolderOverview({
 							<Accordion type="multiple">
 								<SafetyAndHealthDocuments
 									userId={userId}
+									companyId={companyId}
 									isOtcMember={isOtcMember ?? false}
 									folder={startupFolder.safetyAndHealthFolders[0]}
 								/>
+
 								<EnvironmentalDocuments
 									userId={userId}
+									companyId={companyId}
 									isOtcMember={isOtcMember ?? false}
 									folder={startupFolder.environmentalFolders[0]}
 								/>
-								<VehicleDocuments
-									userId={userId}
-									isOtcMember={isOtcMember ?? false}
-									startupFolderId={startupFolder.id}
-									folders={startupFolder.vehiclesFolders}
-								/>
+
+								{startupFolder.vehiclesFolders.length > 0 && (
+									<VehicleDocuments
+										userId={userId}
+										companyId={companyId}
+										isOtcMember={isOtcMember ?? false}
+										startupFolderId={startupFolder.id}
+										folders={startupFolder.vehiclesFolders}
+									/>
+								)}
+
 								<WorkerDocuments
 									userId={userId}
+									companyId={companyId}
 									isOtcMember={isOtcMember ?? false}
 									startupFolderId={startupFolder.id}
 									folders={startupFolder.workersFolders}

@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
 
 		const skip = (page - 1) * limit
 
-		// Get statistics
 		const [equipments, total] = await Promise.all([
 			prisma.equipment.findMany({
 				where: {
@@ -20,9 +19,9 @@ export async function GET(req: NextRequest) {
 					...(search
 						? {
 								OR: [
-									{ name: { contains: search, mode: "insensitive" as const } },
-									{ location: { contains: search, mode: "insensitive" as const } },
-									{ tag: { contains: search, mode: "insensitive" as const } },
+									{ name: { contains: search, mode: "insensitive" } },
+									{ location: { contains: search, mode: "insensitive" } },
+									{ tag: { contains: search, mode: "insensitive" } },
 								],
 							}
 						: {}),
@@ -69,8 +68,7 @@ export async function GET(req: NextRequest) {
 					createdAt: "desc",
 				},
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 			prisma.equipment.count({
@@ -79,16 +77,15 @@ export async function GET(req: NextRequest) {
 					...(search
 						? {
 								OR: [
-									{ name: { contains: search, mode: "insensitive" as const } },
-									{ location: { contains: search, mode: "insensitive" as const } },
-									{ tag: { contains: search, mode: "insensitive" as const } },
+									{ name: { contains: search, mode: "insensitive" } },
+									{ location: { contains: search, mode: "insensitive" } },
+									{ tag: { contains: search, mode: "insensitive" } },
 								],
 							}
 						: {}),
 				},
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 		])

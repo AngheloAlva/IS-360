@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { addWeeks } from "date-fns"
+import { MAINTENANCE_PLAN_LOCATION } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 
@@ -8,6 +9,7 @@ export async function GET(request: NextRequest) {
 	const limit = parseInt(searchParams.get("limit") ?? "10")
 	const page = parseInt(searchParams.get("page") ?? "1")
 	const search = searchParams.get("search") ?? ""
+	const location = searchParams.get("location") ?? ""
 
 	const skip = (page - 1) * limit
 	const nextWeek = addWeeks(new Date(), 1)
@@ -15,13 +17,20 @@ export async function GET(request: NextRequest) {
 	try {
 		const [maintenancePlans, total] = await Promise.all([
 			await prisma.maintenancePlan.findMany({
-				where: search
-					? {
-							name: { contains: search, mode: "insensitive" },
-							description: { contains: search, mode: "insensitive" },
-							equipment: { name: { contains: search, mode: "insensitive" } },
-						}
-					: {},
+				where: {
+					...(search
+						? {
+								OR: [
+									{ name: { contains: search, mode: "insensitive" } },
+									{ description: { contains: search, mode: "insensitive" } },
+									{ equipment: { name: { contains: search, mode: "insensitive" } } },
+								],
+						  }
+						: {}),
+					...(location
+						? { location: location as MAINTENANCE_PLAN_LOCATION }
+						: {}),
+				},
 				skip,
 				select: {
 					id: true,
@@ -60,13 +69,20 @@ export async function GET(request: NextRequest) {
 				},
 			}),
 			await prisma.maintenancePlan.count({
-				where: search
-					? {
-							name: { contains: search, mode: "insensitive" },
-							description: { contains: search, mode: "insensitive" },
-							equipment: { name: { contains: search, mode: "insensitive" } },
-						}
-					: {},
+				where: {
+					...(search
+						? {
+								OR: [
+									{ name: { contains: search, mode: "insensitive" } },
+									{ description: { contains: search, mode: "insensitive" } },
+									{ equipment: { name: { contains: search, mode: "insensitive" } } },
+								],
+						  }
+						: {}),
+					...(location
+						? { location: location as MAINTENANCE_PLAN_LOCATION }
+						: {}),
+				},
 				cacheStrategy: {
 					ttl: 120,
 					swr: 10,

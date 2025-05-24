@@ -16,6 +16,7 @@ export default function StartupFolderTrigger({
 	folderId,
 	category,
 	totalDocs,
+	companyId,
 	isOtcMember,
 	completedDocs,
 	requiredPending,
@@ -26,6 +27,7 @@ export default function StartupFolderTrigger({
 	userId: string
 	folderId: string
 	totalDocs: number
+	companyId: string
 	isOtcMember: boolean
 	status: ReviewStatus
 	completedDocs: number
@@ -78,6 +80,7 @@ export default function StartupFolderTrigger({
 							userId={userId}
 							folderId={folderId}
 							category={category}
+							companyId={companyId}
 						/>
 					)}
 				</div>

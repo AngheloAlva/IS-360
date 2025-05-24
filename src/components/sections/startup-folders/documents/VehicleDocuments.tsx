@@ -21,6 +21,7 @@ import type { StartupFolderWithDocuments } from "@/hooks/startup-folders/use-sta
 
 interface VehicleDocumentsProps {
 	userId: string
+	companyId: string
 	isOtcMember: boolean
 	startupFolderId: string
 	folders: StartupFolderWithDocuments["vehiclesFolders"]
@@ -28,6 +29,7 @@ interface VehicleDocumentsProps {
 
 export default function VehicleDocuments({
 	userId,
+	companyId,
 	folders,
 	isOtcMember,
 	startupFolderId,
@@ -71,6 +73,7 @@ export default function VehicleDocuments({
 					<StartupFolderTrigger
 						userId={userId}
 						icon={<CarIcon />}
+						companyId={companyId}
 						status={foldersStatus}
 						isOtcMember={isOtcMember}
 						folderId={startupFolderId}
@@ -187,6 +190,7 @@ export default function VehicleDocuments({
 																					userId={userId}
 																					isUpdate={false}
 																					folderId={folder.id}
+																					companyId={companyId}
 																					type={docStruct.type}
 																					documentId={document.id}
 																					vehicleId={folder.vehicle.id}
@@ -213,6 +217,7 @@ export default function VehicleDocuments({
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
 					folderType="VEHICLE"
+					companyId={companyId}
 					folderId={startupFolderId}
 					folderName={VEHICLE_STRUCTURE.title}
 					disabled={folders.some((folder) => folder.status !== ReviewStatus.DRAFT)}

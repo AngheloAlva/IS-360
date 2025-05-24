@@ -29,6 +29,7 @@ import type {
 interface DocumentListProps {
 	userId: string
 	folderId: string
+	companyId: string
 	className?: string
 	isEditable: boolean
 	isOtcMember?: boolean
@@ -51,6 +52,7 @@ export function DocumentList({
 	folderId,
 	className,
 	documents,
+	companyId,
 	isEditable,
 	isOtcMember,
 	documentsStructure,
@@ -115,18 +117,22 @@ export function DocumentList({
 											</span>
 										)}
 
-										{isEditable && !isOtcMember && (
-											<UploadStartupFolderDocumentForm
-												isUpdate={true}
-												type={doc.type}
-												userId={userId}
-												folderId={folderId}
-												category={category}
-												documentName={doc.name}
-												documentId={document.id}
-												currentUrl={document.url}
-											/>
-										)}
+										{isEditable &&
+											!isOtcMember &&
+											status !== ReviewStatus.APPROVED &&
+											status !== ReviewStatus.SUBMITTED && (
+												<UploadStartupFolderDocumentForm
+													isUpdate={true}
+													type={doc.type}
+													userId={userId}
+													folderId={folderId}
+													category={category}
+													companyId={companyId}
+													documentName={doc.name}
+													documentId={document.id}
+													currentUrl={document.url}
+												/>
+											)}
 
 										<Link
 											href={document.url}
@@ -138,18 +144,25 @@ export function DocumentList({
 										</Link>
 
 										{isOtcMember && status === ReviewStatus.SUBMITTED && (
-											<DocumentReviewForm document={document} userId={userId} />
+											<DocumentReviewForm
+												document={document}
+												userId={userId}
+												companyId={companyId}
+											/>
 										)}
 									</div>
 								) : (
 									isEditable &&
-									!isOtcMember && (
+									!isOtcMember &&
+									status !== ReviewStatus.APPROVED &&
+									status !== ReviewStatus.SUBMITTED && (
 										<UploadStartupFolderDocumentForm
 											type={doc.type}
 											userId={userId}
 											isUpdate={false}
 											folderId={folderId}
 											category={category}
+											companyId={companyId}
 											documentName={doc.name}
 											documentId={document.id}
 										/>

@@ -6,6 +6,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { queryClient } from "@/lib/queryClient"
 import {
 	submitReviewRequestSchema,
 	type SubmitReviewRequestSchema,
@@ -27,18 +28,18 @@ import {
 
 interface SubmitReviewRequestDialogProps {
 	folderId: string
+	companyId: string
 	disabled: boolean
 	folderName: string
-	onReviewSubmitSuccess?: () => void
 	folderType: "WORKER" | "VEHICLE" | "ENVIRONMENTAL" | "SAFETY_AND_HEALTH"
 }
 
 export function SubmitReviewRequestDialog({
 	folderId,
 	disabled,
+	companyId,
 	folderName,
 	folderType,
-	onReviewSubmitSuccess,
 }: SubmitReviewRequestDialogProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -95,7 +96,6 @@ export function SubmitReviewRequestDialog({
 		}
 
 		setIsSubmitting(true)
-		toast.info("Enviando solicitud de revisión...")
 
 		try {
 			let result: { ok: boolean; message?: string }
@@ -141,9 +141,11 @@ export function SubmitReviewRequestDialog({
 
 			if (result.ok) {
 				toast.success(result.message || "Solicitud de revisión enviada con éxito.")
+				queryClient.invalidateQueries({
+					queryKey: ["startupFolder", { companyId }],
+				})
 				setIsOpen(false)
 				form.reset({ folderId: folderId, notificationEmails: "" })
-				onReviewSubmitSuccess?.()
 			} else {
 				toast.error(result.message || "Error al enviar la solicitud.")
 			}

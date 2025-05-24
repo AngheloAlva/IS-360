@@ -1,13 +1,10 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { FolderOpen } from "lucide-react"
 import { format } from "date-fns"
-import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 import type { WorkEquipment } from "@/hooks/use-equipments"
@@ -56,21 +53,10 @@ export const EquipmentColumns: ColumnDef<WorkEquipment>[] = [
 	},
 	{
 		id: "childrenCount",
-		header: "Cantidad de Equipos Hijos",
+		header: "Equipos Hijos",
 		cell: ({ row }) => {
 			const count = (row.original._count as { children: number }).children
-			return (
-				<div className="flex items-center gap-2">
-					<span>{count}</span>
-					{count > 0 && (
-						<Link href={`/admin/dashboard/equipos?parentId=${row.original.id}`}>
-							<Button size="icon" variant="ghost">
-								<FolderOpen className="h-4 w-4" />
-							</Button>
-						</Link>
-					)}
-				</div>
-			)
+			return <span>{count}</span>
 		},
 	},
 	{

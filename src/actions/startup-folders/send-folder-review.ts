@@ -34,12 +34,20 @@ export const sendFolderReview = async ({
 						submittedAt: new Date(),
 					},
 				})
-				await prisma.safetyAndHealthDocument.updateMany({
+				const safetyAndHealthDocuments = await prisma.safetyAndHealthDocument.findMany({
 					where: { folderId: folderId },
-					data: {
-						status: newStatus,
-						submittedAt: new Date(),
-					},
+				})
+				safetyAndHealthDocuments.forEach(async (document) => {
+					const newDocumentStatus =
+						document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+
+					await prisma.safetyAndHealthDocument.update({
+						where: { id: document.id },
+						data: {
+							status: newDocumentStatus,
+							submittedAt: new Date(),
+						},
+					})
 				})
 				break
 			case DocumentCategory.ENVIRONMENTAL:
@@ -55,12 +63,20 @@ export const sendFolderReview = async ({
 						submittedAt: new Date(),
 					},
 				})
-				await prisma.environmentalDocument.updateMany({
+				const environmentalDocuments = await prisma.environmentalDocument.findMany({
 					where: { folderId: folderId },
-					data: {
-						status: newStatus,
-						submittedAt: new Date(),
-					},
+				})
+				environmentalDocuments.forEach(async (document) => {
+					const newDocumentStatus =
+						document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+
+					await prisma.environmentalDocument.update({
+						where: { id: document.id },
+						data: {
+							status: newDocumentStatus,
+							submittedAt: new Date(),
+						},
+					})
 				})
 				break
 			case DocumentCategory.PERSONNEL:
@@ -87,12 +103,20 @@ export const sendFolderReview = async ({
 							submittedAt: new Date(),
 						},
 					})
-					await prisma.workerDocument.updateMany({
+					const workerDocuments = await prisma.workerDocument.findMany({
 						where: { folderId: folder.id },
-						data: {
-							status: newStatus,
-							submittedAt: new Date(),
-						},
+					})
+					workerDocuments.forEach(async (document) => {
+						const newDocumentStatus =
+							document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+
+						await prisma.workerDocument.update({
+							where: { id: document.id },
+							data: {
+								status: newDocumentStatus,
+								submittedAt: new Date(),
+							},
+						})
 					})
 				})
 				break
@@ -120,12 +144,20 @@ export const sendFolderReview = async ({
 							submittedAt: new Date(),
 						},
 					})
-					await prisma.vehicleDocument.updateMany({
+					const vehicleDocuments = await prisma.vehicleDocument.findMany({
 						where: { folderId: folder.id },
-						data: {
-							status: newStatus,
-							submittedAt: new Date(),
-						},
+					})
+					vehicleDocuments.forEach(async (document) => {
+						const newDocumentStatus =
+							document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+
+						await prisma.vehicleDocument.update({
+							where: { id: document.id },
+							data: {
+								status: newDocumentStatus,
+								submittedAt: new Date(),
+							},
+						})
 					})
 				})
 				break

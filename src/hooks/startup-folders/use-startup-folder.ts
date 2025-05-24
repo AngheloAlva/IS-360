@@ -65,10 +65,7 @@ export const fetchStartupFolder: QueryFunction<
 }
 
 export const useStartupFolder = ({ companyId, folderId }: UseStartupFolderParams) => {
-	const queryKey = [
-		"startupFolder",
-		{ companyId: `company-${companyId}`, folderId: folderId },
-	] as const
+	const queryKey = ["startupFolder", { companyId, folderId }] as const
 
 	return useQuery({
 		queryKey,

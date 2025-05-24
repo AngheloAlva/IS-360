@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { QueryFunction, useQuery } from "@tanstack/react-query"
 
 export async function fetchAllEquipments(parentId: string | null = null) {
 	const searchParams = new URLSearchParams()
@@ -30,6 +30,27 @@ export interface WorkEquipment {
 	}
 }
 
+export const fetchEquipments: QueryFunction<
+	EquipmentsResponse,
+	["equipments", { page: number; limit: number; search: string; parentId: string | null }]
+> = async ({ queryKey }) => {
+	const [, { page, limit, search, parentId }]: [
+		string,
+		{ page: number; limit: number; search: string; parentId: string | null },
+	] = queryKey
+
+	const searchParams = new URLSearchParams()
+	searchParams.set("page", page.toString())
+	searchParams.set("limit", limit.toString())
+	if (search) searchParams.set("search", search)
+	if (parentId) searchParams.set("parentId", parentId)
+
+	const res = await fetch(`/api/equipments?${searchParams.toString()}`)
+	if (!res.ok) throw new Error("Error fetching equipments")
+
+	return await res.json()
+}
+
 interface EquipmentsResponse {
 	equipments: WorkEquipment[]
 	total: number
@@ -51,17 +72,22 @@ export const useEquipments = ({
 }: UseEquipmentsParams) => {
 	return useQuery<EquipmentsResponse>({
 		queryKey: ["equipments", { page, limit, search, parentId }],
-		queryFn: async () => {
-			const searchParams = new URLSearchParams()
-			searchParams.set("page", page.toString())
-			searchParams.set("limit", limit.toString())
-			if (search) searchParams.set("search", search)
-			if (parentId) searchParams.set("parentId", parentId)
+		queryFn: (fn) =>
+			fetchEquipments({ ...fn, queryKey: ["equipments", { page, limit, search, parentId }] }),
+	})
+}
 
-			const res = await fetch(`/api/equipments?${searchParams.toString()}`)
-			if (!res.ok) throw new Error("Error fetching equipments")
+export const useEquipment = (id: string) => {
+	return useQuery({
+		queryKey: ["equipment", id],
+		queryFn: async () => {
+			if (!id) return null
+
+			const res = await fetch(`/api/equipments/${id}`)
+			if (!res.ok) throw new Error("Error fetching equipment")
 
 			return res.json()
 		},
+		enabled: !!id,
 	})
 }

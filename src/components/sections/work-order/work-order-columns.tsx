@@ -22,6 +22,18 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		accessorKey: "otNumber",
 		enableHiding: false,
 		header: "N° OT",
+		cell: ({ row }) => {
+			const id = row.original.id
+
+			return (
+				<Link
+					href={`/admin/dashboard/libros-de-obras/${id}`}
+					className="text-primary font-medium hover:underline"
+				>
+					<div className="font-medium">{row.getValue("otNumber")}</div>
+				</Link>
+			)
+		},
 	},
 	{
 		accessorKey: "company",

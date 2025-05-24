@@ -1,7 +1,6 @@
 "use client"
 
-import { ArrowLeft, FileSpreadsheetIcon } from "lucide-react"
-import { useSearchParams } from "next/navigation"
+import { FileSpreadsheetIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -14,9 +13,16 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { useEquipments, WorkEquipment, fetchAllEquipments } from "@/hooks/use-equipments"
+import {
+	useEquipments,
+	WorkEquipment,
+	fetchAllEquipments,
+	fetchEquipments,
+} from "@/hooks/use-equipments"
 import { EquipmentColumns } from "./equipment-columns"
 
+import CreateEquipmentForm from "@/components/forms/admin/equipment/CreateEquipmentForm"
+import EditEquipmentForm from "@/components/forms/admin/equipment/EditEquipmentForm"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -32,22 +38,28 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
+import { useRouter } from "next/navigation"
+import { queryClient } from "@/lib/queryClient"
 
-export function EquipmentDataTable() {
-	const searchParams = useSearchParams()
-	const parentId = searchParams.get("parentId")
+interface EquipmentDataTableProps {
+	parentId: string | null
+	lastPath: string
+}
 
+export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [exportLoading, setExportLoading] = useState(false)
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
 
+	const router = useRouter()
+
 	const { data, isLoading, refetch, isFetching } = useEquipments({
 		page,
 		search,
-		parentId,
 		limit: 15,
+		parentId: parentId ?? null,
 	})
 
 	const handleExportToExcel = async () => {
@@ -108,25 +120,46 @@ export function EquipmentDataTable() {
 		pageCount: data?.pages ?? 0,
 	})
 
+	const handleRowClick = (id: string) => {
+		router.push(`${lastPath}/${id}`)
+	}
+
+	const prefetchMaintenancePlan = (id: string) => {
+		return queryClient.prefetchQuery({
+			queryKey: [
+				"equipments",
+				{
+					page: 1,
+					limit: 15,
+					search: "",
+					parentId: id,
+				},
+			],
+			queryFn: (fn) =>
+				fetchEquipments({
+					...fn,
+					queryKey: [
+						"equipments",
+						{
+							page: 1,
+							limit: 15,
+							search: "",
+							parentId: id,
+						},
+					],
+				}),
+			staleTime: 5 * 60 * 1000,
+		})
+	}
+
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
 			<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex w-full items-center gap-4">
-					{parentId && (
-						<Button
-							variant="ghost"
-							onClick={() => {
-								window.location.href = "/admin/dashboard/equipos"
-							}}
-						>
-							<ArrowLeft className="mr-2 h-4 w-4" />
-							Volver a Equipos Principales
-						</Button>
-					)}
 					<Button
 						className="border border-green-500 bg-green-500/10 text-green-500 hover:bg-green-500/20"
 						onClick={handleExportToExcel}
-						disabled={isLoading || exportLoading || !data?.equipments.length}
+						disabled={isLoading || exportLoading || !data?.equipments?.length}
 					>
 						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="mr-2 h-4 w-4" />}
 						Exportar a Excel
@@ -145,6 +178,8 @@ export function EquipmentDataTable() {
 						/>
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+						<CreateEquipmentForm equipments={data?.equipments ?? []} />
 					</div>
 				</div>
 			</div>
@@ -163,6 +198,7 @@ export function EquipmentDataTable() {
 										</TableHead>
 									)
 								})}
+								<TableHead>Acciones</TableHead>
 							</TableRow>
 						))}
 					</TableHeader>
@@ -171,20 +207,54 @@ export function EquipmentDataTable() {
 						{isLoading || isFetching
 							? Array.from({ length: 15 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell colSpan={9}>
+										<TableCell colSpan={10}>
 											<Skeleton className="h-6.5 min-w-full" />
 										</TableCell>
 									</TableRow>
 								))
 							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id}>
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && "selected"}
+										onMouseEnter={() => prefetchMaintenancePlan(row.original.id)}
+									>
+										{row.getVisibleCells().map((cell) => {
+											if (cell.column.id === "name") {
+												return (
+													<TableCell
+														key={cell.id}
+														onClick={() => handleRowClick(row.original.id)}
+														className="text-primary font-medium hover:cursor-pointer hover:underline"
+													>
+														{flexRender(cell.column.columnDef.cell, cell.getContext())}
+													</TableCell>
+												)
+											}
+
+											return (
+												<TableCell key={cell.id}>
+													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+												</TableCell>
+											)
+										})}
+										<TableCell>
+											<div className="flex items-center justify-center space-x-2">
+												<EditEquipmentForm
+													id={row.original.id}
+													equipments={data?.equipments ?? []}
+												/>
+											</div>
+										</TableCell>
 									</TableRow>
 								))}
+
+						{data?.equipments?.length === 0 && (
+							<TableRow>
+								<TableCell colSpan={10} className="py-8 text-center text-gray-500">
+									No hay equipos
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
 			</Card>

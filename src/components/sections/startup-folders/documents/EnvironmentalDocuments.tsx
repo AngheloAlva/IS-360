@@ -16,9 +16,11 @@ import { DocumentList } from "./DocumentList"
 export default function EnvironmentalDocuments({
 	folder,
 	userId,
+	companyId,
 	isOtcMember,
 }: {
 	userId: string
+	companyId: string
 	isOtcMember: boolean
 	folder: StartupFolderWithDocuments["environmentalFolders"][number]
 }): React.ReactElement {
@@ -50,6 +52,7 @@ export default function EnvironmentalDocuments({
 					userId={userId}
 					folderId={folder.id}
 					icon={<EarthIcon />}
+					companyId={companyId}
 					totalDocs={totalDocs}
 					status={folder.status}
 					isOtcMember={isOtcMember}
@@ -65,6 +68,7 @@ export default function EnvironmentalDocuments({
 					<DocumentList
 						userId={userId}
 						folderId={folder.id}
+						companyId={companyId}
 						isEditable={isEditable}
 						documents={folder.documents}
 						category={DocumentCategory.ENVIRONMENTAL}
@@ -76,6 +80,7 @@ export default function EnvironmentalDocuments({
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
 					folderId={folder.id}
+					companyId={companyId}
 					disabled={!isEditable}
 					folderType="ENVIRONMENTAL"
 					folderName={ENVIRONMENTAL_STRUCTURE.title}

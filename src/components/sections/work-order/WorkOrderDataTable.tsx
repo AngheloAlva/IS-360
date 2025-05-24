@@ -1,7 +1,6 @@
 "use client"
 
 import { DateRange } from "react-day-picker"
-import { useRouter } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 import { useState } from "react"
 import {
@@ -69,7 +68,6 @@ export function WorkOrderDataTable() {
 	const [rowSelection, setRowSelection] = useState({})
 
 	const { data: companies } = useCompanies()
-	const router = useRouter()
 
 	const { data, isLoading, refetch, isFetching } = useWorkOrders({
 		page,
@@ -104,10 +102,6 @@ export function WorkOrderDataTable() {
 		manualPagination: true,
 		pageCount: data?.pages ?? 0,
 	})
-
-	const handleRowClick = (workOrderId: string) => {
-		router.push(`/admin/dashboard/libros-de-obras/${workOrderId}`)
-	}
 
 	const prefetchWorkBookById = (workOrderId: string) => {
 		queryClient.prefetchQuery({
@@ -297,9 +291,7 @@ export function WorkOrderDataTable() {
 							: table.getRowModel().rows.map((row) => (
 									<TableRow
 										key={row.id}
-										className="cursor-pointer"
 										data-state={row.getIsSelected() && "selected"}
-										onClick={() => handleRowClick(row.original.id)}
 										onMouseEnter={() => prefetchWorkBookById(row.original.id)}
 									>
 										{row.getVisibleCells().map((cell) => (

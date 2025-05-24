@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { StartupFolderWithDocuments } from "@/hooks/startup-folders/use-startup-folder"
 import { addDocumentReview } from "@/actions/startup-folders/add-document-review"
+import { queryClient } from "@/lib/queryClient"
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
@@ -29,9 +30,10 @@ interface DocumentReviewFormProps {
 		| StartupFolderWithDocuments["vehiclesFolders"][number]["documents"][number]
 		| StartupFolderWithDocuments["workersFolders"][number]["documents"][number]
 	userId: string
+	companyId: string
 }
 
-export function DocumentReviewForm({ document, userId }: DocumentReviewFormProps) {
+export function DocumentReviewForm({ document, userId, companyId }: DocumentReviewFormProps) {
 	const [approvalStatus, setApprovalStatus] = useState<"APPROVED" | "REJECTED" | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [comments, setComments] = useState("")
@@ -70,6 +72,10 @@ export function DocumentReviewForm({ document, userId }: DocumentReviewFormProps
 					approvalStatus === "APPROVED"
 						? "El documento ha sido aprobado correctamente"
 						: "El documento ha sido rechazado correctamente",
+			})
+
+			queryClient.invalidateQueries({
+				queryKey: ["startupFolder", { companyId }],
 			})
 
 			setIsOpen(false)

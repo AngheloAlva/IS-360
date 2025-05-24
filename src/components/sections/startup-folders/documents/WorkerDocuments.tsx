@@ -18,6 +18,7 @@ import type { StartupFolderWithDocuments } from "@/hooks/startup-folders/use-sta
 
 interface WorkerDocumentsProps {
 	userId: string
+	companyId: string
 	isOtcMember: boolean
 	startupFolderId: string
 	folders: StartupFolderWithDocuments["workersFolders"]
@@ -26,6 +27,7 @@ interface WorkerDocumentsProps {
 export default function WorkerDocuments({
 	userId,
 	folders,
+	companyId,
 	isOtcMember,
 	startupFolderId,
 }: WorkerDocumentsProps): React.ReactElement {
@@ -68,6 +70,7 @@ export default function WorkerDocuments({
 				<StartupFolderTrigger
 					userId={userId}
 					icon={<UsersIcon />}
+					companyId={companyId}
 					status={foldersStatus}
 					isOtcMember={isOtcMember}
 					folderId={startupFolderId}
@@ -122,6 +125,7 @@ export default function WorkerDocuments({
 											<DocumentList
 												userId={userId}
 												folderId={folder.id}
+												companyId={companyId}
 												isEditable={isEditable}
 												documents={folder.documents}
 												category={WORKER_STRUCTURE.category}
@@ -139,6 +143,7 @@ export default function WorkerDocuments({
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
 					folderType="WORKER"
+					companyId={companyId}
 					folderId={startupFolderId}
 					folderName={WORKER_STRUCTURE.title}
 					disabled={folders.some((folder) => folder.status !== ReviewStatus.DRAFT)}

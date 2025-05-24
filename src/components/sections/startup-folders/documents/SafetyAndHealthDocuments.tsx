@@ -16,9 +16,11 @@ import { DocumentList } from "./DocumentList"
 export default function SafetyAndHealthDocuments({
 	folder,
 	userId,
+	companyId,
 	isOtcMember,
 }: {
 	userId: string
+	companyId: string
 	isOtcMember: boolean
 	folder: StartupFolderWithDocuments["safetyAndHealthFolders"][number]
 }): React.ReactElement {
@@ -51,6 +53,7 @@ export default function SafetyAndHealthDocuments({
 					userId={userId}
 					folderId={folder.id}
 					totalDocs={totalDocs}
+					companyId={companyId}
 					status={folder.status}
 					icon={<ShieldPlusIcon />}
 					isOtcMember={isOtcMember}
@@ -66,6 +69,7 @@ export default function SafetyAndHealthDocuments({
 					<DocumentList
 						userId={userId}
 						folderId={folder.id}
+						companyId={companyId}
 						isEditable={isEditable}
 						isOtcMember={isOtcMember}
 						category={SAFETY_AND_HEALTH_STRUCTURE.category}
@@ -78,6 +82,7 @@ export default function SafetyAndHealthDocuments({
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
 					folderId={folder.id}
+					companyId={companyId}
 					disabled={!isEditable}
 					folderType="SAFETY_AND_HEALTH"
 					folderName={SAFETY_AND_HEALTH_STRUCTURE.title}

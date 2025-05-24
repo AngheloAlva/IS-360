@@ -23,6 +23,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select"
+import {
 	Table,
 	TableRow,
 	TableBody,
@@ -33,10 +40,12 @@ import {
 import { useRouter } from "next/navigation"
 import { queryClient } from "@/lib/queryClient"
 import { fetchMaintenancePlanTasks } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
+import { PlanLocationOptions } from "@/lib/consts/plan-location"
 
 export function MaintenancePlanDataTable() {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
+	const [location, setLocation] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -45,6 +54,7 @@ export function MaintenancePlanDataTable() {
 	const { data, isLoading, refetch, isFetching } = useMaintenancePlans({
 		page,
 		search,
+		location,
 		limit: 15,
 	})
 
@@ -74,11 +84,33 @@ export function MaintenancePlanDataTable() {
 
 	const prefetchMaintenancePlan = (slug: string) => {
 		return queryClient.prefetchQuery({
-			queryKey: ["maintenance-plans-tasks", { planSlug: slug, page: 1, limit: 15, search: "" }],
+			queryKey: [
+				"maintenance-plans-tasks",
+				{
+					planSlug: slug,
+					page: 1,
+					limit: 15,
+					search: "",
+					frequency: "",
+					nextDateFrom: "",
+					nextDateTo: "",
+				},
+			],
 			queryFn: (fn) =>
 				fetchMaintenancePlanTasks({
 					...fn,
-					queryKey: ["maintenance-plans-tasks", { planSlug: slug, page: 1, limit: 15, search: "" }],
+					queryKey: [
+						"maintenance-plans-tasks",
+						{
+							planSlug: slug,
+							page: 1,
+							limit: 15,
+							search: "",
+							frequency: "",
+							nextDateFrom: "",
+							nextDateTo: "",
+						},
+					],
 				}),
 			staleTime: 5 * 60 * 1000,
 		})
@@ -86,17 +118,39 @@ export function MaintenancePlanDataTable() {
 
 	return (
 		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-row items-start gap-2 md:items-center md:justify-between">
-				<Input
-					type="text"
-					value={search}
-					onChange={(e) => {
-						setSearch(e.target.value)
-						setPage(1)
-					}}
-					className="bg-background w-full lg:w-80"
-					placeholder="Buscar por nombre, equipo, o descripcion..."
-				/>
+			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+				<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
+					<Input
+						type="text"
+						value={search}
+						onChange={(e) => {
+							setSearch(e.target.value)
+							setPage(1)
+						}}
+						className="bg-background w-full md:w-80"
+						placeholder="Buscar por nombre, equipo, o descripcion..."
+					/>
+
+					<Select
+						value={location}
+						onValueChange={(value) => {
+							setLocation(value)
+							setPage(1)
+						}}
+					>
+						<SelectTrigger className="bg-background w-full md:w-44">
+							<SelectValue placeholder="Ubicación" />
+						</SelectTrigger>
+						<SelectContent>
+							{/* <SelectItem value="">Todas las ubicaciones</SelectItem> */}
+							{PlanLocationOptions.map((option) => (
+								<SelectItem key={option.value} value={option.value}>
+									{option.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
 
 				<RefreshButton refetch={refetch} isFetching={isFetching} />
 			</div>
