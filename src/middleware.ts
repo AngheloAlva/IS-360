@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { betterFetch } from "@better-fetch/fetch"
 
 import type { auth } from "@/lib/auth"
 
@@ -10,12 +9,11 @@ export default async function authMiddleware(request: NextRequest) {
 		return NextResponse.next()
 	}
 
-	const { data: session } = await betterFetch<Session>("/api/auth/get-session", {
-		baseURL: request.nextUrl.origin,
+	const session: Session = await fetch(`${request.nextUrl.origin}/api/auth/get-session`, {
 		headers: {
 			cookie: request.headers.get("cookie") || "",
 		},
-	})
+	}).then((res) => res.json())
 
 	if (!session) {
 		return NextResponse.redirect(new URL("/auth/login", request.url))

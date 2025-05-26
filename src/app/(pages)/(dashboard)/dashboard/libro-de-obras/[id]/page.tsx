@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 
-import { USER_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 
 import WorkBookMain from "@/components/sections/work-book/WorkBookMain"
@@ -19,11 +18,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 	return (
 		<>
-			<WorkBookMain
-				workBookId={id}
-				userId={session.user.id}
-				userRole={session.user.role as USER_ROLE}
-			/>
+			<WorkBookMain workBookId={id} userId={session.user.id} userRole={session.user.role!} />
 		</>
 	)
 }

@@ -9,7 +9,6 @@ import { toast } from "sonner"
 import { sendSupportMessage } from "@/actions/contact/sendContactMessage"
 import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 
-import { USER_ROLE } from "@prisma/client"
 import {
 	supportFormSchema,
 	type SupportFormSchema,
@@ -70,7 +69,7 @@ export default function SupportForm({ user }: SupportFormProps) {
 			}
 
 			toast.success("Mensaje enviado correctamente")
-			if (user.role === USER_ROLE.ADMIN || user.role === USER_ROLE.USER) {
+			if (user.accessRole === "ADMIN") {
 				router.push("/admin/dashboard/inicio")
 			} else {
 				router.push("/dashboard/inicio")

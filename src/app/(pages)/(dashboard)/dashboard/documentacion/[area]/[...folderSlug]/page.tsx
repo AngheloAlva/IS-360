@@ -9,8 +9,6 @@ import NewFolderFormSheet from "@/components/forms/document-management/NewFolder
 import { FileExplorer } from "@/components/sections/documentation/FileExplorer"
 import BackButton from "@/components/shared/BackButton"
 
-import type { USER_ROLE } from "@prisma/client"
-
 interface PageProps {
 	params: Promise<{
 		area: string
@@ -68,7 +66,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 				userId={data.user.id}
 				areaValue={areaValue}
 				actualFolderId={folderId}
-				userRole={data.user.role as USER_ROLE}
+				userRole={data.user.role}
 				foldersSlugs={[area, ...fullFolderSlugs]}
 			/>
 		</div>

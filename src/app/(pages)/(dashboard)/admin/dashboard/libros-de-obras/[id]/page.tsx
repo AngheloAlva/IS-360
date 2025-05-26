@@ -5,8 +5,6 @@ import { auth } from "@/lib/auth"
 
 import WorkBookMain from "@/components/sections/work-book/WorkBookMain"
 
-import type { USER_ROLE } from "@prisma/client"
-
 export default async function AdminWorkBooksPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params
 
@@ -18,11 +16,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 	return (
 		<div className="w-full flex-1 space-y-6 p-4">
-			<WorkBookMain
-				workBookId={id}
-				userId={session.user.id}
-				userRole={session.user.role as USER_ROLE}
-			/>
+			<WorkBookMain workBookId={id} userId={session.user.id} userRole={session.user.role!} />
 		</div>
 	)
 }

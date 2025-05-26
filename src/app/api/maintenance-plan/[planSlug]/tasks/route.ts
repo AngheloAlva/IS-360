@@ -47,16 +47,17 @@ export async function GET(
 									{ description: { contains: search, mode: "insensitive" } },
 									{ equipment: { name: { contains: search, mode: "insensitive" } } },
 								],
-						  }
+							}
 						: {}),
-					...(frequency
-						? { frequency: frequency as PLAN_FREQUENCY }
-						: {}),
-					...(nextDateFrom
-						? { nextDate: { gte: new Date(nextDateFrom) } }
-						: {}),
+					...(frequency ? { frequency: frequency as PLAN_FREQUENCY } : {}),
+					...(nextDateFrom ? { nextDate: { gte: new Date(nextDateFrom) } } : {}),
 					...(nextDateTo
-						? { nextDate: { ...(nextDateFrom ? { gte: new Date(nextDateFrom) } : {}), lte: new Date(nextDateTo) } }
+						? {
+								nextDate: {
+									...(nextDateFrom ? { gte: new Date(nextDateFrom) } : {}),
+									lte: new Date(nextDateTo),
+								},
+							}
 						: {}),
 				},
 				select: {
@@ -93,10 +94,11 @@ export async function GET(
 				},
 				skip,
 				take: limit,
-				orderBy: { createdAt: "desc" },
+				orderBy: {
+					nextDate: "asc",
+				},
 				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 			await prisma.maintenancePlanTask.count({
@@ -109,16 +111,17 @@ export async function GET(
 									{ description: { contains: search, mode: "insensitive" } },
 									{ equipment: { name: { contains: search, mode: "insensitive" } } },
 								],
-						  }
+							}
 						: {}),
-					...(frequency
-						? { frequency: frequency as PLAN_FREQUENCY }
-						: {}),
-					...(nextDateFrom
-						? { nextDate: { gte: new Date(nextDateFrom) } }
-						: {}),
+					...(frequency ? { frequency: frequency as PLAN_FREQUENCY } : {}),
+					...(nextDateFrom ? { nextDate: { gte: new Date(nextDateFrom) } } : {}),
 					...(nextDateTo
-						? { nextDate: { ...(nextDateFrom ? { gte: new Date(nextDateFrom) } : {}), lte: new Date(nextDateTo) } }
+						? {
+								nextDate: {
+									...(nextDateFrom ? { gte: new Date(nextDateFrom) } : {}),
+									lte: new Date(nextDateTo),
+								},
+							}
 						: {}),
 				},
 				cacheStrategy: {

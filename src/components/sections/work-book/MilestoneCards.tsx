@@ -5,7 +5,7 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
 import { MILESTONE_STATUS_LABELS } from "@/lib/consts/milestone-status"
-import { MILESTONE_STATUS, USER_ROLE } from "@prisma/client"
+import { MILESTONE_STATUS } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,10 +14,11 @@ import CloseMilestoneDialog from "./CloseMilestoneDialog"
 import { Badge } from "@/components/ui/badge"
 
 import type { Milestone } from "@/hooks/work-orders/use-work-book-milestones"
+import { USER_ROLE } from "@/lib/permissions"
 
 interface MilestoneCardsProps {
 	userId: string
-	userRole: USER_ROLE
+	userRole: string
 	milestones: Milestone[]
 }
 
@@ -27,7 +28,7 @@ export default function MilestoneCards({ userId, userRole, milestones }: Milesto
 			<div className="bg-primary/10 border-primary flex flex-col items-center justify-center rounded-md border p-8 text-center">
 				<h3 className="text-lg font-medium">No hay hitos definidos</h3>
 
-				{userRole === USER_ROLE.ADMIN || userRole === USER_ROLE.USER ? (
+				{userRole === USER_ROLE.admin ? (
 					<p className="text-muted-foreground mt-2">
 						El supervisor de la obra debe agregar hitos y actividades a este libro de obras.
 					</p>
@@ -189,16 +190,13 @@ export default function MilestoneCards({ userId, userRole, milestones }: Milesto
 								</div>
 							)}
 
-							{milestone.status === MILESTONE_STATUS.IN_PROGRESS &&
-								userRole === USER_ROLE.SUPERVISOR && (
-									<RequestCloseMilestoneDialog milestoneId={milestone.id} userId={userId} />
-								)}
+							{milestone.status === MILESTONE_STATUS.IN_PROGRESS && (
+								<RequestCloseMilestoneDialog milestoneId={milestone.id} userId={userId} />
+							)}
 
-							{userRole === USER_ROLE.USER ||
-								(userRole === USER_ROLE.ADMIN &&
-									milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE && (
-										<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
-									))}
+							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE && (
+								<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
+							)}
 						</CardContent>
 					</Card>
 				))}

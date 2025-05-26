@@ -1,7 +1,6 @@
 "use client"
 
 import { useWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
-import { USER_ROLE } from "@prisma/client"
 
 import MilestoneCards from "@/components/sections/work-book/MilestoneCards"
 import MilestonesForm from "@/components/forms/work-book/MilestonesForm"
@@ -9,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 interface WorkBookMilestonesProps {
 	userId: string
-	userRole: USER_ROLE
+	userRole: string
 	workOrderId: string
 	workOrderStartDate: Date
 }
@@ -52,7 +51,7 @@ export default function WorkBookMilestones({
 		<div className="w-full space-y-4">
 			<div className="flex items-center justify-between">
 				<h2 className="text-2xl font-bold">Hitos y Actividades</h2>
-				{userRole === USER_ROLE.SUPERVISOR && data?.milestones.length === 0 && (
+				{data?.milestones.length === 0 && (
 					<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
 				)}
 			</div>

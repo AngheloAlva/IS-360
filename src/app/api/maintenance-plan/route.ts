@@ -63,8 +63,7 @@ export async function GET(request: NextRequest) {
 				take: limit,
 				orderBy: { createdAt: "desc" },
 				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 			await prisma.maintenancePlan.count({
@@ -81,8 +80,7 @@ export async function GET(request: NextRequest) {
 					...(location ? { location: location as MAINTENANCE_PLAN_LOCATION } : {}),
 				},
 				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 		])

@@ -30,13 +30,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import FileComments from "./FileComments"
 
-import { type AREAS, USER_ROLE } from "@prisma/client"
+import { type AREAS } from "@prisma/client"
 
 interface FileExplorerTableProps {
 	userId: string
 	areaValue: AREAS
 	foldersSlugs: string[]
-	userRole?: USER_ROLE | null
+	userRole?: string | null
 	actualFolderId?: string | null
 }
 

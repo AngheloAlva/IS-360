@@ -4,7 +4,7 @@ import { subDays } from "date-fns"
 
 import { useWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
-import { USER_ROLE, WORK_ORDER_STATUS } from "@prisma/client"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 import { ApproveWorkBookClosure } from "@/components/sections/work-book/ApproveWorkBookClosure"
@@ -12,16 +12,17 @@ import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntrie
 import WorkBookGeneralData from "@/components/sections/work-book/WorkBookGeneralData"
 import WorkBookMilestones from "@/components/sections/work-book/WorkBookMilestones"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
 import OtcInspectorForm from "@/components/forms/work-book/OtcInspectorForm"
+import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
 import BackButton from "@/components/shared/BackButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { USER_ROLE } from "@/lib/permissions"
 
 interface WorkBookMainProps {
-	userRole: USER_ROLE
 	workBookId: string
+	userRole: string
 	userId: string
 }
 
@@ -81,11 +82,11 @@ export default function WorkBookMain({
 
 	const workBook = data?.workBook
 
-	const isOtcMember = userRole === USER_ROLE.ADMIN || userRole === USER_ROLE.USER
+	const isOtcMember = userRole === USER_ROLE.admin
 	const canAddActivities =
 		workBook.status === WORK_ORDER_STATUS.IN_PROGRESS ||
 		workBook.status === WORK_ORDER_STATUS.PLANNED
-	const canClose = userRole === USER_ROLE.SUPERVISOR && workBook.workProgressStatus === 100
+	const canClose = workBook.workProgressStatus === 100
 
 	return (
 		<>

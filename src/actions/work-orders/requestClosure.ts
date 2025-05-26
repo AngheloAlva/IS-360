@@ -27,6 +27,7 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 			include: {
 				supervisor: {
 					select: {
+						id: true,
 						name: true,
 						email: true,
 					},
@@ -54,7 +55,7 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 		}
 
 		// Verificar que el usuario sea supervisor de la empresa colaboradora
-		if (user.role !== "SUPERVISOR") {
+		if (user.id !== workOrder.supervisor.id) {
 			return {
 				ok: false,
 				message: "Forbidden",
