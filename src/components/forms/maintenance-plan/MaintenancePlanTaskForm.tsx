@@ -35,13 +35,15 @@ import {
 } from "@/components/ui/sheet"
 
 interface MaintenancePlanTaskFormProps {
-	maintenancePlanSlug: string
 	userId: string
+	equipmentId: string
+	maintenancePlanSlug: string
 }
 
 export default function MaintenancePlanTaskForm({
-	maintenancePlanSlug,
 	userId,
+	equipmentId,
+	maintenancePlanSlug,
 }: MaintenancePlanTaskFormProps): React.ReactElement {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -61,7 +63,7 @@ export default function MaintenancePlanTaskForm({
 		},
 	})
 
-	const { data: equipmentsData } = useEquipments({ limit: 1000 })
+	const { data: equipmentsData } = useEquipments({ limit: 1000, parentId: equipmentId })
 
 	const onSubmit = async (values: MaintenancePlanTaskSchema) => {
 		setIsSubmitting(true)

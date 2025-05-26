@@ -14,6 +14,10 @@ export default async function MaintenancePlansPage({
 	params,
 }: MaintenancePlanPageProps): Promise<React.ReactElement> {
 	const { planSlug } = await params
+
+	const maintenancePlanSlug = planSlug.split("_")[0]
+	const equipmentId = planSlug.split("_")[1]
+
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -28,19 +32,23 @@ export default async function MaintenancePlansPage({
 
 					<div className="flex flex-col gap-1">
 						<h1 className="text-text w-fit text-3xl font-bold capitalize">
-							{planSlug.replaceAll("-", " ")}
+							{maintenancePlanSlug.replaceAll("-", " ")}
 						</h1>
 						<p className="text-text w-fit text-sm sm:text-base">
 							En esta sección puedes gestionar las tareas de mantenimiento del plan de
-							mantenimiento: {planSlug.replaceAll("-", " ")}.
+							mantenimiento: {maintenancePlanSlug.replaceAll("-", " ")}.
 						</p>
 					</div>
 				</div>
 
-				<MaintenancePlanTaskForm maintenancePlanSlug={planSlug} userId={session.user.id} />
+				<MaintenancePlanTaskForm
+					userId={session.user.id}
+					equipmentId={equipmentId}
+					maintenancePlanSlug={maintenancePlanSlug}
+				/>
 			</div>
 
-			<MaintenancePlanTaskDataTable planSlug={planSlug} />
+			<MaintenancePlanTaskDataTable planSlug={maintenancePlanSlug} />
 		</div>
 	)
 }

@@ -1,10 +1,10 @@
 "use client"
 
+import { ArrowLeft, InfoIcon, CalendarIcon, FunnelXIcon } from "lucide-react"
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft, InfoIcon, CalendarIcon } from "lucide-react"
-import { useState } from "react"
-import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { format } from "date-fns"
+import { useState } from "react"
 import {
 	flexRender,
 	SortingState,
@@ -15,34 +15,34 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { MaintenancePlanTaskColumns } from "./maintenance-plan-task-columns"
+import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 import {
 	type MaintenancePlanTask,
 	useMaintenancePlanTasks,
 } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
-import { MaintenancePlanTaskColumns } from "./maintenance-plan-task-columns"
-import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import {
 	Select,
-	SelectContent,
 	SelectItem,
-	SelectTrigger,
 	SelectValue,
+	SelectTrigger,
+	SelectContent,
 } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import {
 	Table,
 	TableRow,
-	TableBody,
 	TableCell,
 	TableHead,
+	TableBody,
 	TableHeader,
 } from "@/components/ui/table"
 
@@ -116,34 +116,6 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 							placeholder="Buscar por nombre o equipo..."
 						/>
 
-						<Select
-							value={frequency}
-							onValueChange={(value) => {
-								setFrequency(value)
-								setPage(1)
-							}}
-						>
-							<SelectTrigger className="bg-background w-full md:w-40">
-								<SelectValue placeholder="Frecuencia" />
-							</SelectTrigger>
-							<SelectContent>
-								{/* <SelectItem value="">Todas</SelectItem> */}
-								{TaskFrequencyOptions.map((option) => (
-									<SelectItem key={option.value} value={option.value}>
-										{option.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-
-					<div className="flex items-center gap-2">
-						<RefreshButton refetch={refetch} isFetching={isFetching} />
-					</div>
-				</div>
-
-				<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
-					<div className="flex items-center gap-2">
 						<Popover>
 							<PopoverTrigger asChild>
 								<Button
@@ -191,10 +163,29 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 							</PopoverContent>
 						</Popover>
 
+						<Select
+							value={frequency}
+							onValueChange={(value) => {
+								setFrequency(value)
+								setPage(1)
+							}}
+						>
+							<SelectTrigger className="bg-background w-full md:w-40">
+								<SelectValue placeholder="Frecuencia" />
+							</SelectTrigger>
+							<SelectContent>
+								{TaskFrequencyOptions.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+
 						{(nextDateFrom || nextDateTo || frequency) && (
 							<Button
-								variant="ghost"
 								size="sm"
+								variant="outline"
 								onClick={() => {
 									setNextDateFrom(undefined)
 									setNextDateTo(undefined)
@@ -202,9 +193,14 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 									setPage(1)
 								}}
 							>
+								<FunnelXIcon className="h-4 w-4" />
 								Limpiar filtros
 							</Button>
 						)}
+					</div>
+
+					<div className="flex items-center gap-2">
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
 					</div>
 				</div>
 			</div>

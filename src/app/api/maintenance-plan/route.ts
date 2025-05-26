@@ -25,11 +25,9 @@ export async function GET(request: NextRequest) {
 									{ description: { contains: search, mode: "insensitive" } },
 									{ equipment: { name: { contains: search, mode: "insensitive" } } },
 								],
-						  }
+							}
 						: {}),
-					...(location
-						? { location: location as MAINTENANCE_PLAN_LOCATION }
-						: {}),
+					...(location ? { location: location as MAINTENANCE_PLAN_LOCATION } : {}),
 				},
 				skip,
 				select: {
@@ -44,6 +42,7 @@ export async function GET(request: NextRequest) {
 					},
 					equipment: {
 						select: {
+							id: true,
 							tag: true,
 							name: true,
 						},
@@ -62,7 +61,7 @@ export async function GET(request: NextRequest) {
 					},
 				},
 				take: limit,
-				orderBy: { createdAt: "asc" },
+				orderBy: { createdAt: "desc" },
 				cacheStrategy: {
 					ttl: 120,
 					swr: 10,
@@ -77,11 +76,9 @@ export async function GET(request: NextRequest) {
 									{ description: { contains: search, mode: "insensitive" } },
 									{ equipment: { name: { contains: search, mode: "insensitive" } } },
 								],
-						  }
+							}
 						: {}),
-					...(location
-						? { location: location as MAINTENANCE_PLAN_LOCATION }
-						: {}),
+					...(location ? { location: location as MAINTENANCE_PLAN_LOCATION } : {}),
 				},
 				cacheStrategy: {
 					ttl: 120,

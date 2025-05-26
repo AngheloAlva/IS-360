@@ -5,6 +5,7 @@ export interface MaintenancePlan {
 	name: string
 	slug: string
 	equipment: {
+		id: string
 		name: string
 		tag: string
 	}
@@ -39,7 +40,10 @@ export const useMaintenancePlans = ({
 	return useQuery<MaintenancePlansResponse>({
 		queryKey: ["maintenance-plans", { page, limit, search, location }],
 		queryFn: (fn) =>
-			fetchMaintenancePlans({ ...fn, queryKey: ["maintenance-plans", { page, limit, search, location }] }),
+			fetchMaintenancePlans({
+				...fn,
+				queryKey: ["maintenance-plans", { page, limit, search, location }],
+			}),
 	})
 }
 
@@ -48,8 +52,10 @@ export const fetchMaintenancePlans: QueryFunction<
 	["maintenance-plans", { page: number; limit: number; search: string; location: string }]
 > = async ({ queryKey }) => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [_, { page, limit, search, location }]: [string, { page: number; limit: number; search: string; location: string }] =
-		queryKey
+	const [_, { page, limit, search, location }]: [
+		string,
+		{ page: number; limit: number; search: string; location: string },
+	] = queryKey
 
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())

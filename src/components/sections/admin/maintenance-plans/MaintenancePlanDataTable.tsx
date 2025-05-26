@@ -78,8 +78,8 @@ export function MaintenancePlanDataTable() {
 		pageCount: data?.pages ?? 0,
 	})
 
-	const handleRowClick = (slug: string) => {
-		router.push(`/admin/dashboard/planes-de-mantenimiento/${slug}/tareas`)
+	const handleRowClick = (slug: string, equipmentId: string) => {
+		router.push(`/admin/dashboard/planes-de-mantenimiento/${slug + "_" + equipmentId}/tareas`)
 	}
 
 	const prefetchMaintenancePlan = (slug: string) => {
@@ -187,7 +187,7 @@ export function MaintenancePlanDataTable() {
 										key={row.id}
 										className="cursor-pointer"
 										data-state={row.getIsSelected() && "selected"}
-										onClick={() => handleRowClick(row.original.slug)}
+										onClick={() => handleRowClick(row.original.slug, row.original.equipment.id)}
 										onMouseEnter={() => prefetchMaintenancePlan(row.original.slug)}
 									>
 										{row.getVisibleCells().map((cell) => (
