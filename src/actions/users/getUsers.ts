@@ -88,8 +88,8 @@ export const getOtcUsers = async (limit: number, page: number) => {
 			take: limit,
 			skip: (page - 1) * limit,
 			where: {
-				role: {
-					in: ["ADMIN", "USER"],
+				accessRole: {
+					in: ["ADMIN"],
 				},
 			},
 			orderBy: {

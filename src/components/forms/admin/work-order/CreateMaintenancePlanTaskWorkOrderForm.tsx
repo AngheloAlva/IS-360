@@ -90,6 +90,7 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 	useEffect(() => {
 		const fetchInternalUsers = async () => {
 			const { data, ok } = await getOtcUsers(100, 1)
+			console.log(data)
 
 			if (!ok || !data) {
 				toast("Error al cargar los usuarios internos", {
