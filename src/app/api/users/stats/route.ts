@@ -1,100 +1,69 @@
 import { NextResponse } from "next/server"
 
-import { USER_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 export async function GET() {
 	try {
-		const [totalUsers, usersByRole, usersByArea, twoFactorEnabled, recentlyActiveUsers] =
-			await Promise.all([
-				// Total users
-				prisma.user.count(),
+		const [totalUsers, usersByArea, twoFactorEnabled, recentlyActiveUsers] = await Promise.all([
+			// Total users
+			prisma.user.count(),
 
-				// Users by role
-				prisma.user.groupBy({
-					by: ["role"],
-					where: {
-						role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
-					},
-					_count: true,
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
+			// Users by area
+			prisma.user.groupBy({
+				by: ["area"],
+				_count: true,
+				where: {
+					area: { not: null },
+				},
+				cacheStrategy: {
+					ttl: 120,
+					swr: 10,
+				},
+			}),
 
-				// Users by area
-				prisma.user.groupBy({
-					by: ["area"],
-					_count: true,
-					where: {
-						area: { not: null },
-					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
+			// Users with 2FA enabled
+			prisma.user.count({
+				where: {
+					twoFactorEnabled: true,
+				},
+				cacheStrategy: {
+					ttl: 120,
+					swr: 10,
+				},
+			}),
 
-				// Users with 2FA enabled
-				prisma.user.count({
-					where: {
-						twoFactorEnabled: true,
+			// Recently active users
+			prisma.user.findMany({
+				where: {
+					sessions: {
+						some: {},
 					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
-
-				// Recently active users
-				prisma.user.findMany({
-					where: {
-						sessions: {
-							some: {},
+				},
+				select: {
+					id: true,
+					name: true,
+					role: true,
+					image: true,
+					sessions: {
+						orderBy: {
+							updatedAt: "desc",
+						},
+						take: 1,
+						select: {
+							updatedAt: true,
 						},
 					},
-					select: {
-						id: true,
-						name: true,
-						role: true,
-						image: true,
-						sessions: {
-							orderBy: {
-								updatedAt: "desc",
-							},
-							take: 1,
-							select: {
-								updatedAt: true,
-							},
-						},
-					},
-					orderBy: {
-						updatedAt: "desc",
-					},
-					take: 3,
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
-				}),
-			])
-
-		const roleColors = {
-			ADMIN: "bg-amber-500",
-			USER: "bg-blue-500",
-			OPERATOR: "bg-green-500",
-			SUPERVISOR: "bg-red-500",
-			PARTNER_COMPANY: "bg-purple-500",
-		}
-
-		const formattedUsersByRole = usersByRole.map(
-			(role: { role: keyof typeof roleColors; _count: number }) => ({
-				role: role.role,
-				count: role._count,
-				color: roleColors[role.role],
-			})
-		)
+				},
+				orderBy: {
+					updatedAt: "desc",
+				},
+				take: 3,
+				cacheStrategy: {
+					ttl: 120,
+					swr: 10,
+				},
+			}),
+		])
 
 		const formattedUsersByArea = usersByArea.map(
 			(area: { area: string | null; _count: number }) => ({
@@ -107,7 +76,6 @@ export async function GET() {
 			(user: {
 				id: string
 				name: string
-				role: string
 				image: string | null
 				sessions: { updatedAt: Date }[]
 			}) => {
@@ -128,7 +96,6 @@ export async function GET() {
 				return {
 					id: user.id,
 					name: user.name,
-					role: user.role,
 					image: user.image,
 					lastActive: lastActiveText,
 				}
@@ -138,7 +105,6 @@ export async function GET() {
 		return NextResponse.json({
 			totalUsers,
 			activeUsers: recentlyActiveUsers.length,
-			usersByRole: formattedUsersByRole,
 			usersByArea: formattedUsersByArea.sort(
 				(a: { count: number }, b: { count: number }) => b.count - a.count
 			),

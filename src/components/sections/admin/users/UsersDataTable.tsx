@@ -75,10 +75,10 @@ export function UsersDataTable() {
 			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
 				<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>
 
-				<div className="my-4 flex flex-col gap-2 lg:my-0 lg:flex-row">
+				<div className="my-4 flex w-full flex-col flex-wrap gap-2 md:w-fit md:flex-row lg:my-0">
 					<Input
 						type="text"
-						className="bg-background w-full sm:w-80"
+						className="bg-background w-full md:w-80"
 						placeholder="Buscar por Nombre, Email o RUT..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
@@ -94,7 +94,7 @@ export function UsersDataTable() {
 						}}
 						value={(table.getColumn("area")?.getFilterValue() as string) ?? "all"}
 					>
-						<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
+						<SelectTrigger className="border-input bg-background w-full border md:w-fit">
 							<SelectValue placeholder="Área" />
 						</SelectTrigger>
 						<SelectContent>

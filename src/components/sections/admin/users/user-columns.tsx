@@ -3,11 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 
-import { UserRolesLabels } from "@/lib/consts/user-roles"
-import { type MODULES, USER_ROLE } from "@prisma/client"
-import { ModulesLabels } from "@/lib/consts/modules"
+import { USER_ROLE_LABELS } from "@/lib/permissions"
 import { AreasLabels } from "@/lib/consts/areas"
-import { cn } from "@/lib/utils"
+import { USER_ROLE } from "@prisma/client"
 
 import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { Badge } from "@/components/ui/badge"
@@ -51,23 +49,6 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		header: "RUT",
 	},
 	{
-		accessorKey: "role",
-		header: "Rol",
-		cell: ({ row }) => {
-			const role = row.getValue("role") as USER_ROLE
-
-			return (
-				<Badge
-					className={cn("border-green-500 bg-green-500/10 text-green-500", {
-						"border-purple-500 bg-purple-500/10 text-purple-500": role === USER_ROLE.ADMIN,
-					})}
-				>
-					{UserRolesLabels[role]}
-				</Badge>
-			)
-		},
-	},
-	{
 		accessorKey: "internalRole",
 		header: "Cargo",
 		cell: ({ row }) => {
@@ -96,16 +77,19 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		},
 	},
 	{
-		accessorKey: "modules",
-		header: "Módulos",
+		accessorKey: "role",
+		header: "Rol",
 		cell: ({ row }) => {
-			const modules = row.getValue("modules") as MODULES[]
+			const roles = row.getValue("role") as string
+
 			return (
-				<ul>
-					{modules.map((module) => (
-						<li key={module}>{ModulesLabels[module]}</li>
+				<div className="flex max-w-96 flex-wrap gap-1">
+					{roles.split(",").map((role) => (
+						<Badge key={role} className="border-green-500 bg-green-500/10 text-green-500">
+							{USER_ROLE_LABELS[role]}
+						</Badge>
 					))}
-				</ul>
+				</div>
 			)
 		},
 	},

@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 		const skip = (page - 1) * limit
 
 		const where = {
-			role: { in: [USER_ROLE.ADMIN, USER_ROLE.USER] },
+			accessRole: USER_ROLE.ADMIN,
 			...(showOnlyInternal ? { internal: { not: true } } : {}),
 			...(search
 				? {

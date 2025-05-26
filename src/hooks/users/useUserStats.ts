@@ -3,11 +3,6 @@ import { useQuery } from "@tanstack/react-query"
 interface UserStats {
 	totalUsers: number
 	activeUsers: number
-	usersByRole: {
-		role: string
-		count: number
-		color: string
-	}[]
 	usersByArea: {
 		area: string
 		count: number
@@ -20,7 +15,6 @@ interface UserStats {
 	recentlyActiveUsers: {
 		id: string
 		name: string
-		role: string
 		image: string | null
 		lastActive: string
 	}[]

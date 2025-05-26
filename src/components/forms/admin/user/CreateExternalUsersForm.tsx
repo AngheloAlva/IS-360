@@ -8,7 +8,6 @@ import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
 import { getCompanies } from "@/actions/companies/getCompanies"
-import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
 import { formatRut } from "@/utils/formatRut"
 import { cn } from "@/lib/utils"
@@ -122,8 +121,8 @@ export default function CreateExternalUsersForm(): React.ReactElement {
 					const { data: newUser, error } = await authClient.admin.createUser({
 						name: employee.name,
 						email: employee.email,
+						role: ["partnerCompany"],
 						password: temporalPassword,
-						role: USER_ROLES_VALUES.PARTNER_COMPANY,
 						data: {
 							rut: employee.rut,
 							companyId: selectedCompany?.id,
@@ -140,7 +139,8 @@ export default function CreateExternalUsersForm(): React.ReactElement {
 				(result): result is PromiseRejectedResult => result.status === "rejected"
 			)
 			const successes = results.filter(
-				(result): result is PromiseFulfilledResult<{ user: User }> => result.status === "fulfilled"
+				(result): result is PromiseFulfilledResult<{ user: User & { role: string | undefined } }> =>
+					result.status === "fulfilled"
 			)
 
 			if (errors.length > 0) {

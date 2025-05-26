@@ -9,7 +9,6 @@ import { toast } from "sonner"
 import { createUserStartupFolder } from "@/actions/users/createUserStartupFolder"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
-import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
 import {
 	partnerUsersSchema,
@@ -59,8 +58,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 					const { data: newUser, error } = await authClient.admin.createUser({
 						name: employee.name,
 						email: employee.email,
+						role: ["partnerCompany"],
 						password: temporalPassword,
-						role: USER_ROLES_VALUES.PARTNER_COMPANY,
 						data: {
 							companyId,
 							rut: employee.rut,
@@ -97,7 +96,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 				(result): result is PromiseRejectedResult => result.status === "rejected"
 			)
 			const successes = results.filter(
-				(result): result is PromiseFulfilledResult<{ user: User }> => result.status === "fulfilled"
+				(result): result is PromiseFulfilledResult<{ user: User & { role: string | undefined } }> =>
+					result.status === "fulfilled"
 			)
 
 			if (errors.length > 0) {

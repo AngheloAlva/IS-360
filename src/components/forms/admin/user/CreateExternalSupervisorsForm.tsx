@@ -7,7 +7,6 @@ import { Plus } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 import {
@@ -19,11 +18,11 @@ import { InputFormField } from "@/components/forms/shared/InputFormField"
 import { RutFormField } from "@/components/forms/shared/RutFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Card, CardContent } from "@/components/ui/card"
+import BackButton from "@/components/shared/BackButton"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 
 import type { User } from "@prisma/client"
-import BackButton from "@/components/shared/BackButton"
 
 interface CreateExternalSupervisorsFormProps {
 	companyId: string
@@ -65,8 +64,8 @@ export default function CreateExternalSupervisorsForm({
 					const { data: newUser, error } = await authClient.admin.createUser({
 						name: supervisor.name,
 						email: supervisor.email,
+						role: ["partnerCompany"],
 						password: temporalPassword,
-						role: USER_ROLES_VALUES.PARTNER_COMPANY,
 						data: {
 							companyId,
 							isSupervisor: true,
@@ -83,7 +82,8 @@ export default function CreateExternalSupervisorsForm({
 				(result): result is PromiseRejectedResult => result.status === "rejected"
 			)
 			const successes = results.filter(
-				(result): result is PromiseFulfilledResult<{ user: User }> => result.status === "fulfilled"
+				(result): result is PromiseFulfilledResult<{ user: User & { role: string | undefined } }> =>
+					result.status === "fulfilled"
 			)
 
 			if (errors.length > 0) {

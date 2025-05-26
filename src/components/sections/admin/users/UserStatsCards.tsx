@@ -1,17 +1,7 @@
 "use client"
 
-import {
-	Users,
-	Clock,
-	UserCog,
-	HardHat,
-	Briefcase,
-	Building2,
-	UserCheck,
-	ShieldCheck,
-} from "lucide-react"
+import { Clock, Building2, ShieldCheck } from "lucide-react"
 
-import { UserRolesLabels } from "@/lib/consts/user-roles"
 import { useUserStats } from "@/hooks/users/useUserStats"
 import { AreasLabels } from "@/lib/consts/areas"
 
@@ -43,39 +33,49 @@ export function UserStatsCards() {
 	}
 
 	return (
-		<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-			<Card>
+		<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6 2xl:grid-cols-5">
+			<Card className="md:col-span-2 xl:col-span-2">
 				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-					<Users className="bg-primary/10 text-primary min-h-12 min-w-12 rounded-xl p-2" />
-					<CardTitle className="font-semibold">Distribución de Usuarios por Rol</CardTitle>
+					<Building2 className="min-h-12 min-w-12 rounded-lg bg-teal-500/10 p-2 text-teal-500" />
+					<CardTitle className="font-semibold">Usuarios por Área</CardTitle>
 				</CardHeader>
-
 				<CardContent className="flex h-full flex-col justify-between gap-4">
-					<div className="space-y-2">
-						{userData.usersByRole.map((roleData) => (
-							<div key={roleData.role} className="flex items-center">
-								<div className="w-full">
-									<div className="mb-1 flex justify-between text-sm">
-										<span>{UserRolesLabels[roleData.role as keyof typeof UserRolesLabels]}</span>
-										<span>{roleData.count} usuarios</span>
-									</div>
-									<Progress
-										className="h-2"
-										indicatorClassName={`${roleData.color}`}
-										value={(roleData.count / userData.totalUsers) * 100}
-									/>
-								</div>
-							</div>
+					<div className="flex flex-wrap gap-1">
+						{userData.usersByArea.map((areaData) => (
+							<Badge
+								key={areaData.area}
+								variant="outline"
+								className="flex items-center gap-1 border-emerald-600 bg-emerald-600/5 text-emerald-600"
+							>
+								<span>{areaData.count}</span>
+								<span title={areaData.area} className="max-w-24 truncate">
+									{AreasLabels[areaData.area as keyof typeof AreasLabels]}
+								</span>
+							</Badge>
 						))}
 					</div>
 
-					<div className="text-muted-foreground text-xs">
-						Total: {userData.totalUsers} usuarios registrados
+					<div className="space-y-1.5">
+						<div className="text-muted-foreground flex items-center justify-between text-xs">
+							<span>Áreas más pobladas:</span>
+							<span>{AreasLabels[userData.usersByArea[0]?.area as keyof typeof AreasLabels]}</span>
+						</div>
+						<div className="text-muted-foreground flex items-center justify-between text-xs">
+							<span>Áreas menos pobladas:</span>
+							<span className="text-end">
+								{
+									AreasLabels[
+										userData.usersByArea[userData.usersByArea.length - 1]
+											?.area as keyof typeof AreasLabels
+									]
+								}
+							</span>
+						</div>
 					</div>
 				</CardContent>
 			</Card>
 
-			<Card>
+			<Card className="xl:col-span-2 2xl:col-span-1">
 				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
 					<ShieldCheck className="min-h-12 min-w-12 rounded-lg bg-purple-500/10 p-2 text-purple-500" />
 					<CardTitle className="font-semibold">Seguridad de Cuentas</CardTitle>
@@ -113,48 +113,7 @@ export function UserStatsCards() {
 				</CardContent>
 			</Card>
 
-			<Card>
-				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-					<Building2 className="min-h-12 min-w-12 rounded-lg bg-teal-500/10 p-2 text-teal-500" />
-					<CardTitle className="font-semibold">Usuarios por Área</CardTitle>
-				</CardHeader>
-				<CardContent className="flex h-full flex-col justify-between gap-4">
-					<div className="flex flex-wrap gap-1">
-						{userData.usersByArea.map((areaData) => (
-							<Badge
-								key={areaData.area}
-								variant="outline"
-								className="flex items-center gap-1 border-emerald-600 bg-emerald-600/5 text-emerald-600"
-							>
-								<span>{areaData.count}</span>
-								<span title={areaData.area} className="max-w-24 truncate">
-									{AreasLabels[areaData.area as keyof typeof AreasLabels]}
-								</span>
-							</Badge>
-						))}
-					</div>
-
-					<div className="space-y-1.5">
-						<div className="text-muted-foreground flex items-center justify-between text-xs">
-							<span>Áreas más pobladas:</span>
-							<span>{AreasLabels[userData.usersByArea[0]?.area as keyof typeof AreasLabels]}</span>
-						</div>
-						<div className="text-muted-foreground flex items-center justify-between text-xs">
-							<span>Áreas menos pobladas:</span>
-							<span className="text-end">
-								{
-									AreasLabels[
-									userData.usersByArea[userData.usersByArea.length - 1]
-										?.area as keyof typeof AreasLabels
-									]
-								}
-							</span>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card>
+			<Card className="xl:col-span-2">
 				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
 					<Clock className="min-h-12 min-w-12 rounded-lg bg-amber-500/10 p-2 text-amber-500" />
 					<CardTitle className="font-semibold">Usuarios Recientemente Activos</CardTitle>
@@ -174,13 +133,6 @@ export function UserStatsCards() {
 								</Avatar>
 								<div className="min-w-0 flex-1">
 									<p className="truncate text-sm font-medium">{user.name}</p>
-									<p className="text-muted-foreground flex items-center gap-1 text-xs">
-										{user.role === "ADMIN" && <UserCog className="h-3 w-3" />}
-										{user.role === "OPERATOR" && <HardHat className="h-3 w-3" />}
-										{user.role === "USER" && <UserCheck className="h-3 w-3" />}
-										{user.role === "PARTNER_COMPANY" && <Briefcase className="h-3 w-3" />}
-										<span>{UserRolesLabels[user.role as keyof typeof UserRolesLabels]}</span>
-									</p>
 								</div>
 								<div className="text-muted-foreground text-xs whitespace-nowrap">
 									{user.lastActive}

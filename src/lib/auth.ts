@@ -1,13 +1,21 @@
 import { prismaAdapter } from "better-auth/adapters/prisma"
-import { admin, twoFactor } from "better-auth/plugins"
+import { admin as adminPlugin, twoFactor } from "better-auth/plugins"
 import { nextCookies } from "better-auth/next-js"
 import { betterAuth } from "better-auth"
 
-import { USER_ROLES_VALUES } from "./consts/user-roles"
 import { resend } from "./resend"
 import prisma from "./prisma"
 
 import { OTPCodeEmailTemplate } from "@/components/emails/OTPCodeEmailTemplate"
+import {
+	ac,
+	user,
+	admin,
+	partnerCompany,
+	regulatoryCompliance,
+	integrityAndMaintenance,
+	qualityAndOperationalExcellence,
+} from "./permissions"
 
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
@@ -41,13 +49,13 @@ export const auth = betterAuth({
 			internalRole: {
 				type: "string",
 				required: false,
-				defaultValue: "NONE",
+				nullable: true,
 				input: true,
 			},
 			area: {
 				type: "string",
 				required: false,
-				allowNull: true,
+				nullable: true,
 				input: true,
 			},
 			companyId: {
@@ -65,8 +73,8 @@ export const auth = betterAuth({
 				required: false,
 				input: true,
 			},
-			modules: {
-				type: "string[]",
+			accessRole: {
+				type: "string",
 				required: false,
 				input: true,
 			},
@@ -74,9 +82,16 @@ export const auth = betterAuth({
 	},
 	plugins: [
 		nextCookies(),
-		admin({
-			adminRole: [USER_ROLES_VALUES.ADMIN, USER_ROLES_VALUES.SUPERVISOR],
-			defaultRole: USER_ROLES_VALUES.PARTNER_COMPANY,
+		adminPlugin({
+			ac,
+			roles: {
+				admin,
+				user,
+				partnerCompany,
+				regulatoryCompliance,
+				integrityAndMaintenance,
+				qualityAndOperationalExcellence,
+			},
 		}),
 		twoFactor({
 			skipVerificationOnEnable: true,

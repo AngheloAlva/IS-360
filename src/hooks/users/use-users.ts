@@ -34,8 +34,7 @@ export const useUsers = ({
 export const fetchUsers: QueryFunction<UsersResponse, ["users", UseUsersParams]> = async ({
 	queryKey,
 }) => {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [_, { page, limit, search, showOnlyInternal }]: [
+	const [, { page, limit, search, showOnlyInternal }]: [
 		string,
 		{ page?: number; limit?: number; search?: string; showOnlyInternal?: boolean },
 	] = queryKey

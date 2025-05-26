@@ -53,7 +53,8 @@ model User {
   createdAt        DateTime
   updatedAt        DateTime
   modules          MODULES[]
-  role             USER_ROLE @default(PARTNER_COMPANY)
+  role             String?
+  accessRole       USER_ROLE @default(PARTNER_COMPANY)
   internalRole     String?
   area             AREAS?
   banned           Boolean?

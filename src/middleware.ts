@@ -26,7 +26,7 @@ export default async function authMiddleware(request: NextRequest) {
 		request.nextUrl.pathname.startsWith("/admin/dashboard") ||
 		request.nextUrl.pathname.startsWith("/dashboard/documentacion")
 	) {
-		if (session.user.role === "PARTNER_COMPANY" || session.user.role === "SUPERVISOR") {
+		if (session.user.accessRole === "PARTNER_COMPANY" || session.user.accessRole === "SUPERVISOR") {
 			return NextResponse.redirect(new URL("/dashboard/permiso-de-trabajo", request.url))
 		}
 	}

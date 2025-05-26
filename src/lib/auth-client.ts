@@ -2,6 +2,15 @@ import { adminClient, inferAdditionalFields, twoFactorClient } from "better-auth
 import { createAuthClient } from "better-auth/react"
 
 import type { auth } from "./auth"
+import {
+	ac,
+	admin,
+	user,
+	partnerCompany,
+	regulatoryCompliance,
+	integrityAndMaintenance,
+	qualityAndOperationalExcellence,
+} from "./permissions"
 
 export const authClient = createAuthClient({
 	baseURL: process.env.NEXT_PUBLIC_BASE_URL!,
@@ -11,5 +20,19 @@ export const authClient = createAuthClient({
 			maxAge: 5 * 60,
 		},
 	},
-	plugins: [adminClient(), inferAdditionalFields<typeof auth>(), twoFactorClient()],
+	plugins: [
+		adminClient({
+			ac,
+			roles: {
+				admin,
+				user,
+				partnerCompany,
+				regulatoryCompliance,
+				integrityAndMaintenance,
+				qualityAndOperationalExcellence,
+			},
+		}),
+		inferAdditionalFields<typeof auth>(),
+		twoFactorClient(),
+	],
 })

@@ -1,17 +1,16 @@
 "use client"
 
+import { EditIcon, PlayIcon, PlusIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { EditIcon, PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { USER_ROLE, USER_ROLE_DESCRIPTIONS, USER_ROLE_LABELS } from "@/lib/permissions"
 import { UserAreaOptions, UserAreasValuesArray } from "@/lib/consts/areas"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
-import { InternalUserRoleOptions } from "@/lib/consts/user-roles"
 import { updateInternalUser } from "@/actions/users/updateUser"
-import { ModuleOptions } from "@/lib/consts/modules"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
@@ -55,9 +54,8 @@ export default function InternalUserFormSheet({
 			name: initialData?.name || "",
 			email: initialData?.email || "",
 			phone: initialData?.phone || "",
-			role: initialData?.role || "USER",
-			modules: initialData?.modules || [],
 			internalRole: initialData?.internalRole || "",
+			role: initialData?.role ? initialData.role.split(",") : [USER_ROLE.user],
 			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
 		},
 	})
@@ -69,16 +67,21 @@ export default function InternalUserFormSheet({
 
 		try {
 			if (!initialData) {
+				if (!values.role.length) {
+					toast.error("Por favor, selecciona un rol")
+					return
+				}
+
 				const { data, error } = await authClient.admin.createUser({
 					name: values.name,
-					role: values.role,
 					email: values.email,
 					password: temporalPassword,
+					role: values.role as ["user"],
 					data: {
 						rut: values.rut,
 						area: values.area,
 						phone: values.phone,
-						modules: values.modules,
+						accessRole: "ADMIN",
 						internalRole: values.internalRole,
 					},
 				})
@@ -109,7 +112,7 @@ export default function InternalUserFormSheet({
 
 				await authClient.admin.setRole({
 					userId: data.user.id,
-					role: values.role,
+					role: values.role as ["user"],
 				})
 				sendNewUserEmail({
 					name: values.name,
@@ -163,13 +166,15 @@ export default function InternalUserFormSheet({
 		}
 	}
 
+	const selectedRoles = form.watch("role")
+
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
 				className={cn(
-					"bg-primary hover:bg-primary/80 flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-sm text-white",
+					"bg-primary hover:bg-primary/80 flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-sm text-white transition-colors",
 					{
-						"bg-primary/10 text-primary hover:textwhi size-8 gap-0 p-1": initialData,
+						"bg-primary/10 text-primary size-8 gap-0 p-1 hover:text-white": initialData,
 					}
 				)}
 				onClick={() => setOpen(true)}
@@ -179,7 +184,7 @@ export default function InternalUserFormSheet({
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">
-				<SheetHeader>
+				<SheetHeader className="shadow">
 					<SheetTitle>{initialData ? "Editar Usuario" : "Nuevo Usuario"}</SheetTitle>
 					<SheetDescription>
 						{initialData
@@ -191,7 +196,7 @@ export default function InternalUserFormSheet({
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-2 gap-y-5 px-4 pt-4 sm:grid-cols-2"
+						className="grid gap-x-2 gap-y-5 overflow-y-auto px-4 pt-4 pb-14 sm:grid-cols-2"
 					>
 						<InputFormField<InternalUserSchema>
 							name="name"
@@ -221,14 +226,6 @@ export default function InternalUserFormSheet({
 							placeholder="9 XXXX XXXX"
 						/>
 
-						<SelectFormField<InternalUserSchema>
-							name="role"
-							label="Rol"
-							control={form.control}
-							options={InternalUserRoleOptions}
-							placeholder="Selecciona un rol"
-						/>
-
 						<InputFormField<InternalUserSchema>
 							name="internalRole"
 							label="Cargo"
@@ -245,14 +242,27 @@ export default function InternalUserFormSheet({
 						/>
 
 						<MultiSelectFormField<InternalUserSchema>
-							name="modules"
-							label="Módulos"
+							name="role"
+							label="Rol"
 							control={form.control}
-							options={ModuleOptions}
 							itemClassName="sm:col-span-2"
-							placeholder="Selecciona módulos"
-							description="Estos son los modulos en los cuales el usuario podra crear, editar, o eliminar."
+							options={Array.from(Object.values(USER_ROLE)).map((role) => ({
+								value: role,
+								label: USER_ROLE_LABELS[role],
+							}))}
+							placeholder="Selecciona un rol"
 						/>
+
+						<div className="text-text/80 flex flex-col gap-1 text-sm sm:col-span-2">
+							<p className="text-text font-semibold">Roles seleccionados:</p>
+
+							{selectedRoles.map((role) => (
+								<p key={role}>
+									<PlayIcon className="mr-1 inline h-3 w-3" />
+									{USER_ROLE_DESCRIPTIONS[role]}
+								</p>
+							))}
+						</div>
 
 						<SubmitButton
 							isSubmitting={loading}

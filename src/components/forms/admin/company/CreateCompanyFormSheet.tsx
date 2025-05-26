@@ -11,7 +11,6 @@ import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { createCompany } from "@/actions/companies/createCompany"
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-type"
-import { USER_ROLES_VALUES } from "@/lib/consts/user-roles"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
 
@@ -90,7 +89,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 							name: supervisor.name,
 							email: supervisor.email,
 							password: temporalPassword,
-							role: USER_ROLES_VALUES.PARTNER_COMPANY,
+							role: ["partnerCompany"],
 							data: {
 								companyId: data.id,
 								rut: supervisor.rut,
@@ -103,7 +102,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 
 						await authClient.admin.setRole({
 							userId: newUser.user.id,
-							role: USER_ROLES_VALUES.SUPERVISOR,
+							role: ["partnerCompany"],
 						})
 
 						sendNewUserEmail({
@@ -119,7 +118,9 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 					(result): result is PromiseRejectedResult => result.status === "rejected"
 				)
 				const successes = results.filter(
-					(result): result is PromiseFulfilledResult<{ user: User }> =>
+					(
+						result
+					): result is PromiseFulfilledResult<{ user: User & { role: string | undefined } }> =>
 						result.status === "fulfilled"
 				)
 

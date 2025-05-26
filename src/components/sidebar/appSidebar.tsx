@@ -153,8 +153,8 @@ interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ session, ...props }: AppSidebarProps) {
-	const canAccessAdminRoutes = session.user.role === "ADMIN"
-	const canAccessUserRoutes = session.user.role === "USER"
+	const canAccessAdminRoutes = session.user.accessRole === "ADMIN"
+	const canAccessUserRoutes = session.user.accessRole === "USER"
 
 	const navItems = [
 		...(!canAccessAdminRoutes && !canAccessUserRoutes ? data.navMain : []),

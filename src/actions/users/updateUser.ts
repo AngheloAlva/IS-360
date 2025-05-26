@@ -40,11 +40,16 @@ interface UpdateInternalUserProps {
 
 export const updateInternalUser = async ({ userId, values }: UpdateInternalUserProps) => {
 	try {
+		const { role, ...rest } = values
+
 		const user = await prisma.user.update({
 			where: {
 				id: userId,
 			},
-			data: values,
+			data: {
+				...rest,
+				role: role.join(","),
+			},
 		})
 
 		return {

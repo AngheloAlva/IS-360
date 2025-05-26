@@ -1,13 +1,28 @@
+import { headers } from "next/headers"
+
+import { auth } from "@/lib/auth"
+
 import { MaintenancePlanDataTable } from "@/components/sections/admin/maintenance-plans/MaintenancePlanDataTable"
 import MaintenancePlanForm from "@/components/forms/maintenance-plan/MaintenancePlanForm"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
 
 export default async function MaintenancePlansPage() {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
+
 	if (!session?.user?.id) return null
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				maintenancePlan: ["create"],
+			},
+		},
+	})
+
+	console.log(hasPermission)
+
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<div className="flex items-start justify-between gap-4 md:flex-row">
@@ -18,7 +33,7 @@ export default async function MaintenancePlansPage() {
 					</p>
 				</div>
 
-				<MaintenancePlanForm userId={session.user.id} />
+				{hasPermission.success && <MaintenancePlanForm userId={session.user.id} />}
 			</div>
 
 			<MaintenancePlanDataTable />
