@@ -97,7 +97,6 @@ export const partnerCompany = ac.newRole({
 export const USER_ROLE = {
 	user: "user",
 	admin: "admin",
-	partnerCompany: "partnerCompany",
 	regulatoryCompliance: "regulatoryCompliance",
 	integrityAndMaintenance: "integrityAndMaintenance",
 	qualityAndOperationalExcellence: "qualityAndOperationalExcellence",

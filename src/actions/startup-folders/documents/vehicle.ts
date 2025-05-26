@@ -7,6 +7,7 @@ import { z } from "zod"
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
 import type { UploadResult } from "@/lib/upload-files"
+import { sendRequestReviewEmail } from "../send-request-review-email"
 
 export const createVehicleDocument = async ({
 	data: { folderId, name, type, expirationDate, vehicleId, documentId },
@@ -144,6 +145,18 @@ export const submitVehicleDocumentForReview = async ({
 	try {
 		const folder = await prisma.vehicleFolder.findUnique({
 			where: { id: folderId },
+			select: {
+				startupFolder: {
+					select: {
+						company: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
+				status: true,
+			},
 		})
 
 		if (!folder) {
@@ -177,7 +190,10 @@ export const submitVehicleDocumentForReview = async ({
 			}),
 		])
 
-		// TODO: Send emails to OTC members
+		await sendRequestReviewEmail({
+			companyName: folder.startupFolder.company.name,
+			folderName: "Carpeta de Equipos y Vehículos",
+		})
 
 		return {
 			ok: true,

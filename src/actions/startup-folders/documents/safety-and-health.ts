@@ -7,6 +7,7 @@ import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/start
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
 import type { UploadResult } from "@/lib/upload-files"
 import { z } from "zod"
+import { sendRequestReviewEmail } from "../send-request-review-email"
 
 export const createSafetyAndHealthDocument = async ({
 	data: { name, folderId, type, expirationDate, documentId },
@@ -145,6 +146,18 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 	try {
 		const folder = await prisma.safetyAndHealthFolder.findUnique({
 			where: { id: folderId },
+			select: {
+				startupFolder: {
+					select: {
+						company: {
+							select: {
+								name: true,
+							},
+						},
+					},
+				},
+				status: true,
+			},
 		})
 
 		if (!folder) {
@@ -178,7 +191,10 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 			}),
 		])
 
-		// TODO: Send emails to OTC members
+		await sendRequestReviewEmail({
+			companyName: folder.startupFolder.company.name,
+			folderName: "Carpeta de Seguridad y Salud Ocupacional",
+		})
 
 		return {
 			ok: true,

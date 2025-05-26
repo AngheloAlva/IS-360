@@ -7,6 +7,7 @@ import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/start
 import { ReviewStatus, type EnvironmentalDocType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
 import { z } from "zod"
+import { sendRequestReviewEmail } from "../send-request-review-email"
 
 export const createEnvironmentalDocument = async ({
 	data: { name, folderId, type, expirationDate, documentId },
@@ -146,6 +147,14 @@ export const submitEnvironmentalDocumentForReview = async ({
 	try {
 		const folder = await prisma.environmentalFolder.findUnique({
 			where: { id: folderId },
+			select: {
+				startupFolder: {
+					select: {
+						company: true,
+					},
+				},
+				status: true,
+			},
 		})
 
 		if (!folder) {
@@ -179,7 +188,10 @@ export const submitEnvironmentalDocumentForReview = async ({
 			}),
 		])
 
-		// TODO: Send emails to OTC members
+		await sendRequestReviewEmail({
+			companyName: folder.startupFolder.company.name,
+			folderName: "Carpeta Medio Ambiente",
+		})
 
 		return {
 			ok: true,

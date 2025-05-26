@@ -67,14 +67,15 @@ const TreeNode = memo(function TreeNode({
 					"hover:bg-accent/50 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm",
 					"transition-colors duration-200",
 					{
-						"ml-4": level === 0,
-						"ml-8": level === 1,
-						"ml-12": level === 2,
-						"ml-16": level === 3,
-						"ml-20": level === 4,
-						"ml-24": level === 5,
-						"ml-28": level === 6,
-						"ml-32": level > 6,
+						"ml-0": level === 0,
+						"ml-4": level === 1,
+						"ml-8": level === 2,
+						"ml-12": level === 3,
+						"ml-16": level === 4,
+						"ml-20": level === 5,
+						"ml-24": level === 6,
+						"ml-28": level === 7,
+						"ml-32": level > 8,
 					}
 				)}
 				onClick={handleToggle}
@@ -235,8 +236,13 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 				className
 			)}
 		>
+			<h2 className="truncate font-semibold">Ramificación de {area}</h2>
+			<p className="text-muted-foreground mb-4 line-clamp-2 w-full max-w-64 truncate text-sm text-wrap">
+				Click en una carpeta para expandirla, o doble click para ir a la carpeta
+			</p>
+
 			{!rootNodes.length && !loadedNodes.root ? (
-				<div className="space-y-2 pt-2 pl-8">
+				<div className="space-y-2 pt-2">
 					<Skeleton className="h-6 w-3/4" />
 					<Skeleton className="h-6 w-3/4" />
 					<Skeleton className="h-6 w-3/4" />

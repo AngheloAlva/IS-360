@@ -60,6 +60,9 @@ export async function GET(req: NextRequest) {
 							files: {
 								where: { isActive: true },
 							},
+							subFolders: {
+								where: { isActive: true },
+							},
 						},
 					},
 				},

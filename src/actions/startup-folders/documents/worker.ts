@@ -1,6 +1,7 @@
 "use server"
 
 import { ReviewStatus, type WorkerDocumentType } from "@prisma/client"
+import { sendRequestReviewEmail } from "../send-request-review-email"
 import prisma from "@/lib/prisma"
 import { z } from "zod"
 
@@ -167,6 +168,11 @@ export const submitWorkerDocumentForReview = async ({
 				startupFolder: {
 					select: {
 						id: true,
+						company: {
+							select: {
+								name: true,
+							},
+						},
 					},
 				},
 			},
@@ -215,7 +221,10 @@ export const submitWorkerDocumentForReview = async ({
 			})
 		})
 
-		// TODO: Send emails to OTC members
+		await sendRequestReviewEmail({
+			companyName: folder.startupFolder.company.name,
+			folderName: "Carpeta de Trabajadores",
+		})
 
 		return {
 			ok: true,

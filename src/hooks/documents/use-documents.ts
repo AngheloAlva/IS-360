@@ -8,6 +8,7 @@ export interface Folder extends FolderType {
 	}
 	_count: {
 		files: number
+		subFolders: number
 	}
 }
 

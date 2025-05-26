@@ -139,7 +139,9 @@ export function FileExplorer({
 											}
 										)}
 									>
-										{item._count.files} archivos
+										{item._count.files > 0 || item._count.subFolders > 0
+											? "Si contiene información"
+											: "No contiene información"}
 									</span>
 								</div>
 

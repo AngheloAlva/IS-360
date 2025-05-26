@@ -2,6 +2,7 @@
 
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { sendReviewNotificationEmail } from "./send-review-notification-email"
 
 interface SendFolderReviewProps {
 	userId: string
@@ -18,6 +19,8 @@ export const sendFolderReview = async ({
 }: SendFolderReviewProps) => {
 	try {
 		let folder
+		let companyName: string
+		let additionalNotificationEmails: string[]
 		const newStatus = isApproved ? ReviewStatus.APPROVED : ReviewStatus.DRAFT
 
 		switch (category) {
@@ -33,7 +36,21 @@ export const sendFolderReview = async ({
 						},
 						submittedAt: new Date(),
 					},
+					select: {
+						startupFolder: {
+							select: {
+								company: {
+									select: {
+										name: true,
+									},
+								},
+							},
+						},
+						additionalNotificationEmails: true,
+					},
 				})
+				companyName = folder.startupFolder.company.name
+				additionalNotificationEmails = folder.additionalNotificationEmails
 				const safetyAndHealthDocuments = await prisma.safetyAndHealthDocument.findMany({
 					where: { folderId: folderId },
 				})
@@ -62,7 +79,29 @@ export const sendFolderReview = async ({
 						},
 						submittedAt: new Date(),
 					},
+					select: {
+						startupFolder: {
+							select: {
+								company: {
+									select: {
+										name: true,
+									},
+								},
+							},
+						},
+						additionalNotificationEmails: true,
+					},
 				})
+
+				if (!folder) {
+					return {
+						ok: false,
+						message: "Carpeta no encontrada",
+					}
+				}
+
+				companyName = folder.startupFolder.company.name
+				additionalNotificationEmails = folder.additionalNotificationEmails
 				const environmentalDocuments = await prisma.environmentalDocument.findMany({
 					where: { folderId: folderId },
 				})
@@ -78,10 +117,18 @@ export const sendFolderReview = async ({
 						},
 					})
 				})
+				companyName = folder.startupFolder.company.name
 				break
 			case DocumentCategory.PERSONNEL:
 				folder = await prisma.startupFolder.findFirst({
 					where: { id: folderId },
+					select: {
+						company: {
+							select: {
+								name: true,
+							},
+						},
+					},
 				})
 				if (!folder) {
 					return {
@@ -89,10 +136,17 @@ export const sendFolderReview = async ({
 						message: "Carpeta no encontrada",
 					}
 				}
+				companyName = folder.company.name
 
 				const workerFolders = await prisma.workerFolder.findMany({
 					where: { startupFolderId: folderId },
+					select: {
+						id: true,
+						additionalNotificationEmails: true,
+					},
 				})
+
+				additionalNotificationEmails = workerFolders[0].additionalNotificationEmails
 
 				workerFolders.forEach(async (folder) => {
 					await prisma.workerFolder.update({
@@ -123,6 +177,13 @@ export const sendFolderReview = async ({
 			case DocumentCategory.VEHICLES:
 				folder = await prisma.startupFolder.findFirst({
 					where: { id: folderId },
+					select: {
+						company: {
+							select: {
+								name: true,
+							},
+						},
+					},
 				})
 				if (!folder) {
 					return {
@@ -131,9 +192,17 @@ export const sendFolderReview = async ({
 					}
 				}
 
+				companyName = folder.company.name
+
 				const vehicleFolders = await prisma.vehicleFolder.findMany({
 					where: { startupFolderId: folderId },
+					select: {
+						id: true,
+						additionalNotificationEmails: true,
+					},
 				})
+
+				additionalNotificationEmails = vehicleFolders[0].additionalNotificationEmails
 
 				vehicleFolders.forEach(async (folder) => {
 					await prisma.vehicleFolder.update({
@@ -170,7 +239,11 @@ export const sendFolderReview = async ({
 			}
 		}
 
-		// TODO: Add notification to folder.additionalNotificationEmails
+		await sendReviewNotificationEmail({
+			companyName,
+			emails: additionalNotificationEmails,
+			folderName: "Carpeta de Seguridad y Salud Ocupacional",
+		})
 
 		return {
 			ok: true,
