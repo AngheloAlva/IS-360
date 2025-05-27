@@ -115,10 +115,10 @@ export const getDocumentStatus = (
 	const isUploaded = !!document && document.url !== ""
 
 	return {
+		status,
 		document,
 		isUploaded,
 		isRequired,
 		description,
-		status,
 	}
 }

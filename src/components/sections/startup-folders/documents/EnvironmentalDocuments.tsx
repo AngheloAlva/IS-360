@@ -27,8 +27,10 @@ export default function EnvironmentalDocuments({
 	const totalDocs = ENVIRONMENTAL_STRUCTURE.documents.length
 	const completedDocs = ENVIRONMENTAL_STRUCTURE.documents.filter(
 		(doc: StartupFolderStructure["documents"][number]) =>
-			getDocumentStatus(DocumentCategory.ENVIRONMENTAL, doc.type, folder.documents).isUploaded
+			getDocumentStatus(DocumentCategory.ENVIRONMENTAL, doc.type, folder.documents).status ===
+			"APPROVED"
 	).length
+	console.log("completedDocs", completedDocs)
 	const requiredPending = ENVIRONMENTAL_STRUCTURE.documents.filter(
 		(doc: StartupFolderStructure["documents"][number]) =>
 			!getDocumentStatus(DocumentCategory.ENVIRONMENTAL, doc.type, folder.documents).isUploaded &&
@@ -37,7 +39,7 @@ export default function EnvironmentalDocuments({
 
 	const sectionDescription = ENVIRONMENTAL_STRUCTURE.description
 
-	const progressPercentage = totalDocs > 0 ? Math.round((completedDocs / totalDocs) * 100) : 0
+	const progressPercentage = totalDocs > 0 ? (completedDocs / totalDocs) * 100 : 0
 
 	const isEditable = folder.status === ReviewStatus.DRAFT
 
@@ -80,6 +82,7 @@ export default function EnvironmentalDocuments({
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
+					userId={userId}
 					folderId={folder.id}
 					companyId={companyId}
 					disabled={!isEditable}

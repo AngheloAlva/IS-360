@@ -37,13 +37,13 @@ export default function WorkerDocuments({
 
 	folders.forEach((folder) => {
 		WORKER_STRUCTURE.documents.forEach((docStruct) => {
-			const { isUploaded, isRequired } = getDocumentStatus(
+			const { isUploaded, isRequired, status } = getDocumentStatus(
 				WORKER_STRUCTURE.category as DocumentCategory,
 				docStruct.type,
 				folder.documents
 			)
 
-			if (isUploaded) overallUploadedDocsCount++
+			if (status === "APPROVED") overallUploadedDocsCount++
 			if (isRequired && !isUploaded) overallRequiredPendingDocsCount++
 		})
 	})
@@ -143,6 +143,7 @@ export default function WorkerDocuments({
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
+					userId={userId}
 					folderType="WORKER"
 					companyId={companyId}
 					folderId={startupFolderId}

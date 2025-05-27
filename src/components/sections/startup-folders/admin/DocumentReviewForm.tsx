@@ -153,7 +153,9 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 
 					<DialogFooter className="flex justify-end pt-4">
 						<DialogClose>
-							<Button variant={"secondary"}>Cancelar</Button>
+							<Button type="button" variant={"secondary"}>
+								Cancelar
+							</Button>
 						</DialogClose>
 						<Button
 							type="submit"

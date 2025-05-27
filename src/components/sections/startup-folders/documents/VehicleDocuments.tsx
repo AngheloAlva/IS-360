@@ -40,13 +40,13 @@ export default function VehicleDocuments({
 
 	folders.forEach((folder) => {
 		VEHICLE_STRUCTURE.documents.forEach((docStruct) => {
-			const { isUploaded, isRequired } = getDocumentStatus(
+			const { isUploaded, isRequired, status } = getDocumentStatus(
 				VEHICLE_STRUCTURE.category as DocumentCategory,
 				docStruct.type,
 				folder.documents
 			)
 
-			if (isUploaded) overallUploadedDocsCount++
+			if (status === "APPROVED") overallUploadedDocsCount++
 			if (isRequired && !isUploaded) overallRequiredPendingDocsCount++
 		})
 	})
@@ -216,6 +216,7 @@ export default function VehicleDocuments({
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
+					userId={userId}
 					folderType="VEHICLE"
 					companyId={companyId}
 					folderId={startupFolderId}

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog"
 
 interface SubmitReviewRequestDialogProps {
+	userId: string
 	folderId: string
 	companyId: string
 	disabled: boolean
@@ -35,6 +36,7 @@ interface SubmitReviewRequestDialogProps {
 }
 
 export function SubmitReviewRequestDialog({
+	userId,
 	folderId,
 	disabled,
 	companyId,
@@ -106,6 +108,7 @@ export function SubmitReviewRequestDialog({
 				)
 				result = await submitWorkerDocumentForReview({
 					emails,
+					userId,
 					folderId,
 				})
 			} else if (folderType === "VEHICLE") {
@@ -114,6 +117,7 @@ export function SubmitReviewRequestDialog({
 				)
 				result = await submitVehicleDocumentForReview({
 					emails,
+					userId,
 					folderId,
 				})
 			} else if (folderType === "ENVIRONMENTAL") {
@@ -122,6 +126,7 @@ export function SubmitReviewRequestDialog({
 				)
 				result = await submitEnvironmentalDocumentForReview({
 					emails,
+					userId,
 					folderId,
 				})
 			} else if (folderType === "SAFETY_AND_HEALTH") {
@@ -130,6 +135,7 @@ export function SubmitReviewRequestDialog({
 				)
 				result = await submitSafetyAndHealthDocumentForReview({
 					emails,
+					userId,
 					folderId,
 				})
 			} else {

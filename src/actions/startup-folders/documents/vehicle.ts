@@ -130,16 +130,22 @@ export const updateVehicleDocument = async ({
 
 export const submitVehicleDocumentForReview = async ({
 	emails,
+	userId,
 	folderId,
 }: {
+	userId: string
 	emails: string[]
 	folderId: string
 }) => {
-	if (!emails || emails.length === 0) {
-		return {
-			ok: false,
-			message: "Por favor, ingresa al menos un correo electrónico.",
-		}
+	const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: {
+			email: true,
+		},
+	})
+
+	if (!user) {
+		return { ok: false, message: "Usuario no encontrado." }
 	}
 
 	try {
@@ -176,7 +182,7 @@ export const submitVehicleDocumentForReview = async ({
 				data: {
 					submittedAt: new Date(),
 					status: ReviewStatus.SUBMITTED,
-					additionalNotificationEmails: emails,
+					additionalNotificationEmails: [...emails, user.email],
 				},
 			}),
 			prisma.vehicleDocument.updateMany({

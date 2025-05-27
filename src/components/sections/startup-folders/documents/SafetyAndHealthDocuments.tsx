@@ -27,7 +27,8 @@ export default function SafetyAndHealthDocuments({
 	const totalDocs = SAFETY_AND_HEALTH_STRUCTURE.documents.length
 	const completedDocs = SAFETY_AND_HEALTH_STRUCTURE.documents.filter(
 		(doc: StartupFolderStructure["documents"][number]) =>
-			getDocumentStatus(DocumentCategory.SAFETY_AND_HEALTH, doc.type, folder.documents).isUploaded
+			getDocumentStatus(DocumentCategory.SAFETY_AND_HEALTH, doc.type, folder.documents).status ===
+			"APPROVED"
 	).length
 	const requiredPending = SAFETY_AND_HEALTH_STRUCTURE.documents.filter(
 		(doc: StartupFolderStructure["documents"][number]) =>
@@ -81,6 +82,7 @@ export default function SafetyAndHealthDocuments({
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog
+					userId={userId}
 					folderId={folder.id}
 					companyId={companyId}
 					disabled={!isEditable}
