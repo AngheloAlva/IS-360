@@ -63,6 +63,7 @@ model User {
   rut              String
   twoFactorEnabled Boolean?
   internal         Boolean   @default(false)
+  documentAreas    AREAS[]   @default([])
 
   sessions                       Session[]
   accounts                       Account[]

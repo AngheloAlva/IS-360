@@ -55,20 +55,22 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 					<h1 className="text-text text-3xl font-bold">{areaName}</h1>
 				</div>
 
-				<div className="ml-auto flex gap-2">
-					<NewFileFormSheet
-						areaValue={areaValue}
-						userId={data.user.id}
-						parentFolderId={folderId}
-						area={area as keyof typeof Areas}
-					/>
+				{data.user.documentAreas.includes(areaValue) && (
+					<div className="ml-auto flex gap-2">
+						<NewFileFormSheet
+							areaValue={areaValue}
+							userId={data.user.id}
+							parentFolderId={folderId}
+							area={area as keyof typeof Areas}
+						/>
 
-					<NewFolderFormSheet
-						area={area as keyof typeof Areas}
-						userId={data.user.id}
-						parentFolderId={folderId}
-					/>
-				</div>
+						<NewFolderFormSheet
+							area={area as keyof typeof Areas}
+							userId={data.user.id}
+							parentFolderId={folderId}
+						/>
+					</div>
+				)}
 			</div>
 
 			<FileExplorer

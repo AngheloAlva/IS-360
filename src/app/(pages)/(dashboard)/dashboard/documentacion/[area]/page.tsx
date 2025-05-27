@@ -9,6 +9,8 @@ import { NewFileFormSheet } from "@/components/forms/document-management/NewFile
 import { FileExplorer } from "@/components/sections/documentation/FileExplorer"
 import BackButton from "@/components/shared/BackButton"
 
+import type { AREAS } from "@prisma/client"
+
 interface PageProps {
 	params: Promise<{
 		area: string
@@ -47,11 +49,13 @@ export default async function AreaRootPage({ params }: PageProps) {
 					<h1 className="text-text text-3xl font-bold">{areaName}</h1>
 				</div>
 
-				<div className="ml-auto flex gap-2">
-					<NewFileFormSheet areaValue={areaValue} area={areaKey} userId={data.user.id} />
+				{data.user.documentAreas.includes(areaValue) && (
+					<div className="ml-auto flex gap-2">
+						<NewFileFormSheet areaValue={areaValue} area={areaKey} userId={data.user.id} />
 
-					<NewFolderFormSheet area={areaKey} userId={data.user.id} />
-				</div>
+						<NewFolderFormSheet area={areaKey} userId={data.user.id} />
+					</div>
+				)}
 			</div>
 
 			<FileExplorer
@@ -60,6 +64,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 				foldersSlugs={[area]}
 				userRole={data.user.role}
 				canUpdate={hasPermission.success}
+				userDocumentAreas={data.user.documentAreas as AREAS[]}
 			/>
 		</div>
 	)

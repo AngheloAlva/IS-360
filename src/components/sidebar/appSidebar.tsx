@@ -16,6 +16,7 @@ import {
 	LayoutList,
 	MonitorPlay,
 	Construction,
+	Car,
 } from "lucide-react"
 
 import { NavSecondary } from "./navSecondary"
@@ -45,6 +46,11 @@ const data = {
 			name: "Colaboradores",
 			url: "/dashboard/colaboradores",
 			icon: Users,
+		},
+		{
+			name: "Vehículos",
+			url: "/dashboard/vehiculos",
+			icon: Car,
 		},
 		{
 			name: "Carpetas de Arranque",

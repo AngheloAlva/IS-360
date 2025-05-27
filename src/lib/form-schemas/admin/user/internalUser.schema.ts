@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { UserAreasValuesArray } from "@/lib/consts/areas"
+import { DocumentAreasValuesArray, UserAreasValuesArray } from "@/lib/consts/areas"
 import { rutRegex } from "@/lib/form-schemas/rutRegex"
 
 export const internalUserSchema = z.object({
@@ -11,6 +11,7 @@ export const internalUserSchema = z.object({
 	role: z.array(z.string()).min(1, { message: "Debe seleccionar al menos un rol" }),
 	internalRole: z.string().optional(),
 	area: z.enum(UserAreasValuesArray).optional().nullable(),
+	documentAreas: z.array(z.enum(DocumentAreasValuesArray)).optional(),
 })
 
 export type InternalUserSchema = z.infer<typeof internalUserSchema>

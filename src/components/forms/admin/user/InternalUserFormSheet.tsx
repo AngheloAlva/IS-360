@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { UserAreaOptions, UserAreasValuesArray } from "@/lib/consts/areas"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { USER_ROLE, USER_ROLE_LABELS } from "@/lib/permissions"
@@ -18,6 +17,12 @@ import {
 	internalUserSchema,
 	type InternalUserSchema,
 } from "@/lib/form-schemas/admin/user/internalUser.schema"
+import {
+	AreaOptions,
+	UserAreaOptions,
+	type DocumentAreasValuesArray,
+	type UserAreasValuesArray,
+} from "@/lib/consts/areas"
 
 import { InputWithPrefixFormField } from "@/components/forms/shared/InputWithPrefixFormField"
 import { MultiSelectFormField } from "@/components/forms/shared/MultiSelectFormField"
@@ -56,6 +61,8 @@ export default function InternalUserFormSheet({
 			phone: initialData?.phone || "",
 			internalRole: initialData?.internalRole || "",
 			role: initialData?.role ? initialData.role.split(",") : [USER_ROLE.user],
+			documentAreas:
+				(initialData?.documentAreas as (typeof DocumentAreasValuesArray)[number][]) || [],
 			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
 		},
 	})
@@ -83,6 +90,7 @@ export default function InternalUserFormSheet({
 						phone: values.phone,
 						accessRole: "ADMIN",
 						internalRole: values.internalRole,
+						documentAreas: values.documentAreas,
 					},
 				})
 
@@ -238,6 +246,16 @@ export default function InternalUserFormSheet({
 								control={form.control}
 								options={UserAreaOptions}
 								placeholder="Selecciona un área"
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="documentAreas"
+								options={AreaOptions}
+								control={form.control}
+								label="Áreas de documentos"
+								itemClassName="sm:col-span-2"
+								placeholder="Selecciona áreas de documentos"
+								description="Estas áreas determinan en donde el usuario podrá crear, editar y eliminar documentos"
 							/>
 
 							<MultiSelectFormField<InternalUserSchema>

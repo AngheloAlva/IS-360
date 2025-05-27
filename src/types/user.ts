@@ -16,4 +16,5 @@ export interface ApiUser {
 	company: {
 		name: string
 	} | null
+	documentAreas: string[]
 }

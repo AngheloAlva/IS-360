@@ -38,6 +38,7 @@ interface FileExplorerTableProps {
 	canUpdate: boolean
 	foldersSlugs: string[]
 	userRole?: string | null
+	userDocumentAreas?: AREAS[]
 	actualFolderId?: string | null
 }
 
@@ -47,9 +48,10 @@ export function FileExplorer({
 	canUpdate,
 	foldersSlugs,
 	actualFolderId = null,
+	userDocumentAreas = [],
 }: FileExplorerTableProps) {
 	const canEdit = (userCreatorId: string) => {
-		return userCreatorId === userId
+		return userCreatorId === userId || userDocumentAreas.includes(areaValue) || canUpdate
 	}
 
 	const getFileIcon = (type: string) => {
@@ -175,7 +177,7 @@ export function FileExplorer({
 													</p>
 												</div>
 
-												{(canEdit(item.userId) || canUpdate) && (
+												{canEdit(item.userId) && (
 													<div className="mt-4 flex gap-2">
 														<UpdateFolderFormSheet userId={userId} oldFolder={item} />
 														<DeleteConfirmationDialog id={item.id} type="folder" name={item.name} />
@@ -273,7 +275,7 @@ export function FileExplorer({
 													</div>
 												</div>
 
-												{(canEdit(item.userId) || canUpdate) && (
+												{canEdit(item.userId) && (
 													<div className="mt-4 flex gap-2">
 														<UpdateFileFormSheet
 															userId={userId}

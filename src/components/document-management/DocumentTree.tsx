@@ -236,7 +236,7 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 				className
 			)}
 		>
-			<h2 className="truncate font-semibold">Ramificación de {area}</h2>
+			<h2 className="truncate font-semibold">Ramificación de {area.split("-").join(" ")}</h2>
 			<p className="text-muted-foreground mb-4 line-clamp-2 w-full max-w-64 truncate text-sm text-wrap">
 				Click en una carpeta para expandirla, o doble click para ir a la carpeta
 			</p>

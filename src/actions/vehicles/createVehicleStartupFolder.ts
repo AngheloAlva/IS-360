@@ -47,15 +47,8 @@ export const createVehicleStartupFolder = async (vehicleId: string) => {
 				return {
 					url: "",
 					name: doc.name,
-					fileType: "FILE",
-					required: doc.required,
 					category: VEHICLE_STRUCTURE.category,
 					type: doc.type as VehicleDocumentType,
-					folder: {
-						connect: {
-							id: startupFolder.id,
-						},
-					},
 				}
 			})
 			.filter((doc) => doc !== undefined)
