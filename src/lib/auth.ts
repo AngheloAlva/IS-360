@@ -5,17 +5,24 @@ import { betterAuth } from "better-auth"
 
 import { resend } from "./resend"
 import prisma from "./prisma"
-
-import { OTPCodeEmailTemplate } from "@/components/emails/OTPCodeEmailTemplate"
 import {
 	ac,
 	user,
 	admin,
+	userOperator,
 	partnerCompany,
-	regulatoryCompliance,
-	integrityAndMaintenance,
-	qualityAndOperationalExcellence,
+	companyOperator,
+	workBookOperator,
+	workOrderOperator,
+	equipmentOperator,
+	workPermitOperator,
+	safetyTalkOperator,
+	documentationOperator,
+	startupFolderOperator,
+	maintenancePlanOperator,
 } from "./permissions"
+
+import { OTPCodeEmailTemplate } from "@/components/emails/OTPCodeEmailTemplate"
 
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
@@ -87,10 +94,17 @@ export const auth = betterAuth({
 			roles: {
 				admin,
 				user,
+				userOperator,
 				partnerCompany,
-				regulatoryCompliance,
-				integrityAndMaintenance,
-				qualityAndOperationalExcellence,
+				companyOperator,
+				workBookOperator,
+				workOrderOperator,
+				equipmentOperator,
+				safetyTalkOperator,
+				workPermitOperator,
+				documentationOperator,
+				startupFolderOperator,
+				maintenancePlanOperator,
 			},
 		}),
 		twoFactor({

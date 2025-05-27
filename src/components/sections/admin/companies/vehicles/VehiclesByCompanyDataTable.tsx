@@ -65,7 +65,7 @@ export function VehiclesByCompanyDataTable({
 
 	return (
 		<section className="mt-4 flex w-full flex-col items-start gap-4">
-			<div className="flex items-center justify-between gap-2">
+			<div className="flex w-full items-center justify-between gap-2">
 				<h2 className="text-text mb-4 text-2xl font-bold">Vehículos de la Empresa</h2>
 
 				<div className="flex items-center gap-2">

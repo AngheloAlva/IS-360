@@ -14,6 +14,7 @@ import { useUsers } from "@/hooks/users/use-users"
 import { AreasLabels } from "@/lib/consts/areas"
 import { UserColumns } from "./user-columns"
 
+import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,7 +40,7 @@ import {
 
 import type { ApiUser } from "@/types/user"
 
-export function UsersDataTable() {
+export function UsersDataTable({ hasPermission }: { hasPermission: boolean }) {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -128,6 +129,8 @@ export function UsersDataTable() {
 										</TableHead>
 									)
 								})}
+
+								{hasPermission && <TableHead>Acciones</TableHead>}
 							</TableRow>
 						))}
 					</TableHeader>
@@ -148,6 +151,12 @@ export function UsersDataTable() {
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</TableCell>
 										))}
+
+										{hasPermission && (
+											<TableCell>
+												<InternalUserFormSheet initialData={row.original} />
+											</TableCell>
+										)}
 									</TableRow>
 								))}
 					</TableBody>

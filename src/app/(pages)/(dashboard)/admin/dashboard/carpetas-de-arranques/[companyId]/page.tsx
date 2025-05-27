@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 
-import { USER_ROLE } from "@/lib/permissions"
 import { auth } from "@/lib/auth"
 
 import StartupFolderOverview from "@/components/sections/startup-folders/StartupFolderOverview"
@@ -24,7 +23,7 @@ export default async function StartupFolderReviewPage({
 			<StartupFolderOverview
 				companyId={companyId}
 				userId={session.user.id}
-				isOtcMember={session.user.role === USER_ROLE.admin}
+				isOtcMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>
 	)

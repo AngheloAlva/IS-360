@@ -1,7 +1,11 @@
+import { notFound } from "next/navigation"
+import { headers } from "next/headers"
+
 import { getWorkOrderById } from "@/actions/work-orders/getWorkOrders"
+import { auth } from "@/lib/auth"
+
 import UpdateWorkOrderForm from "@/components/forms/admin/work-order/UpdateWorkOrderForm"
 import BackButton from "@/components/shared/BackButton"
-import { notFound } from "next/navigation"
 
 interface Props {
 	params: Promise<{
@@ -16,6 +20,23 @@ export default async function UpdateWorkOrderPage({ params }: Props) {
 	if (!ok || !data) {
 		return notFound()
 	}
+
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) return notFound()
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				workOrder: ["create"],
+			},
+		},
+	})
+
+	if (!hasPermission.success) return notFound()
 
 	return (
 		<>

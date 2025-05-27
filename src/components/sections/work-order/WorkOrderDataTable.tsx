@@ -55,7 +55,7 @@ import {
 	DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 
-export function WorkOrderDataTable() {
+export function WorkOrderDataTable({ hasPermission }: { hasPermission: boolean }) {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -133,7 +133,7 @@ export function WorkOrderDataTable() {
 					<p className="text-muted-foreground">Visualiza y gestiona todas las ordenes de trabajo</p>
 				</div>
 
-				<CreateWorkOrderForm />
+				{hasPermission && <CreateWorkOrderForm />}
 			</div>
 
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">

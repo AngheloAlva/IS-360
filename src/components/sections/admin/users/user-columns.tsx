@@ -7,7 +7,6 @@ import { USER_ROLE_LABELS } from "@/lib/permissions"
 import { AreasLabels } from "@/lib/consts/areas"
 import { USER_ROLE } from "@prisma/client"
 
-import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { Badge } from "@/components/ui/badge"
 
 import type { ApiUser } from "@/types/user"
@@ -100,13 +99,6 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const date = row.getValue("createdAt")
 			const formattedDate = format(date as Date, "dd/MM/yyyy")
 			return <div>{formattedDate}</div>
-		},
-	},
-	{
-		accessorKey: "id",
-		header: "",
-		cell: ({ row }) => {
-			return <InternalUserFormSheet initialData={row.original} />
 		},
 	},
 ]

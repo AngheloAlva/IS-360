@@ -24,6 +24,15 @@ export default async function MaintenancePlansPage({
 
 	if (!session?.user?.id) return <div>No tienes acceso a esta página</div>
 
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				maintenancePlan: ["create"],
+			},
+		},
+	})
+
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<div className="flex items-start justify-between gap-4 md:flex-row">
@@ -41,11 +50,13 @@ export default async function MaintenancePlansPage({
 					</div>
 				</div>
 
-				<MaintenancePlanTaskForm
-					userId={session.user.id}
-					equipmentId={equipmentId}
-					maintenancePlanSlug={maintenancePlanSlug}
-				/>
+				{hasPermission.success && (
+					<MaintenancePlanTaskForm
+						userId={session.user.id}
+						equipmentId={equipmentId}
+						maintenancePlanSlug={maintenancePlanSlug}
+					/>
+				)}
 			</div>
 
 			<MaintenancePlanTaskDataTable planSlug={maintenancePlanSlug} />

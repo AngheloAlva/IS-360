@@ -75,7 +75,7 @@ export function CompanyDashboardContent({ companyId }: CompanyDashboardContentPr
 						<DashboardStatsCard
 							loading={isLoading}
 							title="Usuarios Activos"
-							href="/dashboard/usuarios"
+							href="/dashboard/colaboradores"
 							value={data?.users.total.toString() ?? "--"}
 							className="hover:border-green-500 hover:bg-green-500/10"
 							icon={

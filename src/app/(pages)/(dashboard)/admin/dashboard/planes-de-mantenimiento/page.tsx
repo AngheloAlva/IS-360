@@ -21,8 +21,6 @@ export default async function MaintenancePlansPage() {
 		},
 	})
 
-	console.log(hasPermission)
-
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<div className="flex items-start justify-between gap-4 md:flex-row">

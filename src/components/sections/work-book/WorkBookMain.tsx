@@ -18,18 +18,19 @@ import BackButton from "@/components/shared/BackButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { USER_ROLE } from "@/lib/permissions"
 
 interface WorkBookMainProps {
-	workBookId: string
-	userRole: string
 	userId: string
+	userRole: string
+	workBookId: string
+	hasPermission: boolean
 }
 
 export default function WorkBookMain({
 	userId,
 	userRole,
 	workBookId,
+	hasPermission,
 }: WorkBookMainProps): React.ReactElement {
 	const { data, isLoading, isError, isFetching } = useWorkBookById({ workOrderId: workBookId })
 
@@ -82,11 +83,10 @@ export default function WorkBookMain({
 
 	const workBook = data?.workBook
 
-	const isOtcMember = userRole === USER_ROLE.admin
 	const canAddActivities =
 		workBook.status === WORK_ORDER_STATUS.IN_PROGRESS ||
 		workBook.status === WORK_ORDER_STATUS.PLANNED
-	const canClose = workBook.workProgressStatus === 100
+	const canClose = workBook.workProgressStatus === 100 && workBook.supervisorId === userId
 
 	return (
 		<>
@@ -175,7 +175,7 @@ export default function WorkBookMain({
 										/>
 									)}
 
-									{isOtcMember && (
+									{hasPermission && (
 										<>
 											<ActivityForm
 												userId={userId}
@@ -186,7 +186,7 @@ export default function WorkBookMain({
 
 											<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
 
-											{isOtcMember &&
+											{hasPermission &&
 												userId === workBook.responsibleId &&
 												workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
 													<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />

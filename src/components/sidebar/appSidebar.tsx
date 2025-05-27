@@ -42,6 +42,16 @@ const data = {
 			icon: Home,
 		},
 		{
+			name: "Colaboradores",
+			url: "/dashboard/colaboradores",
+			icon: Users,
+		},
+		{
+			name: "Carpetas de Arranque",
+			url: "/dashboard/carpetas-de-arranque",
+			icon: Folders,
+		},
+		{
 			name: "Seguridad",
 			url: "/dashboard/charlas-de-seguridad",
 			icon: MonitorPlay,
@@ -56,16 +66,6 @@ const data = {
 			url: "/dashboard/libro-de-obras",
 			icon: BookCopy,
 		},
-		{
-			name: "Colaboradores",
-			url: "/dashboard/colaboradores",
-			icon: Users,
-		},
-		{
-			name: "Carpetas de Arranque",
-			url: "/dashboard/carpetas-de-arranque",
-			icon: Folders,
-		},
 	],
 	navAdmin: [
 		{
@@ -74,19 +74,14 @@ const data = {
 			icon: Home,
 		},
 		{
-			name: "Planes de Mantenimiento",
-			url: "/admin/dashboard/planes-de-mantenimiento",
-			icon: Construction,
-		},
-		{
-			name: "Ordenes de Trabajo",
-			url: "/admin/dashboard/ordenes-de-trabajo",
-			icon: LayoutList,
-		},
-		{
 			name: "Carpetas de Arranques",
 			url: "/admin/dashboard/carpetas-de-arranques",
 			icon: Folders,
+		},
+		{
+			name: "Charlas de Seguridad",
+			url: "/admin/dashboard/charlas-de-seguridad",
+			icon: MonitorPlay,
 		},
 		{
 			name: "Permisos de Trabajo",
@@ -94,14 +89,19 @@ const data = {
 			icon: FileText,
 		},
 		{
+			name: "Ordenes de Trabajo",
+			url: "/admin/dashboard/ordenes-de-trabajo",
+			icon: LayoutList,
+		},
+		{
 			name: "Libros de Obras",
 			url: "/admin/dashboard/libros-de-obras",
 			icon: BookCopy,
 		},
 		{
-			name: "Charlas de Seguridad",
-			url: "/admin/dashboard/charlas-de-seguridad",
-			icon: MonitorPlay,
+			name: "Planes de Mantenimiento",
+			url: "/admin/dashboard/planes-de-mantenimiento",
+			icon: Construction,
 		},
 		{
 			name: "Patrullaje",
@@ -132,9 +132,9 @@ const data = {
 
 const navInternal = [
 	{
-		name: "Equipos",
-		url: "/admin/dashboard/equipos",
-		icon: Wrench,
+		name: "Usuarios",
+		url: "/admin/dashboard/usuarios",
+		icon: Users,
 	},
 	{
 		name: "Empresas",
@@ -142,9 +142,9 @@ const navInternal = [
 		icon: Building2,
 	},
 	{
-		name: "Usuarios",
-		url: "/admin/dashboard/usuarios",
-		icon: Users,
+		name: "Equipos",
+		url: "/admin/dashboard/equipos",
+		icon: Wrench,
 	},
 ]
 

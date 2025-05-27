@@ -14,9 +14,23 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 	if (!session?.user?.id) return notFound()
 
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				workBook: ["create"],
+			},
+		},
+	})
+
 	return (
 		<div className="w-full flex-1 space-y-6 p-4">
-			<WorkBookMain workBookId={id} userId={session.user.id} userRole={session.user.role!} />
+			<WorkBookMain
+				workBookId={id}
+				userId={session.user.id}
+				userRole={session.user.role!}
+				hasPermission={hasPermission.success}
+			/>
 		</div>
 	)
 }

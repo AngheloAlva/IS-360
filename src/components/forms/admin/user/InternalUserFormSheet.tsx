@@ -1,15 +1,15 @@
 "use client"
 
-import { EditIcon, PlayIcon, PlusIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { EditIcon, PlusIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { USER_ROLE, USER_ROLE_DESCRIPTIONS, USER_ROLE_LABELS } from "@/lib/permissions"
 import { UserAreaOptions, UserAreasValuesArray } from "@/lib/consts/areas"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
+import { USER_ROLE, USER_ROLE_LABELS } from "@/lib/permissions"
 import { updateInternalUser } from "@/actions/users/updateUser"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
@@ -166,8 +166,6 @@ export default function InternalUserFormSheet({
 		}
 	}
 
-	const selectedRoles = form.watch("role")
-
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
@@ -196,72 +194,63 @@ export default function InternalUserFormSheet({
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-2 gap-y-5 overflow-y-auto px-4 pt-4 pb-14 sm:grid-cols-2"
+						className="flex h-full flex-col items-center justify-between overflow-y-auto px-4 pt-4 pb-14"
 					>
-						<InputFormField<InternalUserSchema>
-							name="name"
-							label="Nombre"
-							control={form.control}
-							placeholder="Nombre de la persona"
-						/>
+						<div className="grid gap-x-2 gap-y-5 sm:grid-cols-2">
+							<InputFormField<InternalUserSchema>
+								name="name"
+								label="Nombre"
+								control={form.control}
+								placeholder="Nombre de la persona"
+							/>
 
-						<RutFormField<InternalUserSchema> name="rut" label="RUT" control={form.control} />
+							<RutFormField<InternalUserSchema> name="rut" label="RUT" control={form.control} />
 
-						<InputFormField<InternalUserSchema>
-							name="email"
-							type="email"
-							label="Email"
-							control={form.control}
-							itemClassName="sm:col-span-2"
-							placeholder="correo@ejemplo.com"
-							disabled={!!initialData}
-						/>
+							<InputFormField<InternalUserSchema>
+								name="email"
+								type="email"
+								label="Email"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								placeholder="correo@ejemplo.com"
+								disabled={!!initialData}
+							/>
 
-						<InputWithPrefixFormField<InternalUserSchema>
-							type="tel"
-							name="phone"
-							prefix="+56"
-							label="Teléfono"
-							control={form.control}
-							placeholder="9 XXXX XXXX"
-						/>
+							<InputWithPrefixFormField<InternalUserSchema>
+								type="tel"
+								name="phone"
+								prefix="+56"
+								label="Teléfono"
+								control={form.control}
+								placeholder="9 XXXX XXXX"
+							/>
 
-						<InputFormField<InternalUserSchema>
-							name="internalRole"
-							label="Cargo"
-							control={form.control}
-							placeholder="Cargo del usuario"
-						/>
+							<InputFormField<InternalUserSchema>
+								name="internalRole"
+								label="Cargo"
+								control={form.control}
+								placeholder="Cargo del usuario"
+							/>
 
-						<SelectFormField<InternalUserSchema>
-							name="area"
-							label="Área"
-							control={form.control}
-							options={UserAreaOptions}
-							placeholder="Selecciona un área"
-						/>
+							<SelectFormField<InternalUserSchema>
+								name="area"
+								label="Área"
+								control={form.control}
+								options={UserAreaOptions}
+								placeholder="Selecciona un área"
+							/>
 
-						<MultiSelectFormField<InternalUserSchema>
-							name="role"
-							label="Rol"
-							control={form.control}
-							itemClassName="sm:col-span-2"
-							options={Array.from(Object.values(USER_ROLE)).map((role) => ({
-								value: role,
-								label: USER_ROLE_LABELS[role],
-							}))}
-							placeholder="Selecciona un rol"
-						/>
-
-						<div className="text-text/80 flex flex-col gap-1 text-sm sm:col-span-2">
-							<p className="text-text font-semibold">Roles seleccionados:</p>
-
-							{selectedRoles.map((role) => (
-								<p key={role}>
-									<PlayIcon className="mr-1 inline h-3 w-3" />
-									{USER_ROLE_DESCRIPTIONS[role]}
-								</p>
-							))}
+							<MultiSelectFormField<InternalUserSchema>
+								name="role"
+								label="Rol"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								options={Array.from(Object.values(USER_ROLE)).map((role) => ({
+									value: role,
+									label: USER_ROLE_LABELS[role],
+								}))}
+								placeholder="Selecciona un rol"
+							/>
 						</div>
 
 						<SubmitButton

@@ -66,7 +66,7 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
 				<h2 className="text-text mb-4 text-2xl font-bold">Lista de Usuarios</h2>
 
-				<div className="flex w-full flex-row items-center justify-between gap-2">
+				<div className="flex flex-row items-center justify-center gap-2">
 					<Input
 						type="text"
 						value={search}

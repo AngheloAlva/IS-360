@@ -35,6 +35,7 @@ import { type AREAS } from "@prisma/client"
 interface FileExplorerTableProps {
 	userId: string
 	areaValue: AREAS
+	canUpdate?: boolean
 	foldersSlugs: string[]
 	userRole?: string | null
 	actualFolderId?: string | null
@@ -44,6 +45,7 @@ export function FileExplorer({
 	userId,
 	areaValue,
 	foldersSlugs,
+	canUpdate = false,
 	actualFolderId = null,
 }: FileExplorerTableProps) {
 	const canEdit = (userCreatorId: string) => {
@@ -173,12 +175,17 @@ export function FileExplorer({
 													</p>
 												</div>
 
-												{canEdit(item.userId) && (
-													<div className="mt-4 flex gap-2">
-														<UpdateFolderFormSheet userId={userId} oldFolder={item} />
-														<DeleteConfirmationDialog id={item.id} type="folder" name={item.name} />
-													</div>
-												)}
+												{canEdit(item.userId) ||
+													(canUpdate && (
+														<div className="mt-4 flex gap-2">
+															<UpdateFolderFormSheet userId={userId} oldFolder={item} />
+															<DeleteConfirmationDialog
+																id={item.id}
+																type="folder"
+																name={item.name}
+															/>
+														</div>
+													))}
 											</div>
 										</PopoverContent>
 									</Popover>
@@ -271,18 +278,19 @@ export function FileExplorer({
 													</div>
 												</div>
 
-												{canEdit(item.userId) && (
-													<div className="mt-4 flex gap-2">
-														<UpdateFileFormSheet
-															userId={userId}
-															fileId={item.id}
-															initialData={item}
-															areaValue={areaValue}
-															parentFolderId={item.folderId || undefined}
-														/>
-														<DeleteConfirmationDialog type="file" id={item.id} name={item.name} />
-													</div>
-												)}
+												{canEdit(item.userId) ||
+													(canUpdate && (
+														<div className="mt-4 flex gap-2">
+															<UpdateFileFormSheet
+																userId={userId}
+																fileId={item.id}
+																initialData={item}
+																areaValue={areaValue}
+																parentFolderId={item.folderId || undefined}
+															/>
+															<DeleteConfirmationDialog type="file" id={item.id} name={item.name} />
+														</div>
+													))}
 											</div>
 										</PopoverContent>
 									</Popover>

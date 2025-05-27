@@ -1,3 +1,8 @@
+import { notFound } from "next/navigation"
+import { headers } from "next/headers"
+
+import { auth } from "@/lib/auth"
+
 import { EquipmentDataTable } from "@/components/sections/admin/equipments/EquipmentDataTable"
 import BackButton from "@/components/shared/BackButton"
 
@@ -7,6 +12,21 @@ export default async function EquipmentsPage({
 	params: Promise<{ id: string[] }>
 }): Promise<React.ReactElement> {
 	const { id: equipmentIds } = await params
+
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) return notFound()
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				equipment: ["create"],
+			},
+		},
+	})
 
 	const actualParentId = equipmentIds[equipmentIds.length - 1]
 
@@ -27,7 +47,11 @@ export default async function EquipmentsPage({
 				</div>
 			</div>
 
-			<EquipmentDataTable parentId={actualParentId} lastPath={backPath} />
+			<EquipmentDataTable
+				lastPath={backPath}
+				parentId={actualParentId}
+				hasPermission={hasPermission.success}
+			/>
 		</div>
 	)
 }

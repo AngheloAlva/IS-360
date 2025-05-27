@@ -17,9 +17,19 @@ interface PageProps {
 
 export default async function AreaRootPage({ params }: PageProps) {
 	const { area } = await params
+
 	const data = await auth.api.getSession({ headers: await headers() })
 
 	if (!data?.user) return notFound()
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: data.user.id,
+			permissions: {
+				documentation: ["update", "delete"],
+			},
+		},
+	})
 
 	const areaData = Areas[area as keyof typeof Areas]
 	if (!areaData) return notFound()
@@ -49,6 +59,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 				areaValue={areaValue}
 				foldersSlugs={[area]}
 				userRole={data.user.role}
+				canUpdate={hasPermission.success}
 			/>
 		</div>
 	)

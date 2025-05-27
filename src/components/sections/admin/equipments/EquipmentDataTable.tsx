@@ -42,11 +42,12 @@ import { useRouter } from "next/navigation"
 import { queryClient } from "@/lib/queryClient"
 
 interface EquipmentDataTableProps {
-	parentId: string | null
 	lastPath: string
+	hasPermission: boolean
+	parentId: string | null
 }
 
-export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTableProps) {
+export function EquipmentDataTable({ parentId, lastPath, hasPermission }: EquipmentDataTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [exportLoading, setExportLoading] = useState(false)
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -179,7 +180,7 @@ export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTablePro
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
 
-						<CreateEquipmentForm equipments={data?.equipments ?? []} />
+						{hasPermission && <CreateEquipmentForm equipments={data?.equipments ?? []} />}
 					</div>
 				</div>
 			</div>

@@ -18,7 +18,12 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 
 	return (
 		<>
-			<WorkBookMain workBookId={id} userId={session.user.id} userRole={session.user.role!} />
+			<WorkBookMain
+				workBookId={id}
+				hasPermission={false}
+				userId={session.user.id}
+				userRole={session.user.role!}
+			/>
 		</>
 	)
 }

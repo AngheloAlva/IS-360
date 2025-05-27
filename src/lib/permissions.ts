@@ -42,20 +42,33 @@ export const user = ac.newRole({
 	user: ["list"],
 })
 
-export const integrityAndMaintenance = ac.newRole({
+export const maintenancePlanOperator = ac.newRole({
 	maintenancePlan: ["list", "create", "update", "delete"],
-	workOrder: ["list", "create", "update", "delete"],
+	workOrder: ["list"],
 	startupFolder: ["list"],
 	workPermit: ["list"],
-	workBook: ["list", "create", "update", "delete"],
+	workBook: ["list"],
 	safetyTalk: ["list"],
 	documentation: ["list"],
-	equipment: ["list", "create", "update", "delete"],
+	equipment: ["list"],
 	company: ["list"],
 	user: ["list"],
 })
 
-export const regulatoryCompliance = ac.newRole({
+export const workOrderOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list", "create", "update", "delete"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	workBook: ["list"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+})
+
+export const startupFolderOperator = ac.newRole({
 	maintenancePlan: ["list"],
 	workOrder: ["list"],
 	startupFolder: ["list", "create", "update", "delete"],
@@ -68,17 +81,95 @@ export const regulatoryCompliance = ac.newRole({
 	user: ["list"],
 })
 
-export const qualityAndOperationalExcellence = ac.newRole({
+export const workPermitOperator = ac.newRole({
 	maintenancePlan: ["list"],
-	workOrder: ["list", "create", "update", "delete"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list", "create", "update", "delete"],
+	workBook: ["list"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+})
+
+export const workBookOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
 	startupFolder: ["list"],
 	workPermit: ["list"],
 	workBook: ["list", "create", "update", "delete"],
 	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+})
+
+export const safetyTalkOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	workBook: ["list"],
+	safetyTalk: ["list", "create", "update", "delete"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+})
+
+export const documentationOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	workBook: ["list"],
+	safetyTalk: ["list"],
 	documentation: ["list", "create", "update", "delete"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+})
+
+export const equipmentOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	workBook: ["list"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
 	equipment: ["list", "create", "update", "delete"],
 	company: ["list"],
 	user: ["list"],
+})
+
+export const companyOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	workBook: ["list"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list", "create", "update", "delete"],
+	user: ["list"],
+})
+
+export const userOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	workBook: ["list"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list", "create", "delete", "set-role"],
 })
 
 export const partnerCompany = ac.newRole({
@@ -91,40 +182,50 @@ export const partnerCompany = ac.newRole({
 	documentation: [],
 	equipment: [],
 	company: [],
-	user: [],
+	user: ["list", "create", "delete", "set-role"],
 })
 
 export const USER_ROLE = {
 	user: "user",
 	admin: "admin",
-	regulatoryCompliance: "regulatoryCompliance",
-	integrityAndMaintenance: "integrityAndMaintenance",
-	qualityAndOperationalExcellence: "qualityAndOperationalExcellence",
+	maintenancePlanOperator: "maintenancePlanOperator",
+	workOrderOperator: "workOrderOperator",
+	startupFolderOperator: "startupFolderOperator",
+	workPermitOperator: "workPermitOperator",
+	workBookOperator: "workBookOperator",
+	safetyTalkOperator: "safetyTalkOperator",
+	documentationOperator: "documentationOperator",
+	equipmentOperator: "equipmentOperator",
+	companyOperator: "companyOperator",
+	userOperator: "userOperator",
 }
 
 export const USER_ROLE_LABELS = {
 	[USER_ROLE.user]: "Usuario",
 	[USER_ROLE.admin]: "Administrador",
-	[USER_ROLE.regulatoryCompliance]: "Cumplimiento Regulatorio",
-	[USER_ROLE.integrityAndMaintenance]: "Integridad y Mantenimiento",
-	[USER_ROLE.qualityAndOperationalExcellence]: "Calidad y Excelencia Operacional",
+	[USER_ROLE.maintenancePlanOperator]: "Planes de Mantenimiento",
+	[USER_ROLE.workOrderOperator]: "Ordenes de Trabajo",
+	[USER_ROLE.startupFolderOperator]: "Carpetas de Inicio",
+	[USER_ROLE.workPermitOperator]: "Permisos de Trabajo",
+	[USER_ROLE.workBookOperator]: "Libros de Trabajo",
+	[USER_ROLE.safetyTalkOperator]: "Charlas de Seguridad",
+	[USER_ROLE.documentationOperator]: "Documentación",
+	[USER_ROLE.equipmentOperator]: "Equipos",
+	[USER_ROLE.companyOperator]: "Empresas",
+	[USER_ROLE.userOperator]: "Usuarios",
 }
 
 export const USER_ROLE_ARRAY = [
 	"user",
 	"admin",
-	"regulatoryCompliance",
-	"integrityAndMaintenance",
-	"qualityAndOperationalExcellence",
+	"maintenancePlanOperator",
+	"workOrderOperator",
+	"startupFolderOperator",
+	"workPermitOperator",
+	"workBookOperator",
+	"safetyTalkOperator",
+	"documentationOperator",
+	"equipmentOperator",
+	"companyOperator",
+	"userOperator",
 ] as const
-
-export const USER_ROLE_DESCRIPTIONS = {
-	[USER_ROLE.user]: "Usuario: Acceso de solo lectura en toda la plataforma",
-	[USER_ROLE.admin]: "Administrador: Acceso total a toda la plataforma",
-	[USER_ROLE.regulatoryCompliance]:
-		"Cumplimiento Regulatorio: Acceso de lectura en toda la plataforma y ",
-	[USER_ROLE.integrityAndMaintenance]:
-		"Integridad y Mantenimiento: Acceso a la información de mantenimiento y integridad",
-	[USER_ROLE.qualityAndOperationalExcellence]:
-		"Calidad y Excelencia Operacional: Acceso a la información de calidad y excelencia operacional",
-}
