@@ -22,6 +22,11 @@ export const createMaintenancePlanTask = async ({
 			},
 			select: {
 				id: true,
+				equipment: {
+					select: {
+						id: true,
+					},
+				},
 			},
 		})
 
@@ -46,11 +51,21 @@ export const createMaintenancePlanTask = async ({
 					},
 				},
 				nextDate: values.nextDate,
-				equipment: {
-					connect: {
-						id: values.equipmentId,
-					},
-				},
+				...(values.equipmentId
+					? {
+							equipment: {
+								connect: {
+									id: values.equipmentId,
+								},
+							},
+						}
+					: {
+							equipment: {
+								connect: {
+									id: maintenancePlan.equipment.id,
+								},
+							},
+						}),
 				createdBy: {
 					connect: {
 						id: values.createdById,

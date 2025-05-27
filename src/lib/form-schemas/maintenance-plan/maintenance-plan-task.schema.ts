@@ -8,7 +8,7 @@ export const maintenancePlanTaskSchema = z.object({
 	description: z.string().optional(),
 	frequency: z.enum(TASK_FREQUENCY_VALUES_ARRAY, { message: "La frecuencia es requerida" }),
 	nextDate: z.date({ message: "La fecha es requerida" }),
-	equipmentId: z.string({ message: "El equipo es requerido" }),
+	equipmentId: z.string().optional(),
 	maintenancePlanSlug: z.string(),
 	createdById: z.string(),
 	attachments: z.array(fileSchema),
