@@ -70,6 +70,7 @@ export default function EnvironmentalDocuments({
 						folderId={folder.id}
 						companyId={companyId}
 						isEditable={isEditable}
+						isOtcMember={isOtcMember}
 						documents={folder.documents}
 						category={DocumentCategory.ENVIRONMENTAL}
 						documentsStructure={ENVIRONMENTAL_STRUCTURE}

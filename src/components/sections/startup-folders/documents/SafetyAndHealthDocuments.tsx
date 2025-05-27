@@ -72,8 +72,8 @@ export default function SafetyAndHealthDocuments({
 						companyId={companyId}
 						isEditable={isEditable}
 						isOtcMember={isOtcMember}
-						category={SAFETY_AND_HEALTH_STRUCTURE.category}
 						documents={folder.documents}
+						category={SAFETY_AND_HEALTH_STRUCTURE.category}
 						documentsStructure={SAFETY_AND_HEALTH_STRUCTURE}
 					/>
 				</AccordionContent>

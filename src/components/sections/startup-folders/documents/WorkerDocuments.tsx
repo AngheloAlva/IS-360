@@ -127,6 +127,7 @@ export default function WorkerDocuments({
 												folderId={folder.id}
 												companyId={companyId}
 												isEditable={isEditable}
+												isOtcMember={isOtcMember}
 												documents={folder.documents}
 												category={WORKER_STRUCTURE.category}
 												documentsStructure={WORKER_STRUCTURE}
