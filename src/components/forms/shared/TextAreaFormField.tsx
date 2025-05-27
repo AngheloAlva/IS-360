@@ -2,7 +2,14 @@
 
 import { cn } from "@/lib/utils"
 
-import { FormItem, FormLabel, FormField, FormControl, FormMessage } from "@/components/ui/form"
+import {
+	FormItem,
+	FormLabel,
+	FormField,
+	FormControl,
+	FormMessage,
+	FormDescription,
+} from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 
 import type { Control, FieldValues, Path } from "react-hook-form"
@@ -14,6 +21,7 @@ interface TextAreaFormFieldProps<T extends FieldValues> {
 	disabled?: boolean
 	optional?: boolean
 	control: Control<T>
+	description?: string
 	placeholder?: string
 	itemClassName?: string
 }
@@ -23,6 +31,7 @@ export function TextAreaFormField<T extends FieldValues>({
 	label,
 	control,
 	className,
+	description,
 	placeholder,
 	itemClassName,
 	disabled = false,
@@ -46,6 +55,7 @@ export function TextAreaFormField<T extends FieldValues>({
 							{...field}
 						/>
 					</FormControl>
+					{description && <FormDescription>{description}</FormDescription>}
 					<FormMessage />
 				</FormItem>
 			)}

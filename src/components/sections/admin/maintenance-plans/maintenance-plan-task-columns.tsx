@@ -34,7 +34,7 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		header: "Descripción",
 		cell: ({ row }) => {
 			const description = row.getValue("description") as string
-			return <p className="max-w-64 text-wrap">{description || "-"}</p>
+			return <p className="w-64 max-w-64 text-wrap">{description || "-"}</p>
 		},
 	},
 	{

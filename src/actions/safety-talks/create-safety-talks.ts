@@ -37,23 +37,23 @@ export async function createSafetyTalk({
 						order: 0,
 					})),
 				},
-				// questions: {
-				// 	create: validatedData.questions.map((question) => ({
-				// 		type: question.type,
-				// 		question: question.question,
-				// 		imageUrl: question.imageUrl,
-				// 		description: question.description,
-				// 		options: {
-				// 			create: question.options.map((option) => ({
-				// 				text: option.text,
-				// 				isCorrect: option.isCorrect,
-				// 				zoneLabel: option.zoneLabel,
-				// 				zoneId: option.zoneId,
-				// 				order: option.order,
-				// 			})),
-				// 		},
-				// 	})),
-				// },
+				questions: {
+					create: validatedData.questions.map((question) => ({
+						type: question.type,
+						question: question.question,
+						imageUrl: question.imageUrl,
+						description: question.description,
+						options: {
+							create: question.options.map((option) => ({
+								text: option.text,
+								isCorrect: option.isCorrect,
+								zoneLabel: option.zoneLabel,
+								zoneId: option.zoneId,
+								order: option.order ? parseInt(option.order) : 0,
+							})),
+						},
+					})),
+				},
 			},
 		})
 

@@ -1,6 +1,13 @@
 "use client"
 
-import { FormItem, FormLabel, FormField, FormControl, FormMessage } from "@/components/ui/form"
+import {
+	FormItem,
+	FormLabel,
+	FormField,
+	FormControl,
+	FormMessage,
+	FormDescription,
+} from "@/components/ui/form"
 import { Switch } from "@/components/ui/switch"
 
 import type { Control, FieldValues, Path } from "react-hook-form"
@@ -10,6 +17,7 @@ interface SwitchFormFieldProps<T extends FieldValues> {
 	label: string
 	className?: string
 	control: Control<T>
+	description?: string
 	itemClassName?: string
 	onCheckedChange?: (checked: boolean) => void
 }
@@ -19,6 +27,7 @@ export function SwitchFormField<T extends FieldValues>({
 	label,
 	control,
 	className,
+	description,
 	itemClassName,
 	onCheckedChange,
 }: SwitchFormFieldProps<T>) {
@@ -36,6 +45,7 @@ export function SwitchFormField<T extends FieldValues>({
 							onCheckedChange={onCheckedChange ?? field.onChange}
 						/>
 					</FormControl>
+					{description && <FormDescription>{description}</FormDescription>}
 					<FormMessage />
 				</FormItem>
 			)}

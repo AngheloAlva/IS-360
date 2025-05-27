@@ -2,8 +2,9 @@
 "use client"
 
 import { useFieldArray, useFormContext } from "react-hook-form"
-import { ImagePlus, Plus, Trash, X } from "lucide-react"
+import { Check, HelpCircle, ImagePlus, Plus, Trash, X } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { QUESTION_TYPES } from "@/lib/consts/safety-talks"
 
@@ -11,6 +12,7 @@ import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 import type { QuestionSchema } from "@/lib/form-schemas/safety-talk/safety-talk.schema"
 
@@ -23,6 +25,7 @@ interface QuestionCardProps {
 
 export default function QuestionCard({ index, question, onRemove, onUpdate }: QuestionCardProps) {
 	const [imagePreview, setImagePreview] = useState<string | null>(question.imageUrl || null)
+	const [questionType, setQuestionType] = useState<string>(question.type)
 
 	const form = useFormContext<QuestionSchema>()
 
@@ -42,7 +45,16 @@ export default function QuestionCard({ index, question, onRemove, onUpdate }: Qu
 
 		// Validar tipo de imagen
 		if (!file.type.startsWith("image/")) {
-			alert("Por favor sube solo imágenes")
+			toast.error("Por favor sube solo imágenes")
+			return
+		}
+
+		// Validar tamaño (max 5MB)
+		const maxSize = 5 * 1024 * 1024 // 5MB
+		if (file.size > maxSize) {
+			toast.error("La imagen es demasiado grande", {
+				description: "El tamaño máximo permitido es 5MB",
+			})
 			return
 		}
 
@@ -68,9 +80,12 @@ export default function QuestionCard({ index, question, onRemove, onUpdate }: Qu
 
 			const { url } = await response.json()
 			form.setValue("imageUrl", url)
+			toast.success("Imagen subida correctamente")
 		} catch (error) {
 			console.error("Error al subir la imagen:", error)
-			alert("Error al subir la imagen. Por favor intenta de nuevo.")
+			toast.error("Error al subir la imagen", {
+				description: "Por favor intenta de nuevo.",
+			})
 			setImagePreview(null)
 		}
 	}
@@ -103,11 +118,111 @@ export default function QuestionCard({ index, question, onRemove, onUpdate }: Qu
 					</Button>
 
 					<div className="grid gap-4 md:grid-cols-2">
-						<TextAreaFormField<QuestionSchema>
-							name="question"
-							label={`Pregunta ${index + 1}`}
-							control={form.control}
-						/>
+						<div className="col-span-2 md:col-span-1">
+							<TextAreaFormField<QuestionSchema>
+								name="question"
+								label={`Pregunta ${index + 1}`}
+								control={form.control}
+							/>
+						</div>
+
+						<div className="col-span-2 md:col-span-1">
+							<div className="flex items-center space-x-2">
+								<label className="text-sm font-medium">Tipo de pregunta</label>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<HelpCircle className="h-4 w-4 text-muted-foreground" />
+										</TooltipTrigger>
+										<TooltipContent className="max-w-xs">
+											<p>Selecciona el tipo de pregunta:</p>
+											<ul className="ml-4 mt-1 list-disc text-xs">
+												<li>Opción múltiple: Pregunta con varias opciones y una correcta.</li>
+												<li>Zonas de imagen: Etiqueta diferentes partes de una imagen.</li>
+												<li>Verdadero/Falso: Pregunta con respuesta booleana.</li>
+												<li>Respuesta corta: El usuario debe escribir la respuesta.</li>
+											</ul>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+							</div>
+							<div className="mt-2 grid grid-cols-2 gap-2">
+								<Button
+									type="button"
+									variant={questionType === QUESTION_TYPES.MULTIPLE_CHOICE ? "default" : "outline"}
+									size="sm"
+									className="justify-start"
+									onClick={() => {
+										form.setValue("type", QUESTION_TYPES.MULTIPLE_CHOICE)
+										setQuestionType(QUESTION_TYPES.MULTIPLE_CHOICE)
+									}}
+								>
+									{questionType === QUESTION_TYPES.MULTIPLE_CHOICE && (
+										<Check className="mr-2 h-4 w-4" />
+									)}
+									Opción múltiple
+								</Button>
+								<Button
+									type="button"
+									variant={questionType === QUESTION_TYPES.IMAGE_ZONES ? "default" : "outline"}
+									size="sm"
+									className="justify-start"
+									onClick={() => {
+										form.setValue("type", QUESTION_TYPES.IMAGE_ZONES)
+										setQuestionType(QUESTION_TYPES.IMAGE_ZONES)
+									}}
+								>
+									{questionType === QUESTION_TYPES.IMAGE_ZONES && (
+										<Check className="mr-2 h-4 w-4" />
+									)}
+									Zonas de imagen
+								</Button>
+								<Button
+									type="button"
+									variant={questionType === QUESTION_TYPES.TRUE_FALSE ? "default" : "outline"}
+									size="sm"
+									className="justify-start"
+									onClick={() => {
+										form.setValue("type", QUESTION_TYPES.TRUE_FALSE)
+										setQuestionType(QUESTION_TYPES.TRUE_FALSE)
+										// Asegurar que tenga las opciones correctas para verdadero/falso
+										if (options.length !== 2) {
+											// Limpiar opciones existentes
+											while (options.length > 0) {
+												removeOption(0)
+											}
+											// Agregar opciones de verdadero/falso
+											appendOption({ text: "Verdadero", isCorrect: false, order: "0" })
+											appendOption({ text: "Falso", isCorrect: false, order: "1" })
+										}
+									}}
+								>
+									{questionType === QUESTION_TYPES.TRUE_FALSE && (
+										<Check className="mr-2 h-4 w-4" />
+									)}
+									Verdadero/Falso
+								</Button>
+								<Button
+									type="button"
+									variant={questionType === QUESTION_TYPES.SHORT_ANSWER ? "default" : "outline"}
+									size="sm"
+									className="justify-start"
+									onClick={() => {
+										form.setValue("type", QUESTION_TYPES.SHORT_ANSWER)
+										setQuestionType(QUESTION_TYPES.SHORT_ANSWER)
+										// Asegurar que tenga al menos una opción para la respuesta correcta
+										if (options.length === 0) {
+											appendOption({ text: "Respuesta correcta", isCorrect: true, order: "0" })
+										}
+									}}
+								>
+									{questionType === QUESTION_TYPES.SHORT_ANSWER && (
+										<Check className="mr-2 h-4 w-4" />
+									)}
+									Respuesta corta
+								</Button>
+							</div>
+						</div>
 
 						<TextAreaFormField<QuestionSchema>
 							name="description"
@@ -116,18 +231,52 @@ export default function QuestionCard({ index, question, onRemove, onUpdate }: Qu
 						/>
 					</div>
 
-					{question.type === QUESTION_TYPES.IMAGE_ZONES && (
+					{questionType === QUESTION_TYPES.IMAGE_ZONES && (
 						<div className="col-span-full">
-							<label className="mb-2 block text-sm font-medium">Imagen para zonas</label>
-							<div className="flex gap-4">
+							<div className="flex items-center space-x-2">
+								<label className="text-sm font-medium">Imagen para zonas</label>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<HelpCircle className="h-4 w-4 text-muted-foreground" />
+										</TooltipTrigger>
+										<TooltipContent className="max-w-xs">
+											<p>Sube una imagen y define zonas etiquetadas.</p>
+											<p className="mt-1 text-xs">Para cada zona, agrega una opción con:</p>
+											<ul className="ml-4 mt-1 list-disc text-xs">
+												<li>Etiqueta de zona (A, B, C, etc.)</li>
+												<li>ID de zona que identifica la parte</li>
+												<li>Marca cuál es la respuesta correcta</li>
+											</ul>
+										</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+							</div>
+							<div className="mt-2 flex flex-col gap-4 md:flex-row">
 								<div className="bg-muted relative aspect-video w-full max-w-md overflow-hidden rounded-lg border">
 									{imagePreview ? (
-										<>
+										<div className="relative h-full w-full">
 											<img
 												alt="Preview"
 												src={imagePreview}
 												className="h-full w-full object-contain"
 											/>
+											{/* Visualizador de zonas */}
+											{options.map((option, idx) => (
+												option.zoneLabel && (
+													<div
+														key={idx}
+														className="absolute flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white"
+														style={{
+															top: `${20 + idx * 10}%`,
+															left: `${20 + idx * 10}%`,
+															transform: "translate(-50%, -50%)",
+														}}
+													>
+														{option.zoneLabel}
+													</div>
+												)
+											))}
 											<Button
 												type="button"
 												size="icon"
@@ -140,11 +289,12 @@ export default function QuestionCard({ index, question, onRemove, onUpdate }: Qu
 											>
 												<X className="h-4 w-4" />
 											</Button>
-										</>
+										</div>
 									) : (
 										<label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2">
 											<ImagePlus className="text-muted-foreground h-8 w-8" />
 											<span className="text-muted-foreground text-sm">Click para subir imagen</span>
+											<span className="text-muted-foreground text-xs">Formatos: JPG, PNG, GIF (máx. 5MB)</span>
 											<input
 												type="file"
 												className="hidden"
@@ -153,6 +303,16 @@ export default function QuestionCard({ index, question, onRemove, onUpdate }: Qu
 											/>
 										</label>
 									)}
+								</div>
+								
+								<div className="flex flex-col space-y-2">
+									<p className="text-sm font-medium">Instrucciones:</p>
+									<ol className="ml-4 list-decimal text-sm text-muted-foreground">
+										<li>Sube una imagen clara que muestre las zonas a identificar</li>
+										<li>Define cada zona con una etiqueta (A, B, C...)</li>
+										<li>Añade el ID correspondiente a cada zona</li>
+										<li>Marca la opción correcta</li>
+									</ol>
 								</div>
 							</div>
 						</div>

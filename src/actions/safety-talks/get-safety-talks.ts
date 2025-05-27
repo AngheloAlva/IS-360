@@ -29,6 +29,12 @@ export async function getSafetyTalkBySlug(slug: string) {
 					options: true,
 				},
 			},
+			_count: {
+				select: {
+					questions: true,
+					userSafetyTalks: true,
+				},
+			},
 		},
 		cacheStrategy: {
 			ttl: 60,

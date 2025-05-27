@@ -1,5 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, Edit } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -86,5 +86,23 @@ export const SafetyTalkColumns: ColumnDef<SafetyTalk>[] = [
 			const date = new Date(row.getValue("expiresAt"))
 			return format(date, "dd 'de' MMMM, yyyy", { locale: es })
 		},
+	},
+	{
+		id: "actions",
+		cell: ({ row }) => {
+			const slug = row.original.slug
+			return (
+				<div className="flex items-center justify-center gap-2">
+					<Link
+						href={`/admin/dashboard/charlas-de-seguridad/${slug}/editar`}
+						className="text-blue-500 hover:text-blue-700"
+					>
+						<Edit className="h-4 w-4" />
+					</Link>
+					{/* Implementar lógica de eliminación aquí si es necesario */}
+				</div>
+			)
+		},
+		header: "Acciones",
 	},
 ]
