@@ -39,6 +39,7 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet"
 
+import type { PLAN_LOCATION_VALUES } from "@/lib/consts/plan-location"
 import type { Company } from "@/hooks/companies/use-companies"
 import type { User } from "@prisma/client"
 
@@ -46,9 +47,11 @@ interface CreateMaintenancePlanTaskWorkOrderFormProps {
 	equipmentId: string
 	equipmentName: string
 	maintenancePlanTaskId: string
+	location: keyof typeof PLAN_LOCATION_VALUES
 }
 
 export default function CreateMaintenancePlanTaskWorkOrderForm({
+	location,
 	equipmentId,
 	equipmentName,
 	maintenancePlanTaskId,
@@ -74,6 +77,7 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 			supervisorId: "",
 			capex: undefined,
 			responsibleId: "",
+			location: location,
 			estimatedDays: "0",
 			estimatedHours: "0",
 			workDescription: "",
@@ -216,7 +220,12 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 						/>
 
 						<FormItem>
-							<FormLabel>Equipo</FormLabel>
+							<FormLabel>Ubicación (No editable)</FormLabel>
+							<Input readOnly name="location" value={location} />
+						</FormItem>
+
+						<FormItem className="sm:col-span-2">
+							<FormLabel>Equipo (No editable)</FormLabel>
 							<Input readOnly name="equipment" value={equipmentName} />
 						</FormItem>
 

@@ -11,10 +11,11 @@ import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { createWorkOrder } from "@/actions/work-orders/createWorkOrder"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
+import { PlanLocationOptions } from "@/lib/consts/plan-location"
 import { getEquipment } from "@/actions/equipments/getEquipment"
 import { useCompanies } from "@/hooks/companies/use-companies"
-import { getOtcUsers } from "@/actions/users/getUsers"
 import { uploadFilesToCloud } from "@/lib/upload-files"
+import { getOtcUsers } from "@/actions/users/getUsers"
 import {
 	workOrderSchema,
 	type WorkOrderSchema,
@@ -83,11 +84,15 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 			equipment: [],
 			breakDays: "0",
 			workRequest: "",
+			type: undefined,
 			supervisorId: "",
+			capex: undefined,
 			responsibleId: "",
 			estimatedDays: "0",
 			estimatedHours: "0",
 			workDescription: "",
+			priority: undefined,
+			location: undefined,
 			requiresBreak: false,
 			programDate: new Date(),
 			estimatedEndDate: new Date(),
@@ -305,6 +310,14 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							control={form.control}
 							options={WorkOrderCAPEXOptions}
 							placeholder="Seleccione un indicador"
+						/>
+
+						<SelectFormField<WorkOrderSchema>
+							name="location"
+							label="Ubicación"
+							control={form.control}
+							options={PlanLocationOptions}
+							placeholder="Selecciona la ubicación"
 						/>
 
 						<FormField

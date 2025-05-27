@@ -259,7 +259,7 @@ model WorkOrder {
   otNumber String
 
   type                  WORK_ORDER_TYPE
-  status                WORK_ORDER_STATUS   @default(PLANNED)
+  status                WORK_ORDER_STATUS          @default(PLANNED)
   solicitationDate      DateTime
   solicitationTime      String
   workRequest           String
@@ -273,9 +273,10 @@ model WorkOrder {
   requiresBreak         Boolean
   breakDays             Int?
   estimatedEndDate      DateTime?
+  location              MAINTENANCE_PLAN_LOCATION?
   isWorkBook            Boolean
-  isWorkBookInit        Boolean             @default(false)
-  isInternalResponsible Boolean             @default(false)
+  isWorkBookInit        Boolean                    @default(false)
+  isInternalResponsible Boolean                    @default(false)
 
   // Work book data
   workName           String?
@@ -854,14 +855,15 @@ model MaintenancePlan {
 }
 
 model MaintenancePlanTask {
-  id          String         @id @default(cuid())
-  slug        String         @unique
+  id          String                     @id @default(cuid())
+  slug        String                     @unique
   name        String
   description String?
   frequency   PLAN_FREQUENCY
   nextDate    DateTime
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+  location    MAINTENANCE_PLAN_LOCATION?
 
   equipment         Equipment       @relation(fields: [equipmentId], references: [id])
   equipmentId       String

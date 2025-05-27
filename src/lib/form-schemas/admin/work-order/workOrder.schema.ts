@@ -4,6 +4,7 @@ import { WORK_ORDER_PRIORITY_VALUES_ARRAY } from "@/lib/consts/work-order-priori
 import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
 import { fileSchema } from "../../document-management/file.schema"
+import { PLAN_LOCATION_VALUES_ARRAY } from "@/lib/consts/plan-location"
 
 export const workOrderSchema = z.object({
 	type: z.enum(WORK_ORDER_TYPE_VALUES_ARRAY, { message: "El tipo no es válido" }),
@@ -13,6 +14,7 @@ export const workOrderSchema = z.object({
 	workDescription: z.string().optional(),
 	priority: z.enum(WORK_ORDER_PRIORITY_VALUES_ARRAY, { message: "La prioridad no es válida" }),
 	capex: z.enum(WORK_ORDER_CAPEX_VALUES_ARRAY, { message: "El indicador no es válido" }),
+	location: z.enum(PLAN_LOCATION_VALUES_ARRAY, { message: "La ubicación no es válida" }),
 	equipment: z.array(z.string().nonempty({ message: "El equipo no puede estar vacío" })).min(1, {
 		message: "Debe seleccionar al menos un equipo",
 	}),

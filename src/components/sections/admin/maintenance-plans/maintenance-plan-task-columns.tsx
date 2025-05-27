@@ -21,6 +21,7 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 			<CreateMaintenancePlanTaskWorkOrderForm
 				equipmentId={row.original.equipment.id}
 				maintenancePlanTaskId={row.original.id}
+				location={row.original?.location || "PRM"}
 				equipmentName={row.original.equipment.name}
 			/>
 		),

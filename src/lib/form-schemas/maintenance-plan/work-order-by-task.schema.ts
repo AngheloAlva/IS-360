@@ -3,6 +3,7 @@ import { z } from "zod"
 import { WORK_ORDER_PRIORITY_VALUES_ARRAY } from "@/lib/consts/work-order-priority"
 import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
+import { PLAN_LOCATION_VALUES_ARRAY } from "@/lib/consts/plan-location"
 
 export const workOrderSchemaByTask = z.object({
 	isInternalResponsible: z.boolean().optional(),
@@ -15,6 +16,7 @@ export const workOrderSchemaByTask = z.object({
 	priority: z.enum(WORK_ORDER_PRIORITY_VALUES_ARRAY, { message: "La prioridad no es válida" }),
 	capex: z.enum(WORK_ORDER_CAPEX_VALUES_ARRAY, { message: "El indicador no es válido" }),
 	programDate: z.date({ message: "La fecha de programación no es válida" }),
+	location: z.enum(PLAN_LOCATION_VALUES_ARRAY, { message: "La ubicación no es válida" }),
 	estimatedHours: z.string({ message: "La hora estimada no es válida" }).refine(
 		(value) => {
 			const hours = parseInt(value)

@@ -65,6 +65,7 @@ export async function GET(
 					name: true,
 					slug: true,
 					nextDate: true,
+					location: true,
 					createdAt: true,
 					description: true,
 					frequency: true,

@@ -1,6 +1,6 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
-import type { PLAN_FREQUENCY } from "@prisma/client"
+import type { MAINTENANCE_PLAN_LOCATION, PLAN_FREQUENCY } from "@prisma/client"
 
 export interface MaintenancePlanTask {
 	id: string
@@ -10,6 +10,7 @@ export interface MaintenancePlanTask {
 	createdAt: Date
 	frequency: PLAN_FREQUENCY
 	description: string
+	location: MAINTENANCE_PLAN_LOCATION
 	createdBy: {
 		name: string
 	}
@@ -53,38 +54,47 @@ export const useMaintenancePlanTasks = ({
 	nextDateTo = "",
 }: UseMaintenancePlansTasksParams) => {
 	return useQuery<MaintenancePlansTasksResponse>({
-		queryKey: ["maintenance-plans-tasks", { page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo }],
+		queryKey: [
+			"maintenance-plans-tasks",
+			{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo },
+		],
 		queryFn: (fn) =>
 			fetchMaintenancePlanTasks({
 				...fn,
-				queryKey: ["maintenance-plans-tasks", { page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo }],
+				queryKey: [
+					"maintenance-plans-tasks",
+					{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo },
+				],
 			}),
 	})
 }
 
 export const fetchMaintenancePlanTasks: QueryFunction<
 	MaintenancePlansTasksResponse,
-	["maintenance-plans-tasks", { 
-		page: number;
-		limit: number;
-		search: string;
-		planSlug: string;
-		frequency: string;
-		nextDateFrom: string;
-		nextDateTo: string;
-	}]
+	[
+		"maintenance-plans-tasks",
+		{
+			page: number
+			limit: number
+			search: string
+			planSlug: string
+			frequency: string
+			nextDateFrom: string
+			nextDateTo: string
+		},
+	]
 > = async ({ queryKey }) => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [_, { page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo }]: [
 		string,
-		{ 
-			page: number;
-			limit: number;
-			search: string;
-			planSlug: string;
-			frequency: string;
-			nextDateFrom: string;
-			nextDateTo: string;
+		{
+			page: number
+			limit: number
+			search: string
+			planSlug: string
+			frequency: string
+			nextDateFrom: string
+			nextDateTo: string
 		},
 	] = queryKey
 

@@ -1,12 +1,13 @@
 "use server"
 
+import { addMonths } from "date-fns"
+
+import { sendNewWorkOrderEmail } from "../work-orders/sendNewWorkOrderEmail"
 import { generateOTNumber } from "@/actions/work-orders/generateOTNumber"
+import { PLAN_FREQUENCY } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 import type { WorkOrderSchemaByTask } from "@/lib/form-schemas/maintenance-plan/work-order-by-task.schema"
-import { sendNewWorkOrderEmail } from "../work-orders/sendNewWorkOrderEmail"
-import { addMonths } from "date-fns"
-import { PLAN_FREQUENCY } from "@prisma/client"
 
 interface CreateWorkOrderProps {
 	equipmentId?: string
