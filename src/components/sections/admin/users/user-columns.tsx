@@ -82,7 +82,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const roles = row.getValue("role") as string
 
 			return (
-				<div className="flex max-w-96 flex-wrap gap-1">
+				<div className="flex w-96 max-w-96 flex-wrap gap-1">
 					{roles.split(",").map((role) => (
 						<Badge key={role} className="border-green-500 bg-green-500/10 text-green-500">
 							{USER_ROLE_LABELS[role]}

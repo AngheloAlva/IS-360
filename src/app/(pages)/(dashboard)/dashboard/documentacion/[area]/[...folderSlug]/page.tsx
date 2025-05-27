@@ -27,6 +27,15 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 		return notFound()
 	}
 
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: data.user.id,
+			permissions: {
+				documentation: ["update", "delete"],
+			},
+		},
+	})
+
 	const folderId = fullFolderSlugs[fullFolderSlugs.length - 1].split("_")[1]
 
 	const areaName = Areas[area as keyof typeof Areas]["title"]
@@ -67,6 +76,7 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 				areaValue={areaValue}
 				actualFolderId={folderId}
 				userRole={data.user.role}
+				canUpdate={hasPermission.success}
 				foldersSlugs={[area, ...fullFolderSlugs]}
 			/>
 		</div>
