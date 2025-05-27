@@ -194,9 +194,10 @@ export default function MilestoneCards({ userId, userRole, milestones }: Milesto
 								<RequestCloseMilestoneDialog milestoneId={milestone.id} userId={userId} />
 							)}
 
-							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE && (
-								<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
-							)}
+							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
+								userRole !== "partnerCompany" && (
+									<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
+								)}
 						</CardContent>
 					</Card>
 				))}
