@@ -39,6 +39,8 @@ export async function GET(
 					role: true,
 					phone: true,
 					email: true,
+					internalRole: true,
+					internalArea: true,
 				},
 				skip,
 				take: limit,

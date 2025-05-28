@@ -14,30 +14,13 @@ interface CreateStartupFolderProps {
 
 export const createStartupFolder = async ({ companyId }: CreateStartupFolderProps) => {
 	try {
-		// Primero crea la carpeta general
 		const startupFolder = await prisma.startupFolder.create({
 			data: {
 				companyId,
 			},
 		})
 
-		const environmentalDocumentsToCreate = ENVIRONMENTAL_STRUCTURE.documents.map((doc) => ({
-			url: "",
-			name: doc.name,
-			folderId: startupFolder.id,
-			type: doc.type as EnvironmentalDocType,
-			category: ENVIRONMENTAL_STRUCTURE.category,
-		}))
-
-		const safetyAndHealthDocumentsToCreate = SAFETY_AND_HEALTH_STRUCTURE.documents.map((doc) => ({
-			url: "",
-			name: doc.name,
-			folderId: startupFolder.id,
-			type: doc.type as SafetyAndHealthDocumentType,
-			category: SAFETY_AND_HEALTH_STRUCTURE.category,
-		}))
-
-		await prisma.safetyAndHealthFolder.create({
+		const safetyAndHealthFolder = await prisma.safetyAndHealthFolder.create({
 			data: {
 				startupFolder: {
 					connect: {
@@ -46,13 +29,18 @@ export const createStartupFolder = async ({ companyId }: CreateStartupFolderProp
 				},
 				documents: {
 					createMany: {
-						data: safetyAndHealthDocumentsToCreate,
+						data: SAFETY_AND_HEALTH_STRUCTURE.documents.map((doc) => ({
+							url: "",
+							name: doc.name,
+							type: doc.type as SafetyAndHealthDocumentType,
+							category: SAFETY_AND_HEALTH_STRUCTURE.category,
+						})),
 					},
 				},
 			},
 		})
 
-		await prisma.environmentalFolder.create({
+		const environmentalFolder = await prisma.environmentalFolder.create({
 			data: {
 				startupFolder: {
 					connect: {
@@ -61,11 +49,23 @@ export const createStartupFolder = async ({ companyId }: CreateStartupFolderProp
 				},
 				documents: {
 					createMany: {
-						data: environmentalDocumentsToCreate,
+						data: ENVIRONMENTAL_STRUCTURE.documents.map((doc) => ({
+							url: "",
+							name: doc.name,
+							type: doc.type as EnvironmentalDocType,
+							category: ENVIRONMENTAL_STRUCTURE.category,
+						})),
 					},
 				},
 			},
 		})
+
+		if (!startupFolder || !safetyAndHealthFolder || !environmentalFolder) {
+			return {
+				ok: false,
+				message: "Error al crear la carpeta de arranque general",
+			}
+		}
 
 		return {
 			ok: true,

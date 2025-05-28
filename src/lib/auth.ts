@@ -90,6 +90,12 @@ export const auth = betterAuth({
 				required: true,
 				input: true,
 			},
+			internalArea: {
+				type: "string",
+				required: false,
+				nullable: true,
+				input: true,
+			},
 		},
 	},
 	plugins: [

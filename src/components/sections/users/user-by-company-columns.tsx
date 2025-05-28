@@ -19,10 +19,14 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 			if (role !== USER_ROLE.SUPERVISOR && role !== USER_ROLE.PARTNER_COMPANY) return null
 
 			return (
-				<Badge className={cn({
-					"bg-purple-500/10 border border-purple-500 text-purple-500": role === USER_ROLE.SUPERVISOR,
-					"bg-teal-500/10 border border-teal-500 text-teal-500": role === USER_ROLE.PARTNER_COMPANY
-				})}>
+				<Badge
+					className={cn({
+						"border border-purple-500 bg-purple-500/10 text-purple-500":
+							role === USER_ROLE.SUPERVISOR,
+						"border border-teal-500 bg-teal-500/10 text-teal-500":
+							role === USER_ROLE.PARTNER_COMPANY,
+					})}
+				>
 					{role}
 				</Badge>
 			)
@@ -43,6 +47,14 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 	{
 		accessorKey: "rut",
 		header: "RUT",
+	},
+	{
+		accessorKey: "internalRole",
+		header: "Cargo",
+	},
+	{
+		accessorKey: "internalArea",
+		header: "Area",
 	},
 	// {
 	// 	accessorKey: "id",

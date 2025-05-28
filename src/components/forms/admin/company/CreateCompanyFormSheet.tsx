@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sheet"
 
 import type { User } from "@prisma/client"
+import { createUserStartupFolder } from "@/actions/users/createUserStartupFolder"
 
 export default function CreateCompanyFormSheet(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -104,6 +105,8 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 							userId: newUser.user.id,
 							role: ["partnerCompany"],
 						})
+
+						await createUserStartupFolder(newUser.user.id)
 
 						sendNewUserEmail({
 							name: supervisor.name,
@@ -251,13 +254,45 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 											placeholder="Email del supervisor"
 											itemClassName="sm:col-span-2"
 										/>
+
+										<InputFormField<CompanySchema>
+											name={`supervisors.${index}.phone`}
+											label="Telefono"
+											control={form.control}
+											placeholder="Telefono del supervisor"
+											itemClassName="sm:col-span-2"
+										/>
+
+										<InputFormField<CompanySchema>
+											name={`supervisors.${index}.internalArea`}
+											label="Area"
+											control={form.control}
+											placeholder="Area del supervisor"
+											itemClassName="sm:col-span-2"
+										/>
+
+										<InputFormField<CompanySchema>
+											name={`supervisors.${index}.internalRole`}
+											label="Rol"
+											control={form.control}
+											placeholder="Rol del supervisor"
+											itemClassName="sm:col-span-2"
+										/>
 									</div>
 								))}
 
 								<Button
 									type="button"
 									onClick={() =>
-										appendSupervisor({ name: "", email: "", rut: "", isSupervisor: true })
+										appendSupervisor({
+											rut: "",
+											name: "",
+											email: "",
+											phone: "",
+											internalArea: "",
+											internalRole: "",
+											isSupervisor: true,
+										})
 									}
 									className="text-primary w-fit bg-transparent shadow-none hover:underline"
 								>

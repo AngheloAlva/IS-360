@@ -38,8 +38,14 @@ export const createCompany = async ({
 			},
 		})
 
-		// Crear la carpeta de arranque general automáticamente
-		await createStartupFolder({ companyId: company.id })
+		const { ok, message } = await createStartupFolder({ companyId: company.id })
+
+		if (!ok) {
+			return {
+				ok: false,
+				message,
+			}
+		}
 
 		return {
 			ok: true,

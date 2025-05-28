@@ -64,6 +64,7 @@ model User {
   twoFactorEnabled Boolean?
   internal         Boolean   @default(false)
   documentAreas    AREAS[]   @default([])
+  internalArea     String?
 
   sessions                       Session[]
   accounts                       Account[]

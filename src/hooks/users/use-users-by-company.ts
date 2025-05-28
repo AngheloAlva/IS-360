@@ -9,6 +9,8 @@ export interface UsersByCompany {
 	phone: string
 	email: string
 	role: USER_ROLE
+	internalRole: string
+	internalArea: string
 }
 
 interface UsersResponse {
