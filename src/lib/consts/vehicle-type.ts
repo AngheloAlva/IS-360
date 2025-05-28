@@ -6,6 +6,7 @@ export const VEHICLE_TYPE = {
 	TRACTOR: "TRACTOR",
 	TRAILER: "TRAILER",
 	OTHER: "OTHER",
+	VAN: "VAN",
 } as const
 
 export const VEHICLE_TYPE_ARRAY = [
@@ -16,6 +17,7 @@ export const VEHICLE_TYPE_ARRAY = [
 	VEHICLE_TYPE.TRACTOR,
 	VEHICLE_TYPE.TRAILER,
 	VEHICLE_TYPE.OTHER,
+	VEHICLE_TYPE.VAN,
 ] as const
 
 export const VehicleTypeLabels = {
@@ -26,6 +28,7 @@ export const VehicleTypeLabels = {
 	TRACTOR: "Tractor",
 	TRAILER: "Remolque",
 	OTHER: "Otro",
+	VAN: "Furgon",
 } as const
 
 export const VehicleTypeOptions = [
@@ -56,5 +59,9 @@ export const VehicleTypeOptions = [
 	{
 		value: VEHICLE_TYPE.OTHER,
 		label: VehicleTypeLabels.OTHER,
+	},
+	{
+		value: VEHICLE_TYPE.VAN,
+		label: VehicleTypeLabels.VAN,
 	},
 ]
