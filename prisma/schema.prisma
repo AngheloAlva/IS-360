@@ -192,6 +192,7 @@ enum VEHICLE_TYPE {
   TRACTOR
   TRAILER
   OTHER
+  VAN
 }
 
 model Vehicle {

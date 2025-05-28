@@ -75,8 +75,7 @@ export async function GET(req: NextRequest) {
 					createdAt: "desc",
 				},
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 			// Get total count
@@ -94,8 +93,7 @@ export async function GET(req: NextRequest) {
 						: {}),
 				},
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 		])

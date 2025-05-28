@@ -97,7 +97,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 
 						<DropdownMenuItem onClick={() => handleLogOut()}>
 							<LogOut />
-							Log out
+							Cerrar Sesión
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

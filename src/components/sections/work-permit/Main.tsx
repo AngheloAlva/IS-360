@@ -4,8 +4,6 @@ import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
 
 import { getWorkPermits } from "@/actions/work-permit/getWorkPermit"
-import { useSidebar } from "@/components/ui/sidebar"
-import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 import { DataTable } from "./DataTable"
@@ -24,8 +22,6 @@ export default function MainWorkBook({
 	const [workPermits, setWorkPermits] = useState<
 		Array<WorkPermit & { participants: User[]; otNumber: { otNumber: string } }>
 	>([])
-
-	const { state } = useSidebar()
 
 	useEffect(() => {
 		const fetchWorkBooks = async () => {
@@ -47,15 +43,7 @@ export default function MainWorkBook({
 	}, [page, userId])
 
 	return (
-		<div
-			className={cn(
-				"flex h-full w-full flex-col gap-8 overflow-hidden transition-all md:max-w-[95dvw] lg:max-w-[98dvw]",
-				{
-					"md:max-w-[62dvw] lg:max-w-[70dvw] xl:max-w-[77dvw] 2xl:max-w-[80dvw]":
-						state === "expanded",
-				}
-			)}
-		>
+		<div className="flex h-full w-full flex-1 flex-col gap-8 overflow-hidden transition-all">
 			<h1 className="w-fit text-3xl font-bold">Permisos de Trabajo Seguro</h1>
 
 			<DataTable columns={columns} data={workPermits} isLoading={isLoading} />

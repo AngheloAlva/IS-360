@@ -73,6 +73,8 @@ export default function CreateExternalSupervisorsForm({
 						},
 					})
 
+					// TODO: Send notification emails
+
 					if (error) throw new Error(`Error al crear usuario ${supervisor.name}: ${error.message}`)
 					return newUser
 				})
