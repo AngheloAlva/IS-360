@@ -524,24 +524,18 @@ model Attachment {
 
 enum WORK_PERMIT_STATUS {
   ACTIVE
+  IN_PROGRESS
   COMPLETED
   CANCELLED
   EXPIRED
 }
 
 model WorkPermit {
-  id String @id @default(cuid())
-
+  id                             String             @id @default(cuid())
+  status                         WORK_PERMIT_STATUS @default(ACTIVE)
   aplicantPt                     String
-  responsiblePt                  String
-  executanCompany                String
   mutuality                      String
   otherMutuality                 String?
-  initDate                       DateTime
-  endDate                        DateTime?
-  hour                           String
-  workersNumber                  Int
-  workDescription                String
   exactPlace                     String
   workWillBe                     String
   workWillBeOther                String?
@@ -559,29 +553,26 @@ model WorkPermit {
   wasteDisposalLocation          String?
   whoDeliversWorkAreaOp          String
   workerExecutor                 String
-  preventionOfficer              String
-  preventionOfficerUser          User               @relation("PreventionOfficer", fields: [preventionOfficer], references: [id])
-  whoReceives                    String?
-  cleanAndTidyWorkArea           Boolean?
   workCompleted                  Boolean?
-  observations                   String?
+  cleanAndTidyWorkArea           Boolean?
   additionalObservations         String?
+  observations                   String?
   acceptTerms                    Boolean            @default(false)
-  status                         WORK_PERMIT_STATUS @default(ACTIVE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  otNumber     WorkOrder @relation(fields: [otNumberId], references: [id])
-  otNumberId   String
-  user         User      @relation("WorkPermitUser", fields: [userId], references: [id])
-  userId       String
-  participants User[]    @relation("WorkPermitParticipants")
-  company      Company   @relation(fields: [companyId], references: [id])
-  companyId    String
-  vehicles     Vehicle[]
+  preventionOfficerUser User      @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
+  preventionOfficerId   String
+  otNumber              WorkOrder @relation(fields: [otNumberId], references: [id])
+  otNumberId            String
+  user                  User      @relation("WorkPermitUser", fields: [userId], references: [id])
+  userId                String
+  participants          User[]    @relation("WorkPermitParticipants")
+  company               Company   @relation(fields: [companyId], references: [id])
+  companyId             String
+  vehicles              Vehicle[]
 
-  @@index([preventionOfficer])
   @@map("work_permit")
 }
 

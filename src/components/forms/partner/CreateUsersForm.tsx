@@ -3,6 +3,7 @@
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Plus, Trash2, UserIcon } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -41,6 +42,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 			],
 		},
 	})
+
+	const router = useRouter()
 
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
@@ -109,6 +112,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 				description: `${successes.length} colaboradores han sido creados y se les ha enviado un correo con sus credenciales.`,
 				duration: 5000,
 			})
+			router.push("/dashboard/colaboradores")
 		} catch (error) {
 			console.error(error)
 			toast.error("Error al crear colaboradores", {

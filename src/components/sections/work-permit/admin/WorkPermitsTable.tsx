@@ -82,7 +82,6 @@ export default async function WorkPermitsTable() {
 							<TableRow key={workPermit.id}>
 								<TableCell className="font-medium">{workPermit.id}</TableCell>
 								<TableCell>{workPermit.otNumber}</TableCell>
-								<TableCell>{workPermit.company}</TableCell>
 								<TableCell>{workPermit.area}</TableCell>
 								<TableCell>{workPermit.type}</TableCell>
 								<TableCell>{workPermit.status}</TableCell>

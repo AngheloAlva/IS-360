@@ -1,0 +1,18 @@
+export const OPERATOR_LIST = [
+	"Arias Jose Luis",
+	"Barriga Sergio",
+	"Echeverria Rolando",
+	"Gajardo Cristian",
+	"Gutierrez Andres",
+	"Hidalgo Patricio",
+	"Meriño Jose Manuel",
+	"Muñoz Pablo",
+	"Riffo Cristian",
+	"San Martin Francisco",
+	"Valenzuela Jeovanny",
+	"Vallejos Carlos",
+	"Ronaldo Lara",
+	"Eliecer Palma",
+	"Martin Lara",
+	"Rodrigo Vasquez",
+]

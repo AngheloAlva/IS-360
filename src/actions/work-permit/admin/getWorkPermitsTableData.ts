@@ -17,7 +17,7 @@ export async function getWorkPermitsTableData() {
 	return workPermits.map((permit) => ({
 		id: permit.id,
 		otNumber: permit.otNumber.otNumber,
-		company: permit.executanCompany,
+
 		area: permit.exactPlace,
 		type: permit.workWillBe,
 		status: permit.workCompleted ? "Completado" : "En Progreso",

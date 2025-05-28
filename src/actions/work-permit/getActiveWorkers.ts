@@ -5,17 +5,11 @@ export async function getActiveWorkers() {
 		const activeWorkers = await prisma.workPermit.findMany({
 			where: {
 				status: "ACTIVE",
-				endDate: {
-					gte: new Date(),
-				},
 			},
 			include: {
 				participants: true,
 				otNumber: true,
 				user: true,
-			},
-			orderBy: {
-				initDate: "desc",
 			},
 			cacheStrategy: {
 				ttl: 60,

@@ -23,12 +23,10 @@ import {
 } from "@/lib/consts/work-permit-options"
 
 import { MultiSelectFormField } from "@/components/forms/shared/MultiSelectFormField"
-import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SwitchFormField } from "@/components/forms/shared/SwitchFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
-import { RutFormField } from "@/components/forms/shared/RutFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
@@ -42,14 +40,22 @@ import {
 	FormControl,
 } from "@/components/ui/form"
 
-export default function WorkPermitForm({ userId }: { userId: string }): React.ReactElement {
+interface WorkPermitFormProps {
+	userId: string
+	companyId: string
+}
+
+export default function WorkPermitForm({
+	userId,
+	companyId,
+}: WorkPermitFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const form = useForm<WorkPermitSchema>({
 		resolver: zodResolver(workPermitSchema),
 		defaultValues: {
 			userId: userId,
-			hour: "",
+			companyId: companyId,
 			tools: [],
 			otNumber: "",
 			otherRisk: "",
@@ -60,18 +66,12 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 			exactPlace: "",
 			otherTools: "",
 			workWillBe: "",
-			whoReceives: "",
 			observations: "",
-			workersNumber: "",
-			responsiblePt: "",
 			workerExecutor: "",
 			otherPreChecks: "",
 			otherMutuality: "",
 			acceptTerms: false,
-			executanCompany: "",
-			workDescription: "",
 			workWillBeOther: "",
-			initDate: new Date(),
 			workCompleted: false,
 			generateWaste: false,
 			preventionOfficer: "",
@@ -83,7 +83,14 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 			preventiveControlMeasures: [],
 			otherPreventiveControlMeasures: "",
 			activityDetails: [{ activity: "" }, { activity: "" }],
-			participants: [{ fullName: "", rut: "", company: "" }],
+			participants: [
+				{
+					userId: "",
+				},
+				{
+					userId: "",
+				},
+			],
 		},
 	})
 
@@ -159,18 +166,6 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 					control={form.control}
 				/>
 
-				<InputFormField<WorkPermitSchema>
-					name="responsiblePt"
-					label="Responsable PT"
-					control={form.control}
-				/>
-
-				<InputFormField<WorkPermitSchema>
-					name="executanCompany"
-					label="Empresa Ejecutante / Interno"
-					control={form.control}
-				/>
-
 				<SelectFormField<WorkPermitSchema>
 					name="mutuality"
 					label="Mutualidad"
@@ -188,30 +183,10 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 
 				<Separator className="mt-2 bg-gray-200 md:col-span-2" />
 
-				<DatePickerFormField<WorkPermitSchema>
-					name="initDate"
-					control={form.control}
-					label="Fecha Inicio Trabajo"
-				/>
-
-				<InputFormField<WorkPermitSchema> name="hour" label="Hora" control={form.control} />
-
 				<InputFormField<WorkPermitSchema>
 					name="otNumber"
 					label="Número de OT"
 					control={form.control}
-				/>
-
-				<InputFormField<WorkPermitSchema>
-					name="workersNumber"
-					control={form.control}
-					label="Número de trabajadores"
-				/>
-
-				<TextAreaFormField<WorkPermitSchema>
-					name="workDescription"
-					control={form.control}
-					label="Descripción del trabajo"
 				/>
 
 				<TextAreaFormField<WorkPermitSchema>
@@ -403,12 +378,6 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 							Recepcion del trabajo
 						</h2>
 
-						<InputFormField<WorkPermitSchema>
-							name="whoReceives"
-							label="Quien recibe (Cierre de PT)"
-							control={form.control}
-						/>
-
 						<SwitchFormField<WorkPermitSchema>
 							control={form.control}
 							name="cleanAndTidyWorkArea"
@@ -439,7 +408,7 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 					<Button
 						type="button"
 						variant="outline"
-						onClick={() => appendParticipants({ fullName: "", rut: "", company: "" })}
+						onClick={() => appendParticipants({ userId: "" })}
 					>
 						Agregar participante <Plus />
 					</Button>
@@ -450,24 +419,6 @@ export default function WorkPermitForm({ userId }: { userId: string }): React.Re
 						key={field.id}
 						className="mb-1 flex w-full flex-wrap items-center gap-2 md:col-span-2 md:flex-nowrap"
 					>
-						<InputFormField<WorkPermitSchema>
-							name={`participants.${index}.fullName`}
-							label="Nombre completo"
-							control={form.control}
-						/>
-
-						<RutFormField<WorkPermitSchema>
-							name={`participants.${index}.rut`}
-							label="RUT"
-							control={form.control}
-						/>
-
-						<InputFormField<WorkPermitSchema>
-							name={`participants.${index}.company`}
-							label="Empresa"
-							control={form.control}
-						/>
-
 						<Button
 							type="button"
 							variant="outline"

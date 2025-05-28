@@ -56,14 +56,8 @@ export const createUserStartupFolder = async (userId: string) => {
 					create: WORKER_STRUCTURE.documents.map((doc) => ({
 						url: "",
 						name: doc.name,
-						fileType: "FILE",
 						category: WORKER_STRUCTURE.category,
 						type: doc.type as WorkerDocumentType,
-						folder: {
-							connect: {
-								id: startupFolder.id,
-							},
-						},
 					})),
 				},
 			},
