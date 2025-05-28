@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
 import type { WorkEquipment } from "@/hooks/use-equipments"
+import Link from "next/link"
 
 export const EquipmentColumns: ColumnDef<WorkEquipment>[] = [
 	{
@@ -65,6 +66,34 @@ export const EquipmentColumns: ColumnDef<WorkEquipment>[] = [
 		cell: ({ row }) => {
 			const count = (row.original._count as { workOrders: number }).workOrders
 			return <span>{count}</span>
+		},
+	},
+	{
+		id: "attachmentsCount",
+		header: "Archivos",
+		cell: ({ row }) => {
+			const attachments = row.original.attachments
+
+			return (
+				<ul className="flex flex-col gap-1">
+					{attachments.length > 0 ? (
+						attachments.map((attachment) => (
+							<li key={attachment.id}>
+								<Link
+									target="_blank"
+									href={attachment.url}
+									rel="noopener noreferrer"
+									className="text-green-500 hover:underline"
+								>
+									{attachment.name}
+								</Link>
+							</li>
+						))
+					) : (
+						<li>Sin archivos</li>
+					)}
+				</ul>
+			)
 		},
 	},
 	{

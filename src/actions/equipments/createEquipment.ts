@@ -3,21 +3,33 @@
 import prisma from "@/lib/prisma"
 
 import type { EquipmentSchema } from "@/lib/form-schemas/admin/equipment/equipment.schema"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import type { UploadResult } from "@/lib/upload-files"
 
 interface CreateEquipmentProps {
 	values: EquipmentSchema
+	uploadResults: UploadResult[]
 }
 
-export const createEquipment = async ({ values }: CreateEquipmentProps) => {
+export const createEquipment = async ({ values, uploadResults }: CreateEquipmentProps) => {
 	try {
 		const barcode = generateBarcode()
-		const { parentId, ...rest } = values
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { parentId, files, ...rest } = values
 
 		await prisma.equipment.create({
 			data: {
 				barcode,
 				...(parentId && { parent: { connect: { id: parentId } } }),
+				...(uploadResults.length > 0 && {
+					attachments: {
+						create: uploadResults.map((result) => ({
+							url: result.url,
+							name: result.name,
+							type: result.type,
+						})),
+					},
+				}),
 				...rest,
 			},
 		})

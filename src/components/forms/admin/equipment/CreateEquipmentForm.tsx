@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/sheet"
 
 import type { WorkEquipment } from "@/hooks/use-equipments"
+import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
+import UploadFilesFormField from "../../shared/UploadFilesFormField"
+import { Separator } from "@/components/ui/separator"
 
 interface CreateEquipmentFormProps {
 	parentId?: string
@@ -39,6 +42,7 @@ export default function CreateEquipmentForm({
 	parentId,
 	equipments,
 }: CreateEquipmentFormProps): React.ReactElement {
+	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
 
@@ -58,8 +62,20 @@ export default function CreateEquipmentForm({
 	async function onSubmit(values: EquipmentSchema) {
 		setLoading(true)
 
+		const files = form.getValues("files")
+		let uploadResults: UploadResult[] = []
+
 		try {
-			const { ok, message } = await createEquipment({ values })
+			if (files.length > 0) {
+				uploadResults = await uploadFilesToCloud({
+					files,
+					randomString: values.tag,
+					containerType: "equipment",
+					secondaryName: values.name,
+				})
+			}
+
+			const { ok, message } = await createEquipment({ values, uploadResults })
 
 			if (!ok) {
 				toast("Error al crear el equipo", {
@@ -76,7 +92,7 @@ export default function CreateEquipmentForm({
 			setOpen(false)
 			form.reset()
 			queryClient.invalidateQueries({
-				queryKey: ["equipment"],
+				queryKey: ["equipment", { parentId: values.parentId ?? null }],
 			})
 		} catch (error) {
 			console.log(error)
@@ -96,19 +112,21 @@ export default function CreateEquipmentForm({
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden text-nowrap sm:inline">Nuevo Equipo</span>
+				<span className="hidden text-nowrap sm:inline">Nuevo Equipo / Ubicación</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">
 				<SheetHeader className="shadow">
-					<SheetTitle>Nuevo Equipo</SheetTitle>
-					<SheetDescription>Complete el formulario para crear un nuevo equipo.</SheetDescription>
+					<SheetTitle>Nuevo Equipo / Ubicación</SheetTitle>
+					<SheetDescription>
+						Complete el formulario para crear un nuevo equipo / ubicación.
+					</SheetDescription>
 				</SheetHeader>
 
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-2 gap-y-5 px-4 pt-4 sm:grid-cols-2"
+						className="grid gap-x-2 gap-y-5 overflow-y-auto px-4 pt-4 pb-14 sm:grid-cols-2"
 					>
 						<InputFormField<EquipmentSchema>
 							name="name"
@@ -155,7 +173,7 @@ export default function CreateEquipmentForm({
 							name="description"
 							label="Descripción"
 							control={form.control}
-							itemClassName="md:col-span-2"
+							itemClassName="sm:col-span-2"
 							placeholder="Descripción del equipo"
 						/>
 
@@ -166,9 +184,25 @@ export default function CreateEquipmentForm({
 							itemClassName="flex flex-row items-center gap-2"
 						/>
 
+						<Separator className="my-2 sm:col-span-2" />
+
+						<div className="space-y-1 sm:col-span-2">
+							<h3 className="text-sm font-medium">Documentación / Instructivos</h3>
+
+							<UploadFilesFormField<EquipmentSchema>
+								name="files"
+								isMultiple={true}
+								maxFileSize={500}
+								canPreview={false}
+								control={form.control}
+								selectedFileIndex={selectedFileIndex}
+								setSelectedFileIndex={setSelectedFileIndex}
+							/>
+						</div>
+
 						<SubmitButton
-							label="Crear Equipo"
 							isSubmitting={loading}
+							label="Crear Equipo / Ubicación"
 							className="mt-4 w-full sm:col-span-2"
 						/>
 					</form>

@@ -36,6 +36,15 @@ export async function GET(req: NextRequest) {
 					isOperational: true,
 					type: true,
 					tag: true,
+					parentId: true,
+					attachments: {
+						select: {
+							id: true,
+							url: true,
+							name: true,
+							type: true,
+						},
+					},
 					children: {
 						select: {
 							id: true,

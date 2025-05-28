@@ -1,6 +1,8 @@
 import { PLAN_FREQUENCY } from "@prisma/client"
 
 export const TASK_FREQUENCY_VALUES = {
+	DAILY: PLAN_FREQUENCY.DAILY,
+	WEEKLY: PLAN_FREQUENCY.WEEKLY,
 	MONTHLY: PLAN_FREQUENCY.MONTHLY,
 	BIMONTHLY: PLAN_FREQUENCY.BIMONTHLY,
 	QUARTERLY: PLAN_FREQUENCY.QUARTERLY,
@@ -10,6 +12,8 @@ export const TASK_FREQUENCY_VALUES = {
 } as const
 
 export const TASK_FREQUENCY_VALUES_ARRAY = [
+	PLAN_FREQUENCY.DAILY,
+	PLAN_FREQUENCY.WEEKLY,
 	PLAN_FREQUENCY.MONTHLY,
 	PLAN_FREQUENCY.BIMONTHLY,
 	PLAN_FREQUENCY.QUARTERLY,
@@ -19,6 +23,14 @@ export const TASK_FREQUENCY_VALUES_ARRAY = [
 ] as const
 
 export const TaskFrequencyOptions = [
+	{
+		label: "Diario",
+		value: PLAN_FREQUENCY.DAILY,
+	},
+	{
+		label: "Semanal",
+		value: PLAN_FREQUENCY.WEEKLY,
+	},
 	{
 		label: "Mensual",
 		value: PLAN_FREQUENCY.MONTHLY,
@@ -46,6 +58,8 @@ export const TaskFrequencyOptions = [
 ]
 
 export const TaskFrequencyLabels = {
+	[PLAN_FREQUENCY.DAILY]: "Diario",
+	[PLAN_FREQUENCY.WEEKLY]: "Semanal",
 	[PLAN_FREQUENCY.MONTHLY]: "Mensual",
 	[PLAN_FREQUENCY.BIMONTHLY]: "Bimestral",
 	[PLAN_FREQUENCY.QUARTERLY]: "Cuatrimestral",

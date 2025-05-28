@@ -201,13 +201,13 @@ export const USER_ROLE = {
 }
 
 export const USER_ROLE_LABELS = {
-	[USER_ROLE.user]: "Usuario",
+	[USER_ROLE.user]: "Solo lectura",
 	[USER_ROLE.admin]: "Administrador",
 	[USER_ROLE.maintenancePlanOperator]: "Planes de Mantenimiento",
 	[USER_ROLE.workOrderOperator]: "Ordenes de Trabajo",
-	[USER_ROLE.startupFolderOperator]: "Carpetas de Inicio",
+	[USER_ROLE.startupFolderOperator]: "Carpetas de Arranque",
 	[USER_ROLE.workPermitOperator]: "Permisos de Trabajo",
-	[USER_ROLE.workBookOperator]: "Libros de Trabajo",
+	[USER_ROLE.workBookOperator]: "Libros de Obra",
 	[USER_ROLE.safetyTalkOperator]: "Charlas de Seguridad",
 	[USER_ROLE.documentationOperator]: "Documentación",
 	[USER_ROLE.equipmentOperator]: "Equipos",

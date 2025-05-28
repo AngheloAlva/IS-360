@@ -63,9 +63,9 @@ export default function EditEquipmentForm({
 				tag: equipment.tag,
 				type: equipment.type || "",
 				location: equipment.location,
-				description: equipment.description || "",
-				parentId: equipment.parent?.id || "",
+				parentId: equipment.parentId || "",
 				isOperational: equipment.isOperational,
+				description: equipment.description || "",
 			})
 		}
 	}, [equipment, form])
@@ -74,7 +74,13 @@ export default function EditEquipmentForm({
 		setLoading(true)
 
 		try {
-			const { ok, message } = await updateEquipment({ id, values })
+			const { ok, message } = await updateEquipment({
+				id,
+				values: {
+					...values,
+					files: [],
+				},
+			})
 
 			if (!ok) {
 				toast("Error al actualizar el equipo", {
@@ -105,7 +111,7 @@ export default function EditEquipmentForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary/20 hover:bg-primary/80 flex size-9 cursor-pointer items-center justify-center rounded-md px-2.5 text-sm text-white"
+				className="bg-primary/20 text-text hover:bg-primary/80 flex size-9 cursor-pointer items-center justify-center rounded-md px-2.5 text-sm"
 				onClick={() => setOpen(true)}
 			>
 				<EditIcon className="size-5" />
@@ -120,7 +126,7 @@ export default function EditEquipmentForm({
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-2 gap-y-5 px-4 pt-4 sm:grid-cols-2"
+						className="grid gap-x-2 gap-y-5 overflow-y-auto px-4 pt-4 pb-14 sm:grid-cols-2"
 					>
 						<InputFormField<EquipmentSchema>
 							name="name"
@@ -164,7 +170,7 @@ export default function EditEquipmentForm({
 										}))
 									: []
 							}
-							itemClassName="md:col-span-2"
+							itemClassName="sm:col-span-2"
 						/>
 
 						<TextAreaFormField<EquipmentSchema>
@@ -172,7 +178,7 @@ export default function EditEquipmentForm({
 							label="Descripción"
 							control={form.control}
 							placeholder="Descripción del equipo"
-							itemClassName="md:col-span-2"
+							itemClassName="sm:col-span-2"
 						/>
 
 						<SwitchFormField<EquipmentSchema>

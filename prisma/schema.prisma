@@ -377,6 +377,7 @@ model Equipment {
   history             EquipmentHistory[]
   MaintenancePlan     MaintenancePlan[]
   MaintenancePlanTask MaintenancePlanTask[]
+  attachments         Attachment[]
 
   @@unique([id])
   @@unique([tag])
@@ -515,6 +516,8 @@ model Attachment {
   history               AttachmentHistory[]
   MaintenancePlanTask   MaintenancePlanTask? @relation(fields: [maintenancePlanTaskId], references: [id])
   maintenancePlanTaskId String?
+  equipment             Equipment?           @relation(fields: [equipmentId], references: [id])
+  equipmentId           String?
 
   @@map("attachment")
 }
@@ -824,6 +827,8 @@ model EquipmentHistory {
 }
 
 enum PLAN_FREQUENCY {
+  DAILY
+  WEEKLY
   MONTHLY
   BIMONTHLY
   QUARTERLY

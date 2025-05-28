@@ -50,8 +50,8 @@ export function FileCard({ file, isSelected, onClick, canPreview }: FileCardProp
 							"font-bold": isSelected,
 						})}
 					>
-						{file.title && file.title.length > 20
-							? file.title.substring(0, 15) + "..." + getFileExtension(file.title)
+						{file.title && file.title.length > 15
+							? file.title.substring(0, 10) + "..." + getFileExtension(file.title)
 							: file.title}
 					</p>
 					<p className="text-muted-foreground text-sm">{size}</p>

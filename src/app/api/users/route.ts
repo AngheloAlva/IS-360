@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
 					createdAt: true,
 					internalRole: true,
 					isSupervisor: true,
+					documentAreas: true,
 					company: {
 						select: {
 							name: true,

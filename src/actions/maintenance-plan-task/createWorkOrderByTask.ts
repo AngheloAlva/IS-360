@@ -1,6 +1,6 @@
 "use server"
 
-import { addMonths } from "date-fns"
+import { addDays, addMonths, addWeeks } from "date-fns"
 
 import { sendNewWorkOrderEmail } from "../work-orders/sendNewWorkOrderEmail"
 import { generateOTNumber } from "@/actions/work-orders/generateOTNumber"
@@ -105,6 +105,12 @@ export const createWorkOrderByTask = async ({
 		let nextDate: Date
 
 		switch (maintenancePlanTask.frequency) {
+			case PLAN_FREQUENCY.DAILY:
+				nextDate = addDays(maintenancePlanTask.nextDate, 1)
+				break
+			case PLAN_FREQUENCY.WEEKLY:
+				nextDate = addWeeks(maintenancePlanTask.nextDate, 1)
+				break
 			case PLAN_FREQUENCY.MONTHLY:
 				nextDate = addMonths(maintenancePlanTask.nextDate, 1)
 				break

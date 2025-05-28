@@ -148,7 +148,7 @@ const navInternal = [
 		icon: Building2,
 	},
 	{
-		name: "Equipos",
+		name: "Equipos / Ubicaciones",
 		url: "/admin/dashboard/equipos",
 		icon: Wrench,
 	},

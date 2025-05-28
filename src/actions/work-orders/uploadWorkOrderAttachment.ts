@@ -20,9 +20,12 @@ export const uploadWorkOrderAttachment = async ({
 	reportPhase,
 }: UploadWorkOrderAttachmentProps) => {
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { equipment, ...rest } = data
+
 		const result = await prisma.attachment.create({
 			data: {
-				...data,
+				...rest,
 				...(reportPhase === "init"
 					? { initReport: { connect: { id: workOrderId } } }
 					: { endReport: { connect: { id: workOrderId } } }),

@@ -11,11 +11,10 @@ interface UpdateEquipmentProps {
 
 export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 	try {
-		const { parentId, ...rest } = values
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { parentId, files, ...rest } = values
 
-		// Verificar que no estamos creando un ciclo en la jerarquía
 		if (parentId) {
-			// No permitir que un equipo sea su propio padre
 			if (parentId === id) {
 				return {
 					ok: false,
@@ -23,7 +22,6 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 				}
 			}
 
-			// Verificar que el padre no sea uno de sus descendientes (evitar ciclos)
 			const descendants = await getDescendantIds(id)
 			if (descendants.includes(parentId)) {
 				return {
@@ -49,7 +47,6 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 				},
 			}
 		} else {
-			// Si no hay parentId, desconectar cualquier relación padre existente
 			connection.parent = {
 				disconnect: true,
 			}
@@ -77,7 +74,6 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 	}
 }
 
-// Función auxiliar para obtener todos los IDs de equipos descendientes
 async function getDescendantIds(equipmentId: string): Promise<string[]> {
 	const children = await prisma.equipment.findMany({
 		where: {
@@ -89,16 +85,12 @@ async function getDescendantIds(equipmentId: string): Promise<string[]> {
 	})
 
 	const childIds = children.map((child) => child.id)
-	
-	// Si no hay hijos, retornar array vacío
+
 	if (childIds.length === 0) {
 		return []
 	}
-
-	// Obtener todos los descendientes de los hijos
 	const descendantPromises = childIds.map((childId) => getDescendantIds(childId))
 	const nestedDescendants = await Promise.all(descendantPromises)
-	
-	// Aplanar el array de arrays y combinar con los hijos directos
+
 	return [...childIds, ...nestedDescendants.flat()]
 }

@@ -1,3 +1,4 @@
+import { Attachment } from "@prisma/client"
 import { QueryFunction, useQuery } from "@tanstack/react-query"
 
 export async function fetchAllEquipments(parentId: string | null = null) {
@@ -24,6 +25,8 @@ export interface WorkEquipment {
 	type: string | null
 	tag: string
 	children: WorkEquipment[]
+	parentId: string | null
+	attachments: Attachment[]
 	_count: {
 		workOrders: number
 		children: number
@@ -78,7 +81,7 @@ export const useEquipments = ({
 }
 
 export const useEquipment = (id: string) => {
-	return useQuery({
+	return useQuery<WorkEquipment>({
 		queryKey: ["equipment", id],
 		queryFn: async () => {
 			if (!id) return null

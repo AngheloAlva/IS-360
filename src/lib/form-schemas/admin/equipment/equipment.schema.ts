@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { fileSchema } from "../../document-management/file.schema"
+
 export const equipmentSchema = z.object({
 	name: z.string().min(1, { message: "El nombre es requerido" }).max(255),
 	description: z.string().optional(),
@@ -7,6 +9,7 @@ export const equipmentSchema = z.object({
 	isOperational: z.boolean().optional(),
 	type: z.string().optional(),
 	tag: z.string().min(1, { message: "El tag es requerido" }),
+	files: z.array(fileSchema),
 
 	parentId: z.string().optional(),
 })

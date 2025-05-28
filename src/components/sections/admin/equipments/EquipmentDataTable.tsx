@@ -180,7 +180,12 @@ export function EquipmentDataTable({ parentId, lastPath, hasPermission }: Equipm
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
 
-						{hasPermission && <CreateEquipmentForm equipments={data?.equipments ?? []} />}
+						{hasPermission && (
+							<CreateEquipmentForm
+								parentId={parentId ?? undefined}
+								equipments={data?.equipments ?? []}
+							/>
+						)}
 					</div>
 				</div>
 			</div>
