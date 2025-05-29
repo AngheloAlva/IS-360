@@ -3,11 +3,19 @@
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { Plus, X } from "lucide-react"
 import { useEffect, useState } from "react"
+import { addDays, format } from "date-fns"
+import { Plus, X } from "lucide-react"
+import { es } from "date-fns/locale"
 import { toast } from "sonner"
 
+import { useWorkOrders, WorkOrder } from "@/hooks/work-orders/use-work-order"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { createWorkPermit } from "@/actions/work-permit/createWorkPermit"
+import { useUsersByCompany } from "@/hooks/users/use-users-by-company"
+import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_PRIORITY } from "@prisma/client"
+import { cn } from "@/lib/utils"
 import {
 	workPermitSchema,
 	type WorkPermitSchema,
@@ -23,34 +31,27 @@ import {
 } from "@/lib/consts/work-permit-options"
 
 import { MultiSelectFormField } from "@/components/forms/shared/MultiSelectFormField"
+import { SelectWithSearchFormField } from "../shared/SelectWithSearchFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SwitchFormField } from "@/components/forms/shared/SwitchFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-
-import { Form } from "@/components/ui/form"
-import { useWorkOrders, WorkOrder } from "@/hooks/work-orders/use-work-order"
-import { useUsersByCompany } from "@/hooks/users/use-users-by-company"
-import { Card, CardContent } from "@/components/ui/card"
-import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import { WORK_ORDER_PRIORITY } from "@prisma/client"
-import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
-import { SelectWithSearchFormField } from "../shared/SelectWithSearchFormField"
+import { Form } from "@/components/ui/form"
 
 interface WorkPermitFormProps {
 	userId: string
 	companyId: string
+	userName: string
 }
 
 export default function WorkPermitForm({
 	userId,
+	userName,
 	companyId,
 }: WorkPermitFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -67,27 +68,22 @@ export default function WorkPermitForm({
 			wasteType: "",
 			mutuality: "",
 			preChecks: [],
-			aplicantPt: "",
 			exactPlace: "",
 			otherTools: "",
 			workWillBe: "",
-			observations: "",
-			workerExecutor: "",
+			endDate: undefined,
 			otherPreChecks: "",
 			otherMutuality: "",
 			acceptTerms: false,
 			workWillBeOther: "",
-			workCompleted: false,
+			startDate: undefined,
 			generateWaste: false,
-			preventionOfficer: "",
+			aplicantPt: userName,
 			riskIdentification: [],
 			wasteDisposalLocation: "",
-			whoDeliversWorkAreaOp: "",
 			additionalObservations: "",
-			cleanAndTidyWorkArea: false,
 			preventiveControlMeasures: [],
 			otherPreventiveControlMeasures: "",
-			activityDetails: [{ activity: "" }, { activity: "" }],
 			participants: [
 				{
 					userId: "",
@@ -128,10 +124,26 @@ export default function WorkPermitForm({
 
 			if (!workOrder) return
 
+			form.setValue("startDate", new Date(workOrder.programDate))
 			setWorkOrderSelected(workOrder)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("otNumber")])
+
+	useEffect(() => {
+		const workWillBe = form.watch("workWillBe")
+
+		if (
+			workWillBe === "En Caliente" ||
+			workWillBe === "Acceso Limitado" ||
+			workWillBe === "Espacio confinado"
+		) {
+			form.setValue("endDate", addDays(form.watch("startDate"), 1))
+		} else {
+			form.setValue("endDate", addDays(form.watch("startDate"), 7))
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("workWillBe")])
 
 	async function onSubmit(values: WorkPermitSchema) {
 		try {
@@ -148,8 +160,8 @@ export default function WorkPermitForm({
 				return
 			}
 
-			toast("Permiso de trabajo", {
-				description: "Permiso de trabajo enviado exitosamente",
+			toast.success("Permiso de trabajo", {
+				description: "Permiso de trabajo creado exitosamente",
 				duration: 3000,
 			})
 
@@ -157,7 +169,7 @@ export default function WorkPermitForm({
 		} catch (error) {
 			setIsSubmitting(false)
 
-			toast("Error", {
+			toast.error("Error", {
 				description: `Hubo un error al enviar el permiso de trabajo. ${error instanceof Error ? error.message : "Error desconocido"}`,
 				duration: 3000,
 			})
@@ -182,6 +194,10 @@ export default function WorkPermitForm({
 		name: "participants",
 	})
 
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
+
 	return (
 		<Card>
 			<CardContent>
@@ -205,9 +221,10 @@ export default function WorkPermitForm({
 								/>
 
 								<InputFormField<WorkPermitSchema>
+									readOnly
 									name="aplicantPt"
-									label="Solicitante PT"
 									control={form.control}
+									label="Solicitante del Permiso (No editable)"
 								/>
 
 								<SelectFormField<WorkPermitSchema>
@@ -312,16 +329,16 @@ export default function WorkPermitForm({
 
 						<SelectFormField<WorkPermitSchema>
 							name="workWillBe"
-							label="Trabajo a realizar"
 							control={form.control}
+							label="Trabajo a realizar"
 							options={WorkWillBeOptions}
 						/>
 
 						{workWillBeAreOther && (
 							<InputFormField<WorkPermitSchema>
 								name="workWillBeOther"
-								label="Especifique otro trabajo"
 								control={form.control}
+								label="Especifique otro trabajo"
 							/>
 						)}
 
@@ -458,7 +475,6 @@ export default function WorkPermitForm({
 							</>
 						)}
 
-						<Separator className="my-2 bg-gray-200 md:col-span-2" />
 						{/* 
 						<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
 							Firmas de autorización
@@ -476,14 +492,7 @@ export default function WorkPermitForm({
 							control={form.control}
 						/> */}
 
-						<InputFormField<WorkPermitSchema>
-							name="preventionOfficer"
-							label="Especialista en Prevención OTC"
-							control={form.control}
-						/>
-
-						{false && (
-							<>
+						{/* 							
 								<Separator className="my-2 bg-gray-200 md:col-span-2" />
 
 								<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
@@ -506,9 +515,7 @@ export default function WorkPermitForm({
 									name="observations"
 									label="Observaciones"
 									control={form.control}
-								/>
-							</>
-						)}
+								/> */}
 
 						<Separator className="mt-2 bg-gray-200 md:col-span-2" />
 

@@ -25,7 +25,11 @@ export default async function CreateWorkPermitPage() {
 				<h1 className="w-fit text-3xl font-bold">Nuevo Permiso de Trabajo Seguro</h1>
 			</div>
 
-			<WorkPermitForm userId={res.user.id} companyId={res.user.companyId!} />
+			<WorkPermitForm
+				userId={res.user.id}
+				userName={res.user.name}
+				companyId={res.user.companyId!}
+			/>
 		</>
 	)
 }

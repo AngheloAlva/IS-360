@@ -26,7 +26,7 @@ export interface WorkOrder {
 	endReport: {
 		url: string
 	} | null
-	programDate: string | null
+	programDate: Date
 	estimatedHours: number | null
 	estimatedDays: number | null
 	estimatedEndDate: string | null

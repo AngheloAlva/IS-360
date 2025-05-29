@@ -11,6 +11,7 @@ export const MutualityOptions: Option[] = [
 export const WorkWillBeOptions: Option[] = [
 	{ value: "Altura fisica", label: "Altura fisica" },
 	{ value: "Espacio confinado", label: "Espacio confinado" },
+	{ value: "Acceso Limitado", label: "Acceso Limitado" },
 	{ value: "En Caliente", label: "En Caliente" },
 	{ value: "Electrico", label: "Electrico" },
 	{ value: "General", label: "General" },

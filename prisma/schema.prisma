@@ -553,19 +553,22 @@ model WorkPermit {
   generateWaste                  Boolean
   wasteType                      String?
   wasteDisposalLocation          String?
-  whoDeliversWorkAreaOp          String
-  workerExecutor                 String
+  whoDeliversWorkAreaOp          String?
+  workerExecutor                 String?
   workCompleted                  Boolean?
   cleanAndTidyWorkArea           Boolean?
   additionalObservations         String?
   observations                   String?
   acceptTerms                    Boolean            @default(false)
+  startDate                      DateTime
+  endDate                        DateTime
+  initialAreaMeasurement         Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  preventionOfficerUser User      @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
-  preventionOfficerId   String
+  preventionOfficerUser User?     @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
+  preventionOfficerId   String?
   otNumber              WorkOrder @relation(fields: [otNumberId], references: [id])
   otNumberId            String
   user                  User      @relation("WorkPermitUser", fields: [userId], references: [id])

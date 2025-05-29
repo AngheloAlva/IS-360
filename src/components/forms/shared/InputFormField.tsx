@@ -21,6 +21,7 @@ interface InputFormFieldProps<T extends FieldValues> {
 	label: string
 	step?: number
 	name: Path<T>
+	readOnly?: boolean
 	disabled?: boolean
 	optional?: boolean
 	control: Control<T>
@@ -44,6 +45,7 @@ export function InputFormField<T extends FieldValues>({
 	itemClassName,
 	type = "text",
 	disabled = false,
+	readOnly = false,
 	optional = false,
 }: InputFormFieldProps<T>) {
 	return (
@@ -63,6 +65,7 @@ export function InputFormField<T extends FieldValues>({
 							type={type}
 							step={step}
 							disabled={disabled}
+							readOnly={readOnly}
 							className={cn("w-full text-sm", className)}
 							placeholder={placeholder || label}
 							{...field}

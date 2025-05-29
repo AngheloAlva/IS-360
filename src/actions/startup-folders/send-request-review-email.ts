@@ -16,7 +16,7 @@ export const sendRequestReviewEmail = async ({
 	try {
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
-			to: ["anghelo.alva@ingenieriasimple.cl"],
+			to: ["anghelo.alva@ingenieriasimple.cl", "katherine.burgos@oleotrasandino.cl"],
 			subject: `Solicitud de Revisión Carpetas de arranque - ${companyName} - ${folderName}`,
 			react: await RequestReviewEmailTemplate({
 				folderName,

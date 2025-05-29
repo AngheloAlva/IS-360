@@ -1,15 +1,15 @@
-import MainWorkBook from "@/components/sections/work-permit/Main"
-import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+import { auth } from "@/lib/auth"
 
-export default async function WorkPermitPage(props: { searchParams: SearchParams }) {
+import { WorkPermitDataTable } from "@/components/sections/work-permit/WorkPermitDataTable"
+
+export default async function WorkPermitPage() {
 	const res = await auth.api.getSession({
 		headers: await headers(),
 	})
 
-	if (!res) {
+	if (!res || !res.user || res.user.companyId) {
 		return (
 			<main className="flex h-screen items-center justify-center">
 				<p>Acceso denegado</p>
@@ -17,8 +17,11 @@ export default async function WorkPermitPage(props: { searchParams: SearchParams
 		)
 	}
 
-	const searchParams = await props.searchParams
-	const page = searchParams.page ? parseInt(searchParams.page as string) : 1
+	return (
+		<div className="flex h-full w-full flex-1 flex-col gap-8 overflow-hidden transition-all">
+			<h1 className="w-fit text-3xl font-bold">Permisos de Trabajo Seguro</h1>
 
-	return <MainWorkBook page={page} userId={res.user.id} />
+			<WorkPermitDataTable companyId={res.user.companyId!} />
+		</div>
+	)
 }

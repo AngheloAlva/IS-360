@@ -16,7 +16,6 @@ export const workPermitSchema = z.object({
 	otherTools: z.string().optional(),
 	preChecks: z.array(z.string()).min(1, { message: "Debe seleccionar al menos un pre-check" }),
 	otherPreChecks: z.string().optional(),
-	activityDetails: z.array(z.object({ activity: z.string() })),
 	riskIdentification: z
 		.array(z.string())
 		.min(1, { message: "Debe seleccionar al menos un riesgo" }),
@@ -28,15 +27,9 @@ export const workPermitSchema = z.object({
 	generateWaste: z.boolean(),
 	wasteType: z.string().optional(),
 	wasteDisposalLocation: z.string().optional(),
-	whoDeliversWorkAreaOp: z.string().min(2, { message: "Debe seleccionar un Operador" }),
-	workerExecutor: z
-		.string()
-		.min(2, { message: "El nombre del ejecutor del trabajo debe tener al menos 2 caracteres" }),
-	preventionOfficer: z.string().nonempty({ message: "Debe seleccionar un prevencionista" }),
-	cleanAndTidyWorkArea: z.boolean(),
-	workCompleted: z.boolean(),
-	observations: z.string().optional(),
 	additionalObservations: z.string().optional(),
+	startDate: z.date(),
+	endDate: z.date(),
 
 	participants: z.array(
 		z.object({

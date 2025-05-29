@@ -55,7 +55,7 @@ export function MaintenancePlanDataTable() {
 		page,
 		search,
 		location,
-		limit: 15,
+		limit: 20,
 	})
 
 	const table = useReactTable<MaintenancePlan>({
@@ -71,7 +71,7 @@ export function MaintenancePlanDataTable() {
 			columnFilters,
 			pagination: {
 				pageIndex: page - 1,
-				pageSize: 10,
+				pageSize: 20,
 			},
 		},
 		manualPagination: true,
@@ -89,7 +89,7 @@ export function MaintenancePlanDataTable() {
 				{
 					planSlug: slug,
 					page: 1,
-					limit: 15,
+					limit: 20,
 					search: "",
 					frequency: "",
 					nextDateFrom: "",
@@ -104,7 +104,7 @@ export function MaintenancePlanDataTable() {
 						{
 							planSlug: slug,
 							page: 1,
-							limit: 15,
+							limit: 20,
 							search: "",
 							frequency: "",
 							nextDateFrom: "",

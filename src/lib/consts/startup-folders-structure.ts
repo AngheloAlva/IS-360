@@ -22,6 +22,8 @@ export interface StartupFolderStructure {
 	}[]
 }
 
+// TODO: Add nomina del personal, eliminar Organigrama, un procedimiento repetido, y permisos de trabajo
+
 export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 	title: "Seguridad y Salud Ocupacional",
 	category: DocumentCategory.SAFETY_AND_HEALTH,

@@ -1,53 +1,38 @@
 "use server"
 
-// import prisma from "@/lib/prisma"
+import prisma from "@/lib/prisma"
 
-import type { workPermitSchema } from "@/lib/form-schemas/work-permit/work-permit-schema"
-import type { z } from "zod"
+import type { WorkPermitSchema } from "@/lib/form-schemas/work-permit/work-permit-schema"
 
-export const createWorkPermit = async (values: z.infer<typeof workPermitSchema>) => {
+export const createWorkPermit = async (values: WorkPermitSchema) => {
 	try {
-		console.log(values)
-		// const { userId, ...rest } = values
+		const { userId, otNumber, companyId, participants, ...rest } = values
 
-		// await prisma.workPermit.create({
-		// 	data: {
-		// 		...rest,
-		// 		workersNumber: +rest.workersNumber,
-		// 		otherMutuality: rest.otherMutuality || undefined,
-		// 		additionalObservations: rest.additionalObservations || undefined,
-		// 		activityDetails: rest.activityDetails.map((activity) => activity.activity),
-		// 		preventionOfficer: undefined,
-		// 		preventionOfficerUser: {
-		// 			connect: {
-		// 				id: userId,
-		// 			},
-		// 		},
-		// 		participants: undefined,
-		// 		otNumber: {
-		// 			create: {
-		// 				otNumber: rest.otNumber,
-		// 				endDate: new Date(),
-		// 				initDate: new Date(),
-		// 				quantityDays: 0,
-		// 				equipmentProperty: "",
-		// 				type: "CORRECTIVE",
-		// 				estimatedDuration: 0,
-		// 				printed: false,
-		// 				responsible: {
-		// 					connect: {
-		// 						id: userId,
-		// 					},
-		// 				},
-		// 			},
-		// 		},
-		// 		user: {
-		// 			connect: {
-		// 				id: userId,
-		// 			},
-		// 		},
-		// 	},
-		// })
+		await prisma.workPermit.create({
+			data: {
+				...rest,
+				otNumber: {
+					connect: {
+						otNumber,
+					},
+				},
+				user: {
+					connect: {
+						id: userId,
+					},
+				},
+				company: {
+					connect: {
+						id: companyId,
+					},
+				},
+				participants: {
+					connect: participants.map((participant) => ({
+						id: participant.userId,
+					})),
+				},
+			},
+		})
 
 		return {
 			ok: true,

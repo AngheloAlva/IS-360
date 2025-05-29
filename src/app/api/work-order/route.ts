@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
-import prisma from "@/lib/prisma"
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE } from "@prisma/client"
+import prisma from "@/lib/prisma"
 
 export async function GET(req: NextRequest) {
 	try {
