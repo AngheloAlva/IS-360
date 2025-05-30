@@ -29,7 +29,9 @@ import type {
 interface DocumentListProps {
 	userId: string
 	folderId: string
+	workerId?: string
 	companyId: string
+	vehicleId?: string
 	className?: string
 	isEditable: boolean
 	isOtcMember?: boolean
@@ -50,6 +52,8 @@ export function DocumentList({
 	userId,
 	category,
 	folderId,
+	workerId,
+	vehicleId,
 	className,
 	documents,
 	companyId,
@@ -131,6 +135,8 @@ export function DocumentList({
 													documentName={doc.name}
 													documentId={document.id}
 													currentUrl={document.url}
+													workerId={workerId || undefined}
+													vehicleId={vehicleId || undefined}
 												/>
 											)}
 
@@ -165,6 +171,8 @@ export function DocumentList({
 											companyId={companyId}
 											documentName={doc.name}
 											documentId={document.id}
+											workerId={workerId || undefined}
+											vehicleId={vehicleId || undefined}
 										/>
 									)
 								)}

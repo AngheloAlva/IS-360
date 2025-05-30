@@ -19,6 +19,8 @@ export const createVehicleDocument = async ({
 	userId: string
 }) => {
 	try {
+		if (!vehicleId) throw new Error("Vehicle ID is required for creating vehicle document.")
+
 		const folder = await prisma.vehicleFolder.findUnique({
 			where: {
 				id: folderId,
@@ -53,7 +55,6 @@ export const createVehicleDocument = async ({
 				uploadedAt: new Date(),
 				category: "VEHICLES",
 				type: type as VehicleDocumentType,
-				...(vehicleId && { vehicle: { connect: { id: vehicleId } } }), // Conditionally connect vehicle
 				uploadedBy: {
 					connect: {
 						id: userId,

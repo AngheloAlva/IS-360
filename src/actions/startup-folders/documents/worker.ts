@@ -25,10 +25,7 @@ export const createWorkerDocument = async ({
 
 		const folder = await prisma.workerFolder.findUnique({
 			where: {
-				workerId_startupFolderId: {
-					workerId,
-					startupFolderId: folderId,
-				},
+				id: folderId,
 			},
 		})
 
@@ -47,10 +44,7 @@ export const createWorkerDocument = async ({
 		// Buscar o crear la carpeta del trabajador
 		const workerFolder = await prisma.workerFolder.findUnique({
 			where: {
-				workerId_startupFolderId: {
-					workerId,
-					startupFolderId: folderId,
-				},
+				id: folderId,
 			},
 		})
 

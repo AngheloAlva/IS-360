@@ -1,15 +1,11 @@
-import { CarIcon, CheckCircle2, Clock, ExternalLink } from "lucide-react"
+import { CarIcon } from "lucide-react"
 
 import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { getDocumentStatus } from "@/lib/get-document-status"
-import { cn } from "@/lib/utils"
 
-import { StartupFolderStatusBadge } from "@/components/ui/startup-folder-status-badge"
-import { UploadStartupFolderDocumentForm } from "../UploadStartupFolderDocumentForm"
 import { SubmitReviewRequestDialog } from "../SubmitReviewRequestDialog"
 import StartupFolderTrigger from "./StartupFolderTrigger"
-import { Button } from "@/components/ui/button"
 import {
 	Accordion,
 	AccordionItem,
@@ -18,6 +14,7 @@ import {
 } from "@/components/ui/accordion"
 
 import type { StartupFolderWithDocuments } from "@/hooks/startup-folders/use-startup-folder"
+import { DocumentList } from "./DocumentList"
 
 interface VehicleDocumentsProps {
 	userId: string
@@ -96,6 +93,8 @@ export default function VehicleDocuments({
 							<div className="space-y-6 py-2">
 								<Accordion type="multiple" className="space-y-4">
 									{folders.map((folder) => {
+										const isEditable = folder.status === ReviewStatus.DRAFT
+
 										const totalDocumentsUploaded = folder.documents.filter(
 											(doc: { url: string }) => doc.url !== ""
 										).length
@@ -107,102 +106,35 @@ export default function VehicleDocuments({
 												className="border-muted rounded-md border"
 											>
 												<AccordionTrigger className="cursor-pointer px-4 py-3 hover:no-underline">
-													<div className="flex w-full items-center justify-between">
-														<div className="flex items-center">
-															<div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-500">
-																<CarIcon className="h-4 w-4" />
-															</div>
+													<div className="flex items-center">
+														<div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-500">
+															<CarIcon className="h-4 w-4" />
+														</div>
 
-															<div className="flex flex-col">
-																<span className="font-medium">
-																	{folder.vehicle.model} ({folder.vehicle.plate})
-																</span>
-																<span className="text-muted-foreground text-sm">
-																	{totalDocumentsUploaded} de {VEHICLE_STRUCTURE.documents.length}
-																	documentos agregados
-																</span>
-															</div>
+														<div className="flex flex-col">
+															<span className="font-medium">
+																{folder.vehicle.model} ({folder.vehicle.plate})
+															</span>
+															<span className="text-muted-foreground text-sm">
+																{totalDocumentsUploaded} de {VEHICLE_STRUCTURE.documents.length}
+																documentos agregados
+															</span>
 														</div>
 													</div>
 												</AccordionTrigger>
 
-												<AccordionContent>
-													<div className="space-y-4 p-4">
-														{VEHICLE_STRUCTURE.documents.map((docStruct) => {
-															const { document, isUploaded, status } = getDocumentStatus(
-																VEHICLE_STRUCTURE.category,
-																docStruct.type,
-																folder.documents
-															)
-
-															return (
-																<div
-																	key={docStruct.type}
-																	className="flex items-center justify-between rounded-lg border p-4"
-																>
-																	<div className="flex items-center gap-3">
-																		<div
-																			className={cn(
-																				"flex h-8 w-8 items-center justify-center rounded-full",
-																				isUploaded
-																					? "bg-green-100 text-green-600"
-																					: "bg-gray-100 text-gray-400"
-																			)}
-																		>
-																			{isUploaded ? (
-																				<CheckCircle2 className="h-4 w-4" />
-																			) : (
-																				<Clock className="h-4 w-4" />
-																			)}
-																		</div>
-																		<div>
-																			<h4 className="font-medium">{docStruct.name}</h4>
-																		</div>
-																	</div>
-																	<div className="flex items-center gap-2">
-																		{document &&
-																			(isUploaded ? (
-																				<>
-																					<span
-																						className={cn(
-																							"rounded-full px-2 py-1 text-xs font-medium",
-																							status === "APPROVED" &&
-																								"bg-green-100 text-green-800",
-																							status === "REJECTED" && "bg-red-100 text-red-800",
-																							status === "DRAFT" && "bg-yellow-100 text-yellow-800"
-																						)}
-																					>
-																						<StartupFolderStatusBadge status={status} />
-																					</span>
-																					<Button variant="ghost" size="icon" asChild>
-																						<a
-																							href={document.url}
-																							target="_blank"
-																							rel="noopener noreferrer"
-																							className="text-blue-600 hover:text-blue-800"
-																						>
-																							<ExternalLink className="h-4 w-4" />
-																						</a>
-																					</Button>
-																				</>
-																			) : (
-																				<UploadStartupFolderDocumentForm
-																					userId={userId}
-																					isUpdate={false}
-																					folderId={folder.id}
-																					companyId={companyId}
-																					type={docStruct.type}
-																					documentId={document.id}
-																					vehicleId={folder.vehicle.id}
-																					documentName={docStruct.name}
-																					category={VEHICLE_STRUCTURE.category}
-																				/>
-																			))}
-																	</div>
-																</div>
-															)
-														})}
-													</div>
+												<AccordionContent className="px-4 pt-0 pb-2">
+													<DocumentList
+														userId={userId}
+														companyId={companyId}
+														folderId={folder.id}
+														isEditable={isEditable}
+														isOtcMember={isOtcMember}
+														documents={folder.documents}
+														vehicleId={folder.vehicle.id}
+														category={VEHICLE_STRUCTURE.category}
+														documentsStructure={VEHICLE_STRUCTURE}
+													/>
 												</AccordionContent>
 											</AccordionItem>
 										)

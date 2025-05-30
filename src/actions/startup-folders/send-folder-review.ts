@@ -56,7 +56,13 @@ export const sendFolderReview = async ({
 				})
 				safetyAndHealthDocuments.forEach(async (document) => {
 					const newDocumentStatus =
-						document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+						document.status === ReviewStatus.SUBMITTED
+							? newStatus
+							: document.status === ReviewStatus.APPROVED
+								? ReviewStatus.APPROVED
+								: document.status === ReviewStatus.DRAFT
+									? ReviewStatus.DRAFT
+									: document.status
 
 					await prisma.safetyAndHealthDocument.update({
 						where: { id: document.id },
@@ -107,7 +113,13 @@ export const sendFolderReview = async ({
 				})
 				environmentalDocuments.forEach(async (document) => {
 					const newDocumentStatus =
-						document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+						document.status === ReviewStatus.SUBMITTED
+							? newStatus
+							: document.status === ReviewStatus.APPROVED
+								? ReviewStatus.APPROVED
+								: document.status === ReviewStatus.DRAFT
+									? ReviewStatus.DRAFT
+									: document.status
 
 					await prisma.environmentalDocument.update({
 						where: { id: document.id },
@@ -162,7 +174,13 @@ export const sendFolderReview = async ({
 					})
 					workerDocuments.forEach(async (document) => {
 						const newDocumentStatus =
-							document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+							document.status === ReviewStatus.SUBMITTED
+								? newStatus
+								: document.status === ReviewStatus.APPROVED
+									? ReviewStatus.APPROVED
+									: document.status === ReviewStatus.DRAFT
+										? ReviewStatus.DRAFT
+										: document.status
 
 						await prisma.workerDocument.update({
 							where: { id: document.id },
@@ -218,7 +236,13 @@ export const sendFolderReview = async ({
 					})
 					vehicleDocuments.forEach(async (document) => {
 						const newDocumentStatus =
-							document.status === ReviewStatus.SUBMITTED ? newStatus : document.status
+							document.status === ReviewStatus.SUBMITTED
+								? newStatus
+								: document.status === ReviewStatus.APPROVED
+									? ReviewStatus.APPROVED
+									: document.status === ReviewStatus.DRAFT
+										? ReviewStatus.DRAFT
+										: document.status
 
 						await prisma.vehicleDocument.update({
 							where: { id: document.id },

@@ -122,16 +122,19 @@ export default function WorkerDocuments({
 										</AccordionTrigger>
 
 										<AccordionContent className="px-4 pt-0 pb-2">
-											<DocumentList
-												userId={userId}
-												folderId={folder.id}
-												companyId={companyId}
-												isEditable={isEditable}
-												isOtcMember={isOtcMember}
-												documents={folder.documents}
-												category={WORKER_STRUCTURE.category}
-												documentsStructure={WORKER_STRUCTURE}
-											/>
+											{folder.workerId && (
+												<DocumentList
+													userId={userId}
+													folderId={folder.id}
+													companyId={companyId}
+													isEditable={isEditable}
+													isOtcMember={isOtcMember}
+													workerId={folder.workerId}
+													documents={folder.documents}
+													category={WORKER_STRUCTURE.category}
+													documentsStructure={WORKER_STRUCTURE}
+												/>
+											)}
 										</AccordionContent>
 									</AccordionItem>
 								)
