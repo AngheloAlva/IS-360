@@ -23,6 +23,9 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 
 import type { User } from "@prisma/client"
+import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
+import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
+import { createUserStartupFolder } from "@/actions/users/createUserStartupFolder"
 
 interface CreateExternalSupervisorsFormProps {
 	companyId: string
@@ -43,6 +46,9 @@ export default function CreateExternalSupervisorsForm({
 					rut: "",
 					name: "",
 					email: "",
+					phone: "",
+					internalArea: "",
+					internalRole: "",
 				},
 			],
 		},
@@ -59,7 +65,7 @@ export default function CreateExternalSupervisorsForm({
 		try {
 			const results = await Promise.allSettled(
 				values.supervisors.map(async (supervisor) => {
-					const temporalPassword = "123456"
+					const temporalPassword = generateTemporalPassword()
 
 					const { data: newUser, error } = await authClient.admin.createUser({
 						name: supervisor.name,
@@ -70,12 +76,27 @@ export default function CreateExternalSupervisorsForm({
 							companyId,
 							isSupervisor: true,
 							rut: supervisor.rut,
+							phone: supervisor.phone,
+							internalRole: supervisor.internalRole,
+							internalArea: supervisor.internalArea,
 						},
 					})
 
-					// TODO: Send notification emails
-
 					if (error) throw new Error(`Error al crear usuario ${supervisor.name}: ${error.message}`)
+
+					await authClient.admin.setRole({
+						userId: newUser.user.id,
+						role: ["partnerCompany"],
+					})
+
+					await createUserStartupFolder(newUser.user.id)
+
+					sendNewUserEmail({
+						name: supervisor.name,
+						email: supervisor.email,
+						password: temporalPassword,
+					})
+
 					return newUser
 				})
 			)
