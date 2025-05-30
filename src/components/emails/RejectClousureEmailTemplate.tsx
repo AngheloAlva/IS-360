@@ -45,7 +45,7 @@ export const RejectClousureEmailTemplate: React.FC<Readonly<RejectClosureEmailTe
 							width="150"
 							height="142"
 							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.svg`}
+							src={`${systemUrl}/logo.png`}
 							className="mx-auto h-auto w-[150px] object-cover"
 						/>
 					</Section>
@@ -73,7 +73,9 @@ export const RejectClousureEmailTemplate: React.FC<Readonly<RejectClosureEmailTe
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{workOrderName}</Text>
+									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										{workOrderName}
+									</Text>
 								</Column>
 							</Row>
 
@@ -84,7 +86,9 @@ export const RejectClousureEmailTemplate: React.FC<Readonly<RejectClosureEmailTe
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{workOrderNumber}</Text>
+									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										{workOrderNumber}
+									</Text>
 								</Column>
 							</Row>
 
@@ -106,7 +110,9 @@ export const RejectClousureEmailTemplate: React.FC<Readonly<RejectClosureEmailTe
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{supervisorName}</Text>
+									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										{supervisorName}
+									</Text>
 								</Column>
 							</Row>
 
@@ -127,8 +133,8 @@ export const RejectClousureEmailTemplate: React.FC<Readonly<RejectClosureEmailTe
 						</Section>
 
 						<Text className="mb-[24px] text-[16px] text-gray-600">
-							Por favor, revise los motivos del rechazo y realice las correcciones necesarias antes de
-							volver a solicitar el cierre.
+							Por favor, revise los motivos del rechazo y realice las correcciones necesarias antes
+							de volver a solicitar el cierre.
 						</Text>
 
 						<Section className="mb-[32px] text-center">

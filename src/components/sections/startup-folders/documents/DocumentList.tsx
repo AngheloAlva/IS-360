@@ -87,12 +87,6 @@ export function DocumentList({
 											</TooltipContent>
 										</Tooltip>
 									</div>
-
-									{doc.required && !isUploaded && (
-										<span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-											Requerido
-										</span>
-									)}
 								</div>
 
 								{document?.reviewNotes && (

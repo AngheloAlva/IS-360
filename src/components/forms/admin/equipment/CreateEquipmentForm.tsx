@@ -13,7 +13,6 @@ import {
 	type EquipmentSchema,
 } from "@/lib/form-schemas/admin/equipment/equipment.schema"
 
-import { SelectWithSearchFormField } from "@/components/forms/shared/SelectWithSearchFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SwitchFormField } from "@/components/forms/shared/SwitchFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
@@ -28,19 +27,16 @@ import {
 	SheetDescription,
 } from "@/components/ui/sheet"
 
-import type { WorkEquipment } from "@/hooks/use-equipments"
 import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 import UploadFilesFormField from "../../shared/UploadFilesFormField"
 import { Separator } from "@/components/ui/separator"
 
 interface CreateEquipmentFormProps {
 	parentId?: string
-	equipments: WorkEquipment[]
 }
 
 export default function CreateEquipmentForm({
 	parentId,
-	equipments,
 }: CreateEquipmentFormProps): React.ReactElement {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [loading, setLoading] = useState(false)
@@ -78,14 +74,14 @@ export default function CreateEquipmentForm({
 			const { ok, message } = await createEquipment({ values, uploadResults })
 
 			if (!ok) {
-				toast("Error al crear el equipo", {
+				toast.error("Error al crear el equipo", {
 					description: message,
 					duration: 5000,
 				})
 				return
 			}
 
-			toast("Equipo creado exitosamente", {
+			toast.success("Equipo creado exitosamente", {
 				duration: 3000,
 			})
 
@@ -96,7 +92,7 @@ export default function CreateEquipmentForm({
 			})
 		} catch (error) {
 			console.log(error)
-			toast("Error al crear el equipo", {
+			toast.error("Error al crear el equipo", {
 				description: "Ocurrió un error al intentar crear el equipo",
 				duration: 5000,
 			})
@@ -155,18 +151,6 @@ export default function CreateEquipmentForm({
 							label="Tipo de equipo"
 							control={form.control}
 							placeholder="Tipo de equipo"
-						/>
-
-						<SelectWithSearchFormField<EquipmentSchema>
-							name="parentId"
-							label="Equipo Padre"
-							control={form.control}
-							itemClassName="sm:col-span-2"
-							placeholder="Seleccione un equipo padre (opcional)"
-							options={equipments.map((parent) => ({
-								label: `${parent.tag} - ${parent.name}`,
-								value: parent.id,
-							}))}
 						/>
 
 						<TextAreaFormField<EquipmentSchema>

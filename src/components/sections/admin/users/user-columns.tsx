@@ -93,6 +93,23 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		},
 	},
 	{
+		accessorKey: "documentAreas",
+		header: "Áreas de documentos",
+		cell: ({ row }) => {
+			const documentAreas = row.getValue("documentAreas") as string[]
+
+			return (
+				<div className="flex w-96 max-w-96 flex-wrap gap-1">
+					{documentAreas.map((area) => (
+						<Badge key={area} className="border-amber-500 bg-amber-500/10 text-amber-500">
+							{AreasLabels[area as keyof typeof AreasLabels]}
+						</Badge>
+					))}
+				</div>
+			)
+		},
+	},
+	{
 		accessorKey: "createdAt",
 		header: "Fecha de creación",
 		cell: ({ row }) => {

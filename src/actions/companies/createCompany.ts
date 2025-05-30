@@ -4,6 +4,7 @@ import { createStartupFolder } from "@/actions/startup-folders/createStartupFold
 import prisma from "@/lib/prisma"
 
 import type { CompanySchema } from "@/lib/form-schemas/admin/company/company.schema"
+import { createVehicleStartupFolder } from "../vehicles/createVehicleStartupFolder"
 
 interface CreateCompanyProps {
 	values: CompanySchema
@@ -27,18 +28,24 @@ export const createCompany = async ({
 		const company = await prisma.company.create({
 			data: {
 				...rest,
-				...(vehicles && {
-					vehicles: {
-						create: vehicles.map((vehicle) => ({
-							...vehicle,
-							year: Number(vehicle.year),
-						})),
-					},
-				}),
 			},
 		})
 
 		const { ok, message } = await createStartupFolder({ companyId: company.id })
+
+		if (vehicles && vehicles.length > 0) {
+			vehicles.forEach(async (vehicle) => {
+				const newVehicle = await prisma.vehicle.create({
+					data: {
+						...vehicle,
+						companyId: company.id,
+						year: Number(vehicle.year),
+					},
+				})
+
+				await createVehicleStartupFolder(newVehicle.id)
+			})
+		}
 
 		if (!ok) {
 			return {

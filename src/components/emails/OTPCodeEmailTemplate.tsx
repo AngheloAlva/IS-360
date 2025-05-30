@@ -33,7 +33,7 @@ export const OTPCodeEmailTemplate: React.FC<Readonly<OTPCodeEmailTemplateProps>>
 							width="150"
 							height="142"
 							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.svg`}
+							src={`${systemUrl}/logo.png`}
 							className="mx-auto h-auto w-[150px] object-cover"
 						/>
 					</Section>

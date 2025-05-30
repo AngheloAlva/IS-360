@@ -41,16 +41,12 @@ export const createVehicleStartupFolder = async (vehicleId: string) => {
 		}
 
 		const documentsToCreate = VEHICLE_STRUCTURE.documents
-			.map((doc) => {
-				if (doc.type === VehicleDocumentType.EQUIPMENT_FILE) return
-
-				return {
-					url: "",
-					name: doc.name,
-					category: VEHICLE_STRUCTURE.category,
-					type: doc.type as VehicleDocumentType,
-				}
-			})
+			.map((doc) => ({
+				url: "",
+				name: doc.name,
+				category: VEHICLE_STRUCTURE.category,
+				type: doc.type as VehicleDocumentType,
+			}))
 			.filter((doc) => doc !== undefined)
 
 		await prisma.vehicleFolder.create({
@@ -78,7 +74,7 @@ export const createVehicleStartupFolder = async (vehicleId: string) => {
 			message: "Carpeta inicial creada exitosamente",
 		}
 	} catch (error) {
-		console.error("[CREATE_USER_STARTUP_FOLDER]", error)
+		console.error("[CREATE_VEHICLE_STARTUP_FOLDER]", error)
 		return {
 			ok: false,
 			message: "Error al crear la carpeta inicial",

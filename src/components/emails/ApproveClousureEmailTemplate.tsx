@@ -43,7 +43,7 @@ export const ApproveClousureEmailTemplate: React.FC<Readonly<ApproveClosureEmail
 							width="150"
 							height="142"
 							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.svg`}
+							src={`${systemUrl}/logo.png`}
 							className="mx-auto h-auto w-[150px] object-cover"
 						/>
 					</Section>
@@ -71,7 +71,9 @@ export const ApproveClousureEmailTemplate: React.FC<Readonly<ApproveClosureEmail
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{workOrderName}</Text>
+									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										{workOrderName}
+									</Text>
 								</Column>
 							</Row>
 
@@ -82,7 +84,9 @@ export const ApproveClousureEmailTemplate: React.FC<Readonly<ApproveClosureEmail
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{workOrderNumber}</Text>
+									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										{workOrderNumber}
+									</Text>
 								</Column>
 							</Row>
 
@@ -104,13 +108,16 @@ export const ApproveClousureEmailTemplate: React.FC<Readonly<ApproveClosureEmail
 									</Text>
 								</Column>
 								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{supervisorName}</Text>
+									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										{supervisorName}
+									</Text>
 								</Column>
 							</Row>
 						</Section>
 
 						<Text className="mb-[24px] text-[16px] text-gray-600">
-							El libro de obras ha sido cerrado exitosamente y no se podrán realizar más modificaciones.
+							El libro de obras ha sido cerrado exitosamente y no se podrán realizar más
+							modificaciones.
 						</Text>
 
 						<Section className="mb-[32px] text-center">

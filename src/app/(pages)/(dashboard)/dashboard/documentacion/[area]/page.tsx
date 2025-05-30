@@ -49,7 +49,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 					<h1 className="text-text text-3xl font-bold">{areaName}</h1>
 				</div>
 
-				{data.user.documentAreas.includes(areaValue) && (
+				{(data.user.documentAreas.includes(areaValue) || hasPermission.success) && (
 					<div className="ml-auto flex gap-2">
 						<NewFileFormSheet areaValue={areaValue} area={areaKey} userId={data.user.id} />
 

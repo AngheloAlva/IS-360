@@ -3,7 +3,6 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
-import { VehiclesDataTable } from "@/components/sections/admin/companies/vehicles/VehiclesDataTable"
 import CreateCompanyFormSheet from "@/components/forms/admin/company/CreateCompanyFormSheet"
 import { CompanyDataTable } from "@/components/sections/admin/companies/CompanyDataTable"
 import CompanyStatsCards from "@/components/sections/admin/companies/CompanyStatsCards"
@@ -35,10 +34,6 @@ export default async function AdminCompaniesPage(): Promise<React.ReactElement> 
 			<CompanyStatsCards />
 
 			<CompanyDataTable />
-
-			<div className="mt-8">
-				<VehiclesDataTable />
-			</div>
 		</div>
 	)
 }

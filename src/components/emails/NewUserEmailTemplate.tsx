@@ -41,7 +41,7 @@ export const NewUserEmailTemplate: React.FC<Readonly<NewuserEmailTemplateProps>>
 							width="150"
 							height="142"
 							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.svg`}
+							src={`${systemUrl}/logo.png`}
 							className="mx-auto h-auto w-[150px] object-cover"
 						/>
 					</Section>
@@ -70,7 +70,9 @@ export const NewUserEmailTemplate: React.FC<Readonly<NewuserEmailTemplateProps>>
 									</Text>
 								</Column>
 								<Column>
-									<Button href={systemUrl} className="mb-[8px] ml-auto text-[16px] text-blue-600">{systemUrl}</Button>
+									<Button href={systemUrl} className="mb-[8px] ml-auto text-[16px] text-blue-600">
+										{systemUrl}
+									</Button>
 								</Column>
 							</Row>
 

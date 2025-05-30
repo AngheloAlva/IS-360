@@ -11,22 +11,22 @@ import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { createWorkOrder } from "@/actions/work-orders/createWorkOrder"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
-import { PlanLocationOptions } from "@/lib/consts/plan-location"
-import { getEquipment } from "@/actions/equipments/getEquipment"
 import { useCompanies } from "@/hooks/companies/use-companies"
 import { uploadFilesToCloud } from "@/lib/upload-files"
-import { getOtcUsers } from "@/actions/users/getUsers"
+import { useEquipments } from "@/hooks/use-equipments"
+import { useUsers } from "@/hooks/users/use-users"
 import {
 	workOrderSchema,
 	type WorkOrderSchema,
 } from "@/lib/form-schemas/admin/work-order/workOrder.schema"
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
+import { SelectWithSearchFormField } from "../../shared/SelectWithSearchFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
+import { MultiSelectFormField } from "../../shared/MultiSelectFormField"
 import UploadFilesFormField from "../../shared/UploadFilesFormField"
-import MultipleSelector from "@/components/ui/multiselect"
 import { Separator } from "@/components/ui/separator"
 import SubmitButton from "../../shared/SubmitButton"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -56,24 +56,16 @@ import {
 } from "@/components/ui/sheet"
 
 import type { Company } from "@/hooks/companies/use-companies"
-import type { User } from "@prisma/client"
 
 export default function CreateWorkOrderForm(): React.ReactElement {
-	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [equipments, setEquipments] = useState<
-		Array<{
-			value: string
-			label: string
-		}>
-	>([])
 	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
-	const [isInternalUsersLoading, setIsInternalUsersLoading] = useState<boolean>(false)
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
-	const [isEquipmentsLoading, setIsEquipmentsLoading] = useState<boolean>(false)
-	const [internalUsers, setInternalUsers] = useState<User[]>([])
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
 	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
+	const { data: equipmentsData } = useEquipments({ limit: 100 })
+	const { data: usersData } = useUsers({ limit: 100 })
 
 	const router = useRouter()
 
@@ -92,7 +84,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 			estimatedHours: "0",
 			workDescription: "",
 			priority: undefined,
-			location: undefined,
 			requiresBreak: false,
 			programDate: new Date(),
 			estimatedEndDate: new Date(),
@@ -100,51 +91,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 			solicitationTime: new Date().toTimeString().split(" ")[0],
 		},
 	})
-
-	useEffect(() => {
-		const fetchInternalUsers = async () => {
-			setIsInternalUsersLoading(true)
-			const { data, ok } = await getOtcUsers(100, 1)
-
-			if (!ok || !data) {
-				toast("Error al cargar los usuarios internos", {
-					description: "Error al cargar los usuarios internos",
-					duration: 5000,
-				})
-				return
-			}
-
-			setInternalUsers(data)
-			setIsInternalUsersLoading(false)
-		}
-
-		void fetchInternalUsers()
-	}, [])
-
-	useEffect(() => {
-		const fetchEquipments = async () => {
-			setIsEquipmentsLoading(true)
-			const { data, ok } = await getEquipment(1000, 1)
-
-			if (!ok || !data) {
-				toast("Error al cargar los equipos", {
-					description: "Error al cargar los equipos",
-					duration: 5000,
-				})
-				return
-			}
-
-			const equipments = data.map((equipment) => ({
-				value: equipment.id,
-				label: equipment.name,
-			}))
-
-			setEquipments(equipments)
-			setIsEquipmentsLoading(false)
-		}
-
-		void fetchEquipments()
-	}, [])
 
 	useEffect(() => {
 		const estimatedHours = Number(form.watch("estimatedHours"))
@@ -234,39 +180,18 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							</span>
 						</div>
 
-						<FormField
-							control={form.control}
+						<SelectWithSearchFormField<WorkOrderSchema>
 							name="responsibleId"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Responsable</FormLabel>
-									{isInternalUsersLoading ? (
-										<FormControl>
-											<Skeleton className="h-10 w-full" />
-										</FormControl>
-									) : (
-										<Select
-											disabled={!internalUsers}
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder="Selecciona un responsable" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{internalUsers.map((user) => (
-													<SelectItem key={user.id} value={user.id}>
-														{user.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									)}
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Responsable OTC"
+							control={form.control}
+							placeholder="Selecciona un responsable"
+							description="Persona que se encargara de la OT"
+							options={
+								usersData?.users.map((user) => ({
+									value: user.id,
+									label: user.name,
+								})) ?? []
+							}
 						/>
 
 						<SelectFormField<WorkOrderSchema>
@@ -274,6 +199,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							control={form.control}
 							label="Tipo de Trabajo"
 							options={WorkOrderTypeOptions}
+							itemClassName="h-full content-start"
 							placeholder="Seleccione el tipo de trabajo"
 						/>
 
@@ -312,48 +238,18 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							placeholder="Seleccione un indicador"
 						/>
 
-						<SelectFormField<WorkOrderSchema>
-							name="location"
-							label="Ubicación"
-							control={form.control}
-							options={PlanLocationOptions}
-							placeholder="Selecciona la ubicación"
-						/>
-
-						<FormField
-							control={form.control}
+						<MultiSelectFormField<WorkOrderSchema>
 							name="equipment"
-							render={({ field }) => (
-								<FormItem className="sm:col-span-2">
-									<FormLabel>Equipo(s)</FormLabel>
-									<FormControl>
-										{isEquipmentsLoading ? (
-											<Skeleton className="h-9 w-full rounded-md" />
-										) : (
-											<MultipleSelector
-												value={equipments.filter((equipment) =>
-													field.value?.includes(equipment.value)
-												)}
-												options={equipments}
-												placeholder="Seleccione uno o más equipos"
-												commandProps={{
-													label: "Equipos",
-												}}
-												hideClearAllButton
-												hidePlaceholderWhenSelected
-												className="border-input"
-												emptyIndicator={
-													<p className="text-center text-sm">No hay más equipos disponibles</p>
-												}
-												onChange={(options) => {
-													field.onChange(options.map((option) => option.value))
-												}}
-											/>
-										)}
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							options={
+								equipmentsData?.equipments.map((equipment) => ({
+									value: equipment.id,
+									label: equipment.name,
+								})) ?? []
+							}
+							control={form.control}
+							itemClassName="sm:col-span-2"
+							label="Equipo(s) / Ubicación(es)"
+							placeholder="Seleccione uno o más equipos"
 						/>
 
 						<TextAreaFormField<WorkOrderSchema>

@@ -1,5 +1,5 @@
-import { LinkIcon, SquarePen } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
+import { LinkIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 import type { WorkOrder } from "@/hooks/work-orders/use-work-order"
+import UpdateWorkOrderForm from "@/components/forms/admin/work-order/UpdateWorkOrderForm"
 
 export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	{
@@ -216,7 +217,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 					size="icon"
 					variant="outline"
 					disabled={!report}
-					className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
+					className="text-primary bg-primary/10 hover:bg-primary/50 border-primary hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
 				>
 					<Link
 						target="_blank"
@@ -241,7 +242,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 					size="icon"
 					variant="outline"
 					disabled={!report}
-					className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
+					className="text-primary bg-primary/10 hover:bg-primary/50 border-primary hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
 				>
 					<Link
 						target="_blank"
@@ -259,21 +260,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		id: "actions",
 		header: "Acciones",
 		cell: ({ row }) => {
-			const id = row.original.id
-
-			return (
-				<div className="flex items-center gap-2">
-					<Link className="font-medium" href={`/admin/dashboard/ordenes-de-trabajo/${id}`}>
-						<Button
-							size="icon"
-							variant="outline"
-							className="text-primary bg-primary/10 hover:bg-primary/50 hover:text-white"
-						>
-							<SquarePen className="h-4 w-4" />
-						</Button>
-					</Link>
-				</div>
-			)
+			return <UpdateWorkOrderForm workOrder={row.original} />
 		},
 	},
 ]

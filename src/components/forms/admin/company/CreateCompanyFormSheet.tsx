@@ -94,6 +94,9 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 							data: {
 								companyId: data.id,
 								rut: supervisor.rut,
+								phone: supervisor.phone,
+								internalArea: supervisor.internalArea,
+								internalRole: supervisor.internalRole,
 								isSupervisor: supervisor.isSupervisor,
 							},
 						})
@@ -144,6 +147,9 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 			queryClient.invalidateQueries({
 				queryKey: ["companies"],
 			})
+
+			setOpen(false)
+			form.reset()
 		} catch (error) {
 			console.log(error)
 			toast.error("Error al crear la empresa", {
@@ -203,7 +209,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 							</p>
 						</div>
 
-						<Tabs defaultValue="vehicles" className="mt-1 w-full">
+						<Tabs defaultValue="supervisors" className="mt-1 w-full">
 							<TabsList className="w-full rounded-sm">
 								<TabsTrigger className="rounded-sm" value="supervisors">
 									Supervisores

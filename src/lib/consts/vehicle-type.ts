@@ -57,11 +57,11 @@ export const VehicleTypeOptions = [
 		label: VehicleTypeLabels.TRAILER,
 	},
 	{
-		value: VEHICLE_TYPE.OTHER,
-		label: VehicleTypeLabels.OTHER,
-	},
-	{
 		value: VEHICLE_TYPE.VAN,
 		label: VehicleTypeLabels.VAN,
+	},
+	{
+		value: VEHICLE_TYPE.OTHER,
+		label: VehicleTypeLabels.OTHER,
 	},
 ]

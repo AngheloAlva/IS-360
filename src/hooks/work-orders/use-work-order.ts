@@ -1,6 +1,13 @@
 import { QueryFunction, useQuery } from "@tanstack/react-query"
 import { DateRange } from "react-day-picker"
 
+import type {
+	WORK_ORDER_TYPE,
+	WORK_ORDER_CAPEX,
+	WORK_ORDER_STATUS,
+	WORK_ORDER_PRIORITY,
+} from "@prisma/client"
+
 interface WorkOrderStats {
 	activeCount: number
 	completedCount: number
@@ -11,14 +18,14 @@ interface WorkOrderStats {
 export interface WorkOrder {
 	id: string
 	otNumber: string
-	solicitationDate: string
-	type: string
-	status: string
+	solicitationDate: Date
+	type: WORK_ORDER_TYPE
+	status: WORK_ORDER_STATUS
 	solicitationTime: string
 	workRequest: string
-	capex: string
+	capex: WORK_ORDER_CAPEX
 	workDescription: string
-	priority: string
+	priority: WORK_ORDER_PRIORITY
 	workProgressStatus: number
 	initReport: {
 		url: string
@@ -29,11 +36,11 @@ export interface WorkOrder {
 	programDate: Date
 	estimatedHours: number | null
 	estimatedDays: number | null
-	estimatedEndDate: string | null
+	estimatedEndDate: Date | null
 	equipment: {
 		id: string
 		name: string
-	}
+	}[]
 	company?: {
 		id: string
 		name: string

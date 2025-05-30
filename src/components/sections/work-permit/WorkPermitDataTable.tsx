@@ -1,5 +1,8 @@
 "use client"
 
+import { WorkPermitStatusOptions } from "@/lib/consts/work-permit-status"
+import { useWorkPermits } from "@/hooks/work-permit/use-work-permit"
+import { workPermitColumns } from "./work-permit-columns"
 import { ChevronDown, Plus } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
@@ -13,9 +16,12 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { TablePagination } from "@/components/ui/table-pagination"
+import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -26,13 +32,13 @@ import {
 } from "@/components/ui/table"
 import {
 	Select,
-	SelectContent,
-	SelectGroup,
 	SelectItem,
 	SelectLabel,
-	SelectSeparator,
-	SelectTrigger,
 	SelectValue,
+	SelectGroup,
+	SelectTrigger,
+	SelectContent,
+	SelectSeparator,
 } from "@/components/ui/select"
 import {
 	DropdownMenu,
@@ -40,12 +46,6 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
-import { useWorkPermits } from "@/hooks/work-permit/use-work-permit"
-import { workPermitColumns } from "./work-permit-columns"
-import { Card } from "@/components/ui/card"
-import { TablePagination } from "@/components/ui/table-pagination"
-import { WorkPermitStatusOptions } from "@/lib/consts/work-permit-status"
-import RefreshButton from "@/components/shared/RefreshButton"
 
 export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 	const [page, setPage] = useState(1)
@@ -177,7 +177,7 @@ export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell className="" colSpan={17}>
+										<TableCell className="" colSpan={10}>
 											<Skeleton className="h-10 min-w-full" />
 										</TableCell>
 									</TableRow>
@@ -191,6 +191,14 @@ export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 										))}
 									</TableRow>
 								))}
+
+						{table.getRowModel().rows.length === 0 && (
+							<TableRow>
+								<TableCell colSpan={10} className="h-24 text-center">
+									No hay permisos de trabajo
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
 			</Card>

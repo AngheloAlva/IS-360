@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
 					},
 					company: {
 						select: {
+							id: true,
 							name: true,
 							rut: true,
 						},
@@ -121,8 +122,7 @@ export async function GET(req: NextRequest) {
 					createdAt: "desc",
 				},
 				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
+					ttl: 10,
 				},
 			}),
 			prisma.workOrder.count({

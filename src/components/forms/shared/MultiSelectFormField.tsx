@@ -51,9 +51,7 @@ export function MultiSelectFormField<T extends FieldValues>({
 							}}
 							hideClearAllButton
 							hidePlaceholderWhenSelected
-							emptyIndicator={
-								<p className="text-center text-sm">No hay más herramientas disponibles</p>
-							}
+							emptyIndicator={<p className="text-center text-sm">No hay opciones disponibles</p>}
 							onChange={(options) => {
 								field.onChange(options.map((option) => option.value))
 							}}
