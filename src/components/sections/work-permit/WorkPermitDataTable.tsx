@@ -145,7 +145,7 @@ export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				<RefreshButton refetch={refetch} isFetching={isFetching} />
+				<RefreshButton refetch={() => refetch()} isFetching={isFetching} />
 
 				<Link href="/dashboard/permiso-de-trabajo/agregar">
 					<Button>

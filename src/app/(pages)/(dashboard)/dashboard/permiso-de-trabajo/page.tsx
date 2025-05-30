@@ -9,7 +9,9 @@ export default async function WorkPermitPage() {
 		headers: await headers(),
 	})
 
-	if (!res || !res.user || res.user.companyId) {
+	console.log(res?.user)
+
+	if (!res || !res.user || !res.user.companyId) {
 		return (
 			<main className="flex h-screen items-center justify-center">
 				<p>Acceso denegado</p>

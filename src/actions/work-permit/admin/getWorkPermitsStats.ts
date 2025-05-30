@@ -7,9 +7,9 @@ export async function getWorkPermitsStats() {
 
 	// Obtener las empresas más activas
 	const companies = await prisma.$queryRaw<Array<{ name: string; count: number }>>`
-		SELECT "executanCompany" as name, COUNT(*) as count
+		SELECT "company" as name, COUNT(*) as count
 		FROM "work_permit"
-		GROUP BY "executanCompany"
+		GROUP BY "company"
 		ORDER BY count DESC
 		LIMIT 5
 	`

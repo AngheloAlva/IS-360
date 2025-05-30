@@ -140,6 +140,9 @@ export default function WorkPermitForm({
 		) {
 			form.setValue("endDate", addDays(form.watch("startDate"), 1))
 		} else {
+			const day = new Date()
+			day.getDay()
+			// TODO: Maximum end date is 7 days but only if actual day is monday, if other day the end day is maximum until sunday, for example if actual day is wednesday the maximun end date is 4 days
 			form.setValue("endDate", addDays(form.watch("startDate"), 7))
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
