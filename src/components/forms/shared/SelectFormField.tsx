@@ -24,6 +24,7 @@ interface SelectFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label?: string
 	className?: string
+	optional?: boolean
 	control: Control<T>
 	placeholder?: string
 	description?: string
@@ -37,6 +38,7 @@ export function SelectFormField<T extends FieldValues>({
 	options,
 	control,
 	className,
+	optional,
 	description,
 	placeholder,
 	itemClassName,
@@ -47,7 +49,10 @@ export function SelectFormField<T extends FieldValues>({
 			control={control}
 			render={({ field }) => (
 				<FormItem className={itemClassName}>
-					<FormLabel>{label}</FormLabel>
+					<FormLabel className="gap-1">
+						{label}
+						{optional && <span className="text-muted-foreground"> (opcional)</span>}
+					</FormLabel>
 					<Select onValueChange={field.onChange} defaultValue={field.value}>
 						<FormControl>
 							<SelectTrigger className={cn("w-full text-sm", className)}>

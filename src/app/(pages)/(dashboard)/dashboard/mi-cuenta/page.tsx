@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth"
 import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ChangePasswordForm from "@/components/forms/auth/ChangePasswordForm"
+import { MyCompanyForm } from "@/components/forms/auth/MyCompanyForm"
 import Activate2FAForm from "@/components/forms/auth/Activate2FAForm"
 import { ProfileForm } from "@/components/forms/auth/ProfileForm"
 
@@ -40,12 +41,21 @@ export default async function AccountPage(): Promise<React.ReactElement> {
 					>
 						Datos Personales
 					</TabsTrigger>
+
+					<TabsTrigger
+						className="w-full justify-start py-2 font-bold tracking-wide data-[state=active]:bg-amber-500 data-[state=active]:text-white"
+						value="company"
+					>
+						Empresa
+					</TabsTrigger>
+
 					<TabsTrigger
 						className="w-full justify-start py-2 font-bold tracking-wide data-[state=active]:bg-purple-500 data-[state=active]:text-white"
 						value="password"
 					>
 						Cambiar Contraseña
 					</TabsTrigger>
+
 					<TabsTrigger
 						className="w-full justify-start py-2 font-bold tracking-wide data-[state=active]:bg-green-500 data-[state=active]:text-white"
 						value="2fa"
@@ -68,6 +78,22 @@ export default async function AccountPage(): Promise<React.ReactElement> {
 
 						<CardContent className="pt-6">
 							<ProfileForm user={session.user} />
+						</CardContent>
+					</TabsContent>
+
+					<TabsContent value="company">
+						<CardHeader className="flex flex-row items-start justify-between gap-2">
+							<div className="space-y-1">
+								<CardTitle>Empresa</CardTitle>
+								<CardDescription>
+									Edita tus datos de la empresa para que sean actualizados en la plataforma.
+								</CardDescription>
+							</div>
+							<UserLockIcon className="size-10 min-w-10 rounded-md bg-amber-500/10 p-1 text-amber-500" />
+						</CardHeader>
+
+						<CardContent className="pt-6">
+							<MyCompanyForm user={session.user} companyId={session.user.companyId || ""} />
 						</CardContent>
 					</TabsContent>
 

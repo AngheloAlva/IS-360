@@ -12,6 +12,7 @@ import type { Control, FieldValues, Path } from "react-hook-form"
 interface ColorPickerFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label: string
+	optional?: boolean
 	className?: string
 	control: Control<T>
 	itemClassName?: string
@@ -21,6 +22,7 @@ export function ColorPickerFormField<T extends FieldValues>({
 	name,
 	label,
 	control,
+	optional,
 	className,
 	itemClassName,
 }: ColorPickerFormFieldProps<T>) {
@@ -30,7 +32,10 @@ export function ColorPickerFormField<T extends FieldValues>({
 			control={control}
 			render={({ field }) => (
 				<FormItem className={itemClassName}>
-					<FormLabel>{label}</FormLabel>
+					<FormLabel className="gap-1">
+						{label}
+						{optional && <span className="text-muted-foreground"> (opcional)</span>}
+					</FormLabel>
 					<FormControl>
 						<Popover>
 							<PopoverTrigger

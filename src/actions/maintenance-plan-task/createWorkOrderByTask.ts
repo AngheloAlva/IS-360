@@ -41,13 +41,12 @@ export const createWorkOrderByTask = async ({
 		}
 
 		const {
+			breakDays,
+			companyId,
 			supervisorId,
 			responsibleId,
-			companyId,
-			breakDays,
 			solicitationDate,
 			solicitationTime,
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			isInternalResponsible,
 			...rest
 		} = values
@@ -65,7 +64,9 @@ export const createWorkOrderByTask = async ({
 				},
 				supervisor: {
 					connect: {
-						id: supervisorId,
+						...(isInternalResponsible
+							? { email: "scontrol.trm@oleotrasandino.cl" }
+							: { id: supervisorId }),
 					},
 				},
 				...(companyId

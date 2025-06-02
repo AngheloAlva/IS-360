@@ -15,19 +15,12 @@ export async function GET(
 			},
 			select: {
 				id: true,
-				name: true,
 				rut: true,
-				users: {
-					select: {
-						id: true,
-						name: true,
-						isSupervisor: true,
-					},
-				},
-				createdAt: true,
+				name: true,
+				image: true,
 			},
 			cacheStrategy: {
-				ttl: 60,
+				ttl: 10,
 				swr: 10,
 			},
 		})

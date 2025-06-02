@@ -75,6 +75,7 @@ export function AvatarUploadField<T extends FieldValues>({
 			<div className="group relative">
 				<Avatar className="h-24 w-24 transition-all duration-300 group-hover:scale-105">
 					<AvatarImage src={image?.preview || currentImage || undefined} alt="Avatar preview" />
+
 					<AvatarFallback className="text-lg">
 						<Building className="h-8 w-8" />
 					</AvatarFallback>

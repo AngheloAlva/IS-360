@@ -31,29 +31,29 @@ export const sendRequestReviewEmail = async ({
 			case DocumentCategory.SAFETY_AND_HEALTH:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					// "cristian.pavez@oleotrasandino.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"cristian.pavez@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 				]
 				break
 			case DocumentCategory.ENVIRONMENTAL:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					// "bcarrillo@dbj.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"bcarrillo@dbj.cl",
+					"katherine.burgos@oleotrasandino.cl",
 				]
 				break
 			case DocumentCategory.PERSONNEL:
 				emailNotification = [
-					// "cristian.pavez@oleotrasandino.cl",
+					"cristian.pavez@oleotrasandino.cl",
 					"anghelo.alva@ingsimple.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 				]
 				break
 			case DocumentCategory.VEHICLES:
 				emailNotification = [
-					// "cristian.pavez@oleotrasandino.cl",
+					"cristian.pavez@oleotrasandino.cl",
 					"anghelo.alva@ingsimple.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 				]
 				break
 		}

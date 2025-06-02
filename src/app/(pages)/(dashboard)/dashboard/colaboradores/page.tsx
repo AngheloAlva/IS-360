@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import { Plus } from "lucide-react"
-import Link from "next/link"
 
 import { auth } from "@/lib/auth"
 
 import { UsersByCompanyDataTable } from "@/components/sections/users/UsersByCompanyDataTable"
-import { Button } from "@/components/ui/button"
+import CreateUsersForm from "@/components/forms/partner/CreateUsersForm"
 
 export default async function UsersByCompanyPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -27,12 +25,7 @@ export default async function UsersByCompanyPage(): Promise<React.ReactElement> 
 					</p>
 				</div>
 
-				<Link href="/dashboard/colaboradores/agregar">
-					<Button size={"lg"}>
-						<Plus />
-						<span className="hidden sm:inline">Colaborador(es)</span>
-					</Button>
-				</Link>
+				{session.user.isSupervisor && <CreateUsersForm companyId={session.user.companyId} />}
 			</div>
 
 			<UsersByCompanyDataTable companyId={session.user.companyId} />

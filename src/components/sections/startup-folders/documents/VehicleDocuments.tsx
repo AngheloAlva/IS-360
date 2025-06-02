@@ -113,7 +113,8 @@ export default function VehicleDocuments({
 
 														<div className="flex flex-col">
 															<span className="font-medium">
-																{folder.vehicle.model} ({folder.vehicle.plate})
+																{folder.vehicle.model}{" "}
+																{folder.vehicle?.plate && `(${folder.vehicle.plate})`}
 															</span>
 															<span className="text-muted-foreground text-sm">
 																{totalDocumentsUploaded} de {VEHICLE_STRUCTURE.documents.length}

@@ -148,6 +148,7 @@ export default function CreateVehicleForm({
 					label="Modelo / Nombre del equipo"
 				/>
 				<InputFormField<VehicleSchema>
+					optional
 					name="plate"
 					label="Matrícula"
 					placeholder="ABC123"
@@ -155,6 +156,7 @@ export default function CreateVehicleForm({
 				/>
 
 				<InputFormField<VehicleSchema>
+					optional
 					name="brand"
 					label="Marca"
 					placeholder="Toyota"
@@ -162,6 +164,7 @@ export default function CreateVehicleForm({
 				/>
 
 				<InputFormField<VehicleSchema>
+					optional
 					min={1900}
 					name="year"
 					label="Año"
@@ -172,13 +175,19 @@ export default function CreateVehicleForm({
 				/>
 
 				<SelectFormField<VehicleSchema>
+					optional
 					name="type"
 					label="Tipo"
 					control={form.control}
 					options={VehicleTypeOptions}
 				/>
 
-				<ColorPickerFormField<VehicleSchema> label="Color" name="color" control={form.control} />
+				<ColorPickerFormField<VehicleSchema>
+					optional
+					label="Color"
+					name="color"
+					control={form.control}
+				/>
 
 				<FormField
 					control={form.control}
@@ -201,7 +210,7 @@ export default function CreateVehicleForm({
 				<SubmitButton
 					isSubmitting={isLoading}
 					className="w-full sm:col-span-2"
-					label={isUpdate ? "Actualizar vehículo" : "Crear vehículo"}
+					label={isUpdate ? "Actualizar Vehículo / Equipo" : "Crear Vehículo / Equipo"}
 				/>
 			</form>
 		</Form>

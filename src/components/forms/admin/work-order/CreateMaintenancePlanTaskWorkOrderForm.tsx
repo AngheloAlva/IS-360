@@ -12,7 +12,6 @@ import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/hooks/companies/use-companies"
 import { getOtcUsers } from "@/actions/users/getUsers"
-import { useUsers } from "@/hooks/users/use-users"
 import { queryClient } from "@/lib/queryClient"
 import {
 	workOrderSchemaByTask,
@@ -42,6 +41,7 @@ import {
 import type { PLAN_LOCATION_VALUES } from "@/lib/consts/plan-location"
 import type { Company } from "@/hooks/companies/use-companies"
 import type { User } from "@prisma/client"
+import { OPERATOR_LIST } from "@/lib/consts/operator-list"
 
 interface CreateMaintenancePlanTaskWorkOrderFormProps {
 	equipmentId: string
@@ -62,10 +62,6 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 	const [open, setOpen] = useState(false)
 
 	const { data: companiesData } = useCompanies({ limit: 100 })
-	const { data: internalUsersData } = useUsers({
-		showOnlyInternal: true,
-		limit: 100,
-	})
 
 	const form = useForm<WorkOrderSchemaByTask>({
 		resolver: zodResolver(workOrderSchemaByTask),
@@ -302,12 +298,10 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 							<SelectWithSearchFormField<WorkOrderSchemaByTask>
 								name="supervisorId"
 								control={form.control}
-								options={
-									internalUsersData?.users.map((user) => ({
-										value: user.id,
-										label: user.name,
-									})) ?? []
-								}
+								options={OPERATOR_LIST.map((operator) => ({
+									value: operator,
+									label: operator,
+								}))}
 								label="Responsable Interno"
 							/>
 						)}
