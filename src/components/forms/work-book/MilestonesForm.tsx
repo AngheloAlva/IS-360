@@ -1,6 +1,6 @@
 "use client"
 
-import { type FieldError, useFieldArray, useForm } from "react-hook-form"
+import { useFieldArray, useForm } from "react-hook-form"
 import { Trash2Icon, MilestoneIcon, PlusCircleIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
@@ -47,8 +47,8 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 			milestones: [
 				{
 					name: "",
+					weight: "",
 					description: "",
-					weight: "0",
 				},
 			],
 		},
@@ -119,26 +119,20 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="h-fit space-y-6 overflow-y-auto px-4 pb-24"
+						className="h-full space-y-6 overflow-y-auto px-4 pb-24"
 					>
-						{form.formState.errors.milestones &&
-							form.formState.errors.milestones.length &&
-							form.formState.errors.milestones?.length > 0 && (
-								<div className="rounded-md border border-red-500 bg-red-50 p-3 text-sm text-red-800">
-									<p className="font-medium">Errores de validación:</p>
-									<FormMessage className="mt-1" />
-									<ul className="mt-2 list-disc pl-5">
-										{(form.formState.errors.milestones as FieldError[])?.map((error, index) => (
-											<li key={index}>{error?.message}</li>
-										))}
-									</ul>
-								</div>
-							)}
+						{form.formState.errors.milestones?.root && (
+							<div className="rounded-md border border-red-500 bg-red-50 p-3 text-sm text-red-800">
+								<p className="font-medium">Errores de validación:</p>
+								<FormMessage className="mt-1" />
+								<span>{form.formState.errors.milestones?.root.message}</span>
+							</div>
+						)}
 						<Tabs
 							defaultValue="0"
 							value={activeTab}
 							onValueChange={setActiveTab}
-							className="flex min-h-full flex-col gap-4 md:flex-row"
+							className="flex flex-col gap-4 md:flex-row"
 						>
 							<div className="md:w-1/4">
 								<TabsList className="grid h-auto w-full grid-cols-2 justify-start gap-1 bg-transparent p-0 pt-4 md:flex md:flex-col">
@@ -187,8 +181,10 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 										onClick={() => {
 											milestoneAppend({
 												name: "",
-												weight: "0",
+												weight: "",
 												description: "",
+												endDate: new Date(),
+												startDate: new Date(),
 											})
 											setActiveTab(milestoneFields.length.toString())
 										}}

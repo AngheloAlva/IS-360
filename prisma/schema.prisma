@@ -199,13 +199,13 @@ enum VEHICLE_TYPE {
 model Vehicle {
   id String @id @default(cuid())
 
-  plate  String
-  model  String
-  year   Int
-  brand  String
-  type   VEHICLE_TYPE
+  plate  String?
+  model  String?
+  year   Int?
+  brand  String?
+  type   VEHICLE_TYPE?
   color  String?
-  isMain Boolean      @default(false)
+  isMain Boolean       @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -359,15 +359,22 @@ model Milestone {
   @@map("milestone")
 }
 
+enum CRITICALITY {
+  CRITICAL
+  SEMICRITICAL
+  UNCITICAL
+}
+
 model Equipment {
-  id            String  @id @default(cuid())
+  id            String       @id @default(cuid())
   barcode       String
   name          String
   description   String?
   location      String
-  isOperational Boolean @default(true)
+  isOperational Boolean      @default(true)
   type          String?
   tag           String
+  criticality   CRITICALITY?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -401,7 +408,7 @@ model WorkApplication {
   description String
   location    String
   status      WORK_APPLICATION_STATUS @default(PENDING)
-  criticality String
+  criticality CRITICALITY?
 
   attachments   Attachment[]
   responsible   User         @relation(fields: [responsibleId], references: [id])

@@ -64,8 +64,8 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	const [open, setOpen] = useState(false)
 
 	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
+	const { data: usersData } = useUsers({ limit: 100, search: "oleotrasandino" })
 	const { data: equipmentsData } = useEquipments({ limit: 100 })
-	const { data: usersData } = useUsers({ limit: 100 })
 
 	const router = useRouter()
 
@@ -93,12 +93,12 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	})
 
 	useEffect(() => {
-		const estimatedHours = Number(form.watch("estimatedHours"))
-		const estimatedDays = Math.ceil(estimatedHours / 8)
+		const estimatedDays = Number(form.watch("estimatedDays"))
+		const estimatedHours = estimatedDays * 8
 
-		form.setValue("estimatedDays", estimatedDays.toString())
+		form.setValue("estimatedHours", estimatedHours.toString())
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("estimatedHours")])
+	}, [form.watch("estimatedDays")])
 
 	async function onSubmit(values: WorkOrderSchema) {
 		const initReportFile = form.getValues("file")?.[0]

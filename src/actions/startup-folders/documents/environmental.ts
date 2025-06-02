@@ -1,13 +1,15 @@
 "use server"
 
+import { z } from "zod"
+
+import { sendRequestReviewEmail } from "../send-request-review-email"
 import prisma from "@/lib/prisma"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
-import { ReviewStatus, type EnvironmentalDocType } from "@prisma/client"
+import type { UpdateExpirationDateSchema } from "@/lib/form-schemas/startup-folder/update-expiration-date"
+import { DocumentCategory, ReviewStatus, type EnvironmentalDocType } from "@prisma/client"
 import type { UploadResult } from "@/lib/upload-files"
-import { z } from "zod"
-import { sendRequestReviewEmail } from "../send-request-review-email"
 
 export const createEnvironmentalDocument = async ({
 	data: { name, folderId, type, expirationDate, documentId },
@@ -129,6 +131,56 @@ export const updateEnvironmentalDocument = async ({
 	}
 }
 
+export const updateExpirationDateEnvironmentalDocument = async ({
+	data: { documentId, expirationDate },
+}: {
+	data: UpdateExpirationDateSchema
+}) => {
+	try {
+		const existingDocument = await prisma.environmentalDocument.findUnique({
+			where: {
+				id: documentId,
+			},
+			include: {
+				folder: {
+					select: {
+						status: true,
+					},
+				},
+			},
+		})
+
+		if (!existingDocument) {
+			return { ok: false, message: "Documento no encontrado" }
+		}
+
+		if (
+			existingDocument.folder.status !== "DRAFT" &&
+			existingDocument.folder.status !== "REJECTED"
+		) {
+			return {
+				ok: false,
+				message:
+					"No puedes modificar documentos en esta carpeta porque está en revisión o ya fue aprobada",
+			}
+		}
+
+		const updatedDocument = await prisma.environmentalDocument.update({
+			where: {
+				id: documentId,
+			},
+			data: {
+				expirationDate,
+			},
+		})
+
+		return { ok: true, data: updatedDocument }
+	} catch (error) {
+		console.error("Error al actualizar documento:", error)
+		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}
+
 export const submitEnvironmentalDocumentForReview = async ({
 	emails,
 	userId,
@@ -141,7 +193,10 @@ export const submitEnvironmentalDocumentForReview = async ({
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
 		select: {
+			rut: true,
+			name: true,
 			email: true,
+			phone: true,
 		},
 	})
 
@@ -194,8 +249,15 @@ export const submitEnvironmentalDocumentForReview = async ({
 		])
 
 		await sendRequestReviewEmail({
+			solicitator: {
+				email: user.email,
+				name: user.name,
+				rut: user.rut,
+				phone: user.phone,
+			},
 			companyName: folder.startupFolder.company.name,
 			folderName: "Carpeta Medio Ambiente",
+			documentCategory: DocumentCategory.ENVIRONMENTAL,
 		})
 
 		return {

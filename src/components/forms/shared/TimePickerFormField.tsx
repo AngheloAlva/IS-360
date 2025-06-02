@@ -98,8 +98,8 @@ export function TimePickerFormField<T extends FieldValues>({
 										handleTimeChange(field, value, minutes)
 									}}
 								>
-									<SelectTrigger className="w-20">
-										<SelectValue placeholder="00" />
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="HH" />
 									</SelectTrigger>
 									<SelectContent>
 										{HOURS.map((hour) => (
@@ -120,8 +120,8 @@ export function TimePickerFormField<T extends FieldValues>({
 										handleTimeChange(field, hours, value)
 									}}
 								>
-									<SelectTrigger className="w-20">
-										<SelectValue placeholder="00" />
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="MM" />
 									</SelectTrigger>
 									<SelectContent>
 										{MINUTES.map((minute) => (

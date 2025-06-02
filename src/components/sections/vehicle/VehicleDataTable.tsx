@@ -149,9 +149,9 @@ export function VehicleDataTable({ companyId }: { companyId: string }) {
 		<section className="flex w-full flex-col items-start gap-6">
 			<div className="flex w-full items-center justify-between">
 				<div>
-					<h1 className="text-text text-2xl font-bold">Lista de Vehículos</h1>
+					<h1 className="text-text text-2xl font-bold">Lista de Vehículos y Equipos</h1>
 					<p className="text-muted-foreground">
-						Visualiza y gestiona todos los vehículos de tu empresa
+						Visualiza y gestiona todos los vehículos y equipos de tu empresa
 					</p>
 				</div>
 
@@ -161,7 +161,7 @@ export function VehicleDataTable({ companyId }: { companyId: string }) {
 						setIsCreateOpen(true)
 					}}
 				>
-					Crear Vehículo
+					Crear Vehículo/Equipo
 				</Button>
 			</div>
 
@@ -290,11 +290,13 @@ export function VehicleDataTable({ companyId }: { companyId: string }) {
 			<Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 				<SheetContent className="sm:max-w-lg">
 					<SheetHeader>
-						<SheetTitle>{editVehicleId ? "Editar Vehículo" : "Crear Vehículo"}</SheetTitle>
+						<SheetTitle>
+							{editVehicleId ? "Editar Vehículo/Equipo" : "Crear Vehículo/Equipo"}
+						</SheetTitle>
 						<SheetDescription>
 							{editVehicleId
-								? "Actualiza la información del vehículo"
-								: "Completa los datos para registrar un nuevo vehículo"}
+								? "Actualiza la información del vehículo/equipo"
+								: "Puede crear un vehículo o equipo, solo el campo de modelo/nombre es obligatorio"}
 						</SheetDescription>
 					</SheetHeader>
 

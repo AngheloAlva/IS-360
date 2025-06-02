@@ -15,12 +15,15 @@ import {
 	AlertDialogContent,
 	AlertDialogDescription,
 } from "@/components/ui/alert-dialog"
+import { queryClient } from "@/lib/queryClient"
 
 export default function RequestCloseMilestoneDialog({
 	userId,
+	workOrderId,
 	milestoneId,
 }: {
 	userId: string
+	workOrderId: string
 	milestoneId: string
 }) {
 	const [isLoading, setIsLoading] = useState(false)
@@ -36,6 +39,9 @@ export default function RequestCloseMilestoneDialog({
 			})
 
 			if (res.ok) {
+				queryClient.invalidateQueries({
+					queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+				})
 				toast.success("Se ha solicitado el cierre del hito correctamente")
 			} else {
 				toast.error(res.message)
@@ -51,7 +57,7 @@ export default function RequestCloseMilestoneDialog({
 
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogTrigger className="mt-auto w-full rounded-md bg-teal-500 px-2 py-2 text-white hover:bg-teal-600">
+			<AlertDialogTrigger className="bg-primary hover:bg-primary/80 mt-auto w-full rounded-md px-2 py-2 text-white">
 				Solicitar cierre
 			</AlertDialogTrigger>
 			<AlertDialogContent>

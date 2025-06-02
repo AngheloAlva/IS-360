@@ -22,7 +22,7 @@ export interface StartupFolderStructure {
 	}[]
 }
 
-// TODO: Add nomina del personal, eliminar Organigrama, un procedimiento repetido, y permisos de trabajo
+// TODO: Add nomina del personal
 
 export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 	title: "Seguridad y Salud Ocupacional",
@@ -60,12 +60,6 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 			name: "Certificado de siniestralidad de mutualidad (1 año)",
 			required: true,
 			description: "Certificado que muestra la tasa de siniestralidad laboral del último año.",
-		},
-		{
-			type: SafetyAndHealthDocumentType.ORGANIZATION_CHART,
-			name: "Organigrama de la Empresa",
-			required: true,
-			description: "Estructura jerárquica y organizacional de la empresa.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.RISK_MATRIX,
@@ -113,23 +107,10 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 				"Procedimiento según Ley N°21.643 (Ley Karin) con detalles del proceso de denuncia e investigación.",
 		},
 		{
-			type: SafetyAndHealthDocumentType.SAFE_WORK,
-			name: "Procedimientos de trabajo seguro",
-			required: true,
-			description:
-				"Procedimientos específicos para trabajos que se realizarán en OTC, con antigüedad no mayor a un año.",
-		},
-		{
 			type: SafetyAndHealthDocumentType.RISK_ANALYSIS,
 			name: "Análisis de riesgos por actividad",
 			required: true,
 			description: "Documento que identifica aspectos ambientales y evalúa sus impactos.",
-		},
-		{
-			type: SafetyAndHealthDocumentType.WORK_PERMIT,
-			name: "Permisos de trabajo (en caso de aplicar)",
-			description: "Documento opcional para el trabajo",
-			required: true,
 		},
 	],
 }

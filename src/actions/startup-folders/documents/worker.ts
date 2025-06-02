@@ -1,12 +1,13 @@
 "use server"
 
-import { ReviewStatus, type WorkerDocumentType } from "@prisma/client"
+import { DocumentCategory, ReviewStatus, type WorkerDocumentType } from "@prisma/client"
 import { sendRequestReviewEmail } from "../send-request-review-email"
 import prisma from "@/lib/prisma"
 import { z } from "zod"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
+import type { UpdateExpirationDateSchema } from "@/lib/form-schemas/startup-folder/update-expiration-date"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createWorkerDocument = async ({
@@ -141,89 +142,155 @@ export const updateWorkerDocument = async ({
 	}
 }
 
-export const submitWorkerDocumentForReview = async ({
-	emails,
-	userId,
-	folderId,
+export const updateExpirationDateWorkerDocument = async ({
+	data: { documentId, expirationDate },
 }: {
-	userId: string
-	emails: string[]
-	folderId: string
+	data: UpdateExpirationDateSchema
 }) => {
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: {
-			email: true,
-		},
-	})
-
-	if (!user) {
-		return { ok: false, message: "Usuario no encontrado." }
-	}
-
 	try {
-		const folder = await prisma.workerFolder.findUnique({
-			where: { id: folderId },
+		const existingDocument = await prisma.workerDocument.findUnique({
+			where: {
+				id: documentId,
+			},
 			include: {
-				startupFolder: {
+				folder: {
 					select: {
-						id: true,
-						company: {
-							select: {
-								name: true,
-							},
-						},
+						status: true,
 					},
 				},
 			},
 		})
 
-		if (!folder) {
-			return { ok: false, message: "Carpeta no encontrada." }
+		if (!existingDocument) {
+			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		if (folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED) {
+		if (
+			existingDocument.folder.status !== "DRAFT" &&
+			existingDocument.folder.status !== "REJECTED"
+		) {
 			return {
 				ok: false,
-				message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+				message:
+					"No puedes modificar documentos en esta carpeta porque está en revisión o ya fue aprobada",
 			}
+		}
+
+		const updatedDocument = await prisma.workerDocument.update({
+			where: {
+				id: documentId,
+			},
+			data: {
+				expirationDate,
+			},
+		})
+
+		return { ok: true, data: updatedDocument }
+	} catch (error) {
+		console.error("Error al actualizar documento:", error)
+		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}
+
+export const submitWorkerDocumentForReview = async ({
+	userId,
+	emails,
+	folderId,
+	companyId,
+}: {
+	userId: string
+	emails: string[]
+	folderId: string
+	companyId: string
+}) => {
+	try {
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			select: {
+				rut: true,
+				name: true,
+				phone: true,
+				email: true,
+			},
+		})
+
+		if (!user) {
+			return { ok: false, message: "Usuario no encontrado." }
 		}
 
 		await prisma.$transaction(async (tx) => {
 			const folders = await tx.workerFolder.findMany({
 				where: {
-					startupFolderId: folder.startupFolder.id,
+					startupFolderId: folderId,
 				},
 				select: {
 					id: true,
+					status: true,
 				},
 			})
 
-			await tx.workerFolder.updateMany({
-				where: { startupFolderId: folder.startupFolder.id },
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-					additionalNotificationEmails: [...emails, user.email],
-				},
-			})
+			if (folders.length === 0) {
+				return { ok: false, message: "No se encontraron carpetas para esta carpeta." }
+			}
 
-			folders.forEach(async (folder) => {
-				await tx.workerDocument.updateMany({
-					where: {
-						folderId: folder.id,
-					},
-					data: {
-						submittedAt: new Date(),
-						status: ReviewStatus.SUBMITTED,
-					},
+			const invalidFolder = folders.find(
+				(folder) => folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
+			)
+
+			if (invalidFolder) {
+				return {
+					ok: false,
+					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${invalidFolder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+				}
+			}
+
+			await Promise.all(
+				folders.map(async (folder) => {
+					await tx.workerFolder.update({
+						where: { id: folder.id },
+						data: {
+							submittedAt: new Date(),
+							status: ReviewStatus.SUBMITTED,
+							additionalNotificationEmails: [...emails, user.email],
+						},
+					})
+
+					await tx.workerDocument.updateMany({
+						where: {
+							folderId: folder.id,
+						},
+						data: {
+							submittedAt: new Date(),
+							status: ReviewStatus.SUBMITTED,
+						},
+					})
 				})
-			})
+			)
 		})
 
+		const company = await prisma.company.findUnique({
+			where: {
+				id: companyId,
+			},
+			select: {
+				name: true,
+			},
+		})
+
+		if (!company) {
+			return { ok: false, message: "Empresa no encontrada." }
+		}
+
 		await sendRequestReviewEmail({
-			companyName: folder.startupFolder.company.name,
+			solicitator: {
+				name: user.name,
+				rut: user.rut,
+				phone: user.phone,
+				email: user.email,
+			},
+			companyName: company.name,
 			folderName: "Carpeta de Trabajadores",
+			documentCategory: DocumentCategory.PERSONNEL,
 		})
 
 		return {

@@ -7,16 +7,21 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { createEquipment } from "@/actions/equipments/createEquipment"
+import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
+import { CriticalityOptions } from "@/lib/consts/criticality"
 import { queryClient } from "@/lib/queryClient"
 import {
 	equipmentSchema,
 	type EquipmentSchema,
 } from "@/lib/form-schemas/admin/equipment/equipment.schema"
 
+import UploadFilesFormField from "@/components/forms/shared/UploadFilesFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SwitchFormField } from "@/components/forms/shared/SwitchFormField"
+import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
+import { Separator } from "@/components/ui/separator"
 import { Form } from "@/components/ui/form"
 import {
 	Sheet,
@@ -26,10 +31,6 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/components/ui/sheet"
-
-import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
-import UploadFilesFormField from "../../shared/UploadFilesFormField"
-import { Separator } from "@/components/ui/separator"
 
 interface CreateEquipmentFormProps {
 	parentId?: string
@@ -52,6 +53,7 @@ export default function CreateEquipmentForm({
 			description: "",
 			parentId: parentId,
 			isOperational: true,
+			criticality: undefined,
 		},
 	})
 
@@ -151,6 +153,13 @@ export default function CreateEquipmentForm({
 							label="Tipo de equipo"
 							control={form.control}
 							placeholder="Tipo de equipo"
+						/>
+
+						<SelectFormField<EquipmentSchema>
+							name="criticality"
+							label="Criticalidad"
+							control={form.control}
+							options={CriticalityOptions}
 						/>
 
 						<TextAreaFormField<EquipmentSchema>

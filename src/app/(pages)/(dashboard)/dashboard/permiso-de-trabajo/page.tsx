@@ -9,8 +9,6 @@ export default async function WorkPermitPage() {
 		headers: await headers(),
 	})
 
-	console.log(res?.user)
-
 	if (!res || !res.user || !res.user.companyId) {
 		return (
 			<main className="flex h-screen items-center justify-center">

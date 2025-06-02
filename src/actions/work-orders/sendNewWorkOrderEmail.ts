@@ -29,8 +29,11 @@ export const sendNewWorkOrderEmail = async ({ workOrder }: SendNewWorkOrderEmail
 	try {
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
-			//TODO:  "scontrol.trm@oleotrasandino.cl", "scontrol.prs@oleotrasandino.cl" enviar correo tambien a sala de control
-			to: [workOrder.supervisor.email],
+			to: [
+				workOrder.supervisor.email,
+				"soporte@ingenieriasimple.cl",
+				"scontrol.trm@oleotrasandino.cl",
+			],
 			subject: `Nueva Orden de Trabajo Asignada - ${workOrder.otNumber}`,
 			react: await NewWorkOrderEmailTemplate({
 				workOrder,

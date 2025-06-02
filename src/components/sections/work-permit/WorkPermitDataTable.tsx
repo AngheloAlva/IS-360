@@ -174,30 +174,30 @@ export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading || isFetching
-							? Array.from({ length: 10 }).map((_, index) => (
-									<TableRow key={index}>
-										<TableCell className="" colSpan={10}>
-											<Skeleton className="h-10 min-w-full" />
-										</TableCell>
-									</TableRow>
-								))
-							: table.getRowModel().rows.map((row) => (
-									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className="font-medium">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))}
-
-						{table.getRowModel().rows.length === 0 && (
+						{isLoading || isFetching ? (
+							Array.from({ length: 10 }).map((_, index) => (
+								<TableRow key={index}>
+									<TableCell className="" colSpan={10}>
+										<Skeleton className="h-10 min-w-full" />
+									</TableCell>
+								</TableRow>
+							))
+						) : table.getRowModel().rows.length === 0 ? (
 							<TableRow>
 								<TableCell colSpan={10} className="h-24 text-center">
 									No hay permisos de trabajo
 								</TableCell>
 							</TableRow>
+						) : (
+							table.getRowModel().rows.map((row) => (
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="font-medium">
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+									))}
+								</TableRow>
+							))
 						)}
 					</TableBody>
 				</Table>

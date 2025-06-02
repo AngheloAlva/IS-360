@@ -2,12 +2,13 @@
 
 import { z } from "zod"
 
-import { ReviewStatus, SafetyAndHealthDocumentType } from "@prisma/client"
+import { DocumentCategory, ReviewStatus, SafetyAndHealthDocumentType } from "@prisma/client"
 import { sendRequestReviewEmail } from "../send-request-review-email"
 import prisma from "@/lib/prisma"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/lib/form-schemas/startup-folder/new-file.schema"
+import type { UpdateExpirationDateSchema } from "@/lib/form-schemas/startup-folder/update-expiration-date"
 import type { UploadResult } from "@/lib/upload-files"
 
 export const createSafetyAndHealthDocument = async ({
@@ -130,6 +131,56 @@ export const updateSafetyAndHealthDocument = async ({
 	}
 }
 
+export const updateExpirationDateSafetyAndHealthDocument = async ({
+	data: { documentId, expirationDate },
+}: {
+	data: UpdateExpirationDateSchema
+}) => {
+	try {
+		const existingDocument = await prisma.safetyAndHealthDocument.findUnique({
+			where: {
+				id: documentId,
+			},
+			include: {
+				folder: {
+					select: {
+						status: true,
+					},
+				},
+			},
+		})
+
+		if (!existingDocument) {
+			return { ok: false, message: "Documento no encontrado" }
+		}
+
+		if (
+			existingDocument.folder.status !== "DRAFT" &&
+			existingDocument.folder.status !== "REJECTED"
+		) {
+			return {
+				ok: false,
+				message:
+					"No puedes modificar documentos en esta carpeta porque está en revisión o ya fue aprobada",
+			}
+		}
+
+		const updatedDocument = await prisma.safetyAndHealthDocument.update({
+			where: {
+				id: documentId,
+			},
+			data: {
+				expirationDate,
+			},
+		})
+
+		return { ok: true, data: updatedDocument }
+	} catch (error) {
+		console.error("Error al actualizar documento:", error)
+		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}
+
 export const submitSafetyAndHealthDocumentForReview = async ({
 	emails,
 	userId,
@@ -142,7 +193,10 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
 		select: {
+			rut: true,
+			name: true,
 			email: true,
+			phone: true,
 		},
 	})
 
@@ -199,8 +253,15 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 		])
 
 		await sendRequestReviewEmail({
+			solicitator: {
+				email: user.email,
+				name: user.name,
+				rut: user.rut,
+				phone: user.phone,
+			},
 			companyName: folder.startupFolder.company.name,
 			folderName: "Carpeta de Seguridad y Salud Ocupacional",
+			documentCategory: DocumentCategory.SAFETY_AND_HEALTH,
 		})
 
 		return {

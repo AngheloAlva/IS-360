@@ -1,4 +1,13 @@
-import { User, Clock, MapPin, PenTool, Calendar, FileText, Briefcase } from "lucide-react"
+import {
+	User,
+	Clock,
+	MapPin,
+	PenTool,
+	Calendar,
+	FileText,
+	Briefcase,
+	WrenchIcon,
+} from "lucide-react"
 import { format } from "date-fns"
 
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
@@ -20,12 +29,12 @@ export default function WorkBookGeneralData({
 	canClose,
 }: WorkBookGeneralDataProps): React.ReactElement {
 	return (
-		<div className="grid w-full gap-6 md:grid-cols-12">
-			<Card className="md:col-span-12">
+		<div className="grid w-full gap-2">
+			<Card>
 				<CardHeader className="flex flex-row items-center justify-between pb-3">
 					<div>
-						<CardTitle className="flex items-center gap-2 text-xl">
-							<FileText className="text-primary h-5 w-5" />
+						<CardTitle className="flex items-center gap-2 text-lg">
+							<FileText className="bg-primary/10 text-primary size-8 rounded-md p-1.5" />
 							Detalles de la Orden de Trabajo
 						</CardTitle>
 						<CardDescription>
@@ -139,6 +148,34 @@ export default function WorkBookGeneralData({
 							</div>
 						</div>
 					</div>
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center gap-2 text-lg">
+						<WrenchIcon className="size-8 rounded-md bg-green-500/10 p-1.5 text-green-500" />
+						Información del/los equipo(s)
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="grid gap-6 md:grid-cols-2">
+					{data.equipment.map((equipment) => (
+						<div key={equipment.id}>
+							<p className="text-muted-foreground font-semibold">{equipment.name}</p>
+							<p className="text-muted-foreground text-sm font-medium">TAG: {equipment.tag}</p>
+							<p className="text-muted-foreground text-sm font-medium">Tipo: {equipment.type}</p>
+							<p className="text-muted-foreground text-sm font-medium">
+								Ubicación: {equipment.location}
+							</p>
+
+							{equipment.attachments.map((attachment) => (
+								<div key={attachment.id}>
+									<p className="text-muted-foreground text-sm font-medium">{attachment.name}</p>
+									<p className="text-muted-foreground text-sm font-medium">{attachment.url}</p>
+								</div>
+							))}
+						</div>
+					))}
 				</CardContent>
 			</Card>
 		</div>

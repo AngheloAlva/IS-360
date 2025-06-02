@@ -15,8 +15,8 @@ export const milestoneSchema = z
 				message: "El porcentaje del hito debe ser un número mayor a 0",
 			}
 		),
-		startDate: z.date().optional(),
-		endDate: z.date().optional(),
+		startDate: z.date(),
+		endDate: z.date(),
 	})
 	.refine(
 		(data) => {

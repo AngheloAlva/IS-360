@@ -4,7 +4,16 @@ import type { WorkOrder } from "@prisma/client"
 
 export interface WorkBookById extends WorkOrder {
 	equipment: {
+		id: string
+		tag: string
 		name: string
+		type: string
+		location: string
+		attachments: {
+			id: string
+			url: string
+			name: string
+		}[]
 	}[]
 	workEntries: {
 		include: {

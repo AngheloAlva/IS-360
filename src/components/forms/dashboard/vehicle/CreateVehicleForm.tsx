@@ -53,11 +53,11 @@ export default function CreateVehicleForm({
 		defaultValues: {
 			plate: "",
 			model: "",
-			year: new Date().getFullYear(),
 			brand: "",
-			type: "CAR",
 			color: "",
+			type: "CAR",
 			isMain: false,
+			year: undefined,
 		},
 	})
 
@@ -142,6 +142,12 @@ export default function CreateVehicleForm({
 				className="grid space-y-4 gap-x-2 gap-y-5 sm:grid-cols-2"
 			>
 				<InputFormField<VehicleSchema>
+					name="model"
+					placeholder="Corolla"
+					control={form.control}
+					label="Modelo / Nombre del equipo"
+				/>
+				<InputFormField<VehicleSchema>
 					name="plate"
 					label="Matrícula"
 					placeholder="ABC123"
@@ -152,13 +158,6 @@ export default function CreateVehicleForm({
 					name="brand"
 					label="Marca"
 					placeholder="Toyota"
-					control={form.control}
-				/>
-
-				<InputFormField<VehicleSchema>
-					name="model"
-					label="Modelo"
-					placeholder="Corolla"
 					control={form.control}
 				/>
 

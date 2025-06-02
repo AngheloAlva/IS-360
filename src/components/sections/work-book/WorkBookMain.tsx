@@ -18,6 +18,8 @@ import BackButton from "@/components/shared/BackButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { Alert, AlertTitle } from "@/components/ui/alert"
+import { InfoIcon } from "lucide-react"
 
 interface WorkBookMainProps {
 	userId: string
@@ -92,7 +94,13 @@ export default function WorkBookMain({
 		<>
 			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex items-center gap-3">
-					<BackButton href="/admin/dashboard/libros-de-obras" />
+					<BackButton
+						href={
+							userRole === "partnerCompany"
+								? "/dashboard/libro-de-obras"
+								: "/admin/dashboard/libros-de-obras"
+						}
+					/>
 
 					<div>
 						<h1 className="text-2xl font-bold">
@@ -139,16 +147,14 @@ export default function WorkBookMain({
 			<WorkBookGeneralData canClose={canClose} userId={userId} data={workBook} />
 
 			<Tabs defaultValue="milestones" className="w-full">
-				{workBook._count.milestones > 0 && (
-					<TabsList className="mb-6 h-11 w-full">
-						<TabsTrigger value="milestones" className="h-9">
-							Hitos y Tareas
-						</TabsTrigger>
-						<TabsTrigger value="activities" className="h-9">
-							Actividades Diarias
-						</TabsTrigger>
-					</TabsList>
-				)}
+				<TabsList className="mb-6 h-11 w-full">
+					<TabsTrigger value="milestones" className="h-9">
+						Hitos y Tareas
+					</TabsTrigger>
+					<TabsTrigger value="activities" className="h-9">
+						Actividades Diarias
+					</TabsTrigger>
+				</TabsList>
 
 				<TabsContent value="milestones">
 					<WorkBookMilestones
@@ -166,14 +172,22 @@ export default function WorkBookMain({
 						<div className="flex gap-2">
 							{canAddActivities && (
 								<>
-									{!canClose && (
-										<ActivityForm
-											userId={userId}
-											startDate={new Date()}
-											workOrderId={workBook.id}
-											entryType="DAILY_ACTIVITY"
-										/>
-									)}
+									{!canClose &&
+										(workBook._count.milestones > 0 ? (
+											<ActivityForm
+												userId={userId}
+												startDate={new Date()}
+												workOrderId={workBook.id}
+												entryType="DAILY_ACTIVITY"
+											/>
+										) : (
+											<Alert>
+												<InfoIcon className="h-4 w-4" />
+												<AlertTitle>
+													Debe crear su(s) hito(s) para agregar actividades diarias
+												</AlertTitle>
+											</Alert>
+										))}
 
 									{hasPermission && (
 										<>

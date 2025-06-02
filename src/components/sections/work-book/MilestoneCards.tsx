@@ -19,10 +19,16 @@ import { USER_ROLE } from "@/lib/permissions"
 interface MilestoneCardsProps {
 	userId: string
 	userRole: string
+	workOrderId: string
 	milestones: Milestone[]
 }
 
-export default function MilestoneCards({ userId, userRole, milestones }: MilestoneCardsProps) {
+export default function MilestoneCards({
+	userId,
+	userRole,
+	workOrderId,
+	milestones,
+}: MilestoneCardsProps) {
 	if (milestones.length === 0) {
 		return (
 			<div className="bg-primary/10 border-primary flex flex-col items-center justify-center rounded-md border p-8 text-center">
@@ -191,7 +197,11 @@ export default function MilestoneCards({ userId, userRole, milestones }: Milesto
 							)}
 
 							{milestone.status === MILESTONE_STATUS.IN_PROGRESS && (
-								<RequestCloseMilestoneDialog milestoneId={milestone.id} userId={userId} />
+								<RequestCloseMilestoneDialog
+									userId={userId}
+									workOrderId={workOrderId}
+									milestoneId={milestone.id}
+								/>
 							)}
 
 							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&

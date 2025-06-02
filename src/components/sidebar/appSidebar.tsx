@@ -48,7 +48,7 @@ const data = {
 			icon: Users,
 		},
 		{
-			name: "Vehículos",
+			name: "Vehículos y Equipos",
 			url: "/dashboard/vehiculos",
 			icon: Car,
 		},

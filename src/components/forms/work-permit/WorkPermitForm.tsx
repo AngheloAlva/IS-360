@@ -42,6 +42,7 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Form } from "@/components/ui/form"
+import { queryClient } from "@/lib/queryClient"
 
 interface WorkPermitFormProps {
 	userId: string
@@ -168,6 +169,15 @@ export default function WorkPermitForm({
 				duration: 3000,
 			})
 
+			queryClient.invalidateQueries({
+				queryKey: [
+					"workPermits",
+					{
+						companyId,
+					},
+				],
+			})
+
 			router.push("/dashboard/permiso-de-trabajo")
 		} catch (error) {
 			setIsSubmitting(false)
@@ -247,9 +257,7 @@ export default function WorkPermitForm({
 							</div>
 
 							<div className="bg-secondary-background/20 grid w-1/2 gap-y-4 rounded-lg p-3 shadow sm:col-span-2 sm:grid-cols-2">
-								<h2 className="text-lg font-semibold text-gray-700 sm:col-span-2">
-									Información de la OT:
-								</h2>
+								<h2 className="text-lg font-semibold sm:col-span-2">Información de la OT:</h2>
 
 								<div>
 									<h3 className="text-sm font-semibold">Trabajo solicitado:</h3>
@@ -322,7 +330,7 @@ export default function WorkPermitForm({
 							</div>
 						</div>
 
-						<Separator className="mt-2 bg-gray-200 md:col-span-2" />
+						<Separator className="mt-2 md:col-span-2" />
 
 						<InputFormField<WorkPermitSchema>
 							name="exactPlace"
@@ -375,12 +383,12 @@ export default function WorkPermitForm({
 							/>
 						)}
 
-						<Separator className="my-2 bg-gray-200 md:col-span-2" />
+						<Separator className="my-2 md:col-span-2" />
 
-						{/* <h2 className="text-lg font-semibold text-gray-700">Analisis seguro del trabajo</h2>
+						{/* <h2 className="text-lg font-semibold ">Analisis seguro del trabajo</h2>
 
 						<div className="flex w-full items-center justify-between md:col-span-2">
-							<FormLabel className="text-gray-700 md:col-span-2">Detalle de Actividades</FormLabel>
+							<FormLabel className=" md:col-span-2">Detalle de Actividades</FormLabel>
 
 							<Button
 								type="button"
@@ -399,11 +407,11 @@ export default function WorkPermitForm({
 									name={`activityDetails.${index}.activity`}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel className="text-gray-700">Actividad {index + 1}</FormLabel>
+											<FormLabel className="">Actividad {index + 1}</FormLabel>
 											<FormControl>
 												<div className="flex items-center justify-center gap-1">
 													<Input
-														className="w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+														className="w-full rounded-md border-gray-200 bg-white text-sm "
 														placeholder="Actividad"
 														{...field}
 													/>
@@ -479,7 +487,7 @@ export default function WorkPermitForm({
 						)}
 
 						{/* 
-						<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
+						<h2 className="text-lg font-semibold  md:col-span-2">
 							Firmas de autorización
 						</h2>
 
@@ -498,7 +506,7 @@ export default function WorkPermitForm({
 						{/* 							
 								<Separator className="my-2 bg-gray-200 md:col-span-2" />
 
-								<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
+								<h2 className="text-lg font-semibold  md:col-span-2">
 									Recepcion del trabajo
 								</h2>
 
@@ -520,12 +528,10 @@ export default function WorkPermitForm({
 									control={form.control}
 								/> */}
 
-						<Separator className="mt-2 bg-gray-200 md:col-span-2" />
+						<Separator className="mt-2 md:col-span-2" />
 
 						<div className="flex w-full items-center justify-between md:col-span-2">
-							<h2 className="text-lg font-semibold text-gray-700 md:col-span-2">
-								Registro de participacion
-							</h2>
+							<h2 className="text-lg font-semibold md:col-span-2">Registro de participacion</h2>
 
 							<Button
 								type="button"
@@ -554,19 +560,22 @@ export default function WorkPermitForm({
 									}
 								/>
 
-								<Button
-									type="button"
-									variant="outline"
-									className="col-span-4 md:mt-5"
-									onClick={() => removeParticipant(index)}
-								>
-									<X />
-									<span className="md:hidden">Eliminar participante {index + 1}</span>
-								</Button>
+								{index > 0 && (
+									<Button
+										type="button"
+										variant="outline"
+										className="col-span-4 md:mt-5"
+										onClick={() => removeParticipant(index)}
+									>
+										<X />
+										<span className="md:hidden">Eliminar participante {index + 1}</span>
+									</Button>
+								)}
 							</div>
 						))}
 
 						<TextAreaFormField<WorkPermitSchema>
+							optional
 							control={form.control}
 							name="additionalObservations"
 							itemClassName="sm:col-span-2"

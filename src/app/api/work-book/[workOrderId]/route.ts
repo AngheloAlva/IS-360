@@ -47,7 +47,18 @@ export async function GET(
 				},
 				equipment: {
 					select: {
+						id: true,
+						tag: true,
 						name: true,
+						type: true,
+						location: true,
+						attachments: {
+							select: {
+								id: true,
+								url: true,
+								name: true,
+							},
+						},
 					},
 				},
 				milestones: {

@@ -25,6 +25,7 @@ import type {
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
+import { UpdateExpirationDateDocument } from "./UpdateExpirationDateDocument"
 
 interface DocumentListProps {
 	userId: string
@@ -134,11 +135,20 @@ export function DocumentList({
 												/>
 											)}
 
+										{isUploaded && isOtcMember && (
+											<UpdateExpirationDateDocument
+												folderId={folderId}
+												companyId={companyId}
+												documentId={document.id}
+												category={category}
+											/>
+										)}
+
 										<Link
 											href={document.url}
 											target="_blank"
 											rel="noreferrer noopener"
-											className="bg-primary/10 text-primary hover:bg-primary/20 flex h-8 w-8 items-center justify-center rounded-md border transition-colors"
+											className="bg-primary/10 text-primary hover:bg-primary/20 border-primary flex size-9 items-center justify-center rounded-md border transition-colors"
 										>
 											<ExternalLink className="h-4 w-4" />
 										</Link>

@@ -56,7 +56,12 @@ export default function WorkBookMilestones({
 				)}
 			</div>
 
-			<MilestoneCards userId={userId} userRole={userRole} milestones={data?.milestones || []} />
+			<MilestoneCards
+				userId={userId}
+				userRole={userRole}
+				workOrderId={workOrderId}
+				milestones={data?.milestones || []}
+			/>
 		</div>
 	)
 }

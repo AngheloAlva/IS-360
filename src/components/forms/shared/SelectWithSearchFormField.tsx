@@ -76,7 +76,7 @@ export function SelectWithSearchFormField<T extends FieldValues>({
 						</PopoverTrigger>
 						<PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
 							<Command>
-								<CommandInput placeholder="Buscar equipo..." className="h-9" />
+								<CommandInput placeholder="Buscar..." className="h-9" />
 
 								<CommandList>
 									<CommandEmpty>No hay resultados.</CommandEmpty>

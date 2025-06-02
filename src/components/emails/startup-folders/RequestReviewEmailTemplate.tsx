@@ -16,13 +16,19 @@ import {
 interface RequestReviewEmailTemplateProps {
 	folderName: string
 	companyName: string
+	solicitator: {
+		rut: string
+		name: string
+		email: string
+		phone: string | null
+	}
 }
 
 const systemUrl = process.env.NEXT_PUBLIC_APP_URL || "https://otc360.ingsimple.cl"
 
 export const RequestReviewEmailTemplate: React.FC<
 	Readonly<RequestReviewEmailTemplateProps>
-> = async ({ folderName, companyName }) => {
+> = async ({ folderName, companyName, solicitator }) => {
 	return (
 		<Html>
 			<Tailwind>
@@ -57,12 +63,24 @@ export const RequestReviewEmailTemplate: React.FC<
 
 							<div className="mb-6 rounded-lg bg-gray-50 p-4">
 								<Text className="mb-2 text-sm font-medium text-gray-700">
-									Detalles de la solicitud:
+									Detalles del solicitante:
 								</Text>
 								<ul className="space-y-2 text-sm text-gray-600">
 									<li className="flex items-start">
-										<span className="mr-2 font-medium">Solicitado por:</span>
-										<span>{companyName}</span>
+										<span className="mr-2 font-medium">RUT:</span>
+										<span>{solicitator.rut}</span>
+									</li>
+									<li className="flex items-start">
+										<span className="mr-2 font-medium">Nombre:</span>
+										<span>{solicitator.name}</span>
+									</li>
+									<li className="flex items-start">
+										<span className="mr-2 font-medium">Correo:</span>
+										<span>{solicitator.email}</span>
+									</li>
+									<li className="flex items-start">
+										<span className="mr-2 font-medium">Teléfono:</span>
+										<span>{solicitator.phone || "No proporcionado"}</span>
 									</li>
 								</ul>
 							</div>

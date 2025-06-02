@@ -16,7 +16,7 @@ export const sendContactEmail = async ({ message, filesUrls, type }: SendContact
 	try {
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
-			to: ["anghelo.alva@ingenieriasimple.cl"],
+			to: ["anghelo.alva@ingsimple.cl"],
 			subject: `Nuevo mensaje de ${type === "support" ? "soporte" : "contacto"}`,
 			react: await SupportEmailTemplate({
 				type,

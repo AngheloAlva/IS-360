@@ -110,6 +110,7 @@ export function SubmitReviewRequestDialog({
 					emails,
 					userId,
 					folderId,
+					companyId,
 				})
 			} else if (folderType === "VEHICLE") {
 				const { submitVehicleDocumentForReview } = await import(
@@ -119,6 +120,7 @@ export function SubmitReviewRequestDialog({
 					emails,
 					userId,
 					folderId,
+					companyId,
 				})
 			} else if (folderType === "ENVIRONMENTAL") {
 				const { submitEnvironmentalDocumentForReview } = await import(

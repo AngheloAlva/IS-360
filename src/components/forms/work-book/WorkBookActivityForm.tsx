@@ -156,10 +156,15 @@ export default function ActivityForm({
 			}
 
 			toast.success("Actividad creada correctamente")
+
 			setOpen(false)
 			form.reset()
+
 			queryClient.invalidateQueries({
 				queryKey: ["work-entries", { workOrderId }],
+			})
+			queryClient.invalidateQueries({
+				queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
 			})
 		} catch (error) {
 			console.error(error)
