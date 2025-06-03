@@ -7,6 +7,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { companySchema, type CompanySchema } from "@/lib/form-schemas/admin/company/company.schema"
+import { createUserStartupFolder } from "@/actions/users/createUserStartupFolder"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { sendNewUserEmail } from "@/actions/emails/sendNewUserEmail"
 import { createCompany } from "@/actions/companies/createCompany"
@@ -33,7 +34,6 @@ import {
 } from "@/components/ui/sheet"
 
 import type { User } from "@prisma/client"
-import { createUserStartupFolder } from "@/actions/users/createUserStartupFolder"
 
 export default function CreateCompanyFormSheet(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -187,14 +187,14 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 					>
 						<InputFormField<CompanySchema>
 							name="name"
-							label="Nombre"
 							control={form.control}
+							label="Nombre empresa"
 							placeholder="Nombre de la empresa"
 						/>
 
 						<RutFormField<CompanySchema>
 							name="rut"
-							label="RUT"
+							label="RUT empresa"
 							control={form.control}
 							placeholder="RUT de la empresa"
 						/>
@@ -241,8 +241,8 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 
 										<InputFormField<CompanySchema>
 											name={`supervisors.${index}.name`}
-											label="Nombre"
 											control={form.control}
+											label="Nombre completo"
 											placeholder="Nombre del supervisor"
 										/>
 
@@ -271,18 +271,18 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 
 										<InputFormField<CompanySchema>
 											name={`supervisors.${index}.internalArea`}
-											label="Area"
+											label="Area interna"
 											control={form.control}
-											placeholder="Area del supervisor"
 											itemClassName="sm:col-span-2"
+											placeholder="Area interna del supervisor"
 										/>
 
 										<InputFormField<CompanySchema>
 											name={`supervisors.${index}.internalRole`}
-											label="Rol"
+											label="Cargo"
 											control={form.control}
-											placeholder="Rol del supervisor"
 											itemClassName="sm:col-span-2"
+											placeholder="Cargo del supervisor"
 										/>
 									</div>
 								))}

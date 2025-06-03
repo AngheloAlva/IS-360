@@ -112,14 +112,14 @@ export function MyCompanyForm({ user, companyId }: MyCompanyFormProps) {
 						<InputFormField<CompanyFormSchema>
 							readOnly
 							name="name"
+							label="Nombre empresa"
 							control={form.control}
-							label="Nombre completo"
 						/>
 
 						<InputFormField<CompanyFormSchema>
 							readOnly
 							name="rut"
-							label="RUT"
+							label="RUT empresa"
 							control={form.control}
 						/>
 					</div>

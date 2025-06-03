@@ -21,21 +21,14 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
-	const router = useRouter()
 	const [isSubmitting, setIsSubmitting] = useState(false)
+
+	const router = useRouter()
 
 	const form = useForm<ProfileFormSchema>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues: {
 			name: user.name,
-			image: {
-				fileSize: 0,
-				file: undefined,
-				url: user.image || "",
-				mimeType: "image/jpeg",
-				preview: user.image || "",
-				title: user.name || "",
-			},
 			phone: user.phone || "",
 		},
 	})
@@ -105,7 +98,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
 					</div>
 				</div>
 
-				<Button type="submit" className="w-full" disabled={isSubmitting}>
+				<Button type="submit" className="hover:bg-primary/80 w-full" disabled={isSubmitting}>
 					{isSubmitting ? "Actualizando..." : "Actualizar perfil"}
 				</Button>
 			</form>

@@ -138,12 +138,12 @@ const data = {
 
 const navInternal = [
 	{
-		name: "Usuarios",
+		name: "Usuarios Internos",
 		url: "/admin/dashboard/usuarios",
 		icon: Users,
 	},
 	{
-		name: "Empresas",
+		name: "Empresas Contratistas",
 		url: "/admin/dashboard/empresas",
 		icon: Building2,
 	},

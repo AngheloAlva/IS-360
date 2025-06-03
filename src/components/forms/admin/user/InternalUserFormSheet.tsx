@@ -255,7 +255,7 @@ export default function InternalUserFormSheet({
 								label="Áreas de documentos"
 								itemClassName="sm:col-span-2"
 								placeholder="Selecciona áreas de documentos"
-								description="Estas áreas determinan en donde el usuario podrá crear, editar y eliminar documentos"
+								description="Estas áreas determinan en donde el usuario podrá crear, editar y eliminar documentos."
 							/>
 
 							<MultiSelectFormField<InternalUserSchema>
@@ -268,6 +268,7 @@ export default function InternalUserFormSheet({
 									label: USER_ROLE_LABELS[role],
 								}))}
 								placeholder="Selecciona un rol"
+								description="Todos los usuarios podran visualizar los modulos, los roles otorgan permisos para administrar los modulos."
 							/>
 						</div>
 
