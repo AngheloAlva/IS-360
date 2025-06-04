@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
 					role: true,
 					area: true,
 					phone: true,
+					image: true,
 					email: true,
 					modules: true,
 					createdAt: true,

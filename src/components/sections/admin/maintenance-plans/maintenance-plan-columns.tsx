@@ -19,6 +19,14 @@ export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
 		},
 	},
 	{
+		accessorKey: "equipmentLocation",
+		header: "Ubicación del Equipo",
+		cell: ({ row }) => {
+			const equipments = row.getValue("equipment") as MaintenancePlan["equipment"]
+			return <span>{equipments.location}</span>
+		},
+	},
+	{
 		accessorKey: "_count",
 		header: "Proximas Tareas (1 semana)",
 		cell: ({ row }) => {

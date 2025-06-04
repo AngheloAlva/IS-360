@@ -87,7 +87,7 @@ export function AdminStartupFoldersList() {
 										<CardDescription>{folder.company.rut}</CardDescription>
 									</div>
 
-									<Avatar className="size-10 text-xl">
+									<Avatar className="size-14 text-xl">
 										<AvatarImage src={folder.company.image} />
 										<AvatarFallback>{folder.company.name.slice(0, 2)}</AvatarFallback>
 									</Avatar>

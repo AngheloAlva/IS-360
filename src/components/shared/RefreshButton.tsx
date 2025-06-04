@@ -13,13 +13,13 @@ export default function RefreshButton({
 }: RefreshButtonProps): React.ReactElement {
 	return (
 		<Button
-			size="icon"
 			variant="outline"
 			disabled={isFetching}
 			title="Recargar datos"
 			onClick={() => refetch()}
 		>
 			<RefreshCcwIcon className={isFetching ? "animate-spin" : ""} />
+			Recargar
 		</Button>
 	)
 }

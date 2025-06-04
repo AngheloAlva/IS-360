@@ -38,6 +38,7 @@ export async function GET() {
 					sessions: {
 						some: {},
 					},
+					accessRole: "ADMIN",
 				},
 				select: {
 					id: true,

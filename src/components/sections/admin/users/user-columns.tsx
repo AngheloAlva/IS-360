@@ -5,29 +5,24 @@ import { format } from "date-fns"
 
 import { USER_ROLE_LABELS } from "@/lib/permissions"
 import { AreasLabels } from "@/lib/consts/areas"
-import { USER_ROLE } from "@prisma/client"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 
 import type { ApiUser } from "@/types/user"
 
 export const UserColumns: ColumnDef<ApiUser>[] = [
 	{
-		accessorKey: "isSupervisor",
-		header: "Empresa",
+		accessorKey: "image",
 		cell: ({ row }) => {
-			const role = row.getValue("role") as string
-			const isSupervisor = row.getValue("isSupervisor") as boolean
+			const image = row.getValue("image") as string
+			const name = row.getValue("name") as string
 
-			if (role !== USER_ROLE.SUPERVISOR && role !== USER_ROLE.PARTNER_COMPANY) {
-				return <div>OTC</div>
-			}
-
-			const company = row.original.company?.name
 			return (
-				<div>
-					{company} {isSupervisor && "- Supervisor"}
-				</div>
+				<Avatar className="size-8 text-sm">
+					<AvatarImage src={image} alt={name} />
+					<AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+				</Avatar>
 			)
 		},
 	},

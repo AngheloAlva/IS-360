@@ -196,13 +196,14 @@ export default function MilestoneCards({
 								</div>
 							)}
 
-							{milestone.status === MILESTONE_STATUS.IN_PROGRESS && (
-								<RequestCloseMilestoneDialog
-									userId={userId}
-									workOrderId={workOrderId}
-									milestoneId={milestone.id}
-								/>
-							)}
+							{milestone.status === MILESTONE_STATUS.IN_PROGRESS &&
+								userRole === "partnerCompany" && (
+									<RequestCloseMilestoneDialog
+										userId={userId}
+										workOrderId={workOrderId}
+										milestoneId={milestone.id}
+									/>
+								)}
 
 							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
 								userRole !== "partnerCompany" && (

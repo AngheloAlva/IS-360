@@ -100,7 +100,7 @@ export function CompanyDataTable() {
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
 										<TableCell colSpan={8}>
-											<Skeleton className="h-9 min-w-full" />
+											<Skeleton className="h-14 min-w-full" />
 										</TableCell>
 									</TableRow>
 								))

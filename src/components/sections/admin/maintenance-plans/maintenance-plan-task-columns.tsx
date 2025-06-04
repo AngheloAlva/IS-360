@@ -96,6 +96,14 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		},
 	},
 	{
+		accessorKey: "equipmentLocation",
+		header: "Ubicación del Equipo",
+		cell: ({ row }) => {
+			const equipments = row.getValue("equipment") as MaintenancePlanTask["equipment"]
+			return <span>{equipments.location}</span>
+		},
+	},
+	{
 		accessorKey: "attachments",
 		header: "Adjuntos",
 		cell: ({ row }) => {

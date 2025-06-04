@@ -74,14 +74,14 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 		defaultValues: {
 			companyId: "",
 			equipment: [],
-			breakDays: "0",
+			breakDays: "",
 			workRequest: "",
 			type: undefined,
 			supervisorId: "",
 			capex: undefined,
 			responsibleId: "",
-			estimatedDays: "0",
-			estimatedHours: "0",
+			estimatedDays: "",
+			estimatedHours: "",
 			workDescription: "",
 			priority: undefined,
 			requiresBreak: false,
@@ -360,16 +360,16 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 
 						<InputFormField<WorkOrderSchema>
 							type="number"
-							name="estimatedHours"
+							name="estimatedDays"
 							control={form.control}
-							label="Horas Estimadas"
+							label="Días Estimados"
 						/>
 
 						<InputFormField<WorkOrderSchema>
 							type="number"
-							name="estimatedDays"
+							name="estimatedHours"
 							control={form.control}
-							label="Días Estimados"
+							label="Horas Estimadas"
 						/>
 
 						<Separator className="my-2 sm:col-span-2" />

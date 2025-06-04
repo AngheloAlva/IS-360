@@ -6,6 +6,7 @@ export interface ApiUser {
 	name: string
 	email: string
 	rut: string
+	image: string | null
 	role: (typeof USER_ROLE_ARRAY)[number]
 	phone: string
 	internalRole: string

@@ -8,6 +8,7 @@ export interface MaintenancePlan {
 		id: string
 		name: string
 		tag: string
+		location: string
 	}
 	createdAt: Date
 	createdBy: {

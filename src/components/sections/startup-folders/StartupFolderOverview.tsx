@@ -1,6 +1,6 @@
 "use client"
 
-import { Files, Building2 } from "lucide-react"
+import { Files, Building2, DownloadIcon } from "lucide-react"
 
 import { useStartupFolder } from "@/hooks/startup-folders/use-startup-folder"
 
@@ -11,6 +11,8 @@ import VehicleDocuments from "./documents/VehicleDocuments"
 import WorkerDocuments from "./documents/WorkerDocuments"
 import { Accordion } from "@/components/ui/accordion"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -56,32 +58,26 @@ export default function StartupFolderOverview({
 		<div className="w-full space-y-4">
 			<div>
 				<div className="space-y-6">
-					<div className="flex flex-col items-center justify-between gap-4 lg:flex-row">
+					<div className="flex flex-col items-start justify-between gap-4 lg:flex-row">
 						<div>
 							<div className="flex items-center gap-2">
 								<Building2 className="text-muted-foreground h-5 w-5" />
 								<h2 className="text-2xl font-semibold tracking-tight">Carpeta de Arranque</h2>
 							</div>
 							<p className="text-muted-foreground mt-1">
-								Esta carpeta contiene la documentación requerida de tu empresa
+								En este módulo podrás gestionar la documentación de tu empresa. En el caso de que un
+								documento no aplique a tu trabajo, deberas subir un documento indicando que no
+								aplica.
 							</p>
 						</div>
 
 						<div className="flex flex-col items-end gap-2">
-							<div className="text-muted-foreground flex min-w-fit flex-wrap items-start gap-1 gap-x-4 text-sm lg:flex-col lg:flex-nowrap lg:items-center xl:flex-row">
-								<div className="flex items-center text-nowrap lg:w-full">
-									<div className="mr-2 size-3 rounded-full bg-green-500"></div>
-									<span>Completados</span>
-								</div>
-								<div className="flex items-center text-nowrap lg:w-full">
-									<div className="mr-2 size-3 rounded-full bg-amber-500"></div>
-									<span>Pendientes (opcionales)</span>
-								</div>
-								<div className="flex items-center text-nowrap lg:w-full">
-									<div className="mr-2 size-3 rounded-full bg-red-500"></div>
-									<span>Pendientes (requeridos)</span>
-								</div>
-							</div>
+							<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
+								<Button className="bg-purple-500 hover:bg-purple-600">
+									<DownloadIcon className="mr-2 h-4 w-4" />
+									Documento base
+								</Button>
+							</Link>
 						</div>
 					</div>
 

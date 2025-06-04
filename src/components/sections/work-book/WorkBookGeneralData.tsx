@@ -12,8 +12,13 @@ import { format } from "date-fns"
 
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RequestWorkBookClosure } from "./RequestWorkBookClosure"
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from "@/components/ui/accordion"
 
 import type { WorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 
@@ -30,154 +35,170 @@ export default function WorkBookGeneralData({
 }: WorkBookGeneralDataProps): React.ReactElement {
 	return (
 		<div className="grid w-full gap-2">
-			<Card>
-				<CardHeader className="flex flex-row items-center justify-between pb-3">
-					<div>
-						<CardTitle className="flex items-center gap-2 text-lg">
-							<FileText className="bg-primary/10 text-primary size-8 rounded-md p-1.5" />
-							Detalles de la Orden de Trabajo
-						</CardTitle>
-						<CardDescription>
-							Información detallada sobre el trabajo solicitado y sus especificaciones
-						</CardDescription>
-					</div>
+			<Accordion type="single" className="space-y-2" collapsible>
+				<AccordionItem value="work-order-details" className="bg-background rounded-md">
+					<AccordionTrigger className="px-6 py-4 hover:cursor-pointer">
+						<div className="flex items-center gap-2">
+							<FileText className="bg-primary/10 text-primary size-10 rounded-md p-1.5" />
+							<div className="text-left">
+								<p className="font-semibold">Detalles de la Orden de Trabajo</p>
+								<p className="text-muted-foreground text-sm font-normal">
+									Información detallada sobre el trabajo solicitado y sus especificaciones.
+								</p>
+							</div>
+						</div>
+					</AccordionTrigger>
 
-					{canClose && <RequestWorkBookClosure workOrderId={data.id} userId={userId} />}
-				</CardHeader>
+					<AccordionContent className="px-6">
+						<div className="mb-4 flex justify-end">
+							{canClose && <RequestWorkBookClosure workOrderId={data.id} userId={userId} />}
+						</div>
 
-				<CardContent>
-					<div className="grid gap-6 md:grid-cols-2">
-						<div className="space-y-4">
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-pink-500/10 p-1.5 text-pink-500">
-									<PenTool className="h-5 w-5" />
+						<div className="grid gap-6 md:grid-cols-2">
+							<div className="space-y-4">
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-pink-500/10 p-1.5 text-pink-500">
+										<PenTool className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Trabajo Solicitado</p>
+										<p className="font-medium">{data.workRequest}</p>
+									</div>
 								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Trabajo Solicitado</p>
-									<p className="font-medium">{data.workRequest}</p>
+
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-amber-500/10 p-1.5 text-amber-500">
+										<FileText className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Tipo de Trabajo</p>
+										<p className="font-medium">{WorkOrderTypeLabels[data.type]}</p>
+									</div>
+								</div>
+
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-green-500/10 p-1.5 text-green-500">
+										<Briefcase className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Contratista</p>
+										<p className="font-medium">
+											{data.company?.name ? data.company.name : "Interno"}{" "}
+											<span className="text-muted-foreground">
+												{data.company?.rut && " - " + data.company.rut}
+											</span>
+										</p>
+									</div>
+								</div>
+
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-purple-500/10 p-1.5 text-purple-500">
+										<MapPin className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Ubicación</p>
+										<p className="font-medium">{data.workLocation}</p>
+									</div>
 								</div>
 							</div>
 
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-amber-500/10 p-1.5 text-amber-500">
-									<FileText className="h-5 w-5" />
+							<div className="space-y-4">
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-indigo-500/10 p-1.5 text-indigo-500">
+										<Calendar className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Fecha de Inicio</p>
+										<p className="font-medium">
+											{data.workStartDate
+												? format(data.workStartDate, "dd/MM/yyyy")
+												: "No iniciada"}
+										</p>
+									</div>
 								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Tipo de Trabajo</p>
-									<p className="font-medium">{WorkOrderTypeLabels[data.type]}</p>
-								</div>
-							</div>
 
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-green-500/10 p-1.5 text-green-500">
-									<Briefcase className="h-5 w-5" />
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-rose-500/10 p-1.5 text-rose-500">
+										<Clock className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Fecha de Término</p>
+										<p className="font-medium">
+											{data.estimatedEndDate
+												? format(data.estimatedEndDate, "dd/MM/yyyy")
+												: "No terminada"}
+										</p>
+									</div>
 								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Contratista</p>
-									<p className="font-medium">
-										{data.company?.name ? data.company.name : "Interno"}{" "}
-										<span className="text-muted-foreground">
-											{data.company?.rut && " - " + data.company.rut}
-										</span>
-									</p>
-								</div>
-							</div>
 
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-purple-500/10 p-1.5 text-purple-500">
-									<MapPin className="h-5 w-5" />
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-cyan-500/10 p-1.5 text-cyan-500">
+										<User className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Supervisor externo</p>
+										<p className="font-medium">
+											{data.supervisor.name}{" "}
+											<span className="text-muted-foreground">- {data.supervisor.phone}</span>
+										</p>
+									</div>
 								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Ubicación</p>
-									<p className="font-medium">{data.workLocation}</p>
+
+								<div className="flex items-start gap-3">
+									<div className="mt-0.5 rounded-md bg-orange-500/10 p-1.5 text-orange-500">
+										<User className="h-5 w-5" />
+									</div>
+									<div>
+										<p className="text-muted-foreground text-sm font-medium">Responsable OTC</p>
+										<p className="font-medium">
+											{data.responsible.name}{" "}
+											<span className="text-muted-foreground">- {data.responsible.phone}</span>
+										</p>
+									</div>
 								</div>
 							</div>
 						</div>
+					</AccordionContent>
+				</AccordionItem>
 
-						<div className="space-y-4">
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-indigo-500/10 p-1.5 text-indigo-500">
-									<Calendar className="h-5 w-5" />
-								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Fecha de Inicio</p>
-									<p className="font-medium">
-										{data.workStartDate ? format(data.workStartDate, "dd/MM/yyyy") : "No iniciada"}
-									</p>
-								</div>
-							</div>
-
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-rose-500/10 p-1.5 text-rose-500">
-									<Clock className="h-5 w-5" />
-								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Fecha de Término</p>
-									<p className="font-medium">
-										{data.estimatedEndDate
-											? format(data.estimatedEndDate, "dd/MM/yyyy")
-											: "No terminada"}
-									</p>
-								</div>
-							</div>
-
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-cyan-500/10 p-1.5 text-cyan-500">
-									<User className="h-5 w-5" />
-								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Responsable</p>
-									<p className="font-medium">
-										{data.supervisor.name}{" "}
-										<span className="text-muted-foreground">- {data.supervisor.phone}</span>
-									</p>
-								</div>
-							</div>
-
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 rounded-md bg-orange-500/10 p-1.5 text-orange-500">
-									<User className="h-5 w-5" />
-								</div>
-								<div>
-									<p className="text-muted-foreground text-sm font-medium">Inspector OTC</p>
-									<p className="font-medium">
-										{data.responsible.name}{" "}
-										<span className="text-muted-foreground">- {data.responsible.phone}</span>
-									</p>
-								</div>
+				<AccordionItem value="equipment-info" className="bg-background rounded-md">
+					<AccordionTrigger className="px-6 py-4 hover:cursor-pointer">
+						<div className="flex items-center gap-2">
+							<WrenchIcon className="size-10 rounded-md bg-green-500/10 p-1.5 text-green-500" />
+							<div>
+								<p className="font-semibold">Información del/los equipo(s)</p>
+								<p className="text-muted-foreground text-sm font-normal">
+									Información sobre el equipo(s) solicitado(s) y su documentación.
+								</p>
 							</div>
 						</div>
-					</div>
-				</CardContent>
-			</Card>
+					</AccordionTrigger>
 
-			<Card>
-				<CardHeader>
-					<CardTitle className="flex items-center gap-2 text-lg">
-						<WrenchIcon className="size-8 rounded-md bg-green-500/10 p-1.5 text-green-500" />
-						Información del/los equipo(s)
-					</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-6 md:grid-cols-2">
-					{data.equipment.map((equipment) => (
-						<div key={equipment.id}>
-							<p className="text-muted-foreground font-semibold">{equipment.name}</p>
-							<p className="text-muted-foreground text-sm font-medium">TAG: {equipment.tag}</p>
-							<p className="text-muted-foreground text-sm font-medium">Tipo: {equipment.type}</p>
-							<p className="text-muted-foreground text-sm font-medium">
-								Ubicación: {equipment.location}
-							</p>
+					<AccordionContent className="px-6">
+						<div className="grid gap-6 md:grid-cols-2">
+							{data.equipment.map((equipment) => (
+								<div key={equipment.id}>
+									<p className="text-muted-foreground font-semibold">{equipment.name}</p>
+									<p className="text-muted-foreground text-sm font-medium">TAG: {equipment.tag}</p>
+									<p className="text-muted-foreground text-sm font-medium">
+										Tipo: {equipment.type}
+									</p>
+									<p className="text-muted-foreground text-sm font-medium">
+										Ubicación: {equipment.location}
+									</p>
 
-							{equipment.attachments.map((attachment) => (
-								<div key={attachment.id}>
-									<p className="text-muted-foreground text-sm font-medium">{attachment.name}</p>
-									<p className="text-muted-foreground text-sm font-medium">{attachment.url}</p>
+									{equipment.attachments.map((attachment) => (
+										<div key={attachment.id}>
+											<p className="text-muted-foreground text-sm font-medium">{attachment.name}</p>
+											<p className="text-muted-foreground text-sm font-medium">{attachment.url}</p>
+										</div>
+									))}
 								</div>
 							))}
 						</div>
-					))}
-				</CardContent>
-			</Card>
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
 		</div>
 	)
 }

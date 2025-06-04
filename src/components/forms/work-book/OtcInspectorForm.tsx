@@ -1,22 +1,25 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { createOtcInspections } from "@/actions/work-book-entries/createOtcInspections"
+import { uploadFilesToCloud } from "@/lib/upload-files"
+import { queryClient } from "@/lib/queryClient"
 import {
-	OtcInspectionSchema,
 	otcInspectionsSchema,
+	type OtcInspectionSchema,
 } from "@/lib/form-schemas/work-book/otc-inspections.schema"
 
 import { DatePickerFormField } from "@/components/forms/shared/DatePickerFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
+import UploadFilesFormField from "../shared/UploadFilesFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
+import { Separator } from "@/components/ui/separator"
 import { Form } from "@/components/ui/form"
 import {
 	Sheet,
@@ -26,9 +29,6 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/components/ui/sheet"
-import { uploadFilesToCloud } from "@/lib/upload-files"
-import { Separator } from "@/components/ui/separator"
-import UploadFilesFormField from "../shared/UploadFilesFormField"
 
 export default function OtcInspectorForm({
 	userId,
@@ -40,8 +40,6 @@ export default function OtcInspectorForm({
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const form = useForm<OtcInspectionSchema>({
 		resolver: zodResolver(otcInspectionsSchema),
@@ -93,9 +91,16 @@ export default function OtcInspectorForm({
 			}
 
 			toast.success("Inspección creada correctamente")
+
 			setOpen(false)
-			router.refresh()
 			form.reset()
+
+			queryClient.invalidateQueries({
+				queryKey: ["work-entries", { workOrderId }],
+			})
+			queryClient.invalidateQueries({
+				queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+			})
 		} catch (error) {
 			console.error(error)
 			toast.error("Error al crear inspección", {

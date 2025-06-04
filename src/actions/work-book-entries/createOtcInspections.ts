@@ -57,14 +57,7 @@ export const createOtcInspections = async ({
 
 			const workOrder = await tx.workOrder.findUnique({
 				where: { id: workOrderId },
-				select: { workProgressStatus: true, type: true },
-				include: {
-					equipment: {
-						select: {
-							id: true,
-						},
-					},
-				},
+				select: { workProgressStatus: true, type: true, equipment: { select: { id: true } } },
 			})
 
 			const updatedProgress = (workOrder?.workProgressStatus || 0) + Number(progress || 0)

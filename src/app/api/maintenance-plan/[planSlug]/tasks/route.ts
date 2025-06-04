@@ -72,7 +72,9 @@ export async function GET(
 					equipment: {
 						select: {
 							id: true,
+							tag: true,
 							name: true,
+							location: true,
 						},
 					},
 					createdBy: {

@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
 							id: true,
 							tag: true,
 							name: true,
+							location: true,
 						},
 					},
 					_count: {

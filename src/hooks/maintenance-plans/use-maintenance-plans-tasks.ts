@@ -16,7 +16,9 @@ export interface MaintenancePlanTask {
 	}
 	equipment: {
 		id: string
+		tag: string
 		name: string
+		location: string
 	}
 	attachments: {
 		id: string

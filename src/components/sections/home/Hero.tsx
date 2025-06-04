@@ -8,8 +8,8 @@ export default function Hero(): React.ReactElement {
 			<div className="relative mx-auto max-w-screen-xl px-4 sm:mx-0 sm:px-6 md:px-10 lg:flex lg:h-screen lg:items-center lg:px-16">
 				<div className="max-w-xl text-center sm:text-left">
 					<h1 className="text-3xl font-extrabold text-white sm:text-5xl">
-						Operaciones de
-						<strong className="block font-extrabold text-green-600">Ordenes de Trabajo</strong>
+						OTC
+						<strong className="block font-extrabold text-green-600">360</strong>
 					</h1>
 
 					<p className="mt-4 max-w-lg text-white sm:text-xl/relaxed">
