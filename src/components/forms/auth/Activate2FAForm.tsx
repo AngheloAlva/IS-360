@@ -44,7 +44,7 @@ export default function Activate2FAForm() {
 		}
 
 		toast.success("2FA activado exitosamente")
-		router.push("/dashboard/documentacion")
+		router.push("/admin/dashboard/documentacion")
 		setLoading2FA(false)
 	}
 

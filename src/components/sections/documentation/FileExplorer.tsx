@@ -122,7 +122,7 @@ export function FileExplorer({
 									{getFolderIcon(item.type)}
 									<Link
 										prefetch={true}
-										href={`/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug + "_" + item.id}`}
+										href={`/admin/dashboard/documentacion/${foldersSlugs.join("/")}/${item.slug + "_" + item.id}`}
 										className="pr-6 font-medium hover:underline"
 									>
 										{item.name}

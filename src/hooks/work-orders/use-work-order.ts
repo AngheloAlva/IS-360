@@ -67,9 +67,9 @@ interface WorkOrdersParams {
 	page: number
 	limit: number
 	search: string
+	companyId: string | null
 	typeFilter: string | null
 	statusFilter: string | null
-	companyId: string | null
 	dateRange: DateRange | null
 }
 

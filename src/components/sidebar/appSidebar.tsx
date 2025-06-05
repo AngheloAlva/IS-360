@@ -4,7 +4,6 @@ import Image from "next/image"
 import {
 	Home,
 	Send,
-	Siren,
 	Users,
 	Wrench,
 	Folders,
@@ -80,6 +79,11 @@ const data = {
 			icon: Home,
 		},
 		{
+			name: "Documentación",
+			url: "/admin/dashboard/documentacion",
+			icon: FileSearch,
+		},
+		{
 			name: "Carpetas de Arranques",
 			url: "/admin/dashboard/carpetas-de-arranques",
 			icon: Folders,
@@ -108,18 +112,6 @@ const data = {
 			name: "Planes de Mantenimiento",
 			url: "/admin/dashboard/planes-de-mantenimiento",
 			icon: Construction,
-		},
-		{
-			name: "Patrullaje",
-			url: "/admin/dashboard/patrullaje",
-			icon: Siren,
-		},
-	],
-	navUser: [
-		{
-			name: "Documentación",
-			url: "/dashboard/documentacion",
-			icon: FileSearch,
 		},
 	],
 	navSecondary: [
@@ -164,8 +156,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 
 	const navItems = [
 		...(!canAccessAdminRoutes && !canAccessUserRoutes ? data.navMain : []),
-		...(canAccessAdminRoutes ? [...data.navAdmin, ...data.navUser] : []),
-		...(canAccessUserRoutes && !canAccessAdminRoutes ? data.navUser : []),
+		...(canAccessAdminRoutes ? [...data.navAdmin] : []),
 	]
 
 	return (

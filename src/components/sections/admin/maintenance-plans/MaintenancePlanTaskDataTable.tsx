@@ -227,7 +227,7 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 						{isLoading || isFetching ? (
 							Array.from({ length: 10 }).map((_, index) => (
 								<TableRow key={index}>
-									<TableCell colSpan={10}>
+									<TableCell colSpan={11}>
 										<Skeleton className="h-8 min-w-full" />
 									</TableCell>
 								</TableRow>
@@ -244,7 +244,7 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={10} className="h-24">
+								<TableCell colSpan={11} className="h-24">
 									<div className="flex w-full items-center justify-center gap-2 font-semibold">
 										<InfoIcon className="mr-2 h-4 w-4" />
 										No hay tareas asignadas

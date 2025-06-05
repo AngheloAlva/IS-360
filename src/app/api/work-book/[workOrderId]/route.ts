@@ -66,6 +66,17 @@ export async function GET(
 						startDate: true,
 					},
 				},
+				workPermits: {
+					select: {
+						participants: {
+							select: {
+								id: true,
+								rut: true,
+								name: true,
+							},
+						},
+					},
+				},
 				_count: {
 					select: {
 						milestones: true,

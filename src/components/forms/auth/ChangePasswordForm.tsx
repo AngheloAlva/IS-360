@@ -59,7 +59,7 @@ export default function ChangePasswordForm() {
 		}
 
 		toast.success("Contraseña cambiada exitosamente")
-		router.push("/dashboard/documentacion")
+		router.push("/admin/dashboard/documentacion")
 		setLoadingPassword(false)
 	}
 

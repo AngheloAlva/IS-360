@@ -55,7 +55,7 @@ const TreeNode = memo(function TreeNode({
 		if (node.type === "folder") {
 			if (!area) return
 
-			router.push(`/dashboard/documentacion/${area}/${node.slug + "_" + node.id}`)
+			router.push(`/admin/dashboard/documentacion/${area}/${node.slug + "_" + node.id}`)
 		}
 	}, [node, router, area])
 

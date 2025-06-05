@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
 import {
 	Bar,
 	Cell,
@@ -44,7 +44,9 @@ export function DocumentExpirationBarChart({ data, colors }: DocumentExpirationB
 				<Bar dataKey="value" radius={[4, 4, 0, 0]}>
 					{data.map((entry, index) => (
 						<Cell
-							onClick={() => router.push(`/dashboard/documentacion/busqueda?expiration=${entry.id}`)}
+							onClick={() =>
+								router.push(`/admin/dashboard/documentacion/busqueda?expiration=${entry.id}`)
+							}
 							key={`cell-${index}`}
 							fill={
 								entry.fill ||

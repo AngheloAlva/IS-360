@@ -52,8 +52,8 @@ export default function ActivityForm({
 }): React.ReactElement {
 	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [loadingUsers, setLoadingUsers] = useState(false)
 	const [users, setUsers] = useState<User[]>([])
+
 	const [open, setOpen] = useState(false)
 
 	const { data: milestones, isLoading: isLoadingMilestones } = useWorkBookMilestones({
@@ -89,8 +89,6 @@ export default function ActivityForm({
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				setLoadingUsers(true)
-
 				const { data, ok } = await getUsersByWorkOrderId(workOrderId)
 
 				if (!ok || !data) {
@@ -104,8 +102,6 @@ export default function ActivityForm({
 					description: "Ocurrió un error al intentar cargar los usuarios",
 					duration: 5000,
 				})
-			} finally {
-				setLoadingUsers(false)
 			}
 		}
 
@@ -290,18 +286,12 @@ export default function ActivityForm({
 
 						<Separator className="my-4 sm:col-span-2" />
 
-						<div className="flex items-center justify-between gap-2 sm:col-span-2">
+						<div className="flex flex-col sm:col-span-2">
 							<h2 className="text-lg font-bold">Personal que participa en la actividad</h2>
-
-							<Button
-								type="button"
-								variant={"ghost"}
-								onClick={() => append({ userId: "" })}
-								className="text-primary"
-							>
-								<PlusCircleIcon className="mr-1" />
-								Añadir Personal
-							</Button>
+							<span className="text-muted-foreground text-sm">
+								Las opciones disponibles son los trabajadores que se registraron en el permiso de
+								trabajo
+							</span>
 						</div>
 
 						{fields.map((field, index) => (
@@ -313,28 +303,34 @@ export default function ActivityForm({
 										size={"sm"}
 										type="button"
 										variant="ghost"
-										className="text-red-500"
 										onClick={() => remove(index)}
+										className="text-red-500 hover:bg-transparent"
 									>
 										<TrashIcon />
 									</Button>
 								</div>
 
-								{loadingUsers ? (
-									<Skeleton className="h-9 w-full rounded-md" />
-								) : (
-									<SelectFormField<DailyActivitySchema>
-										options={users.map((user) => ({
-											value: user.id,
-											label: user.name,
-										}))}
-										control={form.control}
-										name={`personnel.${index}.userId`}
-										placeholder="Seleccione al personal"
-									/>
-								)}
+								<SelectFormField<DailyActivitySchema>
+									options={users.map((user) => ({
+										value: user.id,
+										label: user.name,
+									}))}
+									control={form.control}
+									name={`personnel.${index}.userId`}
+									placeholder="Seleccione al personal"
+								/>
 							</div>
 						))}
+
+						<Button
+							type="button"
+							variant={"ghost"}
+							onClick={() => append({ userId: "" })}
+							className="text-primary w-fit justify-start hover:cursor-pointer hover:bg-transparent hover:underline sm:col-span-2"
+						>
+							<PlusCircleIcon className="mr-1" />
+							Añadir Personal
+						</Button>
 
 						<SubmitButton
 							label="Crear actividad"

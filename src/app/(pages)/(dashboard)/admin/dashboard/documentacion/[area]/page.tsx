@@ -44,7 +44,7 @@ export default async function AreaRootPage({ params }: PageProps) {
 		<div>
 			<div className="mb-8 flex gap-4 md:items-center md:justify-between">
 				<div className="flex items-center gap-3">
-					<BackButton href="/dashboard/documentacion" />
+					<BackButton href="/admin/dashboard/documentacion" />
 
 					<h1 className="text-text text-3xl font-bold">{areaName}</h1>
 				</div>

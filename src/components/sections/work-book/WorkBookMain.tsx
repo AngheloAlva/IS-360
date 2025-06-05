@@ -72,6 +72,8 @@ export default function WorkBookMain({
 		)
 	}
 
+	console.log("WORKBOOK", data?.workBook)
+
 	if (isError || !data?.workBook) {
 		return (
 			<div className="w-full rounded-md border border-amber-200 bg-amber-50 p-4">

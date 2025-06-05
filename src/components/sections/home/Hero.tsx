@@ -9,7 +9,7 @@ export default function Hero(): React.ReactElement {
 				<div className="max-w-xl text-center sm:text-left">
 					<h1 className="text-3xl font-extrabold text-white sm:text-5xl">
 						OTC
-						<strong className="block font-extrabold text-green-600">360</strong>
+						<strong className="ml-1 font-extrabold text-green-600">360</strong>
 					</h1>
 
 					<p className="mt-4 max-w-lg text-white sm:text-xl/relaxed">

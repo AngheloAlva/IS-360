@@ -41,6 +41,13 @@ export interface WorkBookById extends WorkOrder {
 		email: string
 		phone: string
 	}
+	workPermits: {
+		participants: {
+			id: string
+			rut: string
+			name: string
+		}[]
+	}[]
 	_count: {
 		milestones: number
 	}

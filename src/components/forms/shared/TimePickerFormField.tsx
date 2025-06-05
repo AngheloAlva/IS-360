@@ -38,10 +38,13 @@ const HOURS = Array.from({ length: 24 }, (_, i) => ({
 	label: i.toString().padStart(2, "0"),
 }))
 
-const MINUTES = Array.from({ length: 60 }, (_, i) => ({
-	value: i.toString().padStart(2, "0"),
-	label: i.toString().padStart(2, "0"),
-}))
+const MINUTES = Array.from({ length: 12 }, (_, i) => {
+	const value = (i * 5).toString().padStart(2, "0")
+	return {
+		value,
+		label: value,
+	}
+})
 
 export function TimePickerFormField<T extends FieldValues>({
 	name,

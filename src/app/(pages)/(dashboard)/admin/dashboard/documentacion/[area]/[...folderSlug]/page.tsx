@@ -43,8 +43,8 @@ export default async function DocumentsFilesPage({ params }: PageProps) {
 
 	const backPath =
 		fullFolderSlugs.length >= 1
-			? `/dashboard/documentacion/${area}/${fullFolderSlugs.slice(0, -1).join("/")}`
-			: `/dashboard/documentacion/${area}`
+			? `/admin/dashboard/documentacion/${area}/${fullFolderSlugs.slice(0, -1).join("/")}`
+			: `/admin/dashboard/documentacion/${area}`
 
 	return (
 		<div>

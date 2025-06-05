@@ -177,7 +177,7 @@ export function MaintenancePlanDataTable() {
 						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell colSpan={9}>
+										<TableCell colSpan={10}>
 											<Skeleton className="h-6.5 min-w-full" />
 										</TableCell>
 									</TableRow>
