@@ -46,6 +46,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 			name: "",
 			vehicles: [],
 			supervisors: [],
+			startupFolderName: "",
 		},
 	})
 
@@ -197,6 +198,14 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 							label="RUT empresa"
 							control={form.control}
 							placeholder="RUT de la empresa"
+						/>
+
+						<InputFormField<CompanySchema>
+							name="startupFolderName"
+							control={form.control}
+							label="Nombre de la carpeta de arranque"
+							placeholder="Nombre de la carpeta de arranque"
+							description="Este nombre se usará para crear la primera carpeta de arranque de la empresa"
 						/>
 
 						<Separator className="my-2" />

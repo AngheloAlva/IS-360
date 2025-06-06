@@ -4,8 +4,10 @@ import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { getDocumentStatus } from "@/lib/get-document-status"
 
+import { SendStartupFolderReview } from "../admin/SendStartupFolderReview"
 import { SubmitReviewRequestDialog } from "../SubmitReviewRequestDialog"
 import StartupFolderTrigger from "./StartupFolderTrigger"
+import { DocumentList } from "./DocumentList"
 import {
 	Accordion,
 	AccordionItem,
@@ -14,7 +16,6 @@ import {
 } from "@/components/ui/accordion"
 
 import type { StartupFolderWithDocuments } from "@/hooks/startup-folders/use-startup-folder"
-import { DocumentList } from "./DocumentList"
 
 interface VehicleDocumentsProps {
 	userId: string
@@ -68,15 +69,9 @@ export default function VehicleDocuments({
 					className="bg-background rounded-md border border-solid px-4"
 				>
 					<StartupFolderTrigger
-						userId={userId}
 						icon={<CarIcon />}
-						companyId={companyId}
-						status={foldersStatus}
-						isOtcMember={isOtcMember}
-						folderId={startupFolderId}
 						title={VEHICLE_STRUCTURE.title}
 						totalDocs={totalDocsForSection}
-						category={DocumentCategory.VEHICLES}
 						progressPercentage={progressPercentage}
 						completedDocs={overallUploadedDocsCount}
 						requiredPending={overallRequiredPendingDocsCount}
@@ -146,6 +141,16 @@ export default function VehicleDocuments({
 					</AccordionContent>
 				</AccordionItem>
 			</Accordion>
+
+			{isOtcMember && foldersStatus === ReviewStatus.SUBMITTED && (
+				<SendStartupFolderReview
+					userId={userId}
+					companyId={companyId}
+					folderId={startupFolderId}
+					title={VEHICLE_STRUCTURE.title}
+					category={DocumentCategory.VEHICLES}
+				/>
+			)}
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog

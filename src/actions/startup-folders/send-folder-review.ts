@@ -1,8 +1,8 @@
 "use server"
 
+import { sendReviewNotificationEmail } from "./send-review-notification-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { sendReviewNotificationEmail } from "./send-review-notification-email"
 
 interface SendFolderReviewProps {
 	userId: string
@@ -12,8 +12,8 @@ interface SendFolderReviewProps {
 }
 
 export const sendFolderReview = async ({
-	folderId,
 	userId,
+	folderId,
 	category,
 	isApproved,
 }: SendFolderReviewProps) => {

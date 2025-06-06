@@ -1,41 +1,27 @@
 import { Info } from "lucide-react"
 
-import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { SendStartupFolderReview } from "../admin/SendStartupFolderReview"
 import { AccordionTrigger } from "@/components/ui/accordion"
 import { Progress } from "@/components/ui/progress"
 
 export default function StartupFolderTrigger({
 	icon,
 	title,
-	userId,
-	status,
-	folderId,
-	category,
 	totalDocs,
-	companyId,
-	isOtcMember,
 	completedDocs,
 	requiredPending,
 	progressPercentage,
 	sectionDescription,
 }: {
 	title: string
-	userId: string
-	folderId: string
 	totalDocs: number
-	companyId: string
-	isOtcMember: boolean
-	status: ReviewStatus
 	completedDocs: number
 	icon: React.ReactNode
 	requiredPending: number
 	progressPercentage: number
 	sectionDescription: string
-	category: DocumentCategory
 }): React.ReactElement {
 	return (
 		<AccordionTrigger className="cursor-pointer items-center py-4 hover:no-underline">
@@ -73,16 +59,6 @@ export default function StartupFolderTrigger({
 							"bg-amber-500/50": requiredPending === 0,
 						})}
 					/>
-
-					{isOtcMember && status === ReviewStatus.SUBMITTED && (
-						<SendStartupFolderReview
-							title={title}
-							userId={userId}
-							folderId={folderId}
-							category={category}
-							companyId={companyId}
-						/>
-					)}
 				</div>
 			</div>
 		</AccordionTrigger>

@@ -1,12 +1,11 @@
 "use client"
 
-import { Files, Search, CarIcon, UsersIcon, EarthIcon, ShieldPlusIcon } from "lucide-react"
+import { Files, Search, DotIcon } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
 
 import { useStartupFoldersList } from "@/hooks/startup-folders/use-startup-folder"
 
-import { StartupFolderStatusBadge } from "@/components/ui/startup-folder-status-badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
@@ -23,7 +22,7 @@ import {
 export function AdminStartupFoldersList() {
 	const [searchTerm, setSearchTerm] = useState("")
 
-	const { data: folders, isLoading } = useStartupFoldersList({ search: searchTerm })
+	const { data: companiesWithFolders, isLoading } = useStartupFoldersList({ search: searchTerm })
 
 	return (
 		<>
@@ -40,7 +39,7 @@ export function AdminStartupFoldersList() {
 				</div>
 			</div>
 
-			{folders?.length === 0 && (
+			{companiesWithFolders?.length === 0 && (
 				<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
 					<Files className="text-muted-foreground h-8 w-8" />
 					<div>
@@ -78,90 +77,56 @@ export function AdminStartupFoldersList() {
 				</div>
 			) : (
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{folders?.map((folder) => (
-						<Card key={folder.id} className="gap-2 overflow-hidden">
+					{companiesWithFolders?.map((company) => (
+						<Card key={company.id} className="gap-2 overflow-hidden">
 							<CardHeader className="pb-2">
 								<div className="flex items-center justify-between">
 									<div>
-										<CardTitle className="line-clamp-1 text-lg">{folder.company.name}</CardTitle>
-										<CardDescription>{folder.company.rut}</CardDescription>
+										<CardTitle className="line-clamp-1 text-lg">{company.name}</CardTitle>
+										<CardDescription>{company.rut}</CardDescription>
 									</div>
 
 									<Avatar className="size-14 text-xl">
-										<AvatarImage src={folder.company.image} />
-										<AvatarFallback>{folder.company.name.slice(0, 2)}</AvatarFallback>
+										<AvatarImage src={company.image || ""} />
+										<AvatarFallback>{company.name.slice(0, 2)}</AvatarFallback>
 									</Avatar>
 								</div>
 							</CardHeader>
 
-							<CardContent className="flex flex-col gap-1">
-								<h2 className="font-medium">Documentos:</h2>
+							<CardContent className="mb-2 flex flex-col gap-1">
+								<h2 className="font-semibold">Carpetas de arranque:</h2>
 
-								<div className="flex items-center text-sm">
-									<ShieldPlusIcon className="mr-2 h-4 w-4" />
-									<span className="mr-1">Seguridad y Salud Operacional:</span>
-									<span>
-										{
-											folder.safetyAndHealthFolders[0].documents.filter((doc) => doc.url !== "")
-												?.length
-										}
-									</span>
-									<StartupFolderStatusBadge
-										status={folder.safetyAndHealthFolders[0].status}
-										className="ml-auto"
-									/>
-								</div>
-
-								<div className="flex items-center text-sm">
-									<EarthIcon className="mr-2 h-4 w-4" />
-									<span className="mr-1">Medio Ambiente:</span>
-									<span>
-										{
-											folder.environmentalFolders[0].documents.filter((doc) => doc.url !== "")
-												.length
-										}
-									</span>
-									<StartupFolderStatusBadge
-										status={folder.environmentalFolders[0].status}
-										className="ml-auto"
-									/>
-								</div>
-
-								<div className="flex items-center text-sm">
-									<UsersIcon className="mr-2 h-4 w-4" />
-									<span className="mr-1">Colaboradores:</span>
-									<span>
-										{folder.workersFolders &&
-											folder.workersFolders
-												.map((folder) => folder.documents.filter((doc) => doc.url !== "").length)
-												.reduce((a, b) => a + b)}
-									</span>
-									<StartupFolderStatusBadge
-										status={folder.workersFolders[0].status}
-										className="ml-auto"
-									/>
-								</div>
-
-								{folder.vehiclesFolders.length > 0 && (
-									<div className="flex items-center text-sm">
-										<CarIcon className="mr-2 h-4 w-4" />
-										<span className="mr-1">Vehículos:</span>
-										<span>
-											{folder.vehiclesFolders
-												.map((folder) => folder.documents.filter((doc) => doc.url !== "").length)
-												.reduce((a, b) => a + b)}
+								<div className="flex flex-col gap-1 text-sm">
+									{company.StartupFolders.map((folder) => (
+										<span key={folder.id} className="flex items-center">
+											<DotIcon className="mr-2 h-2 w-2" />
+											{folder.name}
 										</span>
-										<StartupFolderStatusBadge
-											status={folder.vehiclesFolders[0].status}
-											className="ml-auto"
-										/>
-									</div>
-								)}
+									))}
+								</div>
+
+								<div className="mt-3 flex items-center gap-1 font-semibold">
+									<h2>¿Hay carpetas para revisión?:</h2>
+
+									{company.StartupFolders.some(
+										(folder) =>
+											folder.environmentalFolders.some((folder) => folder.status === "SUBMITTED") ||
+											folder.safetyAndHealthFolders.some(
+												(folder) => folder.status === "SUBMITTED"
+											) ||
+											folder.workersFolders.some((folder) => folder.status === "SUBMITTED") ||
+											folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED")
+									) ? (
+										<span className="text-primary">Sí</span>
+									) : (
+										<span className="text-muted-foreground">No</span>
+									)}
+								</div>
 							</CardContent>
 
-							<CardFooter className="mt-2">
+							<CardFooter className="mt-auto">
 								<Button asChild variant="default" className="hover:bg-primary/80 w-full">
-									<Link href={`/admin/dashboard/carpetas-de-arranques/${folder.company.id}`}>
+									<Link href={`/admin/dashboard/carpetas-de-arranques/${company.id}`}>
 										Ver carpeta
 									</Link>
 								</Button>

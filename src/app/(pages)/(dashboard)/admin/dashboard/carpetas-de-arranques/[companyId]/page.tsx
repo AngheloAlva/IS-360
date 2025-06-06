@@ -18,11 +18,21 @@ export default async function StartupFolderReviewPage({
 
 	if (!session?.user?.id) return notFound()
 
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				startupFolder: ["create"],
+			},
+		},
+	})
+
 	return (
 		<div className="w-full flex-1 space-y-6">
 			<StartupFolderOverview
 				companyId={companyId}
 				userId={session.user.id}
+				hasPermission={hasPermission.success}
 				isOtcMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>

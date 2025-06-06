@@ -23,7 +23,7 @@ export const createCompany = async ({
 }: CreateCompanyProps): Promise<CreateCompanyResponse> => {
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { vehicles, supervisors, ...rest } = values
+		const { vehicles, supervisors, startupFolderName, ...rest } = values
 
 		const company = await prisma.company.create({
 			data: {
@@ -31,7 +31,10 @@ export const createCompany = async ({
 			},
 		})
 
-		const { ok, message } = await createStartupFolder({ companyId: company.id })
+		const { ok, message } = await createStartupFolder({
+			companyId: company.id,
+			name: startupFolderName || "Carpeta de arranque",
+		})
 
 		if (vehicles && vehicles.length > 0) {
 			vehicles.forEach(async (vehicle) => {

@@ -24,7 +24,7 @@ export const createUserStartupFolder = async (userId: string) => {
 			}
 		}
 
-		const startupFolder = await prisma.startupFolder.findFirst({
+		const startupFolders = await prisma.startupFolder.findMany({
 			where: {
 				companyId: user.companyId,
 			},
@@ -33,35 +33,39 @@ export const createUserStartupFolder = async (userId: string) => {
 			},
 		})
 
-		if (!startupFolder) {
+		if (!startupFolders.length) {
 			return {
 				ok: false,
 				message: "No se encontró la carpeta inicial",
 			}
 		}
 
-		await prisma.workerFolder.create({
-			data: {
-				worker: {
-					connect: {
-						id: userId,
+		await Promise.all(
+			startupFolders.map((folder) =>
+				prisma.workerFolder.create({
+					data: {
+						worker: {
+							connect: {
+								id: userId,
+							},
+						},
+						startupFolder: {
+							connect: {
+								id: folder.id,
+							},
+						},
+						documents: {
+							create: WORKER_STRUCTURE.documents.map((doc) => ({
+								url: "",
+								name: doc.name,
+								category: WORKER_STRUCTURE.category,
+								type: doc.type as WorkerDocumentType,
+							})),
+						},
 					},
-				},
-				startupFolder: {
-					connect: {
-						id: startupFolder.id,
-					},
-				},
-				documents: {
-					create: WORKER_STRUCTURE.documents.map((doc) => ({
-						url: "",
-						name: doc.name,
-						category: WORKER_STRUCTURE.category,
-						type: doc.type as WorkerDocumentType,
-					})),
-				},
-			},
-		})
+				})
+			)
+		)
 
 		return {
 			ok: true,

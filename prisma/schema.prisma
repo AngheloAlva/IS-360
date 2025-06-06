@@ -981,6 +981,7 @@ enum DocumentCategory {
 
 model StartupFolder {
   id        String   @id @default(uuid())
+  name      String   @default("Carpeta de arranque")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

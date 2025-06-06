@@ -11,6 +11,7 @@ import type {
 	SafetyAndHealthFolder,
 	EnvironmentalDocument,
 	SafetyAndHealthDocument,
+	Company,
 } from "@prisma/client"
 
 export interface StartupFolderWithDocuments extends StartupFolder {
@@ -46,7 +47,7 @@ interface UseStartupFolderParams {
 }
 
 export const fetchStartupFolder: QueryFunction<
-	StartupFolderWithDocuments,
+	StartupFolderWithDocuments[],
 	readonly ["startupFolder", { companyId?: string; folderId?: string }]
 > = async ({ queryKey }) => {
 	const [, { companyId, folderId }] = queryKey
@@ -74,12 +75,16 @@ export const useStartupFolder = ({ companyId, folderId }: UseStartupFolderParams
 	})
 }
 
+interface CompanyWithStartupFolders extends Company {
+	StartupFolders: Omit<StartupFolderWithDocuments, "company">[]
+}
+
 interface UseStartupFoldersListParams {
 	search?: string
 }
 
 export const fetchStartupFoldersList: QueryFunction<
-	StartupFolderWithDocuments[],
+	CompanyWithStartupFolders[],
 	readonly ["startupFolders", string | undefined]
 > = async ({ queryKey }) => {
 	const [, search] = queryKey

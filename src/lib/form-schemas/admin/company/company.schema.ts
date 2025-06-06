@@ -6,6 +6,7 @@ import { VEHICLE_TYPE_ARRAY } from "@/lib/consts/vehicle-type"
 export const companySchema = z.object({
 	name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
 	rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
+	startupFolderName: z.string().optional(),
 
 	vehicles: z
 		.array(

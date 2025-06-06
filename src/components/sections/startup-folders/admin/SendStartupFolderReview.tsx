@@ -1,6 +1,6 @@
 "use client"
 
-import { Loader2 } from "lucide-react"
+import { ClipboardCheckIcon, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -79,7 +79,11 @@ export function SendStartupFolderReview({
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button disabled={isSubmitting} className="hover:bg-primary/80">
+				<Button
+					disabled={isSubmitting}
+					className="hover:bg-primary/80 flex-col gap-0.5 py-9 font-normal"
+				>
+					<ClipboardCheckIcon className="size-5" />
 					Enviar revisión
 				</Button>
 			</DialogTrigger>

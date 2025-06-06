@@ -9,6 +9,7 @@ import {
 } from "@/lib/consts/startup-folders-structure"
 
 import { AccordionItem, AccordionContent } from "@/components/ui/accordion"
+import { SendStartupFolderReview } from "../admin/SendStartupFolderReview"
 import { SubmitReviewRequestDialog } from "../SubmitReviewRequestDialog"
 import StartupFolderTrigger from "./StartupFolderTrigger"
 import { DocumentList } from "./DocumentList"
@@ -30,7 +31,6 @@ export default function EnvironmentalDocuments({
 			getDocumentStatus(DocumentCategory.ENVIRONMENTAL, doc.type, folder.documents).status ===
 			"APPROVED"
 	).length
-	console.log("completedDocs", completedDocs)
 	const requiredPending = ENVIRONMENTAL_STRUCTURE.documents.filter(
 		(doc: StartupFolderStructure["documents"][number]) =>
 			!getDocumentStatus(DocumentCategory.ENVIRONMENTAL, doc.type, folder.documents).isUploaded &&
@@ -51,19 +51,13 @@ export default function EnvironmentalDocuments({
 				className="bg-background w-full rounded-md border border-solid px-4"
 			>
 				<StartupFolderTrigger
-					userId={userId}
-					folderId={folder.id}
 					icon={<EarthIcon />}
-					companyId={companyId}
 					totalDocs={totalDocs}
-					status={folder.status}
-					isOtcMember={isOtcMember}
 					completedDocs={completedDocs}
 					requiredPending={requiredPending}
 					title={ENVIRONMENTAL_STRUCTURE.title}
 					progressPercentage={progressPercentage}
 					sectionDescription={sectionDescription}
-					category={DocumentCategory.ENVIRONMENTAL}
 				/>
 
 				<AccordionContent>
@@ -79,6 +73,16 @@ export default function EnvironmentalDocuments({
 					/>
 				</AccordionContent>
 			</AccordionItem>
+
+			{isOtcMember && folder.status === ReviewStatus.SUBMITTED && (
+				<SendStartupFolderReview
+					userId={userId}
+					folderId={folder.id}
+					companyId={companyId}
+					title={ENVIRONMENTAL_STRUCTURE.title}
+					category={DocumentCategory.ENVIRONMENTAL}
+				/>
+			)}
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog

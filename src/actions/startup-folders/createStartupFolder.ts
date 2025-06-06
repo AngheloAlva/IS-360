@@ -9,13 +9,15 @@ import {
 import type { EnvironmentalDocType, SafetyAndHealthDocumentType } from "@prisma/client"
 
 interface CreateStartupFolderProps {
+	name: string
 	companyId: string
 }
 
-export const createStartupFolder = async ({ companyId }: CreateStartupFolderProps) => {
+export const createStartupFolder = async ({ name, companyId }: CreateStartupFolderProps) => {
 	try {
 		const startupFolder = await prisma.startupFolder.create({
 			data: {
+				name,
 				companyId,
 			},
 		})
@@ -63,22 +65,22 @@ export const createStartupFolder = async ({ companyId }: CreateStartupFolderProp
 		if (!startupFolder || !safetyAndHealthFolder || !environmentalFolder) {
 			return {
 				ok: false,
-				message: "Error al crear la carpeta de arranque general",
+				message: "Error al crear la carpeta de arranque",
 			}
 		}
 
 		return {
 			ok: true,
-			message: "Carpeta de arranque general creada correctamente",
+			message: "Carpeta de arranque creada correctamente",
 			data: {
 				folderId: startupFolder.id,
 			},
 		}
 	} catch (error) {
-		console.error("Error al crear la carpeta de arranque general:", error)
+		console.error("Error al crear la carpeta de arranque:", error)
 		return {
 			ok: false,
-			message: "Error al crear la carpeta de arranque general",
+			message: "Error al crear la carpeta de arranque",
 		}
 	}
 }

@@ -4,6 +4,7 @@ import { WORKER_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { getDocumentStatus } from "@/lib/get-document-status"
 
+import { SendStartupFolderReview } from "../admin/SendStartupFolderReview"
 import { SubmitReviewRequestDialog } from "../SubmitReviewRequestDialog"
 import StartupFolderTrigger from "./StartupFolderTrigger"
 import { DocumentList } from "./DocumentList"
@@ -68,15 +69,9 @@ export default function WorkerDocuments({
 				className="bg-background mb-4 w-full rounded-md border border-solid px-4"
 			>
 				<StartupFolderTrigger
-					userId={userId}
 					icon={<UsersIcon />}
-					companyId={companyId}
-					status={foldersStatus}
-					isOtcMember={isOtcMember}
-					folderId={startupFolderId}
 					title={WORKER_STRUCTURE.title}
 					totalDocs={totalDocsForSection}
-					category={DocumentCategory.PERSONNEL}
 					progressPercentage={progressPercentage}
 					completedDocs={overallUploadedDocsCount}
 					requiredPending={overallRequiredPendingDocsCount}
@@ -143,6 +138,16 @@ export default function WorkerDocuments({
 					</div>
 				</AccordionContent>
 			</AccordionItem>
+
+			{isOtcMember && foldersStatus === ReviewStatus.SUBMITTED && (
+				<SendStartupFolderReview
+					userId={userId}
+					companyId={companyId}
+					folderId={startupFolderId}
+					title={WORKER_STRUCTURE.title}
+					category={DocumentCategory.PERSONNEL}
+				/>
+			)}
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog

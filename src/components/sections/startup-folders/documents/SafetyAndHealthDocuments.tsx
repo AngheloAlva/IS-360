@@ -9,6 +9,7 @@ import {
 } from "@/lib/consts/startup-folders-structure"
 
 import { AccordionItem, AccordionContent } from "@/components/ui/accordion"
+import { SendStartupFolderReview } from "../admin/SendStartupFolderReview"
 import { SubmitReviewRequestDialog } from "../SubmitReviewRequestDialog"
 import StartupFolderTrigger from "./StartupFolderTrigger"
 import { DocumentList } from "./DocumentList"
@@ -51,19 +52,13 @@ export default function SafetyAndHealthDocuments({
 				className="bg-background w-full rounded-md border border-solid px-4"
 			>
 				<StartupFolderTrigger
-					userId={userId}
-					folderId={folder.id}
 					totalDocs={totalDocs}
-					companyId={companyId}
-					status={folder.status}
 					icon={<ShieldPlusIcon />}
-					isOtcMember={isOtcMember}
 					completedDocs={completedDocs}
 					requiredPending={requiredPending}
 					progressPercentage={progressPercentage}
 					sectionDescription={sectionDescription}
 					title={SAFETY_AND_HEALTH_STRUCTURE.title}
-					category={DocumentCategory.SAFETY_AND_HEALTH}
 				/>
 
 				<AccordionContent>
@@ -79,6 +74,16 @@ export default function SafetyAndHealthDocuments({
 					/>
 				</AccordionContent>
 			</AccordionItem>
+
+			{isOtcMember && folder.status === ReviewStatus.SUBMITTED && (
+				<SendStartupFolderReview
+					userId={userId}
+					folderId={folder.id}
+					companyId={companyId}
+					title={SAFETY_AND_HEALTH_STRUCTURE.title}
+					category={DocumentCategory.SAFETY_AND_HEALTH}
+				/>
+			)}
 
 			{!isOtcMember && (
 				<SubmitReviewRequestDialog

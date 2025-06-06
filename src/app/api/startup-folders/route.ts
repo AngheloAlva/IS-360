@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 		if (folderId) where.id = folderId
 
 		// Obtenemos la carpeta de arranque general
-		const startupFolder = await prisma.startupFolder.findFirst({
+		const startupFolders = await prisma.startupFolder.findMany({
 			where,
 			include: {
 				company: {
@@ -89,11 +89,11 @@ export async function GET(req: NextRequest) {
 		})
 
 		// Si no existe la carpeta, devolvemos error
-		if (!startupFolder) {
+		if (!startupFolders) {
 			return new NextResponse("General startup folder not found", { status: 404 })
 		}
 
-		return NextResponse.json(startupFolder)
+		return NextResponse.json(startupFolders)
 	} catch (error) {
 		console.error("[GENERAL_STARTUP_FOLDER_GET]", error)
 		return new NextResponse("Internal Error", { status: 500 })
