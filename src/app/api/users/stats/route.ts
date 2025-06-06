@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma"
 
 export async function GET() {
 	try {
-		const [totalUsers, usersByArea, twoFactorEnabled, recentlyActiveUsers] = await Promise.all([
+		const [totalUsers, usersByArea, internalUsers, recentlyActiveUsers] = await Promise.all([
 			// Total users
 			prisma.user.count(),
 
@@ -21,10 +21,14 @@ export async function GET() {
 				},
 			}),
 
-			// Users with 2FA enabled
-			prisma.user.count({
+			// Get all internal users with their roles
+			prisma.user.findMany({
+				select: {
+					role: true,
+				},
 				where: {
-					twoFactorEnabled: true,
+					accessRole: "ADMIN",
+					role: { not: null },
 				},
 				cacheStrategy: {
 					ttl: 120,
@@ -55,10 +59,7 @@ export async function GET() {
 						},
 					},
 				},
-				orderBy: {
-					updatedAt: "desc",
-				},
-				take: 3,
+				take: 5,
 				cacheStrategy: {
 					ttl: 120,
 					swr: 10,
@@ -66,12 +67,31 @@ export async function GET() {
 			}),
 		])
 
-		const formattedUsersByArea = usersByArea.map(
-			(area: { area: string | null; _count: number }) => ({
-				area: area.area,
+		const formattedUsersByArea = usersByArea
+			.filter((area) => area.area !== null)
+			.map((area: { area: string | null; _count: number }) => ({
+				area: area.area as string,
 				count: area._count,
-			})
-		)
+			}))
+
+		// Process roles from comma-separated strings
+		const roleCount = new Map<string, number>()
+		internalUsers.forEach((user: { role: string | null }) => {
+			if (user.role) {
+				const roles = user.role.split(",")
+				roles.forEach((role) => {
+					const trimmedRole = role.trim()
+					roleCount.set(trimmedRole, (roleCount.get(trimmedRole) || 0) + 1)
+				})
+			}
+		})
+
+		const formattedUsersByRole = Array.from(roleCount.entries())
+			.map(([role, count]) => ({
+				role,
+				count,
+			}))
+			.sort((a, b) => b.count - a.count)
 
 		const formattedRecentUsers = recentlyActiveUsers.map(
 			(user: {
@@ -109,7 +129,9 @@ export async function GET() {
 			usersByArea: formattedUsersByArea.sort(
 				(a: { count: number }, b: { count: number }) => b.count - a.count
 			),
-			twoFactorEnabled,
+			usersByRole: formattedUsersByRole.sort(
+				(a: { count: number }, b: { count: number }) => b.count - a.count
+			),
 			recentlyActiveUsers: formattedRecentUsers,
 		})
 	} catch (error) {

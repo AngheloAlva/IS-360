@@ -106,12 +106,6 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 			description:
 				"Procedimiento según Ley N°21.643 (Ley Karin) con detalles del proceso de denuncia e investigación.",
 		},
-		{
-			type: SafetyAndHealthDocumentType.RISK_ANALYSIS,
-			name: "Análisis de riesgos por actividad",
-			required: true,
-			description: "Documento que identifica aspectos ambientales y evalúa sus impactos.",
-		},
 	],
 }
 

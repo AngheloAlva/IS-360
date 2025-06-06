@@ -1,15 +1,45 @@
 "use client"
 
-import { Clock, Building2, ShieldCheck } from "lucide-react"
+import { ClockIcon, UsersIcon, TagsIcon } from "lucide-react"
 
+import { USER_ROLE, USER_ROLE_LABELS } from "@/lib/permissions"
 import { useUserStats } from "@/hooks/users/useUserStats"
-import { AreasLabels } from "@/lib/consts/areas"
+import { Areas, AreasLabels } from "@/lib/consts/areas"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
+import BarChart from "../../charts/BarChart"
+import PieChart from "../../charts/PieChart"
+
+import type { ChartConfig } from "@/components/ui/chart"
+
+const rolesChartConfig = {
+	...Object.keys(USER_ROLE).reduce(
+		(acc, key) => {
+			acc[key as keyof typeof USER_ROLE] = {
+				label: USER_ROLE_LABELS[key as keyof typeof USER_ROLE],
+			}
+			return acc
+		},
+		{} as Record<keyof typeof USER_ROLE, { label: string }>
+	),
+} satisfies ChartConfig
+
+const areaChartConfig = {
+	type: {
+		label: "Usuarios",
+	},
+	...Object.keys(Areas).reduce(
+		(acc, key) => {
+			acc[key as keyof typeof Areas] = {
+				label: AreasLabels[key as keyof typeof AreasLabels],
+			}
+			return acc
+		},
+		{} as Record<keyof typeof Areas, { label: string }>
+	),
+} satisfies ChartConfig
 
 export function UserStatsCards() {
 	const { data: userData, isLoading } = useUserStats()
@@ -32,91 +62,52 @@ export function UserStatsCards() {
 		)
 	}
 
+	const totalRoles = userData.usersByRole.reduce((acc, role) => acc + role.count, 0)
+
 	return (
-		<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6 2xl:grid-cols-5">
-			<Card className="md:col-span-2 xl:col-span-2">
+		<div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
+			<Card className="lg:col-span-2">
 				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-					<Building2 className="min-h-12 min-w-12 rounded-lg bg-teal-500/10 p-2 text-teal-500" />
+					<UsersIcon className="min-h-12 min-w-12 rounded-lg bg-teal-500/10 p-2 text-teal-500" />
 					<CardTitle className="font-semibold">Usuarios por Área</CardTitle>
 				</CardHeader>
-				<CardContent className="flex h-full flex-col justify-between gap-4">
-					<div className="flex flex-wrap gap-1">
-						{userData.usersByArea.map((areaData) => (
-							<Badge
-								key={areaData.area}
-								variant="outline"
-								className="flex items-center gap-1 border-emerald-600 bg-emerald-600/5 text-emerald-600"
-							>
-								<span>{areaData.count}</span>
-								<span title={areaData.area} className="max-w-24 truncate">
-									{AreasLabels[areaData.area as keyof typeof AreasLabels]}
-								</span>
-							</Badge>
-						))}
-					</div>
 
-					<div className="space-y-1.5">
-						<div className="text-muted-foreground flex items-center justify-between text-xs">
-							<span>Áreas más pobladas:</span>
-							<span>{AreasLabels[userData.usersByArea[0]?.area as keyof typeof AreasLabels]}</span>
-						</div>
-						<div className="text-muted-foreground flex items-center justify-between text-xs">
-							<span>Áreas menos pobladas:</span>
-							<span className="text-end">
-								{
-									AreasLabels[
-										userData.usersByArea[userData.usersByArea.length - 1]
-											?.area as keyof typeof AreasLabels
-									]
-								}
-							</span>
-						</div>
-					</div>
+				<CardContent className="px-0 pb-0">
+					<BarChart
+						data={userData.usersByArea.map((area, index) => ({
+							value: area.count,
+							fill: "var(--chart-" + index + ")",
+							name: AreasLabels[area.area as keyof typeof AreasLabels],
+						}))}
+						config={areaChartConfig}
+					/>
 				</CardContent>
 			</Card>
 
-			<Card className="xl:col-span-2 2xl:col-span-1">
+			<Card className="gap-0">
 				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-					<ShieldCheck className="min-h-12 min-w-12 rounded-lg bg-purple-500/10 p-2 text-purple-500" />
-					<CardTitle className="font-semibold">Seguridad de Cuentas</CardTitle>
+					<TagsIcon className="min-h-12 min-w-12 rounded-lg bg-blue-500/10 p-2 text-blue-500" />
+					<CardTitle className="font-semibold">Distribución de Roles</CardTitle>
 				</CardHeader>
-				<CardContent>
-					<div className="text-2xl font-bold">
-						{Math.round((userData.twoFactorEnabled / userData.totalUsers) * 100)}%
-					</div>
-					<p className="text-muted-foreground text-xs">
-						Usuarios con autenticación de dos factores
-					</p>
-					<div className="mt-4">
-						<div className="mb-1 flex items-center justify-between text-xs">
-							<span>Con 2FA</span>
-							<span>{userData.twoFactorEnabled} usuarios</span>
-						</div>
-						<Progress
-							value={(userData.twoFactorEnabled / userData.totalUsers) * 100}
-							className="h-2"
-							indicatorClassName="bg-green-500"
-						/>
 
-						<div className="mt-2 mb-1 flex items-center justify-between text-xs">
-							<span>Sin 2FA</span>
-							<span>{userData.totalUsers - userData.twoFactorEnabled} usuarios</span>
-						</div>
-						<Progress
-							value={
-								((userData.totalUsers - userData.twoFactorEnabled) / userData.totalUsers) * 100
-							}
-							className="h-2"
-							indicatorClassName="bg-orange-500"
-						/>
-					</div>
+				<CardContent className="h-full flex-1 py-0">
+					<PieChart
+						data={userData.usersByRole.map((role, index) => ({
+							name: role.role,
+							value: role.count,
+							fill: "var(--chart-" + index + ")",
+						}))}
+						totalLabel="Roles"
+						total={totalRoles}
+						config={rolesChartConfig}
+					/>
 				</CardContent>
 			</Card>
 
-			<Card className="xl:col-span-2">
+			<Card className="lg:col-span-1">
 				<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
-					<Clock className="min-h-12 min-w-12 rounded-lg bg-amber-500/10 p-2 text-amber-500" />
-					<CardTitle className="font-semibold">Usuarios Recientemente Activos</CardTitle>
+					<ClockIcon className="min-h-12 min-w-12 rounded-lg bg-amber-500/10 p-2 text-amber-500" />
+					<CardTitle className="font-semibold">Usuarios Activos</CardTitle>
 				</CardHeader>
 				<CardContent className="p-0">
 					<div className="divide-y">

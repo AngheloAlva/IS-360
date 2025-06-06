@@ -7,11 +7,10 @@ interface UserStats {
 		area: string
 		count: number
 	}[]
-	usersByInternalRole: {
+	usersByRole: {
 		role: string
 		count: number
 	}[]
-	twoFactorEnabled: number
 	recentlyActiveUsers: {
 		id: string
 		name: string
@@ -30,5 +29,6 @@ export function useUserStats() {
 			}
 			return response.json()
 		},
+		staleTime: 5 * 60 * 1000,
 	})
 }

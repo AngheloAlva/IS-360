@@ -22,15 +22,19 @@
 	--input: oklch(0.9 0.05 260);
 	--ring: oklch(0.55 0.2 260);
 	--radius: 0.75rem;
+	--chart-0: hsl(120 60% 50%);
 	--chart-1: hsl(220 70% 50%);
 	--chart-2: hsl(160 60% 45%);
 	--chart-3: hsl(30 80% 55%);
 	--chart-4: hsl(280 65% 60%);
 	--chart-5: hsl(340 75% 55%);
-	--chart-6: hsl(220 70% 50%);
-	--chart-7: hsl(160 60% 45%);
-	--chart-8: hsl(30 80% 55%);
-	--chart-9: hsl(280 65% 60%);
+	--chart-6: hsl(40 60% 50%);
+	--chart-7: hsl(20 60% 50%);
+	--chart-8: hsl(260 60% 50%);
+	--chart-9: hsl(320 60% 50%);
+	--chart-10: hsl(280 10% 20%);
+	--chart-11: hsl(120 100% 20%);
+	--chart-12: hsl(190 60% 80%);
 	--area-operations: "#2563eb";
 	--area-instructions: "#60a5fa";
 	--area-integrity-and-maintenance: "#10b981";
@@ -60,6 +64,7 @@
 	--destructive-foreground: oklch(0.985 0 0);
 	--input: oklch(0.2 0.1 260);
 	--ring: oklch(0.6 0.2 260);
+	--chart-0: hsl(120 60% 50%);
 	--chart-1: hsl(220 70% 50%);
 	--chart-2: hsl(160 60% 45%);
 	--chart-3: hsl(30 80% 55%);
@@ -69,6 +74,9 @@
 	--chart-7: hsl(160 60% 45%);
 	--chart-8: hsl(30 80% 55%);
 	--chart-9: hsl(280 65% 60%);
+	--chart-10: hsl(280 10% 20%);
+	--chart-11: hsl(120 100% 20%);
+	--chart-12: hsl(220 60% 80%);
 }
 
 @theme inline {
@@ -89,11 +97,19 @@
 	--color-destructive-foreground: var(--destructive-foreground);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--color-chart-0: var(--chart-0);
 	--color-chart-1: var(--chart-1);
 	--color-chart-2: var(--chart-2);
 	--color-chart-3: var(--chart-3);
 	--color-chart-4: var(--chart-4);
 	--color-chart-5: var(--chart-5);
+	--color-chart-6: var(--chart-6);
+	--color-chart-7: var(--chart-7);
+	--color-chart-8: var(--chart-8);
+	--color-chart-9: var(--chart-9);
+	--color-chart-10: var(--chart-10);
+	--color-chart-11: var(--chart-11);
+	--color-chart-12: var(--chart-12);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
