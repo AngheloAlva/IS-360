@@ -21,7 +21,6 @@ import {
 } from "@/hooks/use-equipments"
 import { EquipmentColumns } from "./equipment-columns"
 
-import CreateEquipmentForm from "@/components/forms/admin/equipment/CreateEquipmentForm"
 import EditEquipmentForm from "@/components/forms/admin/equipment/EditEquipmentForm"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
@@ -43,11 +42,10 @@ import { queryClient } from "@/lib/queryClient"
 
 interface EquipmentDataTableProps {
 	lastPath: string
-	hasPermission: boolean
 	parentId: string | null
 }
 
-export function EquipmentDataTable({ parentId, lastPath, hasPermission }: EquipmentDataTableProps) {
+export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [exportLoading, setExportLoading] = useState(false)
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -158,9 +156,9 @@ export function EquipmentDataTable({ parentId, lastPath, hasPermission }: Equipm
 			<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex w-full items-center gap-4">
 					<Button
-						className="border border-green-500 bg-green-500/10 text-green-500 hover:bg-green-500/20"
 						onClick={handleExportToExcel}
 						disabled={isLoading || exportLoading || !data?.equipments?.length}
+						className="bg-emerald-500 text-white transition-all hover:scale-105"
 					>
 						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="mr-2 h-4 w-4" />}
 						Exportar a Excel
@@ -179,8 +177,6 @@ export function EquipmentDataTable({ parentId, lastPath, hasPermission }: Equipm
 						/>
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
-
-						{hasPermission && <CreateEquipmentForm parentId={parentId ?? undefined} />}
 					</div>
 				</div>
 			</div>
@@ -225,7 +221,7 @@ export function EquipmentDataTable({ parentId, lastPath, hasPermission }: Equipm
 													<TableCell
 														key={cell.id}
 														onClick={() => handleRowClick(row.original.id)}
-														className="text-primary font-medium hover:cursor-pointer hover:underline"
+														className="font-medium text-emerald-500 hover:cursor-pointer hover:underline"
 													>
 														{flexRender(cell.column.columnDef.cell, cell.getContext())}
 													</TableCell>

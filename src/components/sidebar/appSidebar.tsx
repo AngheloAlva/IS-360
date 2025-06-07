@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import {
+	Car,
 	Home,
 	Send,
 	Users,
@@ -9,13 +10,12 @@ import {
 	Folders,
 	FileText,
 	LifeBuoy,
+	Settings,
 	BookCopy,
 	Building2,
 	FileSearch,
 	LayoutList,
 	MonitorPlay,
-	Construction,
-	Car,
 } from "lucide-react"
 
 import { NavSecondary } from "./navSecondary"
@@ -111,7 +111,7 @@ const data = {
 		{
 			name: "Planes de Mantenimiento",
 			url: "/admin/dashboard/planes-de-mantenimiento",
-			icon: Construction,
+			icon: Wrench,
 		},
 	],
 	navSecondary: [
@@ -142,7 +142,7 @@ const navInternal = [
 	{
 		name: "Equipos / Ubicaciones",
 		url: "/admin/dashboard/equipos",
-		icon: Wrench,
+		icon: Settings,
 	},
 ]
 

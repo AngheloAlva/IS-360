@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 
 import { EquipmentDataTable } from "@/components/sections/admin/equipments/EquipmentDataTable"
 import BackButton from "@/components/shared/BackButton"
+import CreateEquipmentForm from "@/components/forms/admin/equipment/CreateEquipmentForm"
 
 export default async function EquipmentsPage({
 	params,
@@ -37,8 +38,28 @@ export default async function EquipmentsPage({
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 overflow-hidden transition-all">
+			<div className="rounded-lg bg-gradient-to-r from-emerald-600 to-teal-700 p-6 shadow-lg">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2 lg:gap-3">
+						{equipmentIds.length >= 1 && (
+							<BackButton
+								className="bg-white/20 text-white transition-all hover:scale-105 hover:bg-white/30"
+								href={backPath}
+							/>
+						)}
+
+						<div className="text-white">
+							<h1 className="text-3xl font-bold tracking-tight">Equipos y Ubicaciones</h1>
+							<p className="opacity-90">
+								Gestión y monitoreo de equipos industriales y ubicaciones
+							</p>
+						</div>
+					</div>
+
+					{hasPermission.success && <CreateEquipmentForm parentId={actualParentId} />}
+				</div>
+			</div>
 			<div className="flex items-center gap-4">
-				{equipmentIds.length >= 1 && <BackButton href={backPath} />}
 				<div className="flex flex-col gap-1">
 					<h1 className="text-text w-fit text-3xl font-bold">Equipos</h1>
 					<p className="text-text w-fit text-sm sm:text-base">
@@ -47,11 +68,7 @@ export default async function EquipmentsPage({
 				</div>
 			</div>
 
-			<EquipmentDataTable
-				lastPath={backPath}
-				parentId={actualParentId}
-				hasPermission={hasPermission.success}
-			/>
+			<EquipmentDataTable lastPath={backPath} parentId={actualParentId} />
 		</div>
 	)
 }

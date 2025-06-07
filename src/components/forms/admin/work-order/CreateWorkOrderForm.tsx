@@ -1,10 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
-import { PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
@@ -153,18 +153,18 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className="flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105"
 				onClick={() => setOpen(true)}
 			>
-				<PlusIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Nueva OT</span>
+				<PlusCircleIcon className="h-4 w-4" />
+				<span className="hidden sm:inline">Nueva Orden de Trabajo</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-xl">
 				<SheetHeader className="shadow">
 					<SheetTitle>Nueva Orden de Trabajo</SheetTitle>
 					<SheetDescription>
-						Complete la información en el formulario para crear una nueva OT.
+						Complete la información en el formulario para crear una nueva Orden de Trabajo.
 					</SheetDescription>
 				</SheetHeader>
 

@@ -25,10 +25,15 @@ export default async function AdminCompaniesPage(): Promise<React.ReactElement> 
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="flex items-center justify-between">
-				<h1 className="w-fit text-3xl font-bold">Lista de Empresas</h1>
+			<div className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Empresas Contratistas</h1>
+						<p className="opacity-90">Gestión y seguimiento de empresas contratistas registradas</p>
+					</div>
 
-				{hasPermission.success && <CreateCompanyFormSheet />}
+					{hasPermission.success && <CreateCompanyFormSheet />}
+				</div>
 			</div>
 
 			<CompanyStatsCards />

@@ -12,6 +12,7 @@ import type {
 	EnvironmentalDocument,
 	SafetyAndHealthDocument,
 	Company,
+	WORK_ORDER_STATUS,
 } from "@prisma/client"
 
 export interface StartupFolderWithDocuments extends StartupFolder {
@@ -81,16 +82,23 @@ interface CompanyWithStartupFolders extends Company {
 
 interface UseStartupFoldersListParams {
 	search?: string
+	withOtActive?: boolean
+	otStatus?: WORK_ORDER_STATUS
 }
 
 export const fetchStartupFoldersList: QueryFunction<
 	CompanyWithStartupFolders[],
-	readonly ["startupFolders", string | undefined]
+	readonly [
+		"startupFolders",
+		{ search?: string; withOtActive?: boolean; otStatus?: WORK_ORDER_STATUS },
+	]
 > = async ({ queryKey }) => {
-	const [, search] = queryKey
+	const [, { search, withOtActive, otStatus }] = queryKey
 
 	const searchParams = new URLSearchParams()
 	if (search) searchParams.set("search", search)
+	if (withOtActive !== undefined) searchParams.set("withOtActive", withOtActive.toString())
+	if (otStatus) searchParams.set("otStatus", otStatus)
 
 	const res = await fetch(`/api/startup-folders/list?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching general startup folders")
@@ -98,8 +106,12 @@ export const fetchStartupFoldersList: QueryFunction<
 	return res.json()
 }
 
-export const useStartupFoldersList = ({ search }: UseStartupFoldersListParams) => {
-	const queryKey = ["startupFolders", search] as const
+export const useStartupFoldersList = ({
+	search,
+	withOtActive,
+	otStatus,
+}: UseStartupFoldersListParams) => {
+	const queryKey = ["startupFolders", { search, withOtActive, otStatus }] as const
 
 	return useQuery({
 		queryKey,

@@ -178,7 +178,7 @@ export default function InternalUserFormSheet({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
 				className={cn(
-					"bg-primary hover:bg-primary/80 flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md px-3 text-sm text-white transition-colors",
+					"flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-purple-500 transition-all hover:scale-105",
 					{
 						"bg-primary/10 text-primary size-8 gap-0 p-1 hover:text-white": initialData,
 					}

@@ -5,6 +5,8 @@ import { useState } from "react"
 import Link from "next/link"
 
 import { useStartupFoldersList } from "@/hooks/startup-folders/use-startup-folder"
+import { WorkOrderStatusSimpleOptions } from "@/lib/consts/work-order-status"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -18,15 +20,32 @@ import {
 	CardContent,
 	CardDescription,
 } from "@/components/ui/card"
+import {
+	Select,
+	SelectItem,
+	SelectValue,
+	SelectGroup,
+	SelectLabel,
+	SelectTrigger,
+	SelectContent,
+	SelectSeparator,
+} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 
 export function AdminStartupFoldersList() {
 	const [searchTerm, setSearchTerm] = useState("")
+	const [withOtActive, setWithOtActive] = useState(true)
+	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
 
-	const { data: companiesWithFolders, isLoading } = useStartupFoldersList({ search: searchTerm })
+	const { data: companiesWithFolders, isLoading } = useStartupFoldersList({
+		otStatus,
+		withOtActive,
+		search: searchTerm,
+	})
 
 	return (
 		<>
-			<div className="mb-4 flex flex-col items-center gap-3 md:flex-row">
+			<div className="mb-4 flex flex-col items-end gap-3 md:flex-row">
 				<div className="relative flex-1">
 					<Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
 					<Input
@@ -36,6 +55,62 @@ export function AdminStartupFoldersList() {
 						onChange={(e) => setSearchTerm(e.target.value)}
 						placeholder="Buscar por nombre o RUT de empresa..."
 					/>
+				</div>
+
+				<div className="flex flex-col gap-1.5">
+					<Label>Estado OT</Label>
+					<Select
+						onValueChange={(value: "all" | WORK_ORDER_STATUS) => {
+							if (value === "all") {
+								setOtStatus(undefined)
+							} else {
+								setOtStatus(value as WORK_ORDER_STATUS)
+							}
+						}}
+						value={otStatus ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
+							<SelectValue placeholder="Estado" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Estado OT</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todos los estados</SelectItem>
+								{WorkOrderStatusSimpleOptions.map((status) => (
+									<SelectItem key={status.value} value={status.value}>
+										{status.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+
+				<div className="flex flex-col gap-1.5">
+					<Label>Mostrar todas las empresas</Label>
+					<Select
+						onValueChange={(value: "true" | "false") => {
+							if (value === "true") {
+								setWithOtActive(true)
+							} else {
+								setWithOtActive(false)
+							}
+						}}
+						value={withOtActive ? "true" : "false"}
+					>
+						<SelectTrigger className="border-input bg-background w-full border">
+							<SelectValue placeholder="Mostrar todas las empresas" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Mostrar todas las empresas</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="false">Sí</SelectItem>
+								<SelectItem value="true">No</SelectItem>
+							</SelectGroup>
+						</SelectContent>
+					</Select>
 				</div>
 			</div>
 

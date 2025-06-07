@@ -52,3 +52,18 @@ export const WorkOrderStatusOptions = [
 		label: "Planificado",
 	},
 ]
+
+export const WorkOrderStatusSimpleOptions = [
+	{
+		value: WORK_ORDER_STATUS_VALUES.PENDING,
+		label: "Pendiente",
+	},
+	{
+		value: WORK_ORDER_STATUS_VALUES.IN_PROGRESS,
+		label: "En Proceso",
+	},
+	{
+		value: WORK_ORDER_STATUS_VALUES.PLANNED,
+		label: "Planificado",
+	},
+]

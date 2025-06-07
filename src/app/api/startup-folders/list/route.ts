@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
 	try {
 		const searchParams = req.nextUrl.searchParams
+		const otStatus = searchParams.get("otStatus")
 		const search = searchParams.get("search") || ""
+		const withOtActive = searchParams.get("withOtActive") === "true"
 
 		const companiesWithStartupFolders = await prisma.company.findMany({
 			where: {
@@ -14,6 +17,30 @@ export async function GET(req: NextRequest) {
 								{ name: { contains: search, mode: "insensitive" as const } },
 								{ rut: { contains: search, mode: "insensitive" as const } },
 							],
+						}
+					: {}),
+				...(withOtActive
+					? {
+							workOrders: {
+								some: {
+									status: {
+										in: [
+											WORK_ORDER_STATUS.PLANNED,
+											WORK_ORDER_STATUS.IN_PROGRESS,
+											WORK_ORDER_STATUS.PENDING,
+										],
+									},
+								},
+							},
+						}
+					: {}),
+				...(otStatus
+					? {
+							workOrders: {
+								some: {
+									status: otStatus as WORK_ORDER_STATUS,
+								},
+							},
 						}
 					: {}),
 			},

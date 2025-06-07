@@ -21,7 +21,6 @@ import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/hooks/companies/use-companies"
 import { queryClient } from "@/lib/queryClient"
 
-import CreateWorkOrderForm from "@/components/forms/admin/work-order/CreateWorkOrderForm"
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
@@ -55,7 +54,7 @@ import {
 	DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 
-export function WorkOrderDataTable({ hasPermission }: { hasPermission: boolean }) {
+export function WorkOrderDataTable() {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -127,15 +126,6 @@ export function WorkOrderDataTable({ hasPermission }: { hasPermission: boolean }
 
 	return (
 		<section className="flex w-full flex-col items-start gap-6">
-			<div className="flex w-full items-center justify-between">
-				<div>
-					<h1 className="text-text text-2xl font-bold">Lista de Ordenes de Trabajo</h1>
-					<p className="text-muted-foreground">Visualiza y gestiona todas las ordenes de trabajo</p>
-				</div>
-
-				{hasPermission && <CreateWorkOrderForm />}
-			</div>
-
 			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 				<div className="flex items-center gap-2">
 					<Input

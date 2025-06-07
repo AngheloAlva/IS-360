@@ -46,18 +46,36 @@ export function UserStatsCards() {
 
 	if (isLoading || !userData) {
 		return (
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				{[...Array(4)].map((_, i) => (
-					<Card key={i} className="animate-pulse">
-						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-							<Skeleton className="h-4 w-32" />
-							<Skeleton className="h-4 w-4" />
-						</CardHeader>
-						<CardContent>
-							<Skeleton className="h-32" />
-						</CardContent>
-					</Card>
-				))}
+			<div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-4">
+				<Card className="animate-pulse lg:col-span-2">
+					<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+						<Skeleton className="size-12" />
+						<Skeleton className="h-6 w-32" />
+					</CardHeader>
+					<CardContent>
+						<Skeleton className="h-[250px]" />
+					</CardContent>
+				</Card>
+
+				<Card className="animate-pulse">
+					<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+						<Skeleton className="size-12" />
+						<Skeleton className="h-6 w-32" />
+					</CardHeader>
+					<CardContent>
+						<Skeleton className="h-[250px]" />
+					</CardContent>
+				</Card>
+
+				<Card className="animate-pulse">
+					<CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+						<Skeleton className="size-12" />
+						<Skeleton className="h-6 w-32" />
+					</CardHeader>
+					<CardContent>
+						<Skeleton className="h-[250px]" />
+					</CardContent>
+				</Card>
 			</div>
 		)
 	}

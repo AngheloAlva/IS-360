@@ -165,7 +165,7 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className="text-primary flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium transition-all hover:scale-105"
 				onClick={() => setOpen(true)}
 			>
 				<PlusIcon className="h-4 w-4" />

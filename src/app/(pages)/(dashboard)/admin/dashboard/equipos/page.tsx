@@ -4,6 +4,8 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
 import { EquipmentDataTable } from "@/components/sections/admin/equipments/EquipmentDataTable"
+import EquipmentStatsCards from "@/components/sections/admin/equipments/EquipmentStatsCards"
+import CreateEquipmentForm from "@/components/forms/admin/equipment/CreateEquipmentForm"
 
 export default async function EquipmentsPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -23,18 +25,20 @@ export default async function EquipmentsPage(): Promise<React.ReactElement> {
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 overflow-hidden transition-all">
-			<div className="flex flex-col gap-1">
-				<h1 className="text-text w-fit text-3xl font-bold">Equipos / Ubicaciones</h1>
-				<p className="text-text w-fit text-sm sm:text-base">
-					Visualiza y gestiona los equipos y ubicaciones de la empresa.
-				</p>
+			<div className="rounded-lg bg-gradient-to-r from-emerald-600 to-teal-700 p-6">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Equipos y Ubicaciones</h1>
+						<p className="opacity-90">Gestión y monitoreo de equipos industriales y ubicaciones</p>
+					</div>
+
+					{hasPermission.success && <CreateEquipmentForm parentId={undefined} />}
+				</div>
 			</div>
 
-			<EquipmentDataTable
-				parentId={null}
-				hasPermission={hasPermission.success}
-				lastPath="/admin/dashboard/equipos"
-			/>
+			<EquipmentStatsCards />
+
+			<EquipmentDataTable parentId={null} lastPath="/admin/dashboard/equipos" />
 		</div>
 	)
 }

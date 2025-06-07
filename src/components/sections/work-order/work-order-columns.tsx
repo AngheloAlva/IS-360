@@ -11,12 +11,12 @@ import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
+import UpdateWorkOrderForm from "@/components/forms/admin/work-order/UpdateWorkOrderForm"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 import type { WorkOrder } from "@/hooks/work-orders/use-work-order"
-import UpdateWorkOrderForm from "@/components/forms/admin/work-order/UpdateWorkOrderForm"
 
 export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	{
@@ -29,7 +29,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 			return (
 				<Link
 					href={`/admin/dashboard/libros-de-obras/${id}`}
-					className="text-primary font-medium hover:underline"
+					className="font-medium text-orange-500 hover:underline"
 				>
 					<div className="font-medium">{row.getValue("otNumber")}</div>
 				</Link>

@@ -33,6 +33,7 @@ export const sendRequestReviewEmail = async ({
 					"anghelo.alva@ingsimple.cl",
 					"cristian.pavez@oleotrasandino.cl",
 					"katherine.burgos@oleotrasandino.cl",
+					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.ENVIRONMENTAL:
@@ -40,6 +41,7 @@ export const sendRequestReviewEmail = async ({
 					"anghelo.alva@ingsimple.cl",
 					"bcarrillo@dbj.cl",
 					"katherine.burgos@oleotrasandino.cl",
+					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.PERSONNEL:
@@ -47,6 +49,7 @@ export const sendRequestReviewEmail = async ({
 					"cristian.pavez@oleotrasandino.cl",
 					"anghelo.alva@ingsimple.cl",
 					"katherine.burgos@oleotrasandino.cl",
+					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.VEHICLES:
@@ -54,6 +57,7 @@ export const sendRequestReviewEmail = async ({
 					"cristian.pavez@oleotrasandino.cl",
 					"anghelo.alva@ingsimple.cl",
 					"katherine.burgos@oleotrasandino.cl",
+					"soporte@ingenieriasimple.cl",
 				]
 				break
 		}
