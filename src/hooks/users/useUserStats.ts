@@ -1,26 +1,32 @@
 import { useQuery } from "@tanstack/react-query"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 
-interface UserStats {
-	totalUsers: number
-	activeUsers: number
-	usersByArea: {
-		area: string
-		count: number
-	}[]
-	usersByRole: {
-		role: string
-		count: number
-	}[]
-	recentlyActiveUsers: {
-		id: string
-		name: string
-		image: string | null
-		lastActive: string
-	}[]
+type WorkOrderStatus = keyof typeof WORK_ORDER_STATUS
+
+interface UserStatsResponse {
+	basicStats: {
+		totalUsers: number
+		twoFactorEnabled: number
+		totalContractors: number
+		totalSupervisors: number
+	}
+	charts: {
+		topUsersByWorkOrders: Array<{
+			name: string
+			workOrders: Record<WorkOrderStatus, number>
+		}>
+		documentActivity: Array<{
+			name: string
+			activity: Array<{
+				date: string
+				documents: number
+			}>
+		}>
+	}
 }
 
 export function useUserStats() {
-	return useQuery<UserStats>({
+	return useQuery<UserStatsResponse>({
 		queryKey: ["userStats"],
 		queryFn: async () => {
 			const response = await fetch("/api/users/stats")

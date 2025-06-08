@@ -1,6 +1,6 @@
 "use client"
 
-import { Files, Building2, DownloadIcon } from "lucide-react"
+import { Files, DownloadIcon } from "lucide-react"
 import Link from "next/link"
 
 import { useStartupFolder } from "@/hooks/startup-folders/use-startup-folder"
@@ -65,28 +65,27 @@ export default function StartupFolderOverview({
 		<div className="w-full space-y-4">
 			<div>
 				<div className="space-y-6">
-					<div className="flex flex-col items-start justify-between gap-4 lg:flex-row">
-						<div>
-							<div className="flex items-center gap-2">
-								<Building2 className="text-muted-foreground h-5 w-5" />
-								<h2 className="text-2xl font-semibold tracking-tight">Carpeta de Arranque</h2>
+					<div className="rounded-lg bg-gradient-to-r from-teal-600 to-cyan-700 p-6 shadow-lg">
+						<div className="flex items-center justify-between">
+							<div className="text-white">
+								<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
+								<p className="opacity-90">
+									En este módulo podrás gestionar la documentación de la empresa. En el caso de que
+									un documento no aplique a tu trabajo, deberas subir un documento indicando que no
+									aplica.
+								</p>
 							</div>
-							<p className="text-muted-foreground mt-1">
-								En este módulo podrás gestionar la documentación de tu empresa. En el caso de que un
-								documento no aplique a tu trabajo, deberas subir un documento indicando que no
-								aplica.
-							</p>
-						</div>
 
-						<div className="flex flex-col items-end gap-2 xl:flex-row">
-							{hasPermission && <CreateStartupFolder companyId={companyId} />}
+							<div className="flex items-center gap-2">
+								{hasPermission && <CreateStartupFolder companyId={companyId} />}
 
-							<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
-								<Button className="gap-0 bg-purple-500 hover:bg-purple-600">
-									<DownloadIcon className="mr-2 h-4 w-4" />
-									Documento base
-								</Button>
-							</Link>
+								<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
+									<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
+										<DownloadIcon className="mr-2 h-4 w-4" />
+										Documento base
+									</Button>
+								</Link>
+							</div>
 						</div>
 					</div>
 

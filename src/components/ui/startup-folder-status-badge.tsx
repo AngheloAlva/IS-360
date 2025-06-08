@@ -1,8 +1,9 @@
 "use client"
 
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { ReviewStatus } from "@prisma/client"
+import { cn } from "@/lib/utils"
+
+import { Badge } from "@/components/ui/badge"
 
 interface StartupFolderStatusBadgeProps {
 	status: ReviewStatus

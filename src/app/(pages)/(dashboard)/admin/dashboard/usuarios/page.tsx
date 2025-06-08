@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth"
-
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
+
+import { auth } from "@/lib/auth"
 
 import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { UsersDataTable } from "@/components/sections/admin/users/UsersDataTable"

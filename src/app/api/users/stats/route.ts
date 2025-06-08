@@ -1,143 +1,130 @@
 import { NextResponse } from "next/server"
-
+import { USER_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { format } from "date-fns"
 
 export async function GET() {
 	try {
-		const [totalUsers, usersByArea, internalUsers, recentlyActiveUsers] = await Promise.all([
-			// Total users
+		// Estadísticas básicas
+		const [totalUsers, twoFactorEnabled, totalContractors, totalSupervisors] = await Promise.all([
 			prisma.user.count(),
-
-			// Users by area
-			prisma.user.groupBy({
-				by: ["area"],
-				_count: true,
+			prisma.user.count({
 				where: {
-					area: { not: null },
-				},
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
+					twoFactorEnabled: true,
+					accessRole: USER_ROLE.ADMIN,
 				},
 			}),
-
-			// Get all internal users with their roles
-			prisma.user.findMany({
-				select: {
-					role: true,
-				},
+			prisma.user.count({
 				where: {
-					accessRole: "ADMIN",
-					role: { not: null },
-				},
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
+					accessRole: USER_ROLE.PARTNER_COMPANY,
 				},
 			}),
-
-			// Recently active users
-			prisma.user.findMany({
+			prisma.user.count({
 				where: {
-					sessions: {
-						some: {},
-					},
-					accessRole: "ADMIN",
-				},
-				select: {
-					id: true,
-					name: true,
-					role: true,
-					image: true,
-					sessions: {
-						orderBy: {
-							updatedAt: "desc",
-						},
-						take: 1,
-						select: {
-							updatedAt: true,
-						},
-					},
-				},
-				take: 5,
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
+					accessRole: USER_ROLE.SUPERVISOR,
 				},
 			}),
 		])
 
-		const formattedUsersByArea = usersByArea
-			.filter((area) => area.area !== null)
-			.map((area: { area: string | null; _count: number }) => ({
-				area: area.area as string,
-				count: area._count,
-			}))
-
-		// Process roles from comma-separated strings
-		const roleCount = new Map<string, number>()
-		internalUsers.forEach((user: { role: string | null }) => {
-			if (user.role) {
-				const roles = user.role.split(",")
-				roles.forEach((role) => {
-					const trimmedRole = role.trim()
-					roleCount.set(trimmedRole, (roleCount.get(trimmedRole) || 0) + 1)
-				})
-			}
+		// Top 5 usuarios por órdenes de trabajo
+		const topUsersByWorkOrders = await prisma.user.findMany({
+			take: 5,
+			select: {
+				name: true,
+				workOrders: {
+					select: {
+						status: true,
+					},
+				},
+			},
+			orderBy: {
+				workOrders: {
+					_count: "desc",
+				},
+			},
 		})
 
-		const formattedUsersByRole = Array.from(roleCount.entries())
-			.map(([role, count]) => ({
-				role,
-				count,
-			}))
-			.sort((a, b) => b.count - a.count)
+		const formattedTopUsers = topUsersByWorkOrders.map((user) => ({
+			name: user.name,
+			workOrders: {
+				PENDING: user.workOrders.filter((wo) => wo.status === "PENDING").length,
+				PLANNED: user.workOrders.filter((wo) => wo.status === "PLANNED").length,
+				IN_PROGRESS: user.workOrders.filter((wo) => wo.status === "IN_PROGRESS").length,
+				COMPLETED: user.workOrders.filter((wo) => wo.status === "COMPLETED").length,
+				CANCELLED: user.workOrders.filter((wo) => wo.status === "CANCELLED").length,
+				CLOSURE_REQUESTED: user.workOrders.filter((wo) => wo.status === "CLOSURE_REQUESTED").length,
+			},
+		}))
 
-		const formattedRecentUsers = recentlyActiveUsers.map(
-			(user: {
-				id: string
-				name: string
-				image: string | null
-				sessions: { updatedAt: Date }[]
-			}) => {
-				const lastActive = user.sessions[0].updatedAt
-				const now = new Date()
-				const diffInMinutes = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60))
+		// Actividad de documentos por día (últimos 30 días)
+		const thirtyDaysAgo = new Date()
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-				let lastActiveText = "Hace un momento"
-				if (diffInMinutes > 0) {
-					if (diffInMinutes < 60) {
-						lastActiveText = `Hace ${diffInMinutes} minutos`
-					} else {
-						const hours = Math.floor(diffInMinutes / 60)
-						lastActiveText = `Hace ${hours} ${hours === 1 ? "hora" : "horas"}`
-					}
-				}
+		const userDocumentActivity = await prisma.user.findMany({
+			select: {
+				name: true,
+				folders: {
+					where: {
+						createdAt: {
+							gte: thirtyDaysAgo,
+						},
+					},
+					select: {
+						createdAt: true,
+						files: true,
+					},
+				},
+			},
+		})
 
-				return {
-					id: user.id,
-					name: user.name,
-					image: user.image,
-					lastActive: lastActiveText,
-				}
+		// Procesar datos de actividad por día
+		const documentActivity = userDocumentActivity.map((user) => {
+			const dailyActivity: Record<string, number> = {}
+
+			// Contar documentos por día
+			user.folders.forEach((folder) => {
+				folder.files.forEach((file) => {
+					const date = format(file.createdAt, "MM-dd")
+					dailyActivity[date] = (dailyActivity[date] || 0) + 1
+				})
+			})
+
+			return {
+				name: user.name,
+				activity: Object.entries(dailyActivity).map(([date, documents]) => ({
+					date,
+					documents,
+				})),
 			}
-		)
+		})
 
 		return NextResponse.json({
-			totalUsers,
-			activeUsers: recentlyActiveUsers.length,
-			usersByArea: formattedUsersByArea.sort(
-				(a: { count: number }, b: { count: number }) => b.count - a.count
-			),
-			usersByRole: formattedUsersByRole.sort(
-				(a: { count: number }, b: { count: number }) => b.count - a.count
-			),
-			recentlyActiveUsers: formattedRecentUsers,
+			basicStats: {
+				totalUsers,
+				twoFactorEnabled,
+				totalContractors,
+				totalSupervisors,
+			},
+			charts: {
+				topUsersByWorkOrders: formattedTopUsers,
+				documentActivity,
+			},
 		})
 	} catch (error) {
-		console.error("Error fetching user stats:", error)
+		console.error("[USERS_STATS_ERROR]", error)
 		return NextResponse.json(
-			{ error: "Error al obtener estadísticas de usuarios" },
+			{
+				basicStats: {
+					totalUsers: 0,
+					twoFactorEnabled: 0,
+					totalContractors: 0,
+					totalSupervisors: 0,
+				},
+				charts: {
+					topUsersByWorkOrders: [],
+					documentActivity: [],
+				},
+			},
 			{ status: 500 }
 		)
 	}

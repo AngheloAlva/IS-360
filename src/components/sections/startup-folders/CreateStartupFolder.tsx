@@ -1,12 +1,12 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
+import { PlusCircleIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { createStartupFolderWithAll } from "@/actions/startup-folders/createStartupFolderWithAll"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { queryClient } from "@/lib/queryClient"
 import {
 	newStartupFolderSchema,
@@ -70,8 +70,11 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button disabled={isSubmitting} className="gap-0 bg-emerald-600 hover:bg-emerald-700">
-					<PlusIcon className="mr-2 h-4 w-4" />
+				<Button
+					disabled={isSubmitting}
+					className="gap-0 bg-white font-medium text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600"
+				>
+					<PlusCircleIcon className="mr-2 h-4 w-4" />
 					Carpeta de arranque
 				</Button>
 			</DialogTrigger>
