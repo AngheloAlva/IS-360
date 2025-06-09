@@ -20,7 +20,7 @@ interface WorkOrderStatusChartProps {
 
 const COLORS = [
 	"var(--color-orange-500)",
-	"var(--color-red-500)",
+	"var(--color-yellow-500)",
 	"var(--color-orange-600)",
 	"var(--color-red-600)",
 	"var(--color-orange-700)",
@@ -31,7 +31,7 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 	const statusData = data.charts.status
 
 	return (
-		<Card className="border-none shadow-md">
+		<Card className="border-none">
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>

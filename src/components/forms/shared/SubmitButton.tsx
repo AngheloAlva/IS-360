@@ -21,13 +21,12 @@ export default function SubmitButton({
 			size={"lg"}
 			type="submit"
 			disabled={isSubmitting || disabled}
-			className={cn("hover:bg-secondary-background mt-4 w-full font-bold tracking-wide", className)}
-		>
-			{isSubmitting ? (
-				<Spinner />
-			) : (
-				label
+			className={cn(
+				"hover:bg-secondary-background w-full cursor-pointer font-bold tracking-wide transition-all hover:scale-105",
+				className
 			)}
+		>
+			{isSubmitting ? <Spinner /> : label}
 		</Button>
 	)
 }

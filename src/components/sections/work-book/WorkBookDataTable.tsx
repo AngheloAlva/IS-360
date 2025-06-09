@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { InfoIcon } from "lucide-react"
 import { useState } from "react"
 import {
 	flexRender,
@@ -11,7 +13,10 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { fetchWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
+import { fetchWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 import { workBookColumns } from "./work-book-columns"
+import { queryClient } from "@/lib/queryClient"
 import {
 	useWorkBooksByCompany,
 	type WorkBookByCompany,
@@ -19,9 +24,9 @@ import {
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -30,11 +35,6 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
-import { InfoIcon } from "lucide-react"
-import { queryClient } from "@/lib/queryClient"
-import { fetchWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
-import { fetchWorkBookMilestones } from "@/hooks/work-orders/use-work-book-milestones"
-import { useRouter } from "next/navigation"
 
 export function WorkBookDataTable({ companyId }: { companyId: string }) {
 	const [page, setPage] = useState(1)
@@ -93,23 +93,23 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 	}
 
 	return (
-		<section className="flex w-full flex-col gap-4">
-			<div className="flex w-full flex-col items-start justify-between gap-2 lg:flex-row">
-				<div className="flex w-full items-center justify-between gap-2">
-					<Input
-						value={search}
-						className="bg-background w-full sm:w-80"
-						placeholder="Filtrar por Numero de OT..."
-						onChange={(e) => {
-							setSearch(e.target.value)
-							setPage(1)
-						}}
-					/>
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+		<Card>
+			<CardContent className="flex w-full flex-col gap-4">
+				<div className="flex w-full flex-col items-start justify-between gap-2 lg:flex-row">
+					<div className="flex w-full items-center justify-between gap-2">
+						<Input
+							value={search}
+							className="bg-background w-full sm:w-80"
+							placeholder="Filtrar por Numero de OT..."
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+						/>
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
-			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -164,14 +164,14 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 						)}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination<WorkBookByCompany>
-				table={table}
-				isLoading={isLoading}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-			/>
-		</section>
+				<TablePagination<WorkBookByCompany>
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

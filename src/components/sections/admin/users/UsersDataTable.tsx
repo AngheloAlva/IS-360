@@ -17,9 +17,9 @@ import { UserColumns } from "./user-columns"
 import InternalUserFormSheet from "@/components/forms/admin/user/InternalUserFormSheet"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -72,50 +72,50 @@ export function UsersDataTable({ hasPermission }: { hasPermission: boolean }) {
 	})
 
 	return (
-		<section className="mt-4 flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
-				<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>
+		<Card>
+			<CardContent className="mt-4 flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-col items-start justify-between lg:flex-row">
+					<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>
 
-				<div className="my-4 flex w-full flex-col flex-wrap gap-2 md:w-fit md:flex-row lg:my-0">
-					<Input
-						type="text"
-						className="bg-background w-full md:w-80"
-						placeholder="Buscar por Nombre, Email o RUT..."
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-					/>
+					<div className="my-4 flex w-full flex-col flex-wrap gap-2 md:w-fit md:flex-row lg:my-0">
+						<Input
+							type="text"
+							className="bg-background w-full md:w-80"
+							placeholder="Buscar por Nombre, Email o RUT..."
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+						/>
 
-					<Select
-						onValueChange={(value) => {
-							if (value === "all") {
-								table.getColumn("area")?.setFilterValue(undefined)
-							} else {
-								table.getColumn("area")?.setFilterValue(value)
-							}
-						}}
-						value={(table.getColumn("area")?.getFilterValue() as string) ?? "all"}
-					>
-						<SelectTrigger className="border-input bg-background w-full border md:w-fit">
-							<SelectValue placeholder="Área" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Áreas</SelectLabel>
-								<SelectItem value="all">Todas las áreas</SelectItem>
-								{Object.keys(AreasLabels).map((area) => (
-									<SelectItem key={area} value={area}>
-										{AreasLabels[area as keyof typeof AreasLabels]}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
+						<Select
+							onValueChange={(value) => {
+								if (value === "all") {
+									table.getColumn("area")?.setFilterValue(undefined)
+								} else {
+									table.getColumn("area")?.setFilterValue(value)
+								}
+							}}
+							value={(table.getColumn("area")?.getFilterValue() as string) ?? "all"}
+						>
+							<SelectTrigger className="border-input bg-background w-full border md:w-fit">
+								<SelectValue placeholder="Área" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Áreas</SelectLabel>
+									<SelectItem value="all">Todas las áreas</SelectItem>
+									{Object.keys(AreasLabels).map((area) => (
+										<SelectItem key={area} value={area}>
+											{AreasLabels[area as keyof typeof AreasLabels]}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
 
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
-			</div>
 
-			<Card className="w-full max-w-full rounded-md border-none p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -161,14 +161,14 @@ export function UsersDataTable({ hasPermission }: { hasPermission: boolean }) {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-				isLoading={isLoading}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					isLoading={isLoading}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

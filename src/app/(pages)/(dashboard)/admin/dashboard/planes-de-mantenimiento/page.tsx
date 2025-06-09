@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth"
 
 import { MaintenancePlanDataTable } from "@/components/sections/admin/maintenance-plans/MaintenancePlanDataTable"
 import MaintenancePlanForm from "@/components/forms/maintenance-plan/MaintenancePlanForm"
+import MaintenancePlanDashboardStats from "@/components/sections/admin/maintenance-plans/stats/maintenance-plan-dashboard-stats"
 
 export default async function MaintenancePlansPage() {
 	const session = await auth.api.getSession({
@@ -23,16 +24,20 @@ export default async function MaintenancePlansPage() {
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="flex items-start justify-between gap-4 md:flex-row">
-				<div className="flex flex-col gap-1">
-					<h1 className="text-text w-fit text-3xl font-bold">Planes de Mantenimiento</h1>
-					<p className="text-text w-fit text-sm sm:text-base">
-						En este modulo puedes gestionar los planes de mantenimiento de la plataforma.
-					</p>
-				</div>
+			<div className="rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 p-6 shadow-lg">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Planes de Mantenimiento</h1>
+						<p className="opacity-90">
+							Gestión y seguimiento de planes de mantenimiento preventivo
+						</p>
+					</div>
 
-				{hasPermission.success && <MaintenancePlanForm userId={session.user.id} />}
+					{hasPermission.success && <MaintenancePlanForm userId={session.user.id} />}
+				</div>
 			</div>
+
+			<MaintenancePlanDashboardStats />
 
 			<MaintenancePlanDataTable />
 		</div>

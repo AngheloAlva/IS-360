@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import {
 	flexRender,
@@ -11,7 +12,9 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { fetchMaintenancePlanTasks } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
 import { MaintenancePlanColumns } from "./maintenance-plan-columns"
+import { queryClient } from "@/lib/queryClient"
 import {
 	type MaintenancePlan,
 	useMaintenancePlans,
@@ -19,16 +22,9 @@ import {
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select"
 import {
 	Table,
 	TableRow,
@@ -37,15 +33,10 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
-import { useRouter } from "next/navigation"
-import { queryClient } from "@/lib/queryClient"
-import { fetchMaintenancePlanTasks } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
-import { PlanLocationOptions } from "@/lib/consts/plan-location"
 
 export function MaintenancePlanDataTable() {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
-	const [location, setLocation] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -54,7 +45,6 @@ export function MaintenancePlanDataTable() {
 	const { data, isLoading, refetch, isFetching } = useMaintenancePlans({
 		page,
 		search,
-		location,
 		limit: 20,
 	})
 
@@ -117,45 +107,25 @@ export function MaintenancePlanDataTable() {
 	}
 
 	return (
-		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-				<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
-					<Input
-						type="text"
-						value={search}
-						onChange={(e) => {
-							setSearch(e.target.value)
-							setPage(1)
-						}}
-						className="bg-background w-full md:w-80"
-						placeholder="Buscar por nombre, equipo, o descripcion..."
-					/>
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+					<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
+						<Input
+							type="text"
+							value={search}
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+							className="bg-background w-full md:w-80"
+							placeholder="Buscar por nombre, equipo, o descripcion..."
+						/>
+					</div>
 
-					<Select
-						value={location}
-						onValueChange={(value) => {
-							setLocation(value)
-							setPage(1)
-						}}
-					>
-						<SelectTrigger className="bg-background w-full md:w-44">
-							<SelectValue placeholder="Ubicación" />
-						</SelectTrigger>
-						<SelectContent>
-							{/* <SelectItem value="">Todas las ubicaciones</SelectItem> */}
-							{PlanLocationOptions.map((option) => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
 				</div>
 
-				<RefreshButton refetch={refetch} isFetching={isFetching} />
-			</div>
-
-			<Card className="w-full max-w-full rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -199,14 +169,14 @@ export function MaintenancePlanDataTable() {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-				isLoading={isLoading}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					isLoading={isLoading}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

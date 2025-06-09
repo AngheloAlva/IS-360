@@ -17,9 +17,9 @@ import { queryClient } from "@/lib/queryClient"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -89,27 +89,27 @@ export function WorkBookDataTable() {
 	}
 
 	return (
-		<section className="mt-4 flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
-				<h2 className="text-text text-2xl font-bold">Lista de Libros de Obras</h2>
+		<Card>
+			<CardContent className="mt-4 flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-col items-start justify-between lg:flex-row">
+					<h2 className="text-text text-2xl font-bold">Lista de Libros de Obras</h2>
 
-				<div className="my-4 flex w-full items-center justify-between gap-2 lg:my-0">
-					<Input
-						type="text"
-						value={search}
-						className="bg-background w-full sm:w-80"
-						onChange={(e) => {
-							setPage(1)
-							setSearch(e.target.value)
-						}}
-						placeholder="Buscar por nombre o número de folio..."
-					/>
+					<div className="my-4 flex w-full items-center justify-between gap-2 lg:my-0">
+						<Input
+							type="text"
+							value={search}
+							className="bg-background w-full sm:w-80"
+							onChange={(e) => {
+								setPage(1)
+								setSearch(e.target.value)
+							}}
+							placeholder="Buscar por nombre o número de folio..."
+						/>
 
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
-			</div>
 
-			<Card className="w-full max-w-full rounded-md border-none p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -148,14 +148,14 @@ export function WorkBookDataTable() {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-				isLoading={isLoading}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					isLoading={isLoading}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

@@ -17,7 +17,7 @@ import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CompanyColumns } from "./company-columns"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -59,25 +59,28 @@ export function CompanyDataTable() {
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
-				<h2 className="text-text- text-2xl font-semibold">Lista de Empresas</h2>
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
+					<div className="flex flex-col">
+						<h2 className="text-text- text-2xl font-semibold">Lista de Empresas</h2>
+						<p className="text-muted-foreground text-sm">Lista de todas las empresas</p>
+					</div>
 
-				<div className="ml-auto flex items-center gap-2">
-					<Input
-						onChange={(e) => {
-							setSearch(e.target.value)
-							setPage(1)
-						}}
-						value={search}
-						placeholder="Buscar por Nombre o RUT..."
-						className="bg-background ml-auto w-fit lg:w-72"
-					/>
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+					<div className="ml-auto flex items-center gap-2">
+						<Input
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+							value={search}
+							placeholder="Buscar por Nombre o RUT..."
+							className="bg-background ml-auto w-fit lg:w-72"
+						/>
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
-			</div>
 
-			<Card className="w-full max-w-full rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -115,14 +118,14 @@ export function CompanyDataTable() {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				isLoading={isLoading}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

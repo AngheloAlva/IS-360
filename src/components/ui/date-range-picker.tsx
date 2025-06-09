@@ -1,10 +1,10 @@
 "use client"
 
-import * as React from "react"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -33,7 +33,7 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 						id="date"
 						variant={"outline"}
 						className={cn(
-							"border-input bg-background w-[300px] justify-start text-left font-normal",
+							"border-input bg-background w-fit justify-start text-left font-normal",
 							!date && "text-muted-foreground"
 						)}
 					>
@@ -52,6 +52,7 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 						)}
 					</Button>
 				</PopoverTrigger>
+
 				<PopoverContent className="w-auto p-0" align="start">
 					<Calendar
 						initialFocus

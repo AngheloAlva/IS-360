@@ -13,7 +13,7 @@ export default function BackButton({ href, className }: BackButtonProps): React.
 		<Link
 			href={href}
 			className={cn(
-				"bg-primary/10 text-primary hover:bg-primary rounded-md p-0.5 transition-colors hover:text-white",
+				"bg-primary/10 text-primary hover:bg-primary rounded-md p-0.5 transition-all hover:scale-110 hover:text-white",
 				className
 			)}
 		>

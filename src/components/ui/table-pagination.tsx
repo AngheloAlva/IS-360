@@ -1,64 +1,68 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { Table } from "@tanstack/react-table"
 
+import { cn } from "@/lib/utils"
+
 import { Button } from "./button"
 
 interface TablePaginationProps<TData> {
-	table: Table<TData>
 	pageCount: number
-	onPageChange: (page: number) => void
+	className?: string
 	isLoading?: boolean
+	table: Table<TData>
+	onPageChange: (page: number) => void
 }
 
 export function TablePagination<TData>({
 	table,
+	className,
+	isLoading,
 	pageCount,
 	onPageChange,
-	isLoading,
 }: TablePaginationProps<TData>) {
 	const currentPage = table.getState().pagination.pageIndex + 1
 
 	return (
 		<div className="text-text flex w-full items-center justify-between">
-			<span className="flex items-center gap-1">
+			<span className="flex items-center gap-1 text-sm">
 				<div>Página</div>
-				<strong>
+				<strong className="font-semibold">
 					{currentPage} de {pageCount}
 				</strong>
 			</span>
 
 			<div className="flex items-center gap-1">
 				<Button
-					variant="outline"
-					className="text-primary border-primary hover:bg-primary"
 					size="sm"
+					variant="outline"
+					className={cn("text-primary border-primary hover:bg-primary", className)}
 					onClick={() => onPageChange(1)}
 					disabled={currentPage <= 1 || isLoading}
 				>
 					<ChevronsLeft className="h-4 w-4" />
 				</Button>
 				<Button
-					variant="outline"
-					className="text-primary border-primary hover:bg-primary"
 					size="sm"
+					variant="outline"
+					className={cn("text-primary border-primary hover:bg-primary", className)}
 					onClick={() => onPageChange(currentPage - 1)}
 					disabled={currentPage <= 1 || isLoading}
 				>
 					<ChevronLeft className="h-4 w-4" />
 				</Button>
 				<Button
-					variant="outline"
-					className="text-primary border-primary hover:bg-primary"
 					size="sm"
+					variant="outline"
+					className={cn("text-primary border-primary hover:bg-primary", className)}
 					onClick={() => onPageChange(currentPage + 1)}
 					disabled={currentPage >= pageCount || isLoading}
 				>
 					<ChevronRight className="h-4 w-4" />
 				</Button>
 				<Button
-					variant="outline"
-					className="text-primary border-primary hover:bg-primary"
 					size="sm"
+					variant="outline"
+					className={cn("text-primary border-primary hover:bg-primary", className)}
 					onClick={() => onPageChange(pageCount)}
 					disabled={currentPage >= pageCount || isLoading}
 				>

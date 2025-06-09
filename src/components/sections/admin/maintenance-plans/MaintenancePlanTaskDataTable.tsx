@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
 	Select,
 	SelectItem,
@@ -89,123 +89,123 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-col gap-4">
-				{parentId && (
-					<Button
-						variant="ghost"
-						onClick={() => {
-							window.location.href = "/admin/dashboard/equipos"
-						}}
-					>
-						<ArrowLeft className="mr-2 h-4 w-4" />
-						Volver a Equipos Principales
-					</Button>
-				)}
-
-				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
-					<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
-						<Input
-							type="text"
-							value={search}
-							onChange={(e) => {
-								setSearch(e.target.value)
-								setPage(1)
-							}}
-							className="bg-background w-full md:w-64"
-							placeholder="Buscar por nombre o equipo..."
-						/>
-
-						<Popover>
-							<PopoverTrigger asChild>
-								<Button
-									variant="outline"
-									className={`w-full justify-start text-left font-normal md:w-52 ${!nextDateFrom && "text-muted-foreground"}`}
-								>
-									<CalendarIcon className="mr-2 h-4 w-4" />
-									{nextDateFrom ? format(nextDateFrom, "PPP", { locale: es }) : "Fecha inicial"}
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent className="w-auto p-0">
-								<Calendar
-									mode="single"
-									selected={nextDateFrom}
-									onSelect={(date) => {
-										setNextDateFrom(date)
-										setPage(1)
-									}}
-									initialFocus
-								/>
-							</PopoverContent>
-						</Popover>
-
-						<Popover>
-							<PopoverTrigger asChild>
-								<Button
-									variant="outline"
-									className={`w-full justify-start text-left font-normal md:w-52 ${!nextDateTo && "text-muted-foreground"}`}
-								>
-									<CalendarIcon className="mr-2 h-4 w-4" />
-									{nextDateTo ? format(nextDateTo, "PPP", { locale: es }) : "Fecha final"}
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent className="w-auto p-0">
-								<Calendar
-									mode="single"
-									selected={nextDateTo}
-									onSelect={(date) => {
-										setNextDateTo(date)
-										setPage(1)
-									}}
-									initialFocus
-									disabled={(date) => (nextDateFrom ? date < nextDateFrom : false)}
-								/>
-							</PopoverContent>
-						</Popover>
-
-						<Select
-							value={frequency}
-							onValueChange={(value) => {
-								setFrequency(value)
-								setPage(1)
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-col gap-4">
+					{parentId && (
+						<Button
+							variant="ghost"
+							onClick={() => {
+								window.location.href = "/admin/dashboard/equipos"
 							}}
 						>
-							<SelectTrigger className="bg-background w-full md:w-40">
-								<SelectValue placeholder="Frecuencia" />
-							</SelectTrigger>
-							<SelectContent>
-								{TaskFrequencyOptions.map((option) => (
-									<SelectItem key={option.value} value={option.value}>
-										{option.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+							<ArrowLeft className="mr-2 h-4 w-4" />
+							Volver a Equipos Principales
+						</Button>
+					)}
 
-						{(nextDateFrom || nextDateTo || frequency) && (
-							<Button
-								size="sm"
-								variant="outline"
-								onClick={() => {
-									setNextDateFrom(undefined)
-									setNextDateTo(undefined)
-									setFrequency("")
+					<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+						<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
+							<Input
+								type="text"
+								value={search}
+								onChange={(e) => {
+									setSearch(e.target.value)
+									setPage(1)
+								}}
+								className="bg-background w-full md:w-64"
+								placeholder="Buscar por nombre o equipo..."
+							/>
+
+							<Popover>
+								<PopoverTrigger asChild>
+									<Button
+										variant="outline"
+										className={`w-full justify-start text-left font-normal md:w-52 ${!nextDateFrom && "text-muted-foreground"}`}
+									>
+										<CalendarIcon className="mr-2 h-4 w-4" />
+										{nextDateFrom ? format(nextDateFrom, "PPP", { locale: es }) : "Fecha inicial"}
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent className="w-auto p-0">
+									<Calendar
+										mode="single"
+										selected={nextDateFrom}
+										onSelect={(date) => {
+											setNextDateFrom(date)
+											setPage(1)
+										}}
+										initialFocus
+									/>
+								</PopoverContent>
+							</Popover>
+
+							<Popover>
+								<PopoverTrigger asChild>
+									<Button
+										variant="outline"
+										className={`w-full justify-start text-left font-normal md:w-52 ${!nextDateTo && "text-muted-foreground"}`}
+									>
+										<CalendarIcon className="mr-2 h-4 w-4" />
+										{nextDateTo ? format(nextDateTo, "PPP", { locale: es }) : "Fecha final"}
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent className="w-auto p-0">
+									<Calendar
+										mode="single"
+										selected={nextDateTo}
+										onSelect={(date) => {
+											setNextDateTo(date)
+											setPage(1)
+										}}
+										initialFocus
+										disabled={(date) => (nextDateFrom ? date < nextDateFrom : false)}
+									/>
+								</PopoverContent>
+							</Popover>
+
+							<Select
+								value={frequency}
+								onValueChange={(value) => {
+									setFrequency(value)
 									setPage(1)
 								}}
 							>
-								<FunnelXIcon className="h-4 w-4" />
-								Limpiar filtros
-							</Button>
-						)}
-					</div>
+								<SelectTrigger className="bg-background w-full md:w-40">
+									<SelectValue placeholder="Frecuencia" />
+								</SelectTrigger>
+								<SelectContent>
+									{TaskFrequencyOptions.map((option) => (
+										<SelectItem key={option.value} value={option.value}>
+											{option.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 
-					<div className="flex items-center gap-2">
-						<RefreshButton refetch={refetch} isFetching={isFetching} />
+							{(nextDateFrom || nextDateTo || frequency) && (
+								<Button
+									size="sm"
+									variant="outline"
+									onClick={() => {
+										setNextDateFrom(undefined)
+										setNextDateTo(undefined)
+										setFrequency("")
+										setPage(1)
+									}}
+								>
+									<FunnelXIcon className="h-4 w-4" />
+									Limpiar filtros
+								</Button>
+							)}
+						</div>
+
+						<div className="flex items-center gap-2">
+							<RefreshButton refetch={refetch} isFetching={isFetching} />
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<Card className="w-full max-w-full rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -254,14 +254,14 @@ export function MaintenancePlanTaskDataTable({ planSlug }: { planSlug: string })
 						)}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-				isLoading={isLoading}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					isLoading={isLoading}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

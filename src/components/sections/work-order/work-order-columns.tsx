@@ -1,5 +1,5 @@
+import { Building2Icon, DotIcon, LinkIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { LinkIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -29,9 +29,9 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 			return (
 				<Link
 					href={`/admin/dashboard/libros-de-obras/${id}`}
-					className="font-medium text-orange-500 hover:underline"
+					className="font-semibold text-orange-600 hover:underline"
 				>
-					<div className="font-medium">{row.getValue("otNumber")}</div>
+					{row.getValue("otNumber")}
 				</Link>
 			)
 		},
@@ -41,11 +41,25 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "Empresa - Supervisor",
 		cell: ({ row }) => {
 			const company = row.getValue("company") as { name: string } | null
-			const supervisor = row.original.supervisor as { name: string } | null
 
 			return (
-				<div className="font-medium">
-					{company?.name ? company.name : "Interno"} - {supervisor?.name}
+				<div className="flex items-center gap-2">
+					<Building2Icon className="text-muted-foreground h-4 w-4" />
+					{company?.name ? company.name : "Interno"}
+				</div>
+			)
+		},
+	},
+	{
+		accessorKey: "supervisor",
+		header: "Supervisor",
+		cell: ({ row }) => {
+			const supervisor = row.getValue("supervisor") as { name: string } | null
+
+			return (
+				<div className="flex items-center gap-2">
+					<UserIcon className="text-muted-foreground h-4 w-4" />
+					{supervisor?.name}
 				</div>
 			)
 		},
@@ -55,7 +69,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "Trabajo Solicitado",
 		cell: ({ row }) => {
 			const request = row.getValue("workRequest") as string
-			return <div className="font-medium">{request}</div>
+			return <div className="w-80 max-w-80 text-wrap">{request}</div>
 		},
 	},
 	{
@@ -63,7 +77,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "Descripción del trabajo",
 		cell: ({ row }) => {
 			const description = row.getValue("workDescription") as string
-			return <div className="max-w-80 min-w-80 font-medium text-wrap">{description}</div>
+			return <div className="w-80 max-w-80 text-wrap">{description}</div>
 		},
 	},
 	{
@@ -74,7 +88,11 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 
 			return (
 				<div className="flex w-[100px] items-center gap-1">
-					<Progress value={progress || 0} className="h-2" />
+					<Progress
+						value={progress || 0}
+						className="h-2 bg-orange-600/10"
+						indicatorClassName="bg-orange-600"
+					/>
 					<span className="text-muted-foreground text-xs">{progress || 0}%</span>
 				</div>
 			)
@@ -88,16 +106,12 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 
 			return (
 				<Badge
-					className={cn("border-slate-500 bg-slate-500/10 text-slate-500", {
-						"border-purple-500 bg-purple-500/10 text-purple-500":
-							status === WORK_ORDER_STATUS.IN_PROGRESS,
-						"border-cyan-500 bg-cyan-500/10 text-cyan-500":
-							status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
-						"border-yellow-500 bg-yellow-500/10 text-yellow-500":
-							status === WORK_ORDER_STATUS.PENDING,
-						"border-green-500 bg-green-500/10 text-green-500":
-							status === WORK_ORDER_STATUS.COMPLETED,
-						"border-red-500 bg-red-500/10 text-red-500": status === WORK_ORDER_STATUS.CANCELLED,
+					className={cn("bg-yellow-500/10 text-yellow-500", {
+						"bg-orange-500/10 text-orange-500": status === WORK_ORDER_STATUS.IN_PROGRESS,
+						"bg-orange-600/10 text-orange-600": status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
+						"bg-red-600/10 text-red-600": status === WORK_ORDER_STATUS.PENDING,
+						"bg-orange-700/10 text-orange-700": status === WORK_ORDER_STATUS.COMPLETED,
+						"bg-red-700/10 text-red-700": status === WORK_ORDER_STATUS.CANCELLED,
 					})}
 				>
 					{WorkOrderStatusLabels[status]}
@@ -127,23 +141,20 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
-		accessorKey: "solicitationTime",
-		header: "Hora de solicitud",
-		cell: ({ row }) => {
-			const time = row.getValue("solicitationTime") as string
-			return <div className="font-medium">{time || "Sin hora"}</div>
-		},
-	},
-	{
 		accessorKey: "equipment",
-		header: "Equipo",
+		header: "Equipos/Ubicaciones",
 		cell: ({ row }) => {
-			const equipment = row.getValue("equipment") as { name: string }[]
+			const equipment = row.getValue("equipment") as { name: string; id: string }[]
 
 			return (
 				<ul className="flex flex-col">
 					{equipment.length > 0
-						? equipment.map((e) => <li key={e.name}>{e.name}</li>)
+						? equipment.map((e) => (
+								<li key={e.id} className="flex items-center gap-1">
+									<DotIcon className="size-4" />
+									{e.name}
+								</li>
+							))
 						: "Sin equipo"}
 				</ul>
 			)
@@ -157,11 +168,9 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 
 			return (
 				<Badge
-					className={cn("bg-primary/5 border-primary text-primary", {
-						"border-red-500 bg-red-500/5 text-red-500": priority === WORK_ORDER_PRIORITY.HIGH,
-						"border-yellow-500 bg-yellow-500/5 text-yellow-500":
-							priority === WORK_ORDER_PRIORITY.MEDIUM,
-						"border-green-500 bg-green-500/5 text-green-500": priority === WORK_ORDER_PRIORITY.LOW,
+					className={cn("bg-yellow-500/10 text-yellow-500", {
+						"bg-red-500/10 text-red-500": priority === WORK_ORDER_PRIORITY.HIGH,
+						"bg-orange-500/10 text-orange-500": priority === WORK_ORDER_PRIORITY.MEDIUM,
 					})}
 				>
 					{WorkOrderPriorityLabels[priority]}
@@ -178,9 +187,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 			if (!capex) return <div className="font-medium">-</div>
 
 			return (
-				<Badge variant="outline" className="border-primary text-primary">
-					{WorkOrderCAPEXLabels[capex]}
-				</Badge>
+				<Badge className="bg-orange-600/10 text-orange-600">{WorkOrderCAPEXLabels[capex]}</Badge>
 			)
 		},
 	},

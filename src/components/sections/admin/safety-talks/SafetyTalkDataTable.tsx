@@ -17,7 +17,7 @@ import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -59,23 +59,23 @@ export function SafetyTalkDataTable() {
 	})
 
 	return (
-		<section className="flex w-full flex-col items-start gap-4">
-			<div className="flex w-full items-center justify-between gap-2">
-				<Input
-					type="text"
-					value={search}
-					onChange={(e) => {
-						setSearch(e.target.value)
-						setPage(1)
-					}}
-					placeholder="Buscar por título o tipo..."
-					className="bg-background w-full lg:w-72"
-				/>
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-full items-center justify-between gap-2">
+					<Input
+						type="text"
+						value={search}
+						onChange={(e) => {
+							setSearch(e.target.value)
+							setPage(1)
+						}}
+						placeholder="Buscar por título o tipo..."
+						className="bg-background w-full lg:w-72"
+					/>
 
-				<RefreshButton refetch={refetch} isFetching={isFetching} />
-			</div>
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
+				</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -113,14 +113,14 @@ export function SafetyTalkDataTable() {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				isLoading={isLoading}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

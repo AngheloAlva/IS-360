@@ -15,9 +15,9 @@ import { UserByCompanyColumns } from "./user-by-company-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -62,27 +62,27 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 	})
 
 	return (
-		<section className="mt-4 flex w-full flex-col items-start gap-4">
-			<div className="flex w-full flex-col items-start justify-between lg:flex-row">
-				<h2 className="text-text mb-4 text-2xl font-bold">Lista de Usuarios</h2>
+		<Card>
+			<CardContent className="mt-4 flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-col items-start justify-between lg:flex-row">
+					<h2 className="text-text mb-4 text-2xl font-bold">Lista de Usuarios</h2>
 
-				<div className="flex flex-row items-center justify-center gap-2">
-					<Input
-						type="text"
-						value={search}
-						onChange={(e) => {
-							setSearch(e.target.value)
-							setPage(1)
-						}}
-						className="bg-background w-full sm:w-80"
-						placeholder="Buscar por Nombre, Empresa, Email o RUT..."
-					/>
+					<div className="flex flex-row items-center justify-center gap-2">
+						<Input
+							type="text"
+							value={search}
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+							className="bg-background w-full sm:w-80"
+							placeholder="Buscar por Nombre, Empresa, Email o RUT..."
+						/>
 
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
-			</div>
 
-			<Card className="w-full max-w-full overflow-x-scroll rounded-md border-none p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -120,14 +120,14 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-				isLoading={isLoading}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					isLoading={isLoading}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

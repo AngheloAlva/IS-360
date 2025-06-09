@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
+import { Check, ChevronsUpDown, PlusCircleIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
@@ -113,14 +113,17 @@ export default function MaintenancePlanForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
-				<Button size={"lg"} className="bg-primary hover:bg-primary/80 gap-1 text-white">
-					<Plus />
-					Plan <span className="hidden sm:inline">de Mantenimiento</span>
+				<Button
+					size={"lg"}
+					className="gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600"
+				>
+					<PlusCircleIcon />
+					Plan de Mantenimiento
 				</Button>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">
-				<SheetHeader>
+				<SheetHeader className="shadow">
 					<SheetTitle>Crear Plan de Mantenimiento</SheetTitle>
 					<SheetDescription>
 						Complete el formulario para crear un nuevo plan de mantenimiento.
@@ -215,10 +218,19 @@ export default function MaintenancePlanForm({
 							)}
 						/>
 
+						<Button
+							size={"lg"}
+							variant="outline"
+							onClick={() => setOpen(false)}
+							className="border-2 border-indigo-600 tracking-wide text-indigo-500 transition-all hover:scale-105 hover:bg-transparent hover:text-indigo-500"
+						>
+							Cancelar
+						</Button>
+
 						<SubmitButton
-							label="Crear Plan de Mantenimiento"
+							label="Crear Plan"
 							isSubmitting={isSubmitting}
-							className="hover:bg-primary/80 sm:col-span-2"
+							className="bg-indigo-600 hover:bg-indigo-700"
 						/>
 					</form>
 				</Form>

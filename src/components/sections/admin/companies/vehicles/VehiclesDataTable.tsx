@@ -17,7 +17,7 @@ import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -59,25 +59,25 @@ export function VehiclesDataTable(): React.ReactElement {
 	})
 
 	return (
-		<div className="space-y-4">
-			<div className="flex items-center justify-between gap-2">
-				<h2 className="text-text mb-4 text-2xl font-bold">Lista de Vehículos</h2>
+		<Card>
+			<CardContent className="space-y-4">
+				<div className="flex items-center justify-between gap-2">
+					<h2 className="text-text mb-4 text-2xl font-bold">Lista de Vehículos</h2>
 
-				<div className="flex items-center gap-2">
-					<Input
-						onChange={(e) => {
-							setSearch(e.target.value)
-							setPage(1)
-						}}
-						value={search}
-						placeholder="Buscar por Patente, Modelo..."
-						className="bg-background ml-auto w-fit lg:w-72"
-					/>
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+					<div className="flex items-center gap-2">
+						<Input
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+							value={search}
+							placeholder="Buscar por Patente, Modelo..."
+							className="bg-background ml-auto w-fit lg:w-72"
+						/>
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
-			</div>
 
-			<Card className="w-full rounded-md border p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -114,14 +114,14 @@ export function VehiclesDataTable(): React.ReactElement {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				isLoading={isLoading}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-			/>
-		</div>
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+				/>
+			</CardContent>
+		</Card>
 	)
 }

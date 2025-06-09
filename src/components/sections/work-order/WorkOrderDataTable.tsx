@@ -1,7 +1,7 @@
 "use client"
 
 import { DateRange } from "react-day-picker"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, SearchIcon } from "lucide-react"
 import { useState } from "react"
 import {
 	flexRender,
@@ -24,11 +24,11 @@ import { queryClient } from "@/lib/queryClient"
 import { CalendarDateRangePicker } from "@/components/ui/date-range-picker"
 import { TablePagination } from "@/components/ui/table-pagination"
 import RefreshButton from "@/components/shared/RefreshButton"
+import { Card, CardContent } from "@/components/ui/card"
 import { workOrderColumns } from "./work-order-columns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -125,133 +125,143 @@ export function WorkOrderDataTable() {
 	}
 
 	return (
-		<section className="flex w-full flex-col items-start gap-6">
-			<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
-				<div className="flex items-center gap-2">
-					<Input
-						onChange={(e) => {
-							setSearch(e.target.value)
-							setPage(1)
-						}}
-						type="text"
-						className="bg-background w-full sm:w-64"
-						placeholder="Buscar por número de OT, trabajo, ubicación..."
-						value={search}
-					/>
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-wrap items-center gap-2 md:w-full md:flex-row">
+					<div className="flex flex-col">
+						<h2 className="text-2xl font-semibold">Lista de Órdenes de Trabajo</h2>
+						<p className="text-muted-foreground text-sm">
+							Gestión y seguimiento de todas las órdenes
+						</p>
+					</div>
+
+					<div className="border-input ml-auto flex items-center rounded-lg border pl-2">
+						<SearchIcon className="text-muted-foreground size-4" />
+						<Input
+							onChange={(e) => {
+								setSearch(e.target.value)
+								setPage(1)
+							}}
+							type="text"
+							value={search}
+							className="w-64 border-none focus-visible:ring-0"
+							placeholder="Buscar por número de OT, trabajo..."
+						/>
+					</div>
+
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
 				</div>
 
-				<Select
-					onValueChange={(value) => {
-						if (value === "all") {
-							setTypeFilter(null)
-						} else {
-							setTypeFilter(value)
-						}
-					}}
-					value={typeFilter ?? "all"}
-				>
-					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
-						<SelectValue placeholder="Tipo de obra" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Tipo de obra</SelectLabel>
-							<SelectSeparator />
-							<SelectItem value="all">Todos los tipos</SelectItem>
-							{WorkOrderTypeOptions.map((type) => (
-								<SelectItem key={type.value} value={type.value}>
-									{type.label}
-								</SelectItem>
-							))}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
+				<div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-full md:flex-row">
+					<Select
+						onValueChange={(value) => {
+							if (value === "all") {
+								setTypeFilter(null)
+							} else {
+								setTypeFilter(value)
+							}
+						}}
+						value={typeFilter ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+							<SelectValue placeholder="Tipo de obra" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Tipo de obra</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todos los tipos</SelectItem>
+								{WorkOrderTypeOptions.map((type) => (
+									<SelectItem key={type.value} value={type.value}>
+										{type.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
 
-				<Select
-					onValueChange={(value) => {
-						if (value === "all") {
-							setCompanyId(null)
-						} else {
-							setCompanyId(value)
-						}
-					}}
-					value={companyId ?? "all"}
-				>
-					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
-						<SelectValue placeholder="Empresa" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Empresa</SelectLabel>
-							<SelectSeparator />
-							<SelectItem value="all">Todas las empresas</SelectItem>
-							{companies?.companies?.map((company) => (
-								<SelectItem key={company.id} value={company.id}>
-									{company.name}
-								</SelectItem>
-							))}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
+					<Select
+						onValueChange={(value) => {
+							if (value === "all") {
+								setCompanyId(null)
+							} else {
+								setCompanyId(value)
+							}
+						}}
+						value={companyId ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+							<SelectValue placeholder="Empresa" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Empresa</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todas las empresas</SelectItem>
+								{companies?.companies?.map((company) => (
+									<SelectItem key={company.id} value={company.id}>
+										{company.name}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
 
-				<CalendarDateRangePicker value={dateRange} onChange={setDateRange} />
+					<CalendarDateRangePicker value={dateRange} onChange={setDateRange} />
 
-				<Select
-					onValueChange={(value) => {
-						if (value === "all") {
-							setStatusFilter(null)
-						} else {
-							setStatusFilter(value)
-						}
-					}}
-					value={statusFilter ?? "all"}
-				>
-					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
-						<SelectValue placeholder="Estado" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Estado</SelectLabel>
-							<SelectSeparator />
-							<SelectItem value="all">Todos los estados</SelectItem>
-							{WorkOrderStatusOptions.map((status) => (
-								<SelectItem key={status.value} value={status.value}>
-									{status.label}
-								</SelectItem>
-							))}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
+					<Select
+						onValueChange={(value) => {
+							if (value === "all") {
+								setStatusFilter(null)
+							} else {
+								setStatusFilter(value)
+							}
+						}}
+						value={statusFilter ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+							<SelectValue placeholder="Estado" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Estado</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todos los estados</SelectItem>
+								{WorkOrderStatusOptions.map((status) => (
+									<SelectItem key={status.value} value={status.value}>
+										{status.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
 
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button className="text-text border-input hover:bg-input bg-background ml-auto border">
-							Columnas <ChevronDown />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						{table
-							.getAllColumns()
-							.filter((column) => column.getCanHide())
-							.map((column) => {
-								return (
-									<DropdownMenuCheckboxItem
-										key={column.id}
-										className="capitalize"
-										checked={column.getIsVisible()}
-										onCheckedChange={(value) => column.toggleVisibility(!!value)}
-									>
-										{(column.columnDef.header as string) || column.id}
-									</DropdownMenuCheckboxItem>
-								)
-							})}
-					</DropdownMenuContent>
-				</DropdownMenu>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button className="text-text border-input hover:bg-input bg-background ml-auto border">
+								Columnas <ChevronDown />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{table
+								.getAllColumns()
+								.filter((column) => column.getCanHide())
+								.map((column) => {
+									return (
+										<DropdownMenuCheckboxItem
+											key={column.id}
+											className="capitalize"
+											checked={column.getIsVisible()}
+											onCheckedChange={(value) => column.toggleVisibility(!!value)}
+										>
+											{(column.columnDef.header as string) || column.id}
+										</DropdownMenuCheckboxItem>
+									)
+								})}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 
-				<RefreshButton refetch={refetch} isFetching={isFetching} />
-			</div>
-
-			<Card className="w-full max-w-full rounded-md p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -274,7 +284,7 @@ export function WorkOrderDataTable() {
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
 										<TableCell className="" colSpan={17}>
-											<Skeleton className="h-10 min-w-full" />
+											<Skeleton className="h-16 min-w-full" />
 										</TableCell>
 									</TableRow>
 								))
@@ -293,14 +303,15 @@ export function WorkOrderDataTable() {
 								))}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				isLoading={isLoading}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-			/>
-		</section>
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					className="border-orange-600 text-orange-600"
+				/>
+			</CardContent>
+		</Card>
 	)
 }

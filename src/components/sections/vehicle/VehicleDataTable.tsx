@@ -26,7 +26,7 @@ import { vehicleColumns } from "./vehicle-columns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
 	Table,
 	TableRow,
@@ -146,89 +146,89 @@ export function VehicleDataTable({ companyId }: { companyId: string }) {
 	}
 
 	return (
-		<section className="flex w-full flex-col items-start gap-6">
-			<div className="flex w-full items-center justify-between">
-				<div>
-					<h1 className="text-text text-2xl font-bold">Lista de Vehículos y Equipos</h1>
-					<p className="text-muted-foreground">
-						Visualiza y gestiona todos los vehículos y equipos de tu empresa
-					</p>
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-6">
+				<div className="flex w-full items-center justify-between">
+					<div>
+						<h1 className="text-text text-2xl font-bold">Lista de Vehículos y Equipos</h1>
+						<p className="text-muted-foreground">
+							Visualiza y gestiona todos los vehículos y equipos de tu empresa
+						</p>
+					</div>
+
+					<Button
+						onClick={() => {
+							setEditVehicleId(null)
+							setIsCreateOpen(true)
+						}}
+					>
+						Crear Vehículo/Equipo
+					</Button>
 				</div>
 
-				<Button
-					onClick={() => {
-						setEditVehicleId(null)
-						setIsCreateOpen(true)
-					}}
-				>
-					Crear Vehículo/Equipo
-				</Button>
-			</div>
+				<div className="flex w-full items-center gap-2 sm:flex-row">
+					<Input
+						placeholder="Buscar vehículo..."
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						className="bg-background h-8 w-full sm:w-[300px]"
+					/>
 
-			<div className="flex w-full items-center gap-2 sm:flex-row">
-				<Input
-					placeholder="Buscar vehículo..."
-					value={search}
-					onChange={(event) => setSearch(event.target.value)}
-					className="bg-background h-8 w-full sm:w-[300px]"
-				/>
+					<Select
+						onValueChange={(value) => {
+							if (value === "all") {
+								setTypeFilter(null)
+							} else {
+								setTypeFilter(value)
+							}
+						}}
+						value={typeFilter ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background ml-auto w-full border sm:w-fit">
+							<SelectValue placeholder="Tipo" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Tipo de vehículo</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todos los tipos</SelectItem>
+								{VehicleTypeOptions.map((type) => (
+									<SelectItem key={type.value} value={type.value}>
+										{type.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
 
-				<Select
-					onValueChange={(value) => {
-						if (value === "all") {
-							setTypeFilter(null)
-						} else {
-							setTypeFilter(value)
-						}
-					}}
-					value={typeFilter ?? "all"}
-				>
-					<SelectTrigger className="border-input bg-background ml-auto w-full border sm:w-fit">
-						<SelectValue placeholder="Tipo" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Tipo de vehículo</SelectLabel>
-							<SelectSeparator />
-							<SelectItem value="all">Todos los tipos</SelectItem>
-							{VehicleTypeOptions.map((type) => (
-								<SelectItem key={type.value} value={type.value}>
-									{type.label}
-								</SelectItem>
-							))}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button className="text-text border-input hover:bg-input bg-background border">
+								Columnas <ChevronDown />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{table
+								.getAllColumns()
+								.filter((column) => column.getCanHide())
+								.map((column) => {
+									return (
+										<DropdownMenuCheckboxItem
+											key={column.id}
+											className="capitalize"
+											checked={column.getIsVisible()}
+											onCheckedChange={(value) => column.toggleVisibility(!!value)}
+										>
+											{(column.columnDef.header as string) || column.id}
+										</DropdownMenuCheckboxItem>
+									)
+								})}
+						</DropdownMenuContent>
+					</DropdownMenu>
 
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button className="text-text border-input hover:bg-input bg-background border">
-							Columnas <ChevronDown />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						{table
-							.getAllColumns()
-							.filter((column) => column.getCanHide())
-							.map((column) => {
-								return (
-									<DropdownMenuCheckboxItem
-										key={column.id}
-										className="capitalize"
-										checked={column.getIsVisible()}
-										onCheckedChange={(value) => column.toggleVisibility(!!value)}
-									>
-										{(column.columnDef.header as string) || column.id}
-									</DropdownMenuCheckboxItem>
-								)
-							})}
-					</DropdownMenuContent>
-				</DropdownMenu>
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
+				</div>
 
-				<RefreshButton refetch={refetch} isFetching={isFetching} />
-			</div>
-
-			<Card className="w-full max-w-full rounded-md p-1.5">
 				<Table>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -278,48 +278,48 @@ export function VehicleDataTable({ companyId }: { companyId: string }) {
 						)}
 					</TableBody>
 				</Table>
-			</Card>
 
-			<TablePagination
-				table={table}
-				isLoading={isLoading}
-				onPageChange={setPage}
-				pageCount={data?.pages ?? 0}
-			/>
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+				/>
 
-			<Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-				<SheetContent className="sm:max-w-lg">
-					<SheetHeader>
-						<SheetTitle>
-							{editVehicleId ? "Editar Vehículo/Equipo" : "Crear Vehículo/Equipo"}
-						</SheetTitle>
-						<SheetDescription>
-							{editVehicleId
-								? "Actualiza la información del vehículo/equipo"
-								: "Puede crear un vehículo o equipo, solo el campo de modelo/nombre es obligatorio"}
-						</SheetDescription>
-					</SheetHeader>
+				<Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+					<SheetContent className="sm:max-w-lg">
+						<SheetHeader>
+							<SheetTitle>
+								{editVehicleId ? "Editar Vehículo/Equipo" : "Crear Vehículo/Equipo"}
+							</SheetTitle>
+							<SheetDescription>
+								{editVehicleId
+									? "Actualiza la información del vehículo/equipo"
+									: "Puede crear un vehículo o equipo, solo el campo de modelo/nombre es obligatorio"}
+							</SheetDescription>
+						</SheetHeader>
 
-					<div className="grid gap-4 px-4 py-4">
-						<CreateVehicleForm
-							vehicleId={editVehicleId}
-							companyId={companyId}
-							onSuccess={() => {
-								setIsCreateOpen(false)
-								queryClient.invalidateQueries({
-									queryKey: ["vehicles"],
-								})
-								if (editVehicleId) {
+						<div className="grid gap-4 px-4 py-4">
+							<CreateVehicleForm
+								vehicleId={editVehicleId}
+								companyId={companyId}
+								onSuccess={() => {
+									setIsCreateOpen(false)
 									queryClient.invalidateQueries({
-										queryKey: ["vehicle", { vehicleId: editVehicleId }],
+										queryKey: ["vehicles"],
 									})
-								}
-							}}
-						/>
-					</div>
-				</SheetContent>
-			</Sheet>
-		</section>
+									if (editVehicleId) {
+										queryClient.invalidateQueries({
+											queryKey: ["vehicle", { vehicleId: editVehicleId }],
+										})
+									}
+								}}
+							/>
+						</div>
+					</SheetContent>
+				</Sheet>
+			</CardContent>
+		</Card>
 	)
 }
 

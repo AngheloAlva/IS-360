@@ -56,6 +56,7 @@ import {
 } from "@/components/ui/sheet"
 
 import type { Company } from "@/hooks/companies/use-companies"
+import { Button } from "@/components/ui/button"
 
 export default function CreateWorkOrderForm(): React.ReactElement {
 	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
@@ -391,10 +392,21 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							setSelectedFileIndex={setSelectedFileIndex}
 						/>
 
+						<Button
+							size="lg"
+							type="button"
+							variant={"outline"}
+							disabled={isSubmitting}
+							onClick={() => setOpen(false)}
+							className="mt-4 w-full cursor-pointer border-2 border-orange-800 font-bold tracking-wide text-orange-800 transition-all hover:scale-105 hover:bg-orange-800"
+						>
+							Cancelar
+						</Button>
+
 						<SubmitButton
 							label="Crear Nueva OT"
-							className="sm:col-span-2"
 							isSubmitting={isSubmitting}
+							className="bg-orange-600 hover:bg-orange-600"
 						/>
 					</form>
 				</Form>

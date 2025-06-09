@@ -35,28 +35,32 @@ export default async function MaintenancePlansPage({
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="flex items-start justify-between gap-4 md:flex-row">
-				<div className="flex items-start gap-2">
-					<BackButton href="/admin/dashboard/planes-de-mantenimiento" className="mt-1 min-w-fit" />
+			<div className="rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 p-6 shadow-lg">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<BackButton
+							href="/admin/dashboard/planes-de-mantenimiento"
+							className="bg-white/10 text-white hover:bg-white/10"
+						/>
 
-					<div className="flex flex-col gap-1">
-						<h1 className="text-text w-fit text-3xl font-bold capitalize">
-							{maintenancePlanSlug.replaceAll("-", " ")}
-						</h1>
-						<p className="text-text w-fit text-sm sm:text-base">
-							En esta sección puedes gestionar las tareas de mantenimiento del plan de
-							mantenimiento: {maintenancePlanSlug.replaceAll("-", " ")}.
-						</p>
+						<div>
+							<h1 className="text-3xl font-bold tracking-tight capitalize">
+								{maintenancePlanSlug.replaceAll("-", " ")}
+							</h1>
+							<p className="opacity-90">
+								Gestión y seguimiento de tareas de mantenimiento preventivo
+							</p>
+						</div>
 					</div>
-				</div>
 
-				{hasPermission.success && (
-					<MaintenancePlanTaskForm
-						userId={session.user.id}
-						equipmentId={equipmentId}
-						maintenancePlanSlug={maintenancePlanSlug}
-					/>
-				)}
+					{hasPermission.success && (
+						<MaintenancePlanTaskForm
+							userId={session.user.id}
+							equipmentId={equipmentId}
+							maintenancePlanSlug={maintenancePlanSlug}
+						/>
+					)}
+				</div>
 			</div>
 
 			<MaintenancePlanTaskDataTable planSlug={maintenancePlanSlug} />

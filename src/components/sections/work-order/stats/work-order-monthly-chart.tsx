@@ -40,7 +40,7 @@ export function WorkOrderMonthlyChart({ data }: WorkOrderMonthlyChartProps) {
 	})
 
 	return (
-		<Card className="border-none shadow-md">
+		<Card className="border-none">
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>

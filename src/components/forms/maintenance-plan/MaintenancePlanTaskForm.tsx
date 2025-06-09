@@ -1,8 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { PlusCircleIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { Plus } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -118,10 +118,12 @@ export default function MaintenancePlanTaskForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
-				<Button size={"lg"} className="bg-primary hover:bg-primary/80 text-white">
-					<Plus />
-					Tarea
-					<span className="hidden sm:inline"> de Mantenimiento</span>
+				<Button
+					size={"lg"}
+					className="gap-1.5 bg-white text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600"
+				>
+					<PlusCircleIcon className="size-4" />
+					Tarea de Mantenimiento
 				</Button>
 			</SheetTrigger>
 
