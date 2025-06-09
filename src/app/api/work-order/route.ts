@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
 			prisma.workOrder.count({
 				where: filter,
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),

@@ -96,6 +96,11 @@ export const auth = betterAuth({
 				nullable: true,
 				input: true,
 			},
+			isActive: {
+				type: "boolean",
+				required: false,
+				input: false,
+			},
 		},
 	},
 	plugins: [

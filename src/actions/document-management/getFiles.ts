@@ -9,8 +9,7 @@ export const getFileById = async (id: string) => {
 				id,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
 					createdAt: "desc",
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
 						: {}),
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),

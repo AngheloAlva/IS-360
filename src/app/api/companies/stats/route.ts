@@ -185,7 +185,7 @@ export async function GET() {
 		// Filtrar solo empresas que tengan documentos y ordenar por porcentaje pendiente descendente
 		const documentReviewProgressData = documentProgressByCompany
 			.filter((item) => item.total > 0)
-			.sort((a, b) => (b.pending / b.total) - (a.pending / a.total))
+			.sort((a, b) => b.pending / b.total - a.pending / a.total)
 			.slice(0, 10) // Limitar a las 10 empresas con más pendientes
 
 		// 3. Distribución de Órdenes de Trabajo por Estado
@@ -202,38 +202,41 @@ export async function GET() {
 			},
 			where: {
 				workOrders: {
-					some: {} // Asegura que solo se devuelvan empresas con órdenes de trabajo
-				}
+					some: {}, // Asegura que solo se devuelvan empresas con órdenes de trabajo
+				},
 			},
 		})
 
 		// Procesar datos para el formato del gráfico
-		const workOrderStatusData = workOrdersData.map((company) => {
-			const planned = company.workOrders.filter((wo) => wo.status === "PLANNED").length
-			const inProgress = company.workOrders.filter((wo) => wo.status === "IN_PROGRESS").length
-			const completed = company.workOrders.filter((wo) => wo.status === "COMPLETED").length
-			const cancelled = company.workOrders.filter(
-				(wo) => wo.status === "CANCELLED"
-			).length
+		const workOrderStatusData = workOrdersData
+			.map((company) => {
+				const planned = company.workOrders.filter((wo) => wo.status === "PLANNED").length
+				const inProgress = company.workOrders.filter((wo) => wo.status === "IN_PROGRESS").length
+				const completed = company.workOrders.filter((wo) => wo.status === "COMPLETED").length
+				const cancelled = company.workOrders.filter((wo) => wo.status === "CANCELLED").length
 
-			return {
-				company: company.name,
-				planned,
-				inProgress,
-				completed,
-				cancelled,
-			}
-		})
+				return {
+					company: company.name,
+					planned,
+					inProgress,
+					completed,
+					cancelled,
+				}
+			})
 			// Ordenar por total de órdenes de trabajo descendente
-			.sort((a, b) => (
-				(b.planned + b.inProgress + b.completed + b.cancelled) -
-				(a.planned + a.inProgress + a.completed + a.cancelled)
-			))
+			.sort(
+				(a, b) =>
+					b.planned +
+					b.inProgress +
+					b.completed +
+					b.cancelled -
+					(a.planned + a.inProgress + a.completed + a.cancelled)
+			)
 			.slice(0, 10) // Limitar a las 10 empresas con más órdenes
 
 		// 4. Actividad de Entrada de Trabajo (WorkEntry) por día para los últimos 30 días
 		const thirtyDaysAgo = subDays(new Date(), 30)
-		
+
 		// Buscar todas las entradas de trabajo de los últimos 30 días
 		const workEntries = await prisma.workEntry.findMany({
 			select: {
@@ -261,15 +264,15 @@ export async function GET() {
 
 		// Agrupar por fecha y empresa
 		const workEntryMap = new Map()
-		
+
 		workEntries.forEach((entry) => {
 			if (!entry.workOrder?.company) return
-			
+
 			const date = entry.createdAt.toISOString().split("T")[0] // formato YYYY-MM-DD
 			const companyId = entry.workOrder.company.id
 			const companyName = entry.workOrder.company.name
 			const key = `${date}-${companyId}`
-			
+
 			if (workEntryMap.has(key)) {
 				workEntryMap.get(key).count += 1
 			} else {
@@ -277,11 +280,11 @@ export async function GET() {
 					date,
 					companyId,
 					companyName,
-					count: 1
+					count: 1,
 				})
 			}
 		})
-		
+
 		const workEntryActivityData = Array.from(workEntryMap.values())
 
 		// Top empresas por órdenes de trabajo activas

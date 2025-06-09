@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 		const [companies, total, safetyTalks] = await Promise.all([
 			prisma.company.findMany({
 				where: {
+					isActive: true,
 					...(search
 						? {
 								OR: [
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
 				skip,
 				take: limit,
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
 						: {}),
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),
@@ -87,7 +88,7 @@ export async function GET(req: NextRequest) {
 					isPresential: true,
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),

@@ -1,10 +1,11 @@
 "use client"
 
-import { ArrowUpDown, ChevronRight } from "lucide-react"
+import { ArrowUpDown, EyeIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import Link from "next/link"
 
+import DeleteCompanyDialog from "@/components/forms/admin/company/DeleteCompany"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import type { Company } from "@/hooks/companies/use-companies"
@@ -89,13 +90,16 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 			const id = row.original.id
 
 			return (
-				<Link
-					href={`/admin/dashboard/empresas/${id}`}
-					className="text-primary flex items-center border-transparent bg-transparent tracking-wider shadow-none hover:underline"
-				>
-					Ver más
-					<ChevronRight className="mt-0.5 h-4 w-4" />
-				</Link>
+				<div className="flex items-center gap-2">
+					<Link
+						href={`/admin/dashboard/empresas/${id}`}
+						className="flex size-8 items-center justify-center rounded-lg bg-blue-500 tracking-wider text-white transition-all hover:scale-105 hover:bg-blue-600"
+					>
+						<EyeIcon className="size-4" />
+					</Link>
+
+					<DeleteCompanyDialog companyId={id} />
+				</div>
 			)
 		},
 	},

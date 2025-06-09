@@ -15,8 +15,7 @@ export async function GET() {
 				},
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

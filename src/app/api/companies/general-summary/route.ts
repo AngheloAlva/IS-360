@@ -5,8 +5,7 @@ export async function GET() {
 	try {
 		const totalCompanies = await prisma.company.count({
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

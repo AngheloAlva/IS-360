@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
 		const skip = (page - 1) * limit
 
 		const whereClause: Prisma.VehicleWhereInput = {
+			isActive: true,
 			companyId: session.user.companyId,
 		}
 

@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
 
 		const where = {
 			accessRole: USER_ROLE.ADMIN,
+			isActive: true,
 			...(showOnlyInternal ? { internal: { not: true } } : {}),
 			...(search
 				? {

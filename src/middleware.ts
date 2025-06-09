@@ -19,7 +19,10 @@ export default async function authMiddleware(request: NextRequest) {
 		return NextResponse.redirect(new URL("/auth/login", request.url))
 	}
 
-	// Proteger rutas de administrador
+	if (!session.user.isActive) {
+		return NextResponse.redirect(new URL("/"))
+	}
+
 	if (request.nextUrl.pathname.startsWith("/admin/dashboard")) {
 		if (session.user.accessRole === "PARTNER_COMPANY") {
 			return NextResponse.redirect(new URL("/dashboard/inicio", request.url))

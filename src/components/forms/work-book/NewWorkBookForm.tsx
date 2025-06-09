@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { PlusIcon } from "lucide-react"
 import { es } from "date-fns/locale"
@@ -49,6 +48,7 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/components/ui/sheet"
+import { queryClient } from "@/lib/queryClient"
 
 interface WorkBookFormProps {
 	userId: string
@@ -62,8 +62,6 @@ export default function NewWorkBookForm({
 	const [loading, setLoading] = useState<boolean>(false)
 	const [workOrderSelected, setWorkOrderSelected] = useState<WorkBookByCompany | null>(null)
 	const [open, setOpen] = useState(false)
-
-	const router = useRouter()
 
 	const form = useForm<WorkBookSchema>({
 		resolver: zodResolver(workBookSchema),
@@ -122,10 +120,12 @@ export default function NewWorkBookForm({
 					duration: 5000,
 				})
 
+				queryClient.invalidateQueries({
+					queryKey: ["work-books", { companyId, onlyBooks: true }],
+				})
 				form.reset()
 				setOpen(false)
 				setWorkOrderSelected(null)
-				router.refresh()
 			} else {
 				toast.error("Error al actualizar el libro de obras", {
 					description: message,

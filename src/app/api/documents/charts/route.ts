@@ -237,7 +237,7 @@ export async function GET() {
 							},
 							isActive: true,
 						},
-						cacheStrategy: { ttl: 120, swr: 10 },
+						cacheStrategy: { ttl: 120 },
 					}),
 					// Folders created on this day
 					prisma.folder.count({
@@ -248,7 +248,7 @@ export async function GET() {
 							},
 							isActive: true,
 						},
-						cacheStrategy: { ttl: 120, swr: 10 },
+						cacheStrategy: { ttl: 120 },
 					}),
 				])
 
@@ -269,7 +269,7 @@ export async function GET() {
 							lt: addDays(new Date(date), 1),
 						},
 					},
-					cacheStrategy: { ttl: 120, swr: 10 },
+					cacheStrategy: { ttl: 120 },
 				})
 				return { date, changes: count }
 			})

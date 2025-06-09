@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/sheet"
 
 import type { ApiUser } from "@/types/user"
+import { Button } from "@/components/ui/button"
 
 interface InternalUserFormProps {
 	initialData?: ApiUser
@@ -272,11 +273,23 @@ export default function InternalUserFormSheet({
 							/>
 						</div>
 
-						<SubmitButton
-							isSubmitting={loading}
-							label={initialData ? "Actualizar Usuario" : "Crear Usuario"}
-							className="hover:bg-primary mt-5 hover:text-white hover:brightness-90 sm:col-span-2"
-						/>
+						<div className="flex w-full items-center justify-center gap-2">
+							<Button
+								size="lg"
+								type="button"
+								variant="outline"
+								onClick={() => setOpen(false)}
+								className="mt-5 w-1/2 border-2 border-indigo-600 font-medium tracking-wider text-indigo-600 transition-all hover:scale-105 hover:bg-indigo-600 hover:text-white"
+							>
+								Cancelar
+							</Button>
+
+							<SubmitButton
+								isSubmitting={loading}
+								className="mt-5 w-1/2 bg-purple-500 hover:bg-purple-600"
+								label={initialData ? "Actualizar Usuario" : "Crear Usuario"}
+							/>
+						</div>
 					</form>
 				</Form>
 			</SheetContent>

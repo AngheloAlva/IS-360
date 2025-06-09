@@ -107,8 +107,7 @@ export async function GET(req: NextRequest) {
 			skip,
 			take: limit,
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

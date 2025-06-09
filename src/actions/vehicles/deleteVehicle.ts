@@ -55,9 +55,12 @@ export const deleteVehicle = async ({ vehicleId, companyId }: DeleteVehicleProps
 			})
 
 			// Finalmente eliminar el vehículo
-			await tx.vehicle.delete({
+			await tx.vehicle.update({
 				where: {
 					id: vehicleId,
+				},
+				data: {
+					isActive: false,
 				},
 			})
 		})

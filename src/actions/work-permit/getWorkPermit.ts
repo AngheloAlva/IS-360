@@ -14,8 +14,7 @@ export const getWorkPermit = async (workPermitId: string) => {
 				preventionOfficerUser: true,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -58,8 +57,7 @@ export const getWorkPermits = async (userId: string, limit: number = 10, page: n
 			take: limit,
 			skip: offset,
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

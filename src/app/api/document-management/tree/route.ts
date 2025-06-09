@@ -43,8 +43,7 @@ export async function GET(request: NextRequest) {
 				name: "asc",
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -64,8 +63,7 @@ export async function GET(request: NextRequest) {
 				name: "asc",
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

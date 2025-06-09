@@ -11,8 +11,7 @@ export const getUsers = async (limit: number, page: number) => {
 				createdAt: "desc",
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -37,8 +36,7 @@ export const getUsersByCompanyId = async (companyId: string) => {
 				companyId,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -63,8 +61,7 @@ export const getUserById = async (userId: string) => {
 				id: userId,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -96,8 +93,7 @@ export const getOtcUsers = async (limit: number, page: number) => {
 				createdAt: "desc",
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -129,8 +125,7 @@ export const getUsersByWorkOrderId = async (workOrderId: string) => {
 				id: true,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 
@@ -146,8 +141,7 @@ export const getUsersByWorkOrderId = async (workOrderId: string) => {
 				companyId: company.id,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

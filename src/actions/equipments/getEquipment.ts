@@ -8,8 +8,7 @@ export const getEquipment = async (limit: number = 10, page: number = 1) => {
 			take: limit,
 			skip: (page - 1) * limit,
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

@@ -12,8 +12,7 @@ export async function getActiveWorkers() {
 				user: true,
 			},
 			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
+				ttl: 10,
 			},
 		})
 

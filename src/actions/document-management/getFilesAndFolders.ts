@@ -17,7 +17,6 @@ export async function getFilesAndFolders(area: AREAS, folderSlug: string | null 
 			},
 			cacheStrategy: {
 				ttl: 60,
-				swr: 10,
 			},
 		})
 
@@ -30,7 +29,6 @@ export async function getFilesAndFolders(area: AREAS, folderSlug: string | null 
 			},
 			cacheStrategy: {
 				ttl: 60,
-				swr: 10,
 			},
 		})
 

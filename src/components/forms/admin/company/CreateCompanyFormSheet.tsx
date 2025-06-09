@@ -402,13 +402,24 @@ export default function CreateCompanyFormSheet(): React.ReactElement {
 							</TabsContent>
 						</Tabs>
 
-						<Separator className="my-2" />
+						<Separator className="my-4" />
 
-						<SubmitButton
-							label="Crear empresa"
-							isSubmitting={loading}
-							className="hover:bg-primary/80 hover:text-white"
-						/>
+						<div className="flex w-full items-center justify-center gap-2">
+							<Button
+								size="lg"
+								variant="outline"
+								onClick={() => setOpen(false)}
+								className="w-1/2 border-2 border-indigo-600 font-medium tracking-wider text-indigo-600 transition-all hover:scale-105 hover:bg-indigo-600 hover:text-white"
+							>
+								Cancelar
+							</Button>
+
+							<SubmitButton
+								label="Crear empresa"
+								isSubmitting={loading}
+								className="w-1/2 bg-blue-600 hover:bg-blue-700"
+							/>
+						</div>
 					</form>
 				</Form>
 			</SheetContent>

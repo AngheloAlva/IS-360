@@ -5,16 +5,16 @@ export async function GET() {
 	try {
 		const [totalVehicles, vehiclesByType, mainVehicles] = await Promise.all([
 			prisma.vehicle.count({
-				cacheStrategy: { ttl: 60, swr: 10 },
+				cacheStrategy: { ttl: 10 },
 			}),
 			prisma.vehicle.groupBy({
 				by: ["type"],
 				_count: true,
-				cacheStrategy: { ttl: 60, swr: 10 },
+				cacheStrategy: { ttl: 10 },
 			}),
 			prisma.vehicle.count({
 				where: { isMain: { equals: true } },
-				cacheStrategy: { ttl: 60, swr: 10 },
+				cacheStrategy: { ttl: 10 },
 			}),
 		])
 

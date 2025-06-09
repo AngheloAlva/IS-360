@@ -65,6 +65,7 @@ model User {
   internal         Boolean   @default(false)
   documentAreas    AREAS[]   @default([])
   internalArea     String?
+  isActive         Boolean   @default(true)
 
   sessions                       Session[]
   accounts                       Account[]
@@ -167,10 +168,11 @@ model Account {
 }
 
 model Company {
-  id    String  @id @default(cuid())
-  name  String
-  rut   String
-  image String?
+  id       String  @id @default(cuid())
+  name     String
+  rut      String
+  image    String?
+  isActive Boolean @default(true)
 
   users          User[]
   workOrders     WorkOrder[]
@@ -199,13 +201,14 @@ enum VEHICLE_TYPE {
 model Vehicle {
   id String @id @default(cuid())
 
-  plate  String?
-  model  String?
-  year   Int?
-  brand  String?
-  type   VEHICLE_TYPE?
-  color  String?
-  isMain Boolean       @default(false)
+  plate    String?
+  model    String?
+  year     Int?
+  brand    String?
+  type     VEHICLE_TYPE?
+  color    String?
+  isMain   Boolean       @default(false)
+  isActive Boolean       @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

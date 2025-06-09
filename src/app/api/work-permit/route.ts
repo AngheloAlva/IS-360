@@ -107,14 +107,14 @@ export async function GET(req: NextRequest) {
 					createdAt: "desc",
 				},
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),
 			prisma.workPermit.count({
 				where: filter,
 				cacheStrategy: {
-					ttl: 60,
+					ttl: 10,
 					swr: 10,
 				},
 			}),

@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/select"
 
 import type { ApiUser } from "@/types/user"
+import DeleteUserDialog from "@/components/forms/admin/user/DeleteUser"
 
 export function UsersDataTable({ hasPermission }: { hasPermission: boolean }) {
 	const [page, setPage] = useState(1)
@@ -153,8 +154,9 @@ export function UsersDataTable({ hasPermission }: { hasPermission: boolean }) {
 										))}
 
 										{hasPermission && (
-											<TableCell>
+											<TableCell className="flex items-center gap-2">
 												<InternalUserFormSheet initialData={row.original} />
+												<DeleteUserDialog userId={row.original.id} />
 											</TableCell>
 										)}
 									</TableRow>

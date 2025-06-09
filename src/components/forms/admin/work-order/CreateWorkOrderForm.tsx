@@ -398,7 +398,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							variant={"outline"}
 							disabled={isSubmitting}
 							onClick={() => setOpen(false)}
-							className="mt-4 w-full cursor-pointer border-2 border-orange-800 font-bold tracking-wide text-orange-800 transition-all hover:scale-105 hover:bg-orange-800"
+							className="w-full cursor-pointer border-2 border-orange-800 font-bold tracking-wide text-orange-800 transition-all hover:scale-105 hover:bg-orange-800"
 						>
 							Cancelar
 						</Button>
