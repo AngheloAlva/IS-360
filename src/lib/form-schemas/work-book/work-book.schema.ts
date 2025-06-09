@@ -3,10 +3,7 @@ import { z } from "zod"
 export const workBookSchema = z.object({
 	userId: z.string().nonempty(),
 	workOrderId: z.string().nonempty({ message: "Debe seleccionar un número de OT" }),
-	workLocation: z
-		.string()
-		.nonempty({ message: "La ubicación de la obra no puede estar vacía" })
-		.min(1),
+	workLocation: z.string().optional(),
 	workStartDate: z.date({ message: "La fecha de inicio no es válida" }),
 	workName: z.string().nonempty({ message: "El nombre de la obra no puede estar vacío" }),
 })
