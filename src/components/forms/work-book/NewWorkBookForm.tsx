@@ -144,6 +144,10 @@ export default function NewWorkBookForm({
 		}
 	}
 
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
+
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
