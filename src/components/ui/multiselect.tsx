@@ -603,7 +603,17 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 																		"pointer-events-none cursor-not-allowed opacity-50"
 																)}
 															>
-																{option.label}
+																{option.label.split("*").map((label, index) => (
+																	<span
+																		key={index}
+																		className={cn({
+																			"font-medium": index === 0,
+																			"text-xs text-blue-500": index === 1,
+																		})}
+																	>
+																		{label}
+																	</span>
+																))}
 															</CommandItem>
 														)
 													})}

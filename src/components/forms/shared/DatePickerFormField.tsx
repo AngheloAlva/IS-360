@@ -44,7 +44,7 @@ export function DatePickerFormField<T extends FieldValues>({
 			name={name}
 			control={control}
 			render={({ field }) => (
-				<FormItem className={itemClassName}>
+				<FormItem className={cn("content-start", itemClassName)}>
 					<FormLabel className="gap-1">
 						{label}
 						{optional && <span className="text-muted-foreground"> (opcional)</span>}

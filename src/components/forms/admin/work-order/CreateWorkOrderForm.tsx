@@ -31,6 +31,7 @@ import { Separator } from "@/components/ui/separator"
 import SubmitButton from "../../shared/SubmitButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import SafetyTalksInfo from "./SafetyTalksInfo"
+import { Button } from "@/components/ui/button"
 import {
 	Form,
 	FormItem,
@@ -56,7 +57,6 @@ import {
 } from "@/components/ui/sheet"
 
 import type { Company } from "@/hooks/companies/use-companies"
-import { Button } from "@/components/ui/button"
 
 export default function CreateWorkOrderForm(): React.ReactElement {
 	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
@@ -64,9 +64,9 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
-	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
-	const { data: usersData } = useUsers({ limit: 100, search: "oleotrasandino" })
-	const { data: equipmentsData } = useEquipments({ limit: 100 })
+	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 1000 })
+	const { data: usersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
+	const { data: equipmentsData } = useEquipments({ limit: 1000 })
 
 	const router = useRouter()
 
@@ -161,7 +161,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 				<span className="hidden sm:inline">Nueva Orden de Trabajo</span>
 			</SheetTrigger>
 
-			<SheetContent className="gap-0 sm:max-w-xl">
+			<SheetContent className="gap-0 sm:max-w-2xl">
 				<SheetHeader className="shadow">
 					<SheetTitle>Nueva Orden de Trabajo</SheetTitle>
 					<SheetDescription>
@@ -244,7 +244,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							options={
 								equipmentsData?.equipments.map((equipment) => ({
 									value: equipment.id,
-									label: equipment.name,
+									label: equipment.name + "* (" + equipment.location + ")",
 								})) ?? []
 							}
 							control={form.control}

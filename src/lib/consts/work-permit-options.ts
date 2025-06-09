@@ -21,7 +21,7 @@ export const WorkWillBeOptions: Option[] = [
 export const ToolsOptions: Option[] = [
 	{ value: "Iluminacion Portatil", label: "Iluminacion Portatil" },
 	{ value: "Soldadora", label: "Soldadora" },
-	{ value: "Galleta", label: "Galleta" },
+	{ value: "Galletera", label: "Galletera" },
 	{ value: "Compresor", label: "Compresor" },
 	{ value: "Bomba", label: "Bomba" },
 	{ value: "Eq. Medicion Tension", label: "Eq. Medicion Tension" },
