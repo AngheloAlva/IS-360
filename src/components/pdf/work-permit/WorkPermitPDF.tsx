@@ -61,13 +61,20 @@ const styles = StyleSheet.create({
 		padding: 5,
 		marginBottom: 5,
 	},
-	customField: {
+	customLargeField: {
 		borderBottomWidth: 1,
 		borderBottomStyle: "dotted",
 		borderBottomColor: "#000",
 		padding: 5,
-		height: 25,
+		height: 35,
 		marginBottom: 5,
+	},
+	customField: {
+		borderBottomWidth: 1,
+		borderBottomStyle: "dotted",
+		borderBottomColor: "#000",
+		height: 5,
+		padding: 5,
 	},
 	signatureBox: {
 		height: 80,
@@ -124,7 +131,58 @@ const styles = StyleSheet.create({
 	checkBoxRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		marginBottom: 3,
+		marginVertical: 3,
+	},
+	table: {
+		display: "flex",
+		width: "100%",
+		borderWidth: 1,
+		borderColor: "#000",
+		marginVertical: 10,
+	},
+	tableRow: {
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		borderColor: "#000",
+	},
+	tableCol: {
+		borderStyle: "solid",
+		borderRightWidth: 1,
+		borderColor: "#000",
+		padding: 5,
+	},
+	tableHeader: {
+		backgroundColor: "#f0f0f0",
+		fontWeight: "bold",
+		textAlign: "center",
+		padding: 5,
+	},
+	tableCell: {
+		padding: 5,
+		textAlign: "center",
+	},
+	measurementCol: {
+		width: "25%",
+		height: 35,
+		borderStyle: "solid",
+		borderRightWidth: 1,
+		borderColor: "#000",
+	},
+	lastCol: {
+		borderRightWidth: 0,
+	},
+	participantsTable: {
+		display: "flex",
+		width: "100%",
+		borderWidth: 1,
+		borderColor: "#000",
+		marginTop: 10,
+	},
+	participantsCol: {
+		flex: 1,
+		borderStyle: "solid",
+		borderRightWidth: 1,
+		borderColor: "#000",
 	},
 })
 
@@ -145,9 +203,6 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 	const preventiveControlMeasuresString = Array.isArray(workPermit.preventiveControlMeasures)
 		? workPermit.preventiveControlMeasures.join(", ")
 		: workPermit.preventiveControlMeasures
-	const participantsString = Array.isArray(workPermit.participants)
-		? workPermit.participants.map((participant) => participant.name).join(", ")
-		: workPermit.participants
 
 	return (
 		<Document>
@@ -165,7 +220,6 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						<Text>
 							Fecha de vencimiento: {format(workPermit.endDate, "dd/MM/yyyy", { locale: es })}
 						</Text>
-						<Text>N° PT: {workPermit.id.substring(0, 8).toUpperCase()}</Text>
 					</View>
 				</View>
 
@@ -179,14 +233,14 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>N°:</Text>
+								<Text style={styles.label}>OT N°:</Text>
 								<Text style={styles.value}>{workPermit.otNumber.otNumber}</Text>
 							</View>
 						</View>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Trabajo:</Text>
-								<Text style={styles.value}>{workPermit.otNumber.workName}</Text>
+								<Text style={styles.label}>Supervisor:</Text>
+								<Text style={styles.value}>Supervisor OTC</Text>
 							</View>
 						</View>
 					</View>
@@ -194,14 +248,18 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Empresa:</Text>
-								<Text style={styles.value}>{workPermit.company.name}</Text>
+								<Text style={styles.label}>Trabajo:</Text>
+								<Text style={styles.value}>{workPermit.otNumber.workName}</Text>
 							</View>
 						</View>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>RUT Empresa:</Text>
-								<Text style={styles.value}>{workPermit.company.rut}</Text>
+								<Text style={styles.label}>Cargo del solicitante:</Text>
+								<Text style={styles.value}>{workPermit.user.internalRole || ""}</Text>
+							</View>
+							<View style={styles.row}>
+								<Text style={styles.label}>Adm. contrato OTC:</Text>
+								<View style={styles.customField}></View>
 							</View>
 						</View>
 					</View>
@@ -289,9 +347,51 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					workPermit.workWillBe === "En Caliente" ? (
 						<View style={styles.row}>
 							<View style={styles.column}>
-								<View style={styles.row}>
-									<Text style={styles.label}>Medicion inicial del area:</Text>
-									<View style={styles.customField}></View>
+								<Text style={styles.label}>Medición inicial del área:</Text>
+
+								<View style={styles.table}>
+									<View style={styles.tableRow}>
+										<View style={[styles.tableCol, styles.tableHeader, styles.measurementCol]}>
+											<Text>O2</Text>
+										</View>
+										<View style={[styles.tableCol, styles.tableHeader, styles.measurementCol]}>
+											<Text>LEL</Text>
+										</View>
+										<View style={[styles.tableCol, styles.tableHeader, styles.measurementCol]}>
+											<Text>CO</Text>
+										</View>
+										<View
+											style={[
+												styles.tableCol,
+												styles.tableHeader,
+												styles.measurementCol,
+												styles.lastCol,
+											]}
+										>
+											<Text>H2S</Text>
+										</View>
+									</View>
+									<View style={styles.tableRow}>
+										<View style={[styles.tableCol, styles.measurementCol, { height: 55 }]}>
+											<Text></Text>
+										</View>
+										<View style={[styles.tableCol, styles.measurementCol, { height: 55 }]}>
+											<Text></Text>
+										</View>
+										<View style={[styles.tableCol, styles.measurementCol, { height: 55 }]}>
+											<Text></Text>
+										</View>
+										<View
+											style={[
+												styles.tableCol,
+												styles.measurementCol,
+												styles.lastCol,
+												{ height: 55 },
+											]}
+										>
+											<Text></Text>
+										</View>
+									</View>
 								</View>
 							</View>
 						</View>
@@ -423,15 +523,8 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 
 					<View style={styles.row}>
 						<View style={styles.column}>
-							<Text style={styles.label}>Quién entrega el área de trabajo (OTP):</Text>
-							<View style={styles.customField}></View>
-						</View>
-					</View>
-
-					<View style={styles.row}>
-						<View style={styles.column}>
-							<Text style={styles.label}>Trabajador ejecutor:</Text>
-							<View style={styles.customField}></View>
+							<Text style={styles.label}>Quién entrega el área de trabajo:</Text>
+							<View style={styles.customLargeField}></View>
 						</View>
 					</View>
 
@@ -464,21 +557,54 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<Text style={styles.label}>Observaciones:</Text>
-							<View style={styles.customField}>{workPermit.observations}</View>
+							<View style={styles.customLargeField}>{workPermit.observations}</View>
 						</View>
 					</View>
 
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<Text style={styles.label}>Participantes:</Text>
-							<View style={styles.customField}>{participantsString}</View>
+
+							<View style={styles.participantsTable}>
+								<View style={styles.tableRow}>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>Nombre completo</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>RUT</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>Cargo</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader, styles.lastCol]}>
+										<Text>Firma</Text>
+									</View>
+								</View>
+								{Array.isArray(workPermit.participants) &&
+									workPermit.participants.map((participant, index) => (
+										<View style={styles.tableRow} key={index}>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}>{participant.name}</Text>
+											</View>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}>{participant.rut}</Text>
+											</View>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}>{participant.internalRole || ""}</Text>
+											</View>
+											<View style={[styles.participantsCol, styles.lastCol]}>
+												<Text style={styles.tableCell}></Text>
+											</View>
+										</View>
+									))}
+							</View>
 						</View>
 					</View>
 
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<Text style={styles.label}>Observaciones adicionales:</Text>
-							<View style={[styles.customField, { height: 50 }]}></View>
+							<View style={[styles.customLargeField]}></View>
 						</View>
 					</View>
 				</View>
@@ -494,13 +620,13 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
 						<Text style={styles.signatureLabel}>Firma Prevención</Text>
-						<Text style={styles.signatureLabel}>{"Oficial de prevención"}</Text>
+						<Text style={styles.signatureLabel}>Prevención Riesgos OTC</Text>
 					</View>
 
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
 						<Text style={styles.signatureLabel}>Firma Supervisor</Text>
-						<Text style={styles.signatureLabel}>Supervisor autorizado</Text>
+						<Text style={styles.signatureLabel}>Operador OTC</Text>
 					</View>
 				</View>
 

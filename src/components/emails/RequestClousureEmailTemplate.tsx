@@ -123,7 +123,7 @@ export const RequestClousureEmailTemplate: React.FC<Readonly<RequestClosureEmail
 
 						<Section className="mb-[32px] text-center">
 							<Button
-								href={`${systemUrl}/admin/dashboard/libros-de-obras/${workOrderId}`}
+								href={`${systemUrl}/admin/dashboard/ordenes-de-trabajo/${workOrderId}`}
 								className="box-input rounded-[4px] bg-blue-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
 							>
 								Revisar Solicitud

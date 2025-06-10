@@ -28,7 +28,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 
 			return (
 				<Link
-					href={`/admin/dashboard/libros-de-obras/${id}`}
+					href={`/admin/dashboard/ordenes-de-trabajo/${id}`}
 					className="font-semibold text-orange-600 hover:underline"
 				>
 					{row.getValue("otNumber")}

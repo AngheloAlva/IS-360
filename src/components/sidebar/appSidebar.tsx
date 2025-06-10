@@ -99,14 +99,9 @@ const data = {
 			icon: FileText,
 		},
 		{
-			name: "Ordenes de Trabajo",
+			name: "OT / Libros de Obras",
 			url: "/admin/dashboard/ordenes-de-trabajo",
 			icon: LayoutList,
-		},
-		{
-			name: "Libros de Obras",
-			url: "/admin/dashboard/libros-de-obras",
-			icon: BookCopy,
 		},
 		{
 			name: "Planes de Mantenimiento",
