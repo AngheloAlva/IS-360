@@ -2,33 +2,22 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 
-import { USER_ROLE } from "@prisma/client"
-import { cn } from "@/lib/utils"
-
-import { Badge } from "@/components/ui/badge"
-
 import type { UsersByCompany } from "@/hooks/users/use-users-by-company"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 	{
-		accessorKey: "role",
-		header: "Rol",
+		accessorKey: "image",
 		cell: ({ row }) => {
-			const role = row.getValue("role") as USER_ROLE
-
-			if (role !== USER_ROLE.SUPERVISOR && role !== USER_ROLE.PARTNER_COMPANY) return null
+			const image = row.getValue("image") as string
+			const name = row.getValue("name") as string
 
 			return (
-				<Badge
-					className={cn({
-						"border border-purple-500 bg-purple-500/10 text-purple-500":
-							role === USER_ROLE.SUPERVISOR,
-						"border border-teal-500 bg-teal-500/10 text-teal-500":
-							role === USER_ROLE.PARTNER_COMPANY,
-					})}
-				>
-					{role}
-				</Badge>
+				<Avatar className="size-8 text-sm">
+					<AvatarImage src={image} alt={name} />
+					<AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+				</Avatar>
 			)
 		},
 	},

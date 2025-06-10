@@ -1,9 +1,9 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { PlusIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import { toast } from "sonner"
@@ -13,6 +13,7 @@ import { updateWorkOrderLikeBook } from "@/actions/work-orders/updateWorkOrder"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { WORK_ORDER_PRIORITY } from "@prisma/client"
+import { queryClient } from "@/lib/queryClient"
 import {
 	useWorkBooksByCompany,
 	type WorkBookByCompany,
@@ -48,7 +49,7 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/components/ui/sheet"
-import { queryClient } from "@/lib/queryClient"
+import { Button } from "@/components/ui/button"
 
 interface WorkBookFormProps {
 	userId: string
@@ -147,10 +148,10 @@ export default function NewWorkBookForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className="flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 text-sm font-semibold tracking-wide text-blue-600 transition-all hover:scale-105"
 				onClick={() => setOpen(true)}
 			>
-				<PlusIcon className="h-4 w-4" />
+				<PlusCircleIcon className="h-4 w-4" />
 				<span className="hidden sm:inline">Nuevo Libro de Obras</span>
 			</SheetTrigger>
 
@@ -195,6 +196,12 @@ export default function NewWorkBookForm({
 														{workOrder.otNumber}
 													</SelectItem>
 												))
+											)}
+
+											{data?.workBooks.length === 0 && (
+												<div className="text-muted-foreground py-2 text-center text-sm">
+													No hay ordenes de trabajo
+												</div>
 											)}
 										</SelectContent>
 									</Select>
@@ -284,11 +291,23 @@ export default function NewWorkBookForm({
 							label="Fecha de Inicio"
 						/>
 
-						<SubmitButton
-							isSubmitting={loading}
-							className="sm:col-span-2"
-							label="Crear Libro de Obras"
-						/>
+						<div className="mt-10 flex items-center justify-center gap-2 sm:col-span-2">
+							<Button
+								size={"lg"}
+								type="button"
+								disabled={loading}
+								variant={"outline"}
+								className="w-1/2 border-2 border-blue-900 font-medium tracking-wide text-blue-800 transition-all hover:scale-105 hover:bg-blue-900"
+							>
+								Cancelar
+							</Button>
+
+							<SubmitButton
+								isSubmitting={loading}
+								label="Crear Libro de Obras"
+								className="w-1/2 bg-blue-600 hover:bg-blue-700"
+							/>
+						</div>
 					</form>
 				</Form>
 			</SheetContent>

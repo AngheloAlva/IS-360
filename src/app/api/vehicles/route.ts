@@ -65,6 +65,7 @@ export async function GET(req: NextRequest) {
 					isMain: true,
 					createdAt: true,
 					updatedAt: true,
+					companyId: true,
 				},
 			}),
 			prisma.vehicle.count({

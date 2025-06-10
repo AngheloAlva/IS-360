@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { PrinterIcon } from "lucide-react"
+import { Building2Icon, PrinterIcon, UserIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -26,7 +26,12 @@ export const workPermitColumns: ColumnDef<WorkPermit>[] = [
 		header: "Solicitante PT",
 		cell: ({ row }) => {
 			const aplicantPt = row.original.user.name
-			return <div className="truncate">{aplicantPt}</div>
+			return (
+				<div className="flex items-center gap-1 truncate">
+					<UserIcon className="size-4" />
+					{aplicantPt}
+				</div>
+			)
 		},
 	},
 	{
@@ -34,7 +39,12 @@ export const workPermitColumns: ColumnDef<WorkPermit>[] = [
 		header: "Empresa ejecutora",
 		cell: ({ row }) => {
 			const company = row.original.company.name
-			return <div className="truncate">{company}</div>
+			return (
+				<div className="flex items-center gap-1 truncate">
+					<Building2Icon className="size-4" />
+					{company}
+				</div>
+			)
 		},
 	},
 	{
@@ -101,7 +111,7 @@ export const workPermitColumns: ColumnDef<WorkPermit>[] = [
 						<Button
 							size={"icon"}
 							variant={"ghost"}
-							className="text-primary hover:bg-primary cursor-pointer hover:text-white"
+							className="cursor-pointer text-indigo-500 hover:bg-indigo-500 hover:text-white"
 						>
 							<PrinterIcon className="h-4 w-4" />
 						</Button>

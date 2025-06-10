@@ -3,9 +3,8 @@
 import { WorkPermitStatusOptions } from "@/lib/consts/work-permit-status"
 import { useWorkPermits } from "@/hooks/work-permit/use-work-permit"
 import { workPermitColumns } from "./work-permit-columns"
-import { ChevronDown, Plus } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { useState } from "react"
-import Link from "next/link"
 import {
 	flexRender,
 	SortingState,
@@ -147,13 +146,6 @@ export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 					</DropdownMenu>
 
 					<RefreshButton refetch={() => refetch()} isFetching={isFetching} />
-
-					<Link href="/dashboard/permiso-de-trabajo/agregar">
-						<Button>
-							Nuevo Permiso de Trabajo
-							<Plus className="ml-1" />
-						</Button>
-					</Link>
 				</div>
 
 				<Table>
@@ -207,6 +199,7 @@ export function WorkPermitDataTable({ companyId }: { companyId: string }) {
 					isLoading={isLoading}
 					onPageChange={setPage}
 					pageCount={data?.pages ?? 0}
+					className="border-purple-500 text-purple-500"
 				/>
 			</CardContent>
 		</Card>

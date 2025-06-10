@@ -148,10 +148,10 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 	return (
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className="flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-600 transition-all hover:scale-105"
 				onClick={() => setIsOpen(true)}
 			>
-				<PlusCircleIcon className="h-4 w-4" />
+				<PlusCircleIcon className="size-4" />
 				<span className="hidden sm:inline">Nuevo Colaborador</span>
 			</SheetTrigger>
 
@@ -220,7 +220,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						<Button
 							type="button"
 							variant="ghost"
-							className="hover:text-primary cursor-pointer hover:bg-transparent"
+							className="cursor-pointer hover:bg-transparent hover:text-orange-500"
 							onClick={() => {
 								append({
 									rut: "",
@@ -233,11 +233,22 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 							Agregar Colaborador
 						</Button>
 
-						<SubmitButton
-							label="Crear Colaborador(es)"
-							isSubmitting={isSubmitting}
-							className="hover:bg-primary/80"
-						/>
+						<div className="flex items-center justify-end gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								className="w-1/2 border-2 border-orange-900 text-orange-700 transition-all hover:scale-105 hover:bg-orange-900 hover:text-white"
+								onClick={() => setIsOpen(false)}
+							>
+								Cancelar
+							</Button>
+
+							<SubmitButton
+								isSubmitting={isSubmitting}
+								label="Crear Colaborador(es)"
+								className="w-1/2 bg-orange-700 hover:bg-orange-600"
+							/>
+						</div>
 					</form>
 				</Form>
 			</SheetContent>

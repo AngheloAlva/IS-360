@@ -17,15 +17,15 @@ export default async function UsersByCompanyPage(): Promise<React.ReactElement> 
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="flex items-start justify-between gap-4 md:flex-row">
-				<div className="flex flex-col gap-1">
-					<h1 className="text-text w-fit text-3xl font-bold">Colaboradores</h1>
-					<p className="text-text w-fit text-sm sm:text-base">
-						En esta sección puedes gestionar los colaboradores de la empresa.
-					</p>
-				</div>
+			<div className="rounded-lg bg-gradient-to-r from-orange-600 to-red-700 p-6 shadow-lg">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Colaboradores</h1>
+						<p className="opacity-90">Gestión del personal de la empresa</p>
+					</div>
 
-				{session.user.isSupervisor && <CreateUsersForm companyId={session.user.companyId} />}
+					{session.user.isSupervisor && <CreateUsersForm companyId={session.user.companyId} />}
+				</div>
 			</div>
 
 			<UsersByCompanyDataTable companyId={session.user.companyId} />

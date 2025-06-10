@@ -170,6 +170,7 @@ export function WorkBookDataTable({ companyId }: { companyId: string }) {
 					isLoading={isLoading}
 					onPageChange={setPage}
 					pageCount={data?.pages ?? 0}
+					className="border-blue-600 text-blue-600"
 				/>
 			</CardContent>
 		</Card>

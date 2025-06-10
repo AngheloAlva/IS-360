@@ -63,9 +63,9 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 
 	return (
 		<Card>
-			<CardContent className="mt-4 flex w-full flex-col items-start gap-4">
-				<div className="flex w-full flex-col items-start justify-between lg:flex-row">
-					<h2 className="text-text mb-4 text-2xl font-bold">Lista de Usuarios</h2>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-full flex-col items-center justify-between lg:flex-row">
+					<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>
 
 					<div className="flex flex-row items-center justify-center gap-2">
 						<Input
@@ -123,9 +123,10 @@ export function UsersByCompanyDataTable({ companyId }: { companyId: string }) {
 
 				<TablePagination
 					table={table}
+					isLoading={isLoading}
 					onPageChange={setPage}
 					pageCount={data?.pages ?? 0}
-					isLoading={isLoading}
+					className="border-orange-600 text-orange-600"
 				/>
 			</CardContent>
 		</Card>

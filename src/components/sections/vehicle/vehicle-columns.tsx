@@ -1,10 +1,11 @@
-import { FileEdit, MoreHorizontal, Trash2 } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-types"
 
-import { ColumnDef } from "@tanstack/react-table"
+import DeleteVehicleDialog from "@/components/forms/dashboard/vehicle/DeleteVehicle"
+import VehicleForm from "@/components/forms/dashboard/vehicle/VehicleForm"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import type { Vehicle } from "@/hooks/vehicles/use-vehicles"
+import type { ColumnDef } from "@tanstack/react-table"
 
 export const vehicleColumns: ColumnDef<Vehicle>[] = [
 	{
@@ -52,9 +54,9 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 			const isMain = row.getValue("isMain") as boolean
 
 			return isMain ? (
-				<Badge className="bg-green-500 hover:bg-green-600">Sí</Badge>
+				<Badge className="bg-teal-500 px-6 font-semibold hover:bg-teal-600">Sí</Badge>
 			) : (
-				<Badge variant="outline">No</Badge>
+				<Badge className="bg-emerald-900 px-6 font-semibold hover:bg-emerald-900">No</Badge>
 			)
 		},
 	},
@@ -84,13 +86,12 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 					<DropdownMenuContent align="end">
 						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => window.vehicleEdit(vehicle.id)}>
-							<FileEdit className="mr-2 h-4 w-4" />
-							Editar vehículo
+						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+							<VehicleForm companyId={vehicle.companyId} vehicleId={vehicle.id} />
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => window.vehicleDelete(vehicle.id)}>
-							<Trash2 className="mr-2 h-4 w-4" />
-							Eliminar vehículo
+
+						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+							<DeleteVehicleDialog vehicleId={vehicle.id} companyId={vehicle.companyId} />
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

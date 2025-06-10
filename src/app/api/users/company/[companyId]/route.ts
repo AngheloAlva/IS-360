@@ -39,6 +39,7 @@ export async function GET(
 					role: true,
 					phone: true,
 					email: true,
+					image: true,
 					internalRole: true,
 					internalArea: true,
 				},

@@ -16,15 +16,15 @@ export default async function WorkBooksPage() {
 
 	return (
 		<main className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="flex w-full flex-wrap items-center justify-between gap-2">
-				<div>
-					<h1 className="text-text w-fit text-3xl font-bold">Libro de Obras</h1>
-					<p className="text-text-foreground">
-						Aca puedes gestionar tus libros de obras y sus actividades.
-					</p>
-				</div>
+			<div className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 p-6 shadow-lg">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Libro de Obras</h1>
+						<p className="opacity-90">Gestión de libros de obras de tu empresa</p>
+					</div>
 
-				<NewWorkBookForm userId={res.user.id} companyId={res.user.companyId} />
+					<NewWorkBookForm userId={res.user.id} companyId={res.user.companyId} />
+				</div>
 			</div>
 
 			<WorkBookDataTable companyId={res.user.companyId} />
