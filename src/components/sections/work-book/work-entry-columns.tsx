@@ -3,12 +3,12 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
 import { WORK_ENTRY_TYPE } from "@/lib/consts/work-entry-type"
+import { cn } from "@/lib/utils"
 
 import { Badge } from "@/components/ui/badge"
 
 import type { WorkEntry } from "@/hooks/work-orders/use-work-entries"
 import type { ENTRY_TYPE } from "@prisma/client"
-import { cn } from "@/lib/utils"
 
 export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 	{
@@ -18,10 +18,10 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 			const entryType = row.getValue("entryType") as ENTRY_TYPE
 			return (
 				<Badge
-					className={cn("border-primary text-primary bg-primary/10", {
-						"border-cyan-500 bg-cyan-500/10 text-cyan-500": entryType === "ADDITIONAL_ACTIVITY",
-						"border-purple-500 bg-purple-500/10 text-purple-500": entryType === "OTC_INSPECTION",
-						"border-amber-500 bg-amber-500/10 text-amber-500": entryType === "COMMENT",
+					className={cn("border-orange-600 bg-orange-600/10 text-orange-600", {
+						"border-amber-600 bg-amber-600/10 text-amber-600": entryType === "ADDITIONAL_ACTIVITY",
+						"border-red-500 bg-red-500/10 text-red-500": entryType === "OTC_INSPECTION",
+						"border-lime-500 bg-lime-500/10 text-lime-500": entryType === "COMMENT",
 					})}
 				>
 					{WORK_ENTRY_TYPE[entryType]}
@@ -72,13 +72,5 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		id: "createdBy",
 		header: "Creado por",
 		accessorFn: (row) => row.createdBy.name,
-	},
-	{
-		accessorKey: "createdAt",
-		header: "Fecha de creación",
-		cell: ({ row }) => {
-			const date = row.getValue("createdAt") as string
-			return format(new Date(date), "PPP", { locale: es })
-		},
 	},
 ]

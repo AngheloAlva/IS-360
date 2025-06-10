@@ -1,11 +1,11 @@
 "use client"
 
+import { InfoIcon, ListOrderedIcon } from "lucide-react"
 import { subDays } from "date-fns"
 
 import { useWorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { WORK_ORDER_STATUS } from "@prisma/client"
-import { cn } from "@/lib/utils"
 
 import { ApproveWorkBookClosure } from "@/components/sections/work-book/ApproveWorkBookClosure"
 import WorkBookEntriesTable from "@/components/sections/work-book/WorkBookEntriesTable"
@@ -14,12 +14,12 @@ import WorkBookMilestones from "@/components/sections/work-book/WorkBookMileston
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import OtcInspectorForm from "@/components/forms/work-book/OtcInspectorForm"
 import ActivityForm from "@/components/forms/work-book/WorkBookActivityForm"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Alert, AlertTitle } from "@/components/ui/alert"
 import BackButton from "@/components/shared/BackButton"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Alert, AlertTitle } from "@/components/ui/alert"
-import { InfoIcon } from "lucide-react"
 
 interface WorkBookMainProps {
 	userId: string
@@ -72,8 +72,6 @@ export default function WorkBookMain({
 		)
 	}
 
-	console.log("WORKBOOK", data?.workBook)
-
 	if (isError || !data?.workBook) {
 		return (
 			<div className="w-full rounded-md border border-amber-200 bg-amber-50 p-4">
@@ -90,43 +88,31 @@ export default function WorkBookMain({
 	const canAddActivities =
 		workBook.status === WORK_ORDER_STATUS.IN_PROGRESS ||
 		workBook.status === WORK_ORDER_STATUS.PLANNED
-	const canClose = workBook.workProgressStatus === 100 && workBook.supervisorId === userId
+	const canRequestClosure = workBook.supervisorId === userId && workBook.workProgressStatus === 100
 
 	return (
 		<>
-			<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+			<div className="flex w-full items-center justify-between rounded-lg bg-gradient-to-r from-orange-600 to-red-600 p-6 text-white shadow-lg">
 				<div className="flex items-center gap-3">
 					<BackButton
 						href={
 							userRole === "partnerCompany"
 								? "/dashboard/libro-de-obras"
-								: "/admin/dashboard/libros-de-obras"
+								: "/admin/dashboard/ordenes-de-trabajo"
 						}
+						className="bg-white/30 text-white hover:bg-white/50"
 					/>
 
 					<div>
 						<h1 className="text-2xl font-bold">
 							{workBook.workName || "Libro de Obras no creado"}
 						</h1>
-						<p className="text-feature mt-1 text-base font-medium">{workBook.otNumber}</p>
+						<p className="text-feature text-base font-bold">{workBook.otNumber}</p>
 					</div>
 				</div>
 
 				<div className="flex w-full flex-col items-end gap-2 md:w-64">
-					<Badge
-						className={cn("border-slate-500 bg-slate-500/10 text-slate-500", {
-							"border-purple-500 bg-purple-500/10 text-purple-500":
-								workBook.status === WORK_ORDER_STATUS.IN_PROGRESS,
-							"border-cyan-500 bg-cyan-500/10 text-cyan-500":
-								workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
-							"border-yellow-500 bg-yellow-500/10 text-yellow-500":
-								workBook.status === WORK_ORDER_STATUS.PENDING,
-							"border-green-500 bg-green-500/10 text-green-500":
-								workBook.status === WORK_ORDER_STATUS.COMPLETED,
-							"border-red-500 bg-red-500/10 text-red-500":
-								workBook.status === WORK_ORDER_STATUS.CANCELLED,
-						})}
-					>
+					<Badge className="border-white bg-white/10 text-white">
 						{WorkOrderStatusLabels[workBook.status as keyof typeof WorkOrderStatusLabels]}
 					</Badge>
 
@@ -136,20 +122,20 @@ export default function WorkBookMain({
 					</div>
 					<Progress
 						value={workBook.workProgressStatus || 0}
-						className="h-2"
-						indicatorClassName={
+						className="h-2 bg-white/40"
+						indicatorClassName={`bg-white ${
 							workBook.workProgressStatus && workBook.workProgressStatus > 50
 								? "bg-green-500"
 								: "bg-yellow-500"
-						}
+						}`}
 					/>
 				</div>
 			</div>
 
-			<WorkBookGeneralData canClose={canClose} userId={userId} data={workBook} />
+			<WorkBookGeneralData data={workBook} />
 
 			<Tabs defaultValue="milestones" className="w-full">
-				<TabsList className="mb-6 h-11 w-full">
+				<TabsList className="h-11 w-full">
 					<TabsTrigger value="milestones" className="h-9">
 						Hitos y Tareas
 					</TabsTrigger>
@@ -163,58 +149,68 @@ export default function WorkBookMain({
 						userId={userId}
 						userRole={userRole}
 						workOrderId={workBook.id}
+						canRequestClosure={canRequestClosure}
 						workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
 					/>
 				</TabsContent>
 
 				<TabsContent value="activities">
-					<div className="flex w-full items-center justify-between gap-2">
-						<h2 className="text-text mb-2 text-2xl font-bold">Lista de Actividades</h2>
+					<Card>
+						<CardHeader className="flex w-full flex-row items-center justify-between gap-2">
+							<h2 className="text-text flex items-center gap-2 text-2xl font-bold">
+								<div className="size-10 rounded-md bg-red-500/10 p-1.5">
+									<ListOrderedIcon className="h-auto w-full text-red-500" />
+								</div>
+								Lista de Actividades
+							</h2>
 
-						<div className="flex gap-2">
-							{canAddActivities && (
-								<>
-									{!canClose &&
-										(workBook._count.milestones > 0 ? (
-											<ActivityForm
-												userId={userId}
-												startDate={new Date()}
-												workOrderId={workBook.id}
-												entryType="DAILY_ACTIVITY"
-											/>
-										) : (
-											<Alert>
-												<InfoIcon className="h-4 w-4" />
-												<AlertTitle>
-													Debe crear su(s) hito(s) para agregar actividades diarias
-												</AlertTitle>
-											</Alert>
-										))}
+							<div className="flex gap-2">
+								{canAddActivities && (
+									<>
+										{!canRequestClosure &&
+											(workBook._count.milestones > 0 ? (
+												<ActivityForm
+													userId={userId}
+													startDate={new Date()}
+													workOrderId={workBook.id}
+													entryType="DAILY_ACTIVITY"
+												/>
+											) : (
+												<Alert>
+													<InfoIcon className="h-4 w-4" />
+													<AlertTitle>
+														Debe crear su(s) hito(s) para agregar actividades diarias
+													</AlertTitle>
+												</Alert>
+											))}
 
-									{hasPermission && (
-										<>
-											<ActivityForm
-												userId={userId}
-												startDate={new Date()}
-												workOrderId={workBook.id}
-												entryType="ADDITIONAL_ACTIVITY"
-											/>
+										{hasPermission && (
+											<>
+												<ActivityForm
+													userId={userId}
+													startDate={new Date()}
+													workOrderId={workBook.id}
+													entryType="ADDITIONAL_ACTIVITY"
+												/>
 
-											<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
+												<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
 
-											{hasPermission &&
-												userId === workBook.responsibleId &&
-												workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
-													<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />
-												)}
-										</>
-									)}
-								</>
-							)}
-						</div>
-					</div>
+												{hasPermission &&
+													userId === workBook.responsibleId &&
+													workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
+														<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />
+													)}
+											</>
+										)}
+									</>
+								)}
+							</div>
+						</CardHeader>
 
-					<WorkBookEntriesTable workOrderId={workBook.id} />
+						<CardContent>
+							<WorkBookEntriesTable workOrderId={workBook.id} />
+						</CardContent>
+					</Card>
 				</TabsContent>
 			</Tabs>
 		</>

@@ -2,20 +2,21 @@
 
 import Image from "next/image"
 import {
-	Car,
-	Home,
-	Send,
-	Users,
-	Wrench,
-	Folders,
-	FileText,
-	LifeBuoy,
-	Settings,
-	BookCopy,
-	Building2,
-	FileSearch,
-	LayoutList,
-	MonitorPlay,
+	CarIcon,
+	HomeIcon,
+	SendIcon,
+	UsersIcon,
+	WrenchIcon,
+	FoldersIcon,
+	FileTextIcon,
+	LifeBuoyIcon,
+	SettingsIcon,
+	BookCopyIcon,
+	Building2Icon,
+	FileSearchIcon,
+	LayoutListIcon,
+	MonitorPlayIcon,
+	FilePlus2Icon,
 } from "lucide-react"
 
 import { NavSecondary } from "./navSecondary"
@@ -39,86 +40,91 @@ const data = {
 		{
 			name: "Inicio",
 			url: "/dashboard/inicio",
-			icon: Home,
+			icon: HomeIcon,
 		},
 		{
 			name: "Colaboradores",
 			url: "/dashboard/colaboradores",
-			icon: Users,
+			icon: UsersIcon,
 		},
 		{
 			name: "Vehículos y Equipos",
 			url: "/dashboard/vehiculos",
-			icon: Car,
+			icon: CarIcon,
 		},
 		{
 			name: "Carpetas de Arranque",
 			url: "/dashboard/carpetas-de-arranque",
-			icon: Folders,
+			icon: FoldersIcon,
 		},
 		{
 			name: "Seguridad",
 			url: "/dashboard/charlas-de-seguridad",
-			icon: MonitorPlay,
+			icon: MonitorPlayIcon,
 		},
 		{
 			name: "Permiso de Trabajo",
 			url: "/dashboard/permiso-de-trabajo",
-			icon: FileText,
+			icon: FileTextIcon,
 		},
 		{
 			name: "Libro de Obras",
 			url: "/dashboard/libro-de-obras",
-			icon: BookCopy,
+			icon: BookCopyIcon,
 		},
 	],
 	navAdmin: [
 		{
 			name: "Inicio",
 			url: "/admin/dashboard/inicio",
-			icon: Home,
+			icon: HomeIcon,
 		},
 		{
 			name: "Documentación",
 			url: "/admin/dashboard/documentacion",
-			icon: FileSearch,
+			icon: FileSearchIcon,
 		},
 		{
 			name: "Carpetas de Arranques",
 			url: "/admin/dashboard/carpetas-de-arranques",
-			icon: Folders,
+			icon: FoldersIcon,
 		},
 		{
 			name: "Charlas de Seguridad",
 			url: "/admin/dashboard/charlas-de-seguridad",
-			icon: MonitorPlay,
+			icon: MonitorPlayIcon,
 		},
 		{
 			name: "Permisos de Trabajo",
 			url: "/admin/dashboard/permisos-de-trabajo",
-			icon: FileText,
+			icon: FileTextIcon,
 		},
 		{
 			name: "OT / Libros de Obras",
 			url: "/admin/dashboard/ordenes-de-trabajo",
-			icon: LayoutList,
+			icon: LayoutListIcon,
 		},
 		{
 			name: "Planes de Mantenimiento",
 			url: "/admin/dashboard/planes-de-mantenimiento",
-			icon: Wrench,
+			icon: WrenchIcon,
+		},
+		{
+			name: "Solicitudes de Trabajo",
+			url: "/admin/dashboard/solicitudes-de-trabajo",
+			icon: FilePlus2Icon,
 		},
 	],
 	navSecondary: [
 		{
 			title: "Soporte",
 			url: "/dashboard/soporte",
-			icon: LifeBuoy,
+			icon: LifeBuoyIcon,
 		},
 		{
 			title: "Contacto",
 			url: "/dashboard/contacto",
-			icon: Send,
+			icon: SendIcon,
 		},
 	],
 }
@@ -127,17 +133,17 @@ const navInternal = [
 	{
 		name: "Usuarios Internos",
 		url: "/admin/dashboard/usuarios",
-		icon: Users,
+		icon: UsersIcon,
 	},
 	{
 		name: "Empresas Contratistas",
 		url: "/admin/dashboard/empresas",
-		icon: Building2,
+		icon: Building2Icon,
 	},
 	{
 		name: "Equipos / Ubicaciones",
 		url: "/admin/dashboard/equipos",
-		icon: Settings,
+		icon: SettingsIcon,
 	},
 ]
 

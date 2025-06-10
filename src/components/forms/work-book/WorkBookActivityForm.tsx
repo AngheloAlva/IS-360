@@ -176,9 +176,9 @@ export default function ActivityForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
 				className={cn(
-					"bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white",
+					"flex h-10 items-center justify-center gap-1 rounded-md bg-orange-600 px-3 text-sm font-semibold text-nowrap text-white transition-all hover:scale-105 hover:bg-orange-700",
 					{
-						"bg-green-500 hover:bg-green-500/80": entryType === "ADDITIONAL_ACTIVITY",
+						"bg-yellow-600 hover:bg-yellow-700": entryType === "ADDITIONAL_ACTIVITY",
 					}
 				)}
 				onClick={() => setOpen(true)}

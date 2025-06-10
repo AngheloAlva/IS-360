@@ -24,13 +24,11 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 	})
 
 	return (
-		<div className="w-full flex-1 space-y-6 p-4">
-			<WorkBookMain
-				workBookId={id}
-				userId={session.user.id}
-				userRole={session.user.role!}
-				hasPermission={hasPermission.success}
-			/>
-		</div>
+		<WorkBookMain
+			workBookId={id}
+			userId={session.user.id}
+			userRole={session.user.role!}
+			hasPermission={hasPermission.success}
+		/>
 	)
 }

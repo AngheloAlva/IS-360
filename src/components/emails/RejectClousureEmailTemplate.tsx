@@ -139,7 +139,7 @@ export const RejectClousureEmailTemplate: React.FC<Readonly<RejectClosureEmailTe
 
 						<Section className="mb-[32px] text-center">
 							<Button
-								href={`${systemUrl}/admin/dashboard/libros-de-obras`}
+								href={`${systemUrl}/admin/dashboard/ordenes-de-trabajo`}
 								className="box-input rounded-[4px] bg-blue-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
 							>
 								Ver Libro de Obras

@@ -620,12 +620,12 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
 						<Text style={styles.signatureLabel}>Firma Prevención</Text>
-						<Text style={styles.signatureLabel}>Prevención Riesgos OTC</Text>
+						<Text style={styles.signatureLabel}>Riesgos OTC</Text>
 					</View>
 
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
-						<Text style={styles.signatureLabel}>Firma Supervisor</Text>
+						<Text style={styles.signatureLabel}>Firma</Text>
 						<Text style={styles.signatureLabel}>Operador OTC</Text>
 					</View>
 				</View>

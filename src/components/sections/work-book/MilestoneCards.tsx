@@ -6,6 +6,7 @@ import { format } from "date-fns"
 
 import { MILESTONE_STATUS_LABELS } from "@/lib/consts/milestone-status"
 import { MILESTONE_STATUS } from "@prisma/client"
+import { USER_ROLE } from "@/lib/permissions"
 import { cn } from "@/lib/utils"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,7 +15,6 @@ import CloseMilestoneDialog from "./CloseMilestoneDialog"
 import { Badge } from "@/components/ui/badge"
 
 import type { Milestone } from "@/hooks/work-orders/use-work-book-milestones"
-import { USER_ROLE } from "@/lib/permissions"
 
 interface MilestoneCardsProps {
 	userId: string
@@ -31,7 +31,7 @@ export default function MilestoneCards({
 }: MilestoneCardsProps) {
 	if (milestones.length === 0) {
 		return (
-			<div className="bg-primary/10 border-primary flex flex-col items-center justify-center rounded-md border p-8 text-center">
+			<div className="flex flex-col items-center justify-center rounded-md border border-orange-600 bg-orange-600/10 p-8 text-center">
 				<h3 className="text-lg font-medium">No hay hitos definidos</h3>
 
 				{userRole === USER_ROLE.admin ? (
@@ -52,7 +52,7 @@ export default function MilestoneCards({
 		<div className="space-y-6">
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
 				{milestones.map((milestone) => (
-					<Card key={milestone.id}>
+					<Card key={milestone.id} className="shadow-xl">
 						<CardHeader>
 							<div className="flex items-center justify-between">
 								<div className="flex items-center gap-1">

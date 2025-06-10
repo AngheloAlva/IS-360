@@ -1,11 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { PlusIcon } from "lucide-react"
-import { toast } from "sonner"
 
+import { toast } from "sonner"
 import { createWorkOrderByTask } from "@/actions/maintenance-plan-task/createWorkOrderByTask"
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
@@ -147,11 +147,11 @@ export default function CreateMaintenancePlanTaskWorkOrderForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex items-center justify-center gap-1 rounded-md px-3 py-1 text-sm text-white"
+				className="flex h-7 cursor-pointer items-center justify-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-semibold tracking-wide text-white transition-all hover:scale-105"
 				onClick={() => setOpen(true)}
 			>
-				<PlusIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Nueva OT</span>
+				<PlusCircleIcon className="size-3" />
+				Nueva OT
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-xl">

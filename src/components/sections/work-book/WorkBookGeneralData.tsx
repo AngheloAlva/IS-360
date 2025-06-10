@@ -6,13 +6,12 @@ import {
 	Calendar,
 	FileText,
 	Briefcase,
-	WrenchIcon,
+	SettingsIcon,
 } from "lucide-react"
 import { format } from "date-fns"
 
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 
-import { RequestWorkBookClosure } from "./RequestWorkBookClosure"
 import {
 	Accordion,
 	AccordionItem,
@@ -21,17 +20,14 @@ import {
 } from "@/components/ui/accordion"
 
 import type { WorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
+import { CloseWorkBook } from "./CloseWorkBook"
 
 interface WorkBookGeneralDataProps {
-	userId: string
-	canClose: boolean
 	data: WorkBookById
 }
 
 export default function WorkBookGeneralData({
 	data,
-	userId,
-	canClose,
 }: WorkBookGeneralDataProps): React.ReactElement {
 	return (
 		<div className="grid w-full gap-2">
@@ -50,10 +46,6 @@ export default function WorkBookGeneralData({
 					</AccordionTrigger>
 
 					<AccordionContent className="px-6">
-						<div className="mb-4 flex justify-end">
-							{canClose && <RequestWorkBookClosure workOrderId={data.id} userId={userId} />}
-						</div>
-
 						<div className="grid gap-6 md:grid-cols-2">
 							<div className="space-y-4">
 								<div className="flex items-start gap-3">
@@ -97,7 +89,7 @@ export default function WorkBookGeneralData({
 									</div>
 									<div>
 										<p className="text-muted-foreground text-sm font-medium">Ubicación</p>
-										<p className="font-medium">{data.workLocation}</p>
+										<p className="font-medium">{data.workLocation || "No proporcionada"}</p>
 									</div>
 								</div>
 							</div>
@@ -158,13 +150,17 @@ export default function WorkBookGeneralData({
 								</div>
 							</div>
 						</div>
+
+						<div className="flex justify-end">
+							<CloseWorkBook userId={data.responsible.id} workOrderId={data.id} />
+						</div>
 					</AccordionContent>
 				</AccordionItem>
 
 				<AccordionItem value="equipment-info" className="bg-background rounded-md">
 					<AccordionTrigger className="px-6 py-4 hover:cursor-pointer">
 						<div className="flex items-center gap-2">
-							<WrenchIcon className="size-10 rounded-md bg-green-500/10 p-1.5 text-green-500" />
+							<SettingsIcon className="size-10 rounded-md bg-green-500/10 p-1.5 text-green-500" />
 							<div>
 								<p className="font-semibold">Información del/los equipo(s)</p>
 								<p className="text-muted-foreground text-sm font-normal">

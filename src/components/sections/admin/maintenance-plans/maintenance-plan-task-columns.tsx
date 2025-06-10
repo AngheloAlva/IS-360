@@ -1,29 +1,35 @@
 "use client"
 
-import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
 import { differenceInDays, format } from "date-fns"
 import { ColumnDef } from "@tanstack/react-table"
 import { LinkIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
 import Link from "next/link"
 
+import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
+import { PLAN_FREQUENCY } from "@prisma/client"
+import { cn } from "@/lib/utils"
+
 import CreateMaintenancePlanTaskWorkOrderForm from "@/components/forms/admin/work-order/CreateMaintenancePlanTaskWorkOrderForm"
+import PostponeTaskDialog from "@/components/forms/admin/work-order/PostponeTask"
 import { Badge } from "@/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/hooks/maintenance-plans/use-maintenance-plans-tasks"
-import { PLAN_FREQUENCY } from "@prisma/client"
 
 export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	{
-		accessorKey: "createWorkOrder",
+		accessorKey: "actions",
 		header: "",
 		cell: ({ row }) => (
-			<CreateMaintenancePlanTaskWorkOrderForm
-				equipmentId={row.original.equipment.id}
-				maintenancePlanTaskId={row.original.id}
-				location={row.original?.location || "PRM"}
-				equipmentName={row.original.equipment.name}
-			/>
+			<div className="flex items-center justify-center gap-2">
+				<PostponeTaskDialog taskId={row.original.id} nextDate={row.original.nextDate} />
+
+				<CreateMaintenancePlanTaskWorkOrderForm
+					equipmentId={row.original.equipment.id}
+					maintenancePlanTaskId={row.original.id}
+					location={row.original?.location || "PRM"}
+					equipmentName={row.original.equipment.name}
+				/>
+			</div>
 		),
 	},
 	{

@@ -11,11 +11,10 @@ import {
 } from "@tanstack/react-table"
 
 import { useWorkEntries, WorkEntry } from "@/hooks/work-orders/use-work-entries"
-import { WorkEntryColumns } from "./work-entry-columns"
 import { WorkBookEntryDetails } from "./WorkBookEntryDetails"
+import { WorkEntryColumns } from "./work-entry-columns"
 
 import { TablePagination } from "@/components/ui/table-pagination"
-import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import {
@@ -65,87 +64,86 @@ export default function WorkBookEntriesTable({
 	})
 
 	return (
-		<Card>
-			<CardContent className="flex w-full flex-col gap-4">
-				<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
-					<Input
-						type="text"
-						value={search}
-						className="bg-background w-full sm:w-96"
-						onChange={(e) => setSearch(e.target.value)}
-						placeholder="Buscar por nombre de actividad o comentarios..."
-					/>
+		<div className="space-y-4">
+			<div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-full md:flex-row">
+				<Input
+					type="text"
+					value={search}
+					className="bg-background w-full sm:w-96"
+					onChange={(e) => setSearch(e.target.value)}
+					placeholder="Buscar por nombre de actividad o comentarios..."
+				/>
+			</div>
+
+			{isLoading ? (
+				<div className="space-y-2 p-4">
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
+					<Skeleton className="h-8 w-full" />
 				</div>
-
-				{isLoading ? (
-					<div className="space-y-2 p-4">
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-					</div>
-				) : (
-					<Table>
-						<TableHeader>
-							{table.getHeaderGroups().map((headerGroup) => (
-								<TableRow key={headerGroup.id}>
-									{headerGroup.headers.map((header) => {
-										return (
-											<TableHead key={header.id}>
-												{header.isPlaceholder
-													? null
-													: flexRender(header.column.columnDef.header, header.getContext())}
-											</TableHead>
-										)
-									})}
+			) : (
+				<Table>
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => {
+									return (
+										<TableHead key={header.id}>
+											{header.isPlaceholder
+												? null
+												: flexRender(header.column.columnDef.header, header.getContext())}
+										</TableHead>
+									)
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+					<TableBody>
+						{table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => (
+								<TableRow
+									key={row.id}
+									data-state={row.getIsSelected() && "selected"}
+									className="hover:bg-muted/50 cursor-pointer"
+									onClick={() => setSelectedEntry(row.original)}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="font-medium">
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+									))}
 								</TableRow>
-							))}
-						</TableHeader>
-						<TableBody>
-							{table.getRowModel().rows?.length ? (
-								table.getRowModel().rows.map((row) => (
-									<TableRow
-										key={row.id}
-										data-state={row.getIsSelected() && "selected"}
-										className="hover:bg-muted/50 cursor-pointer"
-										onClick={() => setSelectedEntry(row.original)}
-									>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className="font-medium">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))
-							) : (
-								<TableRow>
-									<TableCell colSpan={WorkEntryColumns.length} className="h-24 text-center">
-										No hay entradas
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-				)}
+							))
+						) : (
+							<TableRow>
+								<TableCell colSpan={WorkEntryColumns.length} className="h-24 text-center">
+									No hay entradas
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			)}
 
-				<TablePagination<WorkEntry>
-					table={table}
-					pageCount={data?.pages ?? 0}
-					onPageChange={setPage}
-					isLoading={isLoading}
-				/>
+			<TablePagination<WorkEntry>
+				table={table}
+				isLoading={isLoading}
+				onPageChange={setPage}
+				pageCount={data?.pages ?? 0}
+				className="border-orange-600 text-orange-600 hover:bg-orange-600"
+			/>
 
-				<WorkBookEntryDetails
-					entry={selectedEntry}
-					isLoading={false}
-					onClose={() => setSelectedEntry(null)}
-				/>
-			</CardContent>
-		</Card>
+			<WorkBookEntryDetails
+				entry={selectedEntry}
+				isLoading={false}
+				onClose={() => setSelectedEntry(null)}
+			/>
+		</div>
 	)
 }

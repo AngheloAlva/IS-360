@@ -114,7 +114,7 @@ export default function OtcInspectorForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex h-10 items-center justify-center gap-1 rounded-md bg-purple-500 px-3 text-sm text-white hover:bg-purple-500/80"
+				className="flex h-10 items-center justify-center gap-1 rounded-md bg-red-500 px-3 text-sm font-semibold text-nowrap text-white hover:bg-red-500/80"
 				onClick={() => setOpen(true)}
 			>
 				<PlusIcon className="h-4 w-4" />

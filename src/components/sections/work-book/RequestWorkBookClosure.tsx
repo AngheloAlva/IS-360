@@ -59,7 +59,7 @@ export function RequestWorkBookClosure({
 				<Button
 					variant="default"
 					size="lg"
-					className="gap-2 bg-teal-500 font-semibold tracking-wide hover:bg-teal-600"
+					className="gap-2 bg-orange-600 font-semibold tracking-wide transition-all hover:scale-105 hover:bg-orange-700"
 					disabled={isDisabled || isLoading}
 				>
 					{isLoading ? "Solicitando..." : "Solicitar Cierre"}
@@ -78,7 +78,7 @@ export function RequestWorkBookClosure({
 					<AlertDialogCancel>Cancelar</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={handleRequestClosure}
-						className="gap-2 bg-teal-500 font-semibold tracking-wide hover:bg-teal-600"
+						className="gap-2 bg-orange-600 font-semibold tracking-wide transition-all hover:scale-105 hover:bg-orange-700"
 					>
 						Solicitar Cierre
 						<CheckCircleIcon className="h-4 w-4" />
