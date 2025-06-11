@@ -5,6 +5,7 @@ interface UploadFilesToCloudProps {
 	randomString: string
 	secondaryName?: string
 	containerType: "documents" | "files" | "startup" | "avatars" | "equipment"
+	nameStrategy?: "original" | "secondary" | "both"
 }
 
 export interface UploadResult {
@@ -19,6 +20,7 @@ export const uploadFilesToCloud = async ({
 	randomString,
 	secondaryName,
 	containerType,
+	nameStrategy,
 }: UploadFilesToCloudProps): Promise<UploadResult[]> => {
 	// Obtener el SAS token y la información del contenedor
 	const sasResponse = await fetch("/api/file", {
@@ -68,11 +70,28 @@ export const uploadFilesToCloud = async ({
 			throw new Error(`Error al subir archivo: ${fileData.file.name}`)
 		}
 
+		// Determinar el nombre del archivo según la estrategia elegida
+		let fileName
+		switch (nameStrategy) {
+			case "original":
+				fileName = fileData.file.name
+				break
+			case "secondary":
+				fileName = secondaryName || fileData.file.name
+				break
+			case "both":
+				fileName = secondaryName ? `${secondaryName} - ${fileData.file.name}` : fileData.file.name
+				break
+			default:
+				// Comportamiento por defecto (retrocompatible)
+				fileName = secondaryName || fileData.file.name
+		}
+
 		return {
 			url: blobUrl,
 			size: fileData.file.size,
 			type: fileData.file.type,
-			name: secondaryName || fileData.file.name,
+			name: fileName,
 		}
 	})
 

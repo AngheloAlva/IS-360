@@ -4,8 +4,8 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
 import { EquipmentDataTable } from "@/components/sections/admin/equipments/EquipmentDataTable"
-import BackButton from "@/components/shared/BackButton"
 import CreateEquipmentForm from "@/components/forms/admin/equipment/CreateEquipmentForm"
+import BackButton from "@/components/shared/BackButton"
 
 export default async function EquipmentsPage({
 	params,
@@ -57,14 +57,6 @@ export default async function EquipmentsPage({
 					</div>
 
 					{hasPermission.success && <CreateEquipmentForm parentId={actualParentId} />}
-				</div>
-			</div>
-			<div className="flex items-center gap-4">
-				<div className="flex flex-col gap-1">
-					<h1 className="text-text w-fit text-3xl font-bold">Equipos</h1>
-					<p className="text-text w-fit text-sm sm:text-base">
-						Visualiza y gestiona los equipos de la empresa.
-					</p>
 				</div>
 			</div>
 

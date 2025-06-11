@@ -18,7 +18,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 		body: {
 			userId: session.user.id,
 			permissions: {
-				workBook: ["create"],
+				workOrder: ["create"],
 			},
 		},
 	})

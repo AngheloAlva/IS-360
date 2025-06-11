@@ -25,7 +25,6 @@ export const uploadWorkOrderAttachment = async ({
 
 		const result = await prisma.attachment.create({
 			data: {
-				...rest,
 				...(reportPhase === "init"
 					? { initReport: { connect: { id: workOrderId } } }
 					: { endReport: { connect: { id: workOrderId } } }),

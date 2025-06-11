@@ -45,6 +45,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 					name: "",
 					email: "",
 					phone: "",
+					internalRole: "",
+					internalArea: "",
 				},
 			],
 		},
@@ -213,6 +215,18 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 									placeholder="Teléfono"
 									control={form.control}
 									name={`employees.${index}.phone`}
+								/>
+								<InputFormField<PartnerUsersSchema>
+									label="Cargo"
+									placeholder="Cargo"
+									control={form.control}
+									name={`employees.${index}.internalRole`}
+								/>
+								<InputFormField<PartnerUsersSchema>
+									label="Área"
+									placeholder="Área"
+									control={form.control}
+									name={`employees.${index}.internalArea`}
 								/>
 							</div>
 						))}

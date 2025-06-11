@@ -24,7 +24,7 @@ export default async function AdminCompaniesPage(): Promise<React.ReactElement> 
 	})
 
 	return (
-		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
+		<div className="flex h-full w-full flex-1 flex-col gap-8">
 			<div className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
 				<div className="flex items-center justify-between">
 					<div className="text-white">

@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { createEquipment } from "@/actions/equipments/createEquipment"
-import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 import { CriticalityOptions } from "@/lib/consts/criticality"
 import { queryClient } from "@/lib/queryClient"
 import {
@@ -15,13 +15,14 @@ import {
 	type EquipmentSchema,
 } from "@/lib/form-schemas/admin/equipment/equipment.schema"
 
-import UploadFilesFormField from "@/components/forms/shared/UploadFilesFormField"
 import { TextAreaFormField } from "@/components/forms/shared/TextAreaFormField"
 import { SwitchFormField } from "@/components/forms/shared/SwitchFormField"
 import { SelectFormField } from "@/components/forms/shared/SelectFormField"
 import { InputFormField } from "@/components/forms/shared/InputFormField"
 import SubmitButton from "@/components/forms/shared/SubmitButton"
+import FileTable from "@/components/forms/shared/FileTable"
 import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import {
 	Sheet,
@@ -39,9 +40,8 @@ interface CreateEquipmentFormProps {
 export default function CreateEquipmentForm({
 	parentId,
 }: CreateEquipmentFormProps): React.ReactElement {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
-	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
+	const [loading, setLoading] = useState(false)
 
 	const form = useForm<EquipmentSchema>({
 		resolver: zodResolver(equipmentSchema),
@@ -70,6 +70,7 @@ export default function CreateEquipmentForm({
 					randomString: values.tag,
 					containerType: "equipment",
 					secondaryName: values.name,
+					nameStrategy: "original", // Mantener el nombre original del archivo
 				})
 			}
 
@@ -113,7 +114,7 @@ export default function CreateEquipmentForm({
 				<span className="hidden text-nowrap sm:inline">Nuevo Equipo / Ubicación</span>
 			</SheetTrigger>
 
-			<SheetContent className="gap-0 sm:max-w-md">
+			<SheetContent className="gap-0 sm:max-w-lg">
 				<SheetHeader className="shadow">
 					<SheetTitle>Nuevo Equipo / Ubicación</SheetTitle>
 					<SheetDescription>
@@ -174,29 +175,36 @@ export default function CreateEquipmentForm({
 							name="isOperational"
 							control={form.control}
 							label="¿Esta operativo?"
+							className="data-[state=checked]:bg-emerald-600"
 							itemClassName="flex flex-row items-center gap-2"
 						/>
 
-						<Separator className="my-2 sm:col-span-2" />
+						<Separator className="mt-2 sm:col-span-2" />
 
-						<div className="space-y-1 sm:col-span-2">
-							<h3 className="text-sm font-medium">Documentación / Instructivos</h3>
+						<FileTable<EquipmentSchema>
+							name="files"
+							isMultiple={true}
+							maxFileSize={500}
+							control={form.control}
+							className="mt-2 sm:col-span-2"
+							label="Documentación / Instructivos"
+						/>
 
-							<UploadFilesFormField<EquipmentSchema>
-								name="files"
-								isMultiple={true}
-								maxFileSize={500}
-								canPreview={false}
-								control={form.control}
-								selectedFileIndex={selectedFileIndex}
-								setSelectedFileIndex={setSelectedFileIndex}
-							/>
-						</div>
+						<Separator className="my-4 sm:col-span-2" />
+
+						<Button
+							size={"lg"}
+							variant="outline"
+							onClick={() => setOpen(false)}
+							className="border-teal-700 text-teal-700 transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"
+						>
+							Cancelar
+						</Button>
 
 						<SubmitButton
 							isSubmitting={loading}
 							label="Crear Equipo / Ubicación"
-							className="mt-4 w-full sm:col-span-2"
+							className="bg-emerald-600 hover:bg-emerald-700"
 						/>
 					</form>
 				</Form>

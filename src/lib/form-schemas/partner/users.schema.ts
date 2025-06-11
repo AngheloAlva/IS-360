@@ -10,6 +10,8 @@ export const partnerUsersSchema = z.object({
 				email: z.string().email({ message: "El correo electrónico debe ser válido" }),
 				phone: z.string().optional(),
 				rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
+				internalRole: z.string().optional(),
+				internalArea: z.string().optional(),
 			})
 		)
 		.min(1, { message: "Debe agregar al menos un personal" }),

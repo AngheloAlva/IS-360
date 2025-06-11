@@ -21,6 +21,7 @@ export async function GET(
 			// Fetch work books with pagination
 			prisma.user.findMany({
 				where: {
+					isActive: true,
 					companyId,
 					...(search
 						? {
@@ -40,6 +41,7 @@ export async function GET(
 					phone: true,
 					email: true,
 					image: true,
+					companyId: true,
 					internalRole: true,
 					internalArea: true,
 				},

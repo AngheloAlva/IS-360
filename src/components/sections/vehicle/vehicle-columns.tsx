@@ -86,11 +86,11 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 					<DropdownMenuContent align="end">
 						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 							<VehicleForm companyId={vehicle.companyId} vehicleId={vehicle.id} />
 						</DropdownMenuItem>
 
-						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 							<DeleteVehicleDialog vehicleId={vehicle.id} companyId={vehicle.companyId} />
 						</DropdownMenuItem>
 					</DropdownMenuContent>

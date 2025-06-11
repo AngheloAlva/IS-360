@@ -40,6 +40,7 @@ enum MODULES {
   WORK_ORDERS // Ordenes de Trabajo
   WORK_PERMITS // Permisos de Trabajo
   DOCUMENTATION // Documentacion
+  WORK_REQUESTS // Solicitudes de Trabajo
   NONE // Sin módulo
 }
 
@@ -73,7 +74,6 @@ model User {
   folders                        Folder[]
   workTrackers                   WorkTracker[]
   safetyTalks                    UserSafetyTalk[]
-  workApplications               WorkApplication[]
   company                        Company?                  @relation(fields: [companyId], references: [id])
   companyId                      String?
   isSupervisor                   Boolean?
@@ -106,6 +106,8 @@ model User {
   vehicleDocument                VehicleDocument[]
   environmentalFolder            EnvironmentalFolder[]
   environmentalDocument          EnvironmentalDocument[]
+  workRequests                   WorkRequest[]
+  workRequestComments            WorkRequestComment[]
 
   @@unique([email])
   @@unique([rut])
@@ -405,22 +407,6 @@ enum WORK_APPLICATION_STATUS {
   EXPIRED
 }
 
-model WorkApplication {
-  id String @id @default(cuid())
-
-  description String
-  location    String
-  status      WORK_APPLICATION_STATUS @default(PENDING)
-  criticality CRITICALITY?
-
-  attachments   Attachment[]
-  responsible   User         @relation(fields: [responsibleId], references: [id])
-  responsibleId String
-
-  @@unique([id])
-  @@map("work_application")
-}
-
 enum ENTRY_TYPE {
   DAILY_ACTIVITY
   ADDITIONAL_ACTIVITY
@@ -505,17 +491,15 @@ model WorkTracker {
 }
 
 model Attachment {
-  id String @id @default(cuid())
-
+  id   String @id @default(cuid())
   name String
   url  String
   type String
+  size Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  workApplication       WorkApplication?     @relation(fields: [workApplicationId], references: [id])
-  workApplicationId     String?
   workEntry             WorkEntry?           @relation(fields: [workEntryId], references: [id])
   workEntryId           String?
   workTracker           WorkTracker?         @relation(fields: [workTrackerId], references: [id])
@@ -530,6 +514,8 @@ model Attachment {
   maintenancePlanTaskId String?
   equipment             Equipment?           @relation(fields: [equipmentId], references: [id])
   equipmentId           String?
+  workRequest           WorkRequest?         @relation(fields: [workRequestId], references: [id])
+  workRequestId         String?
 
   @@map("attachment")
 }
@@ -666,6 +652,13 @@ model FileComment {
 model Counter {
   id    String @id @default("ot_counter")
   value Int    @default(1)
+}
+
+model WorkRequestCounter {
+  id    String @id @default("work_request_counter")
+  value Int    @default(1)
+
+  @@map("work_request_counter")
 }
 
 enum RESOURCE_TYPE {
@@ -846,6 +839,7 @@ enum PLAN_FREQUENCY {
 enum MAINTENANCE_PLAN_LOCATION {
   PRS
   TRM
+  OTHER
 }
 
 model MaintenancePlan {
@@ -1158,4 +1152,47 @@ model EnvironmentalDocument {
   folder       EnvironmentalFolder @relation(fields: [folderId], references: [id])
 
   @@map("environmental_document")
+}
+
+enum WORK_REQUEST_STATUS {
+  REPORTED // Solicitud Reportada
+  ATTENDED // Solicitud Atendida
+  CANCELLED // Solicitud Cancelada
+}
+
+model WorkRequest {
+  id             String                    @id @default(cuid())
+  requestNumber  String                    @unique
+  description    String
+  isUrgent       Boolean                   @default(false)
+  requestDate    DateTime                  @default(now())
+  observations   String?
+  customLocation String?
+  location       MAINTENANCE_PLAN_LOCATION
+  status         WORK_REQUEST_STATUS       @default(REPORTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId      String
+  user        User                 @relation(fields: [userId], references: [id])
+  attachments Attachment[]
+  comments    WorkRequestComment[]
+
+  @@map("work_request")
+}
+
+model WorkRequestComment {
+  id      String @id @default(cuid())
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  workRequestId String
+  workRequest   WorkRequest @relation(fields: [workRequestId], references: [id], onDelete: Cascade)
+
+  @@map("work_request_comment")
 }

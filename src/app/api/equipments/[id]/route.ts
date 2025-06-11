@@ -18,6 +18,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 						tag: true,
 					},
 				},
+				attachments: true,
 				_count: {
 					select: {
 						children: true,

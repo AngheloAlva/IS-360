@@ -27,6 +27,7 @@ export const createEquipment = async ({ values, uploadResults }: CreateEquipment
 							url: result.url,
 							name: result.name,
 							type: result.type,
+							size: result.size,
 						})),
 					},
 				}),

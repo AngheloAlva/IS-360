@@ -2,7 +2,7 @@ import { Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { deleteVehicle } from "@/actions/vehicles/deleteVehicle"
+import { deleteExternalUser } from "@/actions/users/deleteUser"
 import { queryClient } from "@/lib/queryClient"
 
 import Spinner from "@/components/shared/Spinner"
@@ -18,33 +18,33 @@ import {
 	AlertDialogDescription,
 } from "@/components/ui/alert-dialog"
 
-export default function DeleteVehicleDialog({
-	vehicleId,
+export default function DeleteExternalUserDialog({
+	userId,
 	companyId,
 }: {
-	vehicleId: string
+	userId: string
 	companyId: string
 }) {
 	const [isLoading, setIsLoading] = useState(false)
 	const [open, setOpen] = useState(false)
 
-	const handleDeleteVehicle = async () => {
+	const handleDeleteUser = async () => {
 		setIsLoading(true)
 
 		try {
-			const res = await deleteVehicle({ vehicleId, companyId })
+			const res = await deleteExternalUser(userId, companyId)
 
 			if (res.ok) {
 				queryClient.invalidateQueries({
-					queryKey: ["vehicles"],
+					queryKey: ["usersByCompany", { companyId }],
 				})
-				toast.success("Se ha eliminado el vehículo correctamente")
+				toast.success("Se ha eliminado el colaborador correctamente")
 			} else {
 				toast.error(res.message)
 			}
 		} catch (error) {
 			console.error(error)
-			toast.error("Error al eliminar el vehículo")
+			toast.error("Error al eliminar el colaborador")
 		} finally {
 			setOpen(false)
 			setIsLoading(false)
@@ -55,15 +55,15 @@ export default function DeleteVehicleDialog({
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogTrigger className="hover:bg-accent hover:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
 				<Trash2Icon />
-				Eliminar vehículo
+				Eliminar Colaborador
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>Eliminar vehículo</AlertDialogTitle>
+					<AlertDialogTitle>Eliminar Colaborador</AlertDialogTitle>
 					<AlertDialogDescription>
-						¿Estás seguro de querer eliminar este vehículo?
+						¿Estás seguro de querer eliminar este colaborador?
 						<br />
-						Recuerda que una vez eliminado, no podrás modificar el vehículo.
+						Recuerda que una vez eliminado, no podrás modificar el colaborador.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
@@ -72,7 +72,7 @@ export default function DeleteVehicleDialog({
 						disabled={isLoading}
 						onClick={(e) => {
 							e.preventDefault()
-							handleDeleteVehicle()
+							handleDeleteUser()
 						}}
 						className="bg-rose-600 transition-all hover:scale-105 hover:bg-rose-700"
 					>

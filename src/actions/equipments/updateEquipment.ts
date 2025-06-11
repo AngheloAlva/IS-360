@@ -11,8 +11,7 @@ interface UpdateEquipmentProps {
 
 export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { parentId, files, ...rest } = values
+		const { parentId, files = [], ...rest } = values
 
 		if (parentId) {
 			if (parentId === id) {
@@ -52,15 +51,61 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 			}
 		}
 
-		await prisma.equipment.update({
-			where: {
-				id,
-			},
-			data: {
-				...rest,
-				...connection,
-			},
+		// Obtener los attachments actuales del equipo
+		const currentAttachments = await prisma.attachment.findMany({
+			where: { equipment: { id } },
+			select: { id: true, url: true, name: true, type: true },
 		})
+
+		// Identificar qué archivos mantener (ya existentes) y cuáles son nuevos
+		const existingFileUrls = files
+			.filter((file) => !file.file) // Sin la propiedad file son archivos ya guardados
+			.map((file) => file.url)
+
+		// IDs de adjuntos a eliminar (los que ya no están en la lista de archivos)
+		const attachmentsToDelete = currentAttachments
+			.filter((attachment) => !existingFileUrls.includes(attachment.url))
+			.map((attachment) => attachment.id)
+
+		// Crear nuevos adjuntos para los archivos nuevos
+		const newAttachments = files
+			.filter((file) => !file.file && !currentAttachments.some((att) => att.url === file.url))
+			.map((file) => ({
+				url: file.url,
+				name: file.title,
+				type: file.type,
+				size: file.fileSize,
+			}))
+
+		// Actualizar el equipo con todos los cambios
+		await prisma.$transaction(async (tx) => {
+			// Actualizar equipo
+			await tx.equipment.update({
+				where: { id },
+				data: {
+					...rest,
+					...connection,
+					// Agregar nuevos attachments si existen
+					...(newAttachments.length > 0 && {
+						attachments: {
+							create: newAttachments,
+						},
+					}),
+				},
+			})
+
+			// Eliminar attachments que ya no están en la lista
+			if (attachmentsToDelete.length > 0) {
+				await tx.attachment.deleteMany({
+					where: {
+						id: { in: attachmentsToDelete },
+					},
+				})
+			}
+		})
+
+		// TODO: Si se requiere, implementar la eliminación de archivos del almacenamiento (Azure)
+		// Esto requeriría una función adicional para eliminar archivos por URL
 
 		return {
 			ok: true,

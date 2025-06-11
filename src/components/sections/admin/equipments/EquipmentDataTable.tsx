@@ -204,7 +204,7 @@ export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTablePro
 						{isLoading || isFetching
 							? Array.from({ length: 15 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell colSpan={10}>
+										<TableCell colSpan={11}>
 											<Skeleton className="h-6.5 min-w-full" />
 										</TableCell>
 									</TableRow>
@@ -234,6 +234,7 @@ export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTablePro
 												</TableCell>
 											)
 										})}
+
 										<TableCell>
 											<div className="flex items-center justify-center space-x-2">
 												<EditEquipmentForm
@@ -247,7 +248,7 @@ export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTablePro
 
 						{data?.equipments?.length === 0 && (
 							<TableRow>
-								<TableCell colSpan={10} className="py-8 text-center text-gray-500">
+								<TableCell colSpan={11} className="py-8 text-center text-gray-500">
 									No hay equipos
 								</TableCell>
 							</TableRow>
@@ -257,9 +258,10 @@ export function EquipmentDataTable({ parentId, lastPath }: EquipmentDataTablePro
 
 				<TablePagination
 					table={table}
+					isLoading={isLoading}
 					onPageChange={setPage}
 					pageCount={data?.pages ?? 0}
-					isLoading={isLoading}
+					className="border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white"
 				/>
 			</CardContent>
 		</Card>
