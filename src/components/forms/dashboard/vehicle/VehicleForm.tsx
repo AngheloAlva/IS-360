@@ -96,6 +96,7 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 					toast.success("Vehículo actualizado", {
 						description: result.message,
 					})
+					form.reset()
 					setIsOpen(false)
 					queryClient.invalidateQueries({
 						queryKey: ["vehicles"],
@@ -115,15 +116,7 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 					toast.success("Vehículo creado", {
 						description: result.message,
 					})
-					form.reset({
-						plate: "",
-						model: "",
-						year: new Date().getFullYear(),
-						brand: "",
-						type: "CAR",
-						color: "",
-						isMain: false,
-					})
+					form.reset()
 					setIsOpen(false)
 					queryClient.invalidateQueries({
 						queryKey: ["vehicles"],
@@ -161,7 +154,7 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 					</>
 				) : (
 					<Button className="hover:bg-scale-105 gap-1.5 bg-white font-semibold text-teal-600 transition-all hover:scale-105 hover:text-teal-700">
-						<PlusCircleIcon className="size-4" />
+						<PlusCircleIcon className="size-4 text-teal-600" />
 						Crear Vehículo/Equipo
 					</Button>
 				)}

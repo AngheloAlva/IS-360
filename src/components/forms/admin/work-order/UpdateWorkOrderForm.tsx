@@ -56,6 +56,7 @@ import {
 
 import type { Company } from "@/hooks/companies/use-companies"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
+import { addDays } from "date-fns"
 
 interface UpdateWorkOrderFormProps {
 	workOrder: WorkOrder
@@ -79,6 +80,7 @@ export default function UpdateWorkOrderForm({
 		defaultValues: {
 			type: workOrder.type,
 			status: workOrder.status,
+			estimatedEndDate: undefined,
 			priority: workOrder.priority,
 			companyId: workOrder.company?.id,
 			workRequest: workOrder.workRequest,
@@ -90,7 +92,6 @@ export default function UpdateWorkOrderForm({
 			estimatedHours: `${workOrder.estimatedHours}`,
 			workDescription: workOrder.workDescription ?? "",
 			workProgressStatus: `${workOrder.workProgressStatus}`,
-			estimatedEndDate: workOrder.estimatedEndDate ?? new Date(),
 			solicitationDate: workOrder.solicitationDate ?? new Date(),
 			equipment: workOrder.equipment.map((equipment) => equipment.id),
 			solicitationTime: workOrder.solicitationTime ?? new Date().toTimeString().split(" ")[0],
@@ -110,6 +111,7 @@ export default function UpdateWorkOrderForm({
 		const estimatedDays = Math.ceil(estimatedHours / 8)
 
 		form.setValue("estimatedDays", estimatedDays.toString())
+		form.setValue("estimatedEndDate", addDays(new Date(workOrder.programDate), estimatedDays))
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("estimatedHours")])
 

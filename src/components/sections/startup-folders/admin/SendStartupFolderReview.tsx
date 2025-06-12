@@ -9,8 +9,6 @@ import { DocumentCategory } from "@prisma/client"
 import { queryClient } from "@/lib/queryClient"
 
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import {
 	Dialog,
 	DialogClose,
@@ -38,7 +36,6 @@ export function SendStartupFolderReview({
 	companyId,
 }: SendStartupFolderReviewProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [isApproved, setIsApproved] = useState(false)
 	const [isOpen, setIsOpen] = useState(false)
 
 	async function onSubmit(e: React.FormEvent) {
@@ -51,7 +48,6 @@ export function SendStartupFolderReview({
 				userId,
 				category,
 				folderId,
-				isApproved,
 			})
 
 			if (!response.ok) {
@@ -95,19 +91,6 @@ export function SendStartupFolderReview({
 						para que pueda modificar los documentos si es necesario.
 					</DialogDescription>
 				</DialogHeader>
-
-				<div>
-					<Label>¿La carpeta esta completa para ser aprobada?</Label>
-					<span className="text-muted-foreground text-sm">
-						En caso de que no, se enviara la carpeta para que la empresa contratista la pueda
-						modificar
-					</span>
-				</div>
-
-				<div className="flex items-center space-x-2">
-					<Switch checked={isApproved} onCheckedChange={setIsApproved} type="button" />
-					<Label>{isApproved ? "Si" : "No"}</Label>
-				</div>
 
 				<DialogFooter className="flex justify-end pt-4">
 					<DialogClose>

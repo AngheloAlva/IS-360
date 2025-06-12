@@ -7,28 +7,21 @@ import prisma from "@/lib/prisma"
 interface SendFolderReviewProps {
 	userId: string
 	folderId: string
-	isApproved: boolean
 	category: DocumentCategory
 }
 
-export const sendFolderReview = async ({
-	userId,
-	folderId,
-	category,
-	isApproved,
-}: SendFolderReviewProps) => {
+export const sendFolderReview = async ({ userId, folderId, category }: SendFolderReviewProps) => {
 	try {
 		let folder
 		let companyName: string
 		let additionalNotificationEmails: string[]
-		const newStatus = isApproved ? ReviewStatus.APPROVED : ReviewStatus.DRAFT
 
 		switch (category) {
 			case DocumentCategory.SAFETY_AND_HEALTH:
 				folder = await prisma.safetyAndHealthFolder.update({
 					where: { id: folderId },
 					data: {
-						status: newStatus,
+						status: ReviewStatus.DRAFT,
 						reviewer: {
 							connect: {
 								id: userId,
@@ -57,7 +50,7 @@ export const sendFolderReview = async ({
 				safetyAndHealthDocuments.forEach(async (document) => {
 					const newDocumentStatus =
 						document.status === ReviewStatus.SUBMITTED
-							? newStatus
+							? ReviewStatus.DRAFT
 							: document.status === ReviewStatus.APPROVED
 								? ReviewStatus.APPROVED
 								: document.status === ReviewStatus.DRAFT
@@ -77,7 +70,7 @@ export const sendFolderReview = async ({
 				folder = await prisma.environmentalFolder.update({
 					where: { id: folderId },
 					data: {
-						status: newStatus,
+						status: ReviewStatus.DRAFT,
 						reviewer: {
 							connect: {
 								id: userId,
@@ -114,7 +107,7 @@ export const sendFolderReview = async ({
 				environmentalDocuments.forEach(async (document) => {
 					const newDocumentStatus =
 						document.status === ReviewStatus.SUBMITTED
-							? newStatus
+							? ReviewStatus.DRAFT
 							: document.status === ReviewStatus.APPROVED
 								? ReviewStatus.APPROVED
 								: document.status === ReviewStatus.DRAFT
@@ -164,7 +157,7 @@ export const sendFolderReview = async ({
 					await prisma.workerFolder.update({
 						where: { id: folder.id },
 						data: {
-							status: newStatus,
+							status: ReviewStatus.DRAFT,
 							reviewerId: userId,
 							submittedAt: new Date(),
 						},
@@ -175,7 +168,7 @@ export const sendFolderReview = async ({
 					workerDocuments.forEach(async (document) => {
 						const newDocumentStatus =
 							document.status === ReviewStatus.SUBMITTED
-								? newStatus
+								? ReviewStatus.DRAFT
 								: document.status === ReviewStatus.APPROVED
 									? ReviewStatus.APPROVED
 									: document.status === ReviewStatus.DRAFT
@@ -226,7 +219,7 @@ export const sendFolderReview = async ({
 					await prisma.vehicleFolder.update({
 						where: { id: folder.id },
 						data: {
-							status: newStatus,
+							status: ReviewStatus.DRAFT,
 							reviewerId: userId,
 							submittedAt: new Date(),
 						},
@@ -237,7 +230,7 @@ export const sendFolderReview = async ({
 					vehicleDocuments.forEach(async (document) => {
 						const newDocumentStatus =
 							document.status === ReviewStatus.SUBMITTED
-								? newStatus
+								? ReviewStatus.DRAFT
 								: document.status === ReviewStatus.APPROVED
 									? ReviewStatus.APPROVED
 									: document.status === ReviewStatus.DRAFT

@@ -237,12 +237,6 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 								<Text style={styles.value}>{workPermit.otNumber.otNumber}</Text>
 							</View>
 						</View>
-						<View style={styles.column}>
-							<View style={styles.row}>
-								<Text style={styles.label}>Supervisor:</Text>
-								<Text style={styles.value}>Supervisor OTC</Text>
-							</View>
-						</View>
 					</View>
 
 					<View style={styles.row}>
@@ -259,7 +253,9 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							</View>
 							<View style={styles.row}>
 								<Text style={styles.label}>Adm. contrato OTC:</Text>
-								<View style={styles.customField}></View>
+								<View style={styles.value}>
+									{workPermit.otNumber.supervisor.name + " - " + workPermit.otNumber.supervisor.rut}
+								</View>
 							</View>
 						</View>
 					</View>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Files, DownloadIcon } from "lucide-react"
+import { Files, DownloadIcon, InfoIcon } from "lucide-react"
 import Link from "next/link"
 
 import { useStartupFolder } from "@/hooks/startup-folders/use-startup-folder"
@@ -69,11 +69,14 @@ export default function StartupFolderOverview({
 						<div className="flex items-center justify-between">
 							<div className="text-white">
 								<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
-								<p className="opacity-90">
-									En este módulo podrás gestionar la documentación de la empresa. En el caso de que
-									un documento no aplique a tu trabajo, deberas subir un documento indicando que no
-									aplica.
+								<p className="flex flex-col opacity-90">
+									En este módulo podrás gestionar la documentación de la empresa.
 								</p>
+
+								<span className="mt-2 flex items-center gap-1 font-bold">
+									<InfoIcon className="size-3" /> En el caso de que un documento no aplique a tu
+									trabajo, deberas subir un documento indicando que no aplica.
+								</span>
 							</div>
 
 							<div className="flex items-center gap-2">

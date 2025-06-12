@@ -14,7 +14,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 				id,
 			},
 			include: {
-				otNumber: true,
+				otNumber: {
+					include: {
+						supervisor: {
+							select: {
+								name: true,
+								rut: true,
+							},
+						},
+					},
+				},
 				user: true,
 				company: true,
 				participants: true,

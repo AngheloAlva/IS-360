@@ -1,6 +1,13 @@
 "use client"
 
-import { ClockIcon, UsersIcon, ListCheckIcon, CheckCircleIcon, InfoIcon } from "lucide-react"
+import {
+	ClockIcon,
+	UsersIcon,
+	ListCheckIcon,
+	CheckCircleIcon,
+	InfoIcon,
+	WeightIcon,
+} from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
@@ -105,6 +112,10 @@ export default function MilestoneCards({
 											</span>
 										</div>
 									)}
+									<div className="flex items-center gap-1">
+										<WeightIcon className="h-3 w-3" />
+										<span>Peso: {milestone.weight}</span>
+									</div>
 								</div>
 							</div>
 

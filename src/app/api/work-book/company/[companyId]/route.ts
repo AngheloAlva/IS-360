@@ -46,6 +46,7 @@ export async function GET(
 					estimatedDays: true,
 					estimatedHours: true,
 					workDescription: true,
+					estimatedEndDate: true,
 					workProgressStatus: true,
 					status: true,
 					solicitationDate: true,

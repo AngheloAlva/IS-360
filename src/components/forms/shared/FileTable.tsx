@@ -168,27 +168,26 @@ export default function FileTable<T extends FieldValues>({
 
 	return (
 		<div className={cn("space-y-4", className)}>
-			{files.length === 0 ||
-				(isMultiple && (
-					<div className="mb-3 flex items-center justify-between">
-						{label && <p className="text-sm font-semibold">{label}</p>}
+			{(files.length === 0 || isMultiple) && (
+				<div className="mb-3 flex items-center justify-between">
+					{label && <p className="text-sm font-semibold">{label}</p>}
 
-						<div className="group relative cursor-pointer">
-							<Button className="flex gap-2 bg-emerald-600/10 text-emerald-600 transition-all group-hover:scale-105 group-hover:text-emerald-700">
-								<Upload className="h-4 w-4" />
-								<span>{files.length === 0 ? "Subir archivo" : "Subir más archivos"}</span>
-							</Button>
-							<input
-								type="file"
-								id={`${name}-add`}
-								multiple={isMultiple}
-								disabled={!isMultiple && files.length > 0}
-								onChange={(e) => handleFileChange(e.target.files)}
-								className="absolute inset-0 cursor-pointer opacity-0"
-							/>
-						</div>
+					<div className="group relative cursor-pointer">
+						<Button className="flex gap-2 bg-emerald-600/10 text-emerald-600 transition-all group-hover:scale-105 group-hover:text-emerald-700">
+							<Upload className="h-4 w-4" />
+							<span>{files.length === 0 ? "Subir archivo" : "Subir más archivos"}</span>
+						</Button>
+						<input
+							type="file"
+							id={`${name}-add`}
+							multiple={isMultiple}
+							disabled={!isMultiple && files.length > 0}
+							onChange={(e) => handleFileChange(e.target.files)}
+							className="absolute inset-0 cursor-pointer opacity-0"
+						/>
 					</div>
-				))}
+				</div>
+			)}
 
 			{files.length > 0 ? (
 				<>

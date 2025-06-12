@@ -37,7 +37,7 @@ export default async function MaintenancePlansPage({
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<div className="rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 p-6 shadow-lg">
 				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-3 text-white">
 						<BackButton
 							href="/admin/dashboard/planes-de-mantenimiento"
 							className="bg-white/10 text-white hover:bg-white/10"

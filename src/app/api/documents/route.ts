@@ -9,6 +9,8 @@ export async function GET(req: NextRequest) {
 		const searchParams = req.nextUrl.searchParams
 		const area = searchParams.get("area") as AREAS
 		const folderId = searchParams.get("folderId") || null
+		const order = searchParams.get("order") as "asc" | "desc"
+		const orderBy = searchParams.get("orderBy") as "name" | "createdAt"
 
 		const [files, folders] = await Promise.all([
 			prisma.file.findMany({
@@ -39,7 +41,7 @@ export async function GET(req: NextRequest) {
 					},
 				},
 				orderBy: {
-					name: "asc",
+					[orderBy]: order,
 				},
 			}),
 			prisma.folder.findMany({
