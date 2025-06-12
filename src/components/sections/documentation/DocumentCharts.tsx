@@ -1,16 +1,26 @@
 "use client"
 
+import {
+	UsersIcon,
+	FileXIcon,
+	ReplaceIcon,
+	PieChartIcon,
+	FileTypeIcon,
+	ChartColumnIcon,
+	ChartSplineIcon,
+} from "lucide-react"
+
 import { useDocumentsCharts } from "@/hooks/documents/use-documents-charts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BarChart } from "./BarChart"
-import { PieChart } from "./PieChart"
 import { DocumentExpirationBarChart } from "./DocumentExpirationBarChart"
 import { RecentChangesTable } from "./RecentChangesTable"
 import { ActivityLineChart } from "./ActivityLineChart"
 import { LineChart } from "./LineChart"
 import { Metadata } from "./Metadata"
+import { BarChart } from "./BarChart"
+import { PieChart } from "./PieChart"
 
 export default function DocumentCharts() {
 	const { data, isLoading } = useDocumentsCharts()
@@ -20,31 +30,51 @@ export default function DocumentCharts() {
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				<Metadata
 					isLoading={isLoading}
+					className="bg-blue-500"
 					title="Total Documentos"
 					description="Documentos registrados"
-					className="border-blue-500 bg-blue-500/10"
 					value={data?.areaData.reduce((acc, item) => acc + item.value, 0) || 0}
+					icon={
+						<div className="rounded-lg bg-blue-500/20 p-1.5 text-blue-500">
+							<FileTypeIcon />
+						</div>
+					}
 				/>
 				<Metadata
 					isLoading={isLoading}
+					className="bg-red-500"
 					title="Documentos Vencidos"
 					description="Requieren atención inmediata"
-					className="border-red-500 bg-red-500/10"
 					value={data?.expirationData.find((item) => item.name === "Vencidos")?.value || 0}
+					icon={
+						<div className="rounded-lg bg-red-500/20 p-1.5 text-red-500">
+							<FileXIcon />
+						</div>
+					}
 				/>
 				<Metadata
 					title="Responsables"
 					isLoading={isLoading}
+					className="bg-green-500"
 					description="Personas a cargo"
 					value={data?.responsibleData.length || 0}
-					className="border-green-500 bg-green-500/10"
+					icon={
+						<div className="rounded-lg bg-green-500/20 p-1.5 text-green-500">
+							<UsersIcon />
+						</div>
+					}
 				/>
 				<Metadata
 					isLoading={isLoading}
 					title="Cambios Recientes"
+					className="bg-yellow-500"
 					description="En los últimos 7 días"
 					value={data?.recentChanges.length || 0}
-					className="border-yellow-500 bg-yellow-500/10"
+					icon={
+						<div className="rounded-lg bg-yellow-500/20 p-1.5 text-yellow-500">
+							<ReplaceIcon />
+						</div>
+					}
 				/>
 			</div>
 
@@ -68,9 +98,18 @@ export default function DocumentCharts() {
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						<Card className="col-span-2">
 							<CardHeader>
-								<CardTitle>Actividad de Documentación</CardTitle>
-								<CardDescription>Creación de carpetas y archivos en los últimos 30 días</CardDescription>
+								<div className="flex items-center justify-between">
+									<div>
+										<CardTitle>Actividad de Documentación</CardTitle>
+										<CardDescription>
+											Creación de carpetas y archivos en los últimos 30 días
+										</CardDescription>
+									</div>
+
+									<ChartSplineIcon className="text-muted-foreground h-5 min-w-5" />
+								</div>
 							</CardHeader>
+
 							<CardContent className="pl-2">
 								<ActivityLineChart data={data?.activityByDay || []} />
 							</CardContent>
@@ -78,8 +117,14 @@ export default function DocumentCharts() {
 
 						<Card className="col-span-2 lg:col-span-1">
 							<CardHeader>
-								<CardTitle>Proporción por Áreas</CardTitle>
-								<CardDescription>Distribución porcentual</CardDescription>
+								<div className="flex items-center justify-between">
+									<div>
+										<CardTitle>Proporción por Áreas</CardTitle>
+										<CardDescription>Distribución porcentual</CardDescription>
+									</div>
+
+									<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
+								</div>
 							</CardHeader>
 							<CardContent>
 								<PieChart data={data?.areaData || []} />
@@ -92,20 +137,26 @@ export default function DocumentCharts() {
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						<Card className="col-span-2">
 							<CardHeader>
-								<CardTitle>Estado de Vencimientos</CardTitle>
-								<CardDescription>Documentos por período de vencimiento</CardDescription>
+								<div className="flex items-center justify-between">
+									<div>
+										<CardTitle>Estado de Vencimientos</CardTitle>
+										<CardDescription>Documentos por período de vencimiento</CardDescription>
+									</div>
+
+									<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
+								</div>
 							</CardHeader>
 							<CardContent className="pl-2">
 								<DocumentExpirationBarChart
 									data={data?.expirationData || []}
 									colors={[
-										"#dc2626",
-										"#f97316",
-										"#eab308",
-										"#84cc16",
-										"#10b981",
-										"#0ea5e9",
-										"#8b5cf6",
+										"var(--color-red-500)",
+										"var(--color-orange-500)",
+										"var(--color-yellow-500)",
+										"var(--color-green-500)",
+										"var(--color-blue-500)",
+										"var(--color-indigo-500)",
+										"var(--color-purple-500)",
 									]}
 								/>
 							</CardContent>
@@ -119,13 +170,13 @@ export default function DocumentCharts() {
 								<PieChart
 									data={data?.expirationData || []}
 									colors={[
-										"#dc2626",
-										"#f97316",
-										"#eab308",
-										"#84cc16",
-										"#10b981",
-										"#0ea5e9",
-										"#8b5cf6",
+										"var(--color-red-500)",
+										"var(--color-orange-500)",
+										"var(--color-yellow-500)",
+										"var(--color-green-500)",
+										"var(--color-blue-500)",
+										"var(--color-indigo-500)",
+										"var(--color-purple-500)",
 									]}
 								/>
 							</CardContent>
@@ -137,25 +188,52 @@ export default function DocumentCharts() {
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						<Card className="col-span-2">
 							<CardHeader>
-								<CardTitle>Documentos por Responsable</CardTitle>
-								<CardDescription>Cantidad asignada a cada persona</CardDescription>
+								<div className="flex items-center justify-between">
+									<div>
+										<CardTitle>Documentos por Responsable</CardTitle>
+										<CardDescription>Cantidad asignada a cada persona</CardDescription>
+									</div>
+
+									<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
+								</div>
 							</CardHeader>
+
 							<CardContent className="pl-2">
 								<BarChart
 									data={data?.responsibleData || []}
-									colors={["#2563eb", "#10b981", "#f59e0b", "#dc2626", "#8b5cf6"]}
+									colors={[
+										"var(--color-blue-500)",
+										"var(--color-green-500)",
+										"var(--color-yellow-500)",
+										"var(--color-red-500)",
+										"var(--color-indigo-500)",
+										"var(--color-purple-500)",
+									]}
 								/>
 							</CardContent>
 						</Card>
 						<Card>
 							<CardHeader>
-								<CardTitle>Distribución por Responsable</CardTitle>
-								<CardDescription>Proporción de carga de trabajo</CardDescription>
+								<div className="flex items-center justify-between">
+									<div>
+										<CardTitle>Distribución por Responsable</CardTitle>
+										<CardDescription>Proporción de carga de trabajo</CardDescription>
+									</div>
+
+									<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
+								</div>
 							</CardHeader>
 							<CardContent>
 								<PieChart
 									data={data?.responsibleData || []}
-									colors={["#2563eb", "#10b981", "#f59e0b", "#dc2626", "#8b5cf6"]}
+									colors={[
+										"var(--color-blue-500)",
+										"var(--color-green-500)",
+										"var(--color-yellow-500)",
+										"var(--color-red-500)",
+										"var(--color-indigo-500)",
+										"var(--color-purple-500)",
+									]}
 								/>
 							</CardContent>
 						</Card>
@@ -173,6 +251,7 @@ export default function DocumentCharts() {
 								<LineChart data={data?.changesPerDay || []} />
 							</CardContent>
 						</Card>
+
 						<Card className="col-span-full lg:col-span-1">
 							<CardHeader>
 								<CardTitle>Últimas modificaciones</CardTitle>

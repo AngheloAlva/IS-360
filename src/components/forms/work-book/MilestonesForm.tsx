@@ -121,6 +121,7 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="h-full space-y-6 overflow-y-auto px-4 pb-24"
 					>
+						{/* Root errors */}
 						{form.formState.errors.milestones?.root && (
 							<div className="rounded-md border border-red-500 bg-red-50 p-3 text-sm text-red-800">
 								<p className="font-medium">Errores de validación:</p>
@@ -128,6 +129,36 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 								<span>{form.formState.errors.milestones?.root.message}</span>
 							</div>
 						)}
+
+						{/* Date errors */}
+						{milestoneFields.some(
+							(_, index) =>
+								form.formState.errors.milestones?.[index]?.startDate ||
+								form.formState.errors.milestones?.[index]?.endDate
+						) && (
+							<div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+								<p className="font-medium">Advertencias de fechas:</p>
+								<ul className="mt-2 list-disc pl-5">
+									{milestoneFields.map((_, index) => (
+										<div key={index}>
+											{form.formState.errors.milestones?.[index]?.startDate && (
+												<li>
+													Hito {index + 1}:{" "}
+													{form.formState.errors.milestones[index]?.startDate?.message}
+												</li>
+											)}
+											{form.formState.errors.milestones?.[index]?.endDate && (
+												<li>
+													Hito {index + 1}:{" "}
+													{form.formState.errors.milestones[index]?.endDate?.message}
+												</li>
+											)}
+										</div>
+									))}
+								</ul>
+							</div>
+						)}
+
 						<Tabs
 							defaultValue="0"
 							value={activeTab}
@@ -149,6 +180,7 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 												<span className="truncate">
 													{form.watch(`milestones.${index}.name`) || `Hito ${index + 1}`}
 												</span>
+
 												{milestoneFields.length > 1 && (
 													<div
 														className="hover:bg-accent hover:text-text size-5 cursor-pointer rounded-full p-0.5 transition-colors"
@@ -224,9 +256,6 @@ interface MilestoneFormProps {
 }
 
 function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) {
-	const startDateError = form.formState.errors.milestones?.[index]?.startDate?.message
-	const endDateError = form.formState.errors.milestones?.[index]?.endDate?.message
-
 	return (
 		<div className="space-y-4">
 			<div className="space-y-5">
@@ -237,16 +266,6 @@ function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) 
 					</h3>
 					<FormDescription className="mt-0">Datos estimados para el hito</FormDescription>
 				</div>
-
-				{(startDateError || endDateError) && (
-					<div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
-						<p className="font-medium">Advertencias de fechas:</p>
-						<ul className="mt-2 list-disc pl-5">
-							{startDateError && <li>{startDateError}</li>}
-							{endDateError && <li>{endDateError}</li>}
-						</ul>
-					</div>
-				)}
 
 				<div className="grid grid-cols-1 gap-x-3 gap-y-5 md:grid-cols-2">
 					<InputFormField<WorkBookMilestonesSchema>

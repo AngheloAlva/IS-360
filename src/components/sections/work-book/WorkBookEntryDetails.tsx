@@ -14,6 +14,8 @@ import {
 	DrawerTitle,
 } from "@/components/ui/drawer"
 import Link from "next/link"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
 
 interface WorkBookEntryDetailsProps {
 	entry: WorkEntry | null
@@ -66,6 +68,10 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 								<h4 className="font-semibold">Detalles de la Actividad</h4>
 								<div className="grid grid-cols-2 gap-4">
 									<div>
+										<p className="text-muted-foreground text-sm">Fecha de ejecución</p>
+										<p>{format(entry.executionDate, "dd MMM yyyy", { locale: es })}</p>
+									</div>
+									<div>
 										<p className="text-muted-foreground text-sm">Hora de inicio</p>
 										<p>{entry.activityStartTime}</p>
 									</div>
@@ -77,8 +83,8 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 							</div>
 
 							<div className="space-y-2">
-								<h4 className="font-semibold">Comentarios</h4>
-								<p className="text-sm">{entry.comments || "Sin comentarios"}</p>
+								<h4 className="font-semibold">Descripción</h4>
+								<p className="text-sm">{entry.comments || "Sin descripción"}</p>
 							</div>
 
 							{entry.supervisionComments && (
@@ -114,10 +120,10 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 								<div className="flex flex-wrap gap-2">
 									{entry.assignedUsers.map((user) => (
 										<span
-											key={user.name}
-											className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm"
+											key={user.id}
+											className="rounded-lg bg-amber-600/10 px-3 py-1 text-sm text-amber-600"
 										>
-											{user.name}
+											{user.name} - {user.rut}
 										</span>
 									))}
 								</div>
@@ -132,7 +138,7 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 											key={attachment.name}
 											href={attachment.url}
 											rel="noopener noreferrer"
-											className="text-primary text-sm hover:underline flex items-center gap-1 flex-nowrap"
+											className="flex flex-nowrap items-center gap-1 text-sm text-orange-500 hover:underline"
 										>
 											{attachment.name}
 											<ExternalLink className="h-4 w-4" />

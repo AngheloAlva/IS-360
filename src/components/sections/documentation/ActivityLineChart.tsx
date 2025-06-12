@@ -1,6 +1,8 @@
 "use client"
 
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 interface ActivityLineChartProps {
 	data: {
@@ -12,40 +14,41 @@ interface ActivityLineChartProps {
 
 export function ActivityLineChart({ data }: ActivityLineChartProps) {
 	return (
-		<ResponsiveContainer width="100%" height={350}>
-			<LineChart data={data}>
-				<XAxis
-					dataKey="date"
-					stroke="#888888"
-					fontSize={12}
-					tickLine={false}
-					axisLine={false}
-				/>
-				<YAxis
-					stroke="#888888"
-					fontSize={12}
-					tickLine={false}
-					axisLine={false}
-					tickFormatter={(value) => `${value}`}
-				/>
-				<Tooltip contentStyle={{ backgroundColor: 'var(--background)', border: '1px solid var(--input)', borderRadius: '10px' }} />
-				<Line
+		<ChartContainer config={{}} className="h-[350px] w-full">
+			<AreaChart data={data}>
+				<CartesianGrid strokeDasharray="3 3" vertical={false} />
+
+				<XAxis dataKey="date" />
+				<YAxis />
+
+				<ChartTooltip content={<ChartTooltipContent />} />
+
+				<defs>
+					<linearGradient id={"company-1"} x1="0" y1="0" x2="0" y2="1">
+						<stop offset="5%" stopColor={"var(--color-blue-500)"} stopOpacity={0.8} />
+						<stop offset="95%" stopColor={"var(--color-blue-500)"} stopOpacity={0.1} />
+					</linearGradient>
+					<linearGradient id={"company-2"} x1="0" y1="0" x2="0" y2="1">
+						<stop offset="5%" stopColor={"var(--color-green-500)"} stopOpacity={0.8} />
+						<stop offset="95%" stopColor={"var(--color-green-500)"} stopOpacity={0.1} />
+					</linearGradient>
+				</defs>
+
+				<Area
 					type="monotone"
 					dataKey="archivos"
-					stroke="#2563eb"
-					strokeWidth={2}
-					activeDot={{ r: 4 }}
+					stroke="var(--color-blue-500)"
 					name="Archivos"
+					fill="url(#company-1)"
 				/>
-				<Line
+				<Area
 					type="monotone"
 					dataKey="carpetas"
-					stroke="#16a34a"
-					strokeWidth={2}
-					activeDot={{ r: 4 }}
+					stroke="var(--color-green-500)"
 					name="Carpetas"
+					fill="url(#company-2)"
 				/>
-			</LineChart>
-		</ResponsiveContainer>
+			</AreaChart>
+		</ChartContainer>
 	)
 }

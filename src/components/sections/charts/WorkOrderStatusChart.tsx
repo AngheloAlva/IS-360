@@ -1,6 +1,6 @@
 "use client"
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
 import { ChartColumnIcon } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -47,6 +47,7 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 		completed: item.completed,
 		cancelled: item.cancelled,
 		fullName: item.company, // Para mostrar en el tooltip
+		total: item.planned + item.inProgress + item.cancelled + item.completed,
 	}))
 
 	return (
@@ -61,7 +62,7 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 				</div>
 			</CardHeader>
 			<CardContent className="py-0">
-				<ChartContainer config={config} className="h-[300px] w-full">
+				<ChartContainer config={config} className="h-[350px] w-full">
 					<BarChart data={chartData} margin={{ top: 10 }} barSize={20}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
 						<XAxis
@@ -94,34 +95,35 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 							}
 						/>
 						<ChartLegend className="flex-wrap gap-y-1" content={<ChartLegendContent />} />
+
 						<Bar
 							dataKey="planned"
 							fill="var(--color-blue-500)"
 							name="Planificadas"
-							radius={[4, 4, 0, 0]}
 							stackId="stack"
+							radius={[0, 0, 4, 4]}
 						/>
 						<Bar
 							dataKey="inProgress"
 							fill="var(--color-indigo-500)"
 							name="En Progreso"
-							radius={[4, 4, 0, 0]}
 							stackId="stack"
 						/>
 						<Bar
 							dataKey="completed"
 							fill="var(--color-green-500)"
 							name="Completadas"
-							radius={[4, 4, 0, 0]}
 							stackId="stack"
 						/>
 						<Bar
 							dataKey="cancelled"
 							fill="var(--color-red-500)"
 							name="Canceladas"
-							radius={[0, 0, 4, 4]}
 							stackId="stack"
-						/>
+							radius={[4, 4, 0, 0]}
+						>
+							<LabelList dataKey="total" position="top" />
+						</Bar>
 					</BarChart>
 				</ChartContainer>
 			</CardContent>

@@ -18,10 +18,10 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 			const entryType = row.getValue("entryType") as ENTRY_TYPE
 			return (
 				<Badge
-					className={cn("border-orange-600 bg-orange-600/10 text-orange-600", {
-						"border-amber-600 bg-amber-600/10 text-amber-600": entryType === "ADDITIONAL_ACTIVITY",
-						"border-red-500 bg-red-500/10 text-red-500": entryType === "OTC_INSPECTION",
-						"border-lime-500 bg-lime-500/10 text-lime-500": entryType === "COMMENT",
+					className={cn("bg-orange-600/10 text-orange-600", {
+						"bg-amber-600/10 text-amber-600": entryType === "ADDITIONAL_ACTIVITY",
+						"bg-red-500/10 text-red-500": entryType === "OTC_INSPECTION",
+						"bg-lime-500/10 text-lime-500": entryType === "COMMENT",
 					})}
 				>
 					{WORK_ENTRY_TYPE[entryType]}
@@ -30,8 +30,17 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		},
 	},
 	{
+		accessorKey: "milestone",
+		header: "Nombre del hito",
+		cell: ({ row }) => {
+			const milestone = row.original.milestone.name
+
+			return <span>{milestone}</span>
+		},
+	},
+	{
 		accessorKey: "activityName",
-		header: "Título",
+		header: "Nombre de la actividad",
 		cell: ({ row }) => {
 			const activityName = row.getValue("activityName") as string
 			const entryType = row.getValue("entryType") as ENTRY_TYPE
@@ -62,11 +71,11 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 	},
 	{
 		accessorKey: "activityStartTime",
-		header: "Fecha de inicio",
+		header: "Hora de inicio",
 	},
 	{
 		accessorKey: "activityEndTime",
-		header: "Fecha de fin",
+		header: "Hora de fin",
 	},
 	{
 		id: "createdBy",

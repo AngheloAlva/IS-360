@@ -6,6 +6,11 @@ import prisma from "@/lib/prisma"
 export async function GET() {
 	try {
 		const companies = await prisma.company.findMany({
+			where: {
+				NOT: {
+					rut: "96.655.490-8",
+				},
+			},
 			select: {
 				id: true,
 				name: true,
@@ -52,8 +57,8 @@ export async function GET() {
 				},
 			},
 			cacheStrategy: {
-				swr: 10,
 				ttl: 120,
+				swr: 10,
 			},
 		})
 

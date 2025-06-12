@@ -53,8 +53,8 @@ export function DocumentReviewProgressChart({ data }: DocumentReviewProgressChar
 			</CardHeader>
 
 			<CardContent className="p-0">
-				<ChartContainer className="h-[300px] w-full" config={config}>
-					<BarChart data={chartData} margin={{ top: 10, right: 30, left: 0 }} layout="vertical">
+				<ChartContainer className="h-[350px] w-full" config={config}>
+					<BarChart data={chartData} margin={{ right: 30, left: 0 }} layout="vertical">
 						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis type="number" />
 						<YAxis

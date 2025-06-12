@@ -6,8 +6,8 @@ import {
 	SortingState,
 	useReactTable,
 	getCoreRowModel,
-	ColumnFiltersState,
 	getFilteredRowModel,
+	type ColumnFiltersState,
 } from "@tanstack/react-table"
 
 import { useWorkEntries, WorkEntry } from "@/hooks/work-orders/use-work-entries"
@@ -25,6 +25,13 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/components/ui/table"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select"
 
 export default function WorkBookEntriesTable({
 	workOrderId,
@@ -32,14 +39,16 @@ export default function WorkBookEntriesTable({
 	workOrderId: string
 }): React.ReactElement {
 	const [selectedEntry, setSelectedEntry] = useState<WorkEntry | null>(null)
-	const [page, setPage] = useState(1)
-	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [milestone, setMilestone] = useState<string | null>(null)
 	const [sorting, setSorting] = useState<SortingState>([])
+	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1)
 
 	const { data, isLoading } = useWorkEntries({
 		page,
 		search,
+		milestone,
 		limit: 10,
 		workOrderId,
 	})
@@ -73,6 +82,30 @@ export default function WorkBookEntriesTable({
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder="Buscar por nombre de actividad o comentarios..."
 				/>
+
+				<Select
+					onValueChange={(value) => {
+						if (value === "all") {
+							setMilestone(null)
+						} else {
+							setMilestone(value)
+						}
+					}}
+					value={milestone === null ? "all" : milestone}
+				>
+					<SelectTrigger className="bg-background w-full sm:w-fit">
+						<SelectValue placeholder="Seleccionar hito" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">Todos los hitos</SelectItem>
+
+						{data?.milestones.map((milestone) => (
+							<SelectItem key={milestone.id} value={milestone.id}>
+								{milestone.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			</div>
 
 			{isLoading ? (
@@ -140,8 +173,8 @@ export default function WorkBookEntriesTable({
 			/>
 
 			<WorkBookEntryDetails
-				entry={selectedEntry}
 				isLoading={false}
+				entry={selectedEntry}
 				onClose={() => setSelectedEntry(null)}
 			/>
 		</div>

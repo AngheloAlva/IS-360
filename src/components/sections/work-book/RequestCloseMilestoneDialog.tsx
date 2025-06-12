@@ -57,7 +57,7 @@ export default function RequestCloseMilestoneDialog({
 
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogTrigger className="bg-primary hover:bg-primary/80 mt-auto w-full rounded-md px-2 py-2 text-white">
+			<AlertDialogTrigger className="mt-auto w-full rounded-md bg-orange-600 px-2 py-2 text-white transition-all hover:scale-105 hover:bg-orange-700">
 				Solicitar cierre
 			</AlertDialogTrigger>
 			<AlertDialogContent>
@@ -78,7 +78,7 @@ export default function RequestCloseMilestoneDialog({
 							e.preventDefault()
 							handleRequestCloseMilestone()
 						}}
-						className="hover:bg-primary/80 hover:text-white"
+						className="bg-orange-600 transition-all hover:scale-105 hover:bg-orange-700 hover:text-white"
 					>
 						{isLoading ? <Spinner className="h-4 w-4" /> : "Solicitar cierre"}
 					</AlertDialogAction>

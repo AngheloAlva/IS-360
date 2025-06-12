@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
 		const workOrderId = searchParams.get("workOrderId")
+		const milestone = searchParams.get("milestone")
 
 		if (!workOrderId) {
 			return NextResponse.json({ error: "Work Order ID is required" }, { status: 400 })
@@ -16,12 +17,19 @@ export async function GET(req: NextRequest) {
 
 		const skip = (page - 1) * limit
 
-		const [entries, total] = await Promise.all([
+		const [entries, total, milestones] = await Promise.all([
 			prisma.workEntry.findMany({
 				where: {
 					workOrder: {
 						id: workOrderId,
 					},
+					...(milestone
+						? {
+								milestone: {
+									id: milestone,
+								},
+							}
+						: {}),
 					...(search
 						? {
 								OR: [
@@ -81,6 +89,12 @@ export async function GET(req: NextRequest) {
 							isSupervisor: true,
 						},
 					},
+					milestone: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
 				},
 				skip,
 				take: limit,
@@ -112,11 +126,26 @@ export async function GET(req: NextRequest) {
 					swr: 10,
 				},
 			}),
+			prisma.milestone.findMany({
+				where: {
+					workOrder: {
+						id: workOrderId,
+					},
+				},
+				select: {
+					id: true,
+					name: true,
+				},
+				orderBy: {
+					order: "asc",
+				},
+			}),
 		])
 
 		return NextResponse.json({
-			entries,
 			total,
+			entries,
+			milestones,
 			pages: Math.ceil(total / limit),
 		})
 	} catch (error) {

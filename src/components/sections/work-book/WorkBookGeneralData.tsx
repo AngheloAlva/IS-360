@@ -1,3 +1,4 @@
+import { format } from "date-fns"
 import {
 	User,
 	Clock,
@@ -8,10 +9,10 @@ import {
 	Briefcase,
 	SettingsIcon,
 } from "lucide-react"
-import { format } from "date-fns"
 
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 
+import { CloseWorkBook } from "./CloseWorkBook"
 import {
 	Accordion,
 	AccordionItem,
@@ -20,14 +21,17 @@ import {
 } from "@/components/ui/accordion"
 
 import type { WorkBookById } from "@/hooks/work-orders/use-work-book-by-id"
-import { CloseWorkBook } from "./CloseWorkBook"
 
 interface WorkBookGeneralDataProps {
+	userId: string
 	data: WorkBookById
+	hasPermission: boolean
 }
 
 export default function WorkBookGeneralData({
 	data,
+	userId,
+	hasPermission,
 }: WorkBookGeneralDataProps): React.ReactElement {
 	return (
 		<div className="grid w-full gap-2">
@@ -151,9 +155,11 @@ export default function WorkBookGeneralData({
 							</div>
 						</div>
 
-						<div className="flex justify-end">
-							<CloseWorkBook userId={data.responsible.id} workOrderId={data.id} />
-						</div>
+						{(hasPermission || data.responsibleId === userId) && (
+							<div className="flex justify-end">
+								<CloseWorkBook userId={data.responsible.id} workOrderId={data.id} />
+							</div>
+						)}
 					</AccordionContent>
 				</AccordionItem>
 

@@ -1,12 +1,12 @@
 "use client"
 
 import {
+	InfoIcon,
 	ClockIcon,
 	UsersIcon,
+	WeightIcon,
 	ListCheckIcon,
 	CheckCircleIcon,
-	InfoIcon,
-	WeightIcon,
 } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -27,14 +27,16 @@ interface MilestoneCardsProps {
 	userId: string
 	userRole: string
 	workOrderId: string
+	supervisorId: string
 	milestones: Milestone[]
 }
 
 export default function MilestoneCards({
 	userId,
 	userRole,
-	workOrderId,
 	milestones,
+	workOrderId,
+	supervisorId,
 }: MilestoneCardsProps) {
 	if (milestones.length === 0) {
 		return (
@@ -89,7 +91,7 @@ export default function MilestoneCards({
 
 						<CardContent className="flex h-full flex-col">
 							<div className="text-muted-foreground text-sm">
-								<div className="grid grid-cols-2 gap-2">
+								<div className="grid grid-cols-2 gap-x-2 gap-y-1">
 									{milestone.startDate && (
 										<div className="flex items-center gap-1">
 											<ClockIcon className="h-3 w-3" />
@@ -101,6 +103,7 @@ export default function MilestoneCards({
 											</span>
 										</div>
 									)}
+
 									{milestone.endDate && (
 										<div className="flex items-center gap-1">
 											<ClockIcon className="h-3 w-3" />
@@ -112,9 +115,15 @@ export default function MilestoneCards({
 											</span>
 										</div>
 									)}
+
 									<div className="flex items-center gap-1">
 										<WeightIcon className="h-3 w-3" />
-										<span>Peso: {milestone.weight}</span>
+										<span>Peso: {milestone.weight}%</span>
+									</div>
+
+									<div className="flex items-center gap-1">
+										<ListCheckIcon className="h-3 w-3" />
+										<span>Actividades: {milestone.activities.length}</span>
 									</div>
 								</div>
 							</div>
@@ -140,7 +149,7 @@ export default function MilestoneCards({
 																	<span className="text-sm leading-none font-semibold">
 																		{activity.activityName}
 																	</span>
-																	<CheckCircleIcon className="ml-2 h-4 w-4 text-green-500" />
+																	<CheckCircleIcon className="ml-2 h-4 w-4 text-orange-500" />
 																</div>
 
 																<p className="text-muted-foreground text-sm">
@@ -207,17 +216,16 @@ export default function MilestoneCards({
 								</div>
 							)}
 
-							{milestone.status === MILESTONE_STATUS.IN_PROGRESS &&
-								userRole === "partnerCompany" && (
-									<RequestCloseMilestoneDialog
-										userId={userId}
-										workOrderId={workOrderId}
-										milestoneId={milestone.id}
-									/>
-								)}
+							{milestone.status === MILESTONE_STATUS.IN_PROGRESS && userId === supervisorId && (
+								<RequestCloseMilestoneDialog
+									userId={userId}
+									workOrderId={workOrderId}
+									milestoneId={milestone.id}
+								/>
+							)}
 
 							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
-								userRole !== "partnerCompany" && (
+								userId === supervisorId && (
 									<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
 								)}
 						</CardContent>

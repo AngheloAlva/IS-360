@@ -1,16 +1,8 @@
 "use client"
 
-import {
-	Line,
-	XAxis,
-	YAxis,
-	Tooltip,
-	CartesianGrid,
-	ResponsiveContainer,
-	LineChart as RechartsLineChart,
-} from "recharts"
+import { XAxis, YAxis, CartesianGrid, AreaChart, Area } from "recharts"
 
-import { Card } from "@/components/ui/card"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 interface LineChartProps {
 	data: {
@@ -21,34 +13,30 @@ interface LineChartProps {
 
 export function LineChart({ data }: LineChartProps) {
 	return (
-		<ResponsiveContainer width="100%" height={300}>
-			<RechartsLineChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+		<ChartContainer config={{}} className="h-[300px] w-full">
+			<AreaChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
 				<CartesianGrid strokeDasharray="3 3" vertical={false} />
 				<XAxis dataKey="date" />
 				<YAxis allowDecimals={false} />
-				<Tooltip
-					content={({ active, payload, label }) => {
-						if (active && payload && payload.length) {
-							return (
-								<Card className="border bg-white p-2 shadow-sm">
-									<div className="text-sm font-medium">Fecha: {label}</div>
-									<div className="text-sm">Cambios: {payload[0].value}</div>
-								</Card>
-							)
-						}
-						return null
-					}}
-				/>
-				<Line
+				<ChartTooltip content={<ChartTooltipContent />} />
+
+				<defs>
+					<linearGradient id="colorTasks" x1="0" y1="0" x2="0" y2="1">
+						<stop offset="5%" stopColor="var(--color-purple-500)" stopOpacity={0.8} />
+						<stop offset="95%" stopColor="var(--color-purple-500)" stopOpacity={0.1} />
+					</linearGradient>
+				</defs>
+
+				<Area
 					type="monotone"
 					dataKey="cambios"
-					stroke="#2563eb"
-					strokeWidth={2}
-					dot={{ r: 4, fill: "#2563eb" }}
+					stroke="var(--color-purple-500)"
+					fill="url(#colorTasks)"
+					dot={{ r: 4, fill: "var(--color-purple-500)" }}
 					activeDot={{ r: 6 }}
 					name="Cambios"
 				/>
-			</RechartsLineChart>
-		</ResponsiveContainer>
+			</AreaChart>
+		</ChartContainer>
 	)
 }

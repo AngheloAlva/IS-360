@@ -150,7 +150,7 @@ export function WorkEntryActivityChart({ data }: WorkEntryActivityChartProps) {
 				</div>
 			</CardHeader>
 			<CardContent className="py-0">
-				<ChartContainer config={config} className="h-[300px] w-full">
+				<ChartContainer config={config} className="h-[350px] w-full">
 					<AreaChart data={chartData} margin={{ top: 10 }}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
 						<XAxis dataKey="date" tickLine={false} axisLine={false} label="Fecha" />

@@ -132,7 +132,7 @@ export default function WorkBookMain({
 				</div>
 			</div>
 
-			<WorkBookGeneralData data={workBook} />
+			<WorkBookGeneralData data={workBook} userId={userId} hasPermission={hasPermission} />
 
 			<Tabs defaultValue="milestones" className="w-full">
 				<TabsList className="h-11 w-full">
@@ -149,6 +149,7 @@ export default function WorkBookMain({
 						userId={userId}
 						userRole={userRole}
 						workOrderId={workBook.id}
+						supervisorId={workBook.supervisorId}
 						canRequestClosure={canRequestClosure}
 						workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
 					/>
@@ -176,12 +177,14 @@ export default function WorkBookMain({
 													entryType="DAILY_ACTIVITY"
 												/>
 											) : (
-												<Alert>
-													<InfoIcon className="h-4 w-4" />
-													<AlertTitle>
-														Debe crear su(s) hito(s) para agregar actividades diarias
-													</AlertTitle>
-												</Alert>
+												workBook.supervisorId === userId && (
+													<Alert>
+														<InfoIcon className="h-4 w-4" />
+														<AlertTitle>
+															Debe crear su(s) hito(s) para agregar actividades diarias
+														</AlertTitle>
+													</Alert>
+												)
 											))}
 
 										{hasPermission && (

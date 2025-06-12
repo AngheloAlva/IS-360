@@ -1,8 +1,7 @@
 "use client"
 
-import { Building, ChevronsUpDown, LogOut, UserIcon } from "lucide-react"
+import { Building, ChevronsUpDown, LogOut } from "lucide-react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -11,7 +10,6 @@ import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuGroup,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuSeparator,
@@ -81,17 +79,6 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 								</div>
 							</div>
 						</DropdownMenuLabel>
-
-						<DropdownMenuSeparator />
-
-						<DropdownMenuGroup>
-							<Link href="/dashboard/mi-cuenta">
-								<DropdownMenuItem>
-									<UserIcon />
-									Mi Cuenta
-								</DropdownMenuItem>
-							</Link>
-						</DropdownMenuGroup>
 
 						<DropdownMenuSeparator />
 

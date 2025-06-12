@@ -4,7 +4,6 @@ import Image from "next/image"
 import {
 	CarIcon,
 	HomeIcon,
-	SendIcon,
 	UsersIcon,
 	WrenchIcon,
 	FoldersIcon,
@@ -17,6 +16,7 @@ import {
 	LayoutListIcon,
 	MonitorPlayIcon,
 	FilePlus2Icon,
+	UserIcon,
 } from "lucide-react"
 
 import { NavSecondary } from "./navSecondary"
@@ -116,15 +116,15 @@ const data = {
 		},
 	],
 	navSecondary: [
+		// {
+		// 	title: "Mi Cuenta",
+		// 	url: "/dashboard/mi-cuenta",
+		// 	icon: UserIcon,
+		// },
 		{
-			title: "Soporte",
+			title: "Soporte | Contacto",
 			url: "/dashboard/soporte",
 			icon: LifeBuoyIcon,
-		},
-		{
-			title: "Contacto",
-			url: "/dashboard/contacto",
-			icon: SendIcon,
 		},
 	],
 }
@@ -160,6 +160,12 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 		...(canAccessAdminRoutes ? [...data.navAdmin] : []),
 	]
 
+	const myAccountItem = {
+		title: "Mi Cuenta",
+		url: canAccessUserRoutes ? "/dashboard/mi-cuenta" : "/admin/dashboard/mi-cuenta",
+		icon: UserIcon,
+	}
+
 	return (
 		<Sidebar collapsible="icon" variant="sidebar" {...props}>
 			<SidebarHeader>
@@ -178,7 +184,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 				<NavMain navItems={navItems} />
 				{canAccessAdminRoutes && <NavInternal navItems={navInternal} />}
 
-				<NavSecondary items={data.navSecondary} className="mt-auto" />
+				<NavSecondary items={[myAccountItem, ...data.navSecondary]} className="mt-auto" />
 			</SidebarContent>
 
 			<SidebarFooter>

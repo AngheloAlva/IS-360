@@ -6,13 +6,12 @@ import {
 	Cell,
 	YAxis,
 	XAxis,
-	Tooltip,
 	CartesianGrid,
-	ResponsiveContainer,
 	BarChart as RechartsBarChart,
+	LabelList,
 } from "recharts"
 
-import { Card } from "@/components/ui/card"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 interface DocumentExpirationBarChartProps {
 	data: Array<{ name: string; value: number; fill?: string; id: string }>
@@ -23,27 +22,17 @@ export function DocumentExpirationBarChart({ data, colors }: DocumentExpirationB
 	const router = useRouter()
 
 	return (
-		<ResponsiveContainer width="100%" height={350}>
-			<RechartsBarChart data={data} margin={{ top: 10, right: 10, left: 10, bottom: 40 }}>
-				<CartesianGrid strokeDasharray="3 3" vertical={false} />
+		<ChartContainer config={{}} className="h-[350px] w-full">
+			<RechartsBarChart data={data} margin={{ top: 15 }}>
+				<CartesianGrid strokeDasharray="3 3" />
 				<XAxis dataKey="name" angle={-45} textAnchor="end" height={70} tick={{ fontSize: 12 }} />
 				<YAxis />
-				<Tooltip
-					content={({ active, payload }) => {
-						if (active && payload && payload.length) {
-							return (
-								<Card className="bg-background border p-2 shadow-sm">
-									<div className="text-sm font-medium">{payload[0].payload.name}</div>
-									<div className="text-sm">Cantidad: {payload[0].value}</div>
-								</Card>
-							)
-						}
-						return null
-					}}
-				/>
+				<ChartTooltip content={<ChartTooltipContent formatter={(value) => value} />} />
 				<Bar dataKey="value" radius={[4, 4, 0, 0]}>
+					<LabelList dataKey="value" position="top" />
 					{data.map((entry, index) => (
 						<Cell
+							className="cursor-pointer"
 							onClick={() =>
 								router.push(`/admin/dashboard/documentacion/busqueda?expiration=${entry.id}`)
 							}
@@ -58,6 +47,6 @@ export function DocumentExpirationBarChart({ data, colors }: DocumentExpirationB
 					))}
 				</Bar>
 			</RechartsBarChart>
-		</ResponsiveContainer>
+		</ChartContainer>
 	)
 }

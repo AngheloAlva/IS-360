@@ -13,6 +13,7 @@ interface WorkBookMilestonesProps {
 	userId: string
 	userRole: string
 	workOrderId: string
+	supervisorId: string
 	workOrderStartDate: Date
 	canRequestClosure: boolean
 }
@@ -21,6 +22,7 @@ export default function WorkBookMilestones({
 	userId,
 	userRole,
 	workOrderId,
+	supervisorId,
 	canRequestClosure,
 	workOrderStartDate,
 }: WorkBookMilestonesProps) {
@@ -60,7 +62,7 @@ export default function WorkBookMilestones({
 
 	return (
 		<Card className="w-full">
-			<CardHeader className="flex items-start justify-between">
+			<CardHeader className="flex flex-row items-center justify-between">
 				<h2 className="flex items-center gap-2 text-2xl font-bold">
 					<div className="size-10 rounded-md bg-orange-500/10 p-1.5">
 						<FolderKanbanIcon className="h-auto w-full text-orange-500" />
@@ -69,7 +71,7 @@ export default function WorkBookMilestones({
 				</h2>
 
 				<div className="flex gap-2">
-					{data?.milestones.length === 0 && (
+					{data?.milestones.length === 0 && userId === supervisorId && (
 						<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
 					)}
 
@@ -84,6 +86,7 @@ export default function WorkBookMilestones({
 					userId={userId}
 					userRole={userRole}
 					workOrderId={workOrderId}
+					supervisorId={supervisorId}
 					milestones={data?.milestones || []}
 				/>
 			</CardContent>

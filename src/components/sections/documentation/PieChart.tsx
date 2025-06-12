@@ -1,8 +1,13 @@
 "use client"
 
-import { Cell, Pie, PieChart as RechartsPieChart, ResponsiveContainer, Tooltip, Legend } from "recharts"
+import { Cell, Pie, PieChart as RechartsPieChart } from "recharts"
 
-import { Card } from "@/components/ui/card"
+import {
+	ChartLegend,
+	ChartTooltip,
+	ChartContainer,
+	ChartTooltipContent,
+} from "@/components/ui/chart"
 
 interface PieChartProps {
 	data: Array<{ name: string; value: number; fill?: string }>
@@ -11,17 +16,20 @@ interface PieChartProps {
 
 export function PieChart({ data, colors }: PieChartProps) {
 	const filteredData = data.filter((item) => item.value > 0)
-	const total = filteredData.reduce((acc, item) => acc + item.value, 0)
+	// const total = filteredData.reduce((acc, item) => acc + item.value, 0)
 
 	return (
-		<ResponsiveContainer width="100%" height={300}>
+		<ChartContainer className="h-[300px] w-full" config={{}}>
 			<RechartsPieChart>
 				<Pie
+					label
 					cx="50%"
 					cy="45%"
 					fill="#8884d8"
 					nameKey="name"
 					dataKey="value"
+					paddingAngle={3}
+					innerRadius={40}
 					outerRadius={80}
 					data={filteredData}
 				>
@@ -38,30 +46,10 @@ export function PieChart({ data, colors }: PieChartProps) {
 					))}
 				</Pie>
 
-				<Legend
-					lang="es"
+				<ChartLegend />
 
-					align="center"
-					layout="horizontal"
-					className="text-sm"
-					verticalAlign="bottom"
-				/>
-
-				<Tooltip
-					content={({ active, payload }) => {
-						if (active && payload && payload.length) {
-							return (
-								<Card className="bg-background flex flex-col gap-1 rounded-sm border px-3 py-2 shadow-sm">
-									<div className="text-base font-semibold">{payload[0].payload.name}</div>
-									<div className="text-sm">Cantidad: {payload[0].value}</div>
-									<div className="text-sm">Porcentaje: {(((payload[0].value as number) / total) * 100).toFixed(2)}%</div>
-								</Card>
-							)
-						}
-						return null
-					}}
-				/>
+				<ChartTooltip content={<ChartTooltipContent />} />
 			</RechartsPieChart>
-		</ResponsiveContainer>
+		</ChartContainer>
 	)
 }
