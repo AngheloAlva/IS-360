@@ -1,4 +1,4 @@
-import { FileSchema } from "./form-schemas/document-management/file.schema"
+import { FileSchema } from "@/shared/schemas/file.schema"
 
 interface UploadFilesToCloudProps {
 	files: FileSchema[]

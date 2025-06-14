@@ -3,7 +3,7 @@ import { renderToStream } from "@react-pdf/renderer"
 
 import prisma from "@/lib/prisma"
 
-import WorkPermitPDF from "@/components/pdf/work-permit/WorkPermitPDF"
+import WorkPermitPDF from "@/features/work-permit/components/pdf/WorkPermitPDF"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {

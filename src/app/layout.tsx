@@ -5,7 +5,7 @@ import { generalFont } from "@/config/fonts"
 import type { Metadata } from "next"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/providers/ThemeProvider"
+import { ThemeProvider } from "@/shared/components/providers/ThemeProvider"
 
 export const metadata: Metadata = {
 	title: "OTC",

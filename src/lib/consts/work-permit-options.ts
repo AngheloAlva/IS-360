@@ -1,4 +1,4 @@
-import type { Option } from "@/components/ui/multiselect"
+import type { Option } from "@/shared/components/ui/multiselect"
 
 export const MutualityOptions: Option[] = [
 	{ value: "ACHS", label: "ACHS" },

@@ -6,7 +6,7 @@ import Image from "next/image"
 
 import { authClient } from "@/lib/auth-client"
 
-import OtpForm from "@/components/forms/auth/OtpForm"
+import Otp from "@/features/auth/components/forms/Otp"
 
 export default function TwoFactorPage(): React.ReactElement {
 	useEffect(() => {
@@ -65,7 +65,7 @@ export default function TwoFactorPage(): React.ReactElement {
 							</p>
 						</div>
 
-						<OtpForm />
+						<Otp />
 					</div>
 				</main>
 			</div>

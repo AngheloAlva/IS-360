@@ -22,7 +22,7 @@ import {
 	maintenancePlanOperator,
 } from "./permissions"
 
-import { OTPCodeEmailTemplate } from "@/components/emails/OTPCodeEmailTemplate"
+import { OTPCodeEmail } from "@/features/auth/components/emails/OTPCodeEmail"
 
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {
@@ -131,7 +131,7 @@ export const auth = betterAuth({
 						from: "anghelo.alva@ingenieriasimple.cl",
 						to: [user.email],
 						subject: `Código de verificación para OTC 360`,
-						react: await OTPCodeEmailTemplate({
+						react: await OTPCodeEmail({
 							otp,
 						}),
 					})

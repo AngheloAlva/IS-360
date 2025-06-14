@@ -44,6 +44,12 @@ export async function GET() {
 								createdAt: true,
 							},
 						},
+						safetyAndHealthFolders: {
+							select: {
+								status: true,
+								createdAt: true,
+							},
+						},
 						createdAt: true,
 					},
 				},
@@ -67,18 +73,14 @@ export async function GET() {
 				...sf.workersFolders,
 				...sf.vehiclesFolders,
 				...sf.environmentalFolders,
+				...sf.safetyAndHealthFolders,
 			])
 			const pendingDocuments = allFolders.filter(
 				(folder) => folder.status === "DRAFT" || folder.status === "REJECTED"
 			).length
+			const reviewingDocuments = allFolders.filter((folder) => folder.status === "SUBMITTED").length
+			const approvedDocuments = allFolders.filter((folder) => folder.status === "APPROVED").length
 
-			// Calcular tasa de cumplimiento de documentos
-			const totalFolders = allFolders.length
-			const approvedFolders = allFolders.filter((folder) => folder.status === "APPROVED").length
-			const documentComplianceRate =
-				totalFolders > 0 ? Math.round((approvedFolders / totalFolders) * 100) : 100
-
-			// Calcular órdenes de trabajo completadas y a tiempo
 			const completedWorkOrders = company.workOrders.filter(
 				(wo) => wo.status === "COMPLETED"
 			).length
@@ -89,12 +91,8 @@ export async function GET() {
 					new Date(wo.programDate) <= new Date(wo.solicitationDate)
 			).length
 
-			// Calcular porcentaje de órdenes a tiempo
 			const onTimePercentage =
 				completedWorkOrders > 0 ? Math.round((onTimeWorkOrders / completedWorkOrders) * 100) : 100
-
-			// Calcular rating basado en cumplimiento y tiempo
-			const rating = ((documentComplianceRate + onTimePercentage) / 2 / 100) * 5
 
 			return {
 				id: company.id,
@@ -105,96 +103,19 @@ export async function GET() {
 				activeWorkOrders: company._count.workOrders,
 				vehicles: company._count.vehicles,
 				pendingDocuments,
+				approvedDocuments,
+				reviewingDocuments,
 				createdAt: company.StartupFolders[0]?.createdAt.toISOString().split("T")[0] || null,
 				lastActivity:
 					[...allFolders, ...company.workOrders]
 						.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0]
 						?.createdAt.toISOString()
 						.split("T")[0] || null,
-				rating: parseFloat(rating.toFixed(1)),
 				completedProjects: completedWorkOrders,
 				onTimePercentage,
-				documentComplianceRate,
 			}
 		})
 
-		// 1. Estado de documentos (gráfico circular general)
-		const documentStatusData = [
-			{
-				name: "Al día",
-				value: companiesData.filter((c) => c.pendingDocuments === 0).length,
-				fill: "#10b981",
-			},
-			{
-				name: "Pendiente",
-				value: companiesData.filter((c) => c.pendingDocuments > 0 && c.pendingDocuments <= 2)
-					.length,
-				fill: "#f59e0b",
-			},
-		]
-
-		// 2. Progreso de Revisión de Documentos por Empresa
-		// Buscar todas las carpetas y documentos para calcular las estadísticas por empresa
-		const documentProgressByCompany = await Promise.all(
-			companies.map(async (company) => {
-				// Buscar todos los documentos de todas las carpetas de esta empresa
-				const startupFolders = await prisma.startupFolder.findMany({
-					where: { companyId: company.id },
-					include: {
-						workersFolders: {
-							include: {
-								documents: { select: { status: true } },
-							},
-						},
-						vehiclesFolders: {
-							include: {
-								documents: { select: { status: true } },
-							},
-						},
-						environmentalFolders: {
-							include: {
-								documents: { select: { status: true } },
-							},
-						},
-						safetyAndHealthFolders: {
-							include: {
-								documents: { select: { status: true } },
-							},
-						},
-					},
-				})
-
-				// Recopilar todos los documentos de todas las carpetas
-				const allDocuments = startupFolders.flatMap((folder) => [
-					...folder.workersFolders.flatMap((wf) => wf.documents),
-					...folder.vehiclesFolders.flatMap((vf) => vf.documents),
-					...folder.environmentalFolders.flatMap((ef) => ef.documents),
-					...folder.safetyAndHealthFolders.flatMap((sf) => sf.documents),
-				])
-
-				const total = allDocuments.length
-				const reviewed = allDocuments.filter(
-					(doc) => doc.status === "APPROVED" || doc.status === "REJECTED"
-				).length
-				const pending = total - reviewed
-
-				return {
-					company: company.name,
-					reviewed,
-					pending,
-					total,
-				}
-			})
-		)
-
-		// Filtrar solo empresas que tengan documentos y ordenar por porcentaje pendiente descendente
-		const documentReviewProgressData = documentProgressByCompany
-			.filter((item) => item.total > 0)
-			.sort((a, b) => b.pending / b.total - a.pending / a.total)
-			.slice(0, 10) // Limitar a las 10 empresas con más pendientes
-
-		// 3. Distribución de Órdenes de Trabajo por Estado
-		// Buscar órdenes de trabajo agrupadas por empresa y estado
 		const workOrdersData = await prisma.company.findMany({
 			select: {
 				id: true,
@@ -327,8 +248,6 @@ export async function GET() {
 
 		return NextResponse.json({
 			companiesData,
-			documentStatusData,
-			documentReviewProgressData,
 			workOrderStatusData,
 			workEntryActivityData,
 			topCompaniesData,
