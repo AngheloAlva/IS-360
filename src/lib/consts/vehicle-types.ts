@@ -1,4 +1,4 @@
-import { VEHICLE_TYPE_VALUES_ARRAY } from "../../features/vehicle/schemas/vehicle.schema"
+import { VEHICLE_TYPE_VALUES_ARRAY } from "../../project/vehicle/schemas/vehicle.schema"
 
 export const VehicleTypeOptions = [
 	{ value: "CAR", label: "Automóvil" },

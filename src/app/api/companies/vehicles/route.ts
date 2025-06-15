@@ -5,21 +5,24 @@ import prisma from "@/lib/prisma"
 export async function GET(req: NextRequest) {
 	try {
 		const searchParams = req.nextUrl.searchParams
+
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
+		const companyId = searchParams.get("companyId") as string
 
 		const skip = (page - 1) * limit
 
 		const [vehicles, total] = await Promise.all([
 			prisma.vehicle.findMany({
 				where: {
+					companyId,
 					...(search
 						? {
 								OR: [
 									{ model: { contains: search, mode: "insensitive" as const } },
 									{ plate: { contains: search, mode: "insensitive" as const } },
-									{ company: { name: { contains: search, mode: "insensitive" as const } } },
+									{ brand: { contains: search, mode: "insensitive" as const } },
 								],
 							}
 						: {}),
@@ -27,49 +30,44 @@ export async function GET(req: NextRequest) {
 				select: {
 					id: true,
 					year: true,
+					type: true,
 					model: true,
 					plate: true,
 					brand: true,
-					type: true,
+					color: true,
 					isMain: true,
-					company: {
-						select: {
-							name: true,
-						},
-					},
-				},
-				orderBy: {
-					createdAt: "desc",
+					createdAt: true,
+					companyId: true,
 				},
 				skip,
 				take: limit,
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
+				orderBy: {
+					createdAt: "desc",
 				},
 			}),
 			prisma.vehicle.count({
 				where: {
+					companyId,
 					...(search
 						? {
 								OR: [
 									{ model: { contains: search, mode: "insensitive" as const } },
 									{ plate: { contains: search, mode: "insensitive" as const } },
-									{ company: { name: { contains: search, mode: "insensitive" as const } } },
+									{ brand: { contains: search, mode: "insensitive" as const } },
 								],
 							}
 						: {}),
 				},
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
-				},
 			}),
 		])
 
-		return NextResponse.json({ vehicles, total, pages: Math.ceil(total / limit) })
+		return NextResponse.json({
+			total,
+			vehicles,
+			pages: Math.ceil(total / limit),
+		})
 	} catch (error) {
-		console.error("Error fetching companies:", error)
-		return NextResponse.json({ error: "Error fetching companies" }, { status: 500 })
+		console.error("[VEHICLES_GET]", error)
+		return NextResponse.json({ error: "Error fetching vehicles" }, { status: 500 })
 	}
 }

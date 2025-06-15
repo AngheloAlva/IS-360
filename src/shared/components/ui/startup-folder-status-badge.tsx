@@ -14,23 +14,23 @@ export function StartupFolderStatusBadge({ status, className }: StartupFolderSta
 	const statusMap = {
 		DRAFT: {
 			label: "Borrador",
-			className: "bg-gray-500/10 text-gray-500",
+			className: "bg-neutral-500/10 text-neutral-500",
 		},
 		SUBMITTED: {
-			label: "Enviado para revisión",
-			className: "bg-blue-500/10 text-blue-500",
+			label: "En revisión",
+			className: "bg-cyan-500/10 text-cyan-500",
 		},
 		APPROVED: {
 			label: "Aprobado",
-			className: "bg-green-500/10 text-green-500",
+			className: "bg-emerald-500/10 text-emerald-500",
 		},
 		REJECTED: {
 			label: "Rechazado",
-			className: "bg-red-500/10 text-red-500",
+			className: "bg-rose-500/10 text-rose-500",
 		},
 		EXPIRED: {
 			label: "Vencido",
-			className: "bg-red-500/10 text-red-500",
+			className: "bg-amber-500/10 text-amber-500",
 		},
 	}
 

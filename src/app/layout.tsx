@@ -2,10 +2,11 @@ import { Toaster } from "sonner"
 
 import { generalFont } from "@/config/fonts"
 
+import { ThemeProvider } from "@/shared/components/providers/ThemeProvider"
+
 import type { Metadata } from "next"
 
 import "./globals.css"
-import { ThemeProvider } from "@/shared/components/providers/ThemeProvider"
 
 export const metadata: Metadata = {
 	title: "OTC",

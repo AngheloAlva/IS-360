@@ -6,7 +6,7 @@ import Image from "next/image"
 
 import { authClient } from "@/lib/auth-client"
 
-import Otp from "@/features/auth/components/forms/Otp"
+import Otp from "@/project/auth/components/forms/Otp"
 
 export default function TwoFactorPage(): React.ReactElement {
 	useEffect(() => {

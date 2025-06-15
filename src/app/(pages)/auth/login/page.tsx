@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-import Login from "@/features/auth/components/forms/Login"
+import Login from "@/project/auth/components/forms/Login"
 
 export default function LoginPage(): React.ReactElement {
 	return (

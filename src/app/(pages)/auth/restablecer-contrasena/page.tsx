@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { toast } from "sonner"
 import Image from "next/image"
 
-import ResetPassword from "@/features/auth/components/forms/ResetPassword"
+import ResetPassword from "@/project/auth/components/forms/ResetPassword"
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 

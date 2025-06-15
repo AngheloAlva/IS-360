@@ -108,6 +108,9 @@ export async function GET(req: NextRequest) {
 					},
 				},
 			},
+			cacheStrategy: {
+				ttl: 10,
+			},
 		})
 
 		if (!companiesWithStartupFolders) {

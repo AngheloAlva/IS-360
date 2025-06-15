@@ -22,7 +22,7 @@ import {
 	maintenancePlanOperator,
 } from "./permissions"
 
-import { OTPCodeEmail } from "@/features/auth/components/emails/OTPCodeEmail"
+import { OTPCodeEmail } from "@/project/auth/components/emails/OTPCodeEmail"
 
 export const auth = betterAuth({
 	database: prismaAdapter(prisma, {

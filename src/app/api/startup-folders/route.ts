@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 
 export async function GET(req: NextRequest) {
@@ -7,12 +7,10 @@ export async function GET(req: NextRequest) {
 		const companyId = searchParams.get("companyId")
 		const folderId = searchParams.get("folderId")
 
-		// Al menos uno de los dos parámetros debe estar presente
 		if (!companyId && !folderId) {
 			return new NextResponse("Either company ID or folder ID is required", { status: 400 })
 		}
 
-		// Construir el where según los parámetros proporcionados
 		const where: {
 			companyId?: string
 			id?: string
@@ -20,7 +18,6 @@ export async function GET(req: NextRequest) {
 		if (companyId) where.companyId = companyId
 		if (folderId) where.id = folderId
 
-		// Obtenemos la carpeta de arranque general
 		const startupFolders = await prisma.startupFolder.findMany({
 			where,
 			include: {
@@ -33,67 +30,78 @@ export async function GET(req: NextRequest) {
 				safetyAndHealthFolders: {
 					include: {
 						documents: {
-							orderBy: {
-								name: "asc",
+							select: {
+								status: true,
 							},
 						},
-					},
-					orderBy: {
-						createdAt: "asc",
 					},
 				},
 				environmentalFolders: {
 					include: {
 						documents: {
-							orderBy: {
-								name: "asc",
+							select: {
+								status: true,
 							},
 						},
-					},
-					orderBy: {
-						createdAt: "asc",
 					},
 				},
 				workersFolders: {
 					include: {
 						documents: {
-							orderBy: {
-								name: "asc",
-							},
-						},
-						worker: {
 							select: {
-								id: true,
-								name: true,
-								email: true,
+								status: true,
 							},
-						},
-					},
-					orderBy: {
-						worker: {
-							name: "asc",
 						},
 					},
 				},
 				vehiclesFolders: {
 					include: {
 						documents: {
-							orderBy: {
-								name: "asc",
+							select: {
+								status: true,
 							},
 						},
-						vehicle: true,
 					},
 				},
 			},
 		})
 
-		// Si no existe la carpeta, devolvemos error
 		if (!startupFolders) {
 			return new NextResponse("General startup folder not found", { status: 404 })
 		}
+		const processedFolders = startupFolders.map((folder) => ({
+			...folder,
+			safetyAndHealthFolders: folder.safetyAndHealthFolders.map((shf) => ({
+				...shf,
+				totalDocuments: shf.documents.length,
+				approvedDocuments: shf.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: shf.documents.filter((doc) => doc.status === "REJECTED").length,
+				documents: undefined,
+			})),
+			environmentalFolders: folder.environmentalFolders.map((ef) => ({
+				...ef,
+				totalDocuments: ef.documents.length,
+				approvedDocuments: ef.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: ef.documents.filter((doc) => doc.status === "REJECTED").length,
+				documents: undefined,
+			})),
+			workersFolders: folder.workersFolders.map((wf) => ({
+				...wf,
+				totalDocuments: wf.documents.length,
+				approvedDocuments: wf.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: wf.documents.filter((doc) => doc.status === "REJECTED").length,
+				documents: undefined,
+			})),
+			vehiclesFolders: folder.vehiclesFolders.map((vf) => ({
+				...vf,
+				totalDocuments: vf.documents.length,
+				approvedDocuments: vf.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: vf.documents.filter((doc) => doc.status === "REJECTED").length,
+				documents: undefined,
+			})),
+		}))
 
-		return NextResponse.json(startupFolders)
+		return NextResponse.json(processedFolders)
 	} catch (error) {
 		console.error("[GENERAL_STARTUP_FOLDER_GET]", error)
 		return new NextResponse("Internal Error", { status: 500 })

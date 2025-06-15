@@ -162,7 +162,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 
 	const myAccountItem = {
 		title: "Mi Cuenta",
-		url: canAccessUserRoutes ? "/dashboard/mi-cuenta" : "/admin/dashboard/mi-cuenta",
+		url: canAccessAdminRoutes ? "/admin/dashboard/mi-cuenta" : "/dashboard/mi-cuenta",
 		icon: UserIcon,
 	}
 

@@ -83,6 +83,7 @@ export async function GET(req: NextRequest) {
 					observations: true,
 					startDate: true,
 					endDate: true,
+					workCompleted: true,
 					user: {
 						select: {
 							name: true,

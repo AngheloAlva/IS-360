@@ -1,4 +1,4 @@
-import { FileFormSchema } from "@/features/document/schemas/new-file.schema"
+import { FileFormSchema } from "@/project/document/schemas/new-file.schema"
 import prisma from "@/lib/prisma"
 
 export async function POST(request: Request) {
