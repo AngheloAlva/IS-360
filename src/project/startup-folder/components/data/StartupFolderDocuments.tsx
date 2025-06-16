@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import {
 	Upload,
 	EyeIcon,
+	SendIcon,
 	Trash2Icon,
 	FolderIcon,
 	PencilIcon,
@@ -18,8 +19,11 @@ import { deleteStartupFolderDocument } from "../../actions/delete-startup-folder
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { getCompanyEntities } from "../../actions/get-company-entities"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
+import { queryClient } from "@/lib/queryClient"
 
 import { StartupFolderStatusBadge } from "@/shared/components/ui/startup-folder-status-badge"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
 import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
@@ -40,6 +44,7 @@ interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
 	onBack: () => void
+	isOtcMember: boolean
 	startupFolderId: string
 	canAddDocuments: boolean
 	category: DocumentCategory
@@ -55,6 +60,7 @@ export function StartupFolderDocuments({
 	userId,
 	category,
 	companyId,
+	isOtcMember,
 	startupFolderId,
 	canAddDocuments,
 }: StartupFolderDocumentsProps) {
@@ -63,6 +69,7 @@ export function StartupFolderDocuments({
 	const [entities, setEntities] = useState<Array<{ id: string; name: string }>>([])
 	const [allEntities, setAllEntities] = useState<SelectedEntity[]>([])
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
+	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 	const [showLinkDialog, setShowLinkDialog] = useState(false)
 	const [multiple, setMultiple] = useState(true)
 
@@ -94,16 +101,20 @@ export function StartupFolderDocuments({
 		if (category === DocumentCategory.PERSONNEL) {
 			return (
 				<WorkerFolderDocuments
-					workerId={selectedEntity.id}
 					userId={userId}
+					isOtcMember={isOtcMember}
+					workerId={selectedEntity.id}
+					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
 				/>
 			)
 		} else if (category === DocumentCategory.VEHICLES) {
 			return (
 				<VehicleFolderDocuments
-					vehicleId={selectedEntity.id}
 					userId={userId}
+					isOtcMember={isOtcMember}
+					vehicleId={selectedEntity.id}
+					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
 				/>
 			)
@@ -135,9 +146,21 @@ export function StartupFolderDocuments({
 								setShowUploadDialog(true)
 							}}
 						>
-							<Upload className="size-3.5" />
-							Subir documento
+							<Upload className="h-4 w-4" />
+							Subir documentos
 						</Button>
+
+						{documents.length > 0 &&
+							documents.every((doc) => doc.status === "DRAFT" || doc.status === "REJECTED") && (
+								<Button
+									variant="outline"
+									className="cursor-pointer gap-1.5 bg-emerald-600 transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+									onClick={() => setShowSubmitDialog(true)}
+								>
+									<SendIcon className="h-4 w-4" />
+									Enviar a revisión
+								</Button>
+							)}
 					</div>
 				)}
 			</div>
@@ -221,23 +244,24 @@ export function StartupFolderDocuments({
 												<EyeIcon className="h-4 w-4" />
 											</Button>
 										)}
-										{(doc.status === "DRAFT" ||
-											doc.status === "REJECTED" ||
-											doc.status === "EXPIRED") && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-cyan-600"
-												onClick={() => {
-													setMultiple(false)
-													setSelectedDocument(doc)
-													setShowUploadDialog(true)
-												}}
-											>
-												<PencilIcon className="h-4 w-4" />
-											</Button>
-										)}
-										{doc.status === "DRAFT" && (
+										{!isOtcMember &&
+											(doc.status === "DRAFT" ||
+												doc.status === "REJECTED" ||
+												doc.status === "EXPIRED") && (
+												<Button
+													size={"icon"}
+													variant="ghost"
+													className="text-cyan-600"
+													onClick={() => {
+														setMultiple(false)
+														setSelectedDocument(doc)
+														setShowUploadDialog(true)
+													}}
+												>
+													<PencilIcon className="h-4 w-4" />
+												</Button>
+											)}
+										{!isOtcMember && doc.status === "DRAFT" && (
 											<Button
 												size={"icon"}
 												variant="ghost"
@@ -261,6 +285,14 @@ export function StartupFolderDocuments({
 											>
 												<Trash2Icon className="h-4 w-4" />
 											</Button>
+										)}
+										{isOtcMember && doc.status === "SUBMITTED" && (
+											<DocumentReviewForm
+												document={doc}
+												userId={userId}
+												refetch={refetch}
+												startupFolderId={startupFolderId}
+											/>
 										)}
 									</div>
 								</TableCell>
@@ -304,6 +336,25 @@ export function StartupFolderDocuments({
 					onClose={() => setShowLinkDialog(false)}
 					onSuccess={() => {
 						setShowLinkDialog(false)
+					}}
+				/>
+			)}
+
+			{showSubmitDialog && (
+				<SubmitReviewRequestDialog
+					userId={userId}
+					category={category}
+					companyId={companyId}
+					isOpen={showSubmitDialog}
+					folderId={startupFolderId}
+					onClose={() => setShowSubmitDialog(false)}
+					onSuccess={async () => {
+						queryClient.invalidateQueries({
+							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
+						})
+						setShowSubmitDialog(false)
+						await refetch()
+						toast.success("Documentos enviados a revisión exitosamente")
 					}}
 				/>
 			)}

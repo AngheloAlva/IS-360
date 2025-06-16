@@ -1,51 +1,52 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Send } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { z } from "zod"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { queryClient } from "@/lib/queryClient"
-import {
-	submitReviewRequestSchema,
-	type SubmitReviewRequestSchema,
-} from "@/project/startup-folder/schemas/submit-review-request.schema"
-
-import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/shared/components/ui/form"
+import { Textarea } from "@/shared/components/ui/textarea"
 import { Button } from "@/shared/components/ui/button"
-import { Form } from "@/shared/components/ui/form"
 import {
 	Dialog,
-	DialogClose,
 	DialogTitle,
-	DialogFooter,
 	DialogHeader,
-	DialogTrigger,
+	DialogFooter,
 	DialogContent,
 	DialogDescription,
 } from "@/shared/components/ui/dialog"
+
+import type { DocumentCategory } from "@prisma/client"
 
 interface SubmitReviewRequestDialogProps {
 	userId: string
 	folderId: string
 	companyId: string
-	disabled: boolean
-	folderName: string
-	folderType: "WORKER" | "VEHICLE" | "ENVIRONMENTAL" | "SAFETY_AND_HEALTH"
+	isOpen: boolean
+	category: DocumentCategory
+	onClose: () => void
+	onSuccess: () => void
 }
+
+const submitReviewRequestSchema = z.object({
+	folderId: z.string(),
+	notificationEmails: z.string(),
+})
+
+type SubmitReviewRequestSchema = z.infer<typeof submitReviewRequestSchema>
 
 export function SubmitReviewRequestDialog({
 	userId,
+	isOpen,
+	onClose,
+	category,
 	folderId,
-	disabled,
 	companyId,
-	folderName,
-	folderType,
+	onSuccess,
 }: SubmitReviewRequestDialogProps) {
-	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
-
 	const [emailError, setEmailError] = useState<string | null>(null)
 
 	const form = useForm<SubmitReviewRequestSchema>({
@@ -102,7 +103,7 @@ export function SubmitReviewRequestDialog({
 		try {
 			let result: { ok: boolean; message?: string }
 
-			if (folderType === "WORKER") {
+			if (category === "PERSONNEL") {
 				const { submitWorkerDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/worker"
 				)
@@ -112,7 +113,7 @@ export function SubmitReviewRequestDialog({
 					folderId,
 					companyId,
 				})
-			} else if (folderType === "VEHICLE") {
+			} else if (category === "VEHICLES") {
 				const { submitVehicleDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/vehicle"
 				)
@@ -122,7 +123,7 @@ export function SubmitReviewRequestDialog({
 					folderId,
 					companyId,
 				})
-			} else if (folderType === "ENVIRONMENTAL") {
+			} else if (category === "ENVIRONMENTAL") {
 				const { submitEnvironmentalDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/environmental"
 				)
@@ -131,7 +132,7 @@ export function SubmitReviewRequestDialog({
 					userId,
 					folderId,
 				})
-			} else if (folderType === "SAFETY_AND_HEALTH") {
+			} else if (category === "SAFETY_AND_HEALTH") {
 				const { submitSafetyAndHealthDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/safety-and-health"
 				)
@@ -148,69 +149,58 @@ export function SubmitReviewRequestDialog({
 			}
 
 			if (result.ok) {
-				toast.success(result.message || "Solicitud de revisión enviada con éxito.")
-				queryClient.invalidateQueries({
-					queryKey: ["startupFolder", { companyId }],
-				})
-				setIsOpen(false)
-				form.reset({ folderId: folderId, notificationEmails: "" })
+				onSuccess()
 			} else {
 				toast.error(result.message || "Error al enviar la solicitud.")
 			}
 		} catch (error) {
 			console.error("Error submitting review request:", error)
-			toast.error("Ocurrió un error inesperado al procesar la solicitud.")
+			toast.error("Error al enviar la solicitud.")
 		} finally {
 			setIsSubmitting(false)
 		}
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger asChild>
-				<Button disabled={disabled} className="py-9">
-					<Send />
-					<span className="hidden">Enviar a Revisión</span>
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-[525px]">
+		<Dialog open={isOpen} onOpenChange={onClose}>
+			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Confirmar Envío a Revisión</DialogTitle>
+					<DialogTitle>Enviar documentos a revisión</DialogTitle>
 					<DialogDescription>
-						Vas a enviar la carpeta <strong>{folderName}</strong> para su revisión por OTC. Una vez
-						enviada, no podrás realizar cambios en los documentos hasta que la revisión haya sido
-						completada.
+						¿Estás seguro de que deseas enviar estos documentos a revisión? Los documentos no podrán
+						ser modificados hasta que sean aprobados o rechazados.
 					</DialogDescription>
 				</DialogHeader>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-5">
-						<TextAreaFormField<SubmitReviewRequestSchema>
-							optional
-							itemClassName="mb-2"
+					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+						<FormField
 							control={form.control}
 							name="notificationEmails"
-							label="Correos electrónicos adicionales"
-							placeholder="email1@ejemplo.com, email2@ejemplo.com"
+							render={({ field }) => (
+								<FormItem>
+									<FormControl>
+										<Textarea
+											{...field}
+											placeholder="Ingresa correos electrónicos adicionales para notificar (opcional). Sepáralos por comas o nuevas líneas."
+											rows={3}
+										/>
+									</FormControl>
+									{emailError && <FormMessage>{emailError}</FormMessage>}
+								</FormItem>
+							)}
 						/>
-						{emailError && <p className="text-destructive text-sm font-medium">{emailError}</p>}
-						<p className="text-muted-foreground text-xs">
-							Ingresa correos electrónicos adicionales separados por comas o saltos de línea. Estos
-							correos recibirán notificaciones sobre el estado de la revisión.
-						</p>
 
-						<DialogFooter className="gap-2">
-							<DialogClose asChild>
-								<Button type="button" variant="outline" onClick={() => form.reset()}>
-									Cancelar
-								</Button>
-							</DialogClose>
+						<DialogFooter>
+							<Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+								Cancelar
+							</Button>
 							<Button
+								className="bg-emerald-600 transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 								type="submit"
 								disabled={isSubmitting}
-								className="hover:bg-primary/80 hover:text-white"
 							>
-								{isSubmitting ? "Enviando..." : "Confirmar y Enviar"}
+								{isSubmitting ? "Enviando..." : "Enviar"}
 							</Button>
 						</DialogFooter>
 					</form>

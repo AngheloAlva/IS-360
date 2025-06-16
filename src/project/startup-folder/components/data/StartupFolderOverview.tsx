@@ -71,13 +71,13 @@ export default function StartupFolderOverview({
 						<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
 						<p className="flex flex-col opacity-90">
 							{isOtcMember
-								? "Gestiona la documentación de la empresa contratista"
+								? "Revisión de documentación de empresa contratista"
 								: "En este módulo podrás gestionar la documentación de la empresa."}
 						</p>
 					</div>
 
 					<div className="flex items-center gap-2">
-						{hasPermission && <CreateStartupFolder companyId={companyId} />}
+						{!isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
 
 						<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
 							<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
@@ -112,6 +112,7 @@ export default function StartupFolderOverview({
 									<StartupFolderDocuments
 										userId={userId}
 										companyId={companyId}
+										isOtcMember={isOtcMember}
 										category={selectedCategory}
 										startupFolderId={folder.id}
 										canAddDocuments={isSupervisor}

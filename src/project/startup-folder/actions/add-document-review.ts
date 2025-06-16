@@ -20,47 +20,72 @@ export const addDocumentReview = async ({
 	try {
 		const newStatus = status === "APPROVED" ? ReviewStatus.APPROVED : ReviewStatus.REJECTED
 
+		let document
+		const now = new Date()
+
 		switch (category) {
 			case DocumentCategory.SAFETY_AND_HEALTH:
-				await prisma.safetyAndHealthDocument.update({
+				document = await prisma.safetyAndHealthDocument.update({
 					where: { id: documentId },
 					data: {
 						status: newStatus,
 						reviewNotes: comments,
-						submittedAt: new Date(),
+						reviewedAt: now,
+					},
+					include: {
+						uploadedBy: true,
 					},
 				})
 				break
 			case DocumentCategory.ENVIRONMENTAL:
-				await prisma.environmentalDocument.update({
+				document = await prisma.environmentalDocument.update({
 					where: { id: documentId },
 					data: {
 						status: newStatus,
 						reviewNotes: comments,
-						submittedAt: new Date(),
+						reviewedAt: now,
+					},
+					include: {
+						uploadedBy: true,
 					},
 				})
 				break
 			case DocumentCategory.PERSONNEL:
-				await prisma.workerDocument.update({
+				document = await prisma.workerDocument.update({
 					where: { id: documentId },
 					data: {
 						reviewNotes: comments,
-						submittedAt: new Date(),
+						reviewedAt: now,
 						status: newStatus,
+					},
+					include: {
+						uploadedBy: true,
 					},
 				})
 				break
 			case DocumentCategory.VEHICLES:
-				await prisma.vehicleDocument.update({
+				document = await prisma.vehicleDocument.update({
 					where: { id: documentId },
 					data: {
 						reviewNotes: comments,
-						submittedAt: new Date(),
+						reviewedAt: now,
 						status: newStatus,
+					},
+					include: {
+						uploadedBy: true,
 					},
 				})
 				break
+			default:
+				throw new Error(`Categoría de documento no soportada: ${category}`)
+		}
+
+		// Notificar al supervisor del resultado de la revisión
+		if (document?.uploadedBy?.email) {
+			// TODO: Implementar envío de notificación por email
+			console.log(
+				`Notificar a ${document.uploadedBy.email} que su documento fue ${status === "APPROVED" ? "aprobado" : "rechazado"}`
+			)
 		}
 
 		return {
@@ -68,10 +93,18 @@ export const addDocumentReview = async ({
 			message: "Revisión procesada exitosamente",
 		}
 	} catch (error) {
-		console.log(error)
+		console.error("Error al procesar revisión de documento:", error)
+
+		if (error instanceof Error) {
+			return {
+				ok: false,
+				message: `Error al procesar la revisión: ${error.message}`,
+			}
+		}
+
 		return {
 			ok: false,
-			message: "Ocurrió un error al procesar la revisión",
+			message: "Ocurrió un error inesperado al procesar la revisión",
 		}
 	}
 }

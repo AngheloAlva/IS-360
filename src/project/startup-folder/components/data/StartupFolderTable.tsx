@@ -32,6 +32,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				documentsCount: subFolders.safetyAndHealthFolders[0]?.totalDocuments ?? 0,
 				completedCount: subFolders.safetyAndHealthFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.safetyAndHealthFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.safetyAndHealthFolders[0]?.submittedDocuments ?? 0,
 			},
 			{
 				title: "Medio Ambiente",
@@ -40,6 +41,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				documentsCount: subFolders.environmentalFolders[0]?.totalDocuments ?? 0,
 				completedCount: subFolders.environmentalFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.environmentalFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.environmentalFolders[0]?.submittedDocuments ?? 0,
 			},
 			{
 				title: "Vehículos y Equipos",
@@ -49,6 +51,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				documentsCount: subFolders.vehiclesFolders[0]?.totalDocuments ?? 0,
 				completedCount: subFolders.vehiclesFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.vehiclesFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.vehiclesFolders[0]?.submittedDocuments ?? 0,
 			},
 			{
 				title: "Documentación Personal",
@@ -58,6 +61,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				documentsCount: subFolders.workersFolders[0]?.totalDocuments ?? 0,
 				completedCount: subFolders.workersFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.workersFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.workersFolders[0]?.submittedDocuments ?? 0,
 			},
 		],
 		[subFolders]
@@ -71,6 +75,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 					<TableHead>Descripción</TableHead>
 					<TableHead className="w-[100px] text-right">Completados</TableHead>
 					<TableHead className="w-[100px] text-right">Rechazados</TableHead>
+					<TableHead className="w-[100px] text-right">En revisión</TableHead>
 					<TableHead className="w-[100px] text-right">Total</TableHead>
 				</TableRow>
 			</TableHeader>
@@ -100,6 +105,11 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 								)}
 							>
 								{category.rejectedCount}
+							</span>
+						</TableCell>
+						<TableCell className="text-right">
+							<span className="rounded-lg bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-500">
+								{category.pendingCount}
 							</span>
 						</TableCell>
 						<TableCell className="text-right">

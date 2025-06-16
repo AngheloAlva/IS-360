@@ -1,8 +1,15 @@
 "use client"
 
-import { Loader2, CheckCircle2, ClipboardCheckIcon, ThumbsDown, ThumbsUp } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import {
+	Loader2,
+	FileXIcon,
+	ThumbsDown,
+	CheckCircle2,
+	FileCheckIcon,
+	ClipboardCheckIcon,
+} from "lucide-react"
 
 import { addDocumentReview } from "@/project/startup-folder/actions/add-document-review"
 import { queryClient } from "@/lib/queryClient"
@@ -30,12 +37,22 @@ import type {
 } from "@prisma/client"
 
 interface DocumentReviewFormProps {
-	document: SafetyAndHealthDocument | EnvironmentalDocument | WorkerDocument | VehicleDocument
 	userId: string
-	companyId: string
+	workerId?: string
+	vehicleId?: string
+	refetch: () => void
+	startupFolderId: string
+	document: SafetyAndHealthDocument | EnvironmentalDocument | WorkerDocument | VehicleDocument
 }
 
-export function DocumentReviewForm({ document, userId, companyId }: DocumentReviewFormProps) {
+export function DocumentReviewForm({
+	userId,
+	refetch,
+	document,
+	workerId,
+	vehicleId,
+	startupFolderId,
+}: DocumentReviewFormProps) {
 	const [approvalStatus, setApprovalStatus] = useState<"APPROVED" | "REJECTED" | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [comments, setComments] = useState("")
@@ -77,9 +94,10 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 			})
 
 			queryClient.invalidateQueries({
-				queryKey: ["startupFolder", { companyId }],
+				queryKey: ["startupFolderDocuments", { startupFolderId, workerId, vehicleId }],
 			})
 
+			refetch()
 			setIsOpen(false)
 		} catch (error) {
 			console.error(error)
@@ -92,7 +110,10 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button disabled={isSubmitting} className="hover:bg-primary/80 size-8">
+				<Button
+					disabled={isSubmitting}
+					className="size-8 bg-emerald-600 transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+				>
 					<ClipboardCheckIcon />
 				</Button>
 			</DialogTrigger>
@@ -116,7 +137,7 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 								<RadioGroupItem value="APPROVED" id="approved" />
 								<Label htmlFor="approved" className="flex cursor-pointer items-center">
 									Aprobar documento
-									<ThumbsUp className="mr-1 h-4 w-4 text-green-500" />
+									<FileCheckIcon className="mr-1 h-4 w-4 text-emerald-500" />
 								</Label>
 							</div>
 
@@ -124,7 +145,7 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 								<RadioGroupItem value="REJECTED" id="rejected" />
 								<Label htmlFor="rejected" className="flex cursor-pointer items-center">
 									Rechazar documento
-									<ThumbsDown className="mr-1 h-4 w-4 text-red-500" />
+									<FileXIcon className="mr-1 h-4 w-4 text-rose-500" />
 								</Label>
 							</div>
 						</RadioGroup>
@@ -132,7 +153,8 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 
 					<div className="space-y-2">
 						<Label htmlFor="review-comments">
-							Comentarios {approvalStatus === "REJECTED" && <span className="text-red-500">*</span>}
+							Comentarios{" "}
+							{approvalStatus === "REJECTED" && <span className="text-rose-500">*</span>}
 						</Label>
 						<Textarea
 							id="review-comments"
@@ -164,9 +186,9 @@ export function DocumentReviewForm({ document, userId, companyId }: DocumentRevi
 							disabled={isSubmitting || (approvalStatus === "REJECTED" && !comments)}
 							className={
 								approvalStatus === "APPROVED"
-									? "bg-green-600 hover:bg-green-700"
+									? "bg-emerald-600 hover:bg-emerald-700"
 									: approvalStatus === "REJECTED"
-										? "bg-red-600 hover:bg-red-700"
+										? "bg-rose-600 hover:bg-rose-700"
 										: ""
 							}
 						>

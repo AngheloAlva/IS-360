@@ -4,14 +4,14 @@ import type {
 	Company,
 	WorkerFolder,
 	VehicleFolder,
-	WORK_ORDER_STATUS,
-	EnvironmentalFolder,
-	SafetyAndHealthFolder,
-	StartupFolder as StartupFolderModel,
-	SafetyAndHealthDocument,
-	EnvironmentalDocument,
 	WorkerDocument,
 	VehicleDocument,
+	WORK_ORDER_STATUS,
+	EnvironmentalFolder,
+	EnvironmentalDocument,
+	SafetyAndHealthFolder,
+	SafetyAndHealthDocument,
+	StartupFolder as StartupFolderModel,
 } from "@prisma/client"
 
 export interface StartupFolder extends StartupFolderModel {
@@ -29,21 +29,25 @@ export interface StartupFolder extends StartupFolderModel {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
+		submittedDocuments: number
 	}[]
 	environmentalFolders: {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
+		submittedDocuments: number
 	}[]
 	workersFolders: {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
+		submittedDocuments: number
 	}[]
 	vehiclesFolders: {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
+		submittedDocuments: number
 	}[]
 }
 
