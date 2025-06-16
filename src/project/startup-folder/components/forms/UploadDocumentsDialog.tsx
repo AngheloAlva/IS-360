@@ -2,10 +2,10 @@
 
 import { Trash2Icon, UploadIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type UseFormReturn } from "react-hook-form"
-import { useForm } from "react-hook-form"
-import { addYears } from "date-fns"
+import { type UseFormReturn, useForm } from "react-hook-form"
+import { type UploadResult } from "@/lib/upload-files"
 import { useState } from "react"
+import { addYears } from "date-fns"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -13,13 +13,12 @@ import { createStartupFolderDocument } from "../../actions/create-startup-folder
 import { updateStartupFolderDocument } from "../../actions/update-startup-folder-document"
 import { getDocumentTypesByCategory } from "@/lib/consts/startup-folders-structure"
 import { useFileManager } from "@/project/startup-folder/hooks/use-file-manager"
-import { createVehicleDocument } from "../../actions/create-vehicle-document"
 import { createWorkerDocument } from "../../actions/create-worker-document"
-import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
+import { createVehicleDocument } from "../../actions/create-vehicle-document"
+import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/shared/components/ui/form"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { Button } from "@/shared/components/ui/button"
 import Spinner from "@/shared/components/Spinner"
@@ -47,6 +46,8 @@ import type {
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
 import type { StartupFolderDocument } from "../../types"
+import { Form } from "@/shared/components/ui/form"
+import { UploadDocumentsFormData, uploadDocumentsSchema } from "../../schemas/document.schema"
 
 interface UploadDocumentsDialogProps {
 	userId: string
@@ -80,62 +81,48 @@ export function UploadDocumentsDialog({
 	documentToUpdate,
 	onUploadComplete,
 }: UploadDocumentsDialogProps) {
-	const uploadDocumentsSchema = z.object({
-		file: z.instanceof(File).optional(),
-		documentType: z.string().min(1, "El tipo de documento es obligatorio"),
-		documentName: z.string().min(1, "El nombre del documento es obligatorio"),
-		expirationDate: z.date({
-			required_error: "La fecha de vencimiento es obligatoria",
-			invalid_type_error: "La fecha de vencimiento debe ser válida",
-		}),
-	})
-
-	type UploadDocumentsFormData = z.infer<typeof uploadDocumentsSchema>
-
 	const defaultExpirationDate = addYears(new Date(), 1)
 
 	const form: UseFormReturn<UploadDocumentsFormData> = useForm<UploadDocumentsFormData>({
 		resolver: zodResolver(uploadDocumentsSchema),
 		defaultValues: {
 			file: undefined,
-			documentType: documentToUpdate?.type,
-			documentName: documentToUpdate?.name,
+			documentType: documentToUpdate?.type || documentType?.type || "",
+			documentName: documentToUpdate?.name || documentType?.name || "",
 			expirationDate: documentToUpdate?.expirationDate
 				? new Date(documentToUpdate.expirationDate)
 				: defaultExpirationDate,
 		},
 	})
 
-	const initialFiles = documentToUpdate
-		? [
-				Object.assign({
-					file: undefined,
-					documentType: documentToUpdate.type,
-					documentName: documentToUpdate.name,
-					expirationDate: documentToUpdate.expirationDate
-						? new Date(documentToUpdate.expirationDate)
-						: defaultExpirationDate,
-				}),
-			]
-		: []
+	const initialFile = documentToUpdate
+		? Object.assign({
+				file: undefined,
+				documentType: documentToUpdate.type,
+				documentName: documentToUpdate.name,
+				expirationDate: documentToUpdate.expirationDate
+					? new Date(documentToUpdate.expirationDate)
+					: defaultExpirationDate,
+			})
+		: null
 
-	const { files, addFiles, removeFile } = useFileManager(
-		initialFiles,
+	const { file, addFiles, removeFile } = useFileManager(
+		initialFile,
 		documentType,
 		(updatedFiles) => {
-			updatedFiles.map((file) => {
-				form.setValue("file", file)
-				form.setValue("documentType", file.documentType || "")
-				form.setValue("documentName", file.documentName || "")
-				form.setValue("expirationDate", file.expirationDate || defaultExpirationDate)
-			})
+			if (updatedFiles) {
+				// Keep document type and name from props or existing file
+				form.setValue("documentType", documentType?.type || updatedFiles.documentType || "")
+				form.setValue("documentName", documentType?.name || updatedFiles.documentName || "")
+				form.setValue("expirationDate", updatedFiles.expirationDate || defaultExpirationDate)
+			}
 		}
 	)
 	const { documentTypes, title } = getDocumentTypesByCategory(category)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [dragActive, setDragActive] = useState(false)
 
-	const handleSubmit = form.handleSubmit(async (data) => {
+	const onSubmit = async (data: z.infer<typeof uploadDocumentsSchema>) => {
 		try {
 			setIsSubmitting(true)
 
@@ -144,39 +131,30 @@ export function UploadDocumentsDialog({
 				return
 			}
 
-			const uploadResults =
-				files.length > 0
-					? await uploadFilesToCloud({
-							files: [
-								{
-									file: data.file,
-									url: "",
-									preview: "",
-									type: data.file?.type || "",
-									title: data.file?.name || "",
-									fileSize: data.file?.size || 0,
-									mimeType: data.file?.type || "",
-								},
-							],
-							randomString: startupFolderId || workerId || vehicleId || "",
-							containerType: "startup",
-							nameStrategy: "original",
-						})
-					: []
+			let uploadResult: UploadResult | undefined
 
-			if (documentToUpdate && data.file) {
-				if (!data?.documentType || !data?.documentName || !data?.expirationDate) {
-					throw new Error("Missing required document metadata")
-				}
+			if (file) {
+				const results = await uploadFilesToCloud({
+					files: [
+						{
+							file,
+							url: "",
+							preview: "",
+							type: data.documentType,
+							title: data.documentName,
+							fileSize: data.file?.size || 0,
+							mimeType: data.file?.type || "",
+						},
+					],
+					randomString: startupFolderId || workerId || vehicleId || "",
+					containerType: "startup",
+					nameStrategy: "original",
+				})
+				uploadResult = results[0]
+			}
 
-				const emptyUpload: UploadResult = {
-					url: documentToUpdate.url || "",
-					type: data.documentType,
-					size: 0,
-					name: data.documentName,
-				}
-
-				await updateStartupFolderDocument({
+			if (documentToUpdate) {
+				const result = await updateStartupFolderDocument({
 					data: {
 						category,
 						documentId: documentToUpdate.id,
@@ -184,78 +162,65 @@ export function UploadDocumentsDialog({
 						expirationDate: data.expirationDate,
 						documentType: data.documentType as WorkerDocumentType,
 					},
+					uploadedFile: uploadResult || {
+						url: documentToUpdate.url || "",
+						type: data.documentType,
+						size: data.file?.size || 0,
+						name: data.documentName,
+					},
 					userId,
-					uploadedFile: uploadResults[0] || emptyUpload,
 				})
-			} else {
-				if (files.length > 0) {
-					const uploadResults = await uploadFilesToCloud({
-						files: [
-							{
-								url: "",
-								preview: "",
-								file: data.file,
-								type: data.file?.type || "",
-								title: data.file?.name || "",
-								fileSize: data.file?.size || 0,
-								mimeType: data.file?.type || "",
-							},
-						],
-						randomString: startupFolderId || workerId || vehicleId || "",
-						containerType: "startup",
-						nameStrategy: "original",
-					})
 
-					console.log(uploadResults)
+				if (!result.ok) {
+					toast.error(result.message)
+					return
+				}
+			} else if (file && uploadResult) {
+				const docType = documentType?.type || file.documentType
+				const docName = documentType?.name || file.documentName
+				const docExpiration = file.expirationDate
 
-					const promises = files.map((file, index) => {
-						const { documentType, documentName, expirationDate } = file
-						const uploadResult = uploadResults[index]
+				if (!docType || !docName || !docExpiration) {
+					throw new Error("Document type, name and expiration date are required")
+				}
 
-						// Validate required fields
-						if (!documentType || !documentName || !expirationDate) {
-							throw new Error("Document type, name and expiration date are required")
-						}
-
-						switch (category) {
-							case "PERSONNEL": {
-								if (!workerId) throw new Error("Worker ID is required for personnel documents")
-								return createWorkerDocument({
-									workerId,
-									documentType,
-									documentName,
-									expirationDate,
-									url: uploadResult.url,
-									userId,
-								})
-							}
-							case "VEHICLES": {
-								if (!vehicleId) throw new Error("Vehicle ID is required for vehicle documents")
-								return createVehicleDocument({
-									vehicleId,
-									documentType,
-									documentName,
-									expirationDate,
-									url: uploadResult.url,
-									userId,
-								})
-							}
-							default: {
-								if (!startupFolderId) throw new Error("Startup folder ID is required")
-								return createStartupFolderDocument({
-									startupFolderId,
-									documentType,
-									documentName,
-									category,
-									expirationDate,
-									url: uploadResult.url,
-									userId,
-								})
-							}
-						}
-					})
-
-					await Promise.all(promises)
+				switch (category) {
+					case "PERSONNEL": {
+						if (!workerId) throw new Error("Worker ID is required for personnel documents")
+						await createWorkerDocument({
+							workerId,
+							documentType: docType,
+							documentName: docName,
+							expirationDate: docExpiration,
+							url: uploadResult.url,
+							userId,
+						})
+						break
+					}
+					case "VEHICLES": {
+						if (!vehicleId) throw new Error("Vehicle ID is required for vehicle documents")
+						await createVehicleDocument({
+							vehicleId,
+							documentType: docType,
+							documentName: docName,
+							expirationDate: docExpiration,
+							url: uploadResult.url,
+							userId,
+						})
+						break
+					}
+					default: {
+						if (!startupFolderId) throw new Error("Startup folder ID is required")
+						await createStartupFolderDocument({
+							startupFolderId,
+							documentType: docType,
+							documentName: docName,
+							category,
+							expirationDate: docExpiration,
+							url: uploadResult.url,
+							userId,
+						})
+					}
 				}
 			}
 
@@ -274,7 +239,7 @@ export function UploadDocumentsDialog({
 		} finally {
 			setIsSubmitting(false)
 		}
-	})
+	}
 
 	const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
@@ -293,11 +258,9 @@ export function UploadDocumentsDialog({
 		e.stopPropagation()
 		setDragActive(false)
 
-		if (documentToUpdate) return
+		if (!e.dataTransfer.files || e.dataTransfer.files.length === 0) return
 
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-			addFiles(e.dataTransfer.files)
-		}
+		addFiles(e.dataTransfer.files[0])
 	}
 
 	return (
@@ -312,63 +275,52 @@ export function UploadDocumentsDialog({
 				</DialogHeader>
 
 				<Form {...form}>
-					<form onSubmit={handleSubmit} className="space-y-6">
-						<FormField
-							name="files"
-							render={() => (
-								<FormItem>
-									<FormLabel>Archivos</FormLabel>
-									<FormControl>
-										<div
-											className={cn(
-												"border-muted-foreground/25 hover:bg-accent flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center transition-colors",
-												{
-													"border-primary bg-primary/5": dragActive,
-													"cursor-not-allowed opacity-50 hover:bg-transparent":
-														documentToUpdate || files.length > 0,
-												}
-											)}
-											onDragEnter={handleDragEnter}
-											onDragLeave={handleDragLeave}
-											onDragOver={handleDragEnter}
-											onDrop={handleDrop}
-										>
-											<input
-												type="file"
-												id="file-upload"
-												multiple={false}
-												className="hidden"
-												onChange={(e) => addFiles(e.target.files)}
-												disabled={documentToUpdate ? true : false || files.length > 0}
-											/>
-
-											<label
-												htmlFor="file-upload"
-												className={cn("flex cursor-pointer flex-col items-center gap-2", {
-													"cursor-not-allowed": documentToUpdate || files.length > 0,
-												})}
-											>
-												<UploadIcon className="text-muted-foreground h-8 w-8" />
-												<div className="space-y-1">
-													<p className="text-lg font-medium">
-														{dragActive
-															? "Arrastra los archivos aquí"
-															: "Arrastra y suelta los archivos o haz clic para subir"}
-													</p>
-													<p className="text-muted-foreground text-sm">
-														{documentToUpdate
-															? "Puedes remplazar el archivo actual eliminando el archivo actual y subiendo el nuevo"
-															: "Sube múltiples archivos a la vez"}
-													</p>
-												</div>
-											</label>
-										</div>
-									</FormControl>
-								</FormItem>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+						<div
+							className={cn(
+								"border-muted-foreground/25 hover:bg-accent flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center transition-colors",
+								{
+									"border-primary bg-primary/5": dragActive,
+									"cursor-not-allowed opacity-50 hover:bg-transparent": false,
+								}
 							)}
-						/>
+							onDragEnter={handleDragEnter}
+							onDragLeave={handleDragLeave}
+							onDragOver={handleDragEnter}
+							onDrop={handleDrop}
+						>
+							<input
+								type="file"
+								id="file-upload"
+								multiple={false}
+								className="hidden"
+								onChange={(e) => addFiles(e.target.files?.[0] || null)}
+								disabled={false}
+							/>
 
-						{files.length > 0 && (
+							<label
+								htmlFor="file-upload"
+								className={cn("flex cursor-pointer flex-col items-center gap-2", {
+									"cursor-not-allowed": false,
+								})}
+							>
+								<UploadIcon className="text-muted-foreground h-8 w-8" />
+								<div className="space-y-1">
+									<p className="text-lg font-medium">
+										{dragActive
+											? "Arrastra los archivos aquí"
+											: "Arrastra y suelta los archivos o haz clic para subir"}
+									</p>
+									<p className="text-muted-foreground text-sm">
+										{documentToUpdate
+											? "Puedes remplazar el archivo actual eliminando el archivo actual y subiendo el nuevo"
+											: "Sube un archivo"}
+									</p>
+								</div>
+							</label>
+						</div>
+
+						{file && (
 							<Table>
 								<TableHeader>
 									<TableRow>
@@ -380,8 +332,8 @@ export function UploadDocumentsDialog({
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{files.map((file, index) => (
-										<TableRow key={index}>
+									{file && (
+										<TableRow key={file.name}>
 											<TableCell>{file.documentName || file.name}</TableCell>
 											<TableCell>{Math.round((file as File).size / 1024)} KB</TableCell>
 											<TableCell>
@@ -400,14 +352,14 @@ export function UploadDocumentsDialog({
 												<Button
 													size="icon"
 													variant="ghost"
-													onClick={() => removeFile(index)}
+													onClick={() => removeFile()}
 													className="text-red-500 hover:bg-red-500 hover:text-white"
 												>
 													<Trash2Icon />
 												</Button>
 											</TableCell>
 										</TableRow>
-									))}
+									)}
 								</TableBody>
 							</Table>
 						)}
@@ -420,7 +372,7 @@ export function UploadDocumentsDialog({
 							<Button
 								type="submit"
 								className="bg-cyan-600 hover:bg-cyan-700 hover:text-white"
-								disabled={(files.length === 0 && !documentToUpdate) || isSubmitting}
+								disabled={(file === null && !documentToUpdate) || isSubmitting}
 							>
 								{isSubmitting ? <Spinner /> : documentToUpdate ? "Actualizar" : "Subir"}
 							</Button>

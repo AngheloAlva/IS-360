@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
-import { EyeIcon, SendIcon, FolderIcon, ChevronLeft, FileTextIcon, UploadIcon } from "lucide-react"
+import {
+	EyeIcon,
+	SendIcon,
+	FolderIcon,
+	ChevronLeft,
+	FileTextIcon,
+	UploadIcon,
+	PenIcon,
+} from "lucide-react"
 import {
 	type StartupFolderDocument,
 	type SafetyAndHealthStartupFolderDocument,
@@ -147,22 +155,16 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								Vincular {category === DocumentCategory.PERSONNEL ? "Personal" : "Vehículo"}
 							</Button>
 						)}
-						<Button variant="outline" onClick={() => setShowUploadDialog(true)} className="gap-2">
-							<UploadIcon className="h-4 w-4" />
-							Subir documento
-						</Button>
 
-						{documentsData.length > 0 &&
-							documentsData.every((doc) => doc.status === "DRAFT" || doc.status === "REJECTED") && (
-								<Button
-									variant="outline"
-									className="gap-2"
-									onClick={() => setShowSubmitDialog(true)}
-								>
-									<SendIcon className="h-4 w-4" />
-									Enviar a revisión
-								</Button>
-							)}
+						{(documentsData.length > 0 || entities.length > 0) && (
+							<Button
+								className="gap-2 bg-cyan-600 text-white transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
+								onClick={() => setShowSubmitDialog(true)}
+							>
+								<SendIcon className="h-4 w-4" />
+								Enviar a revisión
+							</Button>
+						)}
 					</div>
 				)}
 			</div>
@@ -304,7 +306,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 														setShowUploadDialog(true)
 													}}
 												>
-													<UploadIcon className="h-4 w-4" />
+													<PenIcon className="h-4 w-4" />
 												</Button>
 											)}
 										{isSupervisor && doc.status === "SUBMITTED" && (

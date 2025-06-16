@@ -6,7 +6,6 @@ import {
 	FileTextIcon,
 	PencilIcon,
 	Trash2Icon,
-	Upload,
 	UploadIcon,
 } from "lucide-react"
 import { useState } from "react"
@@ -85,16 +84,6 @@ export function WorkerFolderDocuments({
 				<Button variant="ghost" className="cursor-pointer gap-1" onClick={onBack}>
 					<ChevronLeft className="h-4 w-4" />
 					Volver
-				</Button>
-
-				<Button
-					className="cursor-pointer gap-2 bg-cyan-600 transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
-					onClick={() => {
-						setShowUploadDialog(true)
-					}}
-				>
-					<Upload className="h-4 w-4" />
-					Subir documento
 				</Button>
 			</div>
 

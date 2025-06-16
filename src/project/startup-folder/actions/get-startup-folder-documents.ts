@@ -1,8 +1,14 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import { DocumentCategory } from "@prisma/client"
-import { StartupFolderDocument, WorkerStartupFolderDocument, VehicleStartupFolderDocument, SafetyAndHealthStartupFolderDocument, EnvironmentalStartupFolderDocument } from "../types"
+import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import {
+	StartupFolderDocument,
+	WorkerStartupFolderDocument,
+	VehicleStartupFolderDocument,
+	SafetyAndHealthStartupFolderDocument,
+	EnvironmentalStartupFolderDocument,
+} from "../types"
 
 export async function getStartupFolderDocuments({
 	startupFolderId,
@@ -14,8 +20,10 @@ export async function getStartupFolderDocuments({
 	category: DocumentCategory
 	workerId?: string
 	vehicleId?: string
-}): Promise<{ documents: StartupFolderDocument[] }> {
+}): Promise<{ documents: StartupFolderDocument[]; folderStatus: ReviewStatus }> {
 	try {
+		let folderStatus: ReviewStatus = "DRAFT"
+
 		const folder = await (async () => {
 			switch (category) {
 				case "PERSONNEL":
@@ -40,8 +48,10 @@ export async function getStartupFolderDocuments({
 		})()
 
 		if (!folder) {
-			return { documents: [] }
+			return { documents: [], folderStatus }
 		}
+
+		folderStatus = folder.status
 
 		const rawDocuments = await (async () => {
 			switch (category) {
@@ -148,7 +158,7 @@ export async function getStartupFolderDocuments({
 			}
 		})
 
-		return { documents }
+		return { documents, folderStatus }
 	} catch (error) {
 		console.error("Error fetching startup folder documents:", error)
 		throw new Error("Could not fetch startup folder documents")

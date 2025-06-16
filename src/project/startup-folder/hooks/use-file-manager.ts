@@ -15,13 +15,13 @@ export type ManagedFile = File & {
 }
 
 export interface FileManager {
-	files: ManagedFile[]
-	removeFile: (index: number) => void
-	addFiles: (newFiles: FileList | null) => void
+	file: ManagedFile | null
+	removeFile: () => void
+	addFiles: (newFiles: File | null) => void
 }
 
 export function useFileManager(
-	initialFiles: ManagedFile[] = [],
+	initialFile: ManagedFile | null,
 	documentType?: {
 		type:
 			| WorkerDocumentType
@@ -30,38 +30,32 @@ export function useFileManager(
 			| SafetyAndHealthDocumentType
 		name: string
 	} | null,
-	onFilesChange?: (files: ManagedFile[]) => void
+	onFilesChange?: (files: ManagedFile | null) => void
 ): FileManager {
-	const [files, setFiles] = useState<ManagedFile[]>(initialFiles)
+	const [file, setFiles] = useState<ManagedFile | null>(initialFile)
 
-	const addFiles = (newFiles: FileList | null) => {
-		if (!newFiles) return
+	const addFiles = (newFile: File | null) => {
+		if (!newFile) return
 
-		setFiles((prev) => {
-			const filesArray = Array.from(newFiles).map((file) => {
-				const managedFile = file as ManagedFile
-				managedFile.documentType = documentType?.type || ""
-				managedFile.expirationDate = addYears(new Date(), 1)
-				managedFile.documentName = documentType?.name || file.name
-				return managedFile
-			})
+		const managedFile: ManagedFile = newFile
 
-			const updatedFiles = [...prev, ...filesArray]
-			onFilesChange?.(updatedFiles)
-			return updatedFiles
-		})
+		if (documentType || initialFile) {
+			managedFile.documentType = documentType?.type || initialFile?.documentType || ""
+			managedFile.documentName = documentType?.name || initialFile?.documentName || ""
+		}
+		managedFile.expirationDate = managedFile.expirationDate || addYears(new Date(), 1)
+
+		setFiles(managedFile)
+		onFilesChange?.(managedFile)
 	}
 
-	const removeFile = (index: number) => {
-		setFiles((prev) => {
-			const newFiles = prev.filter((_, i) => i !== index)
-			onFilesChange?.(newFiles)
-			return newFiles
-		})
+	const removeFile = () => {
+		setFiles(null)
+		onFilesChange?.(null)
 	}
 
 	return {
-		files,
+		file,
 		addFiles,
 		removeFile,
 	}
