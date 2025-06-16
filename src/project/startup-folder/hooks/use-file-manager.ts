@@ -1,27 +1,35 @@
 import { addYears } from "date-fns"
 import { useState } from "react"
 
+import type {
+	WorkerDocumentType,
+	VehicleDocumentType,
+	EnvironmentalDocType,
+	SafetyAndHealthDocumentType,
+} from "@prisma/client"
+
 export type ManagedFile = File & {
 	documentType?: string
 	documentName?: string
 	expirationDate?: Date
 }
 
-interface FileTypeUpdate {
-	type: string
-	name: string
-	expirationDate: Date
-}
-
 export interface FileManager {
 	files: ManagedFile[]
 	removeFile: (index: number) => void
 	addFiles: (newFiles: FileList | null) => void
-	setFileType: (index: number, update: FileTypeUpdate) => void
 }
 
 export function useFileManager(
 	initialFiles: ManagedFile[] = [],
+	documentType?: {
+		type:
+			| WorkerDocumentType
+			| VehicleDocumentType
+			| EnvironmentalDocType
+			| SafetyAndHealthDocumentType
+		name: string
+	} | null,
 	onFilesChange?: (files: ManagedFile[]) => void
 ): FileManager {
 	const [files, setFiles] = useState<ManagedFile[]>(initialFiles)
@@ -32,9 +40,9 @@ export function useFileManager(
 		setFiles((prev) => {
 			const filesArray = Array.from(newFiles).map((file) => {
 				const managedFile = file as ManagedFile
-				managedFile.documentType = ""
-				managedFile.documentName = file.name
+				managedFile.documentType = documentType?.type || ""
 				managedFile.expirationDate = addYears(new Date(), 1)
+				managedFile.documentName = documentType?.name || file.name
 				return managedFile
 			})
 
@@ -52,24 +60,9 @@ export function useFileManager(
 		})
 	}
 
-	const setFileType = (index: number, { type, name, expirationDate }: FileTypeUpdate) => {
-		setFiles((prev) => {
-			const updated = [...prev]
-			const file = updated[index]
-			if (file) {
-				file.documentType = type
-				file.documentName = name
-				file.expirationDate = expirationDate
-			}
-			onFilesChange?.(updated)
-			return updated
-		})
-	}
-
 	return {
 		files,
 		addFiles,
 		removeFile,
-		setFileType,
 	}
 }

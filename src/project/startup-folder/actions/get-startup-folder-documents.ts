@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { DocumentCategory } from "@prisma/client"
+import { StartupFolderDocument, WorkerStartupFolderDocument, VehicleStartupFolderDocument, SafetyAndHealthStartupFolderDocument, EnvironmentalStartupFolderDocument } from "../types"
 
 export async function getStartupFolderDocuments({
 	startupFolderId,
@@ -13,7 +14,7 @@ export async function getStartupFolderDocuments({
 	category: DocumentCategory
 	workerId?: string
 	vehicleId?: string
-}) {
+}): Promise<{ documents: StartupFolderDocument[] }> {
 	try {
 		const folder = await (async () => {
 			switch (category) {
@@ -42,7 +43,7 @@ export async function getStartupFolderDocuments({
 			return { documents: [] }
 		}
 
-		const documents = await (async () => {
+		const rawDocuments = await (async () => {
 			switch (category) {
 				case "PERSONNEL":
 					return prisma.workerDocument.findMany({
@@ -100,6 +101,52 @@ export async function getStartupFolderDocuments({
 					return []
 			}
 		})()
+
+		const documents: StartupFolderDocument[] = rawDocuments.map((doc) => {
+			const baseDoc = {
+				id: doc.id,
+				name: doc.name,
+				url: doc.url,
+				uploadedAt: doc.uploadedAt,
+				status: doc.status,
+				reviewNotes: doc.reviewNotes,
+				reviewedAt: doc.reviewedAt,
+				submittedAt: doc.submittedAt,
+				expirationDate: doc.expirationDate,
+				uploadedBy: doc.uploadedBy,
+				uploadedById: doc.uploadedById,
+				folderId: doc.folderId,
+			}
+
+			switch (category) {
+				case "PERSONNEL":
+					return {
+						...baseDoc,
+						category: "PERSONNEL",
+						type: doc.type,
+					} as WorkerStartupFolderDocument
+				case "VEHICLES":
+					return {
+						...baseDoc,
+						category: "VEHICLES",
+						type: doc.type,
+					} as VehicleStartupFolderDocument
+				case "SAFETY_AND_HEALTH":
+					return {
+						...baseDoc,
+						category: "SAFETY_AND_HEALTH",
+						type: doc.type,
+					} as SafetyAndHealthStartupFolderDocument
+				case "ENVIRONMENTAL":
+					return {
+						...baseDoc,
+						category: "ENVIRONMENTAL",
+						type: doc.type,
+					} as EnvironmentalStartupFolderDocument
+				default:
+					throw new Error(`Invalid category: ${category}`)
+			}
+		})
 
 		return { documents }
 	} catch (error) {

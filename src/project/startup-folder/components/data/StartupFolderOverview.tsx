@@ -115,7 +115,7 @@ export default function StartupFolderOverview({
 										isOtcMember={isOtcMember}
 										category={selectedCategory}
 										startupFolderId={folder.id}
-										canAddDocuments={isSupervisor}
+										isSupervisor={isSupervisor}
 										onBack={() => setSelectedCategory(null)}
 									/>
 								) : (

@@ -38,15 +38,14 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectTrigger,
-	SelectContent,
-} from "@/shared/components/ui/select"
 
-import type { DocumentCategory, WorkerDocumentType } from "@prisma/client"
+import type {
+	DocumentCategory,
+	WorkerDocumentType,
+	VehicleDocumentType,
+	EnvironmentalDocType,
+	SafetyAndHealthDocumentType,
+} from "@prisma/client"
 import type { StartupFolderDocument } from "../../types"
 
 interface UploadDocumentsDialogProps {
@@ -54,12 +53,19 @@ interface UploadDocumentsDialogProps {
 	isOpen: boolean
 	workerId?: string
 	vehicleId?: string
-	multiple?: boolean
 	onClose: () => void
 	startupFolderId: string
 	category: DocumentCategory
 	onUploadComplete?: () => void
 	documentToUpdate?: StartupFolderDocument | null
+	documentType?: {
+		type:
+			| WorkerDocumentType
+			| VehicleDocumentType
+			| EnvironmentalDocType
+			| SafetyAndHealthDocumentType
+		name: string
+	} | null
 }
 
 export function UploadDocumentsDialog({
@@ -69,23 +75,19 @@ export function UploadDocumentsDialog({
 	workerId,
 	category,
 	vehicleId,
+	documentType,
 	startupFolderId,
-	multiple = true,
 	documentToUpdate,
 	onUploadComplete,
 }: UploadDocumentsDialogProps) {
 	const uploadDocumentsSchema = z.object({
-		files: z.array(
-			z.object({
-				file: z.instanceof(File).optional(),
-				documentType: z.string().min(1, "El tipo de documento es obligatorio"),
-				documentName: z.string().min(1, "El nombre del documento es obligatorio"),
-				expirationDate: z.date({
-					required_error: "La fecha de vencimiento es obligatoria",
-					invalid_type_error: "La fecha de vencimiento debe ser válida",
-				}),
-			})
-		),
+		file: z.instanceof(File).optional(),
+		documentType: z.string().min(1, "El tipo de documento es obligatorio"),
+		documentName: z.string().min(1, "El nombre del documento es obligatorio"),
+		expirationDate: z.date({
+			required_error: "La fecha de vencimiento es obligatoria",
+			invalid_type_error: "La fecha de vencimiento debe ser válida",
+		}),
 	})
 
 	type UploadDocumentsFormData = z.infer<typeof uploadDocumentsSchema>
@@ -95,18 +97,12 @@ export function UploadDocumentsDialog({
 	const form: UseFormReturn<UploadDocumentsFormData> = useForm<UploadDocumentsFormData>({
 		resolver: zodResolver(uploadDocumentsSchema),
 		defaultValues: {
-			files: documentToUpdate
-				? [
-						{
-							file: undefined,
-							documentType: documentToUpdate.type,
-							documentName: documentToUpdate.name,
-							expirationDate: documentToUpdate.expirationDate
-								? new Date(documentToUpdate.expirationDate)
-								: defaultExpirationDate,
-						},
-					]
-				: [],
+			file: undefined,
+			documentType: documentToUpdate?.type,
+			documentName: documentToUpdate?.name,
+			expirationDate: documentToUpdate?.expirationDate
+				? new Date(documentToUpdate.expirationDate)
+				: defaultExpirationDate,
 		},
 	})
 
@@ -123,18 +119,16 @@ export function UploadDocumentsDialog({
 			]
 		: []
 
-	const { files, addFiles, removeFile, setFileType } = useFileManager(
+	const { files, addFiles, removeFile } = useFileManager(
 		initialFiles,
+		documentType,
 		(updatedFiles) => {
-			form.setValue(
-				"files",
-				updatedFiles.map((file) => ({
-					file,
-					documentType: file.documentType || "",
-					documentName: file.documentName || "",
-					expirationDate: file.expirationDate || defaultExpirationDate,
-				}))
-			)
+			updatedFiles.map((file) => {
+				form.setValue("file", file)
+				form.setValue("documentType", file.documentType || "")
+				form.setValue("documentName", file.documentName || "")
+				form.setValue("expirationDate", file.expirationDate || defaultExpirationDate)
+			})
 		}
 	)
 	const { documentTypes, title } = getDocumentTypesByCategory(category)
@@ -145,25 +139,7 @@ export function UploadDocumentsDialog({
 		try {
 			setIsSubmitting(true)
 
-			const files = data.files
-				.filter((file): file is typeof file & { file: File } => {
-					return (
-						file.file instanceof File &&
-						typeof file.documentType === "string" &&
-						typeof file.documentName === "string" &&
-						file.expirationDate instanceof Date
-					)
-				})
-				.map((file) => ({
-					file: file.file,
-					documentType: file.documentType,
-					documentName: file.documentName,
-					expirationDate: file.expirationDate,
-				}))
-
-			console.log(files)
-
-			if (files.length === 0) {
+			if (!documentToUpdate && data.file === undefined) {
 				toast.error("No se seleccionaron archivos")
 				return
 			}
@@ -171,60 +147,60 @@ export function UploadDocumentsDialog({
 			const uploadResults =
 				files.length > 0
 					? await uploadFilesToCloud({
-							files: files.map(({ file }) => ({
-								file,
-								type: file.type,
-								url: "",
-								preview: "",
-								title: file.name,
-								fileSize: file.size,
-								mimeType: file.type,
-							})),
+							files: [
+								{
+									file: data.file,
+									url: "",
+									preview: "",
+									type: data.file?.type || "",
+									title: data.file?.name || "",
+									fileSize: data.file?.size || 0,
+									mimeType: data.file?.type || "",
+								},
+							],
 							randomString: startupFolderId || workerId || vehicleId || "",
 							containerType: "startup",
 							nameStrategy: "original",
 						})
 					: []
 
-			if (documentToUpdate && data.files[0]) {
-				const fileData = data.files[0]
-
-				if (!fileData?.documentType || !fileData?.documentName || !fileData?.expirationDate) {
+			if (documentToUpdate && data.file) {
+				if (!data?.documentType || !data?.documentName || !data?.expirationDate) {
 					throw new Error("Missing required document metadata")
 				}
 
 				const emptyUpload: UploadResult = {
 					url: documentToUpdate.url || "",
-					type: fileData.documentType,
+					type: data.documentType,
 					size: 0,
-					name: fileData.documentName,
+					name: data.documentName,
 				}
 
 				await updateStartupFolderDocument({
 					data: {
 						category,
 						documentId: documentToUpdate.id,
-						documentName: fileData.documentName,
-						expirationDate: fileData.expirationDate,
-						documentType: fileData.documentType as WorkerDocumentType,
+						documentName: data.documentName,
+						expirationDate: data.expirationDate,
+						documentType: data.documentType as WorkerDocumentType,
 					},
 					userId,
 					uploadedFile: uploadResults[0] || emptyUpload,
 				})
 			} else {
 				if (files.length > 0) {
-					const filesToUpload = files.map((file) => ({
-						file: file.file,
-						type: file.file.type,
-						url: "",
-						preview: "",
-						title: file.file.name,
-						fileSize: file.file.size,
-						mimeType: file.file.type,
-					}))
-
 					const uploadResults = await uploadFilesToCloud({
-						files: filesToUpload,
+						files: [
+							{
+								url: "",
+								preview: "",
+								file: data.file,
+								type: data.file?.type || "",
+								title: data.file?.name || "",
+								fileSize: data.file?.size || 0,
+								mimeType: data.file?.type || "",
+							},
+						],
 						randomString: startupFolderId || workerId || vehicleId || "",
 						containerType: "startup",
 						nameStrategy: "original",
@@ -287,7 +263,7 @@ export function UploadDocumentsDialog({
 				documentToUpdate ? "Documento actualizado exitosamente" : "Documentos subidos exitosamente"
 			)
 			queryClient.invalidateQueries({
-				queryKey: ["startupFolderDocuments", { startupFolderId, category, workerId, vehicleId }],
+				queryKey: ["startupFolderDocuments", { startupFolderId, category }],
 			})
 
 			onClose()
@@ -299,26 +275,6 @@ export function UploadDocumentsDialog({
 			setIsSubmitting(false)
 		}
 	})
-
-	const handleFileTypeChange = (index: number, type: string) => {
-		const docType = documentTypes.find((dt) => dt.type === type)
-		if (!docType) return
-
-		const currentTypeCount = files.reduce(
-			(count, file) => (file.documentType === type ? count + 1 : count),
-			0
-		)
-
-		const suffix = currentTypeCount > 0 ? ` (${currentTypeCount + 1})` : ""
-		const expirationDate =
-			form.getValues(`files.${index}.expirationDate`) || addYears(new Date(), 1)
-
-		setFileType(index, {
-			type,
-			name: docType.name + suffix,
-			expirationDate,
-		})
-	}
 
 	const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
@@ -348,9 +304,10 @@ export function UploadDocumentsDialog({
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="w-full max-w-full sm:max-w-fit">
 				<DialogHeader>
-					<DialogTitle>Subir documentos</DialogTitle>
+					<DialogTitle>Subir documento</DialogTitle>
 					<DialogDescription>
-						Sube documentos para la carpeta <span className="font-semibold">{title}</span>.
+						Sube el documento {documentType?.name} para la carpeta{" "}
+						<span className="font-semibold">{title}</span>.
 					</DialogDescription>
 				</DialogHeader>
 
@@ -367,7 +324,8 @@ export function UploadDocumentsDialog({
 												"border-muted-foreground/25 hover:bg-accent flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center transition-colors",
 												{
 													"border-primary bg-primary/5": dragActive,
-													"cursor-not-allowed opacity-50 hover:bg-transparent": documentToUpdate,
+													"cursor-not-allowed opacity-50 hover:bg-transparent":
+														documentToUpdate || files.length > 0,
 												}
 											)}
 											onDragEnter={handleDragEnter}
@@ -378,16 +336,16 @@ export function UploadDocumentsDialog({
 											<input
 												type="file"
 												id="file-upload"
+												multiple={false}
 												className="hidden"
-												multiple={multiple}
-												disabled={documentToUpdate ? true : false}
 												onChange={(e) => addFiles(e.target.files)}
+												disabled={documentToUpdate ? true : false || files.length > 0}
 											/>
 
 											<label
 												htmlFor="file-upload"
 												className={cn("flex cursor-pointer flex-col items-center gap-2", {
-													"cursor-not-allowed": documentToUpdate,
+													"cursor-not-allowed": documentToUpdate || files.length > 0,
 												})}
 											>
 												<UploadIcon className="text-muted-foreground h-8 w-8" />
@@ -427,46 +385,14 @@ export function UploadDocumentsDialog({
 											<TableCell>{file.documentName || file.name}</TableCell>
 											<TableCell>{Math.round((file as File).size / 1024)} KB</TableCell>
 											<TableCell>
-												<FormField
-													control={form.control}
-													name={`files.${index}.documentType`}
-													render={({ field }) => (
-														<FormItem>
-															<FormControl>
-																<Select
-																	value={field.value}
-																	onValueChange={(value) => {
-																		field.onChange(value)
-																		handleFileTypeChange(index, value)
-																	}}
-																>
-																	<SelectTrigger>
-																		<SelectValue placeholder="Tipo de documento" />
-																	</SelectTrigger>
-																	<SelectContent>
-																		{documentTypes.map((docType) => (
-																			<SelectItem key={docType.type} value={docType.type}>
-																				{docType.name}
-																			</SelectItem>
-																		))}
-																	</SelectContent>
-																</Select>
-															</FormControl>
-															{form.formState.errors.files?.[index]?.documentType && (
-																<p className="text-sm text-red-500">
-																	{form.formState.errors.files[index]?.documentType?.message}
-																</p>
-															)}
-														</FormItem>
-													)}
-												/>
+												{documentTypes.find((dt) => dt.type === file.documentType)?.name}
 											</TableCell>
 											<TableCell>
 												<DatePickerFormField
 													showLabel={false}
+													name="expirationDate"
 													control={form.control}
 													label="Fecha de vencimiento"
-													name={`files.${index}.expirationDate`}
 													disabledCondition={(date: Date) => date < new Date()}
 												/>
 											</TableCell>

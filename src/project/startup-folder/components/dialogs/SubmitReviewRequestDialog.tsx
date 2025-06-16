@@ -22,12 +22,12 @@ import type { DocumentCategory } from "@prisma/client"
 
 interface SubmitReviewRequestDialogProps {
 	userId: string
+	isOpen: boolean
 	folderId: string
 	companyId: string
-	isOpen: boolean
-	category: DocumentCategory
 	onClose: () => void
 	onSuccess: () => void
+	category: DocumentCategory
 }
 
 const submitReviewRequestSchema = z.object({

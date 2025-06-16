@@ -1,12 +1,27 @@
 "use client"
 
-import { ChevronLeft, EyeIcon, PencilIcon, Trash2Icon, Upload } from "lucide-react"
+import {
+	ChevronLeft,
+	EyeIcon,
+	FileTextIcon,
+	PencilIcon,
+	Trash2Icon,
+	Upload,
+	UploadIcon,
+} from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { deleteStartupFolderDocument } from "../../actions/delete-startup-folder-document"
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import {
+	DocumentCategory,
+	EnvironmentalDocType,
+	ReviewStatus,
+	SafetyAndHealthDocumentType,
+	VehicleDocumentType,
+	WorkerDocumentType,
+} from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/shared/components/ui/startup-folder-status-badge"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
@@ -29,6 +44,16 @@ interface VehicleFolderDocumentsProps {
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
+	documentsNotUploaded: {
+		name: string
+		required: boolean
+		description?: string
+		type:
+			| SafetyAndHealthDocumentType
+			| VehicleDocumentType
+			| WorkerDocumentType
+			| EnvironmentalDocType
+	}[]
 }
 
 export function VehicleFolderDocuments({
@@ -37,9 +62,18 @@ export function VehicleFolderDocuments({
 	vehicleId,
 	isOtcMember,
 	startupFolderId,
+	documentsNotUploaded,
 }: VehicleFolderDocumentsProps) {
-	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
+	const [selectedDocumentType, setSelectedDocumentType] = useState<{
+		type:
+			| WorkerDocumentType
+			| VehicleDocumentType
+			| EnvironmentalDocType
+			| SafetyAndHealthDocumentType
+		name: string
+	} | null>(null)
+	const [showUploadDialog, setShowUploadDialog] = useState(false)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
 		category: DocumentCategory.VEHICLES,
@@ -60,7 +94,7 @@ export function VehicleFolderDocuments({
 					onClick={() => setShowUploadDialog(true)}
 				>
 					<Upload className="h-4 w-4" />
-					Subir documentos
+					Subir documento
 				</Button>
 			</div>
 
@@ -87,7 +121,10 @@ export function VehicleFolderDocuments({
 							<TableRow key={doc.id}>
 								<TableCell className="font-medium">
 									<div className="flex flex-col items-start justify-center">
-										{doc.name}
+										<div className="flex items-center gap-2">
+											<FileTextIcon className="h-4 w-4 text-teal-500" />
+											{doc.name}
+										</div>
 
 										{doc.status === ReviewStatus.REJECTED && (
 											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
@@ -173,6 +210,42 @@ export function VehicleFolderDocuments({
 							</TableCell>
 						</TableRow>
 					)}
+
+					{documentsNotUploaded.length > 0 &&
+						documentsNotUploaded.map((doc) => (
+							<TableRow key={doc.name}>
+								<TableCell className="font-medium">
+									<div className="flex flex-col items-start justify-center">
+										<div className="flex items-center gap-2">
+											<FileTextIcon className="h-4 w-4 text-teal-500" />
+											{doc.name}
+										</div>
+									</div>
+								</TableCell>
+								<TableCell>
+									<StartupFolderStatusBadge status={"DRAFT"} />
+								</TableCell>
+								<TableCell></TableCell>
+								<TableCell>N/A</TableCell>
+								<TableCell>
+									<div className="flex items-center gap-1">
+										{!isOtcMember && (
+											<Button
+												size={"icon"}
+												variant="ghost"
+												className="text-cyan-600"
+												onClick={() => {
+													setShowUploadDialog(true)
+													setSelectedDocumentType({ type: doc.type, name: doc.name })
+												}}
+											>
+												<UploadIcon className="h-4 w-4" />
+											</Button>
+										)}
+									</div>
+								</TableCell>
+							</TableRow>
+						))}
 				</TableBody>
 			</Table>
 
@@ -180,11 +253,11 @@ export function VehicleFolderDocuments({
 				<UploadDocumentsDialog
 					category="VEHICLES"
 					userId={userId}
-					multiple={false}
 					vehicleId={vehicleId}
 					isOpen={showUploadDialog}
 					startupFolderId={startupFolderId}
 					documentToUpdate={selectedDocument}
+					documentType={selectedDocumentType}
 					onClose={() => {
 						setShowUploadDialog(false)
 						setSelectedDocument(null)

@@ -1,6 +1,14 @@
 "use client"
 
-import { ChevronLeft, EyeIcon, PencilIcon, Trash2Icon, Upload } from "lucide-react"
+import {
+	ChevronLeft,
+	EyeIcon,
+	FileTextIcon,
+	PencilIcon,
+	Trash2Icon,
+	Upload,
+	UploadIcon,
+} from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -21,6 +29,12 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
+import type {
+	SafetyAndHealthDocumentType,
+	VehicleDocumentType,
+	WorkerDocumentType,
+	EnvironmentalDocType,
+} from "@prisma/client"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
@@ -28,6 +42,16 @@ interface WorkerFolderDocumentsProps {
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
+	documentsNotUploaded: {
+		name: string
+		required: boolean
+		description?: string
+		type:
+			| SafetyAndHealthDocumentType
+			| VehicleDocumentType
+			| WorkerDocumentType
+			| EnvironmentalDocType
+	}[]
 }
 
 export function WorkerFolderDocuments({
@@ -36,10 +60,18 @@ export function WorkerFolderDocuments({
 	workerId,
 	isOtcMember,
 	startupFolderId,
+	documentsNotUploaded,
 }: WorkerFolderDocumentsProps) {
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
+	const [selectedDocumentType, setSelectedDocumentType] = useState<{
+		type:
+			| WorkerDocumentType
+			| VehicleDocumentType
+			| EnvironmentalDocType
+			| SafetyAndHealthDocumentType
+		name: string
+	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
-	const [isMultiple, setIsMultiple] = useState(false)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
 		category: DocumentCategory.PERSONNEL,
@@ -58,12 +90,11 @@ export function WorkerFolderDocuments({
 				<Button
 					className="cursor-pointer gap-2 bg-cyan-600 transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
 					onClick={() => {
-						setIsMultiple(false)
 						setShowUploadDialog(true)
 					}}
 				>
 					<Upload className="h-4 w-4" />
-					Subir documentos
+					Subir documento
 				</Button>
 			</div>
 
@@ -90,7 +121,10 @@ export function WorkerFolderDocuments({
 							<TableRow key={doc.id}>
 								<TableCell className="font-medium">
 									<div className="flex flex-col items-start justify-center">
-										{doc.name}
+										<div className="flex items-center gap-2">
+											<FileTextIcon className="h-4 w-4 text-teal-500" />
+											{doc.name}
+										</div>
 
 										{doc.status === ReviewStatus.REJECTED && (
 											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
@@ -125,7 +159,6 @@ export function WorkerFolderDocuments({
 													variant="ghost"
 													className="text-amber-600"
 													onClick={() => {
-														setIsMultiple(false)
 														setSelectedDocument(doc)
 														setShowUploadDialog(true)
 													}}
@@ -168,6 +201,42 @@ export function WorkerFolderDocuments({
 										)}
 									</div>
 								</TableCell>
+
+								{documentsNotUploaded.length > 0 &&
+									documentsNotUploaded.map((doc) => (
+										<TableRow key={doc.name}>
+											<TableCell className="font-medium">
+												<div className="flex flex-col items-start justify-center">
+													<div className="flex items-center gap-2">
+														<FileTextIcon className="h-4 w-4 text-teal-500" />
+														{doc.name}
+													</div>
+												</div>
+											</TableCell>
+											<TableCell>
+												<StartupFolderStatusBadge status={"DRAFT"} />
+											</TableCell>
+											<TableCell></TableCell>
+											<TableCell>N/A</TableCell>
+											<TableCell>
+												<div className="flex items-center gap-1">
+													{!isOtcMember && (
+														<Button
+															size={"icon"}
+															variant="ghost"
+															className="text-cyan-600"
+															onClick={() => {
+																setShowUploadDialog(true)
+																setSelectedDocumentType({ type: doc.type, name: doc.name })
+															}}
+														>
+															<UploadIcon className="h-4 w-4" />
+														</Button>
+													)}
+												</div>
+											</TableCell>
+										</TableRow>
+									))}
 							</TableRow>
 						))
 					) : (
@@ -185,9 +254,9 @@ export function WorkerFolderDocuments({
 					category="PERSONNEL"
 					userId={userId}
 					workerId={workerId}
-					multiple={isMultiple}
 					isOpen={showUploadDialog}
 					startupFolderId={startupFolderId}
+					documentType={selectedDocumentType}
 					documentToUpdate={selectedDocument}
 					onClose={() => {
 						setShowUploadDialog(false)

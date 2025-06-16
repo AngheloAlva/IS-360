@@ -467,3 +467,37 @@ export function getDocumentTypesByCategory(category: DocumentCategory) {
 			}
 	}
 }
+
+export const getDocumentsByCategory = (category: DocumentCategory) => {
+	switch (category) {
+		case DocumentCategory.SAFETY_AND_HEALTH:
+			return {
+				title: SAFETY_AND_HEALTH_STRUCTURE.title,
+				documents: SAFETY_AND_HEALTH_STRUCTURE.documents,
+				category: DocumentCategory.SAFETY_AND_HEALTH,
+			}
+		case DocumentCategory.ENVIRONMENTAL:
+			return {
+				title: ENVIRONMENTAL_STRUCTURE.title,
+				documents: ENVIRONMENTAL_STRUCTURE.documents,
+				category: DocumentCategory.ENVIRONMENTAL,
+			}
+		case DocumentCategory.VEHICLES:
+			return {
+				title: VEHICLE_STRUCTURE.title,
+				documents: VEHICLE_STRUCTURE.documents,
+				category: DocumentCategory.VEHICLES,
+			}
+		case DocumentCategory.PERSONNEL:
+			return {
+				title: WORKER_STRUCTURE.title,
+				documents: WORKER_STRUCTURE.documents,
+				category: DocumentCategory.PERSONNEL,
+			}
+		default:
+			return {
+				title: "",
+				documents: [],
+			}
+	}
+}
