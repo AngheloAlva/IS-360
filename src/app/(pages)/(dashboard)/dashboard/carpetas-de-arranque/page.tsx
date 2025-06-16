@@ -21,7 +21,11 @@ export default async function StartupFoldersPage() {
 
 	return (
 		<div className="w-full flex-1 space-y-6">
-			<StartupFolderOverview userId={session.user.id} companyId={session.user.companyId} />
+			<StartupFolderOverview
+				userId={session.user.id}
+				companyId={session.user.companyId}
+				isSupervisor={session.user.isSupervisor ?? false}
+			/>
 		</div>
 	)
 }

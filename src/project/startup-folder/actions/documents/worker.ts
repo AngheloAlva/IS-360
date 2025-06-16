@@ -82,7 +82,7 @@ export const createWorkerDocument = async ({
 
 export const updateWorkerDocument = async ({
 	file,
-	data: { documentId, expirationDate },
+	data: { documentId, expirationDate, documentName, documentType },
 	userId,
 }: {
 	file: UploadResult
@@ -124,8 +124,10 @@ export const updateWorkerDocument = async ({
 				id: documentId,
 			},
 			data: {
-				expirationDate,
 				url: file.url,
+				expirationDate,
+				name: documentName,
+				type: documentType as WorkerDocumentType,
 				uploadedAt: new Date(),
 				uploadedBy: {
 					connect: {

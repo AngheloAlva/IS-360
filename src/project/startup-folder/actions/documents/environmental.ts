@@ -73,7 +73,7 @@ export const createEnvironmentalDocument = async ({
 }
 
 export const updateEnvironmentalDocument = async ({
-	data: { documentId, expirationDate },
+	data: { documentId, expirationDate, documentName, documentType },
 	uploadedFile,
 	userId,
 }: {
@@ -114,8 +114,10 @@ export const updateEnvironmentalDocument = async ({
 			},
 			data: {
 				expirationDate,
+				name: documentName,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
+				type: documentType as EnvironmentalDocType,
 				uploadedBy: {
 					connect: {
 						id: userId,

@@ -30,6 +30,7 @@ export default async function StartupFolderReviewPage({
 	return (
 		<div className="w-full flex-1 space-y-6">
 			<StartupFolderOverview
+				isSupervisor={false}
 				companyId={companyId}
 				userId={session.user.id}
 				hasPermission={hasPermission.success}

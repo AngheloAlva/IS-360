@@ -1,28 +1,28 @@
 "use client"
 
+import { useCallback, useEffect, useState } from "react"
+import { toast } from "sonner"
 import {
-	ChevronLeft,
-	ChevronRight,
+	Upload,
 	EyeIcon,
+	Trash2Icon,
 	FolderIcon,
 	PencilIcon,
-	Trash2Icon,
-	Upload,
+	ChevronLeft,
+	ChevronRight,
+	FileTextIcon,
+	PlusCircleIcon,
 } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
 
-import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
-import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
-import { toast } from "sonner"
-
+import { deleteStartupFolderDocument } from "../../actions/delete-startup-folder-document"
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { getCompanyEntities } from "../../actions/get-company-entities"
-import { deleteStartupFolderDocument } from "../../actions/delete-startup-folder-document"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
-import { type StartupFolderDocument } from "@/project/startup-folder/types"
 
 import { StartupFolderStatusBadge } from "@/shared/components/ui/startup-folder-status-badge"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
+import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
+import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
 import { LinkEntityDialog } from "../dialogs/LinkEntityDialog"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -34,12 +34,15 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
+import type { StartupFolderDocument } from "@/project/startup-folder/types"
+
 interface StartupFolderDocumentsProps {
-	category: DocumentCategory
-	startupFolderId: string
 	userId: string
 	companyId: string
 	onBack: () => void
+	startupFolderId: string
+	canAddDocuments: boolean
+	category: DocumentCategory
 }
 
 interface SelectedEntity {
@@ -53,12 +56,15 @@ export function StartupFolderDocuments({
 	category,
 	companyId,
 	startupFolderId,
+	canAddDocuments,
 }: StartupFolderDocumentsProps) {
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null)
 	const [entities, setEntities] = useState<Array<{ id: string; name: string }>>([])
+	const [allEntities, setAllEntities] = useState<SelectedEntity[]>([])
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showLinkDialog, setShowLinkDialog] = useState(false)
+	const [multiple, setMultiple] = useState(true)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documents = data?.documents ?? []
@@ -66,14 +72,19 @@ export function StartupFolderDocuments({
 	const fetchEntities = useCallback(async () => {
 		try {
 			if (category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES) {
-				const entities = await getCompanyEntities({ companyId, category })
-				setEntities(entities)
+				const { allEntities, vinculatedEntities } = await getCompanyEntities({
+					companyId,
+					category,
+					startupFolderId,
+				})
+				setEntities(vinculatedEntities)
+				setAllEntities(allEntities)
 			}
 		} catch (error) {
 			console.error("Error fetching entities:", error)
 			toast.error("Error al cargar las entidades")
 		}
-	}, [category, companyId])
+	}, [category, companyId, startupFolderId])
 
 	useEffect(() => {
 		fetchEntities()
@@ -107,20 +118,28 @@ export function StartupFolderDocuments({
 					Volver
 				</Button>
 
-				<div className="flex items-center gap-2">
-					{(category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES) && (
-						<Button variant="outline" onClick={() => setShowLinkDialog(true)}>
-							Vincular {category === DocumentCategory.PERSONNEL ? "trabajador" : "vehículo"}
+				{canAddDocuments && (
+					<div className="flex items-center gap-2">
+						{(category === DocumentCategory.PERSONNEL ||
+							category === DocumentCategory.VEHICLES) && (
+							<Button variant="outline" className="gap-1.5" onClick={() => setShowLinkDialog(true)}>
+								<PlusCircleIcon className="size-3.5" />
+								Vincular {category === DocumentCategory.PERSONNEL ? "trabajador" : "vehículo"}
+							</Button>
+						)}
+
+						<Button
+							className="cursor-pointer gap-1.5 bg-cyan-600 transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
+							onClick={() => {
+								setMultiple(true)
+								setShowUploadDialog(true)
+							}}
+						>
+							<Upload className="size-3.5" />
+							Subir documento
 						</Button>
-					)}
-					<Button
-						className="cursor-pointer gap-2 bg-cyan-600 transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
-						onClick={() => setShowUploadDialog(true)}
-					>
-						<Upload className="h-4 w-4" />
-						Subir documento
-					</Button>
-				</div>
+					</div>
+				)}
 			</div>
 
 			<Table>
@@ -142,30 +161,41 @@ export function StartupFolderDocuments({
 							</TableCell>
 						</TableRow>
 					) : category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES ? (
-						entities.map((entity) => (
-							<TableRow
-								key={entity.id}
-								className="cursor-pointer"
-								onClick={() => setSelectedEntity(entity)}
-							>
-								<TableCell className="font-medium">
-									<div className="flex items-center gap-2">
-										<FolderIcon className="h-4 w-4 text-teal-500" />
-										{entity.name}
-									</div>
-								</TableCell>
-								<TableCell colSpan={3}></TableCell>
-								<TableCell>
-									<ChevronRight className="h-4 w-4" />
+						entities?.length > 0 ? (
+							entities?.map((entity) => (
+								<TableRow
+									key={entity.id}
+									className="cursor-pointer"
+									onClick={() => setSelectedEntity(entity)}
+								>
+									<TableCell className="font-medium">
+										<div className="flex items-center gap-2">
+											<FolderIcon className="h-4 w-4 text-teal-500" />
+											{entity.name}
+										</div>
+									</TableCell>
+									<TableCell colSpan={3}></TableCell>
+									<TableCell>
+										<ChevronRight className="h-4 w-4" />
+									</TableCell>
+								</TableRow>
+							))
+						) : (
+							<TableRow>
+								<TableCell colSpan={5} className="h-24 text-center">
+									No hay documentos subidos en esta subcarpeta
 								</TableCell>
 							</TableRow>
-						))
+						)
 					) : documents.length > 0 ? (
 						documents.map((doc) => (
 							<TableRow key={doc.id}>
 								<TableCell className="font-medium">
 									<div className="flex flex-col items-start justify-center">
-										{doc.name}
+										<div className="flex items-center gap-2">
+											<FileTextIcon className="h-4 w-4 text-teal-500" />
+											{doc.name}
+										</div>
 
 										{doc.status === ReviewStatus.REJECTED && (
 											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
@@ -197,8 +227,9 @@ export function StartupFolderDocuments({
 											<Button
 												size={"icon"}
 												variant="ghost"
-												className="text-amber-600"
+												className="text-cyan-600"
 												onClick={() => {
+													setMultiple(false)
 													setSelectedDocument(doc)
 													setShowUploadDialog(true)
 												}}
@@ -238,7 +269,7 @@ export function StartupFolderDocuments({
 					) : (
 						<TableRow>
 							<TableCell colSpan={5} className="h-24 text-center">
-								No hay documentos subidos en esta categoría
+								No hay documentos subidos en esta subcarpeta
 							</TableCell>
 						</TableRow>
 					)}
@@ -247,10 +278,12 @@ export function StartupFolderDocuments({
 
 			{showUploadDialog && (
 				<UploadDocumentsDialog
-					category={category}
-					startupFolderId={startupFolderId}
 					userId={userId}
+					multiple={multiple}
+					category={category}
 					isOpen={showUploadDialog}
+					startupFolderId={startupFolderId}
+					documentToUpdate={selectedDocument}
 					onClose={() => {
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
@@ -259,16 +292,15 @@ export function StartupFolderDocuments({
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
 					}}
-					documentToUpdate={selectedDocument}
 				/>
 			)}
 
 			{showLinkDialog && (category === "PERSONNEL" || category === "VEHICLES") && (
 				<LinkEntityDialog
 					category={category}
-					startupFolderId={startupFolderId}
-					entities={entities}
+					entities={allEntities}
 					isOpen={showLinkDialog}
+					startupFolderId={startupFolderId}
 					onClose={() => setShowLinkDialog(false)}
 					onSuccess={() => {
 						setShowLinkDialog(false)

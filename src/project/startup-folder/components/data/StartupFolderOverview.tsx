@@ -20,6 +20,7 @@ interface StartupFolderOverviewProps {
 	userId: string
 	companyId: string
 	isOtcMember?: boolean
+	isSupervisor?: boolean
 	hasPermission?: boolean
 }
 
@@ -27,6 +28,7 @@ export default function StartupFolderOverview({
 	userId,
 	companyId,
 	isOtcMember = false,
+	isSupervisor = false,
 	hasPermission = false,
 }: StartupFolderOverviewProps): React.ReactElement {
 	const {
@@ -38,8 +40,6 @@ export default function StartupFolderOverview({
 	} = useStartupFolder({
 		companyId,
 	})
-
-	console.log(startupFolders)
 
 	const [selectedCategory, setSelectedCategory] = React.useState<DocumentCategory | null>(null)
 
@@ -114,6 +114,7 @@ export default function StartupFolderOverview({
 										companyId={companyId}
 										category={selectedCategory}
 										startupFolderId={folder.id}
+										canAddDocuments={isSupervisor}
 										onBack={() => setSelectedCategory(null)}
 									/>
 								) : (

@@ -71,7 +71,7 @@ export const createSafetyAndHealthDocument = async ({
 }
 
 export const updateSafetyAndHealthDocument = async ({
-	data: { documentId, expirationDate },
+	data: { documentId, expirationDate, documentName, documentType },
 	uploadedFile,
 	userId,
 }: {
@@ -114,8 +114,10 @@ export const updateSafetyAndHealthDocument = async ({
 			},
 			data: {
 				expirationDate,
+				name: documentName,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
+				type: documentType as SafetyAndHealthDocumentType,
 				uploadedBy: {
 					connect: {
 						id: userId,

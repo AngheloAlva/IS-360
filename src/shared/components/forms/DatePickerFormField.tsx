@@ -24,6 +24,7 @@ interface DatePickerFormFieldProps<T extends FieldValues> {
 	optional?: boolean
 	className?: string
 	control: Control<T>
+	showLabel?: boolean
 	description?: string
 	itemClassName?: string
 	disabledCondition?: (date: Date) => boolean
@@ -37,6 +38,7 @@ export function DatePickerFormField<T extends FieldValues>({
 	description,
 	itemClassName,
 	optional = false,
+	showLabel = true,
 	disabledCondition,
 }: DatePickerFormFieldProps<T>) {
 	return (
@@ -45,10 +47,12 @@ export function DatePickerFormField<T extends FieldValues>({
 			control={control}
 			render={({ field }) => (
 				<FormItem className={cn("content-start", itemClassName)}>
-					<FormLabel className="gap-1">
-						{label}
-						{optional && <span className="text-muted-foreground"> (opcional)</span>}
-					</FormLabel>
+					{showLabel && (
+						<FormLabel className="gap-1">
+							{label}
+							{optional && <span className="text-muted-foreground"> (opcional)</span>}
+						</FormLabel>
+					)}
 					<Popover>
 						<PopoverTrigger asChild>
 							<FormControl>

@@ -72,7 +72,7 @@ export const createVehicleDocument = async ({
 }
 
 export const updateVehicleDocument = async ({
-	data: { documentId, expirationDate },
+	data: { documentId, expirationDate, documentName, documentType },
 	uploadedFile,
 	userId,
 }: {
@@ -113,6 +113,8 @@ export const updateVehicleDocument = async ({
 			},
 			data: {
 				expirationDate,
+				name: documentName,
+				type: documentType as VehicleDocumentType,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
 				uploadedBy: {

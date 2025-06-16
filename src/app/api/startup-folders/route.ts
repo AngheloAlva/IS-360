@@ -46,6 +46,11 @@ export async function GET(req: NextRequest) {
 					},
 				},
 				workersFolders: {
+					where: {
+						worker: {
+							isActive: true,
+						},
+					},
 					include: {
 						documents: {
 							select: {
@@ -55,6 +60,11 @@ export async function GET(req: NextRequest) {
 					},
 				},
 				vehiclesFolders: {
+					where: {
+						vehicle: {
+							isActive: true,
+						},
+					},
 					include: {
 						documents: {
 							select: {
