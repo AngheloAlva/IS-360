@@ -127,7 +127,9 @@ export function WorkerFolderDocuments({
 										</div>
 
 										{doc.status === ReviewStatus.REJECTED && (
-											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
+											<span className="max-w-80 truncate text-rose-500">
+												Rechazado: {doc.reviewNotes}
+											</span>
 										)}
 									</div>
 								</TableCell>

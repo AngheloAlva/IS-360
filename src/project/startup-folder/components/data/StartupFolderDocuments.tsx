@@ -106,7 +106,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			return (
 				<WorkerFolderDocuments
 					userId={userId}
-					isOtcMember={isSupervisor}
+					isOtcMember={isOtcMember}
 					workerId={selectedEntity.id}
 					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
@@ -117,7 +117,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			return (
 				<VehicleFolderDocuments
 					userId={userId}
-					isOtcMember={isSupervisor}
+					isOtcMember={isOtcMember}
 					vehicleId={selectedEntity.id}
 					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
@@ -227,7 +227,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 										</div>
 
 										{doc.status === "REJECTED" && (
-											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
+											<span className="max-w-80 truncate text-rose-500">
+												Rechazado: {doc.reviewNotes}
+											</span>
 										)}
 									</div>
 								</TableCell>
@@ -320,6 +322,8 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					)}
 
 					{documentsNotUploaded.length > 0 &&
+						category !== DocumentCategory.PERSONNEL &&
+						category !== DocumentCategory.VEHICLES &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
 								<TableCell className="font-medium">
