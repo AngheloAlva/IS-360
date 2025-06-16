@@ -127,7 +127,7 @@ export function VehicleFolderDocuments({
 										</div>
 
 										{doc.status === ReviewStatus.REJECTED && (
-											<span className="max-w-80 truncate text-rose-500">
+											<span className="max-w-80 text-wrap text-rose-500">
 												Rechazado: {doc.reviewNotes}
 											</span>
 										)}

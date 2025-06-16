@@ -127,9 +127,7 @@ export function WorkerFolderDocuments({
 										</div>
 
 										{doc.status === ReviewStatus.REJECTED && (
-											<span className="max-w-80 truncate text-rose-500">
-												Rechazado: {doc.reviewNotes}
-											</span>
+											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
 										)}
 									</div>
 								</TableCell>
@@ -203,42 +201,6 @@ export function WorkerFolderDocuments({
 										)}
 									</div>
 								</TableCell>
-
-								{documentsNotUploaded.length > 0 &&
-									documentsNotUploaded.map((doc) => (
-										<TableRow key={doc.name}>
-											<TableCell className="font-medium">
-												<div className="flex flex-col items-start justify-center">
-													<div className="flex items-center gap-2">
-														<FileTextIcon className="h-4 w-4 text-teal-500" />
-														{doc.name}
-													</div>
-												</div>
-											</TableCell>
-											<TableCell>
-												<StartupFolderStatusBadge status={"DRAFT"} />
-											</TableCell>
-											<TableCell></TableCell>
-											<TableCell>N/A</TableCell>
-											<TableCell>
-												<div className="flex items-center gap-1">
-													{!isOtcMember && (
-														<Button
-															size={"icon"}
-															variant="ghost"
-															className="text-cyan-600"
-															onClick={() => {
-																setShowUploadDialog(true)
-																setSelectedDocumentType({ type: doc.type, name: doc.name })
-															}}
-														>
-															<UploadIcon className="h-4 w-4" />
-														</Button>
-													)}
-												</div>
-											</TableCell>
-										</TableRow>
-									))}
 							</TableRow>
 						))
 					) : (
@@ -248,6 +210,42 @@ export function WorkerFolderDocuments({
 							</TableCell>
 						</TableRow>
 					)}
+
+					{documentsNotUploaded.length > 0 &&
+						documentsNotUploaded.map((doc) => (
+							<TableRow key={doc.name}>
+								<TableCell className="font-medium">
+									<div className="flex flex-col items-start justify-center">
+										<div className="flex items-center gap-2">
+											<FileTextIcon className="h-4 w-4 text-teal-500" />
+											{doc.name}
+										</div>
+									</div>
+								</TableCell>
+								<TableCell>
+									<StartupFolderStatusBadge status={"DRAFT"} />
+								</TableCell>
+								<TableCell></TableCell>
+								<TableCell>N/A</TableCell>
+								<TableCell>
+									<div className="flex items-center gap-1">
+										{!isOtcMember && (
+											<Button
+												size={"icon"}
+												variant="ghost"
+												className="text-cyan-600"
+												onClick={() => {
+													setShowUploadDialog(true)
+													setSelectedDocumentType({ type: doc.type, name: doc.name })
+												}}
+											>
+												<UploadIcon className="h-4 w-4" />
+											</Button>
+										)}
+									</div>
+								</TableCell>
+							</TableRow>
+						))}
 				</TableBody>
 			</Table>
 
