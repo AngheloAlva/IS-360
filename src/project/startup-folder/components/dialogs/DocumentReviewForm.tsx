@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import {
+	XIcon,
 	Loader2,
 	FileXIcon,
-	ThumbsDown,
 	CheckCircle2,
 	FileCheckIcon,
 	ClipboardCheckIcon,
@@ -200,7 +200,7 @@ export function DocumentReviewForm({
 								</>
 							) : approvalStatus === "REJECTED" ? (
 								<>
-									<ThumbsDown className="mr-2 h-4 w-4" />
+									<XIcon className="mr-2 h-4 w-4" />
 									Rechazar documento
 								</>
 							) : (

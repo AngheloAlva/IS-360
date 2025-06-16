@@ -37,8 +37,9 @@ export function WorkerFolderDocuments({
 	isOtcMember,
 	startupFolderId,
 }: WorkerFolderDocumentsProps) {
-	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
+	const [showUploadDialog, setShowUploadDialog] = useState(false)
+	const [isMultiple, setIsMultiple] = useState(false)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
 		category: DocumentCategory.PERSONNEL,
@@ -56,10 +57,13 @@ export function WorkerFolderDocuments({
 
 				<Button
 					className="cursor-pointer gap-2 bg-cyan-600 transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
-					onClick={() => setShowUploadDialog(true)}
+					onClick={() => {
+						setIsMultiple(false)
+						setShowUploadDialog(true)
+					}}
 				>
 					<Upload className="h-4 w-4" />
-					Subir documento
+					Subir documentos
 				</Button>
 			</div>
 
@@ -121,6 +125,7 @@ export function WorkerFolderDocuments({
 													variant="ghost"
 													className="text-amber-600"
 													onClick={() => {
+														setIsMultiple(false)
 														setSelectedDocument(doc)
 														setShowUploadDialog(true)
 													}}
@@ -179,8 +184,8 @@ export function WorkerFolderDocuments({
 				<UploadDocumentsDialog
 					category="PERSONNEL"
 					userId={userId}
-					multiple={false}
 					workerId={workerId}
+					multiple={isMultiple}
 					isOpen={showUploadDialog}
 					startupFolderId={startupFolderId}
 					documentToUpdate={selectedDocument}

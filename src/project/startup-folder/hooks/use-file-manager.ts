@@ -20,27 +20,36 @@ export interface FileManager {
 	setFileType: (index: number, update: FileTypeUpdate) => void
 }
 
-export function useFileManager(initialFiles: ManagedFile[] = []): FileManager {
+export function useFileManager(
+	initialFiles: ManagedFile[] = [],
+	onFilesChange?: (files: ManagedFile[]) => void
+): FileManager {
 	const [files, setFiles] = useState<ManagedFile[]>(initialFiles)
 
 	const addFiles = (newFiles: FileList | null) => {
 		if (!newFiles) return
 
 		setFiles((prev) => {
-			const filesArray = Array.from(newFiles).map((file) =>
-				Object.assign(file, {
-					documentType: undefined,
-					documentName: undefined,
-					expirationDate: addYears(new Date(), 1),
-				})
-			)
+			const filesArray = Array.from(newFiles).map((file) => {
+				const managedFile = file as ManagedFile
+				managedFile.documentType = ""
+				managedFile.documentName = file.name
+				managedFile.expirationDate = addYears(new Date(), 1)
+				return managedFile
+			})
 
-			return [...prev, ...filesArray]
+			const updatedFiles = [...prev, ...filesArray]
+			onFilesChange?.(updatedFiles)
+			return updatedFiles
 		})
 	}
 
 	const removeFile = (index: number) => {
-		setFiles((prev) => prev.filter((_, i) => i !== index))
+		setFiles((prev) => {
+			const newFiles = prev.filter((_, i) => i !== index)
+			onFilesChange?.(newFiles)
+			return newFiles
+		})
 	}
 
 	const setFileType = (index: number, { type, name, expirationDate }: FileTypeUpdate) => {
@@ -52,6 +61,7 @@ export function useFileManager(initialFiles: ManagedFile[] = []): FileManager {
 				file.documentName = name
 				file.expirationDate = expirationDate
 			}
+			onFilesChange?.(updated)
 			return updated
 		})
 	}

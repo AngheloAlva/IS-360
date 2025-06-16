@@ -46,9 +46,8 @@ import {
 	SelectContent,
 } from "@/shared/components/ui/select"
 
-import type { ManagedFile } from "@/project/startup-folder/hooks/use-file-manager"
-import type { StartupFolderDocument } from "../../types"
 import type { DocumentCategory, WorkerDocumentType } from "@prisma/client"
+import type { StartupFolderDocument } from "../../types"
 
 interface UploadDocumentsDialogProps {
 	userId: string
@@ -79,9 +78,12 @@ export function UploadDocumentsDialog({
 		files: z.array(
 			z.object({
 				file: z.instanceof(File).optional(),
-				documentType: z.string().optional(),
-				documentName: z.string().optional(),
-				expirationDate: z.date().optional(),
+				documentType: z.string().min(1, "El tipo de documento es obligatorio"),
+				documentName: z.string().min(1, "El nombre del documento es obligatorio"),
+				expirationDate: z.date({
+					required_error: "La fecha de vencimiento es obligatoria",
+					invalid_type_error: "La fecha de vencimiento debe ser válida",
+				}),
 			})
 		),
 	})
@@ -89,7 +91,6 @@ export function UploadDocumentsDialog({
 	type UploadDocumentsFormData = z.infer<typeof uploadDocumentsSchema>
 
 	const defaultExpirationDate = addYears(new Date(), 1)
-	console.log(documentToUpdate)
 
 	const form: UseFormReturn<UploadDocumentsFormData> = useForm<UploadDocumentsFormData>({
 		resolver: zodResolver(uploadDocumentsSchema),
@@ -122,7 +123,20 @@ export function UploadDocumentsDialog({
 			]
 		: []
 
-	const { files, addFiles, removeFile, setFileType } = useFileManager(initialFiles)
+	const { files, addFiles, removeFile, setFileType } = useFileManager(
+		initialFiles,
+		(updatedFiles) => {
+			form.setValue(
+				"files",
+				updatedFiles.map((file) => ({
+					file,
+					documentType: file.documentType || "",
+					documentName: file.documentName || "",
+					expirationDate: file.expirationDate || defaultExpirationDate,
+				}))
+			)
+		}
+	)
 	const { documentTypes, title } = getDocumentTypesByCategory(category)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [dragActive, setDragActive] = useState(false)
@@ -146,6 +160,13 @@ export function UploadDocumentsDialog({
 					documentName: file.documentName,
 					expirationDate: file.expirationDate,
 				}))
+
+			console.log(files)
+
+			if (files.length === 0) {
+				toast.error("No se seleccionaron archivos")
+				return
+			}
 
 			const uploadResults =
 				files.length > 0
@@ -191,7 +212,6 @@ export function UploadDocumentsDialog({
 					uploadedFile: uploadResults[0] || emptyUpload,
 				})
 			} else {
-				// Handle new document upload
 				if (files.length > 0) {
 					const filesToUpload = files.map((file) => ({
 						file: file.file,
@@ -209,6 +229,8 @@ export function UploadDocumentsDialog({
 						containerType: "startup",
 						nameStrategy: "original",
 					})
+
+					console.log(uploadResults)
 
 					const promises = files.map((file, index) => {
 						const { documentType, documentName, expirationDate } = file
@@ -279,21 +301,23 @@ export function UploadDocumentsDialog({
 	})
 
 	const handleFileTypeChange = (index: number, type: string) => {
-		const documentTypes = getDocumentTypesByCategory(category).documentTypes
-		const docType = documentTypes.find((docType) => docType.type === type)
-
+		const docType = documentTypes.find((dt) => dt.type === type)
 		if (!docType) return
 
 		const currentTypeCount = files.reduce(
-			(count: number, file: ManagedFile) => (file.documentType === type ? count + 1 : count),
+			(count, file) => (file.documentType === type ? count + 1 : count),
 			0
 		)
 
 		const suffix = currentTypeCount > 0 ? ` (${currentTypeCount + 1})` : ""
+		const expirationDate =
+			form.getValues(`files.${index}.expirationDate`) || addYears(new Date(), 1)
 
-		setFileType(index, { type, name: docType.name + suffix, expirationDate: defaultExpirationDate })
-		form.setValue(`files.${index}.documentType`, type)
-		form.setValue(`files.${index}.documentName`, docType.name + suffix)
+		setFileType(index, {
+			type,
+			name: docType.name + suffix,
+			expirationDate,
+		})
 	}
 
 	const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -403,21 +427,39 @@ export function UploadDocumentsDialog({
 											<TableCell>{file.documentName || file.name}</TableCell>
 											<TableCell>{Math.round((file as File).size / 1024)} KB</TableCell>
 											<TableCell>
-												<Select
-													value={file.documentType}
-													onValueChange={(value) => handleFileTypeChange(index, value)}
-												>
-													<SelectTrigger>
-														<SelectValue placeholder="Tipo de documento" />
-													</SelectTrigger>
-													<SelectContent>
-														{documentTypes.map((docType) => (
-															<SelectItem key={docType.type} value={docType.type}>
-																{docType.name}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
+												<FormField
+													control={form.control}
+													name={`files.${index}.documentType`}
+													render={({ field }) => (
+														<FormItem>
+															<FormControl>
+																<Select
+																	value={field.value}
+																	onValueChange={(value) => {
+																		field.onChange(value)
+																		handleFileTypeChange(index, value)
+																	}}
+																>
+																	<SelectTrigger>
+																		<SelectValue placeholder="Tipo de documento" />
+																	</SelectTrigger>
+																	<SelectContent>
+																		{documentTypes.map((docType) => (
+																			<SelectItem key={docType.type} value={docType.type}>
+																				{docType.name}
+																			</SelectItem>
+																		))}
+																	</SelectContent>
+																</Select>
+															</FormControl>
+															{form.formState.errors.files?.[index]?.documentType && (
+																<p className="text-sm text-red-500">
+																	{form.formState.errors.files[index]?.documentType?.message}
+																</p>
+															)}
+														</FormItem>
+													)}
+												/>
 											</TableCell>
 											<TableCell>
 												<DatePickerFormField
@@ -425,7 +467,7 @@ export function UploadDocumentsDialog({
 													control={form.control}
 													label="Fecha de vencimiento"
 													name={`files.${index}.expirationDate`}
-													disabledCondition={(date) => date < new Date()}
+													disabledCondition={(date: Date) => date < new Date()}
 												/>
 											</TableCell>
 											<TableCell>
