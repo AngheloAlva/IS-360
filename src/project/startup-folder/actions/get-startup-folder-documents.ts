@@ -112,6 +112,8 @@ export async function getStartupFolderDocuments({
 			}
 		})()
 
+		console.log(rawDocuments)
+
 		const documents: StartupFolderDocument[] = rawDocuments.map((doc) => {
 			const baseDoc = {
 				id: doc.id,
@@ -156,6 +158,10 @@ export async function getStartupFolderDocuments({
 				default:
 					throw new Error(`Invalid category: ${category}`)
 			}
+		})
+
+		console.log({
+			documents,
 		})
 
 		return { documents, folderStatus }

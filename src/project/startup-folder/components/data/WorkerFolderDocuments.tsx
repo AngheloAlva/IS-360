@@ -5,10 +5,10 @@ import { useState } from "react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
-import { type StartupFolderDocument } from "@/project/startup-folder/types"
 
 import { StartupFolderStatusBadge } from "@/shared/components/ui/startup-folder-status-badge"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
+import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Button } from "@/shared/components/ui/button"
 import {
 	Table,
@@ -18,7 +18,8 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
-import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
+
+import { type StartupFolderDocument } from "@/project/startup-folder/types"
 import type {
 	SafetyAndHealthDocumentType,
 	VehicleDocumentType,
@@ -98,7 +99,8 @@ export function WorkerFolderDocuments({
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
-					) : documents.length > 0 ? (
+					) : (
+						documents.length > 0 &&
 						documents.map((doc) => (
 							<TableRow key={doc.id}>
 								<TableCell className="font-medium">
@@ -161,12 +163,6 @@ export function WorkerFolderDocuments({
 								</TableCell>
 							</TableRow>
 						))
-					) : (
-						<TableRow>
-							<TableCell colSpan={5} className="h-24 text-center">
-								No hay documentos subidos para este trabajador
-							</TableCell>
-						</TableRow>
 					)}
 
 					{folderStatus === "DRAFT" &&
