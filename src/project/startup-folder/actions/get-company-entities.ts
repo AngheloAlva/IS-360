@@ -35,6 +35,7 @@ export async function getCompanyEntities({
 						workerFolders: {
 							where: {
 								worker: {
+									companyId,
 									isActive: true,
 									accessRole: USER_ROLE.PARTNER_COMPANY,
 								},
@@ -99,56 +100,93 @@ export async function getCompanyEntities({
 						})) ?? [],
 				}
 			case "VEHICLES":
-				const vinculatedVehicles = await prisma.vehicle
-					.findMany({
-						where: {
-							companyId,
-							isActive: true,
+				const vinculatedVehicles = await prisma.startupFolder.findUnique({
+					where: {
+						id: startupFolderId,
+					},
+					select: {
+						id: true,
+						name: true,
+						vehicleFolders: {
+							where: {
+								vehicle: {
+									companyId,
+									isActive: true,
+								},
+							},
+							select: {
+								vehicle: {
+									select: {
+										id: true,
+										plate: true,
+										brand: true,
+										model: true,
+									},
+								},
+							},
+							orderBy: {
+								vehicle: {
+									plate: "asc",
+								},
+							},
 						},
-						select: {
-							id: true,
-							plate: true,
-							brand: true,
-							model: true,
-						},
-						orderBy: {
-							plate: "asc",
-						},
-					})
-					.then((vehicles) =>
-						vehicles.map((vehicle) => ({
-							id: vehicle.id,
-							name: `${vehicle?.brand ?? ""} ${vehicle?.model ?? ""} - ${vehicle?.plate ?? ""}`.trim(),
-						}))
-					)
+					},
+				})
 
-				const allVehicles = await prisma.vehicle
-					.findMany({
-						where: {
+				const allVehiclesFolders = await prisma.vehicleFolder.findMany({
+					where: {
+						NOT: {
+							startupFolders: {
+								some: {
+									id: startupFolderId,
+								},
+							},
+						},
+						vehicle: {
 							companyId,
 							isActive: true,
 						},
-						select: {
-							id: true,
-							plate: true,
-							brand: true,
-							model: true,
+					},
+					select: {
+						id: true,
+						vehicle: {
+							select: {
+								id: true,
+								plate: true,
+								brand: true,
+								model: true,
+							},
 						},
-						orderBy: {
+					},
+					orderBy: {
+						vehicle: {
 							plate: "asc",
 						},
-					})
-					.then((vehicles) =>
-						vehicles.map((vehicle) => ({
-							id: vehicle.id,
-							name: `${vehicle?.brand ?? ""} ${vehicle?.model ?? ""} - ${vehicle?.plate ?? ""}`.trim(),
-						}))
-					)
+					},
+				})
 
 				return {
-					allEntities: allVehicles,
-					vinculatedEntities: vinculatedVehicles,
+					allEntities: allVehiclesFolders.map((vehicleFolder) => ({
+						id: vehicleFolder.vehicle.id,
+						name:
+							vehicleFolder.vehicle.plate +
+							" " +
+							vehicleFolder.vehicle.brand +
+							" " +
+							vehicleFolder.vehicle.model,
+					})),
+					vinculatedEntities:
+						vinculatedVehicles?.vehicleFolders.map((vehicleFolder) => ({
+							id: vehicleFolder.vehicle.id,
+							name:
+								vehicleFolder.vehicle.plate +
+								" - " +
+								vehicleFolder.vehicle.brand +
+								" - " +
+								vehicleFolder.vehicle.model,
+						})) ?? [],
 				}
+
 			default:
 				return {
 					allEntities: [],

@@ -15,12 +15,6 @@ export async function linkFolderEntity({
 	category,
 }: LinkFolderEntityParams) {
 	try {
-		console.log("Linking folder entity", {
-			startupFolderId,
-			entityId,
-			category,
-		})
-
 		switch (category) {
 			case "PERSONNEL":
 				const folder = await prisma.startupFolder.findUnique({
