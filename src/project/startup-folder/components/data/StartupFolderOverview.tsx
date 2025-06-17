@@ -20,7 +20,6 @@ interface StartupFolderOverviewProps {
 	userId: string
 	companyId: string
 	isOtcMember?: boolean
-	isSupervisor?: boolean
 	hasPermission?: boolean
 }
 
@@ -28,7 +27,6 @@ export default function StartupFolderOverview({
 	userId,
 	companyId,
 	isOtcMember = false,
-	isSupervisor = false,
 	hasPermission = false,
 }: StartupFolderOverviewProps): React.ReactElement {
 	const {
@@ -115,7 +113,6 @@ export default function StartupFolderOverview({
 										isOtcMember={isOtcMember}
 										category={selectedCategory}
 										startupFolderId={folder.id}
-										isSupervisor={isSupervisor}
 										onBack={() => setSelectedCategory(null)}
 									/>
 								) : (

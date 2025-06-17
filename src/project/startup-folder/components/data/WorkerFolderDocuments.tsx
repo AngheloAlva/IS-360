@@ -1,18 +1,9 @@
 "use client"
 
-import {
-	ChevronLeft,
-	EyeIcon,
-	FileTextIcon,
-	PencilIcon,
-	Trash2Icon,
-	UploadIcon,
-} from "lucide-react"
+import { ChevronLeft, EyeIcon, FileTextIcon, PencilIcon, UploadIcon } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { deleteStartupFolderDocument } from "../../actions/delete-startup-folder-document"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { type StartupFolderDocument } from "@/project/startup-folder/types"
 
@@ -146,7 +137,7 @@ export function WorkerFolderDocuments({
 												<Button
 													size={"icon"}
 													variant="ghost"
-													className="text-amber-600"
+													className="text-cyan-600"
 													onClick={() => {
 														setSelectedDocument(doc)
 														setShowUploadDialog(true)
@@ -155,37 +146,13 @@ export function WorkerFolderDocuments({
 													<PencilIcon className="h-4 w-4" />
 												</Button>
 											)}
-										{!isOtcMember && doc.status === "DRAFT" && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-rose-600"
-												onClick={async () => {
-													try {
-														await deleteStartupFolderDocument({
-															data: {
-																documentId: doc.id,
-																category: DocumentCategory.PERSONNEL,
-															},
-															userId,
-														})
-														await refetch()
-														toast.success("Documento eliminado exitosamente")
-													} catch (error) {
-														console.error("Error deleting document:", error)
-														toast.error("Error al eliminar el documento")
-													}
-												}}
-											>
-												<Trash2Icon className="h-4 w-4" />
-											</Button>
-										)}
 										{isOtcMember && doc.status === "SUBMITTED" && (
 											<DocumentReviewForm
 												document={doc}
 												userId={userId}
 												refetch={refetch}
 												startupFolderId={startupFolderId}
+												category={DocumentCategory.PERSONNEL}
 											/>
 										)}
 									</div>

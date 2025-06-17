@@ -14,8 +14,8 @@ export const fetchStartupFolderDocuments: QueryFunction<
 	Awaited<ReturnType<typeof getStartupFolderDocuments>>,
 	readonly ["startupFolderDocuments", UseStartupFolderDocumentsParams]
 > = async ({ queryKey }) => {
-	const [, { startupFolderId, category, workerId, vehicleId }] = queryKey
-	return getStartupFolderDocuments({ startupFolderId, category, workerId, vehicleId })
+	const [, { startupFolderId, category }] = queryKey
+	return getStartupFolderDocuments({ startupFolderId, category })
 }
 
 export const useStartupFolderDocuments = ({

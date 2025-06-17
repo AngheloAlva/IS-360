@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import {
 	EyeIcon,
+	PenIcon,
 	SendIcon,
+	UploadIcon,
 	FolderIcon,
 	ChevronLeft,
 	FileTextIcon,
-	UploadIcon,
-	PenIcon,
+	ChevronRightIcon,
 } from "lucide-react"
 import {
 	type StartupFolderDocument,
@@ -20,8 +21,8 @@ import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-docume
 import { getCompanyEntities } from "../../actions/get-company-entities"
 import {
 	DocumentCategory,
-	VehicleDocumentType,
-	WorkerDocumentType,
+	type WorkerDocumentType,
+	type VehicleDocumentType,
 	type EnvironmentalDocType,
 	type SafetyAndHealthDocumentType,
 } from "@prisma/client"
@@ -49,7 +50,6 @@ interface StartupFolderDocumentsProps {
 	companyId: string
 	onBack: () => void
 	isOtcMember: boolean
-	isSupervisor: boolean
 	startupFolderId: string
 	category: DocumentCategory
 }
@@ -60,7 +60,6 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	category,
 	companyId,
 	isOtcMember,
-	isSupervisor,
 	startupFolderId,
 }) => {
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
@@ -138,12 +137,12 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<Button variant="ghost" className="gap-2" onClick={onBack}>
+					<Button variant="outline" size={"sm"} className="gap-2" onClick={onBack}>
 						<ChevronLeft className="h-4 w-4" />
 						Volver
 					</Button>
-
 					<h2 className="text-lg font-bold">{title}</h2>
+					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
 				{!isOtcMember && (
@@ -156,15 +155,16 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 							</Button>
 						)}
 
-						{(documentsData.length > 0 || entities.length > 0) && (
-							<Button
-								className="gap-2 bg-cyan-600 text-white transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
-								onClick={() => setShowSubmitDialog(true)}
-							>
-								<SendIcon className="h-4 w-4" />
-								Enviar a revisión
-							</Button>
-						)}
+						{data?.folderStatus === "DRAFT" &&
+							(documentsData.length > 0 || entities.length > 0) && (
+								<Button
+									className="gap-2 bg-cyan-600 text-white transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
+									onClick={() => setShowSubmitDialog(true)}
+								>
+									<SendIcon className="h-4 w-4" />
+									Enviar a revisión
+								</Button>
+							)}
 					</div>
 				)}
 			</div>
@@ -190,7 +190,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					) : category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES ? (
 						entities?.length > 0 ? (
 							entities?.map((entity) => (
-								<TableRow key={entity.id} className="hover:bg-accent/50">
+								<TableRow
+									key={entity.id}
+									className="hover:bg-accent/50 cursor-pointer"
+									onClick={() => setSelectedEntity(entity)}
+								>
 									<TableCell className="font-medium">
 										<div className="flex items-center gap-2">
 											<FolderIcon className="h-4 w-4 text-teal-500" />
@@ -199,15 +203,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									</TableCell>
 									<TableCell colSpan={3}></TableCell>
 									<TableCell>
-										<Button
-											variant="ghost"
-											size="sm"
-											className="gap-2"
-											onClick={() => setSelectedEntity(entity)}
-											aria-label={`Ver documentos de ${entity.name}`}
-										>
-											Ver documentos
-										</Button>
+										<ChevronRightIcon className="h-4 w-4" />
 									</TableCell>
 								</TableRow>
 							))
@@ -254,6 +250,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 												<EyeIcon className="h-4 w-4" />
 											</Button>
 										)}
+
 										{!isOtcMember &&
 											(doc.status === "DRAFT" ||
 												doc.status === "REJECTED" ||
@@ -309,11 +306,13 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 													<PenIcon className="h-4 w-4" />
 												</Button>
 											)}
-										{isSupervisor && doc.status === "SUBMITTED" && (
+
+										{isOtcMember && doc.status === "SUBMITTED" && (
 											<DocumentReviewForm
 												document={doc}
 												userId={userId}
 												refetch={refetch}
+												category={category}
 												startupFolderId={startupFolderId}
 											/>
 										)}
@@ -343,19 +342,20 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								<TableCell>N/A</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-cyan-600"
-												onClick={() => {
-													setShowUploadDialog(true)
-													setSelectedDocumentType({ type: doc.type, name: doc.name })
-												}}
-											>
-												<UploadIcon className="h-4 w-4" />
-											</Button>
-										)}
+										{!isOtcMember &&
+											(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
+												<Button
+													size={"icon"}
+													variant="ghost"
+													className="text-cyan-600"
+													onClick={() => {
+														setShowUploadDialog(true)
+														setSelectedDocumentType({ type: doc.type, name: doc.name })
+													}}
+												>
+													<UploadIcon className="h-4 w-4" />
+												</Button>
+											)}
 									</div>
 								</TableCell>
 							</TableRow>
@@ -405,7 +405,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					onClose={() => setShowSubmitDialog(false)}
 					onSuccess={async () => {
 						queryClient.invalidateQueries({
-							queryKey: ["startup-folder-documents", { startupFolderId, category }] as const,
+							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
 						})
 						setShowSubmitDialog(false)
 						await refetch()

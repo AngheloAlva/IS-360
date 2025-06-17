@@ -1,18 +1,8 @@
 "use client"
 
-import {
-	ChevronLeft,
-	EyeIcon,
-	FileTextIcon,
-	PencilIcon,
-	Trash2Icon,
-	Upload,
-	UploadIcon,
-} from "lucide-react"
+import { ChevronLeft, EyeIcon, FileTextIcon, PencilIcon, UploadIcon } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
 
-import { deleteStartupFolderDocument } from "../../actions/delete-startup-folder-document"
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import {
 	DocumentCategory,
@@ -88,14 +78,6 @@ export function VehicleFolderDocuments({
 					<ChevronLeft className="h-4 w-4" />
 					Volver
 				</Button>
-
-				<Button
-					className="cursor-pointer gap-2 bg-cyan-600 transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
-					onClick={() => setShowUploadDialog(true)}
-				>
-					<Upload className="h-4 w-4" />
-					Subir documento
-				</Button>
 			</div>
 
 			<Table>
@@ -159,7 +141,7 @@ export function VehicleFolderDocuments({
 												<Button
 													size={"icon"}
 													variant="ghost"
-													className="text-amber-600"
+													className="text-cyan-600"
 													onClick={() => {
 														setSelectedDocument(doc)
 														setShowUploadDialog(true)
@@ -168,37 +150,13 @@ export function VehicleFolderDocuments({
 													<PencilIcon className="h-4 w-4" />
 												</Button>
 											)}
-										{!isOtcMember && doc.status === "DRAFT" && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-rose-600"
-												onClick={async () => {
-													try {
-														await deleteStartupFolderDocument({
-															data: {
-																documentId: doc.id,
-																category: DocumentCategory.VEHICLES,
-															},
-															userId,
-														})
-														await refetch()
-														toast.success("Documento eliminado exitosamente")
-													} catch (error) {
-														console.error("Error deleting document:", error)
-														toast.error("Error al eliminar el documento")
-													}
-												}}
-											>
-												<Trash2Icon className="h-4 w-4" />
-											</Button>
-										)}
 										{isOtcMember && doc.status === "SUBMITTED" && (
 											<DocumentReviewForm
 												document={doc}
 												userId={userId}
 												refetch={refetch}
 												startupFolderId={startupFolderId}
+												category={DocumentCategory.VEHICLES}
 											/>
 										)}
 									</div>

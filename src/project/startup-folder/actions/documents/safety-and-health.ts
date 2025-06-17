@@ -208,7 +208,7 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 
 	try {
 		const folder = await prisma.safetyAndHealthFolder.findUnique({
-			where: { id: folderId },
+			where: { startupFolderId: folderId },
 			select: {
 				startupFolder: {
 					select: {
@@ -219,6 +219,7 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 						},
 					},
 				},
+				id: true,
 				status: true,
 			},
 		})
@@ -234,25 +235,24 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 			}
 		}
 
-		await Promise.all([
-			prisma.safetyAndHealthFolder.update({
-				where: { id: folderId },
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-					additionalNotificationEmails: [...emails, user.email],
-				},
-			}),
-			prisma.safetyAndHealthDocument.updateMany({
-				where: {
-					folderId,
-				},
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-				},
-			}),
-		])
+		await prisma.safetyAndHealthFolder.update({
+			where: { id: folder.id },
+			data: {
+				submittedAt: new Date(),
+				status: ReviewStatus.SUBMITTED,
+				additionalNotificationEmails: [...emails, user.email],
+			},
+		})
+
+		await prisma.safetyAndHealthDocument.updateMany({
+			where: {
+				folderId: folder.id,
+			},
+			data: {
+				submittedAt: new Date(),
+				status: ReviewStatus.SUBMITTED,
+			},
+		})
 
 		await sendRequestReviewEmail({
 			solicitator: {

@@ -208,13 +208,14 @@ export const submitEnvironmentalDocumentForReview = async ({
 
 	try {
 		const folder = await prisma.environmentalFolder.findUnique({
-			where: { id: folderId },
+			where: { startupFolderId: folderId },
 			select: {
 				startupFolder: {
 					select: {
 						company: true,
 					},
 				},
+				id: true,
 				status: true,
 			},
 		})
@@ -230,25 +231,24 @@ export const submitEnvironmentalDocumentForReview = async ({
 			}
 		}
 
-		await Promise.all([
-			prisma.environmentalFolder.update({
-				where: { id: folderId },
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-					additionalNotificationEmails: [...emails, user.email],
-				},
-			}),
-			prisma.environmentalDocument.updateMany({
-				where: {
-					folderId,
-				},
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-				},
-			}),
-		])
+		await prisma.environmentalFolder.update({
+			where: { id: folder.id },
+			data: {
+				submittedAt: new Date(),
+				status: ReviewStatus.SUBMITTED,
+				additionalNotificationEmails: [...emails, user.email],
+			},
+		})
+
+		await prisma.environmentalDocument.updateMany({
+			where: {
+				folderId: folder.id,
+			},
+			data: {
+				submittedAt: new Date(),
+				status: ReviewStatus.SUBMITTED,
+			},
+		})
 
 		await sendRequestReviewEmail({
 			solicitator: {

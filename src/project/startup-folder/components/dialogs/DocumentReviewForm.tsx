@@ -34,6 +34,7 @@ import type {
 	VehicleDocument,
 	EnvironmentalDocument,
 	SafetyAndHealthDocument,
+	DocumentCategory,
 } from "@prisma/client"
 
 interface DocumentReviewFormProps {
@@ -42,6 +43,7 @@ interface DocumentReviewFormProps {
 	vehicleId?: string
 	refetch: () => void
 	startupFolderId: string
+	category: DocumentCategory
 	document: SafetyAndHealthDocument | EnvironmentalDocument | WorkerDocument | VehicleDocument
 }
 
@@ -50,6 +52,7 @@ export function DocumentReviewForm({
 	refetch,
 	document,
 	workerId,
+	category,
 	vehicleId,
 	startupFolderId,
 }: DocumentReviewFormProps) {
@@ -94,7 +97,7 @@ export function DocumentReviewForm({
 			})
 
 			queryClient.invalidateQueries({
-				queryKey: ["startupFolderDocuments", { startupFolderId, workerId, vehicleId }],
+				queryKey: ["startupFolderDocuments", { startupFolderId, category, workerId, vehicleId }],
 			})
 
 			refetch()
