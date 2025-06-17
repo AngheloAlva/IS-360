@@ -31,8 +31,8 @@ export const sendRequestReviewEmail = async ({
 			case DocumentCategory.SAFETY_AND_HEALTH:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					// "cristian.pavez@oleotrasandino.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"cristian.pavez@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 					"soporte@ingenieriasimple.cl",
 				]
 				break
@@ -40,23 +40,23 @@ export const sendRequestReviewEmail = async ({
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
 					"bcarrillo@dbj.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.PERSONNEL:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					// "cristian.pavez@oleotrasandino.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"cristian.pavez@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.VEHICLES:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					// "cristian.pavez@oleotrasandino.cl",
-					// "katherine.burgos@oleotrasandino.cl",
+					"cristian.pavez@oleotrasandino.cl",
+					"katherine.burgos@oleotrasandino.cl",
 					"soporte@ingenieriasimple.cl",
 				]
 				break
