@@ -1,11 +1,10 @@
 "use client"
 
+import { type UseFormReturn, useForm } from "react-hook-form"
 import { Trash2Icon, UploadIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type UseFormReturn, useForm } from "react-hook-form"
-import { type UploadResult } from "@/lib/upload-files"
-import { useState } from "react"
 import { addYears } from "date-fns"
+import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -21,6 +20,7 @@ import { cn } from "@/lib/utils"
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { Button } from "@/shared/components/ui/button"
+import { Form } from "@/shared/components/ui/form"
 import Spinner from "@/shared/components/Spinner"
 import {
 	Dialog,
@@ -46,7 +46,7 @@ import type {
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
 import type { StartupFolderDocument } from "../../types"
-import { Form } from "@/shared/components/ui/form"
+import { type UploadResult } from "@/lib/upload-files"
 import { UploadDocumentsFormData, uploadDocumentsSchema } from "../../schemas/document.schema"
 
 interface UploadDocumentsDialogProps {
@@ -126,7 +126,7 @@ export function UploadDocumentsDialog({
 		try {
 			setIsSubmitting(true)
 
-			if (!documentToUpdate && data.file === undefined) {
+			if (!documentToUpdate && !file) {
 				toast.error("No se seleccionaron archivos")
 				return
 			}
@@ -142,8 +142,8 @@ export function UploadDocumentsDialog({
 							preview: "",
 							type: data.documentType,
 							title: data.documentName,
-							fileSize: data.file?.size || 0,
-							mimeType: data.file?.type || "",
+							fileSize: file.size || 0,
+							mimeType: file.type || "",
 						},
 					],
 					randomString: startupFolderId || workerId || vehicleId || "",
@@ -165,7 +165,7 @@ export function UploadDocumentsDialog({
 					uploadedFile: uploadResult || {
 						url: documentToUpdate.url || "",
 						type: data.documentType,
-						size: data.file?.size || 0,
+						size: file?.size || 0,
 						name: data.documentName,
 					},
 					userId,

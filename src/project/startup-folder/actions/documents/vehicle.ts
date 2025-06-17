@@ -116,6 +116,7 @@ export const updateVehicleDocument = async ({
 				name: documentName,
 				type: documentType as VehicleDocumentType,
 				url: uploadedFile.url,
+				status: "DRAFT",
 				uploadedAt: new Date(),
 				uploadedBy: {
 					connect: {

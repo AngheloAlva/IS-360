@@ -129,6 +129,7 @@ export const updateWorkerDocument = async ({
 				name: documentName,
 				type: documentType as WorkerDocumentType,
 				uploadedAt: new Date(),
+				status: "DRAFT",
 				uploadedBy: {
 					connect: {
 						id: userId,

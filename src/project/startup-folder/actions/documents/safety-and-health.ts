@@ -114,6 +114,7 @@ export const updateSafetyAndHealthDocument = async ({
 			},
 			data: {
 				expirationDate,
+				status: "DRAFT",
 				name: documentName,
 				url: uploadedFile.url,
 				uploadedAt: new Date(),
