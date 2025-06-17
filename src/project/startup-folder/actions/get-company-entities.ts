@@ -25,49 +25,78 @@ export async function getCompanyEntities({
 	try {
 		switch (category) {
 			case "PERSONNEL":
-				const vinculatedUsers = await prisma.user.findMany({
+				const vinculatedUsers = await prisma.startupFolder.findUnique({
 					where: {
-						companyId,
-						isActive: true,
-						accessRole: USER_ROLE.PARTNER_COMPANY,
-						workerFolder: {
-							some: {
-								startupFolderId,
-							},
-						},
+						id: startupFolderId,
 					},
 					select: {
 						id: true,
 						name: true,
-					},
-					orderBy: {
-						name: "asc",
+						workerFolders: {
+							where: {
+								worker: {
+									isActive: true,
+									accessRole: USER_ROLE.PARTNER_COMPANY,
+								},
+							},
+							select: {
+								worker: {
+									select: {
+										id: true,
+										name: true,
+									},
+								},
+							},
+							orderBy: {
+								worker: {
+									name: "asc",
+								},
+							},
+						},
 					},
 				})
 
-				const allUsers = await prisma.user.findMany({
+				const allWorkerFolders = await prisma.workerFolder.findMany({
 					where: {
-						companyId,
-						isActive: true,
-						accessRole: USER_ROLE.PARTNER_COMPANY,
-						workerFolder: {
-							none: {
-								startupFolderId,
+						NOT: {
+							startupFolders: {
+								some: {
+									id: startupFolderId,
+								},
 							},
+						},
+						worker: {
+							isActive: true,
+							accessRole: USER_ROLE.PARTNER_COMPANY,
+							companyId,
 						},
 					},
 					select: {
 						id: true,
-						name: true,
+						worker: {
+							select: {
+								id: true,
+								name: true,
+							},
+						},
 					},
 					orderBy: {
-						name: "asc",
+						worker: {
+							name: "asc",
+						},
 					},
 				})
 
 				return {
-					allEntities: allUsers,
-					vinculatedEntities: vinculatedUsers,
+					allEntities: allWorkerFolders.map((user) => ({
+						id: user.worker.id,
+						name: user.worker.name,
+					})),
+					vinculatedEntities:
+						vinculatedUsers?.workerFolders.map((workerFolder) => ({
+							id: workerFolder.worker.id,
+							name: workerFolder.worker.name,
+						})) ?? [],
 				}
 			case "VEHICLES":
 				const vinculatedVehicles = await prisma.vehicle

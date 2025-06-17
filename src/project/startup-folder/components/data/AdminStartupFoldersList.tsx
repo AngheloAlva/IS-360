@@ -35,7 +35,7 @@ import type { WORK_ORDER_STATUS } from "@prisma/client"
 
 export function AdminStartupFoldersList() {
 	const [searchTerm, setSearchTerm] = useState("")
-	const [withOtActive, setWithOtActive] = useState(true)
+	const [withOtActive, setWithOtActive] = useState(false)
 	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
 
 	const { data: companiesWithFolders, isLoading } = useStartupFoldersList({

@@ -210,48 +210,56 @@ export const submitVehicleDocumentForReview = async ({
 		}
 
 		await prisma.$transaction(async (tx) => {
-			const folder = await tx.vehicleFolder.findFirst({
+			const folders = await tx.startupFolder.findUnique({
 				where: {
-					startupFolderId: folderId,
+					id: folderId,
 				},
 				select: {
 					id: true,
-					status: true,
+					vehicleFolders: {
+						select: {
+							id: true,
+							status: true,
+						},
+					},
 				},
 			})
 
-			if (!folder) {
+			if (!folders) {
 				return { ok: false, message: "No se encontró la carpeta." }
 			}
 
 			const invalidFolder =
-				folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
+				folders.vehicleFolders[0].status !== ReviewStatus.DRAFT &&
+				folders.vehicleFolders[0].status !== ReviewStatus.REJECTED
 
 			if (invalidFolder) {
 				return {
 					ok: false,
-					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folders.vehicleFolders[0].status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
 				}
 			}
 
-			await tx.vehicleFolder.update({
-				where: { id: folder.id },
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-					additionalNotificationEmails: [...emails, user.email],
-				},
-			})
+			for (const folder of folders.vehicleFolders) {
+				const vehicleFolder = await tx.vehicleFolder.update({
+					where: { id: folder.id },
+					data: {
+						submittedAt: new Date(),
+						status: ReviewStatus.SUBMITTED,
+						additionalNotificationEmails: [...emails, user.email],
+					},
+				})
 
-			await tx.vehicleDocument.updateMany({
-				where: {
-					folderId: folder.id,
-				},
-				data: {
-					submittedAt: new Date(),
-					status: ReviewStatus.SUBMITTED,
-				},
-			})
+				await tx.vehicleDocument.updateMany({
+					where: {
+						folderId: vehicleFolder.id,
+					},
+					data: {
+						submittedAt: new Date(),
+						status: ReviewStatus.SUBMITTED,
+					},
+				})
+			}
 		})
 
 		const company = await prisma.company.findUnique({

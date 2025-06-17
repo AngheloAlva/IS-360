@@ -45,6 +45,7 @@ import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import { SendStartupFolderReview } from "./SendStartupFolderReview"
+import { Progress } from "@/shared/components/ui/progress"
 
 interface StartupFolderDocumentsProps {
 	userId: string
@@ -137,6 +138,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			)
 		}
 	}
+
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
@@ -148,6 +150,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					<h2 className="text-lg font-bold">{title}</h2>
 					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
+
+				<Progress
+					value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
+					className="mr-4 ml-auto max-w-24"
+				/>
 
 				{!isOtcMember ? (
 					<div className="flex items-center gap-2">

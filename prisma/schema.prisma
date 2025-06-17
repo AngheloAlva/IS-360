@@ -990,6 +990,8 @@ model StartupFolder {
   companyId              String
   workOrder              WorkOrder?              @relation(fields: [workOrderId], references: [id])
   workOrderId            String?                 @unique
+  workerFolders          WorkerFolder[]          @relation("WorkerFolderStartupFolder")
+  vehicleFolders         VehicleFolder[]         @relation("VehicleFolderStartupFolder")
 
   @@map("startup_folder")
 }
@@ -1048,6 +1050,7 @@ model WorkerFolder {
   startupFolderId String
   startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
   documents       WorkerDocument[]
+  startupFolders  StartupFolder[]  @relation("WorkerFolderStartupFolder")
 
   @@unique([workerId, startupFolderId])
   @@map("worker_folders")
@@ -1089,6 +1092,7 @@ model VehicleFolder {
   vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
   startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
   documents       VehicleDocument[]
+  startupFolders  StartupFolder[]   @relation("VehicleFolderStartupFolder")
 
   @@unique([vehicleId, startupFolderId])
   @@map("vehicle_folders")

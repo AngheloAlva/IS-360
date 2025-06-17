@@ -20,7 +20,12 @@ export async function getStartupFolderDocuments({
 	category: DocumentCategory
 	workerId?: string
 	vehicleId?: string
-}): Promise<{ documents: StartupFolderDocument[]; folderStatus: ReviewStatus }> {
+}): Promise<{
+	documents: StartupFolderDocument[]
+	folderStatus: ReviewStatus
+	totalDocuments: number
+	approvedDocuments: number
+}> {
 	try {
 		let folderStatus: ReviewStatus = "DRAFT"
 
@@ -29,18 +34,46 @@ export async function getStartupFolderDocuments({
 				case "PERSONNEL":
 					return prisma.workerFolder.findFirst({
 						where: workerId ? { workerId } : { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
 					})
 				case "VEHICLES":
 					return prisma.vehicleFolder.findFirst({
 						where: vehicleId ? { vehicleId } : { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
 					})
 				case "SAFETY_AND_HEALTH":
 					return prisma.safetyAndHealthFolder.findFirst({
 						where: { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
 					})
 				case "ENVIRONMENTAL":
 					return prisma.environmentalFolder.findFirst({
 						where: { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
 					})
 				default:
 					throw new Error(`Invalid category: ${category}`)
@@ -48,7 +81,7 @@ export async function getStartupFolderDocuments({
 		})()
 
 		if (!folder) {
-			return { documents: [], folderStatus }
+			return { documents: [], folderStatus, totalDocuments: 0, approvedDocuments: 0 }
 		}
 
 		folderStatus = folder.status
@@ -112,8 +145,6 @@ export async function getStartupFolderDocuments({
 			}
 		})()
 
-		console.log(rawDocuments)
-
 		const documents: StartupFolderDocument[] = rawDocuments.map((doc) => {
 			const baseDoc = {
 				id: doc.id,
@@ -160,11 +191,10 @@ export async function getStartupFolderDocuments({
 			}
 		})
 
-		console.log({
-			documents,
-		})
+		const totalDocuments = folder._count.documents
+		const approvedDocuments = documents.filter((doc) => doc.status === "APPROVED").length
 
-		return { documents, folderStatus }
+		return { documents, folderStatus, totalDocuments, approvedDocuments }
 	} catch (error) {
 		console.error("Error fetching startup folder documents:", error)
 		throw new Error("Could not fetch startup folder documents")
