@@ -44,6 +44,7 @@ import {
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
+import { SendStartupFolderReview } from "./SendStartupFolderReview"
 
 interface StartupFolderDocumentsProps {
 	userId: string
@@ -70,10 +71,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			| SafetyAndHealthDocumentType
 		name: string
 	} | null>(null)
-	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [selectedEntity, setSelectedEntity] = useState<{ id: string; name: string } | null>(null)
+	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [allEntities, setAllEntities] = useState<Array<{ id: string; name: string }>>([])
 	const [entities, setEntities] = useState<Array<{ id: string; name: string }>>([])
+	const [showReviewFolderDialog, setShowReviewFolderDialog] = useState(false)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 	const [showLinkDialog, setShowLinkDialog] = useState(false)
@@ -145,7 +147,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
-				{!isOtcMember && (
+				{!isOtcMember ? (
 					<div className="flex items-center gap-2">
 						{(category === DocumentCategory.PERSONNEL ||
 							category === DocumentCategory.VEHICLES) && (
@@ -158,7 +160,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						{data?.folderStatus === "DRAFT" &&
 							(documentsData.length > 0 || entities.length > 0) && (
 								<Button
-									className="gap-2 bg-cyan-600 text-white transition-all hover:scale-105 hover:bg-cyan-700 hover:text-white"
+									className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 									onClick={() => setShowSubmitDialog(true)}
 								>
 									<SendIcon className="h-4 w-4" />
@@ -166,6 +168,18 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								</Button>
 							)}
 					</div>
+				) : (
+					data?.folderStatus === "SUBMITTED" && (
+						<div className="flex items-center gap-2">
+							<Button
+								onClick={() => setShowReviewFolderDialog(true)}
+								className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+							>
+								<SendIcon className="h-4 w-4" />
+								Notificar revisión
+							</Button>
+						</div>
+					)
 				)}
 			</div>
 
@@ -411,6 +425,24 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						await refetch()
 						toast.success("Documentos enviados a revisión exitosamente")
 					}}
+				/>
+			)}
+
+			{showReviewFolderDialog && (
+				<SendStartupFolderReview
+					title={title}
+					userId={userId}
+					companyId={companyId}
+					folderId={startupFolderId}
+					isOpen={showReviewFolderDialog}
+					onClose={() => setShowReviewFolderDialog(false)}
+					onSuccess={() => {
+						queryClient.invalidateQueries({
+							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
+						})
+						setShowReviewFolderDialog(false)
+					}}
+					category={category}
 				/>
 			)}
 		</div>

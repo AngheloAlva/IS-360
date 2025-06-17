@@ -19,7 +19,7 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 		switch (category) {
 			case DocumentCategory.SAFETY_AND_HEALTH:
 				folder = await prisma.safetyAndHealthFolder.update({
-					where: { id: folderId },
+					where: { startupFolderId: folderId },
 					data: {
 						status: ReviewStatus.DRAFT,
 						reviewer: {
@@ -39,13 +39,14 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 								},
 							},
 						},
+						id: true,
 						additionalNotificationEmails: true,
 					},
 				})
 				companyName = folder.startupFolder.company.name
 				additionalNotificationEmails = folder.additionalNotificationEmails
 				const safetyAndHealthDocuments = await prisma.safetyAndHealthDocument.findMany({
-					where: { folderId: folderId },
+					where: { folderId: folder.id },
 				})
 				safetyAndHealthDocuments.forEach(async (document) => {
 					const newDocumentStatus =
@@ -68,7 +69,7 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 				break
 			case DocumentCategory.ENVIRONMENTAL:
 				folder = await prisma.environmentalFolder.update({
-					where: { id: folderId },
+					where: { startupFolderId: folderId },
 					data: {
 						status: ReviewStatus.DRAFT,
 						reviewer: {
@@ -88,6 +89,7 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 								},
 							},
 						},
+						id: true,
 						additionalNotificationEmails: true,
 					},
 				})
@@ -102,7 +104,7 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 				companyName = folder.startupFolder.company.name
 				additionalNotificationEmails = folder.additionalNotificationEmails
 				const environmentalDocuments = await prisma.environmentalDocument.findMany({
-					where: { folderId: folderId },
+					where: { folderId: folder.id },
 				})
 				environmentalDocuments.forEach(async (document) => {
 					const newDocumentStatus =
@@ -125,77 +127,84 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 				companyName = folder.startupFolder.company.name
 				break
 			case DocumentCategory.PERSONNEL:
-				folder = await prisma.startupFolder.findFirst({
-					where: { id: folderId },
+				folder = await prisma.workerFolder.findFirst({
+					where: { startupFolderId: folderId },
 					select: {
-						company: {
+						startupFolder: {
 							select: {
-								name: true,
+								company: {
+									select: {
+										name: true,
+									},
+								},
 							},
 						},
+						id: true,
+						additionalNotificationEmails: true,
 					},
 				})
+
 				if (!folder) {
 					return {
 						ok: false,
 						message: "Carpeta no encontrada",
 					}
 				}
-				companyName = folder.company.name
 
-				const workerFolders = await prisma.workerFolder.findMany({
-					where: { startupFolderId: folderId },
-					select: {
-						id: true,
-						additionalNotificationEmails: true,
+				companyName = folder.startupFolder.company.name
+				additionalNotificationEmails = folder.additionalNotificationEmails
+
+				await prisma.workerFolder.update({
+					where: { id: folder.id },
+					data: {
+						status: ReviewStatus.DRAFT,
+						reviewerId: userId,
+						submittedAt: new Date(),
 					},
 				})
 
-				additionalNotificationEmails = workerFolders[0].additionalNotificationEmails
+				const workerDocuments = await prisma.workerDocument.findMany({
+					where: { folderId: folder.id },
+				})
 
-				workerFolders.forEach(async (folder) => {
-					await prisma.workerFolder.update({
-						where: { id: folder.id },
+				workerDocuments.forEach(async (document) => {
+					const newDocumentStatus =
+						document.status === ReviewStatus.SUBMITTED
+							? ReviewStatus.DRAFT
+							: document.status === ReviewStatus.APPROVED
+								? ReviewStatus.APPROVED
+								: document.status === ReviewStatus.DRAFT
+									? ReviewStatus.DRAFT
+									: document.status
+
+					await prisma.workerDocument.update({
+						where: { id: document.id },
 						data: {
-							status: ReviewStatus.DRAFT,
-							reviewerId: userId,
+							status: newDocumentStatus,
 							submittedAt: new Date(),
 						},
 					})
-					const workerDocuments = await prisma.workerDocument.findMany({
-						where: { folderId: folder.id },
-					})
-					workerDocuments.forEach(async (document) => {
-						const newDocumentStatus =
-							document.status === ReviewStatus.SUBMITTED
-								? ReviewStatus.DRAFT
-								: document.status === ReviewStatus.APPROVED
-									? ReviewStatus.APPROVED
-									: document.status === ReviewStatus.DRAFT
-										? ReviewStatus.DRAFT
-										: document.status
-
-						await prisma.workerDocument.update({
-							where: { id: document.id },
-							data: {
-								status: newDocumentStatus,
-								submittedAt: new Date(),
-							},
-						})
-					})
 				})
+
 				break
 			case DocumentCategory.VEHICLES:
-				folder = await prisma.startupFolder.findFirst({
-					where: { id: folderId },
+				folder = await prisma.vehicleFolder.findFirst({
+					where: { startupFolderId: folderId },
 					select: {
-						company: {
+						startupFolder: {
 							select: {
-								name: true,
+								company: {
+									select: {
+										name: true,
+									},
+								},
 							},
 						},
+						id: true,
+						additionalNotificationEmails: true,
 					},
 				})
+
 				if (!folder) {
 					return {
 						ok: false,
@@ -203,49 +212,41 @@ export const sendFolderReview = async ({ userId, folderId, category }: SendFolde
 					}
 				}
 
-				companyName = folder.company.name
+				companyName = folder.startupFolder.company.name
+				additionalNotificationEmails = folder.additionalNotificationEmails
 
-				const vehicleFolders = await prisma.vehicleFolder.findMany({
-					where: { startupFolderId: folderId },
-					select: {
-						id: true,
-						additionalNotificationEmails: true,
+				await prisma.vehicleFolder.update({
+					where: { id: folder.id },
+					data: {
+						status: ReviewStatus.DRAFT,
+						reviewerId: userId,
+						submittedAt: new Date(),
 					},
 				})
 
-				additionalNotificationEmails = vehicleFolders[0].additionalNotificationEmails
+				const vehicleDocuments = await prisma.vehicleDocument.findMany({
+					where: { folderId: folder.id },
+				})
 
-				vehicleFolders.forEach(async (folder) => {
-					await prisma.vehicleFolder.update({
-						where: { id: folder.id },
+				vehicleDocuments.forEach(async (document) => {
+					const newDocumentStatus =
+						document.status === ReviewStatus.SUBMITTED
+							? ReviewStatus.DRAFT
+							: document.status === ReviewStatus.APPROVED
+								? ReviewStatus.APPROVED
+								: document.status === ReviewStatus.DRAFT
+									? ReviewStatus.DRAFT
+									: document.status
+
+					await prisma.vehicleDocument.update({
+						where: { id: document.id },
 						data: {
-							status: ReviewStatus.DRAFT,
-							reviewerId: userId,
+							status: newDocumentStatus,
 							submittedAt: new Date(),
 						},
 					})
-					const vehicleDocuments = await prisma.vehicleDocument.findMany({
-						where: { folderId: folder.id },
-					})
-					vehicleDocuments.forEach(async (document) => {
-						const newDocumentStatus =
-							document.status === ReviewStatus.SUBMITTED
-								? ReviewStatus.DRAFT
-								: document.status === ReviewStatus.APPROVED
-									? ReviewStatus.APPROVED
-									: document.status === ReviewStatus.DRAFT
-										? ReviewStatus.DRAFT
-										: document.status
-
-						await prisma.vehicleDocument.update({
-							where: { id: document.id },
-							data: {
-								status: newDocumentStatus,
-								submittedAt: new Date(),
-							},
-						})
-					})
 				})
+
 				break
 		}
 
