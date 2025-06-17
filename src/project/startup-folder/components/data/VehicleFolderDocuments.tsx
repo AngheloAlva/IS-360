@@ -34,6 +34,7 @@ interface VehicleFolderDocumentsProps {
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
+	folderStatus: ReviewStatus
 	documentsNotUploaded: {
 		name: string
 		required: boolean
@@ -51,6 +52,7 @@ export function VehicleFolderDocuments({
 	userId,
 	vehicleId,
 	isOtcMember,
+	folderStatus,
 	startupFolderId,
 	documentsNotUploaded,
 }: VehicleFolderDocumentsProps) {
@@ -171,7 +173,8 @@ export function VehicleFolderDocuments({
 						</TableRow>
 					)}
 
-					{documentsNotUploaded.length > 0 &&
+					{folderStatus === "DRAFT" &&
+						documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
 								<TableCell className="font-medium">

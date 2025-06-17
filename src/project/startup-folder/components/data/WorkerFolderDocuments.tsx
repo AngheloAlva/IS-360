@@ -32,6 +32,7 @@ interface WorkerFolderDocumentsProps {
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
+	folderStatus: ReviewStatus
 	documentsNotUploaded: {
 		name: string
 		required: boolean
@@ -49,6 +50,7 @@ export function WorkerFolderDocuments({
 	userId,
 	workerId,
 	isOtcMember,
+	folderStatus,
 	startupFolderId,
 	documentsNotUploaded,
 }: WorkerFolderDocumentsProps) {
@@ -167,7 +169,8 @@ export function WorkerFolderDocuments({
 						</TableRow>
 					)}
 
-					{documentsNotUploaded.length > 0 &&
+					{folderStatus === "DRAFT" &&
+						documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
 								<TableCell className="font-medium">

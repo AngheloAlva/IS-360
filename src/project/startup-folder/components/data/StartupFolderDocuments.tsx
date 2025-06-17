@@ -120,6 +120,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
 					documentsNotUploaded={documentsNotUploaded}
+					folderStatus={data?.folderStatus || "DRAFT"}
 				/>
 			)
 		} else if (category === DocumentCategory.VEHICLES) {
@@ -131,6 +132,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
 					documentsNotUploaded={documentsNotUploaded}
+					folderStatus={data?.folderStatus || "DRAFT"}
 				/>
 			)
 		}
@@ -336,7 +338,8 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						))
 					)}
 
-					{documentsNotUploaded.length > 0 &&
+					{data?.folderStatus === "DRAFT" &&
+						documentsNotUploaded.length > 0 &&
 						category !== DocumentCategory.PERSONNEL &&
 						category !== DocumentCategory.VEHICLES &&
 						documentsNotUploaded.map((doc) => (
