@@ -31,6 +31,7 @@ import { Progress } from "@/shared/components/ui/progress"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { queryClient } from "@/lib/queryClient"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface VehicleFolderDocumentsProps {
 	userId: string
@@ -129,7 +130,7 @@ export function VehicleFolderDocuments({
 				<TableBody>
 					{isLoading ? (
 						<TableRow>
-							<TableCell colSpan={5} className="h-24 text-center">
+							<TableCell colSpan={7} className="h-24 text-center">
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
@@ -143,9 +144,14 @@ export function VehicleFolderDocuments({
 											{doc.name}
 										</div>
 
-										{doc.status === ReviewStatus.REJECTED && (
-											<span className="max-w-80 text-wrap text-rose-500">
-												Rechazado: {doc.reviewNotes}
+										{doc.reviewNotes && (
+											<span
+												className={cn("max-w-96 text-wrap text-rose-500", {
+													"text-emerald-500": doc.status === ReviewStatus.APPROVED,
+												})}
+											>
+												{doc.status === ReviewStatus.APPROVED ? "Aprobado" : "Rechazado"}:{" "}
+												{doc.reviewNotes}
 											</span>
 										)}
 									</div>
@@ -224,6 +230,8 @@ export function VehicleFolderDocuments({
 								<TableCell>
 									<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
 								</TableCell>
+								<TableCell></TableCell>
+								<TableCell></TableCell>
 								<TableCell></TableCell>
 								<TableCell></TableCell>
 								<TableCell>

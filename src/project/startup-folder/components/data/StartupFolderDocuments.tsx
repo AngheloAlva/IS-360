@@ -25,6 +25,7 @@ import {
 	type VehicleDocumentType,
 	type EnvironmentalDocType,
 	type SafetyAndHealthDocumentType,
+	ReviewStatus,
 } from "@prisma/client"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { queryClient } from "@/lib/queryClient"
@@ -45,6 +46,7 @@ import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import { Progress } from "@/shared/components/ui/progress"
+import { cn } from "@/lib/utils"
 
 interface StartupFolderDocumentsProps {
 	userId: string
@@ -201,7 +203,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 				<TableBody>
 					{isLoading ? (
 						<TableRow>
-							<TableCell colSpan={5} className="h-24 text-center">
+							<TableCell colSpan={7} className="h-24 text-center">
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
@@ -227,7 +229,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={5} className="h-24 text-center">
+								<TableCell colSpan={7} className="h-24 text-center">
 									No hay documentos subidos en esta subcarpeta
 								</TableCell>
 							</TableRow>
@@ -242,9 +244,14 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 											{doc.name}
 										</div>
 
-										{doc.status === "REJECTED" && (
-											<span className="max-w-80 text-wrap text-rose-500">
-												Rechazado: {doc.reviewNotes}
+										{doc.reviewNotes && (
+											<span
+												className={cn("max-w-96 text-wrap text-rose-500", {
+													"text-emerald-500": doc.status === ReviewStatus.APPROVED,
+												})}
+											>
+												{doc.status === ReviewStatus.APPROVED ? "Aprobado" : "Rechazado"}:{" "}
+												{doc.reviewNotes}
 											</span>
 										)}
 									</div>
@@ -364,7 +371,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
 								</TableCell>
 								<TableCell></TableCell>
-								<TableCell>N/A</TableCell>
+								<TableCell></TableCell>
+								<TableCell></TableCell>
+								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
 										{!isOtcMember &&

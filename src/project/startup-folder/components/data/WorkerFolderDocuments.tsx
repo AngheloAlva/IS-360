@@ -30,6 +30,7 @@ import type {
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { queryClient } from "@/lib/queryClient"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
@@ -128,7 +129,7 @@ export function WorkerFolderDocuments({
 				<TableBody>
 					{isLoading ? (
 						<TableRow>
-							<TableCell colSpan={5} className="h-24 text-center">
+							<TableCell colSpan={7} className="h-24 text-center">
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
@@ -143,8 +144,15 @@ export function WorkerFolderDocuments({
 											{doc.name}
 										</div>
 
-										{doc.status === ReviewStatus.REJECTED && (
-											<span className="text-rose-500">Rechazado: {doc.reviewNotes}</span>
+										{doc.reviewNotes && (
+											<span
+												className={cn("max-w-96 text-wrap text-rose-500", {
+													"text-emerald-500": doc.status === ReviewStatus.APPROVED,
+												})}
+											>
+												{doc.status === ReviewStatus.APPROVED ? "Aprobado" : "Rechazado"}:{" "}
+												{doc.reviewNotes}
+											</span>
 										)}
 									</div>
 								</TableCell>
@@ -217,6 +225,8 @@ export function WorkerFolderDocuments({
 								<TableCell>
 									<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
 								</TableCell>
+								<TableCell></TableCell>
+								<TableCell></TableCell>
 								<TableCell></TableCell>
 								<TableCell></TableCell>
 								<TableCell>
