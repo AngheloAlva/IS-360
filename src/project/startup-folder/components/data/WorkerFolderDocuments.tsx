@@ -241,6 +241,12 @@ export function WorkerFolderDocuments({
 					onClose={() => {
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
+						queryClient.invalidateQueries({
+							queryKey: [
+								"startupFolderDocuments",
+								{ startupFolderId, category: DocumentCategory.PERSONNEL, workerId },
+							],
+						})
 					}}
 					onUploadComplete={async () => {
 						setShowUploadDialog(false)

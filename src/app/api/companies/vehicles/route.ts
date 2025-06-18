@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 		const [vehicles, total] = await Promise.all([
 			prisma.vehicle.findMany({
 				where: {
+					isActive: true,
 					companyId,
 					...(search
 						? {

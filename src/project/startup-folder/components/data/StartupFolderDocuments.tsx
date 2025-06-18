@@ -406,6 +406,10 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					startupFolderId={startupFolderId}
 					onClose={() => setShowLinkDialog(false)}
 					onSuccess={() => {
+						queryClient.invalidateQueries({
+							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
+						})
+						refetch()
 						setShowLinkDialog(false)
 					}}
 				/>

@@ -146,7 +146,12 @@ export function LinkEntityDialog({
 							>
 								Cancelar
 							</Button>
-							<Button type="submit" disabled={linkEntity.isPending}>
+
+							<Button
+								className="bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+								type="submit"
+								disabled={linkEntity.isPending}
+							>
 								Vincular
 							</Button>
 						</DialogFooter>

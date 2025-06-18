@@ -247,6 +247,12 @@ export function VehicleFolderDocuments({
 					documentToUpdate={selectedDocument}
 					documentType={selectedDocumentType}
 					onClose={() => {
+						queryClient.invalidateQueries({
+							queryKey: [
+								"startupFolderDocuments",
+								{ startupFolderId, category: DocumentCategory.VEHICLES, vehicleId },
+							],
+						})
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
 					}}
