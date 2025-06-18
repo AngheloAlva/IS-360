@@ -1,6 +1,6 @@
 "use client"
 
-import { Files, DownloadIcon } from "lucide-react"
+import { Files, DownloadIcon, FolderKanban } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
 
@@ -15,6 +15,7 @@ import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
+import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -93,7 +94,7 @@ export default function StartupFolderOverview({
 			<Tabs defaultValue={startupFolders?.[0].id}>
 				<div className="flex w-full items-center justify-end gap-2">
 					{startupFolders && startupFolders.length > 1 && (
-						<TabsList className="w-full">
+						<TabsList className="w-full" onClick={() => setSelectedCategory(null)}>
 							{startupFolders.map((folder) => (
 								<TabsTrigger value={folder.id} key={folder.id}>
 									{folder.name}
@@ -107,7 +108,24 @@ export default function StartupFolderOverview({
 
 				{startupFolders && startupFolders.length > 0 ? (
 					startupFolders.map((folder) => (
-						<TabsContent value={folder.id} key={folder.id} className="bg-background rounded-lg p-4">
+						<TabsContent
+							value={folder.id}
+							key={folder.id}
+							className="bg-background space-y-4 rounded-lg p-4"
+						>
+							<div className="flex items-center justify-between">
+								<h2 className="flex items-center gap-2 text-lg font-bold">
+									<FolderKanban className="size-5" />
+									{folder.name}
+								</h2>
+
+								<UpdateStartupFolder
+									startupFolderId={folder.id}
+									companyId={companyId}
+									name={folder.name}
+								/>
+							</div>
+
 							<div className="space-y-6">
 								{selectedCategory ? (
 									<StartupFolderDocuments

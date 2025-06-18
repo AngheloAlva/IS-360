@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { useStartupFolderByCompany } from "@/project/startup-folder/hooks/use-startup-folder-by-company"
 import { createUserStartupFolder } from "@/project/startup-folder/actions/createWorkerStartupFolder"
 import { partnerUsersSchema, type PartnerUsersSchema } from "@/project/user/schemas/users.schema"
+import { linkFolderEntity } from "@/project/startup-folder/actions/link-folder-entity"
 import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { queryClient } from "@/lib/queryClient"
@@ -30,7 +31,6 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { User } from "@prisma/client"
-import { linkFolderEntity } from "@/project/startup-folder/actions/link-folder-entity"
 
 export default function CreateUsersForm({ companyId }: { companyId: string }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -78,6 +78,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 							rut: employee.rut,
 							isSupervisor: false,
 							phone: employee.phone,
+							internalRole: employee.internalRole,
+							internalArea: employee.internalArea,
 						},
 					})
 
@@ -103,6 +105,9 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						role: "partnerCompany",
 					})
 
+					await createUserStartupFolder(newUser.user.id)
+
+					// TODO: NO se asocian las carpetas
 					if (employee.startupFoldersId) {
 						employee.startupFoldersId.forEach(async (folderId) => {
 							await linkFolderEntity({
@@ -119,7 +124,6 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						password: temporalPassword,
 					})
 
-					await createUserStartupFolder(newUser.user.id)
 					return newUser
 				})
 			)

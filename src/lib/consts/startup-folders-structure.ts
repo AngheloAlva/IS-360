@@ -381,11 +381,6 @@ export const WORKER_STRUCTURE: StartupFolderStructure = {
 			name: "Capacitación en trabajos de alto riesgo",
 			description: "Certificados de cursos en altura, espacios confinados, etc.",
 		},
-		{
-			type: WorkerDocumentType.ENVIRONMENTAL_TRAINING,
-			name: "Capacitación ambiental",
-			description: "Cursos relacionados con gestión ambiental en faenas OTC.",
-		},
 	],
 }
 

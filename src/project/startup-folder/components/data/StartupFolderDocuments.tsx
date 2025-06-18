@@ -283,6 +283,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 										)}
 
 										{!isOtcMember &&
+											data?.folderStatus === "DRAFT" &&
 											(doc.status === "DRAFT" ||
 												doc.status === "REJECTED" ||
 												doc.status === "EXPIRED") && (

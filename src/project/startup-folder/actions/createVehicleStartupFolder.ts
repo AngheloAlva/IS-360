@@ -1,9 +1,6 @@
 "use server"
 
-import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import prisma from "@/lib/prisma"
-
-import { VehicleDocumentType } from "@prisma/client"
 
 export const createVehicleStartupFolder = async (vehicleId: string) => {
 	try {
@@ -24,54 +21,15 @@ export const createVehicleStartupFolder = async (vehicleId: string) => {
 			}
 		}
 
-		const startupFolders = await prisma.startupFolder.findMany({
-			where: {
-				companyId: vehicle.companyId,
-			},
-			select: {
-				id: true,
+		await prisma.vehicleFolder.create({
+			data: {
+				vehicle: {
+					connect: {
+						id: vehicleId,
+					},
+				},
 			},
 		})
-
-		if (!startupFolders.length) {
-			return {
-				ok: false,
-				message: "No se encontró la carpeta inicial",
-			}
-		}
-
-		const documentsToCreate = VEHICLE_STRUCTURE.documents
-			.map((doc) => ({
-				url: "",
-				name: doc.name,
-				category: VEHICLE_STRUCTURE.category,
-				type: doc.type as VehicleDocumentType,
-			}))
-			.filter((doc) => doc !== undefined)
-
-		await Promise.all(
-			startupFolders.map((folder) =>
-				prisma.vehicleFolder.create({
-					data: {
-						vehicle: {
-							connect: {
-								id: vehicleId,
-							},
-						},
-						startupFolder: {
-							connect: {
-								id: folder.id,
-							},
-						},
-						...(documentsToCreate.length > 0 && {
-							documents: {
-								create: documentsToCreate,
-							},
-						}),
-					},
-				})
-			)
-		)
 
 		return {
 			ok: true,

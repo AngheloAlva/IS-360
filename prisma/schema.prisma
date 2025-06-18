@@ -1059,8 +1059,8 @@ model WorkerFolder {
   reviewer        User?            @relation("WorkerFolderReviewer", fields: [reviewerId], references: [id])
   workerId        String
   worker          User             @relation("WorkerFolderWorker", fields: [workerId], references: [id])
-  startupFolderId String
-  startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
+  startupFolderId String?
+  startupFolder   StartupFolder?   @relation(fields: [startupFolderId], references: [id])
   documents       WorkerDocument[]
   startupFolders  StartupFolder[]  @relation("WorkerFolderStartupFolder")
 
@@ -1099,11 +1099,11 @@ model VehicleFolder {
   updatedAt                    DateTime     @updatedAt
 
   vehicleId       String
-  startupFolderId String
+  startupFolderId String?
   reviewerId      String?
   reviewer        User?             @relation(fields: [reviewerId], references: [id])
   vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
-  startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
+  startupFolder   StartupFolder?    @relation(fields: [startupFolderId], references: [id])
   documents       VehicleDocument[]
   startupFolders  StartupFolder[]   @relation("VehicleFolderStartupFolder")
 

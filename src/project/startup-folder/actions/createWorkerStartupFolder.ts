@@ -28,11 +28,6 @@ export const createUserStartupFolder = async (userId: string) => {
 						id: userId,
 					},
 				},
-				startupFolder: {
-					connect: {
-						id: user.companyId,
-					},
-				},
 			},
 		})
 

@@ -69,7 +69,7 @@ export const Areas = {
 		title: "Biblioteca documental",
 		value: AREAS.DOCUMENTARY_LIBRARY,
 		description:
-			"Busca garantizar la mejora continua, estandarización y cumplimiento de altos estándares de calidad en todos los procesos y servicios.",
+			"Reúne todos los procedimientos instructivo y formato Aplicables de los estándares de OTC",
 		className: "text-blue-500 hover:bg-blue-500/10 hover:border-blue-500",
 	},
 	"comunidades": {
