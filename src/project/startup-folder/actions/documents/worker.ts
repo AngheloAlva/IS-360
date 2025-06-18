@@ -195,7 +195,6 @@ export const updateExpirationDateWorkerDocument = async ({
 export const submitWorkerDocumentForReview = async ({
 	userId,
 	emails,
-	folderId,
 	workerId,
 	companyId,
 }: {
@@ -224,7 +223,6 @@ export const submitWorkerDocumentForReview = async ({
 			const folder = await tx.workerFolder.findFirst({
 				where: {
 					workerId,
-					startupFolderId: folderId,
 				},
 				select: {
 					id: true,
@@ -246,8 +244,6 @@ export const submitWorkerDocumentForReview = async ({
 				}
 			}
 
-			console.log(folder)
-
 			await tx.workerFolder.update({
 				where: { id: folder.id },
 				data: {
@@ -266,6 +262,8 @@ export const submitWorkerDocumentForReview = async ({
 					status: true,
 				},
 			})
+
+			console.log(documents)
 
 			await Promise.all(
 				documents.map(async (document) => {

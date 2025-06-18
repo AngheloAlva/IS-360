@@ -62,6 +62,7 @@ export const addDocumentReview = async ({
 						startupFolderId,
 					},
 					select: {
+						id: true,
 						documents: {
 							select: {
 								status: true,
@@ -154,6 +155,7 @@ export const addDocumentReview = async ({
 						startupFolderId,
 					},
 					select: {
+						id: true,
 						documents: {
 							select: {
 								status: true,
@@ -245,9 +247,9 @@ export const addDocumentReview = async ({
 				allDocuments = await prisma.workerFolder.findFirst({
 					where: {
 						workerId: document.folder.workerId,
-						startupFolderId,
 					},
 					select: {
+						id: true,
 						documents: {
 							select: {
 								status: true,
@@ -274,7 +276,7 @@ export const addDocumentReview = async ({
 				) {
 					await prisma.workerFolder.update({
 						where: {
-							workerId_startupFolderId: { workerId: document.folder.workerId, startupFolderId },
+							id: allDocuments.id,
 						},
 						data: {
 							status: ReviewStatus.APPROVED,
@@ -303,7 +305,7 @@ export const addDocumentReview = async ({
 				) {
 					await prisma.workerFolder.update({
 						where: {
-							workerId_startupFolderId: { workerId: document.folder.workerId, startupFolderId },
+							id: allDocuments.id,
 						},
 						data: {
 							status: ReviewStatus.DRAFT,
@@ -351,6 +353,7 @@ export const addDocumentReview = async ({
 						startupFolderId,
 					},
 					select: {
+						id: true,
 						documents: {
 							select: {
 								status: true,
@@ -377,7 +380,7 @@ export const addDocumentReview = async ({
 				) {
 					await prisma.vehicleFolder.update({
 						where: {
-							vehicleId_startupFolderId: { vehicleId: document.folder.vehicleId, startupFolderId },
+							id: allDocuments.id,
 						},
 						data: {
 							status: ReviewStatus.APPROVED,
@@ -406,7 +409,7 @@ export const addDocumentReview = async ({
 				) {
 					await prisma.vehicleFolder.update({
 						where: {
-							vehicleId_startupFolderId: { vehicleId: document.folder.vehicleId, startupFolderId },
+							id: allDocuments.id,
 						},
 						data: {
 							status: ReviewStatus.DRAFT,
@@ -460,6 +463,7 @@ type Document =
 type AllDocuments =
 	| Prisma.SafetyAndHealthFolderGetPayload<{
 			select: {
+				id: true
 				documents: { select: { status: true } }
 				startupFolder: { select: { company: { select: { name: true } } } }
 				additionalNotificationEmails: true
@@ -467,6 +471,7 @@ type AllDocuments =
 	  }>
 	| Prisma.WorkerFolderGetPayload<{
 			select: {
+				id: true
 				documents: { select: { status: true } }
 				startupFolder: { select: { company: { select: { name: true } } } }
 				additionalNotificationEmails: true
@@ -474,6 +479,7 @@ type AllDocuments =
 	  }>
 	| Prisma.VehicleFolderGetPayload<{
 			select: {
+				id: true
 				documents: { select: { status: true } }
 				startupFolder: { select: { company: { select: { name: true } } } }
 				additionalNotificationEmails: true
@@ -481,6 +487,7 @@ type AllDocuments =
 	  }>
 	| Prisma.EnvironmentalFolderGetPayload<{
 			select: {
+				id: true
 				documents: { select: { status: true } }
 				startupFolder: { select: { company: { select: { name: true } } } }
 				additionalNotificationEmails: true

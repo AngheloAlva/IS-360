@@ -192,6 +192,7 @@ export function WorkerFolderDocuments({
 												document={doc}
 												userId={userId}
 												refetch={refetch}
+												workerId={workerId}
 												startupFolderId={startupFolderId}
 												category={DocumentCategory.PERSONNEL}
 											/>

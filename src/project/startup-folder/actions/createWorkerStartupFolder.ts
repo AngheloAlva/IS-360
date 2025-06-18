@@ -1,9 +1,6 @@
 "use server"
 
-import { WORKER_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import prisma from "@/lib/prisma"
-
-import type { WorkerDocumentType } from "@prisma/client"
 
 export const createUserStartupFolder = async (userId: string) => {
 	try {
@@ -24,48 +21,20 @@ export const createUserStartupFolder = async (userId: string) => {
 			}
 		}
 
-		const startupFolders = await prisma.startupFolder.findMany({
-			where: {
-				companyId: user.companyId,
-			},
-			select: {
-				id: true,
+		await prisma.workerFolder.create({
+			data: {
+				worker: {
+					connect: {
+						id: userId,
+					},
+				},
+				startupFolder: {
+					connect: {
+						id: user.companyId,
+					},
+				},
 			},
 		})
-
-		if (!startupFolders.length) {
-			return {
-				ok: false,
-				message: "No se encontró la carpeta inicial",
-			}
-		}
-
-		await Promise.all(
-			startupFolders.map((folder) =>
-				prisma.workerFolder.create({
-					data: {
-						worker: {
-							connect: {
-								id: userId,
-							},
-						},
-						startupFolder: {
-							connect: {
-								id: folder.id,
-							},
-						},
-						documents: {
-							create: WORKER_STRUCTURE.documents.map((doc) => ({
-								url: "",
-								name: doc.name,
-								category: WORKER_STRUCTURE.category,
-								type: doc.type as WorkerDocumentType,
-							})),
-						},
-					},
-				})
-			)
-		)
 
 		return {
 			ok: true,

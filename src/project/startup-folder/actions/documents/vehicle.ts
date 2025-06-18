@@ -183,7 +183,6 @@ export const updateExpirationDateVehicleDocument = async ({
 export const submitVehicleDocumentForReview = async ({
 	emails,
 	userId,
-	folderId,
 	companyId,
 	vehicleId,
 }: {
@@ -212,7 +211,6 @@ export const submitVehicleDocumentForReview = async ({
 			const folder = await tx.vehicleFolder.findFirst({
 				where: {
 					vehicleId,
-					startupFolderId: folderId,
 				},
 				select: {
 					id: true,
