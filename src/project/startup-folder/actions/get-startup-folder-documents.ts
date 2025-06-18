@@ -98,6 +98,12 @@ export async function getStartupFolderDocuments({
 									name: true,
 								},
 							},
+							reviewer: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
 						},
 						orderBy: { uploadedAt: "desc" },
 					})
@@ -106,6 +112,12 @@ export async function getStartupFolderDocuments({
 						where: { folderId: folder.id },
 						include: {
 							uploadedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+							reviewer: {
 								select: {
 									id: true,
 									name: true,
@@ -124,6 +136,12 @@ export async function getStartupFolderDocuments({
 									name: true,
 								},
 							},
+							reviewer: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
 						},
 						orderBy: { uploadedAt: "desc" },
 					})
@@ -132,6 +150,12 @@ export async function getStartupFolderDocuments({
 						where: { folderId: folder.id },
 						include: {
 							uploadedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+							reviewer: {
 								select: {
 									id: true,
 									name: true,
@@ -159,6 +183,8 @@ export async function getStartupFolderDocuments({
 				uploadedBy: doc.uploadedBy,
 				uploadedById: doc.uploadedById,
 				folderId: doc.folderId,
+				reviewerId: doc.reviewerId,
+				reviewer: doc.reviewer,
 			}
 
 			switch (category) {

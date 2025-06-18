@@ -119,7 +119,9 @@ export function VehicleFolderDocuments({
 						<TableHead>Nombre</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
-						<TableHead>Fecha de vencimiento</TableHead>
+						<TableHead>Vencimiento</TableHead>
+						<TableHead>Revisado por</TableHead>
+						<TableHead>Fecha de revisión</TableHead>
 						<TableHead className="w-[100px]"></TableHead>
 					</TableRow>
 				</TableHeader>
@@ -154,6 +156,10 @@ export function VehicleFolderDocuments({
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
 									{doc.expirationDate ? new Date(doc.expirationDate).toLocaleDateString() : "N/A"}
+								</TableCell>
+								<TableCell>{doc.reviewer?.name ?? "Usuario desconocido"}</TableCell>
+								<TableCell>
+									{doc.reviewedAt ? new Date(doc.reviewedAt).toLocaleDateString() : "N/A"}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">

@@ -1,6 +1,5 @@
 "use server"
 
-import { createVehicleStartupFolder } from "@/project/startup-folder/actions/createVehicleStartupFolder"
 import { createStartupFolder } from "@/project/startup-folder/actions/createStartupFolder"
 import prisma from "@/lib/prisma"
 
@@ -38,15 +37,13 @@ export const createCompany = async ({
 
 		if (vehicles && vehicles.length > 0) {
 			vehicles.forEach(async (vehicle) => {
-				const newVehicle = await prisma.vehicle.create({
+				await prisma.vehicle.create({
 					data: {
 						...vehicle,
 						companyId: company.id,
 						year: Number(vehicle.year),
 					},
 				})
-
-				await createVehicleStartupFolder(newVehicle.id)
 			})
 		}
 

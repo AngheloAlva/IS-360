@@ -119,6 +119,8 @@ export function WorkerFolderDocuments({
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
 						<TableHead>Fecha de vencimiento</TableHead>
+						<TableCell>Revisado por</TableCell>
+						<TableCell>Revisado el</TableCell>
 						<TableHead className="w-[100px]"></TableHead>
 					</TableRow>
 				</TableHeader>
@@ -152,6 +154,10 @@ export function WorkerFolderDocuments({
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
 									{doc.expirationDate ? new Date(doc.expirationDate).toLocaleDateString() : "N/A"}
+								</TableCell>
+								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
+								<TableCell>
+									{doc.reviewedAt ? new Date(doc.reviewedAt).toLocaleDateString() : ""}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">

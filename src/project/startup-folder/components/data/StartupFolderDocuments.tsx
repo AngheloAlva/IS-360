@@ -191,7 +191,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						<TableHead>Nombre</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
-						<TableHead>Fecha de vencimiento</TableHead>
+						<TableHead>Vencimiento</TableHead>
+						<TableHead>Revisado por</TableHead>
+						<TableHead>Revisado el</TableHead>
 						<TableHead className="w-[100px]"></TableHead>
 					</TableRow>
 				</TableHeader>
@@ -217,7 +219,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 											{entity.name}
 										</div>
 									</TableCell>
-									<TableCell colSpan={3}></TableCell>
+									<TableCell colSpan={5}></TableCell>
 									<TableCell>
 										<ChevronRightIcon className="h-4 w-4" />
 									</TableCell>
@@ -253,6 +255,10 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
 									{doc.expirationDate ? new Date(doc.expirationDate).toLocaleDateString() : "N/A"}
+								</TableCell>
+								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
+								<TableCell>
+									{doc.reviewedAt ? new Date(doc.reviewedAt).toLocaleDateString() : ""}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
@@ -299,6 +305,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 																	...baseDoc,
 																	category: DocumentCategory.SAFETY_AND_HEALTH,
 																	type: doc.type as SafetyAndHealthDocumentType,
+																	reviewer: doc.reviewer,
 																}
 																selectedDoc = safetyDoc
 																break
@@ -308,6 +315,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 																	...baseDoc,
 																	category: DocumentCategory.ENVIRONMENTAL,
 																	type: doc.type as EnvironmentalDocType,
+																	reviewer: doc.reviewer,
 																}
 																selectedDoc = envDoc
 																break
