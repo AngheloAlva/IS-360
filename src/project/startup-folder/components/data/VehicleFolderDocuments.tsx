@@ -96,7 +96,7 @@ export function VehicleFolderDocuments({
 					className="mr-4 ml-auto max-w-24"
 				/>
 
-				{data?.folderStatus === "DRAFT" && documents.length > 0 && (
+				{!isOtcMember && data?.folderStatus === "DRAFT" && documents.length > 0 && (
 					<Button
 						className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 						onClick={() => setShowSubmitDialog(true)}
