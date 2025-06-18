@@ -38,8 +38,7 @@ interface WorkerFolderDocumentsProps {
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
-	folderStatus: ReviewStatus
-	documentsNotUploaded: {
+	documents: {
 		name: string
 		required: boolean
 		description?: string
@@ -56,10 +55,9 @@ export function WorkerFolderDocuments({
 	userId,
 	workerId,
 	companyId,
+	documents,
 	isOtcMember,
-	folderStatus,
 	startupFolderId,
-	documentsNotUploaded,
 }: WorkerFolderDocumentsProps) {
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
@@ -77,7 +75,14 @@ export function WorkerFolderDocuments({
 		category: DocumentCategory.PERSONNEL,
 		workerId,
 	})
-	const documents = data?.documents ?? []
+	const documentsData = data?.documents ?? []
+
+	const documentsNotUploaded = documents.filter(
+		(doc) => !documentsData.some((d) => d.type === doc.type)
+	)
+
+	const progress =
+		data && documentsData.length > 0 ? (data.approvedDocuments / documentsData.length) * 100 : 0
 
 	return (
 		<div className="space-y-4">
@@ -91,8 +96,9 @@ export function WorkerFolderDocuments({
 				</div>
 
 				<Progress
-					value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
+					value={progress}
 					className="mr-4 ml-auto max-w-24"
+					indicatorClassName="bg-emerald-600"
 				/>
 
 				{!isOtcMember && data?.folderStatus === "DRAFT" && documents.length > 0 && (
@@ -125,8 +131,8 @@ export function WorkerFolderDocuments({
 							</TableCell>
 						</TableRow>
 					) : (
-						documents.length > 0 &&
-						documents.map((doc) => (
+						documentsData.length > 0 &&
+						documentsData.map((doc) => (
 							<TableRow key={doc.id}>
 								<TableCell className="font-medium">
 									<div className="flex flex-col items-start justify-center">
@@ -190,8 +196,7 @@ export function WorkerFolderDocuments({
 						))
 					)}
 
-					{folderStatus === "DRAFT" &&
-						documentsNotUploaded.length > 0 &&
+					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
 								<TableCell className="font-medium">
@@ -259,6 +264,7 @@ export function WorkerFolderDocuments({
 			{showSubmitDialog && (
 				<SubmitReviewRequestDialog
 					userId={userId}
+					workerId={workerId}
 					companyId={companyId}
 					isOpen={showSubmitDialog}
 					folderId={startupFolderId}

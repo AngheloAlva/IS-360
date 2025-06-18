@@ -237,15 +237,32 @@ export const submitEnvironmentalDocumentForReview = async ({
 			},
 		})
 
-		await prisma.environmentalDocument.updateMany({
+		const documents = await prisma.environmentalDocument.findMany({
 			where: {
 				folderId: folder.id,
 			},
-			data: {
-				submittedAt: new Date(),
-				status: ReviewStatus.SUBMITTED,
+			select: {
+				id: true,
+				status: true,
 			},
 		})
+
+		await Promise.all(
+			documents.map(async (document) => {
+				const newStatus =
+					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
+
+				prisma.environmentalDocument.updateMany({
+					where: {
+						folderId: folder.id,
+					},
+					data: {
+						status: newStatus,
+						submittedAt: new Date(),
+					},
+				})
+			})
+		)
 
 		await sendRequestReviewEmail({
 			solicitator: {

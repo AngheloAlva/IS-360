@@ -109,18 +109,20 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
+	const progress =
+		data && documentsData.length > 0 ? (data.approvedDocuments / documentsData.length) * 100 : 0
+
 	if (selectedEntity) {
 		if (category === DocumentCategory.PERSONNEL) {
 			return (
 				<WorkerFolderDocuments
 					userId={userId}
 					companyId={companyId}
+					documents={documents}
 					isOtcMember={isOtcMember}
 					workerId={selectedEntity.id}
 					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
-					documentsNotUploaded={documentsNotUploaded}
-					folderStatus={data?.folderStatus || "DRAFT"}
 				/>
 			)
 		} else if (category === DocumentCategory.VEHICLES) {
@@ -128,12 +130,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 				<VehicleFolderDocuments
 					userId={userId}
 					companyId={companyId}
+					documents={documents}
 					isOtcMember={isOtcMember}
 					vehicleId={selectedEntity.id}
 					startupFolderId={startupFolderId}
 					onBack={() => setSelectedEntity(null)}
-					documentsNotUploaded={documentsNotUploaded}
-					folderStatus={data?.folderStatus || "DRAFT"}
 				/>
 			)
 		}
@@ -154,11 +155,12 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					category === DocumentCategory.ENVIRONMENTAL) && (
 					<>
 						<Progress
-							value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
+							value={progress}
 							className="mr-4 ml-auto max-w-24"
+							indicatorClassName="bg-emerald-600"
 						/>
 
-						{data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
+						{!isOtcMember && data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
 							<Button
 								className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 								onClick={() => setShowSubmitDialog(true)}
@@ -337,8 +339,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						))
 					)}
 
-					{data?.folderStatus === "DRAFT" &&
-						documentsNotUploaded.length > 0 &&
+					{documentsNotUploaded.length > 0 &&
 						category !== DocumentCategory.PERSONNEL &&
 						category !== DocumentCategory.VEHICLES &&
 						documentsNotUploaded.map((doc) => (

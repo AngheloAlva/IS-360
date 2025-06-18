@@ -78,7 +78,7 @@ export default function StartupFolderOverview({
 					</div>
 
 					<div className="flex items-center gap-2">
-						{!isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
+						{isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
 
 						<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
 							<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">

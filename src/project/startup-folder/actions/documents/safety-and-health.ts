@@ -241,15 +241,32 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 			},
 		})
 
-		await prisma.safetyAndHealthDocument.updateMany({
+		const documents = await prisma.safetyAndHealthDocument.findMany({
 			where: {
 				folderId: folder.id,
 			},
-			data: {
-				submittedAt: new Date(),
-				status: ReviewStatus.SUBMITTED,
+			select: {
+				id: true,
+				status: true,
 			},
 		})
+
+		await Promise.all(
+			documents.map(async (document) => {
+				const newStatus =
+					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
+
+				await prisma.safetyAndHealthDocument.update({
+					where: {
+						id: document.id,
+					},
+					data: {
+						status: newStatus,
+						submittedAt: new Date(),
+					},
+				})
+			})
+		)
 
 		await sendRequestReviewEmail({
 			solicitator: {

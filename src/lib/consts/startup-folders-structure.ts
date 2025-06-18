@@ -101,33 +101,9 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 		},
 		{
 			type: SafetyAndHealthDocumentType.HARASSMENT_PROCEDURE,
-			name: "Procedimiento de Acoso",
+			name: "Procedimiento de Acoso laboral",
 			required: true,
 			description: "Procedimiento para acoso laboral y sexual",
-		},
-		{
-			type: SafetyAndHealthDocumentType.ORGANIZATION_CHART,
-			name: "Organigrama",
-			required: true,
-			description: "Estructura organizacional del proyecto",
-		},
-		{
-			type: SafetyAndHealthDocumentType.SAFE_WORK,
-			name: "Trabajo seguro",
-			required: true,
-			description: "Procedimientos de trabajo seguro",
-		},
-		{
-			type: SafetyAndHealthDocumentType.RISK_ANALYSIS,
-			name: "Análisis de riesgos",
-			required: true,
-			description: "Análisis detallado de riesgos",
-		},
-		{
-			type: SafetyAndHealthDocumentType.WORK_PERMIT,
-			name: "Permiso de trabajo",
-			required: true,
-			description: "Autorización para realizar trabajos",
 		},
 	],
 }

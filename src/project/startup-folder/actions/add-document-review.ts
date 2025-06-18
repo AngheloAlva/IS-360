@@ -3,6 +3,12 @@
 import { sendReviewNotificationEmail } from "./send-review-notification-email"
 import { DocumentCategory, type Prisma, ReviewStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import {
+	WORKER_STRUCTURE,
+	VEHICLE_STRUCTURE,
+	ENVIRONMENTAL_STRUCTURE,
+	SAFETY_AND_HEALTH_STRUCTURE,
+} from "@/lib/consts/startup-folders-structure"
 
 interface AddDocumentReviewProps {
 	comments: string
@@ -22,10 +28,14 @@ export const addDocumentReview = async ({
 	startupFolderId,
 }: AddDocumentReviewProps): Promise<{ ok: boolean; message: string }> => {
 	try {
-		const newStatus = status === "APPROVED" ? ReviewStatus.APPROVED : ReviewStatus.REJECTED
+		const newStatus =
+			status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.REJECTED
 
 		let document: Document
+		let totalDocuments: number
 		let allDocuments: AllDocuments | null
+		let totalReviewedDocuments: number
+
 		const now: Date = new Date()
 
 		switch (category) {
@@ -70,7 +80,12 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
+				totalDocuments = SAFETY_AND_HEALTH_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
 					prisma.safetyAndHealthFolder.update({
 						where: { startupFolderId },
 						data: {
@@ -86,12 +101,19 @@ export const addDocumentReview = async ({
 
 					return {
 						ok: true,
-						message: "Revisión procesada exitosamente",
+						message: "Revisión procesada exitosamente ",
 					}
 				}
 
-				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
-					prisma.safetyAndHealthFolder.update({
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments < totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.safetyAndHealthFolder.update({
 						where: { startupFolderId },
 						data: {
 							status: ReviewStatus.DRAFT,
@@ -100,7 +122,7 @@ export const addDocumentReview = async ({
 
 					sendReviewNotificationEmail({
 						folderName: "Seguridad y Salud Ocupacional",
-						companyName: allDocuments?.startupFolder.company.name,
+						companyName: allDocuments.startupFolder.company.name,
 						emails: allDocuments.additionalNotificationEmails,
 					})
 					return {
@@ -150,7 +172,12 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
+				totalDocuments = ENVIRONMENTAL_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
 					prisma.environmentalFolder.update({
 						where: { startupFolderId },
 						data: {
@@ -169,8 +196,15 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
-					prisma.environmentalFolder.update({
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments < totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.environmentalFolder.update({
 						where: { startupFolderId },
 						data: {
 							status: ReviewStatus.DRAFT,
@@ -232,7 +266,12 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
+				totalDocuments = WORKER_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
 					await prisma.workerFolder.update({
 						where: {
 							workerId_startupFolderId: { workerId: document.folder.workerId, startupFolderId },
@@ -254,8 +293,15 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
-					prisma.workerFolder.update({
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments < totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.workerFolder.update({
 						where: {
 							workerId_startupFolderId: { workerId: document.folder.workerId, startupFolderId },
 						},
@@ -323,7 +369,12 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
+				totalDocuments = VEHICLE_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
 					await prisma.vehicleFolder.update({
 						where: {
 							vehicleId_startupFolderId: { vehicleId: document.folder.vehicleId, startupFolderId },
@@ -345,8 +396,15 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
-					prisma.vehicleFolder.update({
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments < totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.vehicleFolder.update({
 						where: {
 							vehicleId_startupFolderId: { vehicleId: document.folder.vehicleId, startupFolderId },
 						},
