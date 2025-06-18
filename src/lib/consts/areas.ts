@@ -8,6 +8,7 @@ export const UserAreasValues = {
 	OPERATIONS: AREAS.OPERATIONS,
 	OPERATIONAL_SAFETY: AREAS.OPERATIONAL_SAFETY,
 	PROJECTS: AREAS.PROJECTS,
+	DOCUMENTARY_LIBRARY: AREAS.DOCUMENTARY_LIBRARY,
 	QUALITY_AND_OPERATIONAL_EXCELLENCE: AREAS.QUALITY_AND_OPERATIONAL_EXCELLENCE,
 	PURCHASING: AREAS.PURCHASING,
 	ADMINISTRATION_AND_FINANCES: AREAS.ADMINISTRATION_AND_FINANCES,
@@ -24,7 +25,7 @@ export const DocumentAreasValues = {
 	OPERATIONS: AREAS.OPERATIONS,
 	OPERATIONAL_SAFETY: AREAS.OPERATIONAL_SAFETY,
 	PROJECTS: AREAS.PROJECTS,
-	QUALITY_AND_OPERATIONAL_EXCELLENCE: AREAS.QUALITY_AND_OPERATIONAL_EXCELLENCE,
+	DOCUMENTARY_LIBRARY: AREAS.DOCUMENTARY_LIBRARY,
 	REGULATORY_COMPLIANCE: AREAS.REGULATORY_COMPLIANCE,
 }
 
@@ -37,7 +38,7 @@ export const DocumentAreasValuesArray = [
 	DocumentAreasValues.OPERATIONS,
 	DocumentAreasValues.OPERATIONAL_SAFETY,
 	DocumentAreasValues.PROJECTS,
-	DocumentAreasValues.QUALITY_AND_OPERATIONAL_EXCELLENCE,
+	DocumentAreasValues.DOCUMENTARY_LIBRARY,
 	DocumentAreasValues.REGULATORY_COMPLIANCE,
 ] as const
 
@@ -64,9 +65,9 @@ export const Areas = {
 			"Gestiona y supervisa los proyectos de la empresa, asegurando eficiencia y cumplimiento de los procesos operativos.",
 		className: "text-sky-500 hover:bg-sky-500/10 border-sky-500",
 	},
-	"calidad-y-excelencia-operacional": {
-		title: "Calidad y Excelencia Operacional",
-		value: AREAS.QUALITY_AND_OPERATIONAL_EXCELLENCE,
+	"biblioteca-documental": {
+		title: "Biblioteca documental",
+		value: AREAS.DOCUMENTARY_LIBRARY,
 		description:
 			"Busca garantizar la mejora continua, estandarización y cumplimiento de altos estándares de calidad en todos los procesos y servicios.",
 		className: "text-blue-500 hover:bg-blue-500/10 hover:border-blue-500",
@@ -159,6 +160,7 @@ export const AreasLabels = {
 	[AREAS.ENVIRONMENT]: "Medio Ambiente",
 	[AREAS.OPERATIONAL_SAFETY]: "Seguridad Operacional",
 	[AREAS.QUALITY_AND_OPERATIONAL_EXCELLENCE]: "Calidad y Excelencia Operacional",
+	[AREAS.DOCUMENTARY_LIBRARY]: "Biblioteca Documental",
 	[AREAS.REGULATORY_COMPLIANCE]: "Cumplimiento Normativo",
 	[AREAS.LEGAL]: "Juridica",
 	[AREAS.COMMUNITIES]: "Comunidades",

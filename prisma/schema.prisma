@@ -31,6 +31,7 @@ enum AREAS {
   ADMINISTRATION_AND_FINANCES // Administración y Finanzas
   IT // Informática
   GERENCY // Gerencia
+  DOCUMENTARY_LIBRARY // Biblioteca Documental
 }
 
 enum MODULES {

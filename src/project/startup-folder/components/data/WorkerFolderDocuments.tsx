@@ -1,12 +1,25 @@
 "use client"
 
-import { ChevronLeft, EyeIcon, FileTextIcon, PencilIcon, SendIcon, UploadIcon } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
+import {
+	EyeIcon,
+	SendIcon,
+	InfoIcon,
+	UploadIcon,
+	PencilIcon,
+	ChevronLeft,
+	FileTextIcon,
+} from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import { queryClient } from "@/lib/queryClient"
+import { cn } from "@/lib/utils"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Progress } from "@/shared/components/ui/progress"
@@ -27,10 +40,6 @@ import type {
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
-import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
-import { queryClient } from "@/lib/queryClient"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
@@ -41,7 +50,6 @@ interface WorkerFolderDocumentsProps {
 	startupFolderId: string
 	documents: {
 		name: string
-		required: boolean
 		description?: string
 		type:
 			| SafetyAndHealthDocumentType
@@ -219,6 +227,17 @@ export function WorkerFolderDocuments({
 										<div className="flex items-center gap-2">
 											<FileTextIcon className="h-4 w-4 text-teal-500" />
 											{doc.name}
+
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button variant="ghost" size="icon">
+														<InfoIcon className="size-4 text-teal-500" />
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent className="w-fit max-w-96 text-pretty">
+													{doc.description}
+												</TooltipContent>
+											</Tooltip>
 										</div>
 									</div>
 								</TableCell>

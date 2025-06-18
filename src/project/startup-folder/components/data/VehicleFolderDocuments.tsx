@@ -1,20 +1,35 @@
 "use client"
 
-import { ChevronLeft, EyeIcon, FileTextIcon, PencilIcon, SendIcon, UploadIcon } from "lucide-react"
 import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import {
+	EyeIcon,
+	InfoIcon,
+	SendIcon,
+	PencilIcon,
+	UploadIcon,
+	ChevronLeft,
+	FileTextIcon,
+} from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
+import { queryClient } from "@/lib/queryClient"
 import {
-	DocumentCategory,
-	EnvironmentalDocType,
 	ReviewStatus,
-	SafetyAndHealthDocumentType,
-	VehicleDocumentType,
+	DocumentCategory,
 	WorkerDocumentType,
+	VehicleDocumentType,
+	EnvironmentalDocType,
+	SafetyAndHealthDocumentType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
+import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
+import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
 import {
 	Table,
@@ -26,12 +41,6 @@ import {
 } from "@/shared/components/ui/table"
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
-import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
-import { Progress } from "@/shared/components/ui/progress"
-import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
-import { queryClient } from "@/lib/queryClient"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 
 interface VehicleFolderDocumentsProps {
 	userId: string
@@ -42,7 +51,6 @@ interface VehicleFolderDocumentsProps {
 	startupFolderId: string
 	documents: {
 		name: string
-		required: boolean
 		description?: string
 		type:
 			| SafetyAndHealthDocumentType
@@ -224,6 +232,17 @@ export function VehicleFolderDocuments({
 										<div className="flex items-center gap-2">
 											<FileTextIcon className="h-4 w-4 text-teal-500" />
 											{doc.name}
+
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button variant="ghost" size="icon">
+														<InfoIcon className="size-4 text-teal-500" />
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent className="w-fit max-w-96 text-pretty">
+													{doc.description}
+												</TooltipContent>
+											</Tooltip>
 										</div>
 									</div>
 								</TableCell>

@@ -11,6 +11,7 @@ import {
 	ChevronLeft,
 	FileTextIcon,
 	ChevronRightIcon,
+	InfoIcon,
 } from "lucide-react"
 import {
 	type StartupFolderDocument,
@@ -47,6 +48,7 @@ import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import { Progress } from "@/shared/components/ui/progress"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 
 interface StartupFolderDocumentsProps {
 	userId: string
@@ -364,6 +366,17 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 										<div className="flex items-center gap-2">
 											<FileTextIcon className="h-4 w-4 text-teal-500" />
 											{doc.name}
+
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button variant="ghost" size="icon">
+														<InfoIcon className="size-4 text-teal-500" />
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent className="w-fit max-w-96 text-pretty">
+													{doc.description}
+												</TooltipContent>
+											</Tooltip>
 										</div>
 									</div>
 								</TableCell>
