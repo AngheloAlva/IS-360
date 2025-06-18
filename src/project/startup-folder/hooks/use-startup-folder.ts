@@ -30,24 +30,28 @@ export interface StartupFolder extends StartupFolderModel {
 		approvedDocuments: number
 		rejectedDocuments: number
 		submittedDocuments: number
+		draftDocuments: number
 	}[]
 	environmentalFolders: {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
 		submittedDocuments: number
+		draftDocuments: number
 	}[]
 	workersFolders: {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
 		submittedDocuments: number
+		draftDocuments: number
 	}[]
 	vehiclesFolders: {
 		totalDocuments: number
 		approvedDocuments: number
 		rejectedDocuments: number
 		submittedDocuments: number
+		draftDocuments: number
 	}[]
 }
 

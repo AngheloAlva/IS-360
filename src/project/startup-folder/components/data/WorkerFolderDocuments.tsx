@@ -1,14 +1,15 @@
 "use client"
 
-import { ChevronLeft, EyeIcon, FileTextIcon, PencilIcon, UploadIcon } from "lucide-react"
+import { ChevronLeft, EyeIcon, FileTextIcon, PencilIcon, SendIcon, UploadIcon } from "lucide-react"
 import { useState } from "react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 
-import { StartupFolderStatusBadge } from "@/shared/components/ui/startup-folder-status-badge"
+import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
+import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
 import {
 	Table,
@@ -19,17 +20,21 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-import { type StartupFolderDocument } from "@/project/startup-folder/types"
+import type { StartupFolderDocument } from "@/project/startup-folder/types"
 import type {
-	SafetyAndHealthDocumentType,
-	VehicleDocumentType,
 	WorkerDocumentType,
+	VehicleDocumentType,
 	EnvironmentalDocType,
+	SafetyAndHealthDocumentType,
 } from "@prisma/client"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { queryClient } from "@/lib/queryClient"
+import { toast } from "sonner"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
 	workerId: string
+	companyId: string
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
@@ -50,6 +55,7 @@ export function WorkerFolderDocuments({
 	onBack,
 	userId,
 	workerId,
+	companyId,
 	isOtcMember,
 	folderStatus,
 	startupFolderId,
@@ -65,6 +71,7 @@ export function WorkerFolderDocuments({
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
+	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
 		category: DocumentCategory.PERSONNEL,
@@ -75,10 +82,28 @@ export function WorkerFolderDocuments({
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
-				<Button variant="ghost" className="cursor-pointer gap-1" onClick={onBack}>
-					<ChevronLeft className="h-4 w-4" />
-					Volver
-				</Button>
+				<div className="flex items-center gap-2">
+					<Button variant="outline" size={"sm"} className="gap-2" onClick={onBack}>
+						<ChevronLeft className="h-4 w-4" />
+						Volver
+					</Button>
+					<h2 className="text-lg font-bold">Documentación de personal</h2>
+				</div>
+
+				<Progress
+					value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
+					className="mr-4 ml-auto max-w-24"
+				/>
+
+				{folderStatus === "DRAFT" && documents.length > 0 && (
+					<Button
+						className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+						onClick={() => setShowSubmitDialog(true)}
+					>
+						<SendIcon className="h-4 w-4" />
+						Enviar a revisión
+					</Button>
+				)}
 			</div>
 
 			<Table>
@@ -178,10 +203,10 @@ export function WorkerFolderDocuments({
 									</div>
 								</TableCell>
 								<TableCell>
-									<StartupFolderStatusBadge status={"DRAFT"} />
+									<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
 								</TableCell>
 								<TableCell></TableCell>
-								<TableCell>N/A</TableCell>
+								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
 										{!isOtcMember && (
@@ -221,6 +246,28 @@ export function WorkerFolderDocuments({
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
 						await refetch()
+					}}
+				/>
+			)}
+
+			{showSubmitDialog && (
+				<SubmitReviewRequestDialog
+					userId={userId}
+					companyId={companyId}
+					isOpen={showSubmitDialog}
+					folderId={startupFolderId}
+					category={DocumentCategory.PERSONNEL}
+					onClose={() => setShowSubmitDialog(false)}
+					onSuccess={async () => {
+						queryClient.invalidateQueries({
+							queryKey: [
+								"startupFolderDocuments",
+								{ startupFolderId, category: DocumentCategory.PERSONNEL, workerId },
+							],
+						})
+						setShowSubmitDialog(false)
+						await refetch()
+						toast.success("Documentos enviados a revisión exitosamente")
 					}}
 				/>
 			)}

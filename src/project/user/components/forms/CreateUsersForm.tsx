@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { useStartupFolderByCompany } from "@/project/startup-folder/hooks/use-startup-folder-by-company"
 import { createUserStartupFolder } from "@/project/startup-folder/actions/createWorkerStartupFolder"
 import { partnerUsersSchema, type PartnerUsersSchema } from "@/project/user/schemas/users.schema"
 import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
@@ -13,6 +14,7 @@ import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
 
+import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
 import SubmitButton from "../../../../shared/components/forms/SubmitButton"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { RutFormField } from "@/shared/components/forms/RutFormField"
@@ -28,6 +30,7 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { User } from "@prisma/client"
+import { linkFolderEntity } from "@/project/startup-folder/actions/link-folder-entity"
 
 export default function CreateUsersForm({ companyId }: { companyId: string }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -44,6 +47,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 					phone: "",
 					internalRole: "",
 					internalArea: "",
+					startupFoldersId: [],
 				},
 			],
 		},
@@ -53,6 +57,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 		control: form.control,
 		name: "employees",
 	})
+
+	const { data: startupFolders, isLoading } = useStartupFolderByCompany({ companyId })
 
 	async function onSubmit(values: PartnerUsersSchema) {
 		setIsSubmitting(true)
@@ -96,6 +102,16 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						userId: newUser.user.id,
 						role: "partnerCompany",
 					})
+
+					if (employee.startupFoldersId) {
+						employee.startupFoldersId.forEach(async (folderId) => {
+							await linkFolderEntity({
+								category: "PERSONNEL",
+								startupFolderId: folderId,
+								entityId: newUser.user.id,
+							})
+						})
+					}
 
 					await sendNewUserEmail({
 						name: employee.name,
@@ -225,6 +241,22 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 									control={form.control}
 									name={`employees.${index}.internalArea`}
 								/>
+
+								<MultiSelectFormField<PartnerUsersSchema>
+									control={form.control}
+									label="Carpetas de Arranque"
+									itemClassName="sm:col-span-2"
+									name={`employees.${index}.startupFoldersId`}
+									description="Seleccione las carpetas de arranque en las que el colaborador participará."
+									options={
+										isLoading
+											? []
+											: (startupFolders?.map((folder) => ({
+													value: folder.id,
+													label: folder.name,
+												})) ?? [])
+									}
+								/>
 							</div>
 						))}
 
@@ -237,6 +269,10 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 									rut: "",
 									name: "",
 									email: "",
+									phone: "",
+									internalRole: "",
+									internalArea: "",
+									startupFoldersId: [],
 								})
 							}}
 						>

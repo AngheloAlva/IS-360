@@ -1,7 +1,7 @@
 "use client"
 
-import * as React from "react"
 import { Files, DownloadIcon } from "lucide-react"
+import { useState } from "react"
 import Link from "next/link"
 
 import { useStartupFolder } from "@/project/startup-folder/hooks/use-startup-folder"
@@ -39,13 +39,16 @@ export default function StartupFolderOverview({
 		companyId,
 	})
 
-	const [selectedCategory, setSelectedCategory] = React.useState<DocumentCategory | null>(null)
+	const [selectedCategory, setSelectedCategory] = useState<DocumentCategory | null>(null)
 
 	if (isLoadingFolders) {
 		return (
 			<div className="space-y-6">
 				<Skeleton className="h-28 w-full" />
-				<Skeleton className="h-[500px] w-full" />
+				<div className="space-y-3">
+					<Skeleton className="h-[36px] w-full" />
+					<Skeleton className="h-[266px] w-full" />
+				</div>
 			</div>
 		)
 	}

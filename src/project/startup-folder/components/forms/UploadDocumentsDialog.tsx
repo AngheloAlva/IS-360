@@ -8,6 +8,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 
+import { type UploadDocumentsFormData, uploadDocumentsSchema } from "../../schemas/document.schema"
 import { createStartupFolderDocument } from "../../actions/create-startup-folder-document"
 import { updateStartupFolderDocument } from "../../actions/update-startup-folder-document"
 import { getDocumentTypesByCategory } from "@/lib/consts/startup-folders-structure"
@@ -38,6 +39,8 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
+import type { StartupFolderDocument } from "../../types"
+import type { UploadResult } from "@/lib/upload-files"
 import type {
 	DocumentCategory,
 	WorkerDocumentType,
@@ -45,9 +48,6 @@ import type {
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
-import type { StartupFolderDocument } from "../../types"
-import { type UploadResult } from "@/lib/upload-files"
-import { UploadDocumentsFormData, uploadDocumentsSchema } from "../../schemas/document.schema"
 
 interface UploadDocumentsDialogProps {
 	userId: string

@@ -24,6 +24,8 @@ interface SubmitReviewRequestDialogProps {
 	userId: string
 	isOpen: boolean
 	folderId: string
+	workerId?: string
+	vehicleId?: string
 	companyId: string
 	onClose: () => void
 	onSuccess: () => void
@@ -43,6 +45,8 @@ export function SubmitReviewRequestDialog({
 	onClose,
 	category,
 	folderId,
+	workerId,
+	vehicleId,
 	companyId,
 	onSuccess,
 }: SubmitReviewRequestDialogProps) {
@@ -104,6 +108,10 @@ export function SubmitReviewRequestDialog({
 			let result: { ok: boolean; message?: string }
 
 			if (category === "PERSONNEL") {
+				if (!workerId) {
+					return { ok: false, message: "ID de trabajador es requerido" }
+				}
+
 				const { submitWorkerDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/worker"
 				)
@@ -111,9 +119,13 @@ export function SubmitReviewRequestDialog({
 					emails,
 					userId,
 					folderId,
+					workerId,
 					companyId,
 				})
 			} else if (category === "VEHICLES") {
+				if (!vehicleId) {
+					return { ok: false, message: "ID de vehículo es requerido" }
+				}
 				const { submitVehicleDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/vehicle"
 				)
@@ -121,6 +133,7 @@ export function SubmitReviewRequestDialog({
 					emails,
 					userId,
 					folderId,
+					vehicleId,
 					companyId,
 				})
 			} else if (category === "ENVIRONMENTAL") {

@@ -16,6 +16,7 @@ export interface BaseStartupFolderDocument {
 	reviewedAt: Date | null
 	submittedAt: Date | null
 	expirationDate: Date | null
+	reviewerId: string | null
 	uploadedBy: {
 		id: string
 		name: string

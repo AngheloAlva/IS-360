@@ -87,6 +87,7 @@ export async function GET(req: NextRequest) {
 				approvedDocuments: shf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: shf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: shf.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: shf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 			})),
 			environmentalFolders: folder.environmentalFolders.map((ef) => ({
@@ -95,6 +96,7 @@ export async function GET(req: NextRequest) {
 				approvedDocuments: ef.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: ef.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: ef.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: ef.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 			})),
 			workersFolders: folder.workersFolders.map((wf) => ({
@@ -103,6 +105,7 @@ export async function GET(req: NextRequest) {
 				approvedDocuments: wf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: wf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: wf.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: wf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 			})),
 			vehiclesFolders: folder.vehiclesFolders.map((vf) => ({
@@ -111,6 +114,7 @@ export async function GET(req: NextRequest) {
 				approvedDocuments: vf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: vf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: vf.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: vf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 			})),
 		}))

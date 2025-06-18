@@ -1,8 +1,9 @@
 "use server"
 
+import { z } from "zod"
+
 import { DocumentCategory, ReviewStatus, type VehicleDocumentType } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { z } from "zod"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/new-file.schema"
@@ -188,11 +189,13 @@ export const submitVehicleDocumentForReview = async ({
 	userId,
 	folderId,
 	companyId,
+	vehicleId,
 }: {
 	userId: string
 	emails: string[]
 	folderId: string
 	companyId: string
+	vehicleId: string
 }) => {
 	try {
 		const user = await prisma.user.findUnique({
@@ -210,56 +213,49 @@ export const submitVehicleDocumentForReview = async ({
 		}
 
 		await prisma.$transaction(async (tx) => {
-			const folders = await tx.startupFolder.findUnique({
+			const folder = await tx.vehicleFolder.findFirst({
 				where: {
-					id: folderId,
+					vehicleId,
+					startupFolderId: folderId,
 				},
 				select: {
 					id: true,
-					vehicleFolders: {
-						select: {
-							id: true,
-							status: true,
-						},
-					},
+					status: true,
 				},
 			})
 
-			if (!folders) {
+			if (!folder) {
 				return { ok: false, message: "No se encontró la carpeta." }
 			}
 
 			const invalidFolder =
-				folders.vehicleFolders[0].status !== ReviewStatus.DRAFT &&
-				folders.vehicleFolders[0].status !== ReviewStatus.REJECTED
+				folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
 
 			if (invalidFolder) {
 				return {
 					ok: false,
-					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folders.vehicleFolders[0].status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
 				}
 			}
 
-			for (const folder of folders.vehicleFolders) {
-				const vehicleFolder = await tx.vehicleFolder.update({
-					where: { id: folder.id },
-					data: {
-						submittedAt: new Date(),
-						status: ReviewStatus.SUBMITTED,
-						additionalNotificationEmails: [...emails, user.email],
-					},
-				})
+			await tx.vehicleFolder.update({
+				where: { id: folder.id },
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+					additionalNotificationEmails: [...emails, user.email],
+				},
+			})
 
-				await tx.vehicleDocument.updateMany({
-					where: {
-						folderId: vehicleFolder.id,
-					},
-					data: {
-						submittedAt: new Date(),
-						status: ReviewStatus.SUBMITTED,
-					},
-				})
-			}
+			await tx.vehicleDocument.updateMany({
+				where: {
+					folderId: folder.id,
+				},
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+				},
+			})
 		})
 
 		const company = await prisma.company.findUnique({

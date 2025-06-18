@@ -33,6 +33,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				completedCount: subFolders.safetyAndHealthFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.safetyAndHealthFolders[0]?.rejectedDocuments ?? 0,
 				pendingCount: subFolders.safetyAndHealthFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.safetyAndHealthFolders[0]?.draftDocuments ?? 0,
 			},
 			{
 				title: "Medio Ambiente",
@@ -42,6 +43,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				completedCount: subFolders.environmentalFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.environmentalFolders[0]?.rejectedDocuments ?? 0,
 				pendingCount: subFolders.environmentalFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.environmentalFolders[0]?.draftDocuments ?? 0,
 			},
 			{
 				title: "Vehículos y Equipos",
@@ -52,6 +54,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				completedCount: subFolders.vehiclesFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.vehiclesFolders[0]?.rejectedDocuments ?? 0,
 				pendingCount: subFolders.vehiclesFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.vehiclesFolders[0]?.draftDocuments ?? 0,
 			},
 			{
 				title: "Documentación Personal",
@@ -62,6 +65,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				completedCount: subFolders.workersFolders[0]?.approvedDocuments ?? 0,
 				rejectedCount: subFolders.workersFolders[0]?.rejectedDocuments ?? 0,
 				pendingCount: subFolders.workersFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.workersFolders[0]?.draftDocuments ?? 0,
 			},
 		],
 		[subFolders]
@@ -73,10 +77,11 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				<TableRow>
 					<TableHead>Categoría</TableHead>
 					<TableHead>Descripción</TableHead>
-					<TableHead className="w-[100px] text-right">Completados</TableHead>
-					<TableHead className="w-[100px] text-right">Rechazados</TableHead>
-					<TableHead className="w-[100px] text-right">En revisión</TableHead>
-					<TableHead className="w-[100px] text-right">Total</TableHead>
+					<TableHead className="text-right">En borrador</TableHead>
+					<TableHead className="text-right">Completados</TableHead>
+					<TableHead className="text-right">Rechazados</TableHead>
+					<TableHead className="text-right">En revisión</TableHead>
+					<TableHead className="text-right">Total</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -93,28 +98,33 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 							</div>
 						</TableCell>
 						<TableCell>{category.description}</TableCell>
-						<TableCell className="text-right">
-							<span className="rounded-lg bg-green-500/10 px-2 py-1 text-xs font-medium text-green-500">
-								{category.completedCount}
+						<TableCell>
+							<span className="rounded-lg bg-neutral-500/10 px-2 py-1 text-xs font-medium text-neutral-500">
+								{category.draftCount} Docs.
 							</span>
 						</TableCell>
-						<TableCell className="text-right">
+						<TableCell>
+							<span className="rounded-lg bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-500">
+								{category.completedCount} Docs.
+							</span>
+						</TableCell>
+						<TableCell>
 							<span
 								className={cn(
 									"rounded-lg bg-red-500/10 px-2 py-1 text-xs font-medium text-red-500"
 								)}
 							>
-								{category.rejectedCount}
+								{category.rejectedCount} Docs.
 							</span>
 						</TableCell>
-						<TableCell className="text-right">
+						<TableCell>
 							<span className="rounded-lg bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-500">
-								{category.pendingCount}
+								{category.pendingCount} Docs.
 							</span>
 						</TableCell>
-						<TableCell className="text-right">
-							<span className="rounded-lg bg-gray-500/10 px-2 py-1 text-xs font-medium">
-								{category.documentsCount}
+						<TableCell>
+							<span className="rounded-lg bg-cyan-500/10 px-2 py-1 text-xs font-medium text-cyan-500">
+								{category.documentsCount} Docs.
 							</span>
 						</TableCell>
 					</TableRow>

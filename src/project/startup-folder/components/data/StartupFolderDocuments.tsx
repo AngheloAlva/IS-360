@@ -28,7 +28,7 @@ import {
 } from "@prisma/client"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { queryClient } from "@/lib/queryClient"
-import { StartupFolderStatusBadge } from "@/shared/components/ui/startup-folder-status-badge"
+import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
 import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
 import { LinkEntityDialog } from "../dialogs/LinkEntityDialog"
@@ -44,7 +44,6 @@ import {
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
-import { SendStartupFolderReview } from "./SendStartupFolderReview"
 import { Progress } from "@/shared/components/ui/progress"
 
 interface StartupFolderDocumentsProps {
@@ -76,7 +75,6 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [allEntities, setAllEntities] = useState<Array<{ id: string; name: string }>>([])
 	const [entities, setEntities] = useState<Array<{ id: string; name: string }>>([])
-	const [showReviewFolderDialog, setShowReviewFolderDialog] = useState(false)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 	const [showLinkDialog, setShowLinkDialog] = useState(false)
@@ -116,6 +114,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			return (
 				<WorkerFolderDocuments
 					userId={userId}
+					companyId={companyId}
 					isOtcMember={isOtcMember}
 					workerId={selectedEntity.id}
 					startupFolderId={startupFolderId}
@@ -128,6 +127,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			return (
 				<VehicleFolderDocuments
 					userId={userId}
+					companyId={companyId}
 					isOtcMember={isOtcMember}
 					vehicleId={selectedEntity.id}
 					startupFolderId={startupFolderId}
@@ -148,26 +148,17 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						Volver
 					</Button>
 					<h2 className="text-lg font-bold">{title}</h2>
-					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
-				<Progress
-					value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
-					className="mr-4 ml-auto max-w-24"
-				/>
+				{category === DocumentCategory.SAFETY_AND_HEALTH ||
+					(category === DocumentCategory.ENVIRONMENTAL && (
+						<>
+							<Progress
+								value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
+								className="mr-4 ml-auto max-w-24"
+							/>
 
-				{!isOtcMember ? (
-					<div className="flex items-center gap-2">
-						{(category === DocumentCategory.PERSONNEL ||
-							category === DocumentCategory.VEHICLES) && (
-							<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
-								<FolderIcon className="h-4 w-4" />
-								Vincular {category === DocumentCategory.PERSONNEL ? "Personal" : "Vehículo"}
-							</Button>
-						)}
-
-						{data?.folderStatus === "DRAFT" &&
-							(documentsData.length > 0 || entities.length > 0) && (
+							{data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
 								<Button
 									className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 									onClick={() => setShowSubmitDialog(true)}
@@ -176,19 +167,19 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									Enviar a revisión
 								</Button>
 							)}
-					</div>
-				) : (
-					data?.folderStatus === "SUBMITTED" && (
-						<div className="flex items-center gap-2">
-							<Button
-								onClick={() => setShowReviewFolderDialog(true)}
-								className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
-							>
-								<SendIcon className="h-4 w-4" />
-								Notificar revisión
+						</>
+					))}
+
+				{!isOtcMember && (
+					<div className="flex items-center gap-2">
+						{(category === DocumentCategory.PERSONNEL ||
+							category === DocumentCategory.VEHICLES) && (
+							<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
+								<FolderIcon className="h-4 w-4" />
+								Vincular {category === DocumentCategory.PERSONNEL ? "Personal" : "Vehículo"}
 							</Button>
-						</div>
-					)
+						)}
+					</div>
 				)}
 			</div>
 
@@ -295,6 +286,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 															reviewNotes: doc.reviewNotes,
 															submittedAt: doc.submittedAt,
 															expirationDate: doc.expirationDate,
+															reviewerId: doc.reviewerId,
 															folderId: doc.folderId,
 														}
 
@@ -360,7 +352,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									</div>
 								</TableCell>
 								<TableCell>
-									<StartupFolderStatusBadge status={"DRAFT"} />
+									<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
 								</TableCell>
 								<TableCell></TableCell>
 								<TableCell>N/A</TableCell>
@@ -435,24 +427,6 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						await refetch()
 						toast.success("Documentos enviados a revisión exitosamente")
 					}}
-				/>
-			)}
-
-			{showReviewFolderDialog && (
-				<SendStartupFolderReview
-					title={title}
-					userId={userId}
-					companyId={companyId}
-					folderId={startupFolderId}
-					isOpen={showReviewFolderDialog}
-					onClose={() => setShowReviewFolderDialog(false)}
-					onSuccess={() => {
-						queryClient.invalidateQueries({
-							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
-						})
-						setShowReviewFolderDialog(false)
-					}}
-					category={category}
 				/>
 			)}
 		</div>

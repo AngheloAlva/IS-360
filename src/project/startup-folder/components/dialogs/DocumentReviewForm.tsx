@@ -32,10 +32,11 @@ import {
 import type {
 	WorkerDocument,
 	VehicleDocument,
+	DocumentCategory,
 	EnvironmentalDocument,
 	SafetyAndHealthDocument,
-	DocumentCategory,
 } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
 interface DocumentReviewFormProps {
 	userId: string
@@ -79,6 +80,7 @@ export function DocumentReviewForm({
 		try {
 			const response = await addDocumentReview({
 				comments,
+				startupFolderId,
 				reviewerId: userId,
 				status: approvalStatus,
 				documentId: document.id,
@@ -180,20 +182,20 @@ export function DocumentReviewForm({
 
 					<DialogFooter className="flex justify-end pt-4">
 						<DialogClose>
-							<Button type="button" variant={"secondary"}>
+							<Button type="button" variant={"outline"}>
 								Cancelar
 							</Button>
 						</DialogClose>
 						<Button
 							type="submit"
-							disabled={isSubmitting || (approvalStatus === "REJECTED" && !comments)}
-							className={
-								approvalStatus === "APPROVED"
-									? "bg-emerald-600 hover:bg-emerald-700"
-									: approvalStatus === "REJECTED"
-										? "bg-rose-600 hover:bg-rose-700"
-										: ""
+							disabled={
+								isSubmitting ||
+								approvalStatus === null ||
+								(approvalStatus === "REJECTED" && !comments)
 							}
+							className={cn("bg-emerald-600 hover:bg-emerald-700", {
+								"bg-rose-600 hover:bg-rose-700": approvalStatus === "REJECTED",
+							})}
 						>
 							{isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 							{approvalStatus === "APPROVED" ? (

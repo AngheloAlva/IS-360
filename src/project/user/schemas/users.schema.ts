@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { rutRegex } from "../../../shared/schemas/rutRegex"
+import { rutRegex } from "@/shared/schemas/rutRegex"
 
 export const partnerUsersSchema = z.object({
 	employees: z
@@ -12,6 +12,7 @@ export const partnerUsersSchema = z.object({
 				rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
 				internalRole: z.string().optional(),
 				internalArea: z.string().optional(),
+				startupFoldersId: z.array(z.string()).optional(),
 			})
 		)
 		.min(1, { message: "Debe agregar al menos un personal" }),

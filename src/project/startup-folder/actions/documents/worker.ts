@@ -1,9 +1,10 @@
 "use server"
 
+import { z } from "zod"
+
 import { DocumentCategory, ReviewStatus, type WorkerDocumentType } from "@prisma/client"
 import { sendRequestReviewEmail } from "../send-request-review-email"
 import prisma from "@/lib/prisma"
-import { z } from "zod"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/new-file.schema"
@@ -199,11 +200,13 @@ export const submitWorkerDocumentForReview = async ({
 	userId,
 	emails,
 	folderId,
+	workerId,
 	companyId,
 }: {
 	userId: string
 	emails: string[]
 	folderId: string
+	workerId: string
 	companyId: string
 }) => {
 	try {
@@ -222,58 +225,51 @@ export const submitWorkerDocumentForReview = async ({
 		}
 
 		await prisma.$transaction(async (tx) => {
-			const folders = await tx.startupFolder.findUnique({
+			const folder = await tx.workerFolder.findFirst({
 				where: {
-					id: folderId,
+					workerId,
+					startupFolderId: folderId,
 				},
 				select: {
 					id: true,
-					workerFolders: {
-						select: {
-							id: true,
-							status: true,
-						},
-					},
+					status: true,
 				},
 			})
 
-			if (!folders) {
+			if (!folder) {
 				return { ok: false, message: "No se encontró la carpeta." }
 			}
 
 			const invalidFolder =
-				folders.workerFolders[0].status !== ReviewStatus.DRAFT &&
-				folders.workerFolders[0].status !== ReviewStatus.REJECTED
+				folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
 
 			if (invalidFolder) {
 				return {
 					ok: false,
-					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folders.workerFolders[0].status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
+					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
 				}
 			}
 
-			console.log(folders)
+			console.log(folder)
 
-			for (const folder of folders.workerFolders) {
-				const workerFolder = await tx.workerFolder.update({
-					where: { id: folder.id },
-					data: {
-						submittedAt: new Date(),
-						status: ReviewStatus.SUBMITTED,
-						additionalNotificationEmails: [...emails, user.email],
-					},
-				})
+			await tx.workerFolder.update({
+				where: { id: folder.id },
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+					additionalNotificationEmails: [...emails, user.email],
+				},
+			})
 
-				await tx.workerDocument.updateMany({
-					where: {
-						folderId: workerFolder.id,
-					},
-					data: {
-						submittedAt: new Date(),
-						status: ReviewStatus.SUBMITTED,
-					},
-				})
-			}
+			await tx.workerDocument.updateMany({
+				where: {
+					folderId: folder.id,
+				},
+				data: {
+					submittedAt: new Date(),
+					status: ReviewStatus.SUBMITTED,
+				},
+			})
 		})
 
 		const company = await prisma.company.findUnique({

@@ -68,46 +68,50 @@ model User {
   internalArea     String?
   isActive         Boolean   @default(true)
 
-  sessions                       Session[]
-  accounts                       Account[]
-  files                          File[]
-  folders                        Folder[]
-  workTrackers                   WorkTracker[]
-  safetyTalks                    UserSafetyTalk[]
-  company                        Company?                  @relation(fields: [companyId], references: [id])
-  companyId                      String?
-  isSupervisor                   Boolean?
-  workOrders                     WorkOrder[]               @relation("WorkOrderResponsible")
-  workOrdersAsSupervisor         WorkOrder[]               @relation("WorkOrderSupervisor")
-  requestedClosures              WorkOrder[]               @relation("WorkOrderClosureRequester")
-  approvedClosures               WorkOrder[]               @relation("WorkOrderClosureApprover")
-  assignedEntries                WorkEntry[]               @relation("AssignedUsers")
-  createdEntries                 WorkEntry[]               @relation("WorkEntryCreator")
-  signedEntries                  WorkEntry[]               @relation("WorkEntrySigner")
-  workEntries                    WorkEntry[]               @relation("WorkEntryApproval")
-  workPermitsAsParticipant       WorkPermit[]              @relation("WorkPermitParticipants")
-  workPermitsAsPreventionOfficer WorkPermit[]              @relation("PreventionOfficer")
-  workPermits                    WorkPermit[]              @relation("WorkPermitUser")
-  attachmentsHistory             AttachmentHistory[]
-  equipmentHistory               EquipmentHistory[]
-  fileHistory                    FileHistory[]
-  twofactors                     TwoFactor[]
-  FileComment                    FileComment[]
-  MaintenancePlan                MaintenancePlan[]
-  MaintenancePlanTask            MaintenancePlanTask[]
-  approvedMilestones             Milestone[]               @relation("MilestoneApprover")
-  requestedMilestones            Milestone[]               @relation("MilestoneRequestedBy")
-  safetyAndHealthFolders         SafetyAndHealthFolder[]
-  safetyAndHealthDocuments       SafetyAndHealthDocument[]
-  workerFolder                   WorkerFolder[]            @relation("WorkerFolderWorker")
-  workerFolderReviewer           WorkerFolder[]            @relation("WorkerFolderReviewer")
-  workerDocument                 WorkerDocument[]
-  vehicleFolder                  VehicleFolder[]
-  vehicleDocument                VehicleDocument[]
-  environmentalFolder            EnvironmentalFolder[]
-  environmentalDocument          EnvironmentalDocument[]
-  workRequests                   WorkRequest[]
-  workRequestComments            WorkRequestComment[]
+  sessions                        Session[]
+  accounts                        Account[]
+  files                           File[]
+  folders                         Folder[]
+  workTrackers                    WorkTracker[]
+  safetyTalks                     UserSafetyTalk[]
+  company                         Company?                  @relation(fields: [companyId], references: [id])
+  companyId                       String?
+  isSupervisor                    Boolean?
+  workOrders                      WorkOrder[]               @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor          WorkOrder[]               @relation("WorkOrderSupervisor")
+  requestedClosures               WorkOrder[]               @relation("WorkOrderClosureRequester")
+  approvedClosures                WorkOrder[]               @relation("WorkOrderClosureApprover")
+  assignedEntries                 WorkEntry[]               @relation("AssignedUsers")
+  createdEntries                  WorkEntry[]               @relation("WorkEntryCreator")
+  signedEntries                   WorkEntry[]               @relation("WorkEntrySigner")
+  workEntries                     WorkEntry[]               @relation("WorkEntryApproval")
+  workPermitsAsParticipant        WorkPermit[]              @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer  WorkPermit[]              @relation("PreventionOfficer")
+  workPermits                     WorkPermit[]              @relation("WorkPermitUser")
+  attachmentsHistory              AttachmentHistory[]
+  equipmentHistory                EquipmentHistory[]
+  fileHistory                     FileHistory[]
+  twofactors                      TwoFactor[]
+  FileComment                     FileComment[]
+  MaintenancePlan                 MaintenancePlan[]
+  MaintenancePlanTask             MaintenancePlanTask[]
+  approvedMilestones              Milestone[]               @relation("MilestoneApprover")
+  requestedMilestones             Milestone[]               @relation("MilestoneRequestedBy")
+  safetyAndHealthFolders          SafetyAndHealthFolder[]
+  safetyAndHealthDocuments        SafetyAndHealthDocument[] @relation("SafetyAndHealthDocumentUploadedBy")
+  safetyAndHealthDocumentReviewer SafetyAndHealthDocument[] @relation("SafetyAndHealthDocumentReviewer")
+  workerFolder                    WorkerFolder[]            @relation("WorkerFolderWorker")
+  workerFolderReviewer            WorkerFolder[]            @relation("WorkerFolderReviewer")
+  workerDocument                  WorkerDocument[]          @relation("WorkerDocumentUploadedBy")
+  workerDocumentReviewer          WorkerDocument[]          @relation("WorkerDocumentReviewer")
+  vehicleFolder                   VehicleFolder[]
+  vehicleDocument                 VehicleDocument[]         @relation("VehicleDocumentUploadedBy")
+  vehicleDocumentReviewer         VehicleDocument[]         @relation("VehicleDocumentReviewer")
+  environmentalFolder             EnvironmentalFolder[]
+  environmentalDocument           EnvironmentalDocument[]   @relation("EnvironmentalDocumentUploadedBy")
+  environmentalDocumentReviewer   EnvironmentalDocument[]   @relation("EnvironmentalDocumentReviewer")
+  workRequests                    WorkRequest[]
+  workRequestComments             WorkRequestComment[]
 
   @@unique([email])
   @@unique([rut])
@@ -1026,11 +1030,12 @@ model SafetyAndHealthDocument {
   reviewedAt     DateTime?
   submittedAt    DateTime?
   expirationDate DateTime?
-
-  uploadedById String?
-  uploadedBy   User?                 @relation(fields: [uploadedById], references: [id])
-  folderId     String
-  folder       SafetyAndHealthFolder @relation(fields: [folderId], references: [id])
+  reviewerId     String?
+  reviewer       User?                       @relation("SafetyAndHealthDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?                       @relation("SafetyAndHealthDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         SafetyAndHealthFolder       @relation(fields: [folderId], references: [id])
 
   @@map("safety_and_health_document")
 }
@@ -1068,11 +1073,12 @@ model WorkerDocument {
   reviewedAt     DateTime?
   submittedAt    DateTime?
   expirationDate DateTime?
-
-  uploadedById String?
-  uploadedBy   User?        @relation(fields: [uploadedById], references: [id])
-  folder       WorkerFolder @relation(fields: [folderId], references: [id])
-  folderId     String
+  reviewerId     String?
+  reviewer       User?              @relation("WorkerDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?              @relation("WorkerDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folder         WorkerFolder       @relation(fields: [folderId], references: [id])
+  folderId       String
 
   @@map("worker_document")
 }
@@ -1110,11 +1116,12 @@ model VehicleDocument {
   reviewedAt     DateTime?
   submittedAt    DateTime?
   expirationDate DateTime?
-
-  uploadedById String?
-  uploadedBy   User?         @relation(fields: [uploadedById], references: [id])
-  folderId     String
-  folder       VehicleFolder @relation(fields: [folderId], references: [id])
+  reviewerId     String?
+  reviewer       User?               @relation("VehicleDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?               @relation("VehicleDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         VehicleFolder       @relation(fields: [folderId], references: [id])
 
   @@map("vehicle_document")
 }
@@ -1149,11 +1156,12 @@ model EnvironmentalDocument {
   reviewedAt     DateTime?
   submittedAt    DateTime?
   expirationDate DateTime?
-
-  uploadedById String?
-  uploadedBy   User?               @relation(fields: [uploadedById], references: [id])
-  folderId     String
-  folder       EnvironmentalFolder @relation(fields: [folderId], references: [id])
+  reviewerId     String?
+  reviewer       User?                @relation("EnvironmentalDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?                @relation("EnvironmentalDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         EnvironmentalFolder  @relation(fields: [folderId], references: [id])
 
   @@map("environmental_document")
 }
