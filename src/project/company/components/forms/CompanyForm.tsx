@@ -32,7 +32,7 @@ import {
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
 
-import type { User } from "@prisma/client"
+import { StartupFolderType, type User } from "@prisma/client"
 
 export default function CompanyForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -46,6 +46,7 @@ export default function CompanyForm(): React.ReactElement {
 			vehicles: [],
 			supervisors: [],
 			startupFolderName: "",
+			startupFolderType: StartupFolderType.FULL,
 		},
 	})
 
@@ -195,6 +196,17 @@ export default function CompanyForm(): React.ReactElement {
 							label="RUT empresa"
 							control={form.control}
 							placeholder="RUT de la empresa"
+						/>
+
+						<SelectFormField<CompanySchema>
+							name="startupFolderType"
+							control={form.control}
+							label="Tipo de carpeta de arranque"
+							placeholder="Tipo de carpeta de arranque"
+							options={[
+								{ value: StartupFolderType.FULL, label: "Carpeta full" },
+								{ value: StartupFolderType.BASIC, label: "Carpeta básica" },
+							]}
 						/>
 
 						<InputFormField<CompanySchema>

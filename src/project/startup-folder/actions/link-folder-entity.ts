@@ -34,6 +34,11 @@ export async function linkFolderEntity({
 								id: entityId,
 							},
 						},
+						startupFolder: {
+							connect: {
+								id: folder.id,
+							},
+						},
 					},
 				})
 
@@ -41,29 +46,21 @@ export async function linkFolderEntity({
 					throw new Error("Carpeta de usuario no creada")
 				}
 
-				console.log("newWorkerFolder", newWorkerFolder)
-
-				return await prisma.startupFolder.update({
-					where: {
-						id: startupFolderId,
-					},
-					data: {
-						workersFolders: {
-							connect: {
-								id: newWorkerFolder.id,
-							},
-						},
-					},
-					select: {
-						workersFolders: true,
-					},
-				})
+				return {
+					ok: true,
+					message: "Carpeta de colaborador creada y asignada",
+				}
 			case "VEHICLES":
 				const newVehicleFolder = await prisma.vehicleFolder.create({
 					data: {
 						vehicle: {
 							connect: {
 								id: entityId,
+							},
+						},
+						startupFolder: {
+							connect: {
+								id: folder.id,
 							},
 						},
 					},
@@ -73,20 +70,10 @@ export async function linkFolderEntity({
 					throw new Error("Carpeta de vehículo no creada")
 				}
 
-				console.log("newVehicleFolder", newVehicleFolder)
-
-				return await prisma.startupFolder.update({
-					where: {
-						id: startupFolderId,
-					},
-					data: {
-						vehiclesFolders: {
-							connect: {
-								id: newVehicleFolder.id,
-							},
-						},
-					},
-				})
+				return {
+					ok: true,
+					message: "Carpeta del vehiculo creada y asignada",
+				}
 			default:
 				throw new Error(`Cannot link entity for category: ${category}`)
 		}

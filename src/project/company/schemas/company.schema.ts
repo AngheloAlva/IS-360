@@ -2,10 +2,12 @@ import { z } from "zod"
 
 import { VEHICLE_TYPE_ARRAY } from "@/lib/consts/vehicle-type"
 import { rutRegex } from "@/shared/schemas/rutRegex"
+import { StartupFolderType } from "@prisma/client"
 
 export const companySchema = z.object({
 	name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
 	rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
+	startupFolderType: z.nativeEnum(StartupFolderType),
 	startupFolderName: z.string().optional(),
 
 	vehicles: z

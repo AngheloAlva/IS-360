@@ -1,6 +1,5 @@
 "use server"
 
-import { createVehicleStartupFolder } from "@/project/startup-folder/actions/createVehicleStartupFolder"
 import prisma from "@/lib/prisma"
 
 import type { VehicleSchema } from "@/project/vehicle/schemas/vehicle.schema"
@@ -22,15 +21,6 @@ export const createVehicle = async ({ values, companyId }: CreateVehicleProps) =
 				},
 			},
 		})
-
-		const res = await createVehicleStartupFolder(newVehicle.id)
-
-		if (!res.ok) {
-			return {
-				ok: false,
-				message: res.message,
-			}
-		}
 
 		return {
 			ok: true,
