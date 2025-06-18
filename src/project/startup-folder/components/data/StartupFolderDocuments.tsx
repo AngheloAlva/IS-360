@@ -150,25 +150,25 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					<h2 className="text-lg font-bold">{title}</h2>
 				</div>
 
-				{category === DocumentCategory.SAFETY_AND_HEALTH ||
-					(category === DocumentCategory.ENVIRONMENTAL && (
-						<>
-							<Progress
-								value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
-								className="mr-4 ml-auto max-w-24"
-							/>
+				{(category === DocumentCategory.SAFETY_AND_HEALTH ||
+					category === DocumentCategory.ENVIRONMENTAL) && (
+					<>
+						<Progress
+							value={(data?.approvedDocuments ?? 0) / (data?.totalDocuments ?? 0)}
+							className="mr-4 ml-auto max-w-24"
+						/>
 
-							{data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
-								<Button
-									className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
-									onClick={() => setShowSubmitDialog(true)}
-								>
-									<SendIcon className="h-4 w-4" />
-									Enviar a revisión
-								</Button>
-							)}
-						</>
-					))}
+						{data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
+							<Button
+								className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+								onClick={() => setShowSubmitDialog(true)}
+							>
+								<SendIcon className="h-4 w-4" />
+								Enviar a revisión
+							</Button>
+						)}
+					</>
+				)}
 
 				{!isOtcMember && (
 					<div className="flex items-center gap-2">
