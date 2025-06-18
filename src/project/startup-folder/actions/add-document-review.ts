@@ -233,6 +233,11 @@ export const addDocumentReview = async ({
 						reviewNotes: comments,
 						reviewedAt: now,
 						status: newStatus,
+						reviewer: {
+							connect: {
+								id: reviewerId,
+							},
+						},
 					},
 					select: {
 						folder: {

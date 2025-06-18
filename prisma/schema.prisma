@@ -945,6 +945,7 @@ enum VehicleDocumentType {
   TECHNICAL_REVIEW // Revisión técnica
   INSURANCE // Seguro Obligatorio
   CHECKLIST // Lista de chequeo previa al ingreso
+  TRANSPORTATION_TO_OTC // Vehículo de transporte de trabajadores
   HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos peligrosos
   NON_HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos No peligrosos
   LIQUID_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos domésticos líquidos
@@ -967,10 +968,15 @@ enum EnvironmentalDocType {
   GAS_DECLARATION // TC 6, Declaración de instalaciones interiores de gas
   PEST_CONTROL_RESOLUTION // Resolución sanitaria de control de plagas
   PEST_CONTROL_CERTIFICATE // Certificado mensual de desratización, desinsectación y sanitización
+  PEST_CONTROL_PRODUCTS_SDS // HDS productos control de plagas
+  PEST_CONTROL_TRACKING // Planilla control mensual sanitización
   HAZARDOUS_STORAGE_CHECKLIST // Check list de Bodega de almacenamiento
   HAZARDOUS_INVENTORY // Inventario mensual de sustancias peligrosas
+  LAND_MOVEMENT_PERMIT // Permiso municipal para excavaciones o edificaciones preliminares, etc.
+  DEBRIS_ROUTE // Ruta de traslado de escombros y/o tierra de excavación masiva
   FUEL_CONSUMPTION // Planilla de registro de consumo de combustible
   WATER_CONSUMPTION // Planilla de registro mensual de consumo de agua
+  OTHER // Otros documentos
 }
 
 enum DocumentCategory {
