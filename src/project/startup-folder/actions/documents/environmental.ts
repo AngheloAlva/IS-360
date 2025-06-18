@@ -96,14 +96,10 @@ export const updateEnvironmentalDocument = async ({
 		}
 
 		// Verificar que la carpeta esté en estado DRAFT o REJECTED para poder modificar documentos
-		if (
-			existingDocument.folder.status !== "DRAFT" &&
-			existingDocument.folder.status !== "REJECTED"
-		) {
+		if (existingDocument.folder.status === ReviewStatus.APPROVED) {
 			return {
 				ok: false,
-				message:
-					"No puedes modificar documentos en esta carpeta porque está en revisión o ya fue aprobada",
+				message: "No puedes modificar documentos en esta carpeta porque ya fue aprobada",
 			}
 		}
 

@@ -91,6 +91,13 @@ export const addDocumentReview = async ({
 				}
 
 				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
+					prisma.safetyAndHealthFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
 					sendReviewNotificationEmail({
 						folderName: "Seguridad y Salud Ocupacional",
 						companyName: allDocuments?.startupFolder.company.name,
@@ -144,7 +151,7 @@ export const addDocumentReview = async ({
 				})
 
 				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
-					await prisma.environmentalFolder.update({
+					prisma.environmentalFolder.update({
 						where: { startupFolderId },
 						data: {
 							status: ReviewStatus.APPROVED,
@@ -163,6 +170,13 @@ export const addDocumentReview = async ({
 				}
 
 				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
+					prisma.environmentalFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
 					sendReviewNotificationEmail({
 						folderName: "Medio Ambiente",
 						companyName: allDocuments?.startupFolder.company.name,
@@ -241,6 +255,15 @@ export const addDocumentReview = async ({
 				}
 
 				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
+					prisma.workerFolder.update({
+						where: {
+							workerId_startupFolderId: { workerId: document.folder.workerId, startupFolderId },
+						},
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
 					sendReviewNotificationEmail({
 						folderName: "Documentación Personal",
 						companyName: allDocuments?.startupFolder.company.name,
@@ -323,6 +346,15 @@ export const addDocumentReview = async ({
 				}
 
 				if (allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)) {
+					prisma.vehicleFolder.update({
+						where: {
+							vehicleId_startupFolderId: { vehicleId: document.folder.vehicleId, startupFolderId },
+						},
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
 					sendReviewNotificationEmail({
 						folderName: "Vehículos y Equipos",
 						companyName: allDocuments?.startupFolder.company.name,

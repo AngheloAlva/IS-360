@@ -157,14 +157,10 @@ export const updateExpirationDateVehicleDocument = async ({
 			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		if (
-			existingDocument.folder.status !== "DRAFT" &&
-			existingDocument.folder.status !== "REJECTED"
-		) {
+		if (existingDocument.folder.status === ReviewStatus.APPROVED) {
 			return {
 				ok: false,
-				message:
-					"No puedes modificar documentos en esta carpeta porque está en revisión o ya fue aprobada",
+				message: "No puedes modificar documentos en esta carpeta porque ya fue aprobada",
 			}
 		}
 
