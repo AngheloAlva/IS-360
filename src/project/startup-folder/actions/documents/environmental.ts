@@ -252,9 +252,9 @@ export const submitEnvironmentalDocumentForReview = async ({
 				const newStatus =
 					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
 
-				prisma.environmentalDocument.updateMany({
+				await prisma.environmentalDocument.update({
 					where: {
-						folderId: folder.id,
+						id: document.id,
 					},
 					data: {
 						status: newStatus,

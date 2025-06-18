@@ -83,6 +83,7 @@ export function VehicleFolderDocuments({
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
 		category: DocumentCategory.VEHICLES,
+		startupFolderId,
 		vehicleId,
 	})
 	const documentsData = data?.documents ?? []
@@ -142,7 +143,8 @@ export function VehicleFolderDocuments({
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
-					) : documentsData.length > 0 ? (
+					) : (
+						documentsData.length > 0 &&
 						documentsData.map((doc) => (
 							<TableRow key={doc.id}>
 								<TableCell className="font-medium">
@@ -216,12 +218,6 @@ export function VehicleFolderDocuments({
 								</TableCell>
 							</TableRow>
 						))
-					) : (
-						<TableRow>
-							<TableCell colSpan={5} className="h-24 text-center">
-								No hay documentos subidos para este vehículo
-							</TableCell>
-						</TableRow>
 					)}
 
 					{documentsNotUploaded.length > 0 &&

@@ -40,7 +40,6 @@ const submitReviewRequestSchema = z.object({
 type SubmitReviewRequestSchema = z.infer<typeof submitReviewRequestSchema>
 
 // TODO: Error cuando se envía la solicitud sin ningun archivo subido por parte externa
-// TODO: Agregar tooltips
 
 export function SubmitReviewRequestDialog({
 	userId,

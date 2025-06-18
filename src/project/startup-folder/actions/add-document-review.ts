@@ -94,11 +94,13 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Seguridad y Salud Ocupacional",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Seguridad y Salud Ocupacional",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
 
 					return {
 						ok: true,
@@ -121,11 +123,14 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Seguridad y Salud Ocupacional",
-						companyName: allDocuments.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Seguridad y Salud Ocupacional",
+							companyName: allDocuments.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
 					return {
 						ok: true,
 						message: "Revisión procesada exitosamente",
@@ -187,11 +192,14 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Medio Ambiente",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Medio Ambiente",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
 					return {
 						ok: true,
 						message: "Revisión procesada exitosamente",
@@ -213,11 +221,13 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Medio Ambiente",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Medio Ambiente",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
 
 					return {
 						ok: true,
@@ -288,11 +298,13 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Documentación Personal",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Documentación Personal",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
 
 					return {
 						ok: true,
@@ -317,11 +329,13 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Documentación Personal",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Documentación Personal",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
 
 					return {
 						ok: true,
@@ -392,11 +406,13 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Vehículos y Equipos",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Vehículos y Equipos",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
 
 					return {
 						ok: true,
@@ -421,11 +437,13 @@ export const addDocumentReview = async ({
 						},
 					})
 
-					sendReviewNotificationEmail({
-						folderName: "Vehículos y Equipos",
-						companyName: allDocuments?.startupFolder.company.name,
-						emails: allDocuments.additionalNotificationEmails,
-					})
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Vehículos y Equipos",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
 
 					return {
 						ok: true,

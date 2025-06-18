@@ -82,6 +82,7 @@ export function WorkerFolderDocuments({
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
 		category: DocumentCategory.PERSONNEL,
+		startupFolderId,
 		workerId,
 	})
 	const documentsData = data?.documents ?? []

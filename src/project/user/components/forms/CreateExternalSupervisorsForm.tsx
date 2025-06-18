@@ -7,7 +7,6 @@ import { Plus } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { createUserStartupFolder } from "@/project/startup-folder/actions/createWorkerStartupFolder"
 import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { authClient } from "@/lib/auth-client"
@@ -88,8 +87,6 @@ export default function CreateExternalSupervisorsForm({
 						userId: newUser.user.id,
 						role: ["partnerCompany"],
 					})
-
-					await createUserStartupFolder(newUser.user.id)
 
 					sendNewUserEmail({
 						name: supervisor.name,

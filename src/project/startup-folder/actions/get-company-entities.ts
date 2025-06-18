@@ -32,7 +32,7 @@ export async function getCompanyEntities({
 					select: {
 						id: true,
 						name: true,
-						workerFolders: {
+						workersFolders: {
 							where: {
 								worker: {
 									companyId,
@@ -59,17 +59,15 @@ export async function getCompanyEntities({
 
 				const allWorkerFolders = await prisma.workerFolder.findMany({
 					where: {
-						NOT: {
-							startupFolders: {
-								some: {
-									id: startupFolderId,
-								},
-							},
-						},
 						worker: {
+							companyId,
 							isActive: true,
 							accessRole: USER_ROLE.PARTNER_COMPANY,
-							companyId,
+							NOT: {
+								id: {
+									in: vinculatedUsers?.workersFolders.map((wf) => wf.worker.id),
+								},
+							},
 						},
 					},
 					select: {
@@ -94,7 +92,7 @@ export async function getCompanyEntities({
 						name: user.worker.name,
 					})),
 					vinculatedEntities:
-						vinculatedUsers?.workerFolders.map((workerFolder) => ({
+						vinculatedUsers?.workersFolders.map((workerFolder) => ({
 							id: workerFolder.worker.id,
 							name: workerFolder.worker.name,
 						})) ?? [],
@@ -107,7 +105,7 @@ export async function getCompanyEntities({
 					select: {
 						id: true,
 						name: true,
-						vehicleFolders: {
+						vehiclesFolders: {
 							where: {
 								vehicle: {
 									companyId,
@@ -135,16 +133,14 @@ export async function getCompanyEntities({
 
 				const allVehiclesFolders = await prisma.vehicleFolder.findMany({
 					where: {
-						NOT: {
-							startupFolders: {
-								some: {
-									id: startupFolderId,
-								},
-							},
-						},
 						vehicle: {
 							companyId,
 							isActive: true,
+							NOT: {
+								id: {
+									in: vinculatedVehicles?.vehiclesFolders.map((vf) => vf.vehicle.id),
+								},
+							},
 						},
 					},
 					select: {
@@ -176,7 +172,7 @@ export async function getCompanyEntities({
 							vehicleFolder.vehicle.model,
 					})),
 					vinculatedEntities:
-						vinculatedVehicles?.vehicleFolders.map((vehicleFolder) => ({
+						vinculatedVehicles?.vehiclesFolders.map((vehicleFolder) => ({
 							id: vehicleFolder.vehicle.id,
 							name:
 								vehicleFolder.vehicle.plate +

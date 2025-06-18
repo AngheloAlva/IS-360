@@ -16,7 +16,7 @@ export async function getStartupFolderDocuments({
 	workerId,
 	vehicleId,
 }: {
-	startupFolderId?: string
+	startupFolderId: string
 	category: DocumentCategory
 	workerId?: string
 	vehicleId?: string
@@ -28,12 +28,29 @@ export async function getStartupFolderDocuments({
 }> {
 	try {
 		let folderStatus: ReviewStatus = "DRAFT"
+		console.log("workerId", workerId)
+		console.log("vehicleId", vehicleId)
+		console.log("startupFolderId", startupFolderId)
+		console.log("category", category)
 
 		const folder = await (async () => {
 			switch (category) {
 				case "PERSONNEL":
+					if (workerId) {
+						return prisma.workerFolder.findUnique({
+							where: { workerId_startupFolderId: { workerId, startupFolderId } },
+							include: {
+								_count: {
+									select: {
+										documents: true,
+									},
+								},
+							},
+						})
+					}
+
 					return prisma.workerFolder.findFirst({
-						where: workerId ? { workerId } : { startupFolderId },
+						where: { startupFolderId },
 						include: {
 							_count: {
 								select: {
@@ -43,8 +60,21 @@ export async function getStartupFolderDocuments({
 						},
 					})
 				case "VEHICLES":
+					if (vehicleId) {
+						return prisma.vehicleFolder.findUnique({
+							where: { vehicleId_startupFolderId: { vehicleId, startupFolderId } },
+							include: {
+								_count: {
+									select: {
+										documents: true,
+									},
+								},
+							},
+						})
+					}
+
 					return prisma.vehicleFolder.findFirst({
-						where: vehicleId ? { vehicleId } : { startupFolderId },
+						where: { startupFolderId },
 						include: {
 							_count: {
 								select: {
@@ -54,7 +84,7 @@ export async function getStartupFolderDocuments({
 						},
 					})
 				case "SAFETY_AND_HEALTH":
-					return prisma.safetyAndHealthFolder.findFirst({
+					return prisma.safetyAndHealthFolder.findUnique({
 						where: { startupFolderId },
 						include: {
 							_count: {
@@ -65,7 +95,7 @@ export async function getStartupFolderDocuments({
 						},
 					})
 				case "ENVIRONMENTAL":
-					return prisma.environmentalFolder.findFirst({
+					return prisma.environmentalFolder.findUnique({
 						where: { startupFolderId },
 						include: {
 							_count: {

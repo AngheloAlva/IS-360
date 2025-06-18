@@ -15,62 +15,74 @@ export async function linkFolderEntity({
 	category,
 }: LinkFolderEntityParams) {
 	try {
+		const folder = await prisma.startupFolder.findUnique({
+			where: {
+				id: startupFolderId,
+			},
+		})
+
+		if (!folder) {
+			throw new Error("Carpeta de arranque no encontrada")
+		}
+
 		switch (category) {
 			case "PERSONNEL":
-				const folder = await prisma.startupFolder.findUnique({
-					where: {
-						id: startupFolderId,
+				const newWorkerFolder = await prisma.workerFolder.create({
+					data: {
+						worker: {
+							connect: {
+								id: entityId,
+							},
+						},
 					},
 				})
 
-				if (!folder) {
-					throw new Error("Carpeta no encontrada")
+				if (!newWorkerFolder) {
+					throw new Error("Carpeta de usuario no creada")
 				}
 
-				const workerFolder = await prisma.workerFolder.findFirst({
-					where: {
-						workerId: entityId,
-					},
-				})
-
-				if (!workerFolder) {
-					throw new Error("Carpeta de trabajador no encontrada")
-				}
+				console.log("newWorkerFolder", newWorkerFolder)
 
 				return await prisma.startupFolder.update({
 					where: {
 						id: startupFolderId,
 					},
 					data: {
-						workerFolders: {
+						workersFolders: {
 							connect: {
-								id: workerFolder.id,
+								id: newWorkerFolder.id,
 							},
 						},
 					},
 					select: {
-						workerFolders: true,
+						workersFolders: true,
 					},
 				})
 			case "VEHICLES":
-				const vehicleFolder = await prisma.vehicleFolder.findFirst({
-					where: {
-						vehicleId: entityId,
+				const newVehicleFolder = await prisma.vehicleFolder.create({
+					data: {
+						vehicle: {
+							connect: {
+								id: entityId,
+							},
+						},
 					},
 				})
 
-				if (!vehicleFolder) {
-					throw new Error("Carpeta de vehículo no encontrada")
+				if (!newVehicleFolder) {
+					throw new Error("Carpeta de vehículo no creada")
 				}
+
+				console.log("newVehicleFolder", newVehicleFolder)
 
 				return await prisma.startupFolder.update({
 					where: {
 						id: startupFolderId,
 					},
 					data: {
-						vehicleFolders: {
+						vehiclesFolders: {
 							connect: {
-								id: vehicleFolder.id,
+								id: newVehicleFolder.id,
 							},
 						},
 					},

@@ -108,24 +108,7 @@ export default function StartupFolderOverview({
 
 				{startupFolders && startupFolders.length > 0 ? (
 					startupFolders.map((folder) => (
-						<TabsContent
-							value={folder.id}
-							key={folder.id}
-							className="bg-background space-y-4 rounded-lg p-4"
-						>
-							<div className="flex items-center justify-between">
-								<h2 className="flex items-center gap-2 text-lg font-bold">
-									<FolderKanban className="size-5" />
-									{folder.name}
-								</h2>
-
-								<UpdateStartupFolder
-									startupFolderId={folder.id}
-									companyId={companyId}
-									name={folder.name}
-								/>
-							</div>
-
+						<TabsContent value={folder.id} key={folder.id} className="bg-background rounded-lg p-4">
 							<div className="space-y-6">
 								{selectedCategory ? (
 									<StartupFolderDocuments
@@ -137,7 +120,27 @@ export default function StartupFolderOverview({
 										onBack={() => setSelectedCategory(null)}
 									/>
 								) : (
-									<StartupFolderTable subFolders={folder} onCategorySelect={setSelectedCategory} />
+									<div className="space-y-4">
+										<div className="flex items-center justify-between">
+											<h2 className="flex items-center gap-2 text-lg font-bold">
+												<FolderKanban className="size-5" />
+												{folder.name}
+											</h2>
+
+											{isOtcMember && hasPermission && (
+												<UpdateStartupFolder
+													startupFolderId={folder.id}
+													companyId={companyId}
+													name={folder.name}
+												/>
+											)}
+										</div>
+
+										<StartupFolderTable
+											subFolders={folder}
+											onCategorySelect={setSelectedCategory}
+										/>
+									</div>
 								)}
 							</div>
 						</TabsContent>

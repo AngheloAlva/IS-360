@@ -7,7 +7,6 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { useStartupFolderByCompany } from "@/project/startup-folder/hooks/use-startup-folder-by-company"
-import { createUserStartupFolder } from "@/project/startup-folder/actions/createWorkerStartupFolder"
 import { partnerUsersSchema, type PartnerUsersSchema } from "@/project/user/schemas/users.schema"
 import { linkFolderEntity } from "@/project/startup-folder/actions/link-folder-entity"
 import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
@@ -105,9 +104,6 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						role: "partnerCompany",
 					})
 
-					await createUserStartupFolder(newUser.user.id)
-
-					// TODO: NO se asocian las carpetas
 					if (employee.startupFoldersId) {
 						employee.startupFoldersId.forEach(async (folderId) => {
 							await linkFolderEntity({

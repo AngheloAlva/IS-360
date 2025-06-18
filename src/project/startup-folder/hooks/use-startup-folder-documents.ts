@@ -4,7 +4,7 @@ import type { DocumentCategory } from "@prisma/client"
 import { getStartupFolderDocuments } from "../actions/get-startup-folder-documents"
 
 interface UseStartupFolderDocumentsParams {
-	startupFolderId?: string
+	startupFolderId: string
 	category: DocumentCategory
 	workerId?: string
 	vehicleId?: string
