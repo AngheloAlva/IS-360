@@ -6,50 +6,56 @@ import {
 	EyeIcon,
 	PenIcon,
 	SendIcon,
+	InfoIcon,
 	UploadIcon,
 	FolderIcon,
 	ChevronLeft,
 	FileTextIcon,
 	ChevronRightIcon,
-	InfoIcon,
 } from "lucide-react"
-import {
-	type StartupFolderDocument,
-	type SafetyAndHealthStartupFolderDocument,
-	type EnvironmentalStartupFolderDocument,
-} from "../../types"
+
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { getCompanyEntities } from "../../actions/get-company-entities"
+import { queryClient } from "@/lib/queryClient"
+import { cn } from "@/lib/utils"
 import {
+	getDocumentsByCategory,
+	ENVIRONMENTAL_STRUCTURE,
+	SAFETY_AND_HEALTH_STRUCTURE,
+} from "@/lib/consts/startup-folders-structure"
+import {
+	ReviewStatus,
 	DocumentCategory,
 	type WorkerDocumentType,
 	type VehicleDocumentType,
 	type EnvironmentalDocType,
 	type SafetyAndHealthDocumentType,
-	ReviewStatus,
 } from "@prisma/client"
-import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
-import { queryClient } from "@/lib/queryClient"
+
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
+import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
 import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
 import { LinkEntityDialog } from "../dialogs/LinkEntityDialog"
+import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
 import {
 	Table,
-	TableBody,
+	TableRow,
 	TableCell,
+	TableBody,
 	TableHead,
 	TableHeader,
-	TableRow,
 } from "@/shared/components/ui/table"
-import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
-import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
-import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
-import { Progress } from "@/shared/components/ui/progress"
-import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 
+import type {
+	StartupFolderDocument,
+	SafetyAndHealthStartupFolderDocument,
+	EnvironmentalStartupFolderDocument,
+} from "../../types"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -86,6 +92,8 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documentsData = data?.documents ?? []
 
+	const { title, documents } = getDocumentsByCategory(category)
+
 	const fetchEntities = useCallback(async () => {
 		try {
 			if (category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES) {
@@ -107,14 +115,17 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 		fetchEntities()
 	}, [fetchEntities])
 
-	const { title, documents } = getDocumentsByCategory(category)
-
 	const documentsNotUploaded = documents.filter(
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
+	const totalDocumentsToUpload =
+		category === DocumentCategory.SAFETY_AND_HEALTH
+			? SAFETY_AND_HEALTH_STRUCTURE.documents.length
+			: ENVIRONMENTAL_STRUCTURE.documents.length
+
 	const progress =
-		data && documentsData.length > 0 ? (data.approvedDocuments / documentsData.length) * 100 : 0
+		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
 	if (selectedEntity) {
 		if (category === DocumentCategory.PERSONNEL) {
@@ -144,6 +155,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 		}
 	}
 
+	const isVehicleOrWorkerCategory =
+		category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES
+
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
@@ -153,10 +167,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						Volver
 					</Button>
 					<h2 className="text-lg font-bold">{title}</h2>
+
+					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
-				{(category === DocumentCategory.SAFETY_AND_HEALTH ||
-					category === DocumentCategory.ENVIRONMENTAL) && (
+				{!isVehicleOrWorkerCategory && (
 					<>
 						<Progress
 							value={progress}
@@ -176,15 +191,12 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					</>
 				)}
 
-				{!isOtcMember && (
+				{!isOtcMember && isVehicleOrWorkerCategory && (
 					<div className="flex items-center gap-2">
-						{(category === DocumentCategory.PERSONNEL ||
-							category === DocumentCategory.VEHICLES) && (
-							<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
-								<FolderIcon className="h-4 w-4" />
-								Vincular {category === DocumentCategory.PERSONNEL ? "Personal" : "Vehículo"}
-							</Button>
-						)}
+						<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
+							<FolderIcon className="h-4 w-4" />
+							Vincular {category === DocumentCategory.PERSONNEL ? "Personal" : "Vehículo"}
+						</Button>
 					</div>
 				)}
 			</div>
@@ -209,7 +221,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
-					) : category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES ? (
+					) : isVehicleOrWorkerCategory ? (
 						entities?.length > 0 ? (
 							entities?.map((entity) => (
 								<TableRow
@@ -358,8 +370,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					)}
 
 					{documentsNotUploaded.length > 0 &&
-						category !== DocumentCategory.PERSONNEL &&
-						category !== DocumentCategory.VEHICLES &&
+						!isVehicleOrWorkerCategory &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
 								<TableCell className="font-medium">

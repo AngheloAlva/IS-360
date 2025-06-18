@@ -111,6 +111,8 @@ model User {
   environmentalFolder             EnvironmentalFolder[]
   environmentalDocument           EnvironmentalDocument[]   @relation("EnvironmentalDocumentUploadedBy")
   environmentalDocumentReviewer   EnvironmentalDocument[]   @relation("EnvironmentalDocumentReviewer")
+  basicDocument                   BasicDocument[]           @relation("BasicDocumentUploadedBy")
+  basicDocumentReviewer           BasicDocument[]           @relation("BasicDocumentReviewer")
   workRequests                    WorkRequest[]
   workRequestComments             WorkRequestComment[]
 
@@ -980,6 +982,13 @@ enum EnvironmentalDocType {
   OTHER // Otros documentos
 }
 
+enum BasicDocumentType {
+  CONTRACT // Contrato de trabajo o de prestación de servicios.
+  INSURANCE // Certificado de cobertura del seguro contra accidentes laborales.
+  PPE_RECEIPT // Registro firmado de entrega de elementos de protección personal
+  SAFETY_AND_HEALTH_INFO // Inducción sobre Información de riesgos laborales (DS44), la cual debe incluir Los riesgos a los que se podría estar expuesto en OTC y las respectivas medidas de control.
+}
+
 enum DocumentCategory {
   VEHICLES
   PERSONNEL
@@ -987,11 +996,17 @@ enum DocumentCategory {
   SAFETY_AND_HEALTH
 }
 
+enum StartupFolderType {
+  BASIC
+  FULL
+}
+
 model StartupFolder {
-  id        String   @id @default(uuid())
-  name      String   @default("Carpeta de arranque")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String            @id @default(uuid())
+  name      String            @default("Carpeta de arranque")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  type      StartupFolderType @default(FULL)
 
   workersFolders         WorkerFolder[]
   vehiclesFolders        VehicleFolder[]
@@ -1003,8 +1018,47 @@ model StartupFolder {
   workOrderId            String?                 @unique
   workerFolders          WorkerFolder[]          @relation("WorkerFolderStartupFolder")
   vehicleFolders         VehicleFolder[]         @relation("VehicleFolderStartupFolder")
+  basicFolderId          String?
+  basicFolder            BasicFolder?
 
   @@map("startup_folder")
+}
+
+model BasicFolder {
+  id                           String       @id @default(uuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  startupFolderId String          @unique
+  startupFolder   StartupFolder   @relation(fields: [startupFolderId], references: [id])
+  documents       BasicDocument[]
+
+  @@map("basic_folder")
+}
+
+model BasicDocument {
+  id             String            @id @default(uuid())
+  type           BasicDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime          @default(now())
+  category       DocumentCategory
+  status         ReviewStatus      @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?             @relation("BasicDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?             @relation("BasicDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         BasicFolder       @relation(fields: [folderId], references: [id])
+
+  @@map("basic_document")
 }
 
 model SafetyAndHealthFolder {
@@ -1059,8 +1113,8 @@ model WorkerFolder {
   reviewer        User?            @relation("WorkerFolderReviewer", fields: [reviewerId], references: [id])
   workerId        String
   worker          User             @relation("WorkerFolderWorker", fields: [workerId], references: [id])
-  startupFolderId String?
-  startupFolder   StartupFolder?   @relation(fields: [startupFolderId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
   documents       WorkerDocument[]
   startupFolders  StartupFolder[]  @relation("WorkerFolderStartupFolder")
 
@@ -1099,11 +1153,11 @@ model VehicleFolder {
   updatedAt                    DateTime     @updatedAt
 
   vehicleId       String
-  startupFolderId String?
+  startupFolderId String
   reviewerId      String?
   reviewer        User?             @relation(fields: [reviewerId], references: [id])
   vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
-  startupFolder   StartupFolder?    @relation(fields: [startupFolderId], references: [id])
+  startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
   documents       VehicleDocument[]
   startupFolders  StartupFolder[]   @relation("VehicleFolderStartupFolder")
 

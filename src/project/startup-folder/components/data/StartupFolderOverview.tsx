@@ -9,13 +9,13 @@ import { DocumentCategory } from "@prisma/client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
+import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import { CreateStartupFolder } from "../forms/CreateStartupFolder"
 import { StartupFolderDocuments } from "./StartupFolderDocuments"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
-import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 
 interface StartupFolderOverviewProps {
 	userId: string

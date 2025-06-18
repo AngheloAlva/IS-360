@@ -40,6 +40,7 @@ import type {
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
+import { SAFETY_AND_HEALTH_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
@@ -91,8 +92,9 @@ export function WorkerFolderDocuments({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
+	const totalDocumentsToUpload = SAFETY_AND_HEALTH_STRUCTURE.documents.length
 	const progress =
-		data && documentsData.length > 0 ? (data.approvedDocuments / documentsData.length) * 100 : 0
+		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
 	return (
 		<div className="space-y-4">
@@ -103,6 +105,8 @@ export function WorkerFolderDocuments({
 						Volver
 					</Button>
 					<h2 className="text-lg font-bold">Documentación de personal</h2>
+
+					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
 				<Progress

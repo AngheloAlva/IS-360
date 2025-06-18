@@ -28,10 +28,6 @@ export async function getStartupFolderDocuments({
 }> {
 	try {
 		let folderStatus: ReviewStatus = "DRAFT"
-		console.log("workerId", workerId)
-		console.log("vehicleId", vehicleId)
-		console.log("startupFolderId", startupFolderId)
-		console.log("category", category)
 
 		const folder = await (async () => {
 			switch (category) {

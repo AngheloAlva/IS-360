@@ -50,22 +50,42 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				category: DocumentCategory.VEHICLES,
 				description:
 					"Documentación requerida para vehículos y equipos utilizados en trabajos de OTC.",
-				documentsCount: subFolders.vehiclesFolders[0]?.totalDocuments ?? 0,
-				completedCount: subFolders.vehiclesFolders[0]?.approvedDocuments ?? 0,
-				rejectedCount: subFolders.vehiclesFolders[0]?.rejectedDocuments ?? 0,
-				pendingCount: subFolders.vehiclesFolders[0]?.submittedDocuments ?? 0,
-				draftCount: subFolders.vehiclesFolders[0]?.draftDocuments ?? 0,
+				documentsCount: subFolders.vehiclesFolders
+					.map((vf) => vf.totalDocuments)
+					.reduce((a, b) => a + b, 0),
+				completedCount: subFolders.vehiclesFolders
+					.map((vf) => vf.approvedDocuments)
+					.reduce((a, b) => a + b, 0),
+				rejectedCount: subFolders.vehiclesFolders
+					.map((vf) => vf.rejectedDocuments)
+					.reduce((a, b) => a + b, 0),
+				pendingCount: subFolders.vehiclesFolders
+					.map((vf) => vf.submittedDocuments)
+					.reduce((a, b) => a + b, 0),
+				draftCount: subFolders.vehiclesFolders
+					.map((vf) => vf.draftDocuments)
+					.reduce((a, b) => a + b, 0),
 			},
 			{
 				title: "Documentación Personal",
 				category: DocumentCategory.PERSONNEL,
 				description:
 					"Documentación de trabajadores, incluyendo capacitaciones, certificados y autorizaciones.",
-				documentsCount: subFolders.workersFolders[0]?.totalDocuments ?? 0,
-				completedCount: subFolders.workersFolders[0]?.approvedDocuments ?? 0,
-				rejectedCount: subFolders.workersFolders[0]?.rejectedDocuments ?? 0,
-				pendingCount: subFolders.workersFolders[0]?.submittedDocuments ?? 0,
-				draftCount: subFolders.workersFolders[0]?.draftDocuments ?? 0,
+				documentsCount: subFolders.workersFolders
+					.map((wf) => wf.totalDocuments)
+					.reduce((a, b) => a + b, 0),
+				completedCount: subFolders.workersFolders
+					.map((wf) => wf.approvedDocuments)
+					.reduce((a, b) => a + b, 0),
+				rejectedCount: subFolders.workersFolders
+					.map((wf) => wf.rejectedDocuments)
+					.reduce((a, b) => a + b, 0),
+				pendingCount: subFolders.workersFolders
+					.map((wf) => wf.submittedDocuments)
+					.reduce((a, b) => a + b, 0),
+				draftCount: subFolders.workersFolders
+					.map((wf) => wf.draftDocuments)
+					.reduce((a, b) => a + b, 0),
 			},
 		],
 		[subFolders]

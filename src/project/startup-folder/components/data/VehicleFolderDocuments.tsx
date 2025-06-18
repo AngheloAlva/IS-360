@@ -41,6 +41,7 @@ import {
 } from "@/shared/components/ui/table"
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
+import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 
 interface VehicleFolderDocumentsProps {
 	userId: string
@@ -92,8 +93,9 @@ export function VehicleFolderDocuments({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
+	const totalDocumentsToUpload = VEHICLE_STRUCTURE.documents.length
 	const progress =
-		data && documentsData.length > 0 ? (data.approvedDocuments / documentsData.length) * 100 : 0
+		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
 	return (
 		<div className="space-y-4">
@@ -104,6 +106,8 @@ export function VehicleFolderDocuments({
 						Volver
 					</Button>
 					<h2 className="text-lg font-bold">Documentación de vehículos y equipos</h2>
+
+					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
 				<Progress
