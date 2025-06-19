@@ -35,6 +35,7 @@ import type {
 	DocumentCategory,
 	EnvironmentalDocument,
 	SafetyAndHealthDocument,
+	BasicDocument,
 } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
@@ -45,7 +46,12 @@ interface DocumentReviewFormProps {
 	refetch: () => void
 	startupFolderId: string
 	category: DocumentCategory
-	document: SafetyAndHealthDocument | EnvironmentalDocument | WorkerDocument | VehicleDocument
+	document:
+		| SafetyAndHealthDocument
+		| EnvironmentalDocument
+		| WorkerDocument
+		| VehicleDocument
+		| BasicDocument
 }
 
 export function DocumentReviewForm({
