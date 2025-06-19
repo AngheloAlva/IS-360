@@ -234,11 +234,6 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 				"Planilla de registro mensual de consumo de agua para humidificación de áridos, materiales inertes, entre otros.",
 		},
 		{
-			type: EnvironmentalDocType.WATER_CONSUMPTION,
-			name: "Consumo mensual de agua potable",
-			description: "Planilla mensual de consumo de agua potable.",
-		},
-		{
 			type: EnvironmentalDocType.OTHER,
 			name: "Otros documenots",
 			description:
