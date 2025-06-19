@@ -77,7 +77,7 @@ export function StartupFolderTable({
 							title: "Documentación Personal",
 							category: DocumentCategory.PERSONNEL,
 							description:
-								"Documentación de trabajadores, incluyendo capacitaciones, certificados y autorizaciones.",
+								"Documentación de trabajadores, incluyendo capacitaciones, certificados y más.",
 							documentsCount: subFolders.workersFolders
 								.map((wf) => wf.totalDocuments)
 								.reduce((a, b) => a + b, 0),
@@ -99,8 +99,7 @@ export function StartupFolderTable({
 						{
 							title: "Documentacion Basica",
 							category: DocumentCategory.BASIC,
-							description:
-								"Documentación de trabajadores, incluyendo capacitaciones, certificados y autorizaciones.",
+							description: "Documentación básica de la empresa.",
 							documentsCount: subFolders.basicFolder.totalDocuments,
 							completedCount: subFolders.basicFolder.approvedDocuments,
 							rejectedCount: subFolders.basicFolder.rejectedDocuments,
@@ -117,11 +116,11 @@ export function StartupFolderTable({
 				<TableRow>
 					<TableHead>Categoría</TableHead>
 					<TableHead>Descripción</TableHead>
-					<TableHead className="text-right">En borrador</TableHead>
-					<TableHead className="text-right">Completados</TableHead>
-					<TableHead className="text-right">Rechazados</TableHead>
-					<TableHead className="text-right">En revisión</TableHead>
-					<TableHead className="text-right">Total</TableHead>
+					<TableHead>En borrador</TableHead>
+					<TableHead>Completados</TableHead>
+					<TableHead>Rechazados</TableHead>
+					<TableHead>En revisión</TableHead>
+					<TableHead>Total docs.</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>

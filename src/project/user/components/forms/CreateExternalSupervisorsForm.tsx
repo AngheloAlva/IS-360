@@ -143,7 +143,7 @@ export default function CreateExternalSupervisorsForm({
 									href={`/admin/dashboard/empresas/${companyId}`}
 									className="bg-white/20 text-white hover:bg-white/50 hover:text-white"
 								/>
-								<h1 className="w-fit text-2xl font-bold">Nuevos Supervisores</h1>
+								<h1 className="w-fit text-2xl font-bold text-white">Nuevos Supervisores</h1>
 							</div>
 
 							<Button

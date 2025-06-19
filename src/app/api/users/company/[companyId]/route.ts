@@ -42,6 +42,7 @@ export async function GET(
 					email: true,
 					image: true,
 					companyId: true,
+					isSupervisor: true,
 					internalRole: true,
 					internalArea: true,
 				},

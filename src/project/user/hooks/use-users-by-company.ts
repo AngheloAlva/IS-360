@@ -13,6 +13,7 @@ export interface UsersByCompany {
 	internalRole: string
 	internalArea: string
 	image: string | null
+	isSupervisor: boolean
 }
 
 interface UsersResponse {

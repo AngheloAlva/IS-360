@@ -18,7 +18,6 @@ import { VehicleTypeOptions } from "@/lib/consts/vehicle-types"
 import { vehicleColumns } from "../../columns/vehicle-columns"
 import { queryClient } from "@/lib/queryClient"
 
-import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
@@ -101,144 +100,129 @@ export function VehiclesByCompanyTable({ companyId }: { companyId: string }) {
 	}
 
 	return (
-		<>
-			<div className="rounded-lg bg-gradient-to-r from-teal-600 to-emerald-700 p-6 shadow-lg">
-				<div className="flex items-center justify-between">
-					<div className="text-white">
-						<h1 className="text-3xl font-bold tracking-tight">Vehículos y Equipos</h1>
-						<p className="opacity-90">
-							Visualiza y gestiona todos los vehículos y equipos de tu empresa
-						</p>
-					</div>
-
-					<VehicleForm companyId={companyId} />
-				</div>
-			</div>
-
-			<Card>
-				<CardContent className="flex w-full flex-col items-start gap-4">
-					<div className="flex w-full items-center gap-2 sm:flex-row">
-						<Input
-							placeholder="Buscar vehículo..."
-							value={search}
-							onChange={(event) => setSearch(event.target.value)}
-							className="bg-background h-8 w-full sm:w-[300px]"
-						/>
-
-						<Select
-							onValueChange={(value) => {
-								if (value === "all") {
-									setTypeFilter(undefined)
-								} else {
-									setTypeFilter(value as VEHICLE_TYPE)
-								}
-							}}
-							value={typeFilter ?? "all"}
-						>
-							<SelectTrigger className="border-input bg-background ml-auto w-full border sm:w-fit">
-								<SelectValue placeholder="Tipo" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectGroup>
-									<SelectLabel>Tipo de vehículo</SelectLabel>
-									<SelectSeparator />
-									<SelectItem value="all">Todos los tipos</SelectItem>
-									{VehicleTypeOptions.map((type) => (
-										<SelectItem key={type.value} value={type.value}>
-											{type.label}
-										</SelectItem>
-									))}
-								</SelectGroup>
-							</SelectContent>
-						</Select>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button className="text-text border-input hover:bg-input bg-background border">
-									Columnas <ChevronDown />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								{table
-									.getAllColumns()
-									.filter((column) => column.getCanHide())
-									.map((column) => {
-										return (
-											<DropdownMenuCheckboxItem
-												key={column.id}
-												className="capitalize"
-												checked={column.getIsVisible()}
-												onCheckedChange={(value) => column.toggleVisibility(!!value)}
-											>
-												{(column.columnDef.header as string) || column.id}
-											</DropdownMenuCheckboxItem>
-										)
-									})}
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						<RefreshButton refetch={refetch} isFetching={isFetching} />
-					</div>
-
-					<Table>
-						<TableHeader>
-							{table.getHeaderGroups().map((headerGroup) => (
-								<TableRow key={headerGroup.id}>
-									{headerGroup.headers.map((header) => {
-										return (
-											<TableHead key={header.id}>
-												{header.isPlaceholder
-													? null
-													: flexRender(header.column.columnDef.header, header.getContext())}
-											</TableHead>
-										)
-									})}
-								</TableRow>
-							))}
-						</TableHeader>
-
-						<TableBody>
-							{isLoading || isFetching
-								? Array.from({ length: 10 }).map((_, index) => (
-										<TableRow key={index}>
-											<TableCell className="" colSpan={17}>
-												<Skeleton className="h-10 min-w-full" />
-											</TableCell>
-										</TableRow>
-									))
-								: table.getRowModel().rows.map((row) => (
-										<TableRow
-											key={row.id}
-											data-state={row.getIsSelected() && "selected"}
-											onMouseEnter={() => prefetchVehicleById(row.original.id)}
-										>
-											{row.getVisibleCells().map((cell) => (
-												<TableCell key={cell.id} className="font-medium">
-													{flexRender(cell.column.columnDef.cell, cell.getContext())}
-												</TableCell>
-											))}
-										</TableRow>
-									))}
-
-							{table.getRowModel().rows.length === 0 && (
-								<TableRow>
-									<TableCell colSpan={17} className="h-24 text-center">
-										No hay vehículos
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-
-					<TablePagination
-						table={table}
-						isLoading={isLoading}
-						onPageChange={setPage}
-						pageCount={data?.pages ?? 0}
-						className="border-teal-600 text-teal-600"
+		<Card>
+			<CardContent className="flex w-full flex-col items-start gap-4">
+				<div className="flex w-full items-center gap-2 sm:flex-row">
+					<Input
+						placeholder="Buscar vehículo..."
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						className="bg-background h-8 w-full sm:w-[300px]"
 					/>
-				</CardContent>
-			</Card>
-		</>
+
+					<Select
+						onValueChange={(value) => {
+							if (value === "all") {
+								setTypeFilter(undefined)
+							} else {
+								setTypeFilter(value as VEHICLE_TYPE)
+							}
+						}}
+						value={typeFilter ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background ml-auto w-full border sm:w-fit">
+							<SelectValue placeholder="Tipo" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Tipo de vehículo</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todos los tipos</SelectItem>
+								{VehicleTypeOptions.map((type) => (
+									<SelectItem key={type.value} value={type.value}>
+										{type.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button className="text-text border-input hover:bg-input bg-background border">
+								Columnas <ChevronDown />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{table
+								.getAllColumns()
+								.filter((column) => column.getCanHide())
+								.map((column) => {
+									return (
+										<DropdownMenuCheckboxItem
+											key={column.id}
+											className="capitalize"
+											checked={column.getIsVisible()}
+											onCheckedChange={(value) => column.toggleVisibility(!!value)}
+										>
+											{(column.columnDef.header as string) || column.id}
+										</DropdownMenuCheckboxItem>
+									)
+								})}
+						</DropdownMenuContent>
+					</DropdownMenu>
+
+					<RefreshButton refetch={refetch} isFetching={isFetching} />
+				</div>
+
+				<Table>
+					<TableHeader>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => {
+									return (
+										<TableHead key={header.id}>
+											{header.isPlaceholder
+												? null
+												: flexRender(header.column.columnDef.header, header.getContext())}
+										</TableHead>
+									)
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+
+					<TableBody>
+						{isLoading || isFetching
+							? Array.from({ length: 10 }).map((_, index) => (
+									<TableRow key={index}>
+										<TableCell className="" colSpan={17}>
+											<Skeleton className="h-10 min-w-full" />
+										</TableCell>
+									</TableRow>
+								))
+							: table.getRowModel().rows.map((row) => (
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && "selected"}
+										onMouseEnter={() => prefetchVehicleById(row.original.id)}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell key={cell.id} className="font-medium">
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								))}
+
+						{table.getRowModel().rows.length === 0 && (
+							<TableRow>
+								<TableCell colSpan={17} className="h-24 text-center">
+									No hay vehículos
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					onPageChange={setPage}
+					pageCount={data?.pages ?? 0}
+					className="border-teal-600 text-teal-600"
+				/>
+			</CardContent>
+		</Card>
 	)
 }

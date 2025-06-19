@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth"
 import { VehiclesByCompanyTable } from "@/project/vehicle/components/data/VehiclesByCompanyTable"
 import { UsersByCompanyTable } from "@/project/user/components/data/UsersByCompanyTable"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
 import BackButton from "@/shared/components/BackButton"
 import { Button } from "@/shared/components/ui/button"
 
@@ -53,14 +54,18 @@ export default async function CompanyByIdAdminPage({
 						</div>
 
 						{hasPermission.success && (
-							<Link
-								href={`/admin/dashboard/empresas/${companyId}/supervisores/agregar`}
-								className="ml-auto"
-							>
-								<Button className="cursor-pointer bg-white font-semibold tracking-wider text-blue-600 transition-all hover:scale-105 hover:bg-white hover:text-blue-700">
-									<PlusCircleIcon className="mr-2 h-4 w-4" /> Supervisor(es)
-								</Button>
-							</Link>
+							<div className="flex items-center gap-2">
+								<Link
+									href={`/admin/dashboard/empresas/${companyId}/supervisores/agregar`}
+									className="ml-auto"
+								>
+									<Button className="cursor-pointer bg-white font-semibold tracking-wider text-blue-600 transition-all hover:scale-105 hover:bg-white hover:text-blue-700">
+										<PlusCircleIcon className="mr-2 h-4 w-4" /> Supervisor(es)
+									</Button>
+								</Link>
+
+								<VehicleForm companyId={companyId} />
+							</div>
 						)}
 					</div>
 				</div>

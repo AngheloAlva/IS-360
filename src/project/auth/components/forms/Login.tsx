@@ -80,7 +80,11 @@ export default function Login(): React.ReactElement {
 							placeholder="Contraseña"
 						/>
 
-						<SubmitButton label="Iniciar sesión" isSubmitting={loading} />
+						<SubmitButton
+							label="Iniciar sesión"
+							isSubmitting={loading}
+							className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
+						/>
 					</form>
 				</Form>
 			</CardContent>

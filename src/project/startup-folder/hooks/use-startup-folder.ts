@@ -33,6 +33,7 @@ export interface StartupFolder extends StartupFolderModel {
 		rejectedDocuments: number
 		submittedDocuments: number
 		draftDocuments: number
+		isCompleted: boolean
 	}
 	safetyAndHealthFolders: {
 		totalDocuments: number
@@ -40,6 +41,7 @@ export interface StartupFolder extends StartupFolderModel {
 		rejectedDocuments: number
 		submittedDocuments: number
 		draftDocuments: number
+		isCompleted: boolean
 	}[]
 	environmentalFolders: {
 		totalDocuments: number
@@ -47,6 +49,7 @@ export interface StartupFolder extends StartupFolderModel {
 		rejectedDocuments: number
 		submittedDocuments: number
 		draftDocuments: number
+		isCompleted: boolean
 	}[]
 	workersFolders: {
 		totalDocuments: number
@@ -54,6 +57,7 @@ export interface StartupFolder extends StartupFolderModel {
 		rejectedDocuments: number
 		submittedDocuments: number
 		draftDocuments: number
+		isCompleted: boolean
 	}[]
 	vehiclesFolders: {
 		totalDocuments: number
@@ -61,6 +65,7 @@ export interface StartupFolder extends StartupFolderModel {
 		rejectedDocuments: number
 		submittedDocuments: number
 		draftDocuments: number
+		isCompleted: boolean
 	}[]
 }
 

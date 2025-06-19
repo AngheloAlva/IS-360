@@ -1,5 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
+import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
+import {
+	ENVIRONMENTAL_STRUCTURE,
+	SAFETY_AND_HEALTH_STRUCTURE,
+	VEHICLE_STRUCTURE,
+	WORKER_STRUCTURE,
+} from "@/lib/consts/startup-folders-structure"
 
 export async function GET(req: NextRequest) {
 	try {
@@ -95,7 +102,7 @@ export async function GET(req: NextRequest) {
 			...folder,
 			basicFolder: {
 				...folder.basicFolder,
-				totalDocuments: folder.basicFolder?.documents?.length,
+				totalDocuments: BASIC_FOLDER_STRUCTURE.documents.length,
 				approvedDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "APPROVED")
 					.length,
 				rejectedDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "REJECTED")
@@ -105,42 +112,57 @@ export async function GET(req: NextRequest) {
 				).length,
 				draftDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "DRAFT")
 					.length,
+				isCompleted:
+					folder.basicFolder?.documents.length === BASIC_FOLDER_STRUCTURE.documents.length &&
+					folder.basicFolder?.documents?.every((doc) => doc.status === "APPROVED"),
 			},
 			safetyAndHealthFolders: folder.safetyAndHealthFolders.map((shf) => ({
 				...shf,
-				totalDocuments: shf.documents.length,
+				totalDocuments: SAFETY_AND_HEALTH_STRUCTURE.documents.length,
 				approvedDocuments: shf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: shf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: shf.documents.filter((doc) => doc.status === "SUBMITTED").length,
 				draftDocuments: shf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
+				isCompleted:
+					shf.documents.length === SAFETY_AND_HEALTH_STRUCTURE.documents.length &&
+					shf.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
 			environmentalFolders: folder.environmentalFolders.map((ef) => ({
 				...ef,
-				totalDocuments: ef.documents.length,
+				totalDocuments: ENVIRONMENTAL_STRUCTURE.documents.length,
 				approvedDocuments: ef.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: ef.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: ef.documents.filter((doc) => doc.status === "SUBMITTED").length,
 				draftDocuments: ef.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
+				isCompleted:
+					ef.documents.length === ENVIRONMENTAL_STRUCTURE.documents.length &&
+					ef.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
 			workersFolders: folder.workersFolders.map((wf) => ({
 				...wf,
-				totalDocuments: wf.documents.length,
+				totalDocuments: WORKER_STRUCTURE.documents.length,
 				approvedDocuments: wf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: wf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: wf.documents.filter((doc) => doc.status === "SUBMITTED").length,
 				draftDocuments: wf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
+				isCompleted:
+					wf.documents.length === WORKER_STRUCTURE.documents.length &&
+					wf.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
 			vehiclesFolders: folder.vehiclesFolders.map((vf) => ({
 				...vf,
-				totalDocuments: vf.documents.length,
+				totalDocuments: VEHICLE_STRUCTURE.documents.length,
 				approvedDocuments: vf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: vf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: vf.documents.filter((doc) => doc.status === "SUBMITTED").length,
 				draftDocuments: vf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
+				isCompleted:
+					vf.documents.length === VEHICLE_STRUCTURE.documents.length &&
+					vf.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
 		}))
 

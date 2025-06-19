@@ -58,6 +58,15 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 		header: "Area",
 	},
 	{
+		accessorKey: "isSupervisor",
+		header: "Supervisor",
+		cell: ({ row }) => {
+			const isSupervisor = row.getValue("isSupervisor") as boolean
+
+			return isSupervisor ? "Sí" : "No"
+		},
+	},
+	{
 		id: "actions",
 		header: "Acciones",
 		cell: ({ row }) => {

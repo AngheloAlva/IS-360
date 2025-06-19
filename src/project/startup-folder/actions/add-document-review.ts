@@ -84,10 +84,7 @@ export const addDocumentReview = async ({
 
 				totalDocuments = SAFETY_AND_HEALTH_STRUCTURE.documents.length
 
-				if (
-					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
-				) {
+				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
 					prisma.safetyAndHealthFolder.update({
 						where: { startupFolderId },
 						data: {
@@ -182,10 +179,7 @@ export const addDocumentReview = async ({
 
 				totalDocuments = ENVIRONMENTAL_STRUCTURE.documents.length
 
-				if (
-					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
-				) {
+				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
 					prisma.environmentalFolder.update({
 						where: { startupFolderId },
 						data: {
@@ -286,10 +280,7 @@ export const addDocumentReview = async ({
 
 				totalDocuments = WORKER_STRUCTURE.documents.length
 
-				if (
-					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
-				) {
+				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
 					await prisma.workerFolder.update({
 						where: {
 							id: allDocuments.id,
@@ -394,10 +385,7 @@ export const addDocumentReview = async ({
 
 				totalDocuments = VEHICLE_STRUCTURE.documents.length
 
-				if (
-					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
-				) {
+				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
 					await prisma.vehicleFolder.update({
 						where: {
 							id: allDocuments.id,
@@ -497,10 +485,7 @@ export const addDocumentReview = async ({
 
 				totalDocuments = BASIC_FOLDER_STRUCTURE.documents.length
 
-				if (
-					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
-				) {
+				if (allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED)) {
 					prisma.basicFolder.update({
 						where: { startupFolderId },
 						data: {

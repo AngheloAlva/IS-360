@@ -6,13 +6,15 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { createStartupFolderWithAll } from "@/project/startup-folder/actions/createStartupFolderWithAll"
+import { createStartupFolder } from "../../actions/createStartupFolder"
+import { StartupFolderType } from "@prisma/client"
 import { queryClient } from "@/lib/queryClient"
 import {
 	newStartupFolderSchema,
 	type NewStartupFolderSchema,
 } from "@/project/startup-folder/schemas/new-startup-folder.schema"
 
+import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { Button } from "@/shared/components/ui/button"
 import { Form } from "@/shared/components/ui/form"
@@ -40,6 +42,7 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 		resolver: zodResolver(newStartupFolderSchema),
 		defaultValues: {
 			name: "",
+			type: StartupFolderType.FULL,
 		},
 	})
 
@@ -47,9 +50,10 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 		try {
 			setIsSubmitting(true)
 
-			await createStartupFolderWithAll({
+			await createStartupFolder({
 				companyId,
 				name: data.name,
+				type: data.type,
 			})
 
 			queryClient.invalidateQueries({
@@ -91,9 +95,18 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 						<InputFormField<NewStartupFolderSchema>
 							name="name"
 							label="Nombre"
-							itemClassName="mb-2"
 							control={form.control}
 							placeholder="Nombre de la carpeta"
+						/>
+
+						<SelectFormField<NewStartupFolderSchema>
+							name="type"
+							label="Tipo de carpeta"
+							control={form.control}
+							options={[
+								{ value: StartupFolderType.FULL, label: "Carpeta de arranque" },
+								{ value: StartupFolderType.BASIC, label: "Documentos basicos" },
+							]}
 						/>
 
 						<DialogFooter className="mt-4 gap-2">
