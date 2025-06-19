@@ -47,6 +47,7 @@ import type {
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
+	BasicDocumentType,
 } from "@prisma/client"
 
 interface UploadDocumentsDialogProps {
@@ -65,6 +66,7 @@ interface UploadDocumentsDialogProps {
 			| VehicleDocumentType
 			| EnvironmentalDocType
 			| SafetyAndHealthDocumentType
+			| BasicDocumentType
 		name: string
 	} | null
 }
@@ -187,38 +189,40 @@ export function UploadDocumentsDialog({
 				switch (category) {
 					case "PERSONNEL": {
 						if (!workerId) throw new Error("Worker ID is required for personnel documents")
-						await createWorkerDocument({
-							workerId,
-							documentType: docType,
-							documentName: docName,
-							expirationDate: docExpiration,
-							url: uploadResult.url,
+						const {} = await createWorkerDocument({
 							userId,
+							workerId,
+							startupFolderId,
+							documentName: docName,
+							documentType: docType,
+							url: uploadResult.url,
+							expirationDate: docExpiration,
 						})
 						break
 					}
 					case "VEHICLES": {
 						if (!vehicleId) throw new Error("Vehicle ID is required for vehicle documents")
 						await createVehicleDocument({
-							vehicleId,
-							documentType: docType,
-							documentName: docName,
-							expirationDate: docExpiration,
-							url: uploadResult.url,
 							userId,
+							vehicleId,
+							startupFolderId,
+							documentName: docName,
+							documentType: docType,
+							url: uploadResult.url,
+							expirationDate: docExpiration,
 						})
 						break
 					}
 					default: {
 						if (!startupFolderId) throw new Error("Startup folder ID is required")
 						await createStartupFolderDocument({
+							userId,
+							category,
 							startupFolderId,
+							url: uploadResult.url,
 							documentType: docType,
 							documentName: docName,
-							category,
 							expirationDate: docExpiration,
-							url: uploadResult.url,
-							userId,
 						})
 					}
 				}

@@ -5,6 +5,7 @@ import {
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
+import { BASIC_FOLDER_STRUCTURE } from "./basic-startup-folders-structure"
 
 export interface StartupFolderStructure {
 	title: string
@@ -439,6 +440,12 @@ export const getDocumentsByCategory = (category: DocumentCategory) => {
 				title: WORKER_STRUCTURE.title,
 				documents: WORKER_STRUCTURE.documents,
 				category: DocumentCategory.PERSONNEL,
+			}
+		case DocumentCategory.BASIC:
+			return {
+				title: BASIC_FOLDER_STRUCTURE.title,
+				documents: BASIC_FOLDER_STRUCTURE.documents,
+				category: DocumentCategory.BASIC,
 			}
 		default:
 			return {

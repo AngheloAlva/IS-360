@@ -6,6 +6,7 @@ import type {
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
+	BasicDocumentType,
 } from "@prisma/client"
 
 export type ManagedFile = File & {
@@ -28,6 +29,7 @@ export function useFileManager(
 			| VehicleDocumentType
 			| EnvironmentalDocType
 			| SafetyAndHealthDocumentType
+			| BasicDocumentType
 		name: string
 	} | null,
 	onFilesChange?: (files: ManagedFile | null) => void

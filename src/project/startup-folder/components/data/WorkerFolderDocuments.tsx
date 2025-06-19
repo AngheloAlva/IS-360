@@ -39,6 +39,7 @@ import type {
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
+	BasicDocumentType,
 } from "@prisma/client"
 import { SAFETY_AND_HEALTH_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 
@@ -57,6 +58,7 @@ interface WorkerFolderDocumentsProps {
 			| VehicleDocumentType
 			| WorkerDocumentType
 			| EnvironmentalDocType
+			| BasicDocumentType
 	}[]
 }
 
@@ -76,6 +78,7 @@ export function WorkerFolderDocuments({
 			| VehicleDocumentType
 			| EnvironmentalDocType
 			| SafetyAndHealthDocumentType
+			| BasicDocumentType
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
@@ -255,19 +258,20 @@ export function WorkerFolderDocuments({
 								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-cyan-600"
-												onClick={() => {
-													setShowUploadDialog(true)
-													setSelectedDocumentType({ type: doc.type, name: doc.name })
-												}}
-											>
-												<UploadIcon className="h-4 w-4" />
-											</Button>
-										)}
+										{!isOtcMember &&
+											(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
+												<Button
+													size={"icon"}
+													variant="ghost"
+													className="text-cyan-600"
+													onClick={() => {
+														setShowUploadDialog(true)
+														setSelectedDocumentType({ type: doc.type, name: doc.name })
+													}}
+												>
+													<UploadIcon className="h-4 w-4" />
+												</Button>
+											)}
 									</div>
 								</TableCell>
 							</TableRow>

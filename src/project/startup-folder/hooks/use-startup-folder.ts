@@ -6,6 +6,7 @@ import type {
 	VehicleFolder,
 	WorkerDocument,
 	VehicleDocument,
+	StartupFolderType,
 	WORK_ORDER_STATUS,
 	EnvironmentalFolder,
 	EnvironmentalDocument,
@@ -21,10 +22,18 @@ export interface StartupFolder extends StartupFolderModel {
 		image?: string
 		id: string
 	}
+	type: StartupFolderType
 	reviewComments?: string | null
 	submittedBy?: {
 		name: string
 	} | null
+	basicFolder: {
+		totalDocuments: number
+		approvedDocuments: number
+		rejectedDocuments: number
+		submittedDocuments: number
+		draftDocuments: number
+	}
 	safetyAndHealthFolders: {
 		totalDocuments: number
 		approvedDocuments: number

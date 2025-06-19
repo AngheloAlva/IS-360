@@ -60,6 +60,12 @@ export const sendRequestReviewEmail = async ({
 					"soporte@ingenieriasimple.cl",
 				]
 				break
+			case DocumentCategory.BASIC:
+				emailNotification = [
+					"anghelo.alva@ingsimple.cl",
+					"katherine.burgos@oleotrasandino.cl",
+					"soporte@ingenieriasimple.cl",
+				]
 		}
 
 		const { data, error } = await resend.emails.send({

@@ -30,6 +30,7 @@ import {
 	type VehicleDocumentType,
 	type EnvironmentalDocType,
 	type SafetyAndHealthDocumentType,
+	BasicDocumentType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -79,6 +80,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			| VehicleDocumentType
 			| EnvironmentalDocType
 			| SafetyAndHealthDocumentType
+			| BasicDocumentType
 		name: string
 	} | null>(null)
 	const [selectedEntity, setSelectedEntity] = useState<{ id: string; name: string } | null>(null)
@@ -168,7 +170,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					</Button>
 					<h2 className="text-lg font-bold">{title}</h2>
 
-					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
+					{!isVehicleOrWorkerCategory && (
+						<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
+					)}
 				</div>
 
 				{!isVehicleOrWorkerCategory && (

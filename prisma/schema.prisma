@@ -994,6 +994,7 @@ enum DocumentCategory {
   PERSONNEL
   ENVIRONMENTAL
   SAFETY_AND_HEALTH
+  BASIC
 }
 
 enum StartupFolderType {

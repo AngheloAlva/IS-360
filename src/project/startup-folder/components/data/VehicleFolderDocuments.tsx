@@ -22,6 +22,7 @@ import {
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
+	BasicDocumentType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -58,6 +59,7 @@ interface VehicleFolderDocumentsProps {
 			| VehicleDocumentType
 			| WorkerDocumentType
 			| EnvironmentalDocType
+			| BasicDocumentType
 	}[]
 }
 
@@ -77,6 +79,7 @@ export function VehicleFolderDocuments({
 			| VehicleDocumentType
 			| EnvironmentalDocType
 			| SafetyAndHealthDocumentType
+			| BasicDocumentType
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
@@ -255,19 +258,20 @@ export function VehicleFolderDocuments({
 								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-cyan-600"
-												onClick={() => {
-													setShowUploadDialog(true)
-													setSelectedDocumentType({ type: doc.type, name: doc.name })
-												}}
-											>
-												<UploadIcon className="h-4 w-4" />
-											</Button>
-										)}
+										{!isOtcMember &&
+											(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
+												<Button
+													size={"icon"}
+													variant="ghost"
+													className="text-cyan-600"
+													onClick={() => {
+														setShowUploadDialog(true)
+														setSelectedDocumentType({ type: doc.type, name: doc.name })
+													}}
+												>
+													<UploadIcon className="h-4 w-4" />
+												</Button>
+											)}
 									</div>
 								</TableCell>
 							</TableRow>
@@ -277,8 +281,8 @@ export function VehicleFolderDocuments({
 
 			{showUploadDialog && (
 				<UploadDocumentsDialog
-					category="VEHICLES"
 					userId={userId}
+					category="VEHICLES"
 					vehicleId={vehicleId}
 					isOpen={showUploadDialog}
 					startupFolderId={startupFolderId}

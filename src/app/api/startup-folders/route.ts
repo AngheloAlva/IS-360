@@ -27,6 +27,15 @@ export async function GET(req: NextRequest) {
 						rut: true,
 					},
 				},
+				basicFolder: {
+					include: {
+						documents: {
+							select: {
+								status: true,
+							},
+						},
+					},
+				},
 				safetyAndHealthFolders: {
 					include: {
 						documents: {
@@ -84,6 +93,19 @@ export async function GET(req: NextRequest) {
 		}
 		const processedFolders = startupFolders.map((folder) => ({
 			...folder,
+			basicFolder: {
+				...folder.basicFolder,
+				totalDocuments: folder.basicFolder?.documents?.length,
+				approvedDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "APPROVED")
+					.length,
+				rejectedDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "REJECTED")
+					.length,
+				submittedDocuments: folder.basicFolder?.documents?.filter(
+					(doc) => doc.status === "SUBMITTED"
+				).length,
+				draftDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "DRAFT")
+					.length,
+			},
 			safetyAndHealthFolders: folder.safetyAndHealthFolders.map((shf) => ({
 				...shf,
 				totalDocuments: shf.documents.length,

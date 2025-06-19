@@ -138,6 +138,7 @@ export default function StartupFolderOverview({
 
 										<StartupFolderTable
 											subFolders={folder}
+											startupFolderType={folder.type}
 											onCategorySelect={setSelectedCategory}
 										/>
 									</div>

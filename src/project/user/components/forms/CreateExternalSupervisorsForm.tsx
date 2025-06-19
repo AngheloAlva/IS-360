@@ -2,8 +2,8 @@
 
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { PlusCircleIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Plus } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -136,19 +136,24 @@ export default function CreateExternalSupervisorsForm({
 					onSubmit={form.handleSubmit(onSubmit)}
 					className="flex w-full max-w-screen-lg flex-col gap-4"
 				>
-					<div className="mt-4 flex items-center justify-between md:col-span-2">
-						<div className="mx-auto flex w-full max-w-screen-lg items-center justify-start gap-2">
-							<BackButton href={`/admin/dashboard/empresas/${companyId}`} />
-							<h1 className="w-fit text-3xl font-bold">Nuevos Supervisores</h1>
-						</div>
+					<div className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+						<div className="flex items-center justify-between">
+							<div className="mx-auto flex w-full max-w-screen-lg items-center justify-start gap-2">
+								<BackButton
+									href={`/admin/dashboard/empresas/${companyId}`}
+									className="bg-white/20 text-white hover:bg-white/50 hover:text-white"
+								/>
+								<h1 className="w-fit text-2xl font-bold">Nuevos Supervisores</h1>
+							</div>
 
-						<Button
-							type="button"
-							onClick={() => append({ name: "", email: "", rut: "" })}
-							className="border-feature hover:bg-feature text-feature border bg-white hover:text-white"
-						>
-							Agregar Supervisor <Plus className="ml-2" />
-						</Button>
+							<Button
+								type="button"
+								onClick={() => append({ name: "", email: "", rut: "" })}
+								className="cursor-pointer bg-white text-blue-600 transition-all hover:scale-105 hover:bg-white hover:text-blue-700"
+							>
+								Agregar Supervisor <PlusCircleIcon className="ml-2" />
+							</Button>
+						</div>
 					</div>
 
 					{fields.map((field, index) => (

@@ -5,8 +5,7 @@ import { z } from "zod"
 import prisma from "@/lib/prisma"
 import {
 	DocumentCategory,
-	WorkerDocumentType,
-	VehicleDocumentType,
+	BasicDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
@@ -27,15 +26,15 @@ export type CreateStartupFolderDocumentInput = z.infer<typeof createDocumentSche
 
 export async function createStartupFolderDocument(input: CreateStartupFolderDocumentInput) {
 	const {
-		userId,
-		startupFolderId,
-		documentType,
-		documentName,
 		url,
+		userId,
 		category,
 		workerId,
 		vehicleId,
+		documentName,
+		documentType,
 		expirationDate,
+		startupFolderId,
 	} = createDocumentSchema.parse(input)
 
 	const startupFolder = await prisma.startupFolder.findUnique({
@@ -43,6 +42,11 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 		select: {
 			id: true,
 			companyId: true,
+			basicFolder: {
+				select: {
+					id: true,
+				},
+			},
 			workersFolders: workerId
 				? {
 						where: { workerId },
@@ -76,50 +80,6 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 
 	// Create document based on category
 	switch (category) {
-		case "PERSONNEL": {
-			if (!workerId) {
-				throw new Error("workerId is required for PERSONNEL documents")
-			}
-			const folder = startupFolder.workersFolders?.[0]
-			if (!folder) {
-				throw new Error("Worker folder not found for this worker in this startup folder")
-			}
-
-			return await prisma.workerDocument.create({
-				data: {
-					type: documentType as WorkerDocumentType,
-					name: documentName,
-					url,
-					category,
-					uploadedById: userId,
-					folderId: folder.id,
-					expirationDate,
-				},
-			})
-		}
-
-		case "VEHICLES": {
-			if (!vehicleId) {
-				throw new Error("vehicleId is required for VEHICLES documents")
-			}
-			const folder = startupFolder.vehiclesFolders?.[0]
-			if (!folder) {
-				throw new Error("Vehicle folder not found for this vehicle in this startup folder")
-			}
-
-			return await prisma.vehicleDocument.create({
-				data: {
-					type: documentType as VehicleDocumentType,
-					name: documentName,
-					url,
-					category,
-					uploadedById: userId,
-					folderId: folder.id,
-					expirationDate,
-				},
-			})
-		}
-
 		case "ENVIRONMENTAL": {
 			const folder = startupFolder.environmentalFolders[0]
 			if (!folder) {
@@ -128,13 +88,13 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 
 			return await prisma.environmentalDocument.create({
 				data: {
-					type: documentType as EnvironmentalDocType,
-					name: documentName,
 					url,
 					category,
-					uploadedById: userId,
-					folderId: folder.id,
 					expirationDate,
+					name: documentName,
+					folderId: folder.id,
+					uploadedById: userId,
+					type: documentType as EnvironmentalDocType,
 				},
 			})
 		}
@@ -147,13 +107,33 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 
 			return await prisma.safetyAndHealthDocument.create({
 				data: {
-					type: documentType as SafetyAndHealthDocumentType,
-					name: documentName,
 					url,
 					category,
-					uploadedById: userId,
-					folderId: folder.id,
 					expirationDate,
+					name: documentName,
+					folderId: folder.id,
+					uploadedById: userId,
+					type: documentType as SafetyAndHealthDocumentType,
+				},
+			})
+		}
+
+		case "BASIC": {
+			const folder = startupFolder.basicFolder
+
+			if (!folder) {
+				throw new Error("Safety and health folder not found")
+			}
+
+			return await prisma.basicDocument.create({
+				data: {
+					url,
+					category,
+					expirationDate,
+					name: documentName,
+					folderId: folder.id,
+					uploadedById: userId,
+					type: documentType as BasicDocumentType,
 				},
 			})
 		}
