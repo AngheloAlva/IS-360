@@ -58,6 +58,7 @@ import type {
 	EnvironmentalStartupFolderDocument,
 	BasicStartupFolderDocument,
 } from "../../types"
+import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -125,7 +126,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	const totalDocumentsToUpload =
 		category === DocumentCategory.SAFETY_AND_HEALTH
 			? SAFETY_AND_HEALTH_STRUCTURE.documents.length
-			: ENVIRONMENTAL_STRUCTURE.documents.length
+			: category === DocumentCategory.ENVIRONMENTAL
+				? ENVIRONMENTAL_STRUCTURE.documents.length
+				: BASIC_FOLDER_STRUCTURE.documents.length
 
 	const progress =
 		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0

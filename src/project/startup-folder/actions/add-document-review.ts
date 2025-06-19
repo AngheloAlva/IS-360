@@ -114,7 +114,7 @@ export const addDocumentReview = async ({
 					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
 
 				if (
-					totalReviewedDocuments < totalDocuments &&
+					totalReviewedDocuments <= totalDocuments &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.safetyAndHealthFolder.update({
@@ -212,7 +212,7 @@ export const addDocumentReview = async ({
 					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
 
 				if (
-					totalReviewedDocuments < totalDocuments &&
+					totalReviewedDocuments <= totalDocuments &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.environmentalFolder.update({
@@ -318,7 +318,7 @@ export const addDocumentReview = async ({
 					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
 
 				if (
-					totalReviewedDocuments < totalDocuments &&
+					totalReviewedDocuments <= totalDocuments &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.workerFolder.update({
@@ -426,7 +426,7 @@ export const addDocumentReview = async ({
 					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
 
 				if (
-					totalReviewedDocuments < totalDocuments &&
+					totalReviewedDocuments <= totalDocuments &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.vehicleFolder.update({
@@ -510,7 +510,7 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Seguridad y Salud Ocupacional",
+							folderName: "Documentos Básicos",
 							companyName: allDocuments?.startupFolder.company.name,
 							emails: allDocuments.additionalNotificationEmails,
 						})
@@ -527,7 +527,7 @@ export const addDocumentReview = async ({
 					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
 
 				if (
-					totalReviewedDocuments < totalDocuments &&
+					totalReviewedDocuments <= totalDocuments &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.basicFolder.update({
@@ -539,7 +539,7 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Seguridad y Salud Ocupacional",
+							folderName: "Documentos Básicos",
 							companyName: allDocuments.startupFolder.company.name,
 							emails: allDocuments.additionalNotificationEmails,
 						})
