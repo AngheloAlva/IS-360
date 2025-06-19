@@ -1,5 +1,6 @@
 import type {
 	ReviewStatus,
+	BasicDocumentType,
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
@@ -49,8 +50,14 @@ export interface EnvironmentalStartupFolderDocument extends BaseStartupFolderDoc
 	type: EnvironmentalDocType
 }
 
+export interface BasicStartupFolderDocument extends BaseStartupFolderDocument {
+	category: "BASIC"
+	type: BasicDocumentType
+}
+
 export type StartupFolderDocument =
 	| WorkerStartupFolderDocument
 	| VehicleStartupFolderDocument
 	| SafetyAndHealthStartupFolderDocument
 	| EnvironmentalStartupFolderDocument
+	| BasicStartupFolderDocument

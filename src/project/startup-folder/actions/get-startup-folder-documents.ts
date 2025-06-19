@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import {
 	StartupFolderDocument,
+	BasicStartupFolderDocument,
 	WorkerStartupFolderDocument,
 	VehicleStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
@@ -228,19 +229,19 @@ export async function getStartupFolderDocuments({
 		const documents: StartupFolderDocument[] = rawDocuments.map((doc) => {
 			const baseDoc = {
 				id: doc.id,
-				name: doc.name,
 				url: doc.url,
-				uploadedAt: doc.uploadedAt,
+				name: doc.name,
 				status: doc.status,
-				reviewNotes: doc.reviewNotes,
-				reviewedAt: doc.reviewedAt,
-				submittedAt: doc.submittedAt,
-				expirationDate: doc.expirationDate,
-				uploadedBy: doc.uploadedBy,
-				uploadedById: doc.uploadedById,
 				folderId: doc.folderId,
-				reviewerId: doc.reviewerId,
 				reviewer: doc.reviewer,
+				reviewerId: doc.reviewerId,
+				uploadedAt: doc.uploadedAt,
+				reviewedAt: doc.reviewedAt,
+				uploadedBy: doc.uploadedBy,
+				reviewNotes: doc.reviewNotes,
+				submittedAt: doc.submittedAt,
+				uploadedById: doc.uploadedById,
+				expirationDate: doc.expirationDate,
 			}
 
 			switch (category) {
@@ -268,6 +269,12 @@ export async function getStartupFolderDocuments({
 						category: "ENVIRONMENTAL",
 						type: doc.type,
 					} as EnvironmentalStartupFolderDocument
+				case "BASIC":
+					return {
+						...baseDoc,
+						category: "BASIC",
+						type: doc.type,
+					} as BasicStartupFolderDocument
 				default:
 					throw new Error(`Invalid category: ${category}`)
 			}
