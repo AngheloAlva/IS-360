@@ -55,43 +55,23 @@ export async function GET(req: NextRequest) {
 		const [workPermits, total] = await Promise.all([
 			prisma.workPermit.findMany({
 				where: filter,
-				select: {
-					id: true,
+				include: {
 					otNumber: {
 						select: {
 							otNumber: true,
 							workName: true,
 						},
 					},
-					status: true,
-					mutuality: true,
-					otherMutuality: true,
-					exactPlace: true,
-					workWillBe: true,
-					workWillBeOther: true,
-					tools: true,
-					otherTools: true,
-					preChecks: true,
-					otherPreChecks: true,
-					riskIdentification: true,
-					otherRisk: true,
-					preventiveControlMeasures: true,
-					otherPreventiveControlMeasures: true,
-					generateWaste: true,
-					wasteType: true,
-					wasteDisposalLocation: true,
-					observations: true,
-					startDate: true,
-					endDate: true,
-					workCompleted: true,
 					user: {
 						select: {
+							id: true,
 							name: true,
 							rut: true,
 						},
 					},
 					company: {
 						select: {
+							id: true,
 							name: true,
 							rut: true,
 						},
@@ -99,6 +79,29 @@ export async function GET(req: NextRequest) {
 					_count: {
 						select: {
 							participants: true,
+							attachments: true,
+						},
+					},
+					participants: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
+					attachments: {
+						select: {
+							id: true,
+							name: true,
+							url: true,
+							type: true,
+							size: true,
+							uploadedAt: true,
+							uploadedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
 						},
 					},
 				},

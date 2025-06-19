@@ -2,15 +2,17 @@
 
 import { Building2Icon, PrinterIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
 import Link from "next/link"
 
 import { WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
 
+import WorkPermitAttachmentForm from "../components/forms/WorkPermitAttachmentForm"
+import WorkPermitDetailsDialog from "../components/dialogs/WorkPermitDetailsDialog"
 import { Button } from "@/shared/components/ui/button"
 
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
 
 export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 	{
@@ -18,7 +20,14 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 		header: "OT",
 		cell: ({ row }) => {
 			const otNumber = row.original.otNumber.otNumber
-			return <div className="truncate">{otNumber}</div>
+
+			return (
+				<WorkPermitDetailsDialog workPermit={row.original}>
+					<div className="cursor-pointer font-semibold text-rose-500 hover:underline">
+						{otNumber}
+					</div>
+				</WorkPermitDetailsDialog>
+			)
 		},
 	},
 	{
@@ -28,7 +37,7 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 			const aplicantPt = row.original.user.name
 			return (
 				<div className="flex items-center gap-1 truncate">
-					<UserIcon className="size-4" />
+					<UserIcon className="text-muted-foreground size-4" />
 					{aplicantPt}
 				</div>
 			)
@@ -40,8 +49,8 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 		cell: ({ row }) => {
 			const company = row.original.company.name
 			return (
-				<div className="flex items-center gap-1 truncate">
-					<Building2Icon className="size-4" />
+				<div className="flex items-center gap-1.5 truncate">
+					<Building2Icon className="text-muted-foreground size-4" />
 					{company}
 				</div>
 			)
@@ -52,7 +61,7 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber.workName
-			return <div className="truncate">{workOrder}</div>
+			return <div className="w-96 text-wrap">{workOrder}</div>
 		},
 	},
 	{
@@ -106,7 +115,7 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 			const id = row.original.id
 
 			return (
-				<div className="flex items-center gap-2">
+				<div className="z-50 flex items-center gap-2">
 					<Link href={`/api/work-permit/pdf/${id}`} target="_blank">
 						<Button
 							size={"icon"}
@@ -116,6 +125,12 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 							<PrinterIcon className="h-4 w-4" />
 						</Button>
 					</Link>
+
+					<WorkPermitAttachmentForm
+						userId={row.original.user.id}
+						workPermitId={row.original.id}
+						companyId={row.original.company.id}
+					/>
 				</div>
 			)
 		},

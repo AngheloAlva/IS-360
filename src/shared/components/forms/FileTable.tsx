@@ -227,14 +227,13 @@ export default function FileTable<T extends FieldValues>({
 										<TableCell>{getFileExtension(file.url || "")}</TableCell>
 										<TableCell>{formatBytes(file.fileSize)}</TableCell>
 										<TableCell className="text-right">
-											<div className="flex justify-end gap-2">
+											<div className="flex justify-end">
 												<Dialog>
 													<DialogTrigger asChild>
 														<Button
 															size="icon"
 															type="button"
-															variant="outline"
-															className="h-8 w-8"
+															variant="ghost"
 															onClick={() => {}}
 															disabled={!file.preview && !file.url}
 														>
@@ -247,9 +246,9 @@ export default function FileTable<T extends FieldValues>({
 												<Button
 													size="icon"
 													type="button"
-													className="h-8 w-8"
-													variant="destructive"
+													variant="ghost"
 													onClick={() => removeFile(index)}
+													className="text-red-500 hover:bg-red-500 hover:text-white"
 												>
 													<Trash2 className="h-4 w-4" />
 												</Button>
@@ -267,7 +266,12 @@ export default function FileTable<T extends FieldValues>({
 								{files.length}{" "}
 								{files.length === 1 ? "archivo seleccionado" : "archivos seleccionados"}
 							</p>
-							<Button variant="destructive" size="sm" onClick={removeAllFiles}>
+							<Button
+								variant="ghost"
+								className="text-red-500 hover:bg-red-500 hover:text-white"
+								size="sm"
+								onClick={removeAllFiles}
+							>
 								<Trash2 className="mr-1.5 h-3.5 w-3.5" />
 								Eliminar todos
 							</Button>

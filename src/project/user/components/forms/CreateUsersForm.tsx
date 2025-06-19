@@ -30,8 +30,18 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { User } from "@prisma/client"
+import { cn } from "@/lib/utils"
+import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 
-export default function CreateUsersForm({ companyId }: { companyId: string }): React.ReactElement {
+export default function CreateUsersForm({
+	companyId,
+	className,
+	isSupervisor = false,
+}: {
+	companyId: string
+	className?: string
+	isSupervisor?: boolean
+}): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 	const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -74,8 +84,8 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						password: temporalPassword,
 						data: {
 							companyId,
+							isSupervisor,
 							rut: employee.rut,
-							isSupervisor: false,
 							phone: employee.phone,
 							internalRole: employee.internalRole,
 							internalArea: employee.internalArea,
@@ -163,11 +173,16 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 	return (
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>
 			<SheetTrigger
-				className="flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-600 transition-all hover:scale-105"
+				className={cn(
+					"flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-600 transition-all hover:scale-105",
+					className
+				)}
 				onClick={() => setIsOpen(true)}
 			>
 				<PlusCircleIcon className="size-4" />
-				<span className="hidden sm:inline">Nuevo Colaborador</span>
+				<span className="hidden sm:inline">
+					{isSupervisor ? "Nuevo Supervisor" : "Nuevo Colaborador"}
+				</span>
 			</SheetTrigger>
 
 			<SheetContent className="sm:max-w-lg">
@@ -186,7 +201,9 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 						{fields.map((field, index) => (
 							<div key={field.id} className="grid gap-5 md:grid-cols-2">
 								<div className="flex items-center justify-between md:col-span-2">
-									<h3 className="text-lg font-semibold">Colaborador #{index + 1}</h3>
+									<h3 className="text-lg font-semibold">
+										{isSupervisor ? "Supervisor" : "Colaborador"} #{index + 1}
+									</h3>
 
 									{index !== 0 && (
 										<Button
@@ -202,7 +219,7 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 								</div>
 
 								<InputFormField<PartnerUsersSchema>
-									label="Nombre"
+									label="Nombre completo"
 									placeholder="Nombre"
 									control={form.control}
 									name={`employees.${index}.name`}
@@ -222,8 +239,9 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 									control={form.control}
 									name={`employees.${index}.email`}
 								/>
-								<InputFormField<PartnerUsersSchema>
+								<InputWithPrefixFormField<PartnerUsersSchema>
 									type="tel"
+									prefix="+56"
 									label="Teléfono"
 									placeholder="Teléfono"
 									control={form.control}
@@ -242,21 +260,23 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 									name={`employees.${index}.internalArea`}
 								/>
 
-								<MultiSelectFormField<PartnerUsersSchema>
-									control={form.control}
-									label="Carpetas de Arranque"
-									itemClassName="sm:col-span-2"
-									name={`employees.${index}.startupFoldersId`}
-									description="Seleccione las carpetas de arranque en las que el colaborador participará."
-									options={
-										isLoading
-											? []
-											: (startupFolders?.map((folder) => ({
-													value: folder.id,
-													label: folder.name,
-												})) ?? [])
-									}
-								/>
+								{!isSupervisor && (
+									<MultiSelectFormField<PartnerUsersSchema>
+										control={form.control}
+										label="Carpetas de Arranque"
+										itemClassName="sm:col-span-2"
+										name={`employees.${index}.startupFoldersId`}
+										description="Seleccione las carpetas de arranque en las que el colaborador participará."
+										options={
+											isLoading
+												? []
+												: (startupFolders?.map((folder) => ({
+														value: folder.id,
+														label: folder.name,
+													})) ?? [])
+										}
+									/>
+								)}
 							</div>
 						))}
 
@@ -277,14 +297,14 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 							}}
 						>
 							<PlusCircleIcon className="h-4 w-4" />
-							Agregar Colaborador
+							Agregar {isSupervisor ? "Supervisor" : "Colaborador"}
 						</Button>
 
 						<div className="flex items-center justify-end gap-2">
 							<Button
 								type="button"
 								variant="outline"
-								className="w-1/2 border-2 border-orange-900 text-orange-700 transition-all hover:scale-105 hover:bg-orange-900 hover:text-white"
+								className="w-1/2"
 								onClick={() => setIsOpen(false)}
 							>
 								Cancelar
@@ -292,8 +312,11 @@ export default function CreateUsersForm({ companyId }: { companyId: string }): R
 
 							<SubmitButton
 								isSubmitting={isSubmitting}
-								label="Crear Colaborador(es)"
-								className="w-1/2 bg-orange-700 hover:bg-orange-600"
+								label={isSupervisor ? "Crear Supervisor(es)" : "Crear Colaborador(es)"}
+								className={cn(
+									"w-1/2 bg-orange-700 hover:bg-orange-600",
+									"bg-blue-600 hover:bg-blue-700"
+								)}
 							/>
 						</div>
 					</form>

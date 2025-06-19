@@ -29,6 +29,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import BackButton from "@/shared/components/BackButton"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -91,13 +92,20 @@ export default function StartupFolderOverview({
 		<div className="w-full space-y-6">
 			<div className="rounded-lg bg-gradient-to-r from-teal-600 to-cyan-700 p-6 shadow-lg">
 				<div className="flex items-center justify-between">
-					<div className="text-white">
-						<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
-						<p className="flex flex-col opacity-90">
-							{isOtcMember
-								? "Revisión de documentación de empresa contratista"
-								: "En este módulo podrás gestionar la documentación de la empresa."}
-						</p>
+					<div className="flex items-center gap-3">
+						<BackButton
+							href="/admin/dashboard/carpetas-de-arranques"
+							className="bg-white/20 text-white hover:bg-white/50 hover:text-white"
+						/>
+
+						<div className="text-white">
+							<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
+							<p className="flex flex-col opacity-90">
+								{isOtcMember
+									? "Revisión de documentación de empresa contratista"
+									: "En este módulo podrás gestionar la documentación de la empresa."}
+							</p>
+						</div>
 					</div>
 
 					<div className="flex items-center gap-2">

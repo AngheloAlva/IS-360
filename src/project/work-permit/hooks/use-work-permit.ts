@@ -13,8 +13,8 @@ export interface WorkPermit {
 	exactPlace: string
 	workWillBe: string
 	workWillBeOther: string
-	tools: string
-	otherTools: string
+	tools: string[]
+	otherTools: string | null
 	preChecks: string
 	otherPreChecks: string
 	riskIdentification: string
@@ -29,16 +29,35 @@ export interface WorkPermit {
 	endDate: Date
 	workCompleted: boolean
 	user: {
+		id: string
 		name: string
 		rut: string
 	}
 	company: {
+		id: string
 		name: string
 		rut: string
 	}
 	_count: {
 		participants: number
+		attachments: number
 	}
+	participants: Array<{
+		id: string
+		name: string
+	}>
+	attachments: Array<{
+		id: string
+		name: string
+		url: string
+		type: string
+		size: number | null
+		uploadedAt: Date
+		uploadedBy: {
+			id: string
+			name: string
+		}
+	}>
 }
 
 interface WorkPermitsParams {

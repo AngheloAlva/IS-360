@@ -29,9 +29,10 @@ import {
 } from "@/shared/components/ui/table"
 
 export default function WorkPermitsTable() {
-	const [page, setPage] = useState(1)
-	const [search, setSearch] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([])
+	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1)
+
 	const { data, isLoading, refetch, isFetching } = useWorkPermits({
 		page,
 		search,
@@ -90,14 +91,18 @@ export default function WorkPermitsTable() {
 						{isLoading || isFetching ? (
 							Array.from({ length: 15 }).map((_, index) => (
 								<TableRow key={index}>
-									<TableCell colSpan={11}>
+									<TableCell colSpan={10}>
 										<Skeleton className="h-6.5 min-w-full" />
 									</TableCell>
 								</TableRow>
 							))
 						) : table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+								<TableRow
+									key={row.id}
+									className="cursor-pointer"
+									data-state={row.getIsSelected() && "selected"}
+								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>
 											{flexRender(cell.column.columnDef.cell, cell.getContext())}
