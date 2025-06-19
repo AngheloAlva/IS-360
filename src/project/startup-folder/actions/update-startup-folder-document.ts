@@ -4,6 +4,7 @@ import { z } from "zod"
 
 import {
 	DocumentCategory,
+	BasicDocumentType,
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
@@ -16,6 +17,7 @@ import { updateVehicleDocument } from "./documents/vehicle"
 import { updateWorkerDocument } from "./documents/worker"
 
 import type { UploadResult } from "@/lib/upload-files"
+import { updateBasicDocument } from "./documents/basic"
 
 const updateDocumentSchema = z.object({
 	documentId: z.string(),
@@ -26,6 +28,7 @@ const updateDocumentSchema = z.object({
 		...VehicleDocumentType,
 		...EnvironmentalDocType,
 		...SafetyAndHealthDocumentType,
+		...BasicDocumentType,
 	}),
 	documentName: z.string(),
 })
@@ -86,6 +89,19 @@ export async function updateStartupFolderDocument({
 
 		case "SAFETY_AND_HEALTH":
 			return updateSafetyAndHealthDocument({
+				data: {
+					documentId,
+					documentName,
+					expirationDate,
+					documentType: documentType as SafetyAndHealthDocumentType,
+					file: [],
+				},
+				uploadedFile,
+				userId,
+			})
+
+		case "BASIC":
+			return updateBasicDocument({
 				data: {
 					documentId,
 					documentName,

@@ -156,6 +156,15 @@ export function SubmitReviewRequestDialog({
 					userId,
 					folderId,
 				})
+			} else if (category === "BASIC") {
+				const { submitBasicDocumentForReview } = await import(
+					"@/project/startup-folder/actions/documents/basic"
+				)
+				result = await submitBasicDocumentForReview({
+					emails,
+					userId,
+					folderId,
+				})
 			} else {
 				result = {
 					ok: false,
