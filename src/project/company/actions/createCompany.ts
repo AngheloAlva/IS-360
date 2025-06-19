@@ -24,6 +24,20 @@ export const createCompany = async ({
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { vehicles, supervisors, startupFolderName, startupFolderType, ...rest } = values
 
+		const existingCompany = await prisma.company.findUnique({
+			where: {
+				rut: rest.rut,
+			},
+		})
+
+		if (existingCompany) {
+			return {
+				ok: false,
+				message:
+					"Ya existe una empresa con el RUT proporcionado. Por favor, verifique el RUT o contacte con el soporte.",
+			}
+		}
+
 		const company = await prisma.company.create({
 			data: {
 				...rest,

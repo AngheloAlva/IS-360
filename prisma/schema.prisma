@@ -179,7 +179,7 @@ model Account {
 model Company {
   id       String  @id @default(cuid())
   name     String
-  rut      String
+  rut      String  @unique
   image    String?
   isActive Boolean @default(true)
 
