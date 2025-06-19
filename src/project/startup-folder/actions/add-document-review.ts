@@ -1,5 +1,6 @@
 "use server"
 
+import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 import { sendReviewNotificationEmail } from "./send-review-notification-email"
 import { DocumentCategory, type Prisma, ReviewStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
@@ -452,6 +453,105 @@ export const addDocumentReview = async ({
 				}
 
 				break
+			case DocumentCategory.BASIC:
+				document = await prisma.basicDocument.update({
+					where: { id: documentId },
+					data: {
+						reviewNotes: comments,
+						reviewedAt: now,
+						status: newStatus,
+						reviewer: {
+							connect: {
+								id: reviewerId,
+							},
+						},
+					},
+					include: {
+						uploadedBy: true,
+					},
+				})
+
+				allDocuments = await prisma.basicFolder.findUnique({
+					where: {
+						startupFolderId,
+					},
+					select: {
+						id: true,
+						documents: {
+							select: {
+								status: true,
+							},
+						},
+						additionalNotificationEmails: true,
+						startupFolder: {
+							select: {
+								company: {
+									select: {
+										name: true,
+									},
+								},
+							},
+						},
+					},
+				})
+
+				totalDocuments = BASIC_FOLDER_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
+					prisma.basicFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.APPROVED,
+						},
+					})
+
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Seguridad y Salud Ocupacional",
+							companyName: allDocuments?.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
+					return {
+						ok: true,
+						message: "Revisión procesada exitosamente ",
+					}
+				}
+
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments < totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.basicFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: "Seguridad y Salud Ocupacional",
+							companyName: allDocuments.startupFolder.company.name,
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
+					return {
+						ok: true,
+						message: "Revisión procesada exitosamente",
+					}
+				}
+				break
+
 			default:
 				throw new Error(`Categoría de documento no soportada: ${category}`)
 		}
@@ -482,6 +582,7 @@ type Document =
 	| Prisma.WorkerDocumentGetPayload<{ select: { folder: { select: { workerId: true } } } }>
 	| Prisma.VehicleDocumentGetPayload<{ select: { folder: { select: { vehicleId: true } } } }>
 	| Prisma.EnvironmentalDocumentGetPayload<{ include: { uploadedBy: true } }>
+	| Prisma.BasicDocumentGetPayload<{ include: { uploadedBy: true } }>
 
 type AllDocuments =
 	| Prisma.SafetyAndHealthFolderGetPayload<{
@@ -509,6 +610,14 @@ type AllDocuments =
 			}
 	  }>
 	| Prisma.EnvironmentalFolderGetPayload<{
+			select: {
+				id: true
+				documents: { select: { status: true } }
+				startupFolder: { select: { company: { select: { name: true } } } }
+				additionalNotificationEmails: true
+			}
+	  }>
+	| Prisma.BasicFolderGetPayload<{
 			select: {
 				id: true
 				documents: { select: { status: true } }
