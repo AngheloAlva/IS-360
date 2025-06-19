@@ -204,8 +204,8 @@ export default function CompanyForm(): React.ReactElement {
 							label="Tipo de carpeta de arranque"
 							placeholder="Tipo de carpeta de arranque"
 							options={[
-								{ value: StartupFolderType.FULL, label: "Carpeta full" },
-								{ value: StartupFolderType.BASIC, label: "Carpeta básica" },
+								{ value: StartupFolderType.FULL, label: "Carpeta de arranque" },
+								{ value: StartupFolderType.BASIC, label: "Documentos basicos" },
 							]}
 						/>
 
