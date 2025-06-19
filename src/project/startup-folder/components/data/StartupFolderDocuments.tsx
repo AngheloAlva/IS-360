@@ -56,6 +56,7 @@ import type {
 	StartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
+	BasicStartupFolderDocument,
 } from "../../types"
 interface StartupFolderDocumentsProps {
 	userId: string
@@ -344,6 +345,16 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 																	reviewer: doc.reviewer,
 																}
 																selectedDoc = envDoc
+																break
+															}
+															case DocumentCategory.BASIC: {
+																const basDoc: BasicStartupFolderDocument = {
+																	...baseDoc,
+																	category: DocumentCategory.BASIC,
+																	type: doc.type as BasicDocumentType,
+																	reviewer: doc.reviewer,
+																}
+																selectedDoc = basDoc
 																break
 															}
 															default:
