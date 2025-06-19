@@ -101,6 +101,17 @@ export async function getStartupFolderDocuments({
 							},
 						},
 					})
+				case "BASIC":
+					return prisma.basicFolder.findUnique({
+						where: { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
+					})
 				default:
 					throw new Error(`Invalid category: ${category}`)
 			}
@@ -173,6 +184,25 @@ export async function getStartupFolderDocuments({
 					})
 				case "ENVIRONMENTAL":
 					return prisma.environmentalDocument.findMany({
+						where: { folderId: folder.id },
+						include: {
+							uploadedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+							reviewer: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+						},
+						orderBy: { uploadedAt: "desc" },
+					})
+				case "BASIC":
+					return prisma.basicDocument.findMany({
 						where: { folderId: folder.id },
 						include: {
 							uploadedBy: {
