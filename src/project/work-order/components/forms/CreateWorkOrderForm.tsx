@@ -13,6 +13,7 @@ import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { useCompanies } from "@/project/company/hooks/use-companies"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
+import { OPERATOR_LIST } from "@/lib/consts/operator-list"
 import { useUsers } from "@/project/user/hooks/use-users"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import {
@@ -23,29 +24,16 @@ import {
 import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
-import UploadFilesFormField from "@/shared/components/forms/UploadFilesFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
+import { Form, FormItem, FormLabel } from "@/shared/components/ui/form"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
-import { Skeleton } from "@/shared/components/ui/skeleton"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Button } from "@/shared/components/ui/button"
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormField,
-	FormControl,
-	FormMessage,
-} from "@/shared/components/ui/form"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectTrigger,
-	SelectContent,
-} from "@/shared/components/ui/select"
+import { Input } from "@/shared/components/ui/input"
 import {
 	Sheet,
 	SheetTitle,
@@ -56,16 +44,27 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { Company } from "@/project/company/hooks/use-companies"
+import { cn } from "@/lib/utils"
 
-export default function CreateWorkOrderForm(): React.ReactElement {
+interface CreateWorkOrderFormProps {
+	equipmentId?: string
+	equipmentName?: string
+	maintenancePlanTaskId?: string
+}
+
+export default function CreateWorkOrderForm({
+	equipmentId,
+	equipmentName,
+	maintenancePlanTaskId,
+}: CreateWorkOrderFormProps): React.ReactElement {
 	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+
 	const [open, setOpen] = useState(false)
 
-	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 1000 })
-	const { data: usersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
+	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
 	const { data: equipmentsData } = useEquipments({ limit: 1000 })
+	const { data: companiesData } = useCompanies({ limit: 1000 })
 
 	const router = useRouter()
 
@@ -74,7 +73,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 		defaultValues: {
 			companyId: "",
 			equipment: [],
-			breakDays: "",
 			workRequest: "",
 			type: undefined,
 			supervisorId: "",
@@ -84,7 +82,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 			estimatedHours: "",
 			workDescription: "",
 			priority: undefined,
-			requiresBreak: false,
 			programDate: new Date(),
 			estimatedEndDate: new Date(),
 			solicitationDate: new Date(),
@@ -93,12 +90,12 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 	})
 
 	useEffect(() => {
-		const estimatedDays = Number(form.watch("estimatedDays"))
-		const estimatedHours = estimatedDays * 8
+		const estimatedHours = Number(form.watch("estimatedHours"))
+		const estimatedDays = Math.ceil(estimatedHours / 8)
 
-		form.setValue("estimatedHours", estimatedHours.toString())
+		form.setValue("estimatedDays", estimatedDays.toString())
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("estimatedDays")])
+	}, [form.watch("estimatedHours")])
 
 	async function onSubmit(values: WorkOrderSchema) {
 		const initReportFile = form.getValues("file")?.[0]
@@ -110,7 +107,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 				const fileExtension = initReportFile.file.name.split(".").pop()
 				const uniqueFilename = `${Date.now()}-${Math.random()
 					.toString(36)
-					.substring(2, 9)}-${values.companyId.slice(0, 4)}.${fileExtension}`
+					.substring(2, 9)}-${values.companyId?.slice(0, 4)}.${fileExtension}`
 
 				const uploadResult = await uploadFilesToCloud({
 					randomString: uniqueFilename,
@@ -125,6 +122,8 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 						file: undefined,
 					},
 					initReportFile: uploadResult[0],
+					equipmentId,
+					maintenancePlanTaskId,
 				})
 
 				if (!ok) throw new Error(message)
@@ -150,10 +149,18 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 		}
 	}
 
+	const isInternalResponsible = form.watch("isInternalResponsible")
+
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105"
+				className={cn(
+					"flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105",
+					{
+						"flex h-7 cursor-pointer items-center justify-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-semibold tracking-wide text-white transition-all hover:scale-105":
+							equipmentId && maintenancePlanTaskId,
+					}
+				)}
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />
@@ -171,7 +178,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid w-full gap-x-3 gap-y-5 overflow-y-scroll px-4 pt-4 pb-16 sm:grid-cols-2"
+						className="grid w-full gap-x-3 gap-y-5 overflow-y-auto px-4 pt-4 pb-16 sm:grid-cols-2"
 					>
 						<div className="sm:col-span-2">
 							<h2 className="text-xl font-bold">Información General</h2>
@@ -187,7 +194,7 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							placeholder="Selecciona un responsable"
 							description="Persona que se encargara de la OT"
 							options={
-								usersData?.users.map((user) => ({
+								responsibleUsersData?.users.map((user) => ({
 									value: user.id,
 									label: user.name,
 								})) ?? []
@@ -201,18 +208,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							options={WorkOrderTypeOptions}
 							itemClassName="h-full content-start"
 							placeholder="Seleccione el tipo de trabajo"
-						/>
-
-						<DatePickerFormField<WorkOrderSchema>
-							control={form.control}
-							name="solicitationDate"
-							label="Fecha de Solicitud"
-						/>
-
-						<InputFormField<WorkOrderSchema>
-							name="solicitationTime"
-							label="Hora de Solicitud"
-							control={form.control}
 						/>
 
 						<InputFormField<WorkOrderSchema>
@@ -238,19 +233,26 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							placeholder="Seleccione un indicador"
 						/>
 
-						<MultiSelectFormField<WorkOrderSchema>
-							name="equipment"
-							options={
-								equipmentsData?.equipments.map((equipment) => ({
-									value: equipment.id,
-									label: equipment.name + "* (" + equipment.location + ")",
-								})) ?? []
-							}
-							control={form.control}
-							itemClassName="sm:col-span-2"
-							label="Equipo(s) / Ubicación(es)"
-							placeholder="Seleccione uno o más equipos"
-						/>
+						{equipmentId && equipmentName ? (
+							<FormItem className="sm:col-span-2">
+								<FormLabel>Equipo (No editable)</FormLabel>
+								<Input readOnly name="equipment" value={equipmentName} />
+							</FormItem>
+						) : (
+							<MultiSelectFormField<WorkOrderSchema>
+								name="equipment"
+								options={
+									equipmentsData?.equipments.map((equipment) => ({
+										value: equipment.id,
+										label: equipment.name + "* (" + equipment.location + ")",
+									})) ?? []
+								}
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								label="Equipo(s) / Ubicación(es)"
+								placeholder="Seleccione uno o más equipos"
+							/>
+						)}
 
 						<TextAreaFormField<WorkOrderSchema>
 							optional
@@ -265,79 +267,69 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 						<Separator className="my-2 sm:col-span-2" />
 
 						<div className="sm:col-span-2">
-							<h2 className="text-xl font-bold">Empresa Colaboradora</h2>
+							<h2 className="text-xl font-bold">Empresa Colaboradora | Responsable</h2>
 							<span className="text-muted-foreground text-sm">
-								Sólo se muestran las empresas que tengan uno o más supervisores asignados
+								Sólo se muestran las empresas que tengan uno o más supervisores asignados.
 							</span>
 						</div>
 
-						<FormField
+						<SwitchFormField<WorkOrderSchema>
 							control={form.control}
-							name="companyId"
-							render={() => (
-								<FormItem className="flex flex-col">
-									<FormLabel>Empresa Responsable</FormLabel>
-									<Select
-										disabled={isCompaniesLoading}
-										onValueChange={(value) => {
-											const company = companiesData?.companies.find((c) => c.id === value)
-											setSelectedCompany(company)
-											form.setValue("companyId", value)
-										}}
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Selecciona una empresa" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{isCompaniesLoading ? (
-												<div className="flex w-full items-center justify-center p-4">
-													<Skeleton className="h-4 w-full" />
-												</div>
-											) : (
-												companiesData?.companies.map((company) => (
-													<SelectItem key={company.id} value={company.id}>
-														{company.name}
-													</SelectItem>
-												))
-											)}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Responsable Interno"
+							name="isInternalResponsible"
+							itemClassName="sm:col-span-2"
+							onCheckedChange={(checked) => {
+								form.setValue("isInternalResponsible", checked)
+								form.setValue("companyId", "")
+								form.setValue("supervisorId", "")
+								setSelectedCompany(undefined)
+							}}
 						/>
-						{selectedCompany && (
-							<FormField
-								control={form.control}
-								name="supervisorId"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Supervisor</FormLabel>
-										<Select
-											disabled={!selectedCompany}
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder="Selecciona un supervisor" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{selectedCompany?.users
-													.filter((user) => user.isSupervisor)
-													.map((user) => (
-														<SelectItem key={user.id} value={user.id}>
-															{user.name}
-														</SelectItem>
-													))}
-											</SelectContent>
-										</Select>
-										<FormMessage />
-									</FormItem>
+
+						{!isInternalResponsible ? (
+							<>
+								<SelectWithSearchFormField<WorkOrderSchema>
+									name="companyId"
+									control={form.control}
+									options={
+										companiesData?.companies.map((company) => ({
+											value: company.id,
+											label: company.name,
+										})) ?? []
+									}
+									label="Empresa Responsable"
+									onChange={(value) => {
+										setSelectedCompany(
+											companiesData?.companies.find((company) => company.id === value)
+										)
+									}}
+								/>
+
+								{selectedCompany && (
+									<SelectWithSearchFormField<WorkOrderSchema>
+										name="supervisorId"
+										control={form.control}
+										options={
+											selectedCompany?.users
+												.filter((user) => user.isSupervisor)
+												.map((user) => ({
+													value: user.id,
+													label: user.name,
+												})) ?? []
+										}
+										label="Supervisor"
+									/>
 								)}
+							</>
+						) : (
+							<SelectWithSearchFormField<WorkOrderSchema>
+								name="supervisorId"
+								control={form.control}
+								options={OPERATOR_LIST.map((operator) => ({
+									value: operator,
+									label: operator,
+								}))}
+								label="Responsable Interno"
 							/>
 						)}
 
@@ -379,14 +371,11 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							</span>
 						</div>
 
-						<UploadFilesFormField
+						<FileTable<WorkOrderSchema>
 							name="file"
-							maxFileSize={200}
 							isMultiple={false}
 							control={form.control}
-							selectedFileIndex={selectedFileIndex}
-							containerClassName="w-full sm:col-span-2"
-							setSelectedFileIndex={setSelectedFileIndex}
+							className="mb-6 w-full sm:col-span-2"
 						/>
 
 						<Button
@@ -395,7 +384,6 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 							variant={"outline"}
 							disabled={isSubmitting}
 							onClick={() => setOpen(false)}
-							className="w-full cursor-pointer border-2 border-orange-800 font-bold tracking-wide text-orange-800 transition-all hover:scale-105 hover:bg-orange-800"
 						>
 							Cancelar
 						</Button>
@@ -403,7 +391,9 @@ export default function CreateWorkOrderForm(): React.ReactElement {
 						<SubmitButton
 							label="Crear Nueva OT"
 							isSubmitting={isSubmitting}
-							className="bg-orange-600 hover:bg-orange-600"
+							className={cn("bg-orange-600 hover:bg-orange-600", {
+								"bg-indigo-600 hover:bg-indigo-600": equipmentId && maintenancePlanTaskId,
+							})}
 						/>
 					</form>
 				</Form>

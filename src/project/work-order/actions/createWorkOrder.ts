@@ -6,17 +6,67 @@ import prisma from "@/lib/prisma"
 
 import type { WorkOrderSchema } from "@/project/work-order/schemas/workOrder.schema"
 import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
+import { PLAN_FREQUENCY } from "@prisma/client"
 
 interface CreateWorkOrderProps {
+	equipmentId?: string
 	values: WorkOrderSchema
+	maintenancePlanTaskId?: string
 	initReportFile?: FileUploadResult
 }
 
-export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrderProps) => {
+export const createWorkOrder = async ({
+	values,
+	equipmentId,
+	initReportFile,
+	maintenancePlanTaskId,
+}: CreateWorkOrderProps) => {
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { supervisorId, responsibleId, companyId, file, breakDays, equipment, ...rest } = values
+		let maintenancePlanTaskData: {
+			id: string
+			equipment: {
+				id: string
+			}
+			nextDate: Date
+			frequency: PLAN_FREQUENCY
+			attachments: {
+				id: string
+			}[]
+		} | null = null
+
+		if (maintenancePlanTaskId) {
+			maintenancePlanTaskData = await prisma.maintenancePlanTask.findUnique({
+				where: {
+					id: maintenancePlanTaskId,
+				},
+				select: {
+					id: true,
+					equipment: true,
+					nextDate: true,
+					frequency: true,
+					attachments: true,
+				},
+			})
+
+			if (!maintenancePlanTaskData) {
+				return {
+					ok: false,
+					message: "Tarea de mantenimiento no encontrada",
+				}
+			}
+		}
+
 		const otNumber = await generateOTNumber()
+		const {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			file,
+			equipment,
+			companyId,
+			supervisorId,
+			responsibleId,
+			isInternalResponsible,
+			...rest
+		} = values
 
 		const newWorkOrder = await prisma.workOrder.create({
 			data: {
@@ -28,14 +78,20 @@ export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrde
 				},
 				supervisor: {
 					connect: {
-						id: supervisorId,
+						...(isInternalResponsible
+							? { email: "scontrol.trm@oleotrasandino.cl" }
+							: { id: supervisorId }),
 					},
 				},
-				company: {
-					connect: {
-						id: companyId,
-					},
-				},
+				...(companyId
+					? {
+							company: {
+								connect: {
+									id: companyId,
+								},
+							},
+						}
+					: {}),
 				...rest,
 				...(initReportFile
 					? {
@@ -48,14 +104,32 @@ export const createWorkOrder = async ({ values, initReportFile }: CreateWorkOrde
 							},
 						}
 					: {}),
+				...(maintenancePlanTaskData
+					? {
+							MaintenancePlanTask: {
+								connect: {
+									id: maintenancePlanTaskData.id,
+								},
+							},
+							manualDocuments: {
+								connect: maintenancePlanTaskData.attachments.map((attachment) => ({
+									id: attachment.id,
+								})),
+							},
+						}
+					: {}),
 				isWorkBook: true,
 				estimatedDays: +rest.estimatedDays,
 				estimatedHours: +rest.estimatedHours,
+				solicitationDate: rest.solicitationDate ? new Date(rest.solicitationDate) : new Date(),
+				solicitationTime: rest.solicitationTime
+					? rest.solicitationTime
+					: new Date().toTimeString().split(" ")[0],
 				estimatedEndDate: rest.estimatedEndDate ? new Date(rest.estimatedEndDate) : undefined,
-				requiresBreak: rest.requiresBreak || false,
-				breakDays: breakDays ? +breakDays : 0,
+				requiresBreak: false,
+				breakDays: 0,
 				equipment: {
-					connect: equipment.map((id) => ({ id })),
+					connect: equipmentId ? { id: equipmentId } : equipment.map((id) => ({ id })),
 				},
 			},
 		})

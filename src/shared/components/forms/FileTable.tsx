@@ -2,10 +2,6 @@
 
 import { Eye, Trash2, Upload, File, FileText, ImageIcon } from "lucide-react"
 import { useController, type Control } from "react-hook-form"
-import { Document, Page, pdfjs } from "react-pdf"
-import { useState } from "react"
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 
 import { cn, formatBytes, getFileExtension } from "@/lib/utils"
 import { useFileManager } from "@/shared/hooks/useFileManager"
@@ -69,24 +65,6 @@ export default function FileTable<T extends FieldValues>({
 			},
 		})
 
-	const [numPages, setNumPages] = useState<number | null>(null)
-	const [pageNumber, setPageNumber] = useState(1)
-
-	const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-		setNumPages(numPages)
-		setPageNumber(1)
-	}
-
-	const changePage = (offset: number) => {
-		setPageNumber((prevPageNumber) => {
-			const newPageNumber = prevPageNumber + offset
-			return Math.max(1, Math.min(numPages || 1, newPageNumber))
-		})
-	}
-
-	const previousPage = () => changePage(-1)
-	const nextPage = () => changePage(1)
-
 	const renderPreviewDialog = (url: string, fileType?: string) => {
 		const isImage =
 			fileType?.startsWith("image/") || url.match(/\.(jpeg|jpg|gif|png|webp|avif|svg)$/i)
@@ -110,55 +88,12 @@ export default function FileTable<T extends FieldValues>({
 							/>
 						</div>
 					) : isPDF ? (
-						<div className="flex flex-col items-center">
-							<Document
-								file={url}
-								onLoadSuccess={onDocumentLoadSuccess}
-								className="mb-4"
-								error={
-									<div className="flex h-40 items-center justify-center">
-										<p className="text-muted-foreground text-center">Error al cargar el PDF</p>
-									</div>
-								}
-								loading={
-									<div className="flex h-40 items-center justify-center">
-										<p className="text-muted-foreground text-center">Cargando PDF...</p>
-									</div>
-								}
-							>
-								<Page pageNumber={pageNumber} width={500} className="mb-4" />
-							</Document>
-							{numPages && (
-								<div className="flex items-center gap-4">
-									<Button
-										type="button"
-										variant="outline"
-										onClick={previousPage}
-										disabled={pageNumber <= 1}
-										size="sm"
-									>
-										Anterior
-									</Button>
-									<p className="text-sm">
-										Página {pageNumber} de {numPages}
-									</p>
-									<Button
-										type="button"
-										variant="outline"
-										onClick={nextPage}
-										disabled={pageNumber >= (numPages || 1)}
-										size="sm"
-									>
-										Siguiente
-									</Button>
-								</div>
-							)}
+						<div className="flex w-full max-w-4xl flex-col items-center">
+							<iframe src={url} className="h-[80vh] w-full" title="PDF Viewer" />
 						</div>
 					) : (
 						<div className="flex h-40 items-center justify-center">
-							<p className="text-muted-foreground text-center">
-								Vista previa no disponible para este tipo de archivo
-							</p>
+							<p className="text-muted-foreground text-center">Vista previa no disponible</p>
 						</div>
 					)}
 				</div>

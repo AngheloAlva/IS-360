@@ -9,11 +9,11 @@ import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
 import { PLAN_FREQUENCY } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
-import CreateMaintenancePlanTaskWorkOrderForm from "@/project/work-order/components/forms/CreateMaintenancePlanTaskWorkOrderForm"
 import PostponeTaskDialog from "@/project/work-order/components/forms/PostponeTask"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
+import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 
 export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	{
@@ -23,10 +23,9 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 			<div className="flex items-center justify-center gap-2">
 				<PostponeTaskDialog taskId={row.original.id} nextDate={row.original.nextDate} />
 
-				<CreateMaintenancePlanTaskWorkOrderForm
+				<CreateWorkOrderForm
 					equipmentId={row.original.equipment.id}
 					maintenancePlanTaskId={row.original.id}
-					location={row.original?.location || "PRM"}
 					equipmentName={row.original.equipment.name}
 				/>
 			</div>

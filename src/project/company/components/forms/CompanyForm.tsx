@@ -416,6 +416,7 @@ export default function CompanyForm(): React.ReactElement {
 						<div className="flex w-full items-center justify-center gap-2">
 							<Button
 								size="lg"
+								type="button"
 								variant="outline"
 								onClick={() => setOpen(false)}
 								className="w-1/2 border-2 border-indigo-600 font-medium tracking-wider text-indigo-600 transition-all hover:scale-105 hover:bg-indigo-600 hover:text-white"
