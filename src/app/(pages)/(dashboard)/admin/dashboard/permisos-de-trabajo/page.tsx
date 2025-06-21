@@ -19,6 +19,15 @@ export default async function WorkPermitsAdminPage() {
 
 	if (!session?.user?.id) return notFound()
 
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				workPermit: ["create"],
+			},
+		},
+	})
+
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 overflow-hidden transition-all">
 			<div className="rounded-lg bg-gradient-to-r from-pink-600 to-rose-700 p-6">
@@ -34,7 +43,7 @@ export default async function WorkPermitsAdminPage() {
 
 			<WorkPermitStatsContainer />
 
-			<WorkPermitsTable />
+			<WorkPermitsTable hasPermission={hasPermission.success} userId={session.user.id} />
 		</div>
 	)
 }

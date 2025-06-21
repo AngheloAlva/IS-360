@@ -4,16 +4,22 @@ import prisma from "@/lib/prisma"
 
 import type { WorkPermitSchema } from "@/project/work-permit/schemas/work-permit.schema"
 
-export const createWorkPermit = async (values: WorkPermitSchema) => {
+interface CreateWorkPermitProps {
+	userId: string
+	companyId: string
+	values: WorkPermitSchema
+}
+
+export const createWorkPermit = async ({ values, userId, companyId }: CreateWorkPermitProps) => {
 	try {
-		const { userId, otNumber, companyId, participants, ...rest } = values
+		const { participants, ...rest } = values
 
 		await prisma.workPermit.create({
 			data: {
 				...rest,
 				otNumber: {
 					connect: {
-						otNumber,
+						otNumber: values.otNumber,
 					},
 				},
 				user: {

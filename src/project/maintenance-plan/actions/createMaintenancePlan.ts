@@ -19,7 +19,6 @@ export const createMaintenancePlan = async ({ values }: CreateMaintenancePlanVal
 				slug: planSlug,
 				description: "",
 				name: values.name,
-				location: values.location,
 				equipment: {
 					connect: {
 						id: values.equipmentId,

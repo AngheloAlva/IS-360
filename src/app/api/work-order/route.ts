@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 		const companyId = searchParams.get("companyId") || null
 		const startDate = searchParams.get("startDate") || null
 		const endDate = searchParams.get("endDate") || null
+		const permitFilter = searchParams.get("permitFilter") === "true"
 
 		const skip = (page - 1) * limit
 
@@ -28,8 +29,13 @@ export async function GET(req: NextRequest) {
 					}
 				: {}),
 			...(statusFilter
+				? { status: statusFilter as WORK_ORDER_STATUS }
+				: permitFilter
+					? { status: { in: [WORK_ORDER_STATUS.PLANNED, WORK_ORDER_STATUS.IN_PROGRESS] } }
+					: {}),
+			...(permitFilter
 				? {
-						status: statusFilter as WORK_ORDER_STATUS,
+						estimatedEndDate: { gte: new Date() },
 					}
 				: {}),
 			...(typeFilter

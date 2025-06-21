@@ -1,10 +1,10 @@
 "use client"
 
+import { endOfWeek, isSunday, nextMonday, format } from "date-fns"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { addDays, format } from "date-fns"
 import { Plus, X } from "lucide-react"
 import { es } from "date-fns/locale"
 import { toast } from "sonner"
@@ -43,49 +43,72 @@ import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 import { Form } from "@/shared/components/ui/form"
 import { queryClient } from "@/lib/queryClient"
+import { WorkPermit } from "../../hooks/use-work-permit"
+import { updateWorkPermit } from "../../actions/updateWorkPermit"
 
 interface WorkPermitFormProps {
 	userId: string
-	companyId: string
 	userName: string
+	companyId: string
+	isOtcMember?: boolean
+	initialValues?: WorkPermit
 }
 
 export default function WorkPermitForm({
 	userId,
 	userName,
 	companyId,
+	initialValues,
+	isOtcMember = false,
 }: WorkPermitFormProps): React.ReactElement {
-	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [workOrderSelected, setWorkOrderSelected] = useState<WorkOrder | null>(null)
+	const [isSubmitting, setIsSubmitting] = useState(false)
+
+	const getPermitExpirationDate = (startDate: Date, otEndDate: Date | null): Date => {
+		const upcomingSunday = endOfWeek(startDate, { weekStartsOn: 1 })
+
+		const adjustedUpcomingSunday = isSunday(startDate)
+			? endOfWeek(nextMonday(startDate), { weekStartsOn: 1 })
+			: upcomingSunday
+
+		if (!otEndDate) return adjustedUpcomingSunday
+
+		return otEndDate < adjustedUpcomingSunday ? otEndDate : adjustedUpcomingSunday
+	}
+
+	const getPermitExpirationMessage = (startDate: Date, endDate: Date): string => {
+		const formattedEndDate = format(endDate, "EEEE d 'de' MMMM", { locale: es })
+		const formattedStartDate = format(startDate, "EEEE d 'de' MMMM", { locale: es })
+		return `El permiso iniciará el ${formattedStartDate} y vencerá el ${formattedEndDate}. Los permisos tienen una duración máxima de 7 días y no pueden extenderse más allá del domingo.`
+	}
 
 	const form = useForm<WorkPermitSchema>({
 		resolver: zodResolver(workPermitSchema),
 		defaultValues: {
-			userId: userId,
-			companyId: companyId,
-			tools: [],
-			otNumber: "",
-			otherRisk: "",
-			wasteType: "",
-			mutuality: "",
 			preChecks: [],
-			exactPlace: "",
-			otherTools: "",
-			workWillBe: "",
-			endDate: undefined,
-			otherPreChecks: "",
-			otherMutuality: "",
-			acceptTerms: false,
-			workWillBeOther: "",
-			startDate: undefined,
-			generateWaste: false,
-			aplicantPt: userName,
-			riskIdentification: [],
-			wasteDisposalLocation: "",
-			additionalObservations: "",
-			preventiveControlMeasures: [],
-			otherPreventiveControlMeasures: "",
-			participants: [
+			tools: initialValues?.tools || [],
+			acceptTerms: isOtcMember ? true : false,
+			otherRisk: initialValues?.otherRisk || "",
+			wasteType: initialValues?.wasteType || "",
+			mutuality: initialValues?.mutuality || "",
+			exactPlace: initialValues?.exactPlace || "",
+			otherTools: initialValues?.otherTools || "",
+			workWillBe: initialValues?.workWillBe || "",
+			aplicantPt: initialValues?.user.name || userName,
+			startDate: initialValues?.startDate || undefined,
+			otNumber: initialValues?.otNumber?.otNumber || "",
+			otherMutuality: initialValues?.otherMutuality || "",
+			otherPreChecks: initialValues?.otherPreChecks || "",
+			generateWaste: initialValues?.generateWaste || false,
+			workWillBeOther: initialValues?.workWillBeOther || "",
+			additionalObservations: initialValues?.observations || "",
+			riskIdentification: initialValues?.riskIdentification || [],
+			wasteDisposalLocation: initialValues?.wasteDisposalLocation || "",
+			preventiveControlMeasures: initialValues?.preventiveControlMeasures || [],
+			otherPreventiveControlMeasures: initialValues?.otherPreventiveControlMeasures || "",
+			participants: initialValues?.participants.map((participant) => ({
+				userId: participant.id,
+			})) || [
 				{
 					userId: "",
 				},
@@ -99,13 +122,14 @@ export default function WorkPermitForm({
 	const router = useRouter()
 
 	const { data: workOrdersData } = useWorkOrders({
-		page: 1,
 		companyId,
+		page: 1,
 		limit: 100,
 		search: "",
 		dateRange: null,
 		typeFilter: null,
 		statusFilter: null,
+		permitFilter: true,
 	})
 
 	const { data: usersData } = useUsersByCompany({
@@ -118,42 +142,49 @@ export default function WorkPermitForm({
 	useEffect(() => {
 		const otNumber = form.watch("otNumber")
 
-		if (workOrdersData?.workOrders && otNumber) {
+		if (workOrdersData?.workOrders && otNumber && !initialValues) {
 			const workOrder = workOrdersData.workOrders.find(
 				(workOrder) => workOrder.otNumber === otNumber
 			)
 
-			if (!workOrder) return
+			if (!workOrder || !workOrder.programDate) {
+				toast.error("La orden de trabajo seleccionada no tiene una fecha de programación válida")
+				return
+			}
 
-			form.setValue("startDate", new Date(workOrder.programDate))
+			if (workOrder.status !== "PLANNED" && workOrder.status !== "IN_PROGRESS") {
+				toast.error(
+					"Solo se pueden crear permisos para órdenes de trabajo en estado Planificada o En Proceso"
+				)
+				return
+			}
+
+			const startDate = new Date(workOrder.programDate)
+			const otEndDate = workOrder.estimatedEndDate ? new Date(workOrder.estimatedEndDate) : null
+			const endDate = getPermitExpirationDate(startDate, otEndDate)
+			const expirationMessage = getPermitExpirationMessage(startDate, endDate)
+
+			form.setValue("startDate", startDate)
+			toast.info(expirationMessage)
 			setWorkOrderSelected(workOrder)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("otNumber")])
 
-	useEffect(() => {
-		const workWillBe = form.watch("workWillBe")
-
-		if (
-			workWillBe === "En Caliente" ||
-			workWillBe === "Acceso Limitado" ||
-			workWillBe === "Espacio confinado"
-		) {
-			form.setValue("endDate", addDays(form.watch("startDate"), 1))
-		} else {
-			const day = new Date()
-			day.getDay()
-			// TODO: Maximum end date is 7 days but only if actual day is monday, if other day the end day is maximum until sunday, for example if actual day is wednesday the maximun end date is 4 days
-			form.setValue("endDate", addDays(form.watch("startDate"), 7))
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("workWillBe")])
-
 	async function onSubmit(values: WorkPermitSchema) {
 		try {
 			setIsSubmitting(true)
 
-			const res = await createWorkPermit(values)
+			let res: {
+				ok: boolean
+				message: string
+			}
+
+			if (initialValues) {
+				res = await updateWorkPermit({ id: initialValues.id, values })
+			} else {
+				res = await createWorkPermit({ values, userId, companyId })
+			}
 
 			if (!res.ok) {
 				toast("Error", {
@@ -207,10 +238,6 @@ export default function WorkPermitForm({
 		name: "participants",
 	})
 
-	useEffect(() => {
-		console.log(form.formState.errors)
-	}, [form.formState.errors])
-
 	return (
 		<Card>
 			<CardContent>
@@ -221,17 +248,26 @@ export default function WorkPermitForm({
 					>
 						<div className="flex w-full flex-col gap-x-2 gap-y-5 md:col-span-2 lg:flex-row">
 							<div className="flex w-1/2 flex-col justify-start gap-5">
-								<SelectFormField<WorkPermitSchema>
-									name="otNumber"
-									label="Número de OT"
-									control={form.control}
-									options={
-										workOrdersData?.workOrders?.map((workOrder) => ({
-											value: workOrder.otNumber,
-											label: workOrder.otNumber,
-										})) ?? []
-									}
-								/>
+								{initialValues ? (
+									<InputFormField<WorkPermitSchema>
+										readOnly
+										name="otNumber"
+										label="Número de OT (No editable)"
+										control={form.control}
+									/>
+								) : (
+									<SelectFormField<WorkPermitSchema>
+										name="otNumber"
+										label="Número de OT"
+										control={form.control}
+										options={
+											workOrdersData?.workOrders?.map((workOrder) => ({
+												value: workOrder.otNumber,
+												label: workOrder.otNumber,
+											})) ?? []
+										}
+									/>
+								)}
 
 								<InputFormField<WorkPermitSchema>
 									readOnly
@@ -385,56 +421,10 @@ export default function WorkPermitForm({
 
 						<Separator className="my-2 md:col-span-2" />
 
-						{/* <h2 className="text-lg font-semibold ">Analisis seguro del trabajo</h2>
-
-						<div className="flex w-full items-center justify-between md:col-span-2">
-							<FormLabel className=" md:col-span-2">Detalle de Actividades</FormLabel>
-
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => appendActivityDetails({ activity: "" })}
-							>
-								Agregar actividad <Plus />
-							</Button>
-						</div>
-
-						<div className="mb-4 grid gap-4 md:col-span-2 md:grid-cols-2">
-							{activityDetailsFields.map((field, index) => (
-								<FormField
-									key={field.id}
-									control={form.control}
-									name={`activityDetails.${index}.activity`}
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className="">Actividad {index + 1}</FormLabel>
-											<FormControl>
-												<div className="flex items-center justify-center gap-1">
-													<Input
-														className="w-full rounded-md border-gray-200 bg-white text-sm "
-														placeholder="Actividad"
-														{...field}
-													/>
-													<Button
-														type="button"
-														variant="outline"
-														className="border-gray-200"
-														onClick={() => removeActivityDetail(index)}
-													>
-														<X />
-													</Button>
-												</div>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							))}
-						</div> */}
-
 						<MultiSelectFormField<WorkPermitSchema>
 							name="riskIdentification"
 							label="Identificacion de riesgos"
+							itemClassName="content-start"
 							control={form.control}
 							options={RisksOptions}
 						/>
@@ -450,6 +440,7 @@ export default function WorkPermitForm({
 						<MultiSelectFormField<WorkPermitSchema>
 							name="preventiveControlMeasures"
 							label="Medidas de control preventivas"
+							itemClassName="content-start"
 							control={form.control}
 							options={ControlMeasuresOptions}
 						/>
@@ -478,55 +469,28 @@ export default function WorkPermitForm({
 									options={WasteTypesOptions}
 								/>
 
-								<InputFormField<WorkPermitSchema>
+								<SelectFormField<WorkPermitSchema>
+									control={form.control}
 									name="wasteDisposalLocation"
 									label="Los residuos seran dispuestos en"
-									control={form.control}
+									placeholder="Seleccione el lugar de disposición de residuos"
+									options={[
+										{
+											value: "Vertedero establecido",
+											label: "Vertedero establecido",
+										},
+										{
+											value: "Instalaciones de contratista",
+											label: "Instalaciones de contratista",
+										},
+										{
+											value: "Bodegas de residuos OTC",
+											label: "Bodegas de residuos OTC",
+										},
+									]}
 								/>
 							</>
 						)}
-
-						{/* 
-						<h2 className="text-lg font-semibold  md:col-span-2">
-							Firmas de autorización
-						</h2>
-
-						<InputFormField<WorkPermitSchema>
-							name="whoDeliversWorkAreaOp"
-							label="Quien entrega el área de trabajo (OP)"
-							control={form.control}
-						/>
-
-						<InputFormField<WorkPermitSchema>
-							name="workerExecutor"
-							label="Ejecutor del trabajo"
-							control={form.control}
-						/> */}
-
-						{/* 							
-								<Separator className="my-2 bg-gray-200 md:col-span-2" />
-
-								<h2 className="text-lg font-semibold  md:col-span-2">
-									Recepcion del trabajo
-								</h2>
-
-								<SwitchFormField<WorkPermitSchema>
-									control={form.control}
-									name="cleanAndTidyWorkArea"
-									label="El área de trabajo se encuentra limpia y ordenada"
-								/>
-
-								<SwitchFormField<WorkPermitSchema>
-									control={form.control}
-									name="workCompleted"
-									label="Trabajo terminado"
-								/>
-
-								<TextAreaFormField<WorkPermitSchema>
-									name="observations"
-									label="Observaciones"
-									control={form.control}
-								/> */}
 
 						<Separator className="mt-2 md:col-span-2" />
 
@@ -582,16 +546,18 @@ export default function WorkPermitForm({
 							label="Observaciones adicionales a los trabajos"
 						/>
 
-						<SwitchFormField<WorkPermitSchema>
-							name="acceptTerms"
-							control={form.control}
-							itemClassName="sm:col-span-2"
-							label="Los trabajadores declaran haber sido participe en la ejecucion del analisis de trabajo seguro (AST), estar instruido acerca del metodo correcto y seguro de trabajo, los riesgos y peligros asociados y sus medidas de prevencion."
-						/>
+						{!isOtcMember && (
+							<SwitchFormField<WorkPermitSchema>
+								name="acceptTerms"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								label="Los trabajadores declaran haber sido participe en la ejecucion del analisis de trabajo seguro (AST), estar instruido acerca del metodo correcto y seguro de trabajo, los riesgos y peligros asociados y sus medidas de prevencion."
+							/>
+						)}
 
 						<SubmitButton
 							disabled={!acceptTerms}
-							label="Enviar solicitud"
+							label={initialValues ? "Actualizar solicitud" : "Crear solicitud"}
 							isSubmitting={isSubmitting}
 							className="mt-4 md:col-span-2"
 						/>

@@ -1,20 +1,27 @@
 "use client"
 
-import { Building2Icon, PrinterIcon, UserIcon } from "lucide-react"
+import { Building2Icon, PenBoxIcon, PrinterIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
 import { WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
+import { WORK_PERMIT_STATUS } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
 import WorkPermitAttachmentForm from "../components/forms/WorkPermitAttachmentForm"
 import WorkPermitDetailsDialog from "../components/dialogs/WorkPermitDetailsDialog"
+import ApproveWorkPermit from "../components/forms/ApproveWorkPermit"
 import { Button } from "@/shared/components/ui/button"
+import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
 
-export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
+export const getWorkPermitColumns = (
+	hasPermission: boolean,
+	userId: string
+): ColumnDef<WorkPermit>[] => [
 	{
 		accessorKey: "otNumber",
 		header: "OT",
@@ -53,6 +60,24 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 					<Building2Icon className="text-muted-foreground size-4" />
 					{company}
 				</div>
+			)
+		},
+	},
+	{
+		accessorKey: "status",
+		header: "Estado",
+		cell: ({ row }) => {
+			const status = row.original.status
+			return (
+				<Badge
+					className={cn("bg-purple-500/10 text-purple-500", {
+						"bg-indigo-500/10 text-indigo-500": status === WORK_PERMIT_STATUS.CANCELLED,
+						"bg-red-500/10 text-red-500": status === WORK_PERMIT_STATUS.REJECTED,
+						"bg-fuchsia-500/10 text-fuchsia-500": status === WORK_PERMIT_STATUS.ACTIVE,
+					})}
+				>
+					{WorkPermitStatusLabels[status as keyof typeof WorkPermitStatusLabels]}
+				</Badge>
 			)
 		},
 	},
@@ -97,18 +122,6 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 		},
 	},
 	{
-		accessorKey: "status",
-		header: "Estado",
-		cell: ({ row }) => {
-			const status = row.original.status
-			return (
-				<div className="truncate">
-					{WorkPermitStatusLabels[status as keyof typeof WorkPermitStatusLabels]}
-				</div>
-			)
-		},
-	},
-	{
 		accessorKey: "actions",
 		header: "Acciones",
 		cell: ({ row }) => {
@@ -116,6 +129,10 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 
 			return (
 				<div className="z-50 flex items-center gap-2">
+					{hasPermission && row.original.status === WORK_PERMIT_STATUS.REVIEW_PENDING && (
+						<ApproveWorkPermit workPermitId={id} userId={userId} />
+					)}
+
 					<Link href={`/api/work-permit/pdf/${id}`} target="_blank">
 						<Button
 							size={"icon"}
@@ -131,6 +148,16 @@ export const WorkPermitColumns: ColumnDef<WorkPermit>[] = [
 						workPermitId={row.original.id}
 						companyId={row.original.company.id}
 					/>
+
+					<Link href={`/admin/dashboard/permisos-de-trabajo/${id}`}>
+						<Button
+							size={"icon"}
+							variant={"ghost"}
+							className="cursor-pointer text-indigo-500 hover:bg-indigo-500 hover:text-white"
+						>
+							<PenBoxIcon className="h-4 w-4" />
+						</Button>
+					</Link>
 				</div>
 			)
 		},

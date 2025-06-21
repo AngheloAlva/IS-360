@@ -1,8 +1,6 @@
 import { z } from "zod"
 
 export const workPermitSchema = z.object({
-	userId: z.string(),
-	companyId: z.string(),
 	otNumber: z.string().nonempty({ message: "Debe seleccionar un número de OT" }),
 	aplicantPt: z
 		.string()

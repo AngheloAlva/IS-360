@@ -8,7 +8,6 @@ import { toast } from "sonner"
 
 import { createMaintenancePlan } from "@/project/maintenance-plan/actions/createMaintenancePlan"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
-import { PlanLocationOptions } from "@/lib/consts/plan-location"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
@@ -17,7 +16,6 @@ import {
 } from "@/project/maintenance-plan/schemas/maintenance-plan.schema"
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover"
-import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
@@ -62,7 +60,6 @@ export default function MaintenancePlanForm({
 		defaultValues: {
 			name: "",
 			createdById: userId,
-			location: undefined,
 			equipmentId: undefined,
 		},
 	})
@@ -139,16 +136,8 @@ export default function MaintenancePlanForm({
 							name="name"
 							label="Nombre"
 							control={form.control}
+							itemClassName="sm:col-span-2"
 							placeholder="Nombre del plan de mantenimiento"
-							className="sm:col-span-2"
-						/>
-
-						<SelectFormField<MaintenancePlanSchema>
-							name="location"
-							label="Ubicación"
-							control={form.control}
-							options={PlanLocationOptions}
-							placeholder="Selecciona la ubicación"
 						/>
 
 						<FormField

@@ -71,6 +71,7 @@ interface WorkOrdersParams {
 	typeFilter: string | null
 	statusFilter: string | null
 	dateRange: DateRange | null
+	permitFilter?: boolean
 }
 
 interface WorkOrdersResponse {
@@ -92,10 +93,11 @@ export const fetchWorkOrders: QueryFunction<
 			statusFilter: string | null
 			companyId: string | null
 			dateRange: DateRange | null
+			permitFilter?: boolean
 		},
 	]
 > = async ({ queryKey }) => {
-	const [, { page, limit, search, typeFilter, statusFilter, companyId, dateRange }] = queryKey
+	const [, { page, limit, search, typeFilter, statusFilter, companyId, dateRange, permitFilter }] = queryKey
 
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())
@@ -106,6 +108,7 @@ export const fetchWorkOrders: QueryFunction<
 	if (companyId) searchParams.set("companyId", companyId)
 	if (dateRange?.from) searchParams.set("startDate", dateRange.from.toISOString())
 	if (dateRange?.to) searchParams.set("endDate", dateRange.to.toISOString())
+	if (permitFilter) searchParams.set("permitFilter", "true")
 
 	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching work orders")
@@ -121,10 +124,11 @@ export const useWorkOrders = ({
 	statusFilter = null,
 	companyId = null,
 	dateRange = null,
+	permitFilter = false,
 }: WorkOrdersParams) => {
 	const queryKey = [
 		"workOrders",
-		{ page, limit, search, typeFilter, statusFilter, companyId, dateRange },
+		{ page, limit, search, typeFilter, statusFilter, companyId, dateRange, permitFilter },
 	] as const
 
 	return useQuery<WorkOrdersResponse>({

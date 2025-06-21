@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table"
 
 import { useWorkPermits } from "@/project/work-permit/hooks/use-work-permit"
-import { WorkPermitColumns } from "../../columns/work-permit-columns"
+import { getWorkPermitColumns } from "../../columns/work-permit-columns"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
@@ -28,7 +28,13 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-export default function WorkPermitsTable() {
+export default function WorkPermitsTable({
+	hasPermission,
+	userId,
+}: {
+	hasPermission: boolean
+	userId: string
+}) {
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
@@ -44,10 +50,10 @@ export default function WorkPermitsTable() {
 
 	const table = useReactTable({
 		data: data?.workPermits ?? [],
-		columns: WorkPermitColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		columns: getWorkPermitColumns(hasPermission, userId),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		state: {
@@ -112,7 +118,10 @@ export default function WorkPermitsTable() {
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={WorkPermitColumns.length} className="h-24 text-center">
+								<TableCell
+									colSpan={getWorkPermitColumns(hasPermission, userId).length}
+									className="h-24 text-center"
+								>
 									No se encontraron resultados.
 								</TableCell>
 							</TableRow>

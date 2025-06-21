@@ -15,13 +15,13 @@ export interface WorkPermit {
 	workWillBeOther: string
 	tools: string[]
 	otherTools: string | null
-	preChecks: string
+	preChecks: string[]
 	otherPreChecks: string
-	riskIdentification: string
+	riskIdentification: string[]
 	otherRisk: string
-	preventiveControlMeasures: string
+	preventiveControlMeasures: string[]
 	otherPreventiveControlMeasures: string
-	generateWaste: string
+	generateWaste: boolean
 	wasteType: string
 	wasteDisposalLocation: string
 	observations: string

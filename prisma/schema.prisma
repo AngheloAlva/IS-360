@@ -89,6 +89,7 @@ model User {
   workPermitsAsParticipant        WorkPermit[]              @relation("WorkPermitParticipants")
   workPermitsAsPreventionOfficer  WorkPermit[]              @relation("PreventionOfficer")
   workPermits                     WorkPermit[]              @relation("WorkPermitUser")
+  workPermitApproval              WorkPermit[]              @relation("WorkPermitApproval")
   attachmentsHistory              AttachmentHistory[]
   equipmentHistory                EquipmentHistory[]
   fileHistory                     FileHistory[]
@@ -530,15 +531,17 @@ model Attachment {
 
 enum WORK_PERMIT_STATUS {
   ACTIVE
+  REJECTED
   IN_PROGRESS
   COMPLETED
   CANCELLED
   EXPIRED
+  REVIEW_PENDING
 }
 
 model WorkPermit {
-  id                             String             @id @default(cuid())
-  status                         WORK_PERMIT_STATUS @default(ACTIVE)
+  id                             String                 @id @default(cuid())
+  status                         WORK_PERMIT_STATUS     @default(REVIEW_PENDING)
   aplicantPt                     String
   mutuality                      String
   otherMutuality                 String?
@@ -563,24 +566,26 @@ model WorkPermit {
   cleanAndTidyWorkArea           Boolean?
   additionalObservations         String?
   observations                   String?
-  acceptTerms                    Boolean            @default(false)
+  acceptTerms                    Boolean                @default(false)
   startDate                      DateTime
   endDate                        DateTime
   initialAreaMeasurement         Float?
-  createdAt                      DateTime           @default(now())
-  updatedAt                      DateTime           @updatedAt
-
-  preventionOfficerUser User?                  @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
-  preventionOfficerId   String?
-  otNumber              WorkOrder              @relation(fields: [otNumberId], references: [id])
-  otNumberId            String
-  user                  User                   @relation("WorkPermitUser", fields: [userId], references: [id])
-  userId                String
-  participants          User[]                 @relation("WorkPermitParticipants")
-  company               Company                @relation(fields: [companyId], references: [id])
-  companyId             String
-  vehicles              Vehicle[]
-  attachments           WorkPermitAttachment[]
+  createdAt                      DateTime               @default(now())
+  updatedAt                      DateTime               @updatedAt
+  approvalDate                   DateTime?
+  approvalBy                     User?                  @relation("WorkPermitApproval", fields: [approvalById], references: [id])
+  approvalById                   String?
+  preventionOfficerUser          User?                  @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
+  preventionOfficerId            String?
+  otNumber                       WorkOrder              @relation(fields: [otNumberId], references: [id])
+  otNumberId                     String
+  user                           User                   @relation("WorkPermitUser", fields: [userId], references: [id])
+  userId                         String
+  participants                   User[]                 @relation("WorkPermitParticipants")
+  company                        Company                @relation(fields: [companyId], references: [id])
+  companyId                      String
+  vehicles                       Vehicle[]
+  attachments                    WorkPermitAttachment[]
 
   @@map("work_permit")
 }
@@ -870,13 +875,13 @@ enum MAINTENANCE_PLAN_LOCATION {
 }
 
 model MaintenancePlan {
-  id          String                    @id @default(cuid())
-  slug        String                    @unique
+  id          String                     @id @default(cuid())
+  slug        String                     @unique
   name        String
   description String
-  location    MAINTENANCE_PLAN_LOCATION
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @updatedAt
+  location    MAINTENANCE_PLAN_LOCATION?
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
 
   equipment   Equipment             @relation(fields: [equipmentId], references: [id])
   equipmentId String

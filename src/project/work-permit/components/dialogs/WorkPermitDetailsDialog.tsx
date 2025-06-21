@@ -201,7 +201,7 @@ export default function WorkPermitDetailsDialog({
 
 						<ul className="space-y-1">
 							{workPermit.attachments.map((attachment) => (
-								<li key={attachment.id}>
+								<li key={attachment.id} className="flex flex-col">
 									<Link
 										href={attachment.url}
 										target="_blank"
@@ -211,6 +211,11 @@ export default function WorkPermitDetailsDialog({
 										<PaperclipIcon className="h-4 w-4" />
 										{attachment.name}
 									</Link>
+
+									<p className="text-muted-foreground text-sm">
+										Subido por {attachment.uploadedBy.name} el{" "}
+										{format(new Date(attachment.uploadedAt), "dd/MM/yyyy HH:mm", { locale: es })}
+									</p>
 								</li>
 							))}
 						</ul>
