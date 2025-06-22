@@ -67,8 +67,8 @@ export default function ActivityForm({
 			workOrderId,
 			comments: "",
 			activityName: "",
-			activityEndTime: "",
-			activityStartTime: "",
+			activityEndTime: new Date().toTimeString().split(" ")[0],
+			activityStartTime: new Date().toTimeString().split(" ")[0],
 			executionDate: startDate,
 			personnel: [
 				{

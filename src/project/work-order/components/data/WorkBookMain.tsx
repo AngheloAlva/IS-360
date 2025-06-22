@@ -149,8 +149,10 @@ export default function WorkBookMain({
 						userId={userId}
 						userRole={userRole}
 						workOrderId={workBook.id}
+						hasPermission={hasPermission}
 						supervisorId={workBook.supervisorId}
 						canRequestClosure={canRequestClosure}
+						responsibleId={workBook.responsibleId}
 						workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
 					/>
 				</TabsContent>

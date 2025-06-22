@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
+import { subDays } from "date-fns"
 
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE } from "@prisma/client"
-import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
-import { Order, OrderBy } from "@/shared/components/OrderByButton"
+import prisma from "@/lib/prisma"
+
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth.api.getSession({
@@ -56,7 +58,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					: {}),
 			...(permitFilter
 				? {
-						estimatedEndDate: { gte: new Date() },
+						estimatedEndDate: { gte: subDays(new Date(), 1) },
 					}
 				: {}),
 			...(typeFilter

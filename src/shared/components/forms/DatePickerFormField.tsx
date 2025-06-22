@@ -76,10 +76,11 @@ export function DatePickerFormField<T extends FieldValues>({
 						<PopoverContent className="w-auto p-0">
 							<Calendar
 								locale={es}
-								initialFocus
 								mode="single"
 								selected={field.value}
 								onSelect={field.onChange}
+								defaultMonth={field.value}
+								captionLayout={"dropdown"}
 								disabled={disabledCondition}
 							/>
 						</PopoverContent>

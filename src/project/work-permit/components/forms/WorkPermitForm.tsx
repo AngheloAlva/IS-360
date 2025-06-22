@@ -332,10 +332,10 @@ export default function WorkPermitForm({
 									</Badge>
 								</div>
 								<div>
-									<h3 className="text-sm font-semibold">Fecha de solicitud:</h3>
+									<h3 className="text-sm font-semibold">Fecha programada:</h3>
 									<p className="text-muted-foreground">
-										{workOrderSelected?.solicitationDate
-											? format(workOrderSelected.solicitationDate, "PPP", { locale: es })
+										{workOrderSelected?.programDate
+											? format(workOrderSelected.programDate, "PPP", { locale: es })
 											: "N/A"}
 									</p>
 								</div>
@@ -346,10 +346,10 @@ export default function WorkPermitForm({
 									</p>
 								</div>
 								<div>
-									<h3 className="text-sm font-semibold">Fecha programada:</h3>
+									<h3 className="text-sm font-semibold">Fecha estimada de finalización:</h3>
 									<p className="text-muted-foreground">
-										{workOrderSelected?.programDate
-											? format(workOrderSelected.programDate, "PPP", { locale: es })
+										{workOrderSelected?.estimatedEndDate
+											? format(workOrderSelected.estimatedEndDate, "PPP", { locale: es })
 											: "N/A"}
 									</p>
 								</div>

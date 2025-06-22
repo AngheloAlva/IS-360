@@ -45,6 +45,7 @@ import {
 
 import type { Company } from "@/project/company/hooks/use-companies"
 import { cn } from "@/lib/utils"
+import { addDays } from "date-fns"
 
 interface CreateWorkOrderFormProps {
 	className?: string
@@ -64,7 +65,7 @@ export default function CreateWorkOrderForm({
 
 	const [open, setOpen] = useState(false)
 
-	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
+	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "" })
 	const { data: equipmentsData } = useEquipments({ limit: 1000 })
 	const { data: companiesData } = useCompanies({ limit: 1000 })
 
@@ -92,12 +93,14 @@ export default function CreateWorkOrderForm({
 	})
 
 	useEffect(() => {
-		const estimatedHours = Number(form.watch("estimatedHours"))
-		const estimatedDays = Math.ceil(estimatedHours / 8)
+		const estimatedDays = Number(form.watch("estimatedDays"))
+		const estimatedHours = estimatedDays * 8
+		const estimatedEndDate = addDays(new Date(form.watch("programDate")), estimatedDays)
 
-		form.setValue("estimatedDays", estimatedDays.toString())
+		form.setValue("estimatedHours", estimatedHours.toString())
+		form.setValue("estimatedEndDate", estimatedEndDate)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("estimatedHours")])
+	}, [form.watch("estimatedDays")])
 
 	async function onSubmit(values: WorkOrderSchema) {
 		const initReportFile = form.getValues("file")?.[0]
@@ -356,6 +359,12 @@ export default function CreateWorkOrderForm({
 							name="estimatedDays"
 							control={form.control}
 							label="Días Estimados"
+						/>
+
+						<DatePickerFormField<WorkOrderSchema>
+							name="estimatedEndDate"
+							control={form.control}
+							label="Fecha Final Estimada"
 						/>
 
 						<InputFormField<WorkOrderSchema>

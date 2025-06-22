@@ -1,9 +1,8 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-
 import { cn } from "@/lib/utils"
 
+import { Input } from "../ui/input"
 import {
 	FormItem,
 	FormLabel,
@@ -12,39 +11,22 @@ import {
 	FormMessage,
 	FormDescription,
 } from "@/shared/components/ui/form"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectTrigger,
-	SelectContent,
-} from "@/shared/components/ui/select"
 
-import type { Control, FieldValues, Path, ControllerRenderProps } from "react-hook-form"
+import type { Control, FieldValues, Path } from "react-hook-form"
+import { Clock2Icon } from "lucide-react"
 
 interface TimePickerFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label: string
 	optional?: boolean
-	className?: string
+	disabled?: boolean
+	readOnly?: boolean
 	control: Control<T>
 	description?: string
-	itemClassName?: string
-	disabled?: boolean
+	placeholder?: string
+	className?: React.ComponentProps<"div">["className"]
+	itemClassName?: React.ComponentProps<"div">["className"]
 }
-
-const HOURS = Array.from({ length: 24 }, (_, i) => ({
-	value: i.toString().padStart(2, "0"),
-	label: i.toString().padStart(2, "0"),
-}))
-
-const MINUTES = Array.from({ length: 12 }, (_, i) => {
-	const value = (i * 5).toString().padStart(2, "0")
-	return {
-		value,
-		label: value,
-	}
-})
 
 export function TimePickerFormField<T extends FieldValues>({
 	name,
@@ -55,93 +37,41 @@ export function TimePickerFormField<T extends FieldValues>({
 	itemClassName,
 	optional = false,
 	disabled = false,
+	readOnly = false,
+	placeholder = "",
 }: TimePickerFormFieldProps<T>) {
-	const [hours, setHours] = useState<string>("")
-	const [minutes, setMinutes] = useState<string>("")
-	const fieldRef = useRef<ControllerRenderProps<T, Path<T>> | null>(null)
-
-	const handleTimeChange = (
-		field: ControllerRenderProps<T, Path<T>>,
-		hours: string,
-		minutes: string
-	) => {
-		if (hours && minutes) {
-			field.onChange(`${hours}:${minutes}`)
-		}
-	}
-
-	useEffect(() => {
-		if (fieldRef.current?.value) {
-			const [h, m] = fieldRef.current.value.split(":")
-			setHours(h)
-			setMinutes(m)
-		}
-	}, [fieldRef.current?.value])
-
 	return (
 		<FormField
 			name={name}
 			control={control}
-			render={({ field }) => {
-				fieldRef.current = field
+			render={({ field }) => (
+				<FormItem className={cn("content-start", itemClassName)}>
+					<FormLabel className="gap-1">
+						{label}
+						{optional && <span className="text-muted-foreground"> (opcional)</span>}
+					</FormLabel>
+					<FormControl>
+						<div className="relative flex w-full items-center gap-2">
+							<Clock2Icon className="text-muted-foreground pointer-events-none absolute left-2.5 size-4 select-none" />
 
-				return (
-					<FormItem className={itemClassName}>
-						<FormLabel className="gap-1">
-							{label}
-							{optional && <span className="text-muted-foreground"> (opcional)</span>}
-						</FormLabel>
-						<FormControl>
-							<div className={cn("flex items-center gap-1", className)}>
-								<Select
-									value={hours}
-									disabled={disabled}
-									onValueChange={(value) => {
-										setHours(value)
-										handleTimeChange(field, value, minutes)
-									}}
-								>
-									<SelectTrigger className="w-full">
-										<SelectValue placeholder="HH" />
-									</SelectTrigger>
-									<SelectContent>
-										{HOURS.map((hour) => (
-											<SelectItem key={hour.value} value={hour.value}>
-												{hour.label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-
-								<span className="text-lg font-bold">:</span>
-
-								<Select
-									value={minutes}
-									disabled={disabled}
-									onValueChange={(value) => {
-										setMinutes(value)
-										handleTimeChange(field, hours, value)
-									}}
-								>
-									<SelectTrigger className="w-full">
-										<SelectValue placeholder="MM" />
-									</SelectTrigger>
-									<SelectContent>
-										{MINUTES.map((minute) => (
-											<SelectItem key={minute.value} value={minute.value}>
-												{minute.label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						</FormControl>
-
-						{description && <FormDescription>{description}</FormDescription>}
-						<FormMessage />
-					</FormItem>
-				)
-			}}
+							<Input
+								step={1}
+								type="time"
+								disabled={disabled}
+								readOnly={readOnly}
+								className={cn(
+									"w-full appearance-none pl-8 text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+									className
+								)}
+								placeholder={placeholder || label}
+								{...field}
+							/>
+						</div>
+					</FormControl>
+					{description && <FormDescription>{description}</FormDescription>}
+					<FormMessage />
+				</FormItem>
+			)}
 		/>
 	)
 }

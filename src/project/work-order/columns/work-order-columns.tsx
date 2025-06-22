@@ -205,6 +205,19 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
+		accessorKey: "estimatedEndDate",
+		header: "Fecha estimada de finalización",
+		cell: ({ row }) => {
+			const date = row.getValue("estimatedEndDate") as string
+
+			return (
+				<div className="font-medium">
+					{date ? format(new Date(date), "PPP", { locale: es }) : "Sin fecha"}
+				</div>
+			)
+		},
+	},
+	{
 		accessorKey: "_count",
 		header: "Actividades Realizadas",
 		cell: ({ row }) => {
@@ -224,7 +237,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 					size="icon"
 					variant="outline"
 					disabled={!report}
-					className="text-primary bg-primary/10 hover:bg-primary/50 border-primary hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
+					className="hover:bg-orange-amber/50 border-amber-500 bg-amber-500/10 text-amber-500 hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
 				>
 					<Link
 						target="_blank"
@@ -249,7 +262,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 					size="icon"
 					variant="outline"
 					disabled={!report}
-					className="text-primary bg-primary/10 hover:bg-primary/50 border-primary hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
+					className="hover:bg-orange-amber/50 border-amber-500 bg-amber-500/10 text-amber-500 hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
 				>
 					<Link
 						target="_blank"

@@ -38,7 +38,7 @@ export interface WorkEntry {
 		name: string
 		createdAt: string
 	}[]
-	milestone: {
+	milestone?: {
 		id: string
 		name: string
 	}

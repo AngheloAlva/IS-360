@@ -15,6 +15,8 @@ interface WorkBookMilestonesProps {
 	userRole: string
 	workOrderId: string
 	supervisorId: string
+	responsibleId: string
+	hasPermission: boolean
 	workOrderStartDate: Date
 	canRequestClosure: boolean
 }
@@ -24,6 +26,8 @@ export default function WorkBookMilestones({
 	userRole,
 	workOrderId,
 	supervisorId,
+	responsibleId,
+	hasPermission,
 	canRequestClosure,
 	workOrderStartDate,
 }: WorkBookMilestonesProps) {
@@ -88,6 +92,8 @@ export default function WorkBookMilestones({
 					userRole={userRole}
 					workOrderId={workOrderId}
 					supervisorId={supervisorId}
+					responsibleId={responsibleId}
+					hasPermission={hasPermission}
 					milestones={data?.milestones || []}
 				/>
 			</CardContent>

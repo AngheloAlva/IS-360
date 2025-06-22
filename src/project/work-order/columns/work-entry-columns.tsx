@@ -33,7 +33,7 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		accessorKey: "milestone",
 		header: "Nombre del hito",
 		cell: ({ row }) => {
-			const milestone = row.original.milestone.name
+			const milestone = row.original.milestone?.name
 
 			return <span>{milestone}</span>
 		},
