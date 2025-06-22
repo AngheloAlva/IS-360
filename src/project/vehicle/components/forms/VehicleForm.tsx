@@ -72,13 +72,13 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 		if (isUpdate && vehicleData) {
 			form.reset({
 				id: vehicleData.id,
-				plate: vehicleData.plate,
-				model: vehicleData.model,
-				year: vehicleData.year,
-				brand: vehicleData.brand,
-				type: vehicleData.type as (typeof VEHICLE_TYPE_VALUES_ARRAY)[number],
+				plate: vehicleData.plate || "",
+				model: vehicleData.model || "",
+				brand: vehicleData.brand || "",
 				color: vehicleData.color || "",
-				isMain: vehicleData.isMain,
+				isMain: vehicleData.isMain || false,
+				year: vehicleData.year || undefined,
+				type: vehicleData.type as (typeof VEHICLE_TYPE_VALUES_ARRAY)[number],
 			})
 		}
 	}, [isUpdate, vehicleData, form])
