@@ -1,19 +1,19 @@
 "use client"
 
+import { LinkIcon, MapPinIcon, SettingsIcon } from "lucide-react"
 import { differenceInDays, format } from "date-fns"
 import { ColumnDef } from "@tanstack/react-table"
-import { LinkIcon } from "lucide-react"
 import Link from "next/link"
 
 import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
 import { PLAN_FREQUENCY } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
+import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 import PostponeTaskDialog from "@/project/work-order/components/forms/PostponeTask"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
-import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 
 export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	{
@@ -97,7 +97,12 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		header: "Equipo",
 		cell: ({ row }) => {
 			const equipment = row.original.equipment as MaintenancePlanTask["equipment"]
-			return <span>{equipment.name}</span>
+			return (
+				<span className="flex items-center gap-1.5">
+					<SettingsIcon className="text-muted-foreground size-4" />
+					{equipment.name}
+				</span>
+			)
 		},
 	},
 	{
@@ -105,7 +110,12 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 		header: "Ubicación del Equipo",
 		cell: ({ row }) => {
 			const equipments = row.getValue("equipment") as MaintenancePlanTask["equipment"]
-			return <span>{equipments.location}</span>
+			return (
+				<span className="flex items-center gap-1.5">
+					<MapPinIcon className="text-muted-foreground size-4" />
+					{equipments.location}
+				</span>
+			)
 		},
 	},
 	{

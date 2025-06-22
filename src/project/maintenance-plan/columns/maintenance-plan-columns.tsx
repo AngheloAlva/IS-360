@@ -1,5 +1,6 @@
 "use client"
 
+import { MapPinIcon, SettingsIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 
@@ -15,7 +16,12 @@ export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
 		header: "Equipo",
 		cell: ({ row }) => {
 			const equipments = row.getValue("equipment") as MaintenancePlan["equipment"]
-			return <span>{equipments.name}</span>
+			return (
+				<span className="flex items-center gap-1.5">
+					<SettingsIcon className="text-muted-foreground size-4" />
+					{equipments.name}
+				</span>
+			)
 		},
 	},
 	{
@@ -23,7 +29,12 @@ export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
 		header: "Ubicación del Equipo",
 		cell: ({ row }) => {
 			const equipments = row.getValue("equipment") as MaintenancePlan["equipment"]
-			return <span>{equipments.location}</span>
+			return (
+				<span className="flex items-center gap-1.5">
+					<MapPinIcon className="text-muted-foreground size-4" />
+					{equipments.location}
+				</span>
+			)
 		},
 	},
 	{
