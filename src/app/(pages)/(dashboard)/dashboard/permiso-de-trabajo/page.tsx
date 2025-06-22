@@ -38,7 +38,7 @@ export default async function WorkPermitPage() {
 				</div>
 			</div>
 
-			<WorkPermitsTableByCompany companyId={res.user.companyId!} />
+			<WorkPermitsTableByCompany companyId={res.user.companyId!} userId={res.user.id} />
 		</div>
 	)
 }

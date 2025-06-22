@@ -15,8 +15,9 @@ export default async function UpdateWorkPermitPage({
 	const res = await auth.api.getSession({
 		headers: await headers(),
 	})
+	const cookie = (await headers()).get("cookie")
 
-	if (!res) {
+	if (!res || !cookie) {
 		return (
 			<main className="flex h-screen items-center justify-center">
 				<p>Acceso denegado</p>
@@ -32,6 +33,7 @@ export default async function UpdateWorkPermitPage({
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
+				cookie,
 			},
 		}
 	).then((res) => res.json())

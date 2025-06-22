@@ -1,10 +1,20 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
-		const searchParams = request.nextUrl.searchParams
+		const searchParams = req.nextUrl.searchParams
 		const page = parseInt(searchParams.get("page") ?? "1")
 		const limit = parseInt(searchParams.get("limit") ?? "10")
 		const search = searchParams.get("search") ?? ""
@@ -54,13 +64,9 @@ export async function GET(request: NextRequest) {
 			}),
 		])
 
-		return Response.json({
-			safetyTalks,
-			total,
-			pages: Math.ceil(total / limit),
-		})
+		return NextResponse.json({ data: safetyTalks, total, pages: Math.ceil(total / limit) }, { status: 200 })
 	} catch (error) {
 		console.error("[SAFETY_TALKS_GET]", error)
-		return new Response("Internal Error", { status: 500 })
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 })
 	}
 }

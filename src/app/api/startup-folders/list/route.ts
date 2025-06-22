@@ -1,13 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
 import { WORK_ORDER_STATUS } from "@prisma/client"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
-export async function GET(req: NextRequest) {
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const otStatus = searchParams.get("otStatus")
 		const search = searchParams.get("search") || ""
 		const withOtActive = searchParams.get("withOtActive") === "true"
+		const order = searchParams.get("order") as Order
+		const orderBy = searchParams.get("orderBy") as OrderBy
 
 		const companiesWithStartupFolders = await prisma.company.findMany({
 			where: {
@@ -107,6 +121,9 @@ export async function GET(req: NextRequest) {
 						},
 					},
 				},
+			},
+			orderBy: {
+				[orderBy]: order,
 			},
 			cacheStrategy: {
 				ttl: 10,

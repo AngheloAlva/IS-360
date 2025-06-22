@@ -1,25 +1,38 @@
 import { BlobSASPermissions } from "@azure/storage-blob"
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 import {
 	blobServiceClient,
 	FILES_CONTAINER_NAME,
 	DOCUMENTS_CONTAINER_NAME,
 } from "@/lib/azure-storage-client"
 
-import type { NextRequest } from "next/server"
+import { auth } from "@/lib/auth"
 
 type ContainerType = "documents" | "files" | "startup" | "avatars" | "equipment"
 
 export async function POST(request: NextRequest) {
-	const {
-		filenames,
-		containerType = "documents",
-	}: { filenames: string[]; containerType?: ContainerType } = await request.json()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
 
 	try {
 		// Validar entrada
+		const {
+			filenames,
+			containerType = "documents",
+		}: { filenames: string[]; containerType?: ContainerType } = await request.json()
+
 		if (!filenames || filenames.length === 0) {
 			console.error("No se proporcionaron nombres de archivo")
-			return Response.json({ error: "No se proporcionaron nombres de archivo" }, { status: 400 })
+			return NextResponse.json(
+				{ error: "No se proporcionaron nombres de archivo" },
+				{ status: 400 }
+			)
 		}
 
 		// Seleccionar el contenedor correcto basado en el tipo
@@ -47,10 +60,10 @@ export async function POST(request: NextRequest) {
 			})
 		)
 
-		return Response.json({ urls })
+		return NextResponse.json({ urls })
 	} catch (error: unknown) {
 		console.error("Error en POST /api/file:", error)
-		return Response.json(
+		return NextResponse.json(
 			{ error: error instanceof Error ? error.message : "Error interno del servidor" },
 			{ status: 500 }
 		)
@@ -65,7 +78,7 @@ export async function GET(request: NextRequest) {
 		// Validar entrada
 		if (!filename) {
 			console.error("No se proporcionó nombre de archivo")
-			return Response.json({ error: "No se proporcionó nombre de archivo" }, { status: 400 })
+			return NextResponse.json({ error: "No se proporcionó nombre de archivo" }, { status: 400 })
 		}
 
 		// Seleccionar el contenedor correcto basado en el tipo
@@ -83,10 +96,10 @@ export async function GET(request: NextRequest) {
 			expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
 		})
 
-		return Response.json({ url })
+		return NextResponse.json({ url })
 	} catch (error: unknown) {
 		console.error("Error en GET /api/file:", error)
-		return Response.json(
+		return NextResponse.json(
 			{ error: error instanceof Error ? error.message : "Error interno del servidor" },
 			{ status: 500 }
 		)

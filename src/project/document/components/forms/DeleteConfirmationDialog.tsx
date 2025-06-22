@@ -83,8 +83,9 @@ export default function DeleteConfirmationDialog({
 		<AlertDialog open={isOpen} onOpenChange={setIsOpen}>
 			<AlertDialogTrigger asChild>
 				<Button
-					variant="outline"
+					type="button"
 					size={"icon"}
+					variant="outline"
 					onClick={handlePreview}
 					className="border-red-500 bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white"
 				>

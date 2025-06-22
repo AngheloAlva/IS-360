@@ -14,6 +14,7 @@ import {
 	ChevronRightIcon,
 } from "lucide-react"
 
+import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { getCompanyEntities } from "../../actions/get-company-entities"
 import { queryClient } from "@/lib/queryClient"
@@ -26,11 +27,11 @@ import {
 import {
 	ReviewStatus,
 	DocumentCategory,
+	BasicDocumentType,
 	type WorkerDocumentType,
 	type VehicleDocumentType,
 	type EnvironmentalDocType,
 	type SafetyAndHealthDocumentType,
-	BasicDocumentType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -54,11 +55,10 @@ import {
 
 import type {
 	StartupFolderDocument,
+	BasicStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
-	BasicStartupFolderDocument,
 } from "../../types"
-import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -461,6 +461,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 
 			{showLinkDialog && (category === "PERSONNEL" || category === "VEHICLES") && (
 				<LinkEntityDialog
+					userId={userId}
 					category={category}
 					entities={allEntities}
 					isOpen={showLinkDialog}
@@ -468,7 +469,10 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					onClose={() => setShowLinkDialog(false)}
 					onSuccess={() => {
 						queryClient.invalidateQueries({
-							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
+							queryKey: [
+								"startupFolderDocuments",
+								{ startupFolderId, category, workerId: null, vehicleId: null },
+							],
 						})
 						refetch()
 						setShowLinkDialog(false)
@@ -486,11 +490,14 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					onClose={() => setShowSubmitDialog(false)}
 					onSuccess={async () => {
 						queryClient.invalidateQueries({
-							queryKey: ["startupFolderDocuments", { startupFolderId, category }],
+							queryKey: [
+								"startupFolderDocuments",
+								{ startupFolderId, category, workerId: null, vehicleId: null },
+							],
 						})
 						setShowSubmitDialog(false)
 						await refetch()
-						toast.success("Documentos enviados a revisión exitosamente")
+						toast.success("Documentos envia	os a revisión exitosamente")
 					}}
 				/>
 			)}

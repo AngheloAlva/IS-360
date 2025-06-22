@@ -13,12 +13,14 @@ import {
 
 import { useWorkPermits } from "@/project/work-permit/hooks/use-work-permit"
 import { getWorkPermitColumns } from "../../columns/work-permit-columns"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 
+import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { Input } from "@/shared/components/ui/input"
+import SearchInput from "@/shared/components/SearchInput"
 import {
 	Table,
 	TableRow,
@@ -35,27 +37,33 @@ export default function WorkPermitsTable({
 	hasPermission: boolean
 	userId: string
 }) {
+	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [sorting, setSorting] = useState<SortingState>([])
-	const [search, setSearch] = useState("")
-	const [page, setPage] = useState(1)
+	const [order, setOrder] = useState<Order>("desc")
+	const [search, setSearch] = useState<string>("")
+	const [page, setPage] = useState<number>(1)
+
+	const debouncedSearch = useDebounce(search)
 
 	const { data, isLoading, refetch, isFetching } = useWorkPermits({
 		page,
-		search,
+		order,
+		orderBy,
 		limit: 10,
 		companyId: null,
 		dateRange: null,
 		statusFilter: null,
+		search: debouncedSearch,
 	})
 
 	const table = useReactTable({
 		data: data?.workPermits ?? [],
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
+		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		columns: getWorkPermitColumns(hasPermission, userId),
 		getPaginationRowModel: getPaginationRowModel(),
-		getSortedRowModel: getSortedRowModel(),
 		state: {
 			sorting,
 		},
@@ -68,14 +76,23 @@ export default function WorkPermitsTable({
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex w-full items-center justify-between gap-4">
-						<Input
-							placeholder="Buscar permisos..."
+						<SearchInput
 							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							className="h-8 w-[150px] lg:w-[250px]"
+							onChange={setSearch}
+							placeholder="Buscar permisos..."
+							className="w-[150px] lg:w-[250px]"
 						/>
 
-						<RefreshButton refetch={refetch} isFetching={isFetching} />
+						<div className="flex items-center gap-2">
+							<OrderByButton
+								onChange={(orderBy, order) => {
+									setOrderBy(orderBy)
+									setOrder(order)
+								}}
+							/>
+
+							<RefreshButton refetch={refetch} isFetching={isFetching} />
+						</div>
 					</div>
 				</div>
 

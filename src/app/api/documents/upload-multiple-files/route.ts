@@ -1,9 +1,20 @@
 import { FileFormSchema } from "@/project/document/schemas/new-file.schema"
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
-		const formData = await request.formData()
+		const formData = await req.formData()
 		const files = formData.getAll("files") as File[]
 		const data = JSON.parse(formData.get("data") as string) as Omit<FileFormSchema, "files">
 		const { parentFolderId, userId, code, otherCode, ...rest } = data
@@ -65,13 +76,13 @@ export async function POST(request: Request) {
 			})
 		)
 
-		return Response.json({
+		return NextResponse.json({
 			ok: true,
 			data: results,
 		})
 	} catch (error: unknown) {
 		console.error("Error en POST /api/documents/upload-multiple-files:", error)
-		return Response.json(
+		return NextResponse.json(
 			{ error: error instanceof Error ? error.message : "Error interno del servidor" },
 			{ status: 500 }
 		)

@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 export interface DeleteResponse {
@@ -33,15 +38,47 @@ async function getRecursiveFolderContents(folderId: string) {
 }
 
 export async function deleteFile(fileId: string): Promise<DeleteResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			success: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const file = await prisma.file.findUnique({
 			where: { id: fileId },
+			select: {
+				id: true,
+				name: true,
+				type: true,
+				size: true,
+				folderId: true,
+			},
 		})
 		if (!file) return { success: false, message: "Archivo no encontrado" }
 
-		await prisma.file.update({
+		const updatedFile = await prisma.file.update({
 			where: { id: fileId },
 			data: { isActive: false, name: "(Eliminado) " + file.name },
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.DOCUMENTATION,
+			action: ACTIVITY_TYPE.DELETE,
+			entityId: updatedFile.id,
+			entityType: "File",
+			metadata: {
+				name: file.name,
+				type: file.type,
+				size: file.size,
+				folderId: file.folderId,
+			},
 		})
 
 		return {
@@ -59,11 +96,29 @@ export async function deleteFile(fileId: string): Promise<DeleteResponse> {
 }
 
 export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			success: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const contents = await getRecursiveFolderContents(folderId)
 
 		const folder = await prisma.folder.findUnique({
 			where: { id: folderId },
+			select: {
+				id: true,
+				name: true,
+				slug: true,
+				area: true,
+				parentId: true,
+			},
 		})
 		if (!folder) return { success: false, message: "Carpeta no encontrada" }
 
@@ -76,12 +131,17 @@ export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
 		})
 
 		if (files.length > 0) {
-			files.forEach((file) => {
-				prisma.file.update({
-					where: { id: file.id },
-					data: { isActive: false, name: "(Eliminado) " + file.name },
-				})
-			})
+			await Promise.all(
+				files.map((file) =>
+					prisma.file.update({
+						where: { id: file.id },
+						data: {
+							isActive: false,
+							name: "(Eliminado) " + file.name,
+						},
+					})
+				)
+			)
 		}
 
 		// Marcar todas las carpetas como inactivas
@@ -95,6 +155,22 @@ export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
 				isActive: false,
 				slug: "eliminado-" + folder.slug,
 				name: "(Eliminado) " + folder.name,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.DOCUMENTATION,
+			action: ACTIVITY_TYPE.DELETE,
+			entityId: folder.id,
+			entityType: "Folder",
+			metadata: {
+				name: folder.name,
+				slug: folder.slug,
+				area: folder.area,
+				parentId: folder.parentId,
+				affectedFiles: contents.files.length,
+				affectedFolders: contents.folders.length - 1, // -1 para no contar la carpeta actual
 			},
 		})
 

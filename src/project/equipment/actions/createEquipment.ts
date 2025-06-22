@@ -1,9 +1,14 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
-import type { EquipmentSchema } from "@/project/equipment/schemas/equipment.schema"
 import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import type { EquipmentSchema } from "@/project/equipment/schemas/equipment.schema"
 import type { UploadResult } from "@/lib/upload-files"
 
 interface CreateEquipmentProps {
@@ -12,12 +17,39 @@ interface CreateEquipmentProps {
 }
 
 export const createEquipment = async ({ values, uploadResults }: CreateEquipmentProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				equipment: ["create"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const barcode = generateBarcode()
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { parentId, files, ...rest } = values
 
-		await prisma.equipment.create({
+		const equipment = await prisma.equipment.create({
 			data: {
 				barcode,
 				...(parentId && { parent: { connect: { id: parentId } } }),
@@ -32,6 +64,20 @@ export const createEquipment = async ({ values, uploadResults }: CreateEquipment
 					},
 				}),
 				...rest,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.EQUIPMENT,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: equipment.id,
+			entityType: "Equipment",
+			metadata: {
+				name: equipment.name,
+				barcode: equipment.barcode,
+				parentId: equipment.parentId,
+				attachments: uploadResults.length,
 			},
 		})
 

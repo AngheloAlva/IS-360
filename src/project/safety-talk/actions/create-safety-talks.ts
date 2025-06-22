@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import {
@@ -16,6 +21,17 @@ export async function createSafetyTalk({
 	data,
 	slug,
 }: CreateSafetyTalkProps): Promise<{ ok: boolean; message: string }> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const validatedData = safetyTalkSchema.parse(data)
 
@@ -62,12 +78,30 @@ export async function createSafetyTalk({
 			throw new Error("No se pudo crear la charla de seguridad")
 		}
 
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.SAFETY_TALK,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: safetyTalk.id,
+			entityType: "SafetyTalk",
+			metadata: {
+				title: safetyTalk.title,
+				slug: safetyTalk.slug,
+				isPresential: safetyTalk.isPresential,
+				timeLimit: safetyTalk.timeLimit,
+				minimumScore: safetyTalk.minimumScore,
+				expiresAt: safetyTalk.expiresAt?.toISOString(),
+				resourcesCount: validatedData.resources.length,
+				questionsCount: validatedData.questions.length,
+			},
+		})
+
 		return {
 			ok: true,
 			message: "Charla de seguridad creada exitosamente",
 		}
 	} catch (error) {
-		console.log(error)
+		console.error("[CREATE_SAFETY_TALK]", error)
 		return {
 			ok: false,
 			message: error instanceof Error ? error.message : "Error al crear la charla de seguridad",

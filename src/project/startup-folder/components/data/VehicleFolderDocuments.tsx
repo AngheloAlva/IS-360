@@ -292,7 +292,7 @@ export function VehicleFolderDocuments({
 						queryClient.invalidateQueries({
 							queryKey: [
 								"startupFolderDocuments",
-								{ startupFolderId, category: DocumentCategory.VEHICLES, vehicleId },
+								{ startupFolderId, category: DocumentCategory.VEHICLES, vehicleId, workerId: null },
 							],
 						})
 						setShowUploadDialog(false)

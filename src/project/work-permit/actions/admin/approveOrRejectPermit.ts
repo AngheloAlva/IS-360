@@ -1,6 +1,10 @@
 "use server"
 
-import { WORK_PERMIT_STATUS } from "@prisma/client"
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES, WORK_PERMIT_STATUS } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 interface ApproveWorkPermitProps {
@@ -14,8 +18,19 @@ export const approveOrRejectWorkPermit = async ({
 	userId,
 	action,
 }: ApproveWorkPermitProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
-		await prisma.workPermit.update({
+		const workPermit = await prisma.workPermit.update({
 			where: {
 				id: workPermitId,
 			},
@@ -28,6 +43,33 @@ export const approveOrRejectWorkPermit = async ({
 					},
 				},
 			},
+			select: {
+				id: true,
+				status: true,
+				approvalDate: true,
+				approvalById: true,
+				otNumber: {
+					select: {
+						otNumber: true,
+						workName: true,
+					},
+				},
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_PERMITS,
+			action: action === "approve" ? ACTIVITY_TYPE.APPROVE : ACTIVITY_TYPE.REJECT,
+			entityId: workPermit.id,
+			entityType: "WorkPermit",
+			metadata: {
+				status: workPermit.status,
+				approvalDate: workPermit.approvalDate,
+				approvalById: workPermit.approvalById,
+				otNumber: workPermit.otNumber?.otNumber,
+				workName: workPermit.otNumber?.workName,
+			},
 		})
 
 		return {
@@ -38,7 +80,7 @@ export const approveOrRejectWorkPermit = async ({
 					: "Permiso de trabajo rechazado exitosamente",
 		}
 	} catch (error) {
-		console.error(error)
+		console.error("[APPROVE_OR_REJECT_WORK_PERMIT]", error)
 		return {
 			ok: false,
 			message:

@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server"
-import { PrismaClient, WORK_ORDER_STATUS, WORK_ORDER_PRIORITY } from "@prisma/client"
+import { headers } from "next/headers"
+import { WORK_ORDER_STATUS, WORK_ORDER_PRIORITY } from "@prisma/client"
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
-const prisma = new PrismaClient()
+export async function GET(): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 
-export async function GET() {
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		// Realizar consultas en paralelo para mejorar el rendimiento
 		const [

@@ -2,6 +2,8 @@
 
 import { z } from "zod"
 
+import { MODULES, ACTIVITY_TYPE } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
 import {
 	DocumentCategory,
@@ -78,7 +80,22 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 		throw new Error("Unauthorized - User does not belong to this company")
 	}
 
-	// Create document based on category
+	logActivity({
+		userId,
+		module: MODULES.STARTUP_FOLDERS,
+		action: ACTIVITY_TYPE.UPLOAD,
+		entityId: startupFolderId,
+		entityType: "StartupFolderDocument",
+		metadata: {
+			documentName,
+			documentType,
+			category,
+			workerId,
+			vehicleId,
+			expirationDate: expirationDate.toISOString(),
+		},
+	})
+
 	switch (category) {
 		case "ENVIRONMENTAL": {
 			const folder = startupFolder.environmentalFolders[0]

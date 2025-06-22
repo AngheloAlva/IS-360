@@ -54,8 +54,9 @@ export default async function CompanyByIdAdminPage({
 						{hasPermission.success && (
 							<div className="flex items-center gap-2">
 								<CreateUsersForm
-									companyId={companyId}
 									isSupervisor={true}
+									companyId={companyId}
+									userId={session.user.id}
 									className="text-blue-600 hover:text-blue-700"
 								/>
 

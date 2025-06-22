@@ -6,21 +6,21 @@ import { useForm } from "react-hook-form"
 import { UploadIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { fileFormSchema, type FileFormSchema } from "@/project/document/schemas/new-file.schema"
 import { uploadMultipleFiles } from "@/project/document/actions/uploadMultipleFiles"
 import { Areas, type DocumentAreasValuesArray } from "@/lib/consts/areas"
 import { CodeOptions, CodesValues } from "@/lib/consts/codes"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
-import { fileFormSchema, type FileFormSchema } from "@/project/document/schemas/new-file.schema"
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
-import UploadFilesFormField from "../../../../shared/components/forms/UploadFilesFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
-import { FilePreview } from "@/shared/components/ui/file-preview"
 import { Separator } from "@/shared/components/ui/separator"
+import FileTable from "@/shared/components/forms/FileTable"
+import { Button } from "@/shared/components/ui/button"
 import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
@@ -35,13 +35,21 @@ import type { AREAS } from "@prisma/client"
 
 interface NewFileFormProps {
 	userId: string
-	parentFolderId?: string
-	area: keyof typeof Areas
 	areaValue: AREAS
+	order: "asc" | "desc"
+	area: keyof typeof Areas
+	orderBy: "name" | "createdAt"
+	parentFolderId?: string | null
 }
 
-export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: NewFileFormProps) {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
+export function NewFileFormSheet({
+	area,
+	order,
+	userId,
+	orderBy,
+	areaValue,
+	parentFolderId = null,
+}: NewFileFormProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [isOneFile, setIsOneFile] = useState(true)
 	const [open, setOpen] = useState(false)
@@ -51,10 +59,10 @@ export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: Ne
 		defaultValues: {
 			userId,
 			name: "",
-			parentFolderId,
 			description: "",
 			expirationDate: undefined,
 			registrationDate: new Date(),
+			parentFolderId: parentFolderId || "",
 			area: Areas[area].value as (typeof DocumentAreasValuesArray)[number],
 		},
 	})
@@ -91,9 +99,10 @@ export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: Ne
 			}
 
 			toast.success("Archivos subidos correctamente")
+			form.reset()
 			setOpen(false)
 			queryClient.invalidateQueries({
-				queryKey: ["documents", { area: areaValue, folderId: parentFolderId }],
+				queryKey: ["documents", { area: areaValue, folderId: parentFolderId, order, orderBy }],
 			})
 		} catch (error) {
 			console.error(error)
@@ -119,7 +128,7 @@ export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: Ne
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex h-10 items-center justify-center gap-1 rounded-md bg-green-500 px-3 text-sm text-white hover:bg-green-500/80"
+				className="flex h-10 items-center justify-center gap-1 rounded-md bg-green-600 px-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-green-700"
 				onClick={() => setOpen(true)}
 			>
 				<UploadIcon className="h-4 w-4" />
@@ -132,31 +141,21 @@ export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: Ne
 					<SheetDescription>Complete el formulario para crear un nuevo documento.</SheetDescription>
 				</SheetHeader>
 
-				<div className="flex flex-col gap-5 px-4 pt-4 lg:flex-row">
-					<UploadFilesFormField
-						name="files"
-						isMultiple={true}
-						maxFileSize={500}
-						control={form.control}
-						className="hidden lg:grid"
-						containerClassName="w-full lg:w-2/3"
-						selectedFileIndex={selectedFileIndex}
-						setSelectedFileIndex={setSelectedFileIndex}
-					/>
-
-					<FilePreview
-						className="hidden lg:block lg:w-1/3"
-						file={selectedFileIndex !== null ? form.getValues("files")[selectedFileIndex] : null}
-					/>
-				</div>
-
-				<Separator className="mt-6 mb-4" />
-
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-3 gap-y-5 px-4 sm:grid-cols-2"
+						className="grid gap-x-3 gap-y-5 px-4 pt-4 sm:grid-cols-2"
 					>
+						<FileTable<FileFormSchema>
+							name="files"
+							label="Archivos"
+							isMultiple={true}
+							control={form.control}
+							className="sm:col-span-2"
+						/>
+
+						<Separator className="my-4 sm:col-span-2" />
+
 						<div className="sm:col-span-2">
 							<h3 className="text-lg font-semibold">Información del o los Documentos</h3>
 							<p className="text-muted-foreground text-sm">
@@ -215,11 +214,15 @@ export function NewFileFormSheet({ userId, parentFolderId, area, areaValue }: Ne
 							itemClassName="h-full flex flex-col items-start"
 						/>
 
+						<Button variant={"outline"} onClick={() => setOpen(false)}>
+							Cancelar
+						</Button>
+
 						<SubmitButton
 							label="Subir Documento"
 							isSubmitting={isSubmitting}
-							className="hover:bg-primary/80 sm:col-span-2"
 							disabled={form.getValues("files")?.length === 0}
+							className="bg-green-600 text-white hover:bg-green-700 hover:text-white"
 						/>
 					</form>
 				</Form>

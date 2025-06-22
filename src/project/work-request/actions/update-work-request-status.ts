@@ -1,9 +1,13 @@
 "use server"
 
+import { headers } from "next/headers"
 import { z } from "zod"
 
 import { sendWorkRequestStatusUpdateEmail } from "./send-work-request-status-update"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { WORK_REQUEST_STATUS } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 const updateWorkRequestStatusSchema = z.object({
@@ -18,6 +22,17 @@ const updateWorkRequestStatusSchema = z.object({
 export async function updateWorkRequestStatus(
 	formData: z.infer<typeof updateWorkRequestStatusSchema>
 ) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user) {
+		return {
+			ok: false,
+			message: "No se pudo obtener la sesión del usuario",
+		}
+	}
+
 	try {
 		const validatedData = updateWorkRequestStatusSchema.parse(formData)
 
@@ -60,6 +75,23 @@ export async function updateWorkRequestStatus(
 				description: workRequest.description,
 			})
 		}
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_REQUESTS,
+			action: ACTIVITY_TYPE.UPDATE,
+			entityId: updatedWorkRequest.id,
+			entityType: "WorkRequest",
+			metadata: {
+				requestNumber: updatedWorkRequest.requestNumber,
+				description: updatedWorkRequest.description,
+				isUrgent: updatedWorkRequest.isUrgent,
+				requestDate: updatedWorkRequest.requestDate,
+				observations: updatedWorkRequest.observations,
+				location: updatedWorkRequest.location,
+				customLocation: updatedWorkRequest.customLocation,
+			},
+		})
 
 		return {
 			success: "Estado actualizado correctamente",

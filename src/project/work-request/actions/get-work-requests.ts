@@ -1,8 +1,22 @@
 "use server"
 
+import { headers } from "next/headers"
+
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export async function getWorkRequests() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user) {
+		return {
+			ok: false,
+			message: "No se pudo obtener la sesión del usuario",
+		}
+	}
+
 	try {
 		const workRequests = await prisma.workRequest.findMany({
 			include: {

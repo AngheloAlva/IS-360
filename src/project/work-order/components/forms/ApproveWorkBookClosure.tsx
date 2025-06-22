@@ -135,6 +135,7 @@ export function ApproveWorkBookClosure({
 
 				<div className="flex justify-end gap-2">
 					<Button
+						type="button"
 						variant="outline"
 						className="mr-auto"
 						disabled={isLoading}

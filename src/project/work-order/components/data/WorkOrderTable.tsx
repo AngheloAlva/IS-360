@@ -1,7 +1,7 @@
 "use client"
 
-import { ChevronDown, SearchIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
+import { ChevronDown } from "lucide-react"
 import { useState } from "react"
 import {
 	flexRender,
@@ -21,14 +21,15 @@ import { useCompanies } from "@/project/company/hooks/use-companies"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { queryClient } from "@/lib/queryClient"
 
+import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { CalendarDateRangePicker } from "@/shared/components/ui/date-range-picker"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
-import RefreshButton from "@/shared/components/RefreshButton"
-import { Card, CardContent } from "@/shared/components/ui/card"
 import { workOrderColumns } from "../../columns/work-order-columns"
+import { Card, CardContent } from "@/shared/components/ui/card"
+import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
+import SearchInput from "@/shared/components/SearchInput"
 import { Button } from "@/shared/components/ui/button"
-import { Input } from "@/shared/components/ui/input"
 import {
 	Table,
 	TableRow,
@@ -53,29 +54,36 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuCheckboxItem,
 } from "@/shared/components/ui/dropdown-menu"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 
 export function WorkOrderTable() {
-	const [page, setPage] = useState(1)
-	const [search, setSearch] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([])
-	const [typeFilter, setTypeFilter] = useState<string | null>(null)
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [statusFilter, setStatusFilter] = useState<string | null>(null)
-	const [companyId, setCompanyId] = useState<string | null>(null)
 	const [dateRange, setDateRange] = useState<DateRange | null>(null)
-	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+	const [typeFilter, setTypeFilter] = useState<string | null>(null)
+	const [companyId, setCompanyId] = useState<string | null>(null)
+	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
+	const [sorting, setSorting] = useState<SortingState>([])
 	const [rowSelection, setRowSelection] = useState({})
+	const [order, setOrder] = useState<Order>("desc")
+	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1)
 
 	const { data: companies } = useCompanies()
 
+	const debouncedSearch = useDebounce(search)
+
 	const { data, isLoading, refetch, isFetching } = useWorkOrders({
 		page,
-		search,
+		order,
+		orderBy,
+		dateRange,
+		companyId,
 		limit: 10,
 		typeFilter,
 		statusFilter,
-		companyId,
-		dateRange,
+		search: debouncedSearch,
 	})
 
 	const table = useReactTable<WorkOrder>({
@@ -135,19 +143,13 @@ export function WorkOrderTable() {
 						</p>
 					</div>
 
-					<div className="border-input ml-auto flex items-center rounded-lg border pl-2">
-						<SearchIcon className="text-muted-foreground size-4" />
-						<Input
-							onChange={(e) => {
-								setSearch(e.target.value)
-								setPage(1)
-							}}
-							type="text"
-							value={search}
-							className="w-64 border-none focus-visible:ring-0"
-							placeholder="Buscar por número de OT, trabajo..."
-						/>
-					</div>
+					<SearchInput
+						value={search}
+						className="ml-auto"
+						onChange={setSearch}
+						inputClassName="bg-background w-72"
+						placeholder="Buscar por número de OT, trabajo..."
+					/>
 
 					<RefreshButton refetch={refetch} isFetching={isFetching} />
 				</div>
@@ -236,9 +238,17 @@ export function WorkOrderTable() {
 						</SelectContent>
 					</Select>
 
+					<OrderByButton
+						className="ml-auto"
+						onChange={(orderBy, order) => {
+							setOrderBy(orderBy)
+							setOrder(order)
+						}}
+					/>
+
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button className="text-text border-input hover:bg-input bg-background ml-auto border">
+							<Button className="text-text border-input hover:bg-input bg-background border">
 								Columnas <ChevronDown />
 							</Button>
 						</DropdownMenuTrigger>

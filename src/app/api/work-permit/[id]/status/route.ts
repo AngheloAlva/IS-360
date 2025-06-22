@@ -1,14 +1,28 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
+
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 import { z } from "zod"
 
 const updateWorkPermitStatusSchema = z.object({
 	workCompleted: z.boolean(),
 })
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(
+	req: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
-		const body = await request.json()
+		const body = await req.json()
 		const { workCompleted } = updateWorkPermitStatusSchema.parse(body)
 
 		const { id } = await params

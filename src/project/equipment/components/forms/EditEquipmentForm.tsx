@@ -253,6 +253,7 @@ export default function EditEquipmentForm({
 						<Separator className="my-2 sm:col-span-2" />
 						<Button
 							size={"lg"}
+							type="button"
 							variant="outline"
 							onClick={() => setOpen(false)}
 							className="border-teal-700 text-teal-700 transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"

@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 import { PLAN_FREQUENCY } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export async function GET(
-	request: NextRequest,
+	req: NextRequest,
 	{ params }: { params: Promise<{ planSlug: string }> }
-) {
-	const { planSlug } = await params
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 
-	const searchParams = request.nextUrl.searchParams
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
+	const { planSlug } = await params
+	const searchParams = req.nextUrl.searchParams
 	const limit = parseInt(searchParams.get("limit") ?? "10")
 	const page = parseInt(searchParams.get("page") ?? "1")
 	const search = searchParams.get("search") ?? ""

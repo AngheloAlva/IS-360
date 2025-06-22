@@ -3,10 +3,9 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
+import WorkRequestStatsContainer from "@/project/work-request/components/stats/WorkRequestStatsContainer"
 import CreateWorkRequestButton from "@/project/work-request/components/forms/CreateWorkRequestForm"
 import WorkRequestsTable from "@/project/work-request/components/forms/WorkRequestsTable"
-
-// Utilizaremos el tipo WorkRequestWithDetails de work-requests-table.tsx
 
 export default async function WorkRequestsPage() {
 	const session = await auth.api.getSession({
@@ -25,7 +24,7 @@ export default async function WorkRequestsPage() {
 	})
 
 	return (
-		<div className="flex h-full w-full flex-1 flex-col gap-8">
+		<div className="flex h-full w-full flex-1 flex-col gap-6">
 			<div className="rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 p-6 shadow-lg">
 				<div className="flex items-center justify-between">
 					<div className="text-white">
@@ -37,7 +36,9 @@ export default async function WorkRequestsPage() {
 				</div>
 			</div>
 
-			<WorkRequestsTable />
+			<WorkRequestStatsContainer />
+
+			<WorkRequestsTable hasPermission={hasPermission.success} />
 		</div>
 	)
 }

@@ -1,8 +1,13 @@
 "use server"
 
-import { FileFormSchema } from "@/project/document/schemas/new-file.schema"
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, AREAS, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { AREAS } from "@prisma/client"
+
+import type { FileFormSchema } from "@/project/document/schemas/new-file.schema"
 
 type FileUploadResult = {
 	url: string
@@ -17,6 +22,17 @@ interface UploadMultipleFilesProps {
 }
 
 export async function uploadMultipleFiles({ values, files }: UploadMultipleFilesProps) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			error: "No autorizado",
+		}
+	}
+
 	try {
 		const {
 			area,
@@ -30,25 +46,31 @@ export async function uploadMultipleFiles({ values, files }: UploadMultipleFiles
 			registrationDate,
 		} = values
 
-		// Buscar la carpeta si se proporciona un folderSlug
+		if (userId !== session.user.id) {
+			return { ok: false, error: "No tienes permiso para subir archivos para este usuario" }
+		}
+
 		let folderId: string | null = null
 		if (parentFolderId) {
 			const foundFolder = await prisma.folder.findFirst({
 				where: { id: parentFolderId },
-				select: { id: true },
+				select: { id: true, userId: true },
 			})
 
 			if (!foundFolder) {
 				return { ok: false, error: "Carpeta no encontrada" }
 			}
 
+			if (foundFolder.userId !== session.user.id) {
+				return { ok: false, error: "No tienes permiso para subir archivos a esta carpeta" }
+			}
+
 			folderId = foundFolder.id
 		}
 
-		// Crear registros en la base de datos
 		const results = await Promise.all(
 			files.map(async (file) => {
-				return prisma.file.create({
+				const createdFile = await prisma.file.create({
 					data: {
 						description,
 						url: file.url,
@@ -63,6 +85,27 @@ export async function uploadMultipleFiles({ values, files }: UploadMultipleFiles
 						...(folderId ? { folder: { connect: { id: folderId } } } : {}),
 					},
 				})
+
+				logActivity({
+					userId: session.user.id,
+					module: MODULES.DOCUMENTATION,
+					action: ACTIVITY_TYPE.CREATE,
+					entityId: createdFile.id,
+					entityType: "File",
+					metadata: {
+						name: createdFile.name,
+						type: createdFile.type,
+						size: createdFile.size,
+						code: createdFile.code,
+						area: createdFile.area,
+						description: createdFile.description,
+						folderId: createdFile.folderId,
+						expirationDate: createdFile.expirationDate?.toISOString(),
+						registrationDate: createdFile.registrationDate?.toISOString(),
+					},
+				})
+
+				return createdFile
 			})
 		)
 

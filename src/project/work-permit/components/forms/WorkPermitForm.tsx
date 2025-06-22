@@ -14,6 +14,7 @@ import { createWorkPermit } from "@/project/work-permit/actions/createWorkPermit
 import { useUsersByCompany } from "@/project/user/hooks/use-users-by-company"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
+import { updateWorkPermit } from "../../actions/updateWorkPermit"
 import { WORK_ORDER_PRIORITY } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import {
@@ -43,8 +44,8 @@ import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 import { Form } from "@/shared/components/ui/form"
 import { queryClient } from "@/lib/queryClient"
-import { WorkPermit } from "../../hooks/use-work-permit"
-import { updateWorkPermit } from "../../actions/updateWorkPermit"
+
+import type { WorkPermit } from "../../hooks/use-work-permit"
 
 interface WorkPermitFormProps {
 	userId: string
@@ -122,14 +123,16 @@ export default function WorkPermitForm({
 	const router = useRouter()
 
 	const { data: workOrdersData } = useWorkOrders({
-		companyId,
 		page: 1,
+		companyId,
 		limit: 100,
 		search: "",
+		order: "desc",
 		dateRange: null,
 		typeFilter: null,
 		statusFilter: null,
 		permitFilter: true,
+		orderBy: "createdAt",
 	})
 
 	const { data: usersData } = useUsersByCompany({

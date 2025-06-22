@@ -14,17 +14,19 @@ import {
 
 import { fetchMaintenancePlanTasks } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
 import { MaintenancePlanColumns } from "../../columns/maintenance-plan-columns"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
 import {
 	useMaintenancePlans,
 	type MaintenancePlan,
 } from "@/project/maintenance-plan/hooks/use-maintenance-plans"
 
+import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { Input } from "@/shared/components/ui/input"
+import SearchInput from "@/shared/components/SearchInput"
 import {
 	Table,
 	TableRow,
@@ -35,17 +37,23 @@ import {
 } from "@/shared/components/ui/table"
 
 export function MaintenancePlanTable() {
-	const [page, setPage] = useState(1)
-	const [search, setSearch] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [sorting, setSorting] = useState<SortingState>([])
+	const [orderBy, setOrderBy] = useState<OrderBy>("name")
+	const [order, setOrder] = useState<Order>("asc")
+	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1)
 
 	const router = useRouter()
 
+	const debouncedSearch = useDebounce(search)
+
 	const { data, isLoading, refetch, isFetching } = useMaintenancePlans({
 		page,
-		search,
+		order,
+		orderBy,
 		limit: 20,
+		search: debouncedSearch,
 	})
 
 	const table = useReactTable<MaintenancePlan>({
@@ -77,13 +85,13 @@ export function MaintenancePlanTable() {
 			queryKey: [
 				"maintenance-plans-tasks",
 				{
-					planSlug: slug,
 					page: 1,
 					limit: 20,
 					search: "",
 					frequency: "",
-					nextDateFrom: "",
+					planSlug: slug,
 					nextDateTo: "",
+					nextDateFrom: "",
 				},
 			],
 			queryFn: (fn) =>
@@ -92,13 +100,13 @@ export function MaintenancePlanTable() {
 					queryKey: [
 						"maintenance-plans-tasks",
 						{
-							planSlug: slug,
 							page: 1,
 							limit: 20,
 							search: "",
 							frequency: "",
-							nextDateFrom: "",
+							planSlug: slug,
 							nextDateTo: "",
+							nextDateFrom: "",
 						},
 					],
 				}),
@@ -111,19 +119,25 @@ export function MaintenancePlanTable() {
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
-						<Input
-							type="text"
+						<SearchInput
 							value={search}
-							onChange={(e) => {
-								setSearch(e.target.value)
-								setPage(1)
-							}}
-							className="bg-background w-full md:w-80"
-							placeholder="Buscar por nombre, equipo, o descripcion..."
+							className="w-80"
+							onChange={setSearch}
+							inputClassName="bg-background"
+							placeholder="Buscar por nombre o RUT de empresa..."
 						/>
 					</div>
 
-					<RefreshButton refetch={refetch} isFetching={isFetching} />
+					<div className="flex items-center gap-2">
+						<OrderByButton
+							onChange={(orderBy, order) => {
+								setOrderBy(orderBy)
+								setOrder(order)
+							}}
+						/>
+
+						<RefreshButton refetch={refetch} isFetching={isFetching} />
+					</div>
 				</div>
 
 				<Table>

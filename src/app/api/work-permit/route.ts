@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import { WORK_PERMIT_STATUS } from "@prisma/client"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
-export async function GET(req: NextRequest) {
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const page = parseInt(searchParams.get("page") || "1")
@@ -13,6 +25,8 @@ export async function GET(req: NextRequest) {
 		const companyId = searchParams.get("companyId") || null
 		const startDate = searchParams.get("startDate") || null
 		const endDate = searchParams.get("endDate") || null
+		const orderBy = searchParams.get("orderBy") as OrderBy
+		const order = searchParams.get("order") as Order
 
 		const skip = (page - 1) * limit
 
@@ -111,7 +125,7 @@ export async function GET(req: NextRequest) {
 				skip,
 				take: limit,
 				orderBy: {
-					createdAt: "desc",
+					[orderBy]: order,
 				},
 				cacheStrategy: {
 					ttl: 10,

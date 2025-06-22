@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { EquipmentSchema } from "@/project/equipment/schemas/equipment.schema"
@@ -10,6 +15,33 @@ interface UpdateEquipmentProps {
 }
 
 export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				equipment: ["update"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const { parentId, files = [], ...rest } = values
 
@@ -80,7 +112,7 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 		// Actualizar el equipo con todos los cambios
 		await prisma.$transaction(async (tx) => {
 			// Actualizar equipo
-			await tx.equipment.update({
+			const updatedEquipment = await tx.equipment.update({
 				where: { id },
 				data: {
 					...rest,
@@ -102,10 +134,23 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 					},
 				})
 			}
-		})
 
-		// TODO: Si se requiere, implementar la eliminación de archivos del almacenamiento (Azure)
-		// Esto requeriría una función adicional para eliminar archivos por URL
+			logActivity({
+				userId: session.user.id,
+				module: MODULES.EQUIPMENT,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: updatedEquipment.id,
+				entityType: "Equipment",
+				metadata: {
+					name: updatedEquipment.name,
+					barcode: updatedEquipment.barcode,
+					oldParentId: updatedEquipment.parentId,
+					newParentId: parentId,
+					attachmentsAdded: newAttachments.length,
+					attachmentsRemoved: attachmentsToDelete.length,
+				},
+			})
+		})
 
 		return {
 			ok: true,

@@ -1,6 +1,11 @@
 "use server"
 
+import { headers } from "next/headers"
+
 import { UploadResult as UploadFileResult } from "@/lib/upload-files"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { DailyActivitySchema } from "@/project/work-order/schemas/daily-activity.schema"
@@ -19,6 +24,17 @@ export const createActivity = async ({
 	entryType,
 	attachment,
 }: CreateActivityProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		return await prisma.$transaction(async (tx) => {
 			const { workOrderId, milestoneId, comments, personnel, ...rest } = values
@@ -59,60 +75,157 @@ export const createActivity = async ({
 						},
 					}),
 				},
-			})
-
-			const workOrder = await tx.workOrder.findUnique({
-				where: { id: workOrderId },
-				include: {
-					equipment: {
+				select: {
+					id: true,
+					entryType: true,
+					hasAttachments: true,
+					comments: true,
+					workOrderId: true,
+					milestoneId: true,
+					createdById: true,
+					activityName: true,
+					assignedUsers: {
 						select: {
 							id: true,
+							name: true,
+						},
+					},
+					attachments: {
+						select: {
+							id: true,
+							name: true,
+							type: true,
+							url: true,
 						},
 					},
 				},
 			})
 
-			await tx.workOrder.update({
+			const workOrder = await tx.workOrder.findUnique({
+				where: { id: workOrderId },
+				select: {
+					id: true,
+					status: true,
+					otNumber: true,
+					workName: true,
+					type: true,
+					equipment: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
+					company: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
+				},
+			})
+
+			if (!workOrder) {
+				return {
+					ok: false,
+					message: "Orden de trabajo no encontrada",
+				}
+			}
+
+			const updatedWorkOrder = await tx.workOrder.update({
 				where: {
 					id: workOrderId,
 				},
 				data: {
 					status: "IN_PROGRESS",
 				},
+				select: {
+					id: true,
+					status: true,
+					otNumber: true,
+					workName: true,
+				},
 			})
 
-			await tx.milestone.update({
+			const updatedMilestone = await tx.milestone.update({
 				where: {
 					id: milestoneId,
 				},
 				data: {
 					status: "IN_PROGRESS",
 				},
+				select: {
+					id: true,
+					status: true,
+					name: true,
+				},
 			})
 
-			workOrder?.equipment.forEach(async (equipment) => {
-				await tx.equipmentHistory.create({
-					data: {
-						equipment: {
-							connect: {
-								id: equipment.id,
+			const equipmentHistories = await Promise.all(
+				workOrder.equipment.map(async (equipment) => {
+					return await tx.equipmentHistory.create({
+						data: {
+							equipment: {
+								connect: {
+									id: equipment.id,
+								},
+							},
+							workEntry: {
+								connect: {
+									id: newWorkEntry.id,
+								},
+							},
+							changeType: workOrder.type || "",
+							description: rest.activityName,
+							status: "",
+							modifiedBy: {
+								connect: {
+									id: userId,
+								},
 							},
 						},
-						workEntry: {
-							connect: {
-								id: newWorkEntry.id,
+						select: {
+							id: true,
+							changeType: true,
+							description: true,
+							status: true,
+							equipmentId: true,
+							workEntryId: true,
+							modifiedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
 							},
 						},
-						changeType: workOrder?.type || "",
-						description: rest.activityName,
-						status: "",
-						modifiedBy: {
-							connect: {
-								id: userId,
-							},
-						},
-					},
+					})
 				})
+			)
+
+			logActivity({
+				userId: session.user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: newWorkEntry.id,
+				entityType: "WorkEntry",
+				metadata: {
+					entryType: newWorkEntry.entryType,
+					hasAttachments: newWorkEntry.hasAttachments,
+					comments: newWorkEntry.comments,
+					workOrderId: newWorkEntry.workOrderId,
+					milestoneId: newWorkEntry.milestoneId,
+					createdById: newWorkEntry.createdById,
+					activityName: newWorkEntry.activityName,
+					assignedUsers: newWorkEntry.assignedUsers,
+					attachments: newWorkEntry.attachments,
+					workOrderStatus: updatedWorkOrder.status,
+					otNumber: updatedWorkOrder.otNumber,
+					workName: updatedWorkOrder.workName,
+					milestoneStatus: updatedMilestone.status,
+					milestoneName: updatedMilestone.name,
+					companyId: workOrder.company?.id,
+					companyName: workOrder.company?.name,
+					equipmentHistories,
+				},
 			})
 
 			return {
@@ -122,11 +235,11 @@ export const createActivity = async ({
 			}
 		})
 	} catch (error) {
-		console.error(error)
+		console.error("[CREATE_ACTIVITY]", error)
 
 		return {
 			ok: false,
-			message: "Error al crear la actividad" + error,
+			message: "Error al crear la actividad",
 		}
 	}
 }

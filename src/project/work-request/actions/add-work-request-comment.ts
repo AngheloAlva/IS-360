@@ -1,6 +1,12 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+
 import { z } from "zod"
 
 const addWorkRequestCommentSchema = z.object({
@@ -12,6 +18,17 @@ export async function addWorkRequestComment(
 	formData: z.infer<typeof addWorkRequestCommentSchema>,
 	userId: string
 ) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user) {
+		return {
+			ok: false,
+			message: "No se pudo obtener la sesión del usuario",
+		}
+	}
+
 	try {
 		const validatedData = addWorkRequestCommentSchema.parse(formData)
 
@@ -42,6 +59,19 @@ export async function addWorkRequestComment(
 						image: true,
 					},
 				},
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_REQUESTS,
+			action: ACTIVITY_TYPE.COMMENT,
+			entityId: workRequest.id,
+			entityType: "WorkRequestComment",
+			metadata: {
+				content: validatedData.content,
+				workRequestId: validatedData.workRequestId,
+				userId,
 			},
 		})
 

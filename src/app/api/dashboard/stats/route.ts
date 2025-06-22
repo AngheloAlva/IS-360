@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
 
-import { WORK_ORDER_STATUS } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 
 export async function GET() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const [workOrderStats, companyStats, maintenanceStats, documentStats] = await Promise.all([
 			// Estadísticas de órdenes de trabajo

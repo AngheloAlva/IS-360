@@ -244,6 +244,7 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 
 							<Button
 								size={"lg"}
+								type="button"
 								variant="outline"
 								className="w-full border-2 border-emerald-800 font-medium tracking-wide text-emerald-700 transition-all hover:scale-105 hover:bg-emerald-800 hover:text-white"
 								onClick={() => setIsOpen(false)}

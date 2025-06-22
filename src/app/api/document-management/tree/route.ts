@@ -2,16 +2,26 @@
 
 import prisma from "@/lib/prisma"
 import { AREAS } from "@prisma/client"
-import { type NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
 
 export async function GET(request: NextRequest) {
 	try {
+		const session = await auth.api.getSession({
+			headers: await headers(),
+		})
+
+		if (!session?.user?.id) {
+			return new NextResponse("No autorizado", { status: 401 })
+		}
+
 		const searchParams = request.nextUrl.searchParams
 		const area = searchParams.get("area")
 		const folderId = searchParams.get("folderId")
 
 		if (!area) {
-			return Response.json({ error: "Area is required" }, { status: 400 })
+			return NextResponse.json({ error: "Area is required" }, { status: 400 })
 		}
 
 		const folders = await prisma.folder.findMany({
@@ -67,7 +77,7 @@ export async function GET(request: NextRequest) {
 			},
 		})
 
-		return Response.json({
+		return NextResponse.json({
 			folders: folders.map((folder) => ({
 				...folder,
 				type: "folder",
@@ -77,6 +87,6 @@ export async function GET(request: NextRequest) {
 		})
 	} catch (error) {
 		console.error("Error fetching tree data:", error)
-		return Response.json({ error: "Internal server error" }, { status: 500 })
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 })
 	}
 }

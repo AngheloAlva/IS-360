@@ -12,7 +12,7 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { workPermitByCompanyColumns } from "../../columns/work-permit-by-company-columns"
+import { getWorkPermitByCompanyColumns } from "../../columns/work-permit-by-company-columns"
 import { useWorkPermits } from "@/project/work-permit/hooks/use-work-permit"
 import { WorkPermitStatusOptions } from "@/lib/consts/work-permit-status"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
@@ -20,7 +20,6 @@ import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Button } from "@/shared/components/ui/button"
-import { Input } from "@/shared/components/ui/input"
 import {
 	Table,
 	TableRow,
@@ -45,17 +44,29 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuCheckboxItem,
 } from "@/shared/components/ui/dropdown-menu"
+import OrderByButton, { Order, OrderBy } from "@/shared/components/OrderByButton"
+import SearchInput from "@/shared/components/SearchInput"
 
-export function WorkPermitsTableByCompany({ companyId }: { companyId: string }) {
-	const [page, setPage] = useState(1)
-	const [search, setSearch] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([])
+export function WorkPermitsTableByCompany({
+	companyId,
+	userId,
+}: {
+	companyId: string
+	userId: string
+}) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [statusFilter, setStatusFilter] = useState<string | null>(null)
+	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
+	const [sorting, setSorting] = useState<SortingState>([])
+	const [order, setOrder] = useState<Order>("desc")
+	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1)
 
 	const { data, isLoading, refetch, isFetching } = useWorkPermits({
 		page,
+		order,
 		search,
+		orderBy,
 		limit: 10,
 		companyId,
 		statusFilter,
@@ -64,12 +75,12 @@ export function WorkPermitsTableByCompany({ companyId }: { companyId: string }) 
 
 	const table = useReactTable({
 		data: data?.workPermits ?? [],
-		columns: workPermitByCompanyColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
+		columns: getWorkPermitByCompanyColumns(userId),
 		state: {
 			sorting,
 			columnFilters,
@@ -80,18 +91,12 @@ export function WorkPermitsTableByCompany({ companyId }: { companyId: string }) 
 		<Card>
 			<CardContent className="flex w-full flex-col items-start gap-2">
 				<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
-					<div className="flex items-center gap-2">
-						<Input
-							onChange={(e) => {
-								setSearch(e.target.value)
-								setPage(1)
-							}}
-							type="text"
-							className="bg-background w-full sm:w-64"
-							placeholder="Buscar por número de OT, trabajo, ubicación..."
-							value={search}
-						/>
-					</div>
+					<SearchInput
+						value={search}
+						onChange={setSearch}
+						inputClassName="w-80"
+						placeholder="Buscar por número de OT, trabajo, ubicación..."
+					/>
 
 					<Select
 						onValueChange={(value) => {
@@ -119,6 +124,13 @@ export function WorkPermitsTableByCompany({ companyId }: { companyId: string }) 
 							</SelectGroup>
 						</SelectContent>
 					</Select>
+
+					<OrderByButton
+						onChange={(orderBy, order) => {
+							setOrderBy(orderBy)
+							setOrder(order)
+						}}
+					/>
 
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>

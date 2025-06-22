@@ -7,6 +7,7 @@ import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import { es } from "date-fns/locale"
 import { Badge } from "@/shared/components/ui/badge"
 import { WORK_REQUEST_STATUS } from "@prisma/client"
+import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 
 const statusBadgeVariant = (status: WORK_REQUEST_STATUS) => {
 	switch (status) {
@@ -34,7 +35,16 @@ const statusText = (status: WORK_REQUEST_STATUS) => {
 	}
 }
 
-export const WorkRequestColumns: ColumnDef<WorkRequest>[] = [
+export const getWorkRequestColumns = (hasPermission: boolean): ColumnDef<WorkRequest>[] => [
+	{
+		accessorKey: "workOrder",
+		header: "Orden de trabajo",
+		cell: () => {
+			return hasPermission ? (
+				<CreateWorkOrderForm className="h-8 bg-cyan-500 text-white hover:bg-cyan-600" />
+			) : null
+		},
+	},
 	{
 		accessorKey: "requestNumber",
 		header: "N° Solicitud",
@@ -77,9 +87,9 @@ export const WorkRequestColumns: ColumnDef<WorkRequest>[] = [
 			const isUrgent = row.original.isUrgent
 
 			return isUrgent ? (
-				<Badge variant="destructive">Urgente</Badge>
+				<Badge className="bg-rose-500/10 text-rose-500">Urgente</Badge>
 			) : (
-				<Badge variant="outline">Normal</Badge>
+				<Badge className="bg-sky-500/10 text-sky-500">No</Badge>
 			)
 		},
 	},

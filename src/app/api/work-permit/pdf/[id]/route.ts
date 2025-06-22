@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 import { renderToStream } from "@react-pdf/renderer"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 import WorkPermitPDF from "@/project/work-permit/components/pdf/WorkPermitPDF"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const { id } = await params
 

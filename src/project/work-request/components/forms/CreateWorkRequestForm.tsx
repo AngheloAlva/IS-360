@@ -15,16 +15,16 @@ import {
 	LOCATION_VALUES_ARRAY,
 } from "@/project/work-request/schemas/work-request.schema"
 
-import { Form, FormItem, FormLabel, FormField, FormControl } from "@/shared/components/ui/form"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
-import UploadFilesFormField from "@/shared/components/forms/UploadFilesFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
-import { Checkbox } from "@/shared/components/ui/checkbox"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Button } from "@/shared/components/ui/button"
+import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
 	SheetTitle,
@@ -35,7 +35,6 @@ import {
 } from "@/shared/components/ui/sheet"
 
 export default function CreateWorkRequestForm({ userId }: { userId: string }): React.ReactElement {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 	const router = useRouter()
@@ -119,13 +118,17 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
-				<Button className="flex gap-2 bg-white font-semibold tracking-wide text-cyan-500 transition-all hover:scale-105 hover:bg-white hover:text-cyan-600">
+				<Button
+					size={"lg"}
+					className="flex gap-2 bg-white font-semibold tracking-wide text-cyan-500 transition-all hover:scale-105 hover:bg-white hover:text-cyan-600"
+				>
 					<PlusCircleIcon size={20} />
 					<span>Nueva Solicitud</span>
 				</Button>
 			</SheetTrigger>
-			<SheetContent className="w-full overflow-y-auto sm:max-w-xl md:max-w-2xl">
-				<SheetHeader className="mb-5">
+
+			<SheetContent className="gap-0 sm:max-w-2xl">
+				<SheetHeader className="shadow">
 					<SheetTitle className="text-2xl">Nueva Solicitud de Trabajo</SheetTitle>
 					<SheetDescription>
 						Completa el formulario para crear una nueva solicitud de trabajo.
@@ -133,106 +136,98 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 				</SheetHeader>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-							<TextAreaFormField<WorkRequestSchema>
-								name="description"
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="grid gap-x-2 gap-y-5 overflow-y-auto px-4 pt-4 pb-14 sm:grid-cols-2"
+					>
+						<TextAreaFormField<WorkRequestSchema>
+							className="h-32"
+							name="description"
+							control={form.control}
+							itemClassName="sm:col-span-2"
+							label="Descripción del trabajo"
+							placeholder="Describe el trabajo solicitado"
+						/>
+
+						<DatePickerFormField<WorkRequestSchema>
+							name="requestDate"
+							label="Fecha de solicitud"
+							control={form.control}
+						/>
+
+						<SelectFormField<WorkRequestSchema>
+							name="location"
+							label="Ubicación"
+							control={form.control}
+							placeholder="Selecciona la ubicación"
+							options={LOCATION_VALUES_ARRAY.map((value) => ({
+								value,
+								label:
+									value === "TRM"
+										? "Terminal (TRM)"
+										: value === "PRS"
+											? "Planta (PRS)"
+											: "Otra ubicación",
+							}))}
+						/>
+
+						{watchLocation === "OTHER" && (
+							<InputFormField<WorkRequestSchema>
+								name="customLocation"
 								control={form.control}
-								label="Descripción del trabajo"
-								placeholder="Describe el trabajo solicitado"
-								className="sm:col-span-2"
+								label="Ubicación personalizada"
+								placeholder="Especifica la ubicación"
 							/>
+						)}
 
-							<DatePickerFormField<WorkRequestSchema>
-								name="requestDate"
-								label="Fecha de solicitud"
-								control={form.control}
-							/>
+						<TextAreaFormField<WorkRequestSchema>
+							name="observations"
+							control={form.control}
+							label="Observaciones"
+							itemClassName="sm:col-span-2"
+							placeholder="Agrega observaciones adicionales"
+						/>
 
-							<SelectFormField<WorkRequestSchema>
-								name="location"
-								label="Ubicación"
-								control={form.control}
-								placeholder="Selecciona la ubicación"
-								options={LOCATION_VALUES_ARRAY.map((value) => ({
-									value,
-									label:
-										value === "TRM"
-											? "Terminal (TRM)"
-											: value === "PRS"
-												? "Planta (PRS)"
-												: "Otra ubicación",
-								}))}
-							/>
+						<SwitchFormField<WorkRequestSchema>
+							name="isUrgent"
+							control={form.control}
+							label="Marcar como urgente"
+							itemClassName="flex-row items-center sm:col-span-2 mt-4 flex"
+							className="data-[state=checked]:bg-cyan-500"
+						/>
 
-							{watchLocation === "OTHER" && (
-								<InputFormField<WorkRequestSchema>
-									name="customLocation"
-									label="Ubicación personalizada"
-									control={form.control}
-									placeholder="Especifica la ubicación"
-								/>
-							)}
+						<Separator className="my-2 sm:col-span-2" />
 
-							<FormField
-								control={form.control}
-								name="isUrgent"
-								render={({ field }) => (
-									<FormItem className="flex flex-row items-center space-y-0 space-x-3 rounded-md border p-4">
-										<FormControl>
-											<Checkbox checked={field.value} onCheckedChange={field.onChange} />
-										</FormControl>
-										<div className="space-y-1 leading-none">
-											<FormLabel className="cursor-pointer">Marcar como urgente</FormLabel>
-										</div>
-									</FormItem>
-								)}
-							/>
-
-							<TextAreaFormField<WorkRequestSchema>
-								name="observations"
-								control={form.control}
-								label="Observaciones"
-								placeholder="Agrega observaciones adicionales"
-								className="sm:col-span-2"
-							/>
-
-							<Separator className="my-2 sm:col-span-2" />
-
-							<div className="sm:col-span-2">
-								<h2 className="text-xl font-bold">Imágenes o archivos adjuntos</h2>
-								<span className="text-muted-foreground text-sm">
-									Adjunta imágenes o archivos relacionados con la solicitud.
-								</span>
-							</div>
-
-							<UploadFilesFormField
-								name="attachments"
-								maxFileSize={200}
-								isMultiple={true}
-								control={form.control}
-								selectedFileIndex={selectedFileIndex}
-								containerClassName="w-full sm:col-span-2"
-								setSelectedFileIndex={setSelectedFileIndex}
-							/>
-
-							<Button
-								size="lg"
-								type="button"
-								variant={"outline"}
-								disabled={isSubmitting}
-								onClick={() => setOpen(false)}
-								className="w-full cursor-pointer border-2 border-orange-800 font-bold tracking-wide text-orange-800 transition-all hover:scale-105 hover:bg-orange-800 hover:text-white"
-							>
-								Cancelar
-							</Button>
-
-							<SubmitButton
-								label="Crear Solicitud"
-								isSubmitting={isSubmitting}
-								className="bg-orange-600 hover:bg-orange-700"
-							/>
+						<div className="sm:col-span-2">
+							<h2 className="text-xl font-bold">Imágenes o archivos adjuntos</h2>
+							<span className="text-muted-foreground text-sm">
+								Adjunta imágenes o archivos relacionados con la solicitud.
+							</span>
 						</div>
+
+						<FileTable<WorkRequestSchema>
+							isMultiple={true}
+							name="attachments"
+							control={form.control}
+							label="Archivos adjuntos"
+							className="mt-2 mb-10 sm:col-span-2"
+						/>
+
+						<Button
+							size="lg"
+							type="button"
+							variant={"outline"}
+							disabled={isSubmitting}
+							onClick={() => setOpen(false)}
+						>
+							Cancelar
+						</Button>
+
+						<SubmitButton
+							label="Crear Solicitud"
+							isSubmitting={isSubmitting}
+							className="bg-cyan-500 hover:bg-cyan-600 hover:text-white"
+						/>
 					</form>
 				</Form>
 			</SheetContent>

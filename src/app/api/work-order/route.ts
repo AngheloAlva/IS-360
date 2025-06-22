@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+import { Order, OrderBy } from "@/shared/components/OrderByButton"
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const page = parseInt(searchParams.get("page") || "1")
@@ -15,6 +26,16 @@ export async function GET(req: NextRequest) {
 		const startDate = searchParams.get("startDate") || null
 		const endDate = searchParams.get("endDate") || null
 		const permitFilter = searchParams.get("permitFilter") === "true"
+		const order = searchParams.get("order") as Order
+		const orderBy = searchParams.get("orderBy") as OrderBy
+
+		let orderByField: string
+
+		if (orderBy === "name") {
+			orderByField = "workName"
+		} else {
+			orderByField = "createdAt"
+		}
 
 		const skip = (page - 1) * limit
 
@@ -125,7 +146,7 @@ export async function GET(req: NextRequest) {
 				skip,
 				take: limit,
 				orderBy: {
-					createdAt: "desc",
+					[orderByField]: order,
 				},
 				cacheStrategy: {
 					ttl: 10,

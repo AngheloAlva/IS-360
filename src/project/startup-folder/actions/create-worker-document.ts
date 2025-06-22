@@ -1,10 +1,10 @@
 "use server"
 
-import prisma from "@/lib/prisma"
-
 import { z } from "zod"
 
-import type { WorkerDocumentType } from "@prisma/client"
+import { ACTIVITY_TYPE, DocumentCategory, MODULES, type WorkerDocumentType } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import prisma from "@/lib/prisma"
 
 const createWorkerDocumentSchema = z.object({
 	url: z.string(),
@@ -37,24 +37,52 @@ export async function createWorkerDocument(input: CreateWorkerDocumentInput) {
 		})
 
 		if (!workerFolder) {
-			throw new Error("Carpeta de personal no encontrada")
+			return {
+				ok: false,
+				message: "Carpeta de personal no encontrada",
+			}
 		}
 
 		const user = await prisma.user.findUnique({ where: { id: userId } })
 
 		if (!user || user.companyId !== workerFolder.worker.companyId) {
-			throw new Error("No autorizado - El usuario no pertenece a la empresa")
+			return {
+				ok: false,
+				message: "No autorizado - El usuario no pertenece a la empresa",
+			}
 		}
 
-		await prisma.workerDocument.create({
+		const document = await prisma.workerDocument.create({
 			data: {
 				url,
 				expirationDate,
 				name: documentName,
-				category: "PERSONNEL",
+				category: DocumentCategory.PERSONNEL,
 				uploadedById: userId,
 				folderId: workerFolder.id,
 				type: documentType as WorkerDocumentType,
+			},
+		})
+
+		if (!document) {
+			return {
+				ok: false,
+				message: "Error al crear el documento",
+			}
+		}
+
+		logActivity({
+			userId,
+			module: MODULES.STARTUP_FOLDERS,
+			action: ACTIVITY_TYPE.UPLOAD,
+			entityId: document.id,
+			entityType: "WorkerDocument",
+			metadata: {
+				documentName,
+				documentType,
+				workerId,
+				startupFolderId,
+				expirationDate: expirationDate.toISOString(),
 			},
 		})
 

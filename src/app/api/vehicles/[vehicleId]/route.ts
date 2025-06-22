@@ -6,11 +6,15 @@ import { NextRequest, NextResponse } from "next/server"
 export async function GET(
 	req: NextRequest,
 	{ params }: { params: Promise<{ vehicleId: string }> }
-) {
+): Promise<NextResponse> {
 	try {
 		const session = await auth.api.getSession({
 			headers: await headers(),
 		})
+
+		if (!session?.user?.id) {
+			return new NextResponse("No autorizado", { status: 401 })
+		}
 
 		if (!session?.user?.companyId) {
 			return NextResponse.json(

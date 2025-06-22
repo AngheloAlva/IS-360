@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
-
+import { headers } from "next/headers"
 import { USER_ROLE } from "@prisma/client"
-import prisma from "@/lib/prisma"
 
-export async function GET(req: NextRequest) {
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const page = parseInt(searchParams.get("page") || "1")

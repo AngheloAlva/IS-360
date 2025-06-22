@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 import type { WORK_ORDER_STATUS } from "@prisma/client"
 
-export async function GET() {
+export async function GET(): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const workBookStats = await prisma.workOrder.groupBy({
 			by: ["status"],

@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { WorkBookSchema } from "@/project/work-order/schemas/work-book.schema"
@@ -10,8 +15,18 @@ interface UpdateWorkOrderLikeBook {
 }
 
 export const updateWorkOrderLikeBook = async ({ id, values }: UpdateWorkOrderLikeBook) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
 	try {
-		await prisma.workOrder.update({
+		const updatedWorkOrder = await prisma.workOrder.update({
 			where: {
 				id,
 			},
@@ -20,6 +35,20 @@ export const updateWorkOrderLikeBook = async ({ id, values }: UpdateWorkOrderLik
 				workName: values.workName,
 				workLocation: values.workLocation,
 				workStartDate: values.workStartDate,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_ORDERS,
+			action: ACTIVITY_TYPE.UPDATE,
+			entityId: id,
+			entityType: "WorkOrder",
+			metadata: {
+				isWorkBookInit: updatedWorkOrder.isWorkBookInit,
+				workName: updatedWorkOrder.workName,
+				workLocation: updatedWorkOrder.workLocation,
+				workStartDate: updatedWorkOrder.workStartDate,
 			},
 		})
 

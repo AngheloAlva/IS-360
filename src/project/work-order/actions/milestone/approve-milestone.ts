@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import { sendApproveMilestoneEmail, sendRejectMilestoneEmail } from "./send-close-milestone"
 import prisma from "@/lib/prisma"
 
@@ -19,6 +24,17 @@ export async function approveMilestone({
 	milestoneId,
 	closureComment,
 }: RequestCloseMilestoneParams): Promise<RequestCloseMilestoneResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const milestone = await prisma.milestone.findUnique({
 			where: { id: milestoneId },
@@ -47,7 +63,7 @@ export async function approveMilestone({
 			}
 		}
 
-		await prisma.milestone.update({
+		const updatedMilestone = await prisma.milestone.update({
 			where: { id: milestoneId },
 			data: {
 				closureComment,
@@ -61,10 +77,28 @@ export async function approveMilestone({
 			},
 		})
 
-		await prisma.workOrder.update({
+		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: milestone.workOrder.id },
 			data: {
 				workProgressStatus: (milestone.workOrder.workProgressStatus || 0) + milestone.weight,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_ORDERS,
+			action: ACTIVITY_TYPE.APPROVE,
+			entityId: milestoneId,
+			entityType: "Milestone",
+			metadata: {
+				name: milestone.name,
+				weight: milestone.weight,
+				workOrderId: milestone.workOrder.id,
+				otNumber: milestone.workOrder.otNumber,
+				workProgressStatus: updatedWorkOrder.workProgressStatus,
+				closureComment,
+				status: updatedMilestone.status,
+				approvedAt: updatedMilestone.approvedAt,
 			},
 		})
 
@@ -93,6 +127,16 @@ export async function rejectMilestone({
 	milestoneId,
 	closureComment,
 }: RequestCloseMilestoneParams): Promise<RequestCloseMilestoneResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
 	try {
 		const milestone = await prisma.milestone.findUnique({
 			where: { id: milestoneId },
@@ -121,7 +165,7 @@ export async function rejectMilestone({
 			}
 		}
 
-		await prisma.milestone.update({
+		const updatedMilestone = await prisma.milestone.update({
 			where: { id: milestoneId },
 			data: {
 				closureComment,
@@ -135,10 +179,28 @@ export async function rejectMilestone({
 			},
 		})
 
-		await prisma.workOrder.update({
+		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: milestone.workOrder.id },
 			data: {
 				workProgressStatus: milestone.workOrder.workProgressStatus! - milestone.weight,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_ORDERS,
+			action: ACTIVITY_TYPE.REJECT,
+			entityId: milestoneId,
+			entityType: "Milestone",
+			metadata: {
+				name: milestone.name,
+				weight: milestone.weight,
+				workOrderId: milestone.workOrder.id,
+				otNumber: milestone.workOrder.otNumber,
+				workProgressStatus: updatedWorkOrder.workProgressStatus,
+				closureComment,
+				status: updatedMilestone.status,
+				approvedAt: updatedMilestone.approvedAt,
 			},
 		})
 

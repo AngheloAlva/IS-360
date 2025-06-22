@@ -1,15 +1,26 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
+
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 import { MILESTONE_STATUS } from "@prisma/client"
 
 export async function GET(
-	request: NextRequest,
+	req: NextRequest,
 	{ params }: { params: Promise<{ workOrderId: string }> }
-) {
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const { workOrderId } = await params
 
-		const searchParams = request.nextUrl.searchParams
+		const searchParams = req.nextUrl.searchParams
 		const showAll = searchParams.get("showAll") === "true"
 
 		if (!workOrderId) {

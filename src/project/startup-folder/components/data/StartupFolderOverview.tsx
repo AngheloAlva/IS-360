@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import Link from "next/link"
 import {
 	CarIcon,
 	EarthIcon,
@@ -10,15 +12,13 @@ import {
 	FolderKanbanIcon,
 	SquareActivityIcon,
 } from "lucide-react"
-import { useEffect, useState } from "react"
-import Link from "next/link"
 
 import {
-	type StartupFolder,
 	useStartupFolder,
+	type StartupFolder,
 } from "@/project/startup-folder/hooks/use-startup-folder"
-import { DocumentCategory } from "@prisma/client"
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
@@ -28,8 +28,9 @@ import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import BackButton from "@/shared/components/BackButton"
+
+import type { DocumentCategory } from "@prisma/client"
 
 interface StartupFolderOverviewProps {
 	userId: string

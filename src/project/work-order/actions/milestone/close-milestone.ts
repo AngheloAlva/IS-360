@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { sendRequestCloseMilestoneEmail } from "./send-close-milestone"
 
@@ -17,6 +22,16 @@ export async function requestCloseMilestone({
 	userId,
 	milestoneId,
 }: RequestCloseMilestoneParams): Promise<RequestCloseMilestoneResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
 	try {
 		const milestone = await prisma.milestone.findUnique({
 			where: { id: milestoneId },
@@ -48,7 +63,7 @@ export async function requestCloseMilestone({
 			}
 		}
 
-		await prisma.milestone.update({
+		const updatedMilestone = await prisma.milestone.update({
 			where: { id: milestoneId },
 			data: {
 				requestedBy: {
@@ -58,6 +73,26 @@ export async function requestCloseMilestone({
 				},
 				isCompleted: true,
 				status: "REQUESTED_CLOSURE",
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_ORDERS,
+			action: ACTIVITY_TYPE.SUBMIT,
+			entityId: milestoneId,
+			entityType: "Milestone",
+			metadata: {
+				name: milestone.name,
+				weight: milestone.weight,
+				description: milestone.description,
+				workOrderId: milestone.workOrderId,
+				otNumber: milestone.workOrder.otNumber,
+				workName: milestone.workOrder.workName,
+				workDescription: milestone.workOrder.workDescription,
+				workProgressStatus: milestone.workOrder.workProgressStatus,
+				status: updatedMilestone.status,
+				isCompleted: updatedMilestone.isCompleted,
 			},
 		})
 

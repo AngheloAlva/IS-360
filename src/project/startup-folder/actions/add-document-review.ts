@@ -1,8 +1,9 @@
 "use server"
 
+import { DocumentCategory, type Prisma, ReviewStatus, MODULES, ACTIVITY_TYPE } from "@prisma/client"
 import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 import { sendReviewNotificationEmail } from "./send-review-notification-email"
-import { DocumentCategory, type Prisma, ReviewStatus } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
 import {
 	WORKER_STRUCTURE,
@@ -31,6 +32,19 @@ export const addDocumentReview = async ({
 	try {
 		const newStatus =
 			status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.REJECTED
+
+		logActivity({
+			userId: reviewerId,
+			module: MODULES.STARTUP_FOLDERS,
+			action: newStatus === ReviewStatus.APPROVED ? ACTIVITY_TYPE.APPROVE : ACTIVITY_TYPE.REJECT,
+			entityId: documentId,
+			entityType: "StartupFolderDocument",
+			metadata: {
+				category,
+				comments,
+				startupFolderId,
+			},
+		})
 
 		let document: Document
 		let totalDocuments: number
@@ -88,7 +102,7 @@ export const addDocumentReview = async ({
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
 					allDocuments.documents.length === totalDocuments
 				) {
-					prisma.safetyAndHealthFolder.update({
+					await prisma.safetyAndHealthFolder.update({
 						where: { startupFolderId },
 						data: {
 							status: ReviewStatus.APPROVED,
@@ -186,7 +200,7 @@ export const addDocumentReview = async ({
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
 					allDocuments.documents.length === totalDocuments
 				) {
-					prisma.environmentalFolder.update({
+					await prisma.environmentalFolder.update({
 						where: { startupFolderId },
 						data: {
 							status: ReviewStatus.APPROVED,
@@ -501,7 +515,7 @@ export const addDocumentReview = async ({
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
 					allDocuments.documents.length === totalDocuments
 				) {
-					prisma.basicFolder.update({
+					await prisma.basicFolder.update({
 						where: { startupFolderId },
 						data: {
 							status: ReviewStatus.APPROVED,

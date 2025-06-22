@@ -1,5 +1,6 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 import type {
 	Company,
 	WorkerFolder,
@@ -119,21 +120,31 @@ interface UseStartupFoldersListParams {
 	search?: string
 	withOtActive?: boolean
 	otStatus?: WORK_ORDER_STATUS
+	order?: Order
+	orderBy?: OrderBy
 }
 
 export const fetchStartupFoldersList: QueryFunction<
 	CompanyWithStartupFolders[],
 	readonly [
 		"startupFolders",
-		{ search?: string; withOtActive?: boolean; otStatus?: WORK_ORDER_STATUS },
+		{
+			search?: string
+			withOtActive?: boolean
+			otStatus?: WORK_ORDER_STATUS
+			order?: Order
+			orderBy?: OrderBy
+		},
 	]
 > = async ({ queryKey }) => {
-	const [, { search, withOtActive, otStatus }] = queryKey
+	const [, { search, withOtActive, otStatus, order, orderBy }] = queryKey
 
 	const searchParams = new URLSearchParams()
 	if (search) searchParams.set("search", search)
 	if (withOtActive !== undefined) searchParams.set("withOtActive", withOtActive.toString())
 	if (otStatus) searchParams.set("otStatus", otStatus)
+	if (order) searchParams.set("order", order)
+	if (orderBy) searchParams.set("orderBy", orderBy)
 
 	const res = await fetch(`/api/startup-folders/list?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching general startup folders")
@@ -142,11 +153,13 @@ export const fetchStartupFoldersList: QueryFunction<
 }
 
 export const useStartupFoldersList = ({
+	order,
 	search,
-	withOtActive,
+	orderBy,
 	otStatus,
+	withOtActive,
 }: UseStartupFoldersListParams) => {
-	const queryKey = ["startupFolders", { search, withOtActive, otStatus }] as const
+	const queryKey = ["startupFolders", { search, withOtActive, otStatus, order, orderBy }] as const
 
 	return useQuery({
 		queryKey,

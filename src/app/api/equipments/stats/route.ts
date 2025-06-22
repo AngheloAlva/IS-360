@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
+
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		// 1. Total count of equipment
 		const totalEquipment = await prisma.equipment.count({

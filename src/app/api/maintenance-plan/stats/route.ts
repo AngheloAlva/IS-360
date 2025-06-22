@@ -1,10 +1,21 @@
-import prisma from "@/lib/prisma"
-import { NextResponse } from "next/server"
-import { PLAN_FREQUENCY, WORK_ORDER_PRIORITY } from "@prisma/client"
 import { add, format, isAfter } from "date-fns"
+import { NextResponse } from "next/server"
+import { headers } from "next/headers"
+
+import { PLAN_FREQUENCY, WORK_ORDER_PRIORITY } from "@prisma/client"
 import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export async function GET() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		// Extraer parámetros de consulta si es necesario
 		// const searchParams = request.nextUrl.searchParams

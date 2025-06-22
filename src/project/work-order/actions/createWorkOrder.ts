@@ -1,12 +1,17 @@
 "use server"
 
+import { headers } from "next/headers"
+
 import { generateOTNumber } from "@/project/work-order/actions/generateOTNumber"
 import { sendNewWorkOrderEmail } from "./sendNewWorkOrderEmail"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { PLAN_FREQUENCY } from "@prisma/client"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { WorkOrderSchema } from "@/project/work-order/schemas/workOrder.schema"
 import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
-import { PLAN_FREQUENCY } from "@prisma/client"
 
 interface CreateWorkOrderProps {
 	equipmentId?: string
@@ -21,6 +26,17 @@ export const createWorkOrder = async ({
 	initReportFile,
 	maintenancePlanTaskId,
 }: CreateWorkOrderProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		let maintenancePlanTaskData: {
 			id: string
@@ -41,10 +57,22 @@ export const createWorkOrder = async ({
 				},
 				select: {
 					id: true,
-					equipment: true,
+					equipment: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
 					nextDate: true,
 					frequency: true,
-					attachments: true,
+					attachments: {
+						select: {
+							id: true,
+							name: true,
+							type: true,
+							url: true,
+						},
+					},
 				},
 			})
 
@@ -132,55 +160,107 @@ export const createWorkOrder = async ({
 					connect: equipmentId ? { id: equipmentId } : equipment.map((id) => ({ id })),
 				},
 			},
-		})
-
-		const workOrder = await prisma.workOrder.findUnique({
-			where: {
-				id: newWorkOrder.id,
-			},
-			include: {
+			select: {
+				id: true,
+				status: true,
+				otNumber: true,
+				type: true,
+				priority: true,
+				programDate: true,
+				estimatedDays: true,
+				estimatedHours: true,
+				workDescription: true,
 				responsible: {
 					select: {
+						id: true,
 						name: true,
 					},
 				},
 				supervisor: {
 					select: {
+						id: true,
 						name: true,
 						email: true,
 					},
 				},
 				equipment: {
 					select: {
+						id: true,
 						name: true,
+					},
+				},
+				company: {
+					select: {
+						id: true,
+						name: true,
+					},
+				},
+				initReport: {
+					select: {
+						id: true,
+						name: true,
+						type: true,
+						url: true,
+					},
+				},
+				MaintenancePlanTask: {
+					select: {
+						id: true,
+						nextDate: true,
+						frequency: true,
+						attachments: {
+							select: {
+								id: true,
+								name: true,
+								type: true,
+								url: true,
+							},
+						},
 					},
 				},
 			},
 		})
 
-		if (!workOrder) {
-			return {
-				ok: false,
-				message: "Error al crear el orden de trabajo",
-			}
-		}
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_ORDERS,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: newWorkOrder.id,
+			entityType: "WorkOrder",
+			metadata: {
+				status: newWorkOrder.status,
+				otNumber: newWorkOrder.otNumber,
+				type: newWorkOrder.type,
+				priority: newWorkOrder.priority,
+				programDate: newWorkOrder.programDate,
+				estimatedDays: newWorkOrder.estimatedDays,
+				estimatedHours: newWorkOrder.estimatedHours,
+				workDescription: newWorkOrder.workDescription,
+				responsible: newWorkOrder.responsible,
+				supervisor: newWorkOrder.supervisor,
+				equipment: newWorkOrder.equipment,
+				company: newWorkOrder.company,
+				initReport: newWorkOrder.initReport,
+				maintenancePlanTask: newWorkOrder.MaintenancePlanTask,
+			},
+		})
 
 		sendNewWorkOrderEmail({
 			workOrder: {
-				otNumber: workOrder.otNumber,
-				type: workOrder.type,
-				priority: workOrder.priority,
-				equipment: workOrder.equipment,
-				programDate: workOrder.programDate,
-				estimatedDays: +workOrder.estimatedDays,
-				estimatedHours: +workOrder.estimatedHours,
+				otNumber: newWorkOrder.otNumber,
+				type: newWorkOrder.type,
+				priority: newWorkOrder.priority,
+				equipment: newWorkOrder.equipment,
+				programDate: newWorkOrder.programDate,
+				estimatedDays: +newWorkOrder.estimatedDays,
+				estimatedHours: +newWorkOrder.estimatedHours,
 				responsible: {
-					name: workOrder.responsible.name,
+					name: newWorkOrder.responsible.name,
 				},
-				workDescription: workOrder.workDescription,
+				workDescription: newWorkOrder.workDescription,
 				supervisor: {
-					name: workOrder.supervisor.name,
-					email: workOrder.supervisor.email,
+					name: newWorkOrder.supervisor.name,
+					email: newWorkOrder.supervisor.email,
 				},
 			},
 		})
@@ -190,7 +270,7 @@ export const createWorkOrder = async ({
 			message: "Orden de trabajo creado exitosamente",
 		}
 	} catch (error) {
-		console.error(error)
+		console.error("[CREATE_WORK_ORDER]", error)
 		return {
 			ok: false,
 			message: "Error al crear el orden de trabajo",

@@ -1,6 +1,10 @@
 "use server"
 
-import { StartupFolderType } from "@prisma/client"
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES, StartupFolderType } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 interface CreateStartupFolderProps {
@@ -10,6 +14,33 @@ interface CreateStartupFolderProps {
 }
 
 export const createStartupFolder = async ({ name, companyId, type }: CreateStartupFolderProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				startupFolder: ["create"],
+			},
+		},
+	})
+
+	if (!hasPermission.success) {
+		return {
+			ok: false,
+			message: "No tienes permiso para crear carpetas de arranque",
+		}
+	}
+
 	try {
 		const startupFolder = await prisma.startupFolder.create({
 			data: {
@@ -58,6 +89,19 @@ export const createStartupFolder = async ({ name, companyId, type }: CreateStart
 				throw new Error("Error al crear la carpeta básica")
 			}
 		}
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.STARTUP_FOLDERS,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: startupFolder.id,
+			entityType: "StartupFolder",
+			metadata: {
+				name,
+				type,
+				companyId,
+			},
+		})
 
 		return {
 			ok: true,

@@ -1,14 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { headers } from "next/headers"
+
 import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 import {
+	WORKER_STRUCTURE,
+	VEHICLE_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
-	VEHICLE_STRUCTURE,
-	WORKER_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const companyId = searchParams.get("companyId")

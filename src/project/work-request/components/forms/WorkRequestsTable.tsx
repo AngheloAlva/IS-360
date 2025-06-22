@@ -21,7 +21,7 @@ import {
 
 import { updateWorkRequestStatus } from "@/project/work-request/actions/update-work-request-status"
 import { useWorkRequests, WorkRequest } from "@/project/work-request/hooks/use-work-request"
-import { WorkRequestColumns } from "../../columns/work-request-columns"
+import { getWorkRequestColumns } from "../../columns/work-request-columns"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import WorkRequestDetailsDialog from "./WorkRequestDetailsDialog"
@@ -58,7 +58,7 @@ import {
 
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
 
-export default function WorkRequestsTable() {
+export default function WorkRequestsTable({ hasPermission }: { hasPermission: boolean }) {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [status, setStatus] = useState("all")
@@ -80,11 +80,11 @@ export default function WorkRequestsTable() {
 
 	const table = useReactTable({
 		data: data?.workRequests ?? [],
-		columns: WorkRequestColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
+		columns: getWorkRequestColumns(hasPermission),
 		state: {
 			sorting,
 			columnFilters,
@@ -237,14 +237,14 @@ export default function WorkRequestsTable() {
 							{isLoading || isFetching ? (
 								Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell colSpan={9}>
+										<TableCell colSpan={10}>
 											<Skeleton className="h-14 min-w-full" />
 										</TableCell>
 									</TableRow>
 								))
 							) : table.getRowModel().rows.length === 0 ? (
 								<TableRow>
-									<TableCell colSpan={9} className="h-24 text-center">
+									<TableCell colSpan={10} className="h-24 text-center">
 										No hay solicitudes de trabajo
 									</TableCell>
 								</TableRow>
@@ -272,32 +272,37 @@ export default function WorkRequestsTable() {
 													<DropdownMenuItem onClick={() => handleOpenComment(row.original)}>
 														<MessageCircleIcon className="mr-2 h-4 w-4" /> Comentar
 													</DropdownMenuItem>
-													{row.original.status !== "ATTENDED" && (
-														<DropdownMenuItem
-															onClick={() => handleStatusUpdate(row.original.id, "ATTENDED")}
-															disabled={isStatusLoading}
-														>
-															<CheckCircleIcon className="mr-2 h-4 w-4 text-green-600" /> Marcar
-															como atendida
-														</DropdownMenuItem>
-													)}
-													{row.original.status !== "CANCELLED" && (
-														<DropdownMenuItem
-															onClick={() => handleStatusUpdate(row.original.id, "CANCELLED")}
-															disabled={isStatusLoading}
-														>
-															<XCircleIcon className="mr-2 h-4 w-4 text-red-600" /> Cancelar
-															solicitud
-														</DropdownMenuItem>
-													)}
-													{row.original.status !== "REPORTED" && (
-														<DropdownMenuItem
-															onClick={() => handleStatusUpdate(row.original.id, "REPORTED")}
-															disabled={isStatusLoading}
-														>
-															<AlertCircleIcon className="mr-2 h-4 w-4 text-amber-600" /> Marcar
-															como reportada
-														</DropdownMenuItem>
+
+													{hasPermission && (
+														<>
+															{row.original.status !== "ATTENDED" && (
+																<DropdownMenuItem
+																	onClick={() => handleStatusUpdate(row.original.id, "ATTENDED")}
+																	disabled={isStatusLoading}
+																>
+																	<CheckCircleIcon className="mr-2 h-4 w-4 text-sky-500" /> Marcar
+																	como atendida
+																</DropdownMenuItem>
+															)}
+															{row.original.status !== "CANCELLED" && (
+																<DropdownMenuItem
+																	onClick={() => handleStatusUpdate(row.original.id, "CANCELLED")}
+																	disabled={isStatusLoading}
+																>
+																	<XCircleIcon className="mr-2 h-4 w-4 text-rose-500" /> Cancelar
+																	solicitud
+																</DropdownMenuItem>
+															)}
+															{row.original.status !== "REPORTED" && (
+																<DropdownMenuItem
+																	onClick={() => handleStatusUpdate(row.original.id, "REPORTED")}
+																	disabled={isStatusLoading}
+																>
+																	<AlertCircleIcon className="mr-2 h-4 w-4 text-amber-500" /> Marcar
+																	como reportada
+																</DropdownMenuItem>
+															)}
+														</>
 													)}
 												</DropdownMenuContent>
 											</DropdownMenu>
@@ -313,6 +318,7 @@ export default function WorkRequestsTable() {
 						isLoading={isLoading}
 						onPageChange={setPage}
 						pageCount={data?.pages ?? 0}
+						className="border-cyan-500 text-cyan-500 hover:bg-cyan-500"
 					/>
 				</CardContent>
 			</Card>

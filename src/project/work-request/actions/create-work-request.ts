@@ -1,8 +1,13 @@
 "use server"
 
-import prisma from "@/lib/prisma"
+import { headers } from "next/headers"
 
-import { type WorkRequestSchema } from "@/project/work-request/schemas/work-request.schema"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+
+import type { WorkRequestSchema } from "@/project/work-request/schemas/work-request.schema"
 import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
 
 interface CreateWorkRequestProps {
@@ -16,6 +21,17 @@ export const createWorkRequest = async ({
 	attachments,
 	userId,
 }: CreateWorkRequestProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user) {
+		return {
+			ok: false,
+			message: "No se pudo obtener la sesión del usuario",
+		}
+	}
+
 	try {
 		// Obtener el siguiente número de solicitud
 		const counter = await prisma.workRequestCounter.upsert({
@@ -53,9 +69,23 @@ export const createWorkRequest = async ({
 			},
 		})
 
-		// Enviar notificación por correo electrónico
-		// Aquí podríamos enviar una notificación por correo electrónico a los administradores
-		// sobre la nueva solicitud de trabajo creada
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_REQUESTS,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: newWorkRequest.id,
+			entityType: "WorkRequest",
+			metadata: {
+				requestNumber: newWorkRequest.requestNumber,
+				description: newWorkRequest.description,
+				isUrgent: newWorkRequest.isUrgent,
+				requestDate: newWorkRequest.requestDate,
+				observations: newWorkRequest.observations,
+				location: newWorkRequest.location,
+				customLocation: newWorkRequest.customLocation,
+				userId,
+			},
+		})
 
 		return {
 			success: "Solicitud de trabajo creada exitosamente",

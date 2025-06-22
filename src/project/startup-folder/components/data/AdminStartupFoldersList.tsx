@@ -1,17 +1,18 @@
 "use client"
 
-import { Files, Search, DotIcon } from "lucide-react"
+import { Files, DotIcon } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
 
 import { useStartupFoldersList } from "@/project/startup-folder/hooks/use-startup-folder"
 import { WorkOrderStatusSimpleOptions } from "@/lib/consts/work-order-status"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 
+import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { Skeleton } from "@/shared/components/ui/skeleton"
+import SearchInput from "@/shared/components/SearchInput"
 import { Button } from "@/shared/components/ui/button"
-import { Input } from "@/shared/components/ui/input"
-import { Label } from "@/shared/components/ui/label"
 import {
 	Card,
 	CardTitle,
@@ -34,85 +35,88 @@ import {
 import type { WORK_ORDER_STATUS } from "@prisma/client"
 
 export function AdminStartupFoldersList() {
-	const [searchTerm, setSearchTerm] = useState("")
-	const [withOtActive, setWithOtActive] = useState(false)
 	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
+	const [withOtActive, setWithOtActive] = useState(false)
+	const [orderBy, setOrderBy] = useState<OrderBy>("name")
+	const [searchTerm, setSearchTerm] = useState("")
+	const [order, setOrder] = useState<Order>("asc")
+
+	const debouncedSearch = useDebounce(searchTerm)
 
 	const { data: companiesWithFolders, isLoading } = useStartupFoldersList({
+		order,
+		orderBy,
 		otStatus,
 		withOtActive,
-		search: searchTerm,
+		search: debouncedSearch,
 	})
 
 	return (
 		<>
-			<div className="mb-4 flex flex-col items-end gap-3 md:flex-row">
-				<div className="relative flex-1">
-					<Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
-					<Input
-						type="search"
-						value={searchTerm}
-						className="bg-background pl-8"
-						onChange={(e) => setSearchTerm(e.target.value)}
-						placeholder="Buscar por nombre o RUT de empresa..."
-					/>
-				</div>
+			<div className="mb-4 flex flex-col items-end gap-2 md:flex-row">
+				<SearchInput
+					value={searchTerm}
+					className="flex-1"
+					onChange={setSearchTerm}
+					inputClassName="bg-background"
+					placeholder="Buscar por nombre o RUT de empresa..."
+				/>
 
-				<div className="flex flex-col gap-1.5">
-					<Label>Estado OT</Label>
-					<Select
-						onValueChange={(value: "all" | WORK_ORDER_STATUS) => {
-							if (value === "all") {
-								setOtStatus(undefined)
-							} else {
-								setOtStatus(value as WORK_ORDER_STATUS)
-							}
-						}}
-						value={otStatus ?? "all"}
-					>
-						<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
-							<SelectValue placeholder="Estado" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Estado OT</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="all">Todos los estados</SelectItem>
-								{WorkOrderStatusSimpleOptions.map((status) => (
-									<SelectItem key={status.value} value={status.value}>
-										{status.label}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-				</div>
+				<Select
+					onValueChange={(value: "all" | WORK_ORDER_STATUS) => {
+						if (value === "all") {
+							setOtStatus(undefined)
+						} else {
+							setOtStatus(value as WORK_ORDER_STATUS)
+						}
+					}}
+					value={otStatus ?? "all"}
+				>
+					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
+						<SelectValue placeholder="Estado" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							<SelectLabel>Estado OT</SelectLabel>
+							<SelectSeparator />
+							<SelectItem value="all">Todos los estados de OT</SelectItem>
 
-				<div className="flex flex-col gap-1.5">
-					<Label>Mostrar todas las empresas</Label>
-					<Select
-						onValueChange={(value: "true" | "false") => {
-							if (value === "true") {
-								setWithOtActive(true)
-							} else {
-								setWithOtActive(false)
-							}
-						}}
-						value={withOtActive ? "true" : "false"}
-					>
-						<SelectTrigger className="border-input bg-background w-full border">
-							<SelectValue placeholder="Mostrar todas las empresas" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Mostrar todas las empresas</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="false">Sí</SelectItem>
-								<SelectItem value="true">No</SelectItem>
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-				</div>
+							{WorkOrderStatusSimpleOptions.map((status) => (
+								<SelectItem key={status.value} value={status.value}>
+									{status.label}
+								</SelectItem>
+							))}
+						</SelectGroup>
+					</SelectContent>
+				</Select>
+
+				<Select
+					onValueChange={(value: "true" | "false") => {
+						if (value === "true") {
+							setWithOtActive(true)
+						} else {
+							setWithOtActive(false)
+						}
+					}}
+					value={withOtActive ? "true" : "false"}
+				>
+					<SelectTrigger className="border-input bg-background w-fit border">
+						<SelectValue placeholder="Mostrar todas las empresas" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							<SelectItem value="false">Todas las empresas</SelectItem>
+							<SelectItem value="true">Solo empresas con OT activa</SelectItem>
+						</SelectGroup>
+					</SelectContent>
+				</Select>
+
+				<OrderByButton
+					onChange={(orderBy, order) => {
+						setOrderBy(orderBy)
+						setOrder(order)
+					}}
+				/>
 			</div>
 
 			{companiesWithFolders?.length === 0 && (

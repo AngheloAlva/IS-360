@@ -144,7 +144,7 @@ export const getWorkPermitColumns = (
 					</Link>
 
 					<WorkPermitAttachmentForm
-						userId={row.original.user.id}
+						userId={userId}
 						workPermitId={row.original.id}
 						companyId={row.original.company.id}
 					/>

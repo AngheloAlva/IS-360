@@ -150,6 +150,7 @@ export default function MaintenancePlanForm({
 										<PopoverTrigger asChild>
 											<FormControl>
 												<Button
+													type="button"
 													variant="outline"
 													role="combobox"
 													className={cn(
@@ -209,9 +210,10 @@ export default function MaintenancePlanForm({
 
 						<Button
 							size={"lg"}
+							type="button"
 							variant="outline"
+							className="mt-6"
 							onClick={() => setOpen(false)}
-							className="border-2 border-indigo-600 tracking-wide text-indigo-500 transition-all hover:scale-105 hover:bg-transparent hover:text-indigo-500"
 						>
 							Cancelar
 						</Button>
@@ -219,7 +221,7 @@ export default function MaintenancePlanForm({
 						<SubmitButton
 							label="Crear Plan"
 							isSubmitting={isSubmitting}
-							className="bg-indigo-600 hover:bg-indigo-700"
+							className="mt-6 bg-indigo-600 hover:bg-indigo-700 hover:text-white"
 						/>
 					</form>
 				</Form>

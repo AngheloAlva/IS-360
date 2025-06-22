@@ -294,7 +294,12 @@ export function WorkerFolderDocuments({
 						queryClient.invalidateQueries({
 							queryKey: [
 								"startupFolderDocuments",
-								{ startupFolderId, category: DocumentCategory.PERSONNEL, workerId },
+								{
+									startupFolderId,
+									category: DocumentCategory.PERSONNEL,
+									workerId,
+									vehicleId: null,
+								},
 							],
 						})
 					}}

@@ -40,6 +40,7 @@ const linkEntitySchema = z.object({
 interface LinkEntityDialogProps {
 	category: DocumentCategory
 	startupFolderId: string
+	userId: string
 	entities: Array<{ id: string; name: string }>
 	isOpen: boolean
 	onClose: () => void
@@ -51,6 +52,7 @@ export function LinkEntityDialog({
 	startupFolderId,
 	entities,
 	isOpen,
+	userId,
 	onClose,
 	onSuccess,
 }: LinkEntityDialogProps) {
@@ -66,9 +68,10 @@ export function LinkEntityDialog({
 	const onSubmit = async (data: z.infer<typeof linkEntitySchema>) => {
 		linkEntity.mutate(
 			{
+				userId,
+				category,
 				startupFolderId,
 				entityId: data.entityId,
-				category,
 			},
 			{
 				onSuccess: () => {

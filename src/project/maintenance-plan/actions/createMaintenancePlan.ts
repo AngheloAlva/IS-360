@@ -1,6 +1,11 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { generateSlug } from "@/lib/generateSlug"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { MaintenancePlanSchema } from "@/project/maintenance-plan/schemas/maintenance-plan.schema"
@@ -11,10 +16,37 @@ interface CreateMaintenancePlanValues {
 }
 
 export const createMaintenancePlan = async ({ values }: CreateMaintenancePlanValues) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				maintenancePlan: ["create"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const planSlug = generateSlug(values.name)
 
-		await prisma.maintenancePlan.create({
+		const maintenancePlan = await prisma.maintenancePlan.create({
 			data: {
 				slug: planSlug,
 				description: "",
@@ -29,6 +61,19 @@ export const createMaintenancePlan = async ({ values }: CreateMaintenancePlanVal
 						id: values.createdById,
 					},
 				},
+			},
+		})
+
+		logActivity({
+			userId: values.createdById,
+			module: MODULES.MAINTENANCE_PLANS,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: maintenancePlan.id,
+			entityType: "MaintenancePlan",
+			metadata: {
+				name: values.name,
+				equipmentId: values.equipmentId,
+				slug: planSlug,
 			},
 		})
 

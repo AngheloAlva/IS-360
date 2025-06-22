@@ -1,5 +1,10 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { CommentSchema } from "@/project/document/schemas/comment.schema"
@@ -11,8 +16,19 @@ interface NewCommentProps {
 export const newComment = async ({
 	values,
 }: NewCommentProps): Promise<{ ok: boolean; message: string }> => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
-		await prisma.fileComment.create({
+		const comment = await prisma.fileComment.create({
 			data: {
 				content: values.content,
 				file: {
@@ -25,6 +41,18 @@ export const newComment = async ({
 						id: values.userId,
 					},
 				},
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.DOCUMENTATION,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: comment.id,
+			entityType: "FileComment",
+			metadata: {
+				content: values.content,
+				fileId: values.fileId,
 			},
 		})
 

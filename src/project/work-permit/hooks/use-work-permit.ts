@@ -1,5 +1,7 @@
-import { QueryFunction, useQuery } from "@tanstack/react-query"
-import { DateRange } from "react-day-picker"
+import { type QueryFunction, useQuery } from "@tanstack/react-query"
+
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
+import type { DateRange } from "react-day-picker"
 
 export interface WorkPermit {
 	id: string
@@ -62,10 +64,12 @@ export interface WorkPermit {
 
 interface WorkPermitsParams {
 	page: number
+	order: Order
 	limit: number
 	search: string
-	statusFilter: string | null
+	orderBy: OrderBy
 	companyId: string | null
+	statusFilter: string | null
 	dateRange: DateRange | null
 }
 
@@ -81,15 +85,17 @@ export const fetchWorkPermits: QueryFunction<
 		"workPermits",
 		{
 			page: number
+			order: Order
 			limit: number
 			search: string
-			statusFilter: string | null
+			orderBy: OrderBy
 			companyId: string | null
+			statusFilter: string | null
 			dateRange: DateRange | null
 		},
 	]
 > = async ({ queryKey }) => {
-	const [, { page, limit, search, statusFilter, companyId, dateRange }] = queryKey
+	const [, { page, limit, search, statusFilter, companyId, dateRange, orderBy, order }] = queryKey
 
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())
@@ -99,6 +105,8 @@ export const fetchWorkPermits: QueryFunction<
 	if (statusFilter) searchParams.set("statusFilter", statusFilter)
 	if (dateRange?.from) searchParams.set("startDate", dateRange.from.toISOString())
 	if (dateRange?.to) searchParams.set("endDate", dateRange.to.toISOString())
+	if (orderBy) searchParams.set("orderBy", orderBy)
+	if (order) searchParams.set("order", order)
 
 	const res = await fetch(`/api/work-permit?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching work permits")
@@ -110,13 +118,15 @@ export const useWorkPermits = ({
 	page = 1,
 	limit = 10,
 	search = "",
-	statusFilter = null,
+	order = "desc",
 	companyId = null,
 	dateRange = null,
+	statusFilter = null,
+	orderBy = "createdAt",
 }: WorkPermitsParams) => {
 	const queryKey = [
 		"workPermits",
-		{ page, limit, search, statusFilter, companyId, dateRange },
+		{ page, limit, search, order, statusFilter, companyId, dateRange, orderBy },
 	] as const
 
 	return useQuery<WorkPermitsResponse>({

@@ -1,12 +1,18 @@
 "use server"
 
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
 
 interface DeleteStartupFolderProps {
 	startupFolderId: string
+	userId: string
 }
 
-export const deleteStartupFolder = async ({ startupFolderId }: DeleteStartupFolderProps) => {
+export const deleteStartupFolder = async ({
+	startupFolderId,
+	userId,
+}: DeleteStartupFolderProps) => {
 	try {
 		const startupFolder = await prisma.startupFolder.findUnique({
 			where: {
@@ -14,6 +20,9 @@ export const deleteStartupFolder = async ({ startupFolderId }: DeleteStartupFold
 			},
 			select: {
 				id: true,
+				name: true,
+				type: true,
+				companyId: true,
 				safetyAndHealthFolders: true,
 				environmentalFolders: true,
 				vehiclesFolders: true,
@@ -84,9 +93,22 @@ export const deleteStartupFolder = async ({ startupFolderId }: DeleteStartupFold
 			},
 		})
 
-		await prisma.startupFolder.delete({
+		const deletedFolder = await prisma.startupFolder.delete({
 			where: {
 				id: startupFolder.id,
+			},
+		})
+
+		logActivity({
+			userId,
+			module: MODULES.STARTUP_FOLDERS,
+			action: ACTIVITY_TYPE.DELETE,
+			entityId: deletedFolder.id,
+			entityType: "StartupFolder",
+			metadata: {
+				companyId: deletedFolder.companyId,
+				name: deletedFolder.name,
+				type: deletedFolder.type,
 			},
 		})
 

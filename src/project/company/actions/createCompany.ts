@@ -1,6 +1,11 @@
 "use server"
 
+import { headers } from "next/headers"
+
 import { createStartupFolder } from "@/project/startup-folder/actions/createStartupFolder"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { CompanySchema } from "@/project/company/schemas/company.schema"
@@ -20,8 +25,34 @@ interface CreateCompanyResponse {
 export const createCompany = async ({
 	values,
 }: CreateCompanyProps): Promise<CreateCompanyResponse> => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				company: ["create"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { vehicles, supervisors, startupFolderName, startupFolderType, ...rest } = values
 
 		const existingCompany = await prisma.company.findUnique({
@@ -44,6 +75,20 @@ export const createCompany = async ({
 			},
 		})
 
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.COMPANY,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: company.id,
+			entityType: "Company",
+			metadata: {
+				name: rest.name,
+				rut: rest.rut,
+				hasVehicles: vehicles && vehicles.length > 0,
+				hasSupervisors: supervisors && supervisors.length > 0,
+			},
+		})
+
 		const { ok, message } = await createStartupFolder({
 			companyId: company.id,
 			type: startupFolderType,
@@ -51,12 +96,27 @@ export const createCompany = async ({
 		})
 
 		if (vehicles && vehicles.length > 0) {
-			vehicles.forEach(async (vehicle) => {
-				await prisma.vehicle.create({
+			vehicles.forEach(async (vehicleData) => {
+				const vehicle = await prisma.vehicle.create({
 					data: {
-						...vehicle,
+						...vehicleData,
 						companyId: company.id,
-						year: Number(vehicle.year),
+						year: Number(vehicleData.year),
+					},
+				})
+
+				logActivity({
+					userId: session.user.id,
+					module: MODULES.COMPANY,
+					action: ACTIVITY_TYPE.CREATE,
+					entityId: vehicle.id,
+					entityType: "Vehicle",
+					metadata: {
+						companyId: company.id,
+						plate: vehicle.plate,
+						brand: vehicle.brand,
+						model: vehicle.model,
+						year: vehicle.year,
 					},
 				})
 			})

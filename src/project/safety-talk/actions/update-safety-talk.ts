@@ -1,11 +1,17 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+
 import {
 	type SafetyTalkSchema,
 	safetyTalkSchema,
 } from "@/project/safety-talk/schemas/safety-talk.schema"
-import prisma from "@/lib/prisma"
 
 interface UpdateSafetyTalkProps {
 	id: string
@@ -18,6 +24,33 @@ export async function updateSafetyTalk({
 	data,
 	slug,
 }: UpdateSafetyTalkProps): Promise<{ ok: boolean; message: string }> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				safetyTalk: ["update"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No tienes permisos para actualizar la charla de seguridad",
+		}
+	}
+
 	try {
 		const validatedData = safetyTalkSchema.parse(data)
 
@@ -105,6 +138,24 @@ export async function updateSafetyTalk({
 			throw new Error("No se pudo actualizar la charla de seguridad")
 		}
 
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.SAFETY_TALK,
+			action: ACTIVITY_TYPE.UPDATE,
+			entityId: updatedSafetyTalk.id,
+			entityType: "SafetyTalk",
+			metadata: {
+				title: updatedSafetyTalk.title,
+				slug: updatedSafetyTalk.slug,
+				isPresential: updatedSafetyTalk.isPresential,
+				timeLimit: updatedSafetyTalk.timeLimit,
+				minimumScore: updatedSafetyTalk.minimumScore,
+				expiresAt: updatedSafetyTalk.expiresAt?.toISOString(),
+				resourcesCount: validatedData.resources.length,
+				questionsCount: validatedData.questions.length,
+			},
+		})
+
 		// Revalidar las rutas relevantes
 		revalidatePath("/admin/dashboard/charlas-de-seguridad")
 		revalidatePath(`/admin/dashboard/charlas-de-seguridad/${slug}`)
@@ -114,7 +165,7 @@ export async function updateSafetyTalk({
 			message: "Charla de seguridad actualizada exitosamente",
 		}
 	} catch (error) {
-		console.error(error)
+		console.error("[UPDATE_SAFETY_TALK]", error)
 		return {
 			ok: false,
 			message:

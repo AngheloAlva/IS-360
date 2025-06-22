@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 import type { AREAS } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const area = searchParams.get("area") as AREAS
@@ -69,7 +79,7 @@ export async function GET(req: NextRequest) {
 					},
 				},
 				orderBy: {
-					name: "asc",
+					[orderBy]: order,
 				},
 			}),
 		])

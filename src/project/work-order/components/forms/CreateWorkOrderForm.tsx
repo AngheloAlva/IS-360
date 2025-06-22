@@ -47,12 +47,14 @@ import type { Company } from "@/project/company/hooks/use-companies"
 import { cn } from "@/lib/utils"
 
 interface CreateWorkOrderFormProps {
+	className?: string
 	equipmentId?: string
 	equipmentName?: string
 	maintenancePlanTaskId?: string
 }
 
 export default function CreateWorkOrderForm({
+	className,
 	equipmentId,
 	equipmentName,
 	maintenancePlanTaskId,
@@ -156,6 +158,7 @@ export default function CreateWorkOrderForm({
 			<SheetTrigger
 				className={cn(
 					"flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105",
+					className,
 					{
 						"flex h-7 cursor-pointer items-center justify-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-semibold tracking-wide text-white transition-all hover:scale-105":
 							equipmentId && maintenancePlanTaskId,

@@ -1,8 +1,7 @@
 "use server"
 
-import { resend } from "@/lib/resend"
-
 import { NewUserEmail } from "@/project/user/components/emails/NewUserEmail"
+import { resend } from "@/lib/resend"
 
 interface SendNewUserEmailProps {
 	name: string
@@ -24,6 +23,7 @@ export const sendNewUserEmail = async ({ email, name, password }: SendNewUserEma
 		})
 
 		if (error) {
+			console.error("[SEND_NEW_USER_EMAIL]", error)
 			return {
 				ok: false,
 				error,
@@ -35,6 +35,7 @@ export const sendNewUserEmail = async ({ email, name, password }: SendNewUserEma
 			data,
 		}
 	} catch (error) {
+		console.error("[SEND_NEW_USER_EMAIL]", error)
 		return {
 			ok: false,
 			error,

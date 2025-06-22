@@ -2,9 +2,9 @@
 
 import { z } from "zod"
 
+import { ACTIVITY_TYPE, DocumentCategory, MODULES, type VehicleDocumentType } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
-
-import type { VehicleDocumentType } from "@prisma/client"
 
 const createVehicleDocumentSchema = z.object({
 	url: z.string(),
@@ -37,24 +37,51 @@ export async function createVehicleDocument(input: CreateVehicleDocumentInput) {
 		})
 
 		if (!vehicleFolder) {
-			throw new Error("Carpeta de vehiculo no encontrada")
+			return {
+				ok: false,
+				message: "Carpeta de vehiculo no encontrada",
+			}
 		}
 
-		// Verify user belongs to the company
 		const user = await prisma.user.findUnique({ where: { id: userId } })
 		if (!user || user.companyId !== vehicleFolder.vehicle.companyId) {
-			throw new Error("No autorizado - El vehiculo no pertenece a la empresa")
+			return {
+				ok: false,
+				message: "No autorizado - El vehiculo no pertenece a la empresa",
+			}
 		}
 
-		await prisma.vehicleDocument.create({
+		const document = await prisma.vehicleDocument.create({
 			data: {
 				type: documentType as VehicleDocumentType,
 				name: documentName,
 				url,
-				category: "VEHICLES",
+				category: DocumentCategory.VEHICLES,
 				uploadedById: userId,
 				folderId: vehicleFolder.id,
 				expirationDate,
+			},
+		})
+
+		if (!document) {
+			return {
+				ok: false,
+				message: "Error al crear el documento",
+			}
+		}
+
+		logActivity({
+			userId,
+			module: MODULES.STARTUP_FOLDERS,
+			action: ACTIVITY_TYPE.UPLOAD,
+			entityId: document.id,
+			entityType: "VehicleDocument",
+			metadata: {
+				documentName,
+				documentType,
+				vehicleId,
+				startupFolderId,
+				expirationDate: expirationDate.toISOString(),
 			},
 		})
 

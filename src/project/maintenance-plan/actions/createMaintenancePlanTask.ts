@@ -1,7 +1,12 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { generateSlug } from "@/lib/generateSlug"
+import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 import type { MaintenancePlanTaskSchema } from "@/project/maintenance-plan/schemas/maintenance-plan-task.schema"
 import type { UploadResult } from "@/lib/upload-files"
@@ -15,6 +20,33 @@ export const createMaintenancePlanTask = async ({
 	values,
 	attachments,
 }: CreateMaintenancePlanTaskValues) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				maintenancePlan: ["create"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const maintenancePlan = await prisma.maintenancePlan.findUnique({
 			where: {
@@ -39,7 +71,7 @@ export const createMaintenancePlanTask = async ({
 
 		const taskSlug = generateSlug(values.name)
 
-		await prisma.maintenancePlanTask.create({
+		const task = await prisma.maintenancePlanTask.create({
 			data: {
 				slug: taskSlug,
 				name: values.name,
@@ -78,6 +110,23 @@ export const createMaintenancePlanTask = async ({
 						type: attachment.type,
 					})),
 				},
+			},
+		})
+
+		logActivity({
+			userId: values.createdById,
+			module: MODULES.MAINTENANCE_PLANS,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: task.id,
+			entityType: "MaintenancePlanTask",
+			metadata: {
+				name: values.name,
+				frequency: values.frequency,
+				maintenancePlanId: maintenancePlan.id,
+				equipmentId: values.equipmentId || maintenancePlan.equipment.id,
+				nextDate: values.nextDate.toISOString(),
+				hasAttachments: attachments.length > 0,
+				slug: taskSlug,
 			},
 		})
 

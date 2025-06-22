@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { headers } from "next/headers"
 
-export async function GET() {
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+
+export async function GET(): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const [totalFolders, totalFoldersToReview, totalFoldersActive, totalCompaniesApproved] =
 			await Promise.all([

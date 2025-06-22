@@ -1,6 +1,10 @@
 "use server"
 
 import prisma from "@/lib/prisma"
+import { logActivity } from "@/lib/activity/log"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { headers } from "next/headers"
+import { auth } from "@/lib/auth"
 
 import type { UpdateFileSchema } from "@/project/document/schemas/update-file.schema.ts"
 
@@ -26,6 +30,17 @@ export const updateFile = async ({
 	expirationDate,
 	registrationDate,
 }: UpdateFileParams) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			error: "No autorizado",
+		}
+	}
+
 	try {
 		// Obtener el archivo actual
 		const currentFile = await prisma.file.findUnique({
@@ -77,6 +92,23 @@ export const updateFile = async ({
 				},
 				previousUrl,
 				previousName,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.DOCUMENTATION,
+			action: ACTIVITY_TYPE.UPDATE,
+			entityId: updatedFile.id,
+			entityType: "File",
+			metadata: {
+				name,
+				type,
+				size,
+				description,
+				expirationDate: expirationDate?.toISOString(),
+				registrationDate: registrationDate?.toISOString(),
+				urlChanged: url !== previousUrl,
 			},
 		})
 

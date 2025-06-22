@@ -1,11 +1,26 @@
 "use server"
 
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { generateSlug } from "@/lib/generateSlug"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { FolderFormSchema } from "@/project/document/schemas/folder.schema"
 
 export const createFolder = async (values: FolderFormSchema) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
 	try {
 		const { parentFolderId, userId, ...rest } = values
 
@@ -43,6 +58,20 @@ export const createFolder = async (values: FolderFormSchema) => {
 					},
 				},
 				slug: newFolderSlug,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.DOCUMENTATION,
+			action: ACTIVITY_TYPE.CREATE,
+			entityId: folder.id,
+			entityType: "Folder",
+			metadata: {
+				name: folder.name,
+				slug: folder.slug,
+				area: folder.area,
+				parentId: folder.parentId,
 			},
 		})
 

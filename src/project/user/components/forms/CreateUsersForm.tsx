@@ -13,7 +13,9 @@ import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
+import { cn } from "@/lib/utils"
 
+import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
 import SubmitButton from "../../../../shared/components/forms/SubmitButton"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
@@ -30,14 +32,14 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { User } from "@prisma/client"
-import { cn } from "@/lib/utils"
-import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 
 export default function CreateUsersForm({
+	userId,
 	companyId,
 	className,
 	isSupervisor = false,
 }: {
+	userId: string
 	companyId: string
 	className?: string
 	isSupervisor?: boolean
@@ -117,6 +119,7 @@ export default function CreateUsersForm({
 					if (employee.startupFoldersId) {
 						employee.startupFoldersId.forEach(async (folderId) => {
 							await linkFolderEntity({
+								userId: userId,
 								category: "PERSONNEL",
 								startupFolderId: folderId,
 								entityId: newUser.user.id,

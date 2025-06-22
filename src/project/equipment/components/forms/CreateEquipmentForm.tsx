@@ -191,6 +191,7 @@ export default function CreateEquipmentForm({
 
 						<Button
 							size={"lg"}
+							type="button"
 							variant="outline"
 							onClick={() => setOpen(false)}
 							className="border-teal-700 text-teal-700 transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"
@@ -201,7 +202,7 @@ export default function CreateEquipmentForm({
 						<SubmitButton
 							isSubmitting={loading}
 							label="Crear Equipo / Ubicación"
-							className="bg-emerald-600 hover:bg-emerald-700"
+							className="bg-emerald-600 hover:bg-emerald-700 hover:text-white"
 						/>
 					</form>
 				</Form>

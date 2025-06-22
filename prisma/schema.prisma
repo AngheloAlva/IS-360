@@ -36,12 +36,18 @@ enum AREAS {
 
 enum MODULES {
   ALL // Todo
-  EQUIPMENT // Equipos
+  EQUIPMENT // Equipos y Ubicacioens
   SAFETY_TALK // Charlas de seguridad
-  WORK_ORDERS // Ordenes de Trabajo
+  WORK_ORDERS // Ordenes de Trabajo y Libros de obras
   WORK_PERMITS // Permisos de Trabajo
   DOCUMENTATION // Documentacion
   WORK_REQUESTS // Solicitudes de Trabajo
+  COMPANY // Empresas
+  USERS // Usuarios
+  MAINTENANCE_PLANS // Planes de Mantenimiento y Tareas de los planes
+  STARTUP_FOLDERS // Carpetas de Arranque
+  VEHICLES // Vehiculos (acceso contratista, no OTC)
+  CONTACT // Contacto y Soporte
   NONE // Sin módulo
 }
 
@@ -117,6 +123,7 @@ model User {
   workRequests                    WorkRequest[]
   workRequestComments             WorkRequestComment[]
   workPermitAttachments           WorkPermitAttachment[]
+  activityLogs                    ActivityLog[]
 
   @@unique([email])
   @@unique([rut])
@@ -1294,4 +1301,45 @@ model WorkRequestComment {
   workRequest   WorkRequest @relation(fields: [workRequestId], references: [id], onDelete: Cascade)
 
   @@map("work_request_comment")
+}
+
+enum ACTIVITY_TYPE {
+  CREATE
+  UPDATE
+  DELETE
+  SUBMIT
+  APPROVE
+  REJECT
+  CANCEL
+  COMPLETE
+  VIEW
+  DOWNLOAD
+  UPLOAD
+  COMMENT
+  ASSIGN
+  UNASSIGN
+  LOGIN
+  LOGOUT
+}
+
+model ActivityLog {
+  id         String        @id @default(cuid())
+  timestamp  DateTime      @default(now())
+  module     MODULES
+  action     ACTIVITY_TYPE
+  entityId   String
+  entityType String
+  metadata   Json?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([module])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@map("activity_log")
 }

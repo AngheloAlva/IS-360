@@ -29,14 +29,18 @@ import {
 
 export default function NewFolderForm({
 	area,
+	order,
 	userId,
-	parentFolderId,
+	orderBy,
 	isRootFolder = false,
+	parentFolderId = null,
 }: {
 	area: string
 	userId: string
+	order: "asc" | "desc"
 	isRootFolder?: boolean
-	parentFolderId?: string
+	orderBy: "name" | "createdAt"
+	parentFolderId?: string | null
 }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [errorMessage, setErrorMessage] = useState("")
@@ -70,8 +74,9 @@ export default function NewFolderForm({
 				})
 
 				setOpen(false)
+				form.reset()
 				queryClient.invalidateQueries({
-					queryKey: ["documents", { area: areaValue, folderId: parentFolderId }],
+					queryKey: ["documents", { area: areaValue, folderId: parentFolderId, order, orderBy }],
 				})
 			} else {
 				toast.error("Error al crear la carpeta", {
@@ -98,7 +103,7 @@ export default function NewFolderForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="bg-primary hover:bg-primary/80 flex h-10 items-center justify-center gap-1 rounded-md px-3 text-sm text-white"
+				className="flex h-10 items-center justify-center gap-1 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-blue-700"
 				onClick={() => setOpen(true)}
 			>
 				<FolderIcon className="h-4 w-4" />
@@ -146,7 +151,7 @@ export default function NewFolderForm({
 							<SubmitButton
 								label="Crear Carpeta"
 								isSubmitting={isSubmitting}
-								className="hover:bg-primary/80 hover:text-white"
+								className="bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
 							/>
 						</div>
 					</form>

@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 
-import { WORK_ORDER_STATUS, USER_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+import { WORK_ORDER_STATUS, USER_ROLE } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const companyId = searchParams.get("companyId")

@@ -1,24 +1,36 @@
 "use client"
 
-import { Building2Icon, PrinterIcon, UserIcon } from "lucide-react"
+import { Building2Icon, PenBoxIcon, PrinterIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
 import { WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
+import { WORK_PERMIT_STATUS } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
+import WorkPermitAttachmentForm from "../components/forms/WorkPermitAttachmentForm"
+import WorkPermitDetailsDialog from "../components/dialogs/WorkPermitDetailsDialog"
 import { Button } from "@/shared/components/ui/button"
+import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
 
-export const workPermitByCompanyColumns: ColumnDef<WorkPermit>[] = [
+export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPermit>[] => [
 	{
 		accessorKey: "otNumber",
 		header: "OT",
 		cell: ({ row }) => {
 			const otNumber = row.original.otNumber.otNumber
-			return <div className="truncate">{otNumber}</div>
+
+			return (
+				<WorkPermitDetailsDialog workPermit={row.original} className="bg-indigo-500">
+					<div className="cursor-pointer font-semibold text-indigo-500 hover:underline">
+						{otNumber}
+					</div>
+				</WorkPermitDetailsDialog>
+			)
 		},
 	},
 	{
@@ -28,7 +40,7 @@ export const workPermitByCompanyColumns: ColumnDef<WorkPermit>[] = [
 			const aplicantPt = row.original.user.name
 			return (
 				<div className="flex items-center gap-1 truncate">
-					<UserIcon className="size-4" />
+					<UserIcon className="text-muted-foreground size-4" />
 					{aplicantPt}
 				</div>
 			)
@@ -40,10 +52,28 @@ export const workPermitByCompanyColumns: ColumnDef<WorkPermit>[] = [
 		cell: ({ row }) => {
 			const company = row.original.company.name
 			return (
-				<div className="flex items-center gap-1 truncate">
-					<Building2Icon className="size-4" />
+				<div className="flex items-center gap-1.5 truncate">
+					<Building2Icon className="text-muted-foreground size-4" />
 					{company}
 				</div>
+			)
+		},
+	},
+	{
+		accessorKey: "status",
+		header: "Estado",
+		cell: ({ row }) => {
+			const status = row.original.status
+			return (
+				<Badge
+					className={cn("bg-purple-500/10 text-purple-500", {
+						"bg-indigo-500/10 text-indigo-500": status === WORK_PERMIT_STATUS.CANCELLED,
+						"bg-red-500/10 text-red-500": status === WORK_PERMIT_STATUS.REJECTED,
+						"bg-fuchsia-500/10 text-fuchsia-500": status === WORK_PERMIT_STATUS.ACTIVE,
+					})}
+				>
+					{WorkPermitStatusLabels[status as keyof typeof WorkPermitStatusLabels]}
+				</Badge>
 			)
 		},
 	},
@@ -52,7 +82,7 @@ export const workPermitByCompanyColumns: ColumnDef<WorkPermit>[] = [
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber.workName
-			return <div className="truncate">{workOrder}</div>
+			return <div className="w-96 text-wrap">{workOrder}</div>
 		},
 	},
 	{
@@ -88,25 +118,13 @@ export const workPermitByCompanyColumns: ColumnDef<WorkPermit>[] = [
 		},
 	},
 	{
-		accessorKey: "status",
-		header: "Estado",
-		cell: ({ row }) => {
-			const status = row.original.status
-			return (
-				<div className="truncate">
-					{WorkPermitStatusLabels[status as keyof typeof WorkPermitStatusLabels]}
-				</div>
-			)
-		},
-	},
-	{
 		accessorKey: "actions",
 		header: "Acciones",
 		cell: ({ row }) => {
 			const id = row.original.id
 
 			return (
-				<div className="flex items-center gap-2">
+				<div className="z-50 flex items-center gap-2">
 					<Link href={`/api/work-permit/pdf/${id}`} target="_blank">
 						<Button
 							size={"icon"}
@@ -114,6 +132,22 @@ export const workPermitByCompanyColumns: ColumnDef<WorkPermit>[] = [
 							className="cursor-pointer text-indigo-500 hover:bg-indigo-500 hover:text-white"
 						>
 							<PrinterIcon className="h-4 w-4" />
+						</Button>
+					</Link>
+
+					<WorkPermitAttachmentForm
+						userId={userId}
+						workPermitId={row.original.id}
+						companyId={row.original.company.id}
+					/>
+
+					<Link href={`/dashboard/permiso-de-trabajo/${id}`}>
+						<Button
+							size={"icon"}
+							variant={"ghost"}
+							className="cursor-pointer text-rose-500 hover:bg-rose-500 hover:text-white"
+						>
+							<PenBoxIcon className="h-4 w-4" />
 						</Button>
 					</Link>
 				</div>

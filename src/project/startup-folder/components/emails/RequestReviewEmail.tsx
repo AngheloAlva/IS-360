@@ -107,12 +107,7 @@ export const RequestReviewEmail: React.FC<Readonly<RequestReviewEmailTemplatePro
 							<Hr className="my-[32px] border-gray-200" />
 
 							<Text className="text-center text-sm text-gray-500">
-								Si tienes alguna duda, no dudes en contactarnos a través de nuestro correo
-								electrónico:
-								<br />
-								<a href="mailto:soporte@otc360.cl" className="text-blue-600 hover:underline">
-									soporte@otc360.cl
-								</a>
+								Si tienes alguna duda, no dudes en contactarnos
 							</Text>
 						</Section>
 					</Container>

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 interface WeeklyData {
 	week: string
@@ -8,7 +10,15 @@ interface WeeklyData {
 	count: number
 }
 
-export async function GET() {
+export async function GET(): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		// Get progress for the last 12 weeks
 		const twelveWeeksAgo = new Date()

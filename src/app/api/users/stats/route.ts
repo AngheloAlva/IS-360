@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server"
-import { USER_ROLE } from "@prisma/client"
-import prisma from "@/lib/prisma"
+import { headers } from "next/headers"
 import { format } from "date-fns"
 
-export async function GET() {
+import { USER_ROLE } from "@prisma/client"
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+
+export async function GET(): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		// Estadísticas básicas
 		const [totalUsers, twoFactorEnabled, totalContractors, totalSupervisors] = await Promise.all([

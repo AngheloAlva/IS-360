@@ -23,9 +23,9 @@ import { cn } from "@/lib/utils"
 
 import { UpdateFileFormSheet } from "@/project/document/components/forms/UpdateFileFormSheet"
 import UpdateFolderFormSheet from "@/project/document/components/forms/UpdateFolderFormSheet"
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover"
 import { NewFileFormSheet } from "@/project/document/components/forms/NewFileFormSheet"
 import NewFolderFormSheet from "@/project/document/components/forms/NewFolderFormSheet"
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover"
 import DeleteConfirmationDialog from "../forms/DeleteConfirmationDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import OrderByButton from "@/shared/components/OrderByButton"
@@ -134,15 +134,22 @@ export function FileExplorer({
 				{canCreate && (
 					<div className="ml-auto flex gap-2">
 						<OrderByButton
+							className="h-10"
 							onChange={(orderBy, order) => {
 								setOrderBy(orderBy)
 								setOrder(order)
 							}}
 						/>
 
-						<NewFileFormSheet areaValue={areaValue} area={area} userId={userId} />
+						<NewFileFormSheet
+							area={area}
+							order={order}
+							userId={userId}
+							orderBy={orderBy}
+							areaValue={areaValue}
+						/>
 
-						<NewFolderFormSheet area={area} userId={userId} />
+						<NewFolderFormSheet area={area} userId={userId} order={order} orderBy={orderBy} />
 					</div>
 				)}
 			</div>

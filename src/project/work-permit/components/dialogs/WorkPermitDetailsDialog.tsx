@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 
 import { WorkPermitStatus, WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
+import { cn } from "@/lib/utils"
 
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { Separator } from "@/shared/components/ui/separator"
@@ -33,12 +34,14 @@ import {
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
 
 interface WorkPermitDetailsDialogProps {
-	children: React.ReactNode
+	className?: string
 	workPermit: WorkPermit
+	children: React.ReactNode
 }
 
 export default function WorkPermitDetailsDialog({
 	children,
+	className,
 	workPermit,
 }: WorkPermitDetailsDialogProps) {
 	return (
@@ -46,7 +49,7 @@ export default function WorkPermitDetailsDialog({
 			<DialogTrigger asChild>{children}</DialogTrigger>
 
 			<DialogContent className="overflow-hidden p-0">
-				<div className="h-2 w-full bg-rose-500"></div>
+				<div className={cn("h-2 w-full bg-rose-500", className)}></div>
 
 				<DialogHeader className="px-4">
 					<DialogTitle className="flex items-center gap-2">

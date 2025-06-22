@@ -1,10 +1,41 @@
 "use server"
 
-import prisma from "@/lib/prisma"
-import { PLAN_FREQUENCY } from "@prisma/client"
 import { addDays, addMonths, addWeeks } from "date-fns"
+import { headers } from "next/headers"
+
+import { ACTIVITY_TYPE, MODULES, PLAN_FREQUENCY } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export const postponeTask = async ({ id }: { id: string }) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permission: {
+				maintenancePlan: ["update"],
+			},
+		},
+	})
+
+	if (!hasPermission) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
+
 	try {
 		const task = await prisma.maintenancePlanTask.findUnique({
 			where: {
@@ -50,12 +81,25 @@ export const postponeTask = async ({ id }: { id: string }) => {
 				nextDate = task.nextDate
 		}
 
-		await prisma.maintenancePlanTask.update({
+		const updatedTask = await prisma.maintenancePlanTask.update({
 			where: {
 				id,
 			},
 			data: {
 				nextDate,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.MAINTENANCE_PLANS,
+			action: ACTIVITY_TYPE.UPDATE,
+			entityId: updatedTask.id,
+			entityType: "MaintenancePlanTask",
+			metadata: {
+				previousDate: task.nextDate.toISOString(),
+				newDate: nextDate.toISOString(),
+				frequency: task.frequency,
 			},
 		})
 

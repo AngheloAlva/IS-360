@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 interface MonthlyData {
 	month: string
@@ -9,7 +11,15 @@ interface MonthlyData {
 	inspection: number
 }
 
-export async function GET() {
+export async function GET(): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		// Get entries for the last 6 months
 		const sixMonthsAgo = new Date()

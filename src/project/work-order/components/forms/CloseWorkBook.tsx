@@ -110,7 +110,12 @@ export function CloseWorkBook({ userId, className, workOrderId }: CloseWorkBookP
 				</div>
 
 				<div className="flex justify-end gap-2">
-					<Button variant="outline" disabled={isLoading} onClick={() => setIsOpen(false)}>
+					<Button
+						type="button"
+						variant="outline"
+						disabled={isLoading}
+						onClick={() => setIsOpen(false)}
+					>
 						Cancelar
 					</Button>
 

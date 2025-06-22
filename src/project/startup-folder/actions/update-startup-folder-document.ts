@@ -2,6 +2,8 @@
 
 import { z } from "zod"
 
+import { MODULES, ACTIVITY_TYPE } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
 import {
 	DocumentCategory,
 	BasicDocumentType,
@@ -15,9 +17,9 @@ import { updateSafetyAndHealthDocument } from "./documents/safety-and-health"
 import { updateEnvironmentalDocument } from "./documents/environmental"
 import { updateVehicleDocument } from "./documents/vehicle"
 import { updateWorkerDocument } from "./documents/worker"
+import { updateBasicDocument } from "./documents/basic"
 
 import type { UploadResult } from "@/lib/upload-files"
-import { updateBasicDocument } from "./documents/basic"
 
 const updateDocumentSchema = z.object({
 	documentId: z.string(),
@@ -46,6 +48,21 @@ export async function updateStartupFolderDocument({
 }) {
 	const { documentId, category, expirationDate, documentName, documentType } =
 		updateDocumentSchema.parse(data)
+
+	logActivity({
+		userId,
+		module: MODULES.STARTUP_FOLDERS,
+		action: ACTIVITY_TYPE.UPDATE,
+		entityId: documentId,
+		entityType: "StartupFolderDocument",
+		metadata: {
+			documentName,
+			documentType,
+			category,
+			expirationDate: expirationDate.toISOString(),
+			hasNewFile: !!uploadedFile,
+		},
+	})
 
 	switch (category) {
 		case "PERSONNEL":

@@ -88,7 +88,9 @@ export default function ApproveWorkPermit({
 
 				<DialogFooter>
 					<DialogClose asChild>
-						<Button variant="outline">Cancelar</Button>
+						<Button type="button" variant="outline">
+							Cancelar
+						</Button>
 					</DialogClose>
 
 					<Button

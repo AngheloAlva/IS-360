@@ -1,7 +1,21 @@
-import { NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
 
-export async function GET(req: Request, { params }: { params: Promise<{ companyId: string }> }) {
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: Promise<{ companyId: string }> }
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const { companyId } = await params
 

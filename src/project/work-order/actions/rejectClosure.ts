@@ -1,15 +1,30 @@
 "use server"
 
+import { headers } from "next/headers"
+
 import { sendRejectClosureEmail } from "./sendRejectClosure"
+import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 interface RejectClosureProps {
 	userId: string
-	workBookId: string
 	reason?: string
+	workBookId: string
 }
 
 export async function rejectClosure({ userId, workBookId, reason }: RejectClosureProps) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return {
+			ok: false,
+			message: "No autorizado",
+		}
+	}
 	try {
 		const user = await prisma.user.findUnique({
 			where: { id: userId },
@@ -24,6 +39,7 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 				closureRequestedBy: true,
 				company: {
 					select: {
+						id: true,
 						name: true,
 					},
 				},
@@ -40,7 +56,7 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 		}
 
 		// Actualizar el estado del libro de obras
-		await prisma.workOrder.update({
+		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: workBookId },
 			data: {
 				status: "IN_PROGRESS",
@@ -49,12 +65,32 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 		})
 
 		// Crear una entrada en el libro de obras
-		await prisma.workEntry.create({
+		const workEntry = await prisma.workEntry.create({
 			data: {
 				entryType: "COMMENT",
 				comments: `Solicitud de cierre rechazada${reason ? `: ${reason}` : ""}`,
 				workOrderId: workBookId,
 				createdById: userId,
+			},
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.WORK_ORDERS,
+			action: ACTIVITY_TYPE.REJECT,
+			entityId: workBookId,
+			entityType: "WorkOrder",
+			metadata: {
+				status: updatedWorkOrder.status,
+				otNumber: workOrder.otNumber,
+				workName: workOrder.workName,
+				reason,
+				workEntryId: workEntry.id,
+				workEntryComments: workEntry.comments,
+				companyId: workOrder.company?.id,
+				companyName: workOrder.company?.name,
+				closureRequestedById: workOrder.closureRequestedBy?.id,
+				closureRequestedByName: workOrder.closureRequestedBy?.name,
 			},
 		})
 

@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: req.headers,
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	try {
 		const { id } = await params
 

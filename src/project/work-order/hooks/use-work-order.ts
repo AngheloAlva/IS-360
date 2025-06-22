@@ -7,6 +7,7 @@ import type {
 	WORK_ORDER_STATUS,
 	WORK_ORDER_PRIORITY,
 } from "@prisma/client"
+import { Order, OrderBy } from "@/shared/components/OrderByButton"
 
 interface WorkOrderStats {
 	activeCount: number
@@ -65,13 +66,15 @@ export interface WorkOrder {
 
 interface WorkOrdersParams {
 	page: number
+	order: Order
 	limit: number
 	search: string
+	orderBy: OrderBy
+	permitFilter?: boolean
 	companyId: string | null
 	typeFilter: string | null
 	statusFilter: string | null
 	dateRange: DateRange | null
-	permitFilter?: boolean
 }
 
 interface WorkOrdersResponse {
@@ -94,10 +97,26 @@ export const fetchWorkOrders: QueryFunction<
 			companyId: string | null
 			dateRange: DateRange | null
 			permitFilter?: boolean
+			orderBy: OrderBy
+			order: Order
 		},
 	]
 > = async ({ queryKey }) => {
-	const [, { page, limit, search, typeFilter, statusFilter, companyId, dateRange, permitFilter }] = queryKey
+	const [
+		,
+		{
+			page,
+			limit,
+			search,
+			typeFilter,
+			statusFilter,
+			companyId,
+			dateRange,
+			permitFilter,
+			orderBy,
+			order,
+		},
+	] = queryKey
 
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())
@@ -109,6 +128,8 @@ export const fetchWorkOrders: QueryFunction<
 	if (dateRange?.from) searchParams.set("startDate", dateRange.from.toISOString())
 	if (dateRange?.to) searchParams.set("endDate", dateRange.to.toISOString())
 	if (permitFilter) searchParams.set("permitFilter", "true")
+	if (orderBy) searchParams.set("orderBy", orderBy)
+	if (order) searchParams.set("order", order)
 
 	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching work orders")
@@ -125,10 +146,23 @@ export const useWorkOrders = ({
 	companyId = null,
 	dateRange = null,
 	permitFilter = false,
+	orderBy = "createdAt",
+	order = "desc",
 }: WorkOrdersParams) => {
 	const queryKey = [
 		"workOrders",
-		{ page, limit, search, typeFilter, statusFilter, companyId, dateRange, permitFilter },
+		{
+			page,
+			limit,
+			search,
+			typeFilter,
+			statusFilter,
+			companyId,
+			dateRange,
+			permitFilter,
+			orderBy,
+			order,
+		},
 	] as const
 
 	return useQuery<WorkOrdersResponse>({

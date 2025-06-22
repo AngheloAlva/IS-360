@@ -2,14 +2,24 @@
 
 import { addDays, format, subDays } from "date-fns"
 import { NextResponse } from "next/server"
+import { headers } from "next/headers"
 
 import { type DocumentAreasValues, DocumentAreasValuesArray } from "@/lib/consts/areas"
 import { DocumentExpirations } from "@/lib/consts/document-expirations"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { AREAS } from "@prisma/client"
 
 export async function GET() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
 	// Get documents by area
 	const areas = DocumentAreasValuesArray
 

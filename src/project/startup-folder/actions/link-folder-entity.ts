@@ -1,18 +1,21 @@
 "use server"
 
+import { ACTIVITY_TYPE, DocumentCategory, MODULES } from "@prisma/client"
+import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
-import { DocumentCategory } from "@prisma/client"
 
 interface LinkFolderEntityParams {
 	startupFolderId: string
 	entityId: string
 	category: DocumentCategory
+	userId: string
 }
 
 export async function linkFolderEntity({
 	startupFolderId,
 	entityId,
 	category,
+	userId,
 }: LinkFolderEntityParams) {
 	try {
 		const folder = await prisma.startupFolder.findUnique({
@@ -46,6 +49,19 @@ export async function linkFolderEntity({
 					throw new Error("Carpeta de usuario no creada")
 				}
 
+				await logActivity({
+					userId,
+					module: MODULES.STARTUP_FOLDERS,
+					action: ACTIVITY_TYPE.CREATE,
+					entityId: newWorkerFolder.id,
+					entityType: "WorkerFolder",
+					metadata: {
+						startupFolderId,
+						workerId: entityId,
+						category,
+					},
+				})
+
 				return {
 					ok: true,
 					message: "Carpeta de colaborador creada y asignada",
@@ -69,6 +85,19 @@ export async function linkFolderEntity({
 				if (!newVehicleFolder) {
 					throw new Error("Carpeta de vehículo no creada")
 				}
+
+				logActivity({
+					userId,
+					module: MODULES.STARTUP_FOLDERS,
+					action: ACTIVITY_TYPE.CREATE,
+					entityId: newVehicleFolder.id,
+					entityType: "VehicleFolder",
+					metadata: {
+						startupFolderId,
+						vehicleId: entityId,
+						category,
+					},
+				})
 
 				return {
 					ok: true,
