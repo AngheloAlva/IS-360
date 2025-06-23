@@ -19,10 +19,10 @@ export function CompanyOverviewCards({ data, isLoading }: CompanyOverviewCardsPr
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 			<Link href="/dashboard/colaboradores">
 				<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
-					<div className="bg-gradient-to-br from-blue-500 to-blue-600 p-1.5" />
+					<div className="bg-gradient-to-br from-orange-600 to-red-700 p-1.5" />
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle>Colaboradores</CardTitle>
-						<div className="rounded-lg bg-blue-100 p-1.5 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+						<div className="rounded-lg bg-orange-100 p-1.5 text-orange-600 dark:bg-orange-900 dark:text-orange-400">
 							<UsersIcon className="size-5.5" />
 						</div>
 					</CardHeader>
@@ -36,7 +36,7 @@ export function CompanyOverviewCards({ data, isLoading }: CompanyOverviewCardsPr
 
 			<Link href="/dashboard/vehiculos">
 				<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
-					<div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-1.5" />
+					<div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-1.5" />
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle>Vehículos</CardTitle>
 						<div className="rounded-lg bg-emerald-100 p-1.5 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-400">
@@ -53,10 +53,10 @@ export function CompanyOverviewCards({ data, isLoading }: CompanyOverviewCardsPr
 
 			<Link href="/dashboard/libro-de-obras">
 				<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
-					<div className="bg-gradient-to-br from-purple-500 to-purple-600 p-1.5" />
+					<div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-1.5" />
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle>Libros de Obra</CardTitle>
-						<div className="rounded-lg bg-purple-100 p-1.5 text-purple-600 dark:bg-purple-900 dark:text-purple-400">
+						<div className="rounded-lg bg-blue-100 p-1.5 text-blue-600 dark:bg-blue-900 dark:text-blue-400">
 							<BookCopyIcon className="size-5.5" />
 						</div>
 					</CardHeader>
@@ -69,10 +69,10 @@ export function CompanyOverviewCards({ data, isLoading }: CompanyOverviewCardsPr
 
 			<Link href="/dashboard/permiso-de-trabajo">
 				<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
-					<div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5" />
+					<div className="bg-gradient-to-br from-purple-600 to-indigo-700 p-1.5" />
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<CardTitle>Permisos de Trabajo</CardTitle>
-						<div className="rounded-lg bg-orange-100 p-1.5 text-orange-600 dark:bg-orange-900 dark:text-orange-400">
+						<div className="rounded-lg bg-purple-100 p-1.5 text-purple-600 dark:bg-purple-900 dark:text-purple-400">
 							<FileText className="size-5.5" />
 						</div>
 					</CardHeader>
@@ -91,7 +91,7 @@ function CompanyOverviewCardsSkeleton() {
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 			{[...Array(4)].map((_, i) => (
-				<Card key={`card-skeleton-1-${i}`} className="overflow-hidden border-none shadow-md">
+				<Card key={`card-skeleton-1-${i}`} className="overflow-hidden border-none pt-0 shadow-md">
 					<div className="bg-gradient-to-br from-gray-200 to-gray-300 p-1 dark:from-gray-700 dark:to-gray-800" />
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<Skeleton className="h-5 w-24" />

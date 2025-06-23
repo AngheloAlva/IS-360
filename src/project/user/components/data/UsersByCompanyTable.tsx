@@ -104,7 +104,7 @@ export function UsersByCompanyTable({ companyId }: { companyId: string }) {
 						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell className="" colSpan={8}>
+										<TableCell className="" colSpan={9}>
 											<Skeleton className="h-9 min-w-full" />
 										</TableCell>
 									</TableRow>

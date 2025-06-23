@@ -184,7 +184,15 @@ export function FileExplorer({
 									)}
 
 									<div className="mt-2 flex w-full items-center justify-end">
-										<span className="w-fit rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-500">
+										<span
+											className={cn(
+												"w-fit rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-500",
+												{
+													"bg-red-500/10 text-red-500":
+														item._count.files === 0 && item._count.subFolders === 0,
+												}
+											)}
+										>
 											{item._count.files > 0 || item._count.subFolders > 0
 												? "Si contiene información"
 												: "No contiene información"}
