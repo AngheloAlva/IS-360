@@ -38,7 +38,7 @@ export function UsersByCompanyTable({ companyId }: { companyId: string }) {
 	const { data, isLoading, refetch, isFetching } = useUsersByCompany({
 		page,
 		search,
-		limit: 10,
+		limit: 15,
 		companyId,
 	})
 

@@ -1,8 +1,10 @@
-import { Building2Icon, DotIcon, LinkIcon, UserIcon } from "lucide-react"
+import { Building2Icon, DotIcon, EyeIcon, LinkIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
+
+import WorkOrderDetailsDialog from "@/project/work-order/components/dialogs/WorkOrderDetailsDialog"
 
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
@@ -20,19 +22,39 @@ import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 
 export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	{
+		accessorKey: "id",
+		cell: ({ row }) => {
+			const workOrder = row.original
+
+			return (
+				<WorkOrderDetailsDialog workOrder={workOrder}>
+					<Button
+						variant={"ghost"}
+						size={"icon"}
+						className="size-9 font-semibold text-amber-600 hover:bg-amber-600 hover:text-white hover:underline"
+					>
+						<EyeIcon className="size-4" />
+					</Button>
+				</WorkOrderDetailsDialog>
+			)
+		},
+	},
+	{
 		accessorKey: "otNumber",
 		enableHiding: false,
 		header: "N° OT",
 		cell: ({ row }) => {
-			const id = row.original.id
+			const workOrder = row.original
 
 			return (
-				<Link
-					href={`/admin/dashboard/ordenes-de-trabajo/${id}`}
-					className="font-semibold text-orange-600 hover:underline"
-				>
-					{row.getValue("otNumber")}
-				</Link>
+				<div className="flex items-center gap-2">
+					<Link
+						href={`/admin/dashboard/ordenes-de-trabajo/${workOrder.id}`}
+						className="font-semibold text-orange-600 hover:underline"
+					>
+						{workOrder.otNumber}
+					</Link>
+				</div>
 			)
 		},
 	},

@@ -1,16 +1,35 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
+import { EyeIcon } from "lucide-react"
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
+import EquipmentDetailsDialog from "@/project/equipment/components/dialogs/EquipmentDetailsDialog"
+import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkEquipment } from "@/project/equipment/hooks/use-equipments"
 
 export const EquipmentColumns: ColumnDef<WorkEquipment>[] = [
+	{
+		accessorKey: "id",
+		cell: ({ row }) => {
+			const equipment = row.original
+			return (
+				<EquipmentDetailsDialog equipment={equipment}>
+					<Button
+						size={"icon"}
+						variant={"ghost"}
+						className="size-8 cursor-pointer text-left font-medium text-teal-600 hover:bg-teal-600 hover:text-white"
+					>
+						<EyeIcon className="size-4" />
+					</Button>
+				</EquipmentDetailsDialog>
+			)
+		},
+	},
 	{
 		accessorKey: "tag",
 		header: "TAG",
@@ -94,14 +113,6 @@ export const EquipmentColumns: ColumnDef<WorkEquipment>[] = [
 					)}
 				</ul>
 			)
-		},
-	},
-	{
-		accessorKey: "createdAt",
-		header: "Fecha de Creación",
-		cell: ({ row }) => {
-			const date = row.getValue("createdAt") as Date
-			return <span>{format(new Date(date), "dd-MM-yyyy")}</span>
 		},
 	},
 ]

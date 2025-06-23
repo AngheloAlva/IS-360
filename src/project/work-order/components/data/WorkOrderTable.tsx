@@ -80,7 +80,7 @@ export function WorkOrderTable() {
 		orderBy,
 		dateRange,
 		companyId,
-		limit: 10,
+		limit: 15,
 		typeFilter,
 		statusFilter,
 		search: debouncedSearch,

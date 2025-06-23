@@ -49,7 +49,7 @@ export default function WorkPermitsTable({
 		page,
 		order,
 		orderBy,
-		limit: 10,
+		limit: 15,
 		companyId: null,
 		dateRange: null,
 		statusFilter: null,

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "./button"
 
 interface TablePaginationProps<TData> {
+	total?: number
 	pageCount: number
 	className?: string
 	isLoading?: boolean
@@ -15,6 +16,7 @@ interface TablePaginationProps<TData> {
 
 export function TablePagination<TData>({
 	table,
+	total,
 	className,
 	isLoading,
 	pageCount,
@@ -24,12 +26,16 @@ export function TablePagination<TData>({
 
 	return (
 		<div className="text-text flex w-full items-center justify-between">
-			<span className="flex items-center gap-1 text-sm">
-				<div>Página</div>
-				<strong className="font-semibold">
-					{currentPage} de {pageCount}
-				</strong>
-			</span>
+			<div className="flex flex-col items-start">
+				<span className="flex items-center gap-1 text-sm">
+					<div>Página</div>
+					<strong className="font-semibold">
+						{currentPage} de {pageCount}
+					</strong>
+				</span>
+
+				{total && <span className="text-muted-foreground text-sm"> {total} resultados</span>}
+			</div>
 
 			<div className="flex items-center gap-1">
 				<Button

@@ -36,7 +36,7 @@ export function CompanyTable() {
 	const { data, isLoading, refetch, isFetching } = useCompanies({
 		page,
 		search,
-		limit: 10,
+		limit: 15,
 	})
 
 	const table = useReactTable({

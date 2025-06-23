@@ -63,7 +63,7 @@ export function VehiclesByCompanyTable({ companyId }: { companyId: string }) {
 	const { data, isLoading, refetch, isFetching } = useVehiclesByCompany({
 		page,
 		search,
-		limit: 10,
+		limit: 15,
 		companyId,
 	})
 

@@ -36,7 +36,7 @@ export function SafetyTalkDataTable() {
 	const { data, isLoading, refetch, isFetching } = useSafetyTalks({
 		page,
 		search,
-		limit: 10,
+		limit: 15,
 	})
 
 	const table = useReactTable({

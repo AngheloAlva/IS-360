@@ -49,7 +49,7 @@ export default function WorkBookEntriesTable({
 		page,
 		search,
 		milestone,
-		limit: 10,
+		limit: 15,
 		workOrderId,
 	})
 

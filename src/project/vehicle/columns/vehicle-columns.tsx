@@ -1,9 +1,8 @@
 import { MoreHorizontal } from "lucide-react"
-import { es } from "date-fns/locale"
-import { format } from "date-fns"
 
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-types"
 
+import VehicleDetailsDialog from "@/project/vehicle/components/dialogs/VehicleDetailsDialog"
 import DeleteVehicleDialog from "@/project/vehicle/components/forms/DeleteVehicle"
 import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
 import { Button } from "@/shared/components/ui/button"
@@ -24,6 +23,18 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 	{
 		accessorKey: "plate",
 		header: "Matrícula",
+		cell: ({ row }) => {
+			const vehicle = row.original
+			const plate = row.getValue("plate") as string
+
+			return (
+				<VehicleDetailsDialog vehicle={vehicle}>
+					<span className="cursor-pointer font-semibold text-emerald-500 hover:underline">
+						{plate}
+					</span>
+				</VehicleDetailsDialog>
+			)
+		},
 	},
 	{
 		accessorKey: "model",
@@ -58,15 +69,6 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 			) : (
 				<Badge className="bg-emerald-900 px-6 font-semibold hover:bg-emerald-900">No</Badge>
 			)
-		},
-	},
-	{
-		accessorKey: "createdAt",
-		header: "Fecha de creación",
-		cell: ({ row }) => {
-			const createdAt = row.getValue("createdAt") as string
-
-			return format(new Date(createdAt), "dd/MM/yyyy", { locale: es })
 		},
 	},
 	{

@@ -2,8 +2,6 @@
 
 import { headers } from "next/headers"
 
-import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
-import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -28,19 +26,6 @@ export const getUsers = async (limit: number, page: number) => {
 			},
 			cacheStrategy: {
 				ttl: 10,
-			},
-		})
-
-		logActivity({
-			userId: session.user.id,
-			module: MODULES.USERS,
-			action: ACTIVITY_TYPE.VIEW,
-			entityId: "all",
-			entityType: "User",
-			metadata: {
-				page,
-				limit,
-				count: users.length,
 			},
 		})
 
@@ -77,18 +62,6 @@ export const getUsersByCompanyId = async (companyId: string) => {
 			},
 			cacheStrategy: {
 				ttl: 10,
-			},
-		})
-
-		logActivity({
-			userId: session.user.id,
-			module: MODULES.USERS,
-			action: ACTIVITY_TYPE.VIEW,
-			entityId: companyId,
-			entityType: "Company",
-			metadata: {
-				companyId,
-				count: users.length,
 			},
 		})
 
@@ -135,19 +108,6 @@ export const getUserById = async (userId: string) => {
 			}
 		}
 
-		logActivity({
-			userId: session.user.id,
-			module: MODULES.USERS,
-			action: ACTIVITY_TYPE.VIEW,
-			entityId: user.id,
-			entityType: "User",
-			metadata: {
-				email: user.email,
-				name: user.name,
-				companyId: user.companyId,
-			},
-		})
-
 		return {
 			ok: true,
 			data: user,
@@ -188,19 +148,6 @@ export const getOtcUsers = async (limit: number, page: number) => {
 			},
 			cacheStrategy: {
 				ttl: 10,
-			},
-		})
-
-		logActivity({
-			userId: session.user.id,
-			module: MODULES.USERS,
-			action: ACTIVITY_TYPE.VIEW,
-			entityId: "otc",
-			entityType: "User",
-			metadata: {
-				page,
-				limit,
-				count: users.length,
 			},
 		})
 
@@ -260,19 +207,6 @@ export const getUsersByWorkOrderId = async (workOrderId: string) => {
 			},
 			cacheStrategy: {
 				ttl: 10,
-			},
-		})
-
-		logActivity({
-			userId: session.user.id,
-			module: MODULES.USERS,
-			action: ACTIVITY_TYPE.VIEW,
-			entityId: workOrderId,
-			entityType: "WorkOrder",
-			metadata: {
-				workOrderId,
-				companyId: company.id,
-				count: users.length,
 			},
 		})
 

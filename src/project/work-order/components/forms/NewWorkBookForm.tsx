@@ -84,7 +84,7 @@ export default function NewWorkBookForm({
 	const { data, isLoading } = useWorkBooksByCompany({
 		page: 1,
 		companyId,
-		limit: 10,
+		limit: 15,
 		search: "",
 		onlyBooks: false,
 	})

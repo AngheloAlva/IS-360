@@ -82,6 +82,8 @@ export function DatePickerFormField<T extends FieldValues>({
 								defaultMonth={field.value}
 								captionLayout={"dropdown"}
 								disabled={disabledCondition}
+								toYear={new Date().getFullYear() + 1}
+								fromYear={new Date().getFullYear() - 1}
 							/>
 						</PopoverContent>
 					</Popover>

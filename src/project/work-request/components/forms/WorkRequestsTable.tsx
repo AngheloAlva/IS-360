@@ -24,7 +24,7 @@ import { useWorkRequests, WorkRequest } from "@/project/work-request/hooks/use-w
 import { getWorkRequestColumns } from "../../columns/work-request-columns"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
-import WorkRequestDetailsDialog from "./WorkRequestDetailsDialog"
+import WorkRequestDetailsDialog from "../dialogs/WorkRequestDetailsDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
@@ -75,7 +75,7 @@ export default function WorkRequestsTable({ hasPermission }: { hasPermission: bo
 		search,
 		status,
 		isUrgent,
-		limit: 10,
+		limit: 15,
 	})
 
 	const table = useReactTable({

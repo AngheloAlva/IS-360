@@ -46,7 +46,7 @@ export function WorkBookTable({ companyId }: { companyId: string }) {
 		page,
 		search,
 		companyId,
-		limit: 10,
+		limit: 15,
 		onlyBooks: true,
 	})
 

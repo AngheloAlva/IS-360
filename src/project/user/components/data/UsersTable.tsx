@@ -166,9 +166,10 @@ export function UsersTable({ hasPermission }: { hasPermission: boolean }) {
 
 				<TablePagination
 					table={table}
-					onPageChange={setPage}
-					pageCount={data?.pages ?? 0}
 					isLoading={isLoading}
+					onPageChange={setPage}
+					total={data?.total ?? 0}
+					pageCount={data?.pages ?? 0}
 				/>
 			</CardContent>
 		</Card>

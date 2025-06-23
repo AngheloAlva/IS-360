@@ -145,7 +145,7 @@ export default function MaintenancePlanForm({
 							name="equipmentId"
 							render={({ field }) => (
 								<FormItem className="flex flex-col sm:col-span-2">
-									<FormLabel>Equipo</FormLabel>
+									<FormLabel>Equipo/Ubicación</FormLabel>
 									<Popover modal>
 										<PopoverTrigger asChild>
 											<FormControl>
@@ -162,7 +162,7 @@ export default function MaintenancePlanForm({
 														? equipments?.equipments?.find(
 																(equipment) => equipment.id === field.value
 															)?.name
-														: "Seleccionar equipo"}
+														: "Seleccionar equipo/ubicación"}
 													<ChevronsUpDown className="opacity-50" />
 												</Button>
 											</FormControl>
@@ -188,7 +188,7 @@ export default function MaintenancePlanForm({
 																		"bg-primary": equipment.id === field.value,
 																	})}
 																>
-																	{equipment.name}
+																	{equipment.name + "* (" + equipment.location + ")"}
 																	<Check
 																		className={cn(
 																			"ml-auto text-white",

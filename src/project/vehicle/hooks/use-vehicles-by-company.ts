@@ -12,6 +12,7 @@ export interface Vehicle {
 	isMain?: boolean
 	type?: VEHICLE_TYPE
 	companyId: string
+	createdAt: string
 }
 
 interface UseVehiclesByCompanyParams {

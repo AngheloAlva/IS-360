@@ -67,7 +67,7 @@ export function WorkPermitsTableByCompany({
 		order,
 		search,
 		orderBy,
-		limit: 10,
+		limit: 15,
 		companyId,
 		statusFilter,
 		dateRange: null,

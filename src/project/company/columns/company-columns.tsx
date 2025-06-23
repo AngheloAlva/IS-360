@@ -1,10 +1,10 @@
 "use client"
 
-import { ArrowUpDown, EyeIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
+import { EyeIcon } from "lucide-react"
 import Link from "next/link"
 
+import CompanyDetailsDialog from "@/project/company/components/dialogs/CompanyDetailsDialog"
 import DeleteCompanyDialog from "@/project/company/components/forms/DeleteCompanyDialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 
@@ -29,8 +29,14 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 		accessorKey: "name",
 		header: "Nombre",
 		cell: ({ row }) => {
-			const name = row.getValue("name") as string
-			return <div className="font-semibold">{name}</div>
+			const company = row.original
+			return (
+				<CompanyDetailsDialog company={company}>
+					<button className="flex cursor-pointer items-center gap-1 text-left font-semibold text-blue-500 hover:underline">
+						{company.name}
+					</button>
+				</CompanyDetailsDialog>
+			)
 		},
 	},
 	{
@@ -65,25 +71,6 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 		},
 	},
 	{
-		accessorKey: "createdAt",
-		header: ({ column }) => {
-			return (
-				<div
-					onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-					className="hover:text-primary flex cursor-pointer items-center transition-colors"
-				>
-					Fecha de creación
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</div>
-			)
-		},
-		cell: ({ row }) => {
-			const date = row.getValue("createdAt")
-			const formattedDate = format(date as Date, "dd/MM/yyyy")
-			return <div>{formattedDate}</div>
-		},
-	},
-	{
 		accessorKey: "actions",
 		header: "Acciones",
 		cell: ({ row }) => {
@@ -93,7 +80,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 				<div className="flex items-center gap-2">
 					<Link
 						href={`/admin/dashboard/empresas/${id}`}
-						className="flex size-8 items-center justify-center rounded-lg bg-blue-500 tracking-wider text-white transition-all hover:scale-105 hover:bg-blue-600"
+						className="flex size-8 items-center justify-center rounded-lg bg-blue-600 tracking-wider text-white transition-all hover:scale-105 hover:bg-blue-700"
 					>
 						<EyeIcon className="size-4" />
 					</Link>
