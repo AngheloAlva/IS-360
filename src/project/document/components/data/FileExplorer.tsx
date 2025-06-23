@@ -147,6 +147,7 @@ export function FileExplorer({
 							userId={userId}
 							orderBy={orderBy}
 							areaValue={areaValue}
+							parentFolderId={actualFolderId}
 						/>
 
 						<NewFolderFormSheet area={area} userId={userId} order={order} orderBy={orderBy} />

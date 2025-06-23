@@ -46,10 +46,6 @@ export async function uploadMultipleFiles({ values, files }: UploadMultipleFiles
 			registrationDate,
 		} = values
 
-		if (userId !== session.user.id) {
-			return { ok: false, error: "No tienes permiso para subir archivos para este usuario" }
-		}
-
 		let folderId: string | null = null
 		if (parentFolderId) {
 			const foundFolder = await prisma.folder.findFirst({
@@ -59,10 +55,6 @@ export async function uploadMultipleFiles({ values, files }: UploadMultipleFiles
 
 			if (!foundFolder) {
 				return { ok: false, error: "Carpeta no encontrada" }
-			}
-
-			if (foundFolder.userId !== session.user.id) {
-				return { ok: false, error: "No tienes permiso para subir archivos a esta carpeta" }
 			}
 
 			folderId = foundFolder.id
