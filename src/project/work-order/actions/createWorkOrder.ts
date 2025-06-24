@@ -1,5 +1,6 @@
 "use server"
 
+import { addDays, addMonths, addWeeks } from "date-fns"
 import { headers } from "next/headers"
 
 import { generateOTNumber } from "@/project/work-order/actions/generateOTNumber"
@@ -220,6 +221,53 @@ export const createWorkOrder = async ({
 				},
 			},
 		})
+
+		if (maintenancePlanTaskData) {
+			let nextDate: Date
+
+			switch (maintenancePlanTaskData.frequency) {
+				case PLAN_FREQUENCY.DAILY:
+					nextDate = addDays(maintenancePlanTaskData.nextDate, 1)
+					break
+				case PLAN_FREQUENCY.WEEKLY:
+					nextDate = addWeeks(maintenancePlanTaskData.nextDate, 1)
+					break
+				case PLAN_FREQUENCY.MONTHLY:
+					nextDate = addMonths(maintenancePlanTaskData.nextDate, 1)
+					break
+				case PLAN_FREQUENCY.BIMONTHLY:
+					nextDate = addMonths(maintenancePlanTaskData.nextDate, 2)
+					break
+				case PLAN_FREQUENCY.QUARTERLY:
+					nextDate = addMonths(maintenancePlanTaskData.nextDate, 3)
+					break
+				case PLAN_FREQUENCY.FOURMONTHLY:
+					nextDate = addMonths(maintenancePlanTaskData.nextDate, 4)
+					break
+				case PLAN_FREQUENCY.BIANNUAL:
+					nextDate = addMonths(maintenancePlanTaskData.nextDate, 6)
+					break
+				case PLAN_FREQUENCY.YEARLY:
+					nextDate = addMonths(maintenancePlanTaskData.nextDate, 12)
+					break
+				default:
+					nextDate = maintenancePlanTaskData.nextDate
+			}
+
+			await prisma.maintenancePlanTask.update({
+				where: {
+					id: maintenancePlanTaskData.id,
+				},
+				data: {
+					nextDate,
+					workOrders: {
+						connect: {
+							id: newWorkOrder.id,
+						},
+					},
+				},
+			})
+		}
 
 		logActivity({
 			userId: session.user.id,

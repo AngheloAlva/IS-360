@@ -1,4 +1,4 @@
-import { Building2Icon, DotIcon, EyeIcon, LinkIcon, UserIcon } from "lucide-react"
+import { Building2Icon, EyeIcon, LinkIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -9,7 +9,6 @@ import WorkOrderDetailsDialog from "@/project/work-order/components/dialogs/Work
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
-import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
@@ -95,14 +94,6 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
-		accessorKey: "workDescription",
-		header: "Descripción del trabajo",
-		cell: ({ row }) => {
-			const description = row.getValue("workDescription") as string
-			return <div className="w-80 max-w-80 text-wrap">{description}</div>
-		},
-	},
-	{
 		accessorKey: "workProgressStatus",
 		header: "Progreso",
 		cell: ({ row }) => {
@@ -163,26 +154,6 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
-		accessorKey: "equipment",
-		header: "Equipos/Ubicaciones",
-		cell: ({ row }) => {
-			const equipment = row.getValue("equipment") as { name: string; id: string }[]
-
-			return (
-				<ul className="flex flex-col">
-					{equipment.length > 0
-						? equipment.map((e) => (
-								<li key={e.id} className="flex items-center gap-1">
-									<DotIcon className="size-4" />
-									{e.name}
-								</li>
-							))
-						: "Sin equipo"}
-				</ul>
-			)
-		},
-	},
-	{
 		accessorKey: "priority",
 		header: "Prioridad",
 		cell: ({ row }) => {
@@ -201,47 +172,24 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		},
 	},
 	{
-		accessorKey: "capex",
-		header: "CAPEX",
-		cell: ({ row }) => {
-			const capex = row.getValue("capex") as keyof typeof WorkOrderCAPEXLabels | null
-
-			if (!capex) return <div className="font-medium">-</div>
-
-			return (
-				<Badge className="bg-orange-600/10 text-orange-600">{WorkOrderCAPEXLabels[capex]}</Badge>
-			)
-		},
-	},
-	{
 		accessorKey: "programDate",
-		header: "Fecha programada de inicio",
+		header: "Fecha programada - Fecha finalización",
 		cell: ({ row }) => {
 			const date = row.getValue("programDate") as string
+			const endDate = row.getValue("estimatedEndDate") as string
 
 			return (
 				<div className="font-medium">
-					{date ? format(new Date(date), "PPP", { locale: es }) : "Sin fecha"}
+					{date ? format(new Date(date), "dd/MM/yyyy", { locale: es }) : "Sin fecha"} {" - "}
+					{endDate ? format(new Date(endDate), "dd/MM/yyyy", { locale: es }) : "Sin fecha"}
 				</div>
 			)
 		},
 	},
-	{
-		accessorKey: "estimatedEndDate",
-		header: "Fecha estimada de finalización",
-		cell: ({ row }) => {
-			const date = row.getValue("estimatedEndDate") as string
 
-			return (
-				<div className="font-medium">
-					{date ? format(new Date(date), "PPP", { locale: es }) : "Sin fecha"}
-				</div>
-			)
-		},
-	},
 	{
 		accessorKey: "_count",
-		header: "Actividades Realizadas",
+		header: "N° Actividades",
 		cell: ({ row }) => {
 			const count = row.getValue("_count") as { workEntries: number }
 

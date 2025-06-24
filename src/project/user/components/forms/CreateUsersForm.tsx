@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils"
 
 import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import SubmitButton from "../../../../shared/components/forms/SubmitButton"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { RutFormField } from "@/shared/components/forms/RutFormField"
@@ -56,6 +57,7 @@ export default function CreateUsersForm({
 					name: "",
 					email: "",
 					phone: "",
+					isSupervisor,
 					internalRole: "",
 					internalArea: "",
 					startupFoldersId: [],
@@ -86,9 +88,9 @@ export default function CreateUsersForm({
 						password: temporalPassword,
 						data: {
 							companyId,
-							isSupervisor,
 							rut: employee.rut,
 							phone: employee.phone,
+							isSupervisor: employee.isSupervisor,
 							internalRole: employee.internalRole,
 							internalArea: employee.internalArea,
 						},
@@ -280,6 +282,12 @@ export default function CreateUsersForm({
 										}
 									/>
 								)}
+
+								<SwitchFormField<PartnerUsersSchema>
+									label="¿Es Supervisor?"
+									control={form.control}
+									name={`employees.${index}.isSupervisor`}
+								/>
 							</div>
 						))}
 

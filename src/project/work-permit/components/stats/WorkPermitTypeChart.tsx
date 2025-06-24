@@ -34,13 +34,14 @@ export default function WorkPermitTypeChart({ data }: WorkPermitTypeChartProps) 
 			<CardContent className="p-0">
 				<ChartContainer config={{}} className="h-[250px] w-full">
 					<BarChart data={data} margin={{ right: 15, top: 15 }}>
+						<ChartTooltip content={<ChartTooltipContent />} />
+
 						<XAxis dataKey="type" />
 						<YAxis />
 
 						<Bar dataKey="count" fill="var(--color-rose-600)" radius={[4, 4, 4, 4]} maxBarSize={40}>
 							<LabelList dataKey="count" position="top" />
 						</Bar>
-						<ChartTooltip content={<ChartTooltipContent />} />
 					</BarChart>
 				</ChartContainer>
 			</CardContent>

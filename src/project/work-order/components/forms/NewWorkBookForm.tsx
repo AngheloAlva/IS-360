@@ -297,6 +297,7 @@ export default function NewWorkBookForm({
 								type="button"
 								disabled={loading}
 								variant={"outline"}
+								onClick={() => setOpen(false)}
 								className="w-1/2 border-2 border-blue-900 font-medium tracking-wide text-blue-800 transition-all hover:scale-105 hover:bg-blue-900"
 							>
 								Cancelar

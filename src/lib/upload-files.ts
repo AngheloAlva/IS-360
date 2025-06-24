@@ -4,8 +4,8 @@ interface UploadFilesToCloudProps {
 	files: FileSchema[]
 	randomString: string
 	secondaryName?: string
-	containerType: "documents" | "files" | "startup" | "avatars" | "equipment"
 	nameStrategy?: "original" | "secondary" | "both"
+	containerType: "documents" | "files" | "startup" | "avatars" | "equipment"
 }
 
 export interface UploadResult {
@@ -20,7 +20,7 @@ export const uploadFilesToCloud = async ({
 	randomString,
 	secondaryName,
 	containerType,
-	nameStrategy,
+	nameStrategy = "original",
 }: UploadFilesToCloudProps): Promise<UploadResult[]> => {
 	// Obtener el SAS token y la información del contenedor
 	const sasResponse = await fetch("/api/file", {

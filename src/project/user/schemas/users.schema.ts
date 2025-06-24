@@ -13,6 +13,7 @@ export const partnerUsersSchema = z.object({
 				internalRole: z.string().optional(),
 				internalArea: z.string().optional(),
 				startupFoldersId: z.array(z.string()).optional(),
+				isSupervisor: z.boolean().optional(),
 			})
 		)
 		.min(1, { message: "Debe agregar al menos un personal" }),

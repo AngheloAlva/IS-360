@@ -10,6 +10,10 @@ export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
 	{
 		accessorKey: "name",
 		header: "Nombre",
+		cell: ({ row }) => {
+			const name = row.getValue("name") as string
+			return <span className="font-semibold text-purple-600">{name || "-"}</span>
+		},
 	},
 	{
 		accessorKey: "equipment",

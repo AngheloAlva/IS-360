@@ -45,7 +45,7 @@ export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
 	},
 	{
 		accessorKey: "_count",
-		header: "Ordenes de Trabajo Creadas",
+		header: "OTs Creadas",
 		cell: ({ row }) => {
 			const count = row.getValue("_count") as MaintenancePlanTask["_count"]
 			return <span>{count.workOrders}</span>

@@ -5,17 +5,19 @@ import { PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import { addDays } from "date-fns"
 import { toast } from "sonner"
 
 import { createWorkOrder } from "@/project/work-order/actions/createWorkOrder"
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
-import { useCompanies } from "@/project/company/hooks/use-companies"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
+import { useCompanies } from "@/project/company/hooks/use-companies"
 import { OPERATOR_LIST } from "@/lib/consts/operator-list"
 import { useUsers } from "@/project/user/hooks/use-users"
 import { uploadFilesToCloud } from "@/lib/upload-files"
+import { cn } from "@/lib/utils"
 import {
 	workOrderSchema,
 	type WorkOrderSchema,
@@ -44,8 +46,6 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { Company } from "@/project/company/hooks/use-companies"
-import { cn } from "@/lib/utils"
-import { addDays } from "date-fns"
 
 interface CreateWorkOrderFormProps {
 	className?: string
@@ -65,9 +65,9 @@ export default function CreateWorkOrderForm({
 
 	const [open, setOpen] = useState(false)
 
+	const { data: companiesData } = useCompanies({ limit: 1000, orderBy: "name", order: "desc" })
 	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "" })
 	const { data: equipmentsData } = useEquipments({ limit: 1000 })
-	const { data: companiesData } = useCompanies({ limit: 1000 })
 
 	const router = useRouter()
 
@@ -75,7 +75,6 @@ export default function CreateWorkOrderForm({
 		resolver: zodResolver(workOrderSchema),
 		defaultValues: {
 			companyId: "",
-			equipment: [],
 			workRequest: "",
 			type: undefined,
 			supervisorId: "",
@@ -88,6 +87,7 @@ export default function CreateWorkOrderForm({
 			programDate: new Date(),
 			estimatedEndDate: new Date(),
 			solicitationDate: new Date(),
+			equipment: equipmentId ? [equipmentId] : [],
 			solicitationTime: new Date().toTimeString().split(" ")[0],
 		},
 	})
@@ -170,12 +170,12 @@ export default function CreateWorkOrderForm({
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Nueva Orden de Trabajo</span>
+				<span className="hidden sm:inline">Nueva OT</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-2xl">
 				<SheetHeader className="shadow">
-					<SheetTitle>Nueva Orden de Trabajo</SheetTitle>
+					<SheetTitle>{equipmentName ? "Nueva OT" : "Nueva Orden de Trabajo"}</SheetTitle>
 					<SheetDescription>
 						Complete la información en el formulario para crear una nueva Orden de Trabajo.
 					</SheetDescription>

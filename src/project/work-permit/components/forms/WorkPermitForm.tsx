@@ -65,24 +65,6 @@ export default function WorkPermitForm({
 	const [workOrderSelected, setWorkOrderSelected] = useState<WorkOrder | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
-	const getPermitExpirationDate = (startDate: Date, otEndDate: Date | null): Date => {
-		const upcomingSunday = endOfWeek(startDate, { weekStartsOn: 1 })
-
-		const adjustedUpcomingSunday = isSunday(startDate)
-			? endOfWeek(nextMonday(startDate), { weekStartsOn: 1 })
-			: upcomingSunday
-
-		if (!otEndDate) return adjustedUpcomingSunday
-
-		return otEndDate < adjustedUpcomingSunday ? otEndDate : adjustedUpcomingSunday
-	}
-
-	const getPermitExpirationMessage = (startDate: Date, endDate: Date): string => {
-		const formattedEndDate = format(endDate, "EEEE d 'de' MMMM", { locale: es })
-		const formattedStartDate = format(startDate, "EEEE d 'de' MMMM", { locale: es })
-		return `El permiso iniciará el ${formattedStartDate} y vencerá el ${formattedEndDate}. Los permisos tienen una duración máxima de 7 días y no pueden extenderse más allá del domingo.`
-	}
-
 	const form = useForm<WorkPermitSchema>({
 		resolver: zodResolver(workPermitSchema),
 		defaultValues: {
@@ -121,6 +103,44 @@ export default function WorkPermitForm({
 	})
 
 	const router = useRouter()
+
+	const getPermitExpirationDate = (startDate: Date, otEndDate: Date | null): Date => {
+		const upcomingSunday = endOfWeek(startDate, { weekStartsOn: 1 })
+
+		const adjustedUpcomingSunday = isSunday(startDate)
+			? endOfWeek(nextMonday(startDate), { weekStartsOn: 1 })
+			: upcomingSunday
+
+		if (!otEndDate) return adjustedUpcomingSunday
+
+		return otEndDate < adjustedUpcomingSunday ? otEndDate : adjustedUpcomingSunday
+	}
+
+	const getPermitExpirationMessage = (startDate: Date, endDate: Date): string => {
+		const formattedEndDate = format(endDate, "EEEE d 'de' MMMM", { locale: es })
+		const formattedStartDate = format(startDate, "EEEE d 'de' MMMM", { locale: es })
+		return `El permiso iniciará el ${formattedStartDate} y vencerá el ${formattedEndDate}. Los permisos tienen una duración máxima de 7 días y no pueden extenderse más allá del domingo.`
+	}
+
+	const getAvailableUsers = (currentIndex: number) => {
+		const participants = form.watch("participants")
+		const selectedUserIds = participants
+			.map((p, idx) => (idx !== currentIndex ? p.userId : null))
+			.filter((id): id is string => id !== null && id !== "")
+
+		return (
+			usersData?.users
+				?.filter((user) => !selectedUserIds.includes(user.id))
+				.map((user) => ({
+					value: user.id,
+					label: user.name,
+				})) ?? []
+		)
+	}
+
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
 
 	const { data: workOrdersData } = useWorkOrders({
 		page: 1,
@@ -167,6 +187,7 @@ export default function WorkPermitForm({
 			const endDate = getPermitExpirationDate(startDate, otEndDate)
 			const expirationMessage = getPermitExpirationMessage(startDate, endDate)
 
+			form.setValue("endDate", endDate)
 			form.setValue("startDate", startDate)
 			toast.info(expirationMessage)
 			setWorkOrderSelected(workOrder)
@@ -519,12 +540,7 @@ export default function WorkPermitForm({
 									label="Participante"
 									control={form.control}
 									itemClassName="w-full"
-									options={
-										usersData?.users?.map((user) => ({
-											value: user.id,
-											label: user.name,
-										})) ?? []
-									}
+									options={getAvailableUsers(index)}
 								/>
 
 								{index > 0 && (
