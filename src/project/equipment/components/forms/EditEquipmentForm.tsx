@@ -97,9 +97,9 @@ export default function EditEquipmentForm({
 		let uploadResults: UploadResult[] = []
 
 		try {
-			const filesToUpload = files.filter((file) => file.file)
+			const filesToUpload = files?.filter((file) => file.file)
 
-			if (filesToUpload.length > 0) {
+			if (filesToUpload && filesToUpload.length > 0) {
 				uploadResults = await uploadFilesToCloud({
 					files: filesToUpload,
 					randomString: values.tag,
@@ -110,7 +110,7 @@ export default function EditEquipmentForm({
 			}
 
 			const existingFiles = files
-				.filter((file) => !file.file)
+				?.filter((file) => !file.file)
 				.map((fileObj) => {
 					const { url, type, title, preview, fileSize, mimeType } = fileObj
 					return { url, type, title, preview, fileSize, mimeType }
@@ -129,7 +129,7 @@ export default function EditEquipmentForm({
 				id,
 				values: {
 					...values,
-					files: [...existingFiles, ...convertedResults],
+					files: existingFiles ? [...existingFiles, ...convertedResults] : [...convertedResults],
 				},
 			})
 
