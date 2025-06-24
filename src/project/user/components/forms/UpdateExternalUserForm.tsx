@@ -13,6 +13,7 @@ import {
 	type UpdatePartnerUsersSchema,
 } from "@/project/user/schemas/update-user.schema"
 
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { RutFormField } from "@/shared/components/forms/RutFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
@@ -49,6 +50,7 @@ export default function UpdateExternalUserForm({
 			phone: user.phone || "",
 			internalRole: user.internalRole || "",
 			internalArea: user.internalArea || "",
+			isSupervisor: user.isSupervisor || false,
 		},
 	})
 
@@ -149,6 +151,13 @@ export default function UpdateExternalUserForm({
 							name="internalArea"
 							placeholder="Area"
 							control={form.control}
+						/>
+
+						<SwitchFormField
+							name="isSupervisor"
+							control={form.control}
+							label="¿Es supervisor?"
+							className="data-[state=checked]:bg-orange-600"
 						/>
 
 						<div className="mt-4 flex items-center justify-end gap-2 sm:col-span-2">

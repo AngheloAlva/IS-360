@@ -39,6 +39,7 @@ export const updateExternalUser = async ({ userId, values }: UpdateExternalUserP
 				email: true,
 				name: true,
 				companyId: true,
+				isSupervisor: true,
 			},
 		})
 

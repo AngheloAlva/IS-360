@@ -18,14 +18,15 @@ export async function GET(req: NextRequest) {
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
-		const parentId = searchParams.get("parentId")
+		const parentId = searchParams.get("parentId") || null
+		const showAll = searchParams.get("showAll") === "true"
 
 		const skip = (page - 1) * limit
 
 		const [equipments, total] = await Promise.all([
 			prisma.equipment.findMany({
 				where: {
-					parentId: parentId,
+					...(showAll ? {} : { parentId }),
 					...(search
 						? {
 								OR: [
@@ -92,7 +93,7 @@ export async function GET(req: NextRequest) {
 			}),
 			prisma.equipment.count({
 				where: {
-					parentId: parentId,
+					...(showAll ? {} : { parentId }),
 					...(search
 						? {
 								OR: [

@@ -82,7 +82,7 @@ export default function CompanyDetailsDialog({ children, company }: CompanyDetai
 							<DialogLabel
 								icon={<CalendarIcon className="size-4" />}
 								label="Fecha de registro"
-								value={format(company.createdAt, "dd/MM/yyyy", { locale: es })}
+								value={format(company.createdAt, "dd/MM/yyyy HH:mm", { locale: es })}
 							/>
 						</div>
 					</div>

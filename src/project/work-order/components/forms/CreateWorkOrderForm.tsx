@@ -166,22 +166,24 @@ export default function CreateWorkOrderForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
 				className={cn(
-					"flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105",
+					"flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105",
 					className,
 					{
-						"flex h-7 cursor-pointer items-center justify-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-semibold tracking-wide text-white transition-all hover:scale-105":
+						"flex h-7 items-center justify-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-semibold tracking-wide text-white transition-all hover:scale-105":
 							equipmentId && maintenancePlanTaskId,
 					}
 				)}
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Nueva OT</span>
+				<span className="hidden sm:inline">
+					{equipmentName ? "Nueva OT" : "Nueva Orden de Trabajo"}
+				</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-2xl">
 				<SheetHeader className="shadow">
-					<SheetTitle>{equipmentName ? "Nueva OT" : "Nueva Orden de Trabajo"}</SheetTitle>
+					<SheetTitle>Nueva Orden de Trabajo</SheetTitle>
 					<SheetDescription>
 						Complete la información en el formulario para crear una nueva Orden de Trabajo.
 					</SheetDescription>

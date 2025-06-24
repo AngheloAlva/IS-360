@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table"
 
 import { EquipmentColumns } from "../../columns/equipment-columns"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
 import { useRouter } from "next/navigation"
 import {
@@ -39,7 +40,14 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
-import { useDebounce } from "@/shared/hooks/useDebounce"
+import {
+	Select,
+	SelectItem,
+	SelectGroup,
+	SelectValue,
+	SelectContent,
+	SelectTrigger,
+} from "@/shared/components/ui/select"
 
 interface EquipmentTableProps {
 	lastPath: string
@@ -48,10 +56,11 @@ interface EquipmentTableProps {
 
 export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-	const [exportLoading, setExportLoading] = useState(false)
+	const [showAll, setShowAll] = useState<boolean>(parentId ? false : true)
+	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [sorting, setSorting] = useState<SortingState>([])
-	const [search, setSearch] = useState("")
-	const [page, setPage] = useState(1)
+	const [search, setSearch] = useState<string>("")
+	const [page, setPage] = useState<number>(1)
 
 	const searchInput = useDebounce(search)
 
@@ -59,6 +68,7 @@ export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 
 	const { data, isLoading, refetch, isFetching } = useEquipments({
 		page,
+		showAll,
 		limit: 15,
 		search: searchInput,
 		parentId: parentId ?? null,
@@ -147,6 +157,7 @@ export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 							limit: 15,
 							search: "",
 							parentId: id,
+							showAll: false,
 						},
 					],
 				}),
@@ -179,6 +190,27 @@ export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 								className="bg-background w-full sm:w-72"
 								placeholder="Buscar por nombre, TAG o ubicación..."
 							/>
+
+							<Select
+								onValueChange={(value) => {
+									if (value === "true") {
+										setShowAll(true)
+									} else {
+										setShowAll(false)
+									}
+								}}
+								value={showAll ? "true" : "false"}
+							>
+								<SelectTrigger className="border-input bg-background w-full border md:w-fit">
+									<SelectValue placeholder="Mostrar todos los equipos" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="true">Todos los equipos</SelectItem>
+										<SelectItem value="false">Equipos padres</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
 						</div>

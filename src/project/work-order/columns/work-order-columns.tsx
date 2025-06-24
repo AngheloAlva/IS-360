@@ -175,8 +175,8 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		accessorKey: "programDate",
 		header: "Fecha programada - Fecha finalización",
 		cell: ({ row }) => {
-			const date = row.getValue("programDate") as string
-			const endDate = row.getValue("estimatedEndDate") as string
+			const date = row.getValue("programDate") as Date | null
+			const endDate = row.getValue("estimatedEndDate") as Date | null
 
 			return (
 				<div className="font-medium">

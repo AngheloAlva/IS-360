@@ -36,11 +36,14 @@ export interface WorkEquipment {
 
 export const fetchEquipments: QueryFunction<
 	EquipmentsResponse,
-	["equipments", { page: number; limit: number; search: string; parentId: string | null }]
+	[
+		"equipments",
+		{ page: number; limit: number; search: string; parentId: string | null; showAll: boolean },
+	]
 > = async ({ queryKey }) => {
-	const [, { page, limit, search, parentId }]: [
+	const [, { page, limit, search, parentId, showAll }]: [
 		string,
-		{ page: number; limit: number; search: string; parentId: string | null },
+		{ page: number; limit: number; search: string; parentId: string | null; showAll: boolean },
 	] = queryKey
 
 	const searchParams = new URLSearchParams()
@@ -48,6 +51,7 @@ export const fetchEquipments: QueryFunction<
 	searchParams.set("limit", limit.toString())
 	if (search) searchParams.set("search", search)
 	if (parentId) searchParams.set("parentId", parentId)
+	if (showAll) searchParams.set("showAll", showAll.toString())
 
 	const res = await fetch(`/api/equipments?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching equipments")
@@ -65,6 +69,7 @@ interface UseEquipmentsParams {
 	page?: number
 	limit?: number
 	search?: string
+	showAll?: boolean
 	parentId?: string | null
 }
 
@@ -72,12 +77,16 @@ export const useEquipments = ({
 	page = 1,
 	limit = 10,
 	search = "",
+	showAll = true,
 	parentId = null,
 }: UseEquipmentsParams) => {
 	return useQuery<EquipmentsResponse>({
-		queryKey: ["equipments", { page, limit, search, parentId }],
+		queryKey: ["equipments", { page, limit, search, parentId, showAll }],
 		queryFn: (fn) =>
-			fetchEquipments({ ...fn, queryKey: ["equipments", { page, limit, search, parentId }] }),
+			fetchEquipments({
+				...fn,
+				queryKey: ["equipments", { page, limit, search, parentId, showAll }],
+			}),
 	})
 }
 

@@ -9,6 +9,7 @@ export const updatePartnerUsersSchema = z.object({
 	rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
 	internalRole: z.string().optional(),
 	internalArea: z.string().optional(),
+	isSupervisor: z.boolean().optional(),
 })
 
 export type UpdatePartnerUsersSchema = z.infer<typeof updatePartnerUsersSchema>
