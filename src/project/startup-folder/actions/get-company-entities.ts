@@ -1,6 +1,6 @@
 "use server"
 
-import { DocumentCategory, USER_ROLE } from "@prisma/client"
+import { DocumentCategory, ReviewStatus, USER_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 interface GetCompanyEntitiesParams {
@@ -12,6 +12,7 @@ interface GetCompanyEntitiesParams {
 interface SelectedEntity {
 	id: string
 	name: string
+	status: ReviewStatus
 }
 
 export async function getCompanyEntities({
@@ -41,6 +42,7 @@ export async function getCompanyEntities({
 								},
 							},
 							select: {
+								status: true,
 								worker: {
 									select: {
 										id: true,
@@ -81,10 +83,12 @@ export async function getCompanyEntities({
 					allEntities: allWorkerFolders.map((user) => ({
 						id: user.id,
 						name: user.name,
+						status: ReviewStatus.DRAFT,
 					})),
 					vinculatedEntities:
 						vinculatedUsers?.workersFolders.map((workerFolder) => ({
 							id: workerFolder.worker.id,
+							status: workerFolder.status,
 							name: workerFolder.worker.name,
 						})) ?? [],
 				}
@@ -104,6 +108,7 @@ export async function getCompanyEntities({
 								},
 							},
 							select: {
+								status: true,
 								vehicle: {
 									select: {
 										id: true,
@@ -147,6 +152,7 @@ export async function getCompanyEntities({
 					allEntities: allVehiclesFolders.map((vehicle) => ({
 						id: vehicle.id,
 						name: vehicle.plate + " " + vehicle.brand + " " + vehicle.model,
+						status: ReviewStatus.DRAFT,
 					})),
 					vinculatedEntities:
 						vinculatedVehicles?.vehiclesFolders.map((vehicleFolder) => ({
@@ -157,6 +163,7 @@ export async function getCompanyEntities({
 								vehicleFolder.vehicle.brand +
 								" - " +
 								vehicleFolder.vehicle.model,
+							status: vehicleFolder.status,
 						})) ?? [],
 				}
 

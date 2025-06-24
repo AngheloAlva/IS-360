@@ -85,10 +85,18 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			| BasicDocumentType
 		name: string
 	} | null>(null)
-	const [selectedEntity, setSelectedEntity] = useState<{ id: string; name: string } | null>(null)
+	const [selectedEntity, setSelectedEntity] = useState<{
+		id: string
+		name: string
+		status: ReviewStatus
+	} | null>(null)
+	const [allEntities, setAllEntities] = useState<
+		Array<{ id: string; name: string; status: ReviewStatus }>
+	>([])
+	const [entities, setEntities] = useState<
+		Array<{ id: string; name: string; status: ReviewStatus }>
+	>([])
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
-	const [allEntities, setAllEntities] = useState<Array<{ id: string; name: string }>>([])
-	const [entities, setEntities] = useState<Array<{ id: string; name: string }>>([])
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 	const [showLinkDialog, setShowLinkDialog] = useState(false)
@@ -243,7 +251,10 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 											{entity.name}
 										</div>
 									</TableCell>
-									<TableCell colSpan={5}></TableCell>
+									<TableCell>
+										<StartupFolderStatusBadge status={entity.status} />
+									</TableCell>
+									<TableCell colSpan={4}></TableCell>
 									<TableCell>
 										<ChevronRightIcon className="h-4 w-4" />
 									</TableCell>
