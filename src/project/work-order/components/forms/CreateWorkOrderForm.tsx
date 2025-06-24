@@ -50,6 +50,7 @@ import type { Company } from "@/project/company/hooks/use-companies"
 interface CreateWorkOrderFormProps {
 	className?: string
 	equipmentId?: string
+	workRequestId?: string
 	equipmentName?: string
 	maintenancePlanTaskId?: string
 }
@@ -57,6 +58,7 @@ interface CreateWorkOrderFormProps {
 export default function CreateWorkOrderForm({
 	className,
 	equipmentId,
+	workRequestId,
 	equipmentName,
 	maintenancePlanTaskId,
 }: CreateWorkOrderFormProps): React.ReactElement {
@@ -128,6 +130,7 @@ export default function CreateWorkOrderForm({
 					},
 					initReportFile: uploadResult[0],
 					equipmentId,
+					workRequestId,
 					maintenancePlanTaskId,
 				})
 
@@ -135,6 +138,9 @@ export default function CreateWorkOrderForm({
 			} else {
 				const { ok, message } = await createWorkOrder({
 					values,
+					equipmentId,
+					workRequestId,
+					maintenancePlanTaskId,
 				})
 
 				if (!ok) throw new Error(message)

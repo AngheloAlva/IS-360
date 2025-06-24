@@ -18,13 +18,13 @@ import {
 
 import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
-import UploadFilesFormField from "@/shared/components/forms/UploadFilesFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
-import { Form, FormLabel } from "@/shared/components/ui/form"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Button } from "@/shared/components/ui/button"
+import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
 	SheetTitle,
@@ -45,7 +45,6 @@ export default function MaintenancePlanTaskForm({
 	equipmentId,
 	maintenancePlanSlug,
 }: MaintenancePlanTaskFormProps): React.ReactElement {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
@@ -74,8 +73,8 @@ export default function MaintenancePlanTaskForm({
 			uploadResults = await uploadFilesToCloud({
 				randomString: userId,
 				containerType: "files",
+				nameStrategy: "original",
 				files: values.attachments,
-				secondaryName: values.name,
 			})
 		}
 
@@ -151,22 +150,26 @@ export default function MaintenancePlanTaskForm({
 
 						<InputFormField<MaintenancePlanTaskSchema>
 							name="name"
-							label="Nombre"
 							control={form.control}
+							label="Nombre de la tarea"
+							itemClassName="sm:col-span-2"
 							placeholder="Nombre de la tarea"
-							className="sm:col-span-2"
 						/>
 
 						<SelectWithSearchFormField<MaintenancePlanTaskSchema>
-							name="equipmentId"
+							optional
 							label="Equipo"
+							name="equipmentId"
 							control={form.control}
 							options={
 								equipmentsData?.equipments?.map((equipment) => ({
 									value: equipment.id,
-									label: equipment.name,
+									label: equipment.name + "* (" + equipment.location + ")",
 								})) || []
 							}
+							className=""
+							itemClassName="sm:col-span-2"
+							description="Equipo hijo al que se asigna la tarea. En caso de no escoger ninguno, se asigna al equipo padre."
 						/>
 
 						<SelectFormField<MaintenancePlanTaskSchema>
@@ -184,6 +187,7 @@ export default function MaintenancePlanTaskForm({
 						/>
 
 						<TextAreaFormField<MaintenancePlanTaskSchema>
+							optional
 							name="description"
 							label="Descripción"
 							control={form.control}
@@ -191,20 +195,30 @@ export default function MaintenancePlanTaskForm({
 							placeholder="Descripción de la tarea"
 						/>
 
-						<FormLabel>Archivos adjuntos</FormLabel>
-						<UploadFilesFormField<MaintenancePlanTaskSchema>
+						<FileTable<MaintenancePlanTaskSchema>
+							isMultiple={true}
 							name="attachments"
 							control={form.control}
-							containerClassName="sm:col-span-2"
-							selectedFileIndex={selectedFileIndex}
-							setSelectedFileIndex={setSelectedFileIndex}
+							label="Archivos adjuntos"
+							className="sm:col-span-2"
 						/>
 
-						<SubmitButton
-							label="Crear tarea"
-							isSubmitting={isSubmitting}
-							className="hover:bg-primary/80 sm:col-span-2"
-						/>
+						<div className="flex gap-2 sm:col-span-2">
+							<Button
+								variant="outline"
+								onClick={() => setOpen(false)}
+								size={"lg"}
+								className="w-1/2"
+							>
+								Cancelar
+							</Button>
+
+							<SubmitButton
+								label="Crear tarea"
+								isSubmitting={isSubmitting}
+								className="w-1/2 bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white"
+							/>
+						</div>
 					</form>
 				</Form>
 			</SheetContent>

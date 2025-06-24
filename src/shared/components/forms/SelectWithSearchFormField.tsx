@@ -29,6 +29,7 @@ interface SelectWithSearchFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label?: string
 	className?: string
+	optional?: boolean
 	control: Control<T>
 	placeholder?: string
 	description?: string
@@ -42,6 +43,7 @@ export function SelectWithSearchFormField<T extends FieldValues>({
 	label,
 	options,
 	control,
+	optional,
 	onChange,
 	className,
 	placeholder,
@@ -54,7 +56,10 @@ export function SelectWithSearchFormField<T extends FieldValues>({
 			control={control}
 			render={({ field }) => (
 				<FormItem className={itemClassName}>
-					<FormLabel>{label}</FormLabel>
+					<FormLabel className="gap-1">
+						{label}
+						{optional && <span className="text-muted-foreground"> (opcional)</span>}
+					</FormLabel>
 					<Popover modal>
 						<PopoverTrigger asChild>
 							<FormControl>
@@ -90,10 +95,22 @@ export function SelectWithSearchFormField<T extends FieldValues>({
 													if (onChange) onChange(option.value)
 												}}
 												className={cn({
-													"bg-primary": option.value === field.value,
+													"bg-accent": option.value === field.value,
 												})}
 											>
-												{option.label}
+												<div>
+													{option.label.split("*").map((label, index) => (
+														<span
+															key={index}
+															className={cn({
+																"font-medium": index === 0,
+																"text-xs text-blue-500": index === 1,
+															})}
+														>
+															{label}
+														</span>
+													))}
+												</div>
 
 												<Check
 													className={cn(

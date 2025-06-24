@@ -1,18 +1,22 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
-import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
-import { es } from "date-fns/locale"
-import { Badge } from "@/shared/components/ui/badge"
 import { WORK_REQUEST_STATUS } from "@prisma/client"
+
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
+import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
+import ApproveWorkRequest from "../components/forms/ApproveWorkRequest"
+import { Badge } from "@/shared/components/ui/badge"
 
 const statusBadgeVariant = (status: WORK_REQUEST_STATUS) => {
 	switch (status) {
 		case "REPORTED":
 			return "outline"
+		case "APPROVED":
+			return "secondary"
 		case "ATTENDED":
 			return "default"
 		case "CANCELLED":
@@ -26,6 +30,8 @@ const statusText = (status: WORK_REQUEST_STATUS) => {
 	switch (status) {
 		case "REPORTED":
 			return "Reportada"
+		case "APPROVED":
+			return "Aprobada"
 		case "ATTENDED":
 			return "Atendida"
 		case "CANCELLED":
@@ -39,10 +45,19 @@ export const getWorkRequestColumns = (hasPermission: boolean): ColumnDef<WorkReq
 	{
 		accessorKey: "workOrder",
 		header: "Orden de trabajo",
-		cell: () => {
-			return hasPermission ? (
-				<CreateWorkOrderForm className="h-8 bg-cyan-500 text-white hover:bg-cyan-600" />
-			) : null
+		cell: ({ row }) => {
+			const status = row.original.status
+
+			return hasPermission && status === "APPROVED" ? (
+				<CreateWorkOrderForm
+					workRequestId={row.original.id}
+					className="h-8 bg-cyan-500 text-white hover:bg-cyan-600"
+				/>
+			) : (
+				hasPermission && status === "REPORTED" && (
+					<ApproveWorkRequest userId={row.original.userId} workRequestId={row.original.id} />
+				)
+			)
 		},
 	},
 	{

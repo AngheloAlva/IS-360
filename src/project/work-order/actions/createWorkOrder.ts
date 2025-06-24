@@ -16,6 +16,7 @@ import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
 
 interface CreateWorkOrderProps {
 	equipmentId?: string
+	workRequestId?: string
 	values: WorkOrderSchema
 	maintenancePlanTaskId?: string
 	initReportFile?: FileUploadResult
@@ -24,6 +25,7 @@ interface CreateWorkOrderProps {
 export const createWorkOrder = async ({
 	values,
 	equipmentId,
+	workRequestId,
 	initReportFile,
 	maintenancePlanTaskId,
 }: CreateWorkOrderProps) => {
@@ -260,6 +262,22 @@ export const createWorkOrder = async ({
 				},
 				data: {
 					nextDate,
+					workOrders: {
+						connect: {
+							id: newWorkOrder.id,
+						},
+					},
+				},
+			})
+		}
+
+		if (workRequestId) {
+			await prisma.workRequest.update({
+				where: {
+					id: workRequestId,
+				},
+				data: {
+					status: "ATTENDED",
 					workOrders: {
 						connect: {
 							id: newWorkOrder.id,

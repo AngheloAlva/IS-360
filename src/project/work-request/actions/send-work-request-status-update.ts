@@ -33,6 +33,7 @@ export async function sendWorkRequestStatusUpdateEmail({
 		const statusText = {
 			[WORK_REQUEST_STATUS.REPORTED]: "Reportada",
 			[WORK_REQUEST_STATUS.ATTENDED]: "Atendida",
+			[WORK_REQUEST_STATUS.APPROVED]: "Aprovada",
 			[WORK_REQUEST_STATUS.CANCELLED]: "Cancelada",
 		}
 

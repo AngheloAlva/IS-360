@@ -120,10 +120,11 @@ model User {
   environmentalDocumentReviewer   EnvironmentalDocument[]   @relation("EnvironmentalDocumentReviewer")
   basicDocument                   BasicDocument[]           @relation("BasicDocumentUploadedBy")
   basicDocumentReviewer           BasicDocument[]           @relation("BasicDocumentReviewer")
-  workRequests                    WorkRequest[]
+  workRequestApproves             WorkRequest[]             @relation("WorkRequestApprovalBy")
   workRequestComments             WorkRequestComment[]
   workPermitAttachments           WorkPermitAttachment[]
   activityLogs                    ActivityLog[]
+  WorkRequest                     WorkRequest[]
 
   @@unique([email])
   @@unique([rut])
@@ -306,7 +307,7 @@ model WorkOrder {
   workName           String?
   workLocation       String?
   workStartDate      DateTime?
-  workProgressStatus Float?      @default(0) // Cambiado a Float para precisión en el porcentaje
+  workProgressStatus Float?      @default(0)
   workEntries        WorkEntry[]
 
   company               Company?             @relation(fields: [companyId], references: [id])
@@ -334,6 +335,8 @@ model WorkOrder {
   maintenancePlanTaskId String?
   milestones            Milestone[]
   startupFolder         StartupFolder?
+  workRequestId         String?
+  workRequested         WorkRequest?         @relation(fields: [workRequestId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1262,6 +1265,7 @@ model EnvironmentalDocument {
 
 enum WORK_REQUEST_STATUS {
   REPORTED // Solicitud Reportada
+  APPROVED // Solicitud Aprobada
   ATTENDED // Solicitud Atendida
   CANCELLED // Solicitud Cancelada
 }
@@ -1277,13 +1281,16 @@ model WorkRequest {
   location       MAINTENANCE_PLAN_LOCATION
   status         WORK_REQUEST_STATUS       @default(REPORTED)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId      String
-  user        User                 @relation(fields: [userId], references: [id])
-  attachments Attachment[]
-  comments    WorkRequestComment[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  approvalDate DateTime?
+  approvalById String?
+  approvalBy   User?                @relation("WorkRequestApprovalBy", fields: [approvalById], references: [id])
+  userId       String
+  user         User                 @relation(fields: [userId], references: [id])
+  attachments  Attachment[]
+  comments     WorkRequestComment[]
+  workOrders   WorkOrder[]
 
   @@map("work_request")
 }

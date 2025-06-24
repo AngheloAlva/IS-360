@@ -14,6 +14,7 @@ const updateWorkRequestStatusSchema = z.object({
 	id: z.string(),
 	status: z.enum([
 		WORK_REQUEST_STATUS.REPORTED,
+		WORK_REQUEST_STATUS.APPROVED,
 		WORK_REQUEST_STATUS.ATTENDED,
 		WORK_REQUEST_STATUS.CANCELLED,
 	]),
