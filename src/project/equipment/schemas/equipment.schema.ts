@@ -10,7 +10,7 @@ export const equipmentSchema = z.object({
 	isOperational: z.boolean().optional(),
 	type: z.string().optional(),
 	tag: z.string().min(1, { message: "El tag es requerido" }),
-	files: z.array(fileSchema),
+	files: z.array(fileSchema).optional(),
 	criticality: z.enum(CRITICALITY_ARRAY, { message: "La criticalidad es requerida" }).optional(),
 
 	parentId: z.string().optional(),

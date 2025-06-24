@@ -39,6 +39,7 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 
 interface EquipmentTableProps {
 	lastPath: string
@@ -52,12 +53,14 @@ export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
 
+	const searchInput = useDebounce(search)
+
 	const router = useRouter()
 
 	const { data, isLoading, refetch, isFetching } = useEquipments({
 		page,
-		search,
 		limit: 15,
+		search: searchInput,
 		parentId: parentId ?? null,
 	})
 
@@ -260,6 +263,7 @@ export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 					table={table}
 					isLoading={isLoading}
 					onPageChange={setPage}
+					total={data?.total ?? 0}
 					pageCount={data?.pages ?? 0}
 					className="border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white"
 				/>

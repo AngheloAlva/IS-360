@@ -83,7 +83,7 @@ export const useEquipments = ({
 
 export const useEquipment = (id: string) => {
 	return useQuery<WorkEquipment>({
-		queryKey: ["equipment", id],
+		queryKey: ["equipments", id],
 		queryFn: async () => {
 			if (!id) return null
 

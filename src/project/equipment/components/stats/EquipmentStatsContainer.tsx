@@ -77,7 +77,7 @@ export default function EquipmentStatsContainer() {
 						<div className="text-2xl font-bold">
 							{data?.equipmentHierarchy.parentEquipment || 0}
 						</div>
-						<p className="text-muted-foreground text-xs">Vehículos/Equipos registrados</p>
+						<p className="text-muted-foreground text-xs">Equipos/Ubicaciones registrados</p>
 					</CardContent>
 				</Card>
 			</div>

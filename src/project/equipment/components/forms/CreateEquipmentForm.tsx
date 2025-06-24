@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { createEquipment } from "@/project/equipment/actions/createEquipment"
+import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { CriticalityOptions } from "@/lib/consts/criticality"
 import { queryClient } from "@/lib/queryClient"
 import { equipmentSchema, type EquipmentSchema } from "@/project/equipment/schemas/equipment.schema"
@@ -61,7 +61,7 @@ export default function CreateEquipmentForm({
 		let uploadResults: UploadResult[] = []
 
 		try {
-			if (files.length > 0) {
+			if (files && files.length > 0) {
 				uploadResults = await uploadFilesToCloud({
 					files,
 					randomString: values.tag,
@@ -88,7 +88,7 @@ export default function CreateEquipmentForm({
 			setOpen(false)
 			form.reset()
 			queryClient.invalidateQueries({
-				queryKey: ["equipment", { parentId: values.parentId ?? null }],
+				queryKey: ["equipments", { parentId: values.parentId ?? null }],
 			})
 		} catch (error) {
 			console.log(error)
