@@ -13,8 +13,8 @@ import {
 } from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { queryClient } from "@/lib/queryClient"
+import { ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -220,7 +220,7 @@ export function WorkerFolderDocuments({
 												refetch={refetch}
 												workerId={workerId}
 												startupFolderId={startupFolderId}
-												category={DocumentCategory.PERSONNEL}
+												category={category}
 											/>
 										)}
 									</div>
@@ -298,7 +298,7 @@ export function WorkerFolderDocuments({
 								"startupFolderDocuments",
 								{
 									startupFolderId,
-									category: DocumentCategory.PERSONNEL,
+									category,
 									workerId,
 									vehicleId: null,
 								},
@@ -320,14 +320,11 @@ export function WorkerFolderDocuments({
 					companyId={companyId}
 					isOpen={showSubmitDialog}
 					folderId={startupFolderId}
-					category={DocumentCategory.PERSONNEL}
+					category={category}
 					onClose={() => setShowSubmitDialog(false)}
 					onSuccess={async () => {
 						queryClient.invalidateQueries({
-							queryKey: [
-								"startupFolderDocuments",
-								{ startupFolderId, category: DocumentCategory.PERSONNEL, workerId },
-							],
+							queryKey: ["startupFolderDocuments", { startupFolderId, category, workerId }],
 						})
 						setShowSubmitDialog(false)
 						await refetch()
