@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-table"
 
 import { fetchMaintenancePlanTasks } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
+import MaintenancePlanForm from "../forms/MaintenancePlanForm"
 import { MaintenancePlanColumns } from "../../columns/maintenance-plan-columns"
 import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
@@ -36,13 +37,18 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-export function MaintenancePlanTable() {
+interface MaintenancePlanTableProps {
+	userId: string
+}
+
+export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [orderBy, setOrderBy] = useState<OrderBy>("name")
 	const [order, setOrder] = useState<Order>("asc")
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
+	const [planToEdit, setPlanToEdit] = useState<MaintenancePlan | null>(null)
 
 	const router = useRouter()
 
@@ -58,8 +64,8 @@ export function MaintenancePlanTable() {
 
 	const table = useReactTable<MaintenancePlan>({
 		data: data?.maintenancePlans ?? [],
-		columns: MaintenancePlanColumns,
 		onSortingChange: setSorting,
+		columns: MaintenancePlanColumns,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
@@ -117,6 +123,17 @@ export function MaintenancePlanTable() {
 	return (
 		<Card>
 			<CardContent className="flex w-full flex-col items-start gap-4">
+				{planToEdit && (
+					<MaintenancePlanForm
+						userId={userId}
+						initialData={{
+							name: planToEdit.name,
+							equipmentId: planToEdit.equipment.id,
+							slug: planToEdit.slug,
+						}}
+						onClose={() => setPlanToEdit(null)}
+					/>
+				)}
 				<div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex w-full flex-col gap-2 md:flex-row md:items-center">
 						<SearchInput

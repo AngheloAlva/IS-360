@@ -72,6 +72,11 @@ export const createCompany = async ({
 		const company = await prisma.company.create({
 			data: {
 				...rest,
+				createdBy: {
+					connect: {
+						id: session.user.id,
+					},
+				},
 			},
 		})
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { BuildingIcon, CalendarIcon, UsersIcon } from "lucide-react"
+import { BuildingIcon, CalendarIcon, UserIcon, UsersIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
@@ -84,6 +84,14 @@ export default function CompanyDetailsDialog({ children, company }: CompanyDetai
 								label="Fecha de registro"
 								value={format(company.createdAt, "dd/MM/yyyy HH:mm", { locale: es })}
 							/>
+
+							{company.createdBy && (
+								<DialogLabel
+									icon={<UserIcon className="size-4" />}
+									label="Creado por"
+									value={company.createdBy.name}
+								/>
+							)}
 						</div>
 					</div>
 				</ScrollArea>

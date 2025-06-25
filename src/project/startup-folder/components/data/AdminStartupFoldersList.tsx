@@ -33,6 +33,7 @@ import {
 } from "@/shared/components/ui/select"
 
 import type { WORK_ORDER_STATUS } from "@prisma/client"
+import { Badge } from "@/shared/components/ui/badge"
 
 export function AdminStartupFoldersList() {
 	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
@@ -181,11 +182,14 @@ export function AdminStartupFoldersList() {
 										Carpetas de arranque:
 									</h2>
 
-									<div className="grid gap-1.5 text-sm">
+									<div className="mt-1.5 flex flex-wrap gap-1.5 text-sm">
 										{company.StartupFolders.map((folder) => (
-											<span key={folder.id} className="flex items-center text-white">
+											<Badge
+												key={folder.id}
+												className="bg-accent text-text flex items-center text-wrap whitespace-normal"
+											>
 												{folder.name}
-											</span>
+											</Badge>
 										))}
 									</div>
 								</div>

@@ -155,7 +155,7 @@ export const companyOperator = ac.newRole({
 	documentation: ["list"],
 	equipment: ["list"],
 	company: ["list", "create", "update", "delete"],
-	user: ["list"],
+	user: ["list", "create", "delete", "set-role"],
 	workRequest: ["list"],
 })
 

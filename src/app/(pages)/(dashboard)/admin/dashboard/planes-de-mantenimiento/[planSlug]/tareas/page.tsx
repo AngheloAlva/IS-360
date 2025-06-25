@@ -63,7 +63,7 @@ export default async function MaintenancePlansPage({
 				</div>
 			</div>
 
-			<MaintenancePlanTaskTable planSlug={maintenancePlanSlug} />
+			<MaintenancePlanTaskTable planSlug={maintenancePlanSlug} userId={session.user.id} />
 		</div>
 	)
 }

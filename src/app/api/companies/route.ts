@@ -43,7 +43,17 @@ export async function GET(req: NextRequest) {
 					rut: true,
 					name: true,
 					image: true,
+					createdBy: {
+						select: {
+							id: true,
+							name: true,
+						},
+					},
 					users: {
+						where: {
+							isActive: true,
+							isSupervisor: true,
+						},
 						select: {
 							id: true,
 							name: true,

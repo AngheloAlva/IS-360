@@ -59,6 +59,7 @@ import type {
 	SafetyAndHealthStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
 } from "../../types"
+import DeleteEntityDialog from "@/project/maintenance-plan/components/forms/DeleteEntityDialog"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -240,12 +241,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					) : isVehicleOrWorkerCategory ? (
 						entities?.length > 0 ? (
 							entities?.map((entity) => (
-								<TableRow
-									key={entity.id}
-									className="hover:bg-accent/50 cursor-pointer"
-									onClick={() => setSelectedEntity(entity)}
-								>
-									<TableCell className="font-medium">
+								<TableRow key={entity.id}>
+									<TableCell
+										className="cursor-pointer font-medium hover:text-teal-600"
+										onClick={() => setSelectedEntity(entity)}
+									>
 										<div className="flex items-center gap-2">
 											<FolderIcon className="h-4 w-4 text-teal-500" />
 											{entity.name}
@@ -256,7 +256,26 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									</TableCell>
 									<TableCell colSpan={4}></TableCell>
 									<TableCell>
-										<ChevronRightIcon className="h-4 w-4" />
+										<div className="flex items-center gap-2">
+											<DeleteEntityDialog
+												entityId={entity.id}
+												entityName={entity.name}
+												folderId={startupFolderId}
+												entityCategory={
+													category === DocumentCategory.PERSONNEL ? "WORKER" : "VEHICLE"
+												}
+												onSuccess={() => {
+													queryClient.invalidateQueries({
+														queryKey: [
+															"startupFolderDocuments",
+															{ startupFolderId, category, workerId: null, vehicleId: null },
+														],
+													})
+													refetch()
+												}}
+											/>
+											<ChevronRightIcon className="h-4 w-4" />
+										</div>
 									</TableCell>
 								</TableRow>
 							))

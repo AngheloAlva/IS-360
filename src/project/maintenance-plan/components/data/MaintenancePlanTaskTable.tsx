@@ -2,9 +2,9 @@
 
 import { ArrowLeft, InfoIcon, CalendarIcon, FunnelXIcon } from "lucide-react"
 import { useSearchParams } from "next/navigation"
+import { useState } from "react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import { useState } from "react"
 import {
 	flexRender,
 	SortingState,
@@ -15,7 +15,8 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { MaintenancePlanTaskColumns } from "../../columns/maintenance-plan-task-columns"
+import { MaintenancePlanTaskColumns } from "@/project/maintenance-plan/columns/maintenance-plan-task-columns"
+
 import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 import {
 	type MaintenancePlanTask,
@@ -46,7 +47,12 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-export function MaintenancePlanTaskTable({ planSlug }: { planSlug: string }) {
+interface MaintenancePlanTaskTableProps {
+	planSlug: string
+	userId: string
+}
+
+export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTaskTableProps) {
 	const searchParams = useSearchParams()
 	const parentId = searchParams.get("parentId")
 
@@ -70,7 +76,10 @@ export function MaintenancePlanTaskTable({ planSlug }: { planSlug: string }) {
 
 	const table = useReactTable<MaintenancePlanTask>({
 		data: data?.tasks ?? [],
-		columns: MaintenancePlanTaskColumns,
+		columns: MaintenancePlanTaskColumns({
+			userId,
+			maintenancePlanSlug: planSlug,
+		}),
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,

@@ -5,6 +5,7 @@ import { differenceInDays, format } from "date-fns"
 import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 
+import MaintenancePlanTaskForm from "@/project/maintenance-plan/components/forms/MaintenancePlanTaskForm"
 import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
 import { PLAN_FREQUENCY } from "@prisma/client"
 import { cn } from "@/lib/utils"
@@ -15,12 +16,34 @@ import { Badge } from "@/shared/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
 
-export const MaintenancePlanTaskColumns: ColumnDef<MaintenancePlanTask>[] = [
+interface MaintenancePlanTaskColumnsProps {
+	userId: string
+	maintenancePlanSlug: string
+}
+
+export const MaintenancePlanTaskColumns = ({
+	userId,
+	maintenancePlanSlug,
+}: MaintenancePlanTaskColumnsProps): ColumnDef<MaintenancePlanTask>[] => [
 	{
 		accessorKey: "actions",
 		header: "",
 		cell: ({ row }) => (
 			<div className="flex items-center justify-center gap-2">
+				<MaintenancePlanTaskForm
+					userId={userId}
+					maintenancePlanSlug={maintenancePlanSlug}
+					equipmentId={row.original.equipment?.id ?? undefined}
+					initialData={{
+						id: row.original.id,
+						name: row.original.name,
+						description: row.original.description ?? undefined,
+						frequency: row.original.frequency,
+						nextDate: row.original.nextDate,
+						equipmentId: row.original.equipment?.id ?? undefined,
+					}}
+				/>
+
 				<PostponeTaskDialog taskId={row.original.id} nextDate={row.original.nextDate} />
 
 				<CreateWorkOrderForm

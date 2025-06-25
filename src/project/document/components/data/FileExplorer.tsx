@@ -235,6 +235,8 @@ export function FileExplorer({
 																id={item.id}
 																type="folder"
 																name={item.name}
+																areaValue={areaValue}
+																parentFolderId={actualFolderId}
 															/>
 														</div>
 													)}
@@ -339,7 +341,13 @@ export function FileExplorer({
 																areaValue={areaValue}
 																parentFolderId={item.folderId || undefined}
 															/>
-															<DeleteConfirmationDialog type="file" id={item.id} name={item.name} />
+															<DeleteConfirmationDialog
+																type="file"
+																id={item.id}
+																name={item.name}
+																areaValue={areaValue}
+																parentFolderId={item.folderId || undefined}
+															/>
 														</div>
 													)}
 												</div>

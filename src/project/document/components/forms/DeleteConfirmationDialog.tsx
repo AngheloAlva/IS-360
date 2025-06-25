@@ -1,10 +1,10 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { queryClient } from "@/lib/queryClient"
 import {
 	deleteFile,
 	deleteFolder,
@@ -24,19 +24,23 @@ import {
 	AlertDialogTrigger,
 } from "@/shared/components/ui/alert-dialog"
 
+import type { AREAS } from "@prisma/client"
+
 interface DeleteConfirmationDialogProps {
 	id: string
 	name: string
+	areaValue: AREAS
 	type: "file" | "folder"
+	parentFolderId?: string | null
 }
 
 export default function DeleteConfirmationDialog({
 	id,
 	type,
 	name,
+	areaValue,
+	parentFolderId,
 }: DeleteConfirmationDialogProps) {
-	const router = useRouter()
-
 	const [isPreviewLoading, setIsPreviewLoading] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [preview, setPreview] = useState<{
@@ -66,7 +70,9 @@ export default function DeleteConfirmationDialog({
 
 			if (response.success) {
 				toast.success(response.message)
-				router.refresh()
+				queryClient.invalidateQueries({
+					queryKey: ["documents", { area: areaValue, folderId: parentFolderId }],
+				})
 			} else {
 				toast.error(response.message)
 			}

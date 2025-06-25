@@ -7,6 +7,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { createMaintenancePlan } from "@/project/maintenance-plan/actions/createMaintenancePlan"
+import { updateMaintenancePlan } from "@/project/maintenance-plan/actions/updateMaintenancePlan"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
@@ -47,10 +48,18 @@ import {
 
 interface MaintenancePlanFormProps {
 	userId: string
+	initialData?: {
+		name: string
+		equipmentId: string
+		slug: string
+	}
+	onClose?: () => void
 }
 
 export default function MaintenancePlanForm({
 	userId,
+	initialData,
+	onClose,
 }: MaintenancePlanFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
@@ -58,9 +67,9 @@ export default function MaintenancePlanForm({
 	const form = useForm<MaintenancePlanSchema>({
 		resolver: zodResolver(maintenancePlanSchema),
 		defaultValues: {
-			name: "",
+			name: initialData?.name ?? "",
 			createdById: userId,
-			equipmentId: undefined,
+			equipmentId: initialData?.equipmentId ?? undefined,
 		},
 	})
 
@@ -69,19 +78,34 @@ export default function MaintenancePlanForm({
 	const onSubmit = async (values: MaintenancePlanSchema) => {
 		setIsSubmitting(true)
 		try {
-			const { ok, message, code } = await createMaintenancePlan({ values })
+			let response;
+			if (initialData?.slug) {
+				response = await updateMaintenancePlan({ values, slug: initialData.slug })
+			} else {
+				response = await createMaintenancePlan({ values })
+			}
+
+			const { ok, message, code } = response
 
 			if (ok) {
-				toast.success("Plan de mantenimiento creado exitosamente", {
-					description: "El plan de mantenimiento ha sido creado exitosamente",
-					duration: 3000,
-				})
+				toast.success(
+					initialData
+						? "Plan de mantenimiento actualizado exitosamente"
+						: "Plan de mantenimiento creado exitosamente",
+					{
+						description: initialData
+							? "El plan de mantenimiento ha sido actualizado exitosamente"
+							: "El plan de mantenimiento ha sido creado exitosamente",
+						duration: 3000,
+					}
+				)
 
 				setOpen(false)
 				queryClient.invalidateQueries({
 					queryKey: ["maintenance-plans"],
 				})
 				form.reset()
+				onClose?.()
 			} else {
 				if (code === "NAME_ALREADY_EXISTS") {
 					toast.error("El nombre del plan de mantenimiento ya existe", {
@@ -90,18 +114,28 @@ export default function MaintenancePlanForm({
 						className: "bg-red-500/10 border border-red-500 text-white",
 					})
 				} else {
-					toast.error("Error al crear el plan de mantenimiento", {
-						description: message,
-						duration: 5000,
-					})
+					toast.error(
+						initialData
+							? "Error al actualizar el plan de mantenimiento"
+							: "Error al crear el plan de mantenimiento",
+						{
+							description: message,
+							duration: 5000,
+						}
+					)
 				}
 			}
 		} catch (error) {
 			console.log(error)
-			toast.error("Error al crear el plan de mantenimiento", {
-				description: "Ocurrió un error al intentar crear el plan de mantenimiento",
-				duration: 5000,
-			})
+			toast.error(
+				initialData
+					? "Error al actualizar el plan de mantenimiento"
+					: "Error al crear el plan de mantenimiento",
+				{
+					description: "Ocurrió un error al intentar " + (initialData ? "actualizar" : "crear") + " el plan de mantenimiento",
+					duration: 5000,
+				}
+			)
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -121,9 +155,11 @@ export default function MaintenancePlanForm({
 
 			<SheetContent className="gap-0 sm:max-w-md">
 				<SheetHeader className="shadow">
-					<SheetTitle>Crear Plan de Mantenimiento</SheetTitle>
+					<SheetTitle>
+						{initialData ? "Editar" : "Crear"} Plan de Mantenimiento
+					</SheetTitle>
 					<SheetDescription>
-						Complete el formulario para crear un nuevo plan de mantenimiento.
+						Complete el formulario para {initialData ? "editar el" : "crear un nuevo"} plan de mantenimiento.
 					</SheetDescription>
 				</SheetHeader>
 
@@ -219,7 +255,7 @@ export default function MaintenancePlanForm({
 						</Button>
 
 						<SubmitButton
-							label="Crear Plan"
+							label={initialData ? "Guardar Cambios" : "Crear Plan"}
 							isSubmitting={isSubmitting}
 							className="mt-6 bg-indigo-600 hover:bg-indigo-700 hover:text-white"
 						/>

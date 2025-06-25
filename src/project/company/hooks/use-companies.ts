@@ -28,6 +28,10 @@ export interface Company {
 	createdAt: Date
 	users: CompanyUser[]
 	image: string | null
+	createdBy?: {
+		id: string
+		name: string
+	}
 }
 
 interface UseCompaniesParams {

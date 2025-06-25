@@ -82,6 +82,7 @@ model User {
   workTrackers                    WorkTracker[]
   safetyTalks                     UserSafetyTalk[]
   company                         Company?                  @relation(fields: [companyId], references: [id])
+  companiesCreatedBy              Company[]                 @relation("CompanyCreatedBy")
   companyId                       String?
   isSupervisor                    Boolean?
   workOrders                      WorkOrder[]               @relation("WorkOrderResponsible")
@@ -193,6 +194,8 @@ model Company {
   image    String?
   isActive Boolean @default(true)
 
+  createdBy      User?           @relation("CompanyCreatedBy", fields: [createdById], references: [id])
+  createdById    String?
   users          User[]
   workOrders     WorkOrder[]
   workPermits    WorkPermit[]

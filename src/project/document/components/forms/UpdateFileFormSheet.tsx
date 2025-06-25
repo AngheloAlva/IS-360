@@ -2,9 +2,9 @@
 
 import { useQueryClient } from "@tanstack/react-query"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { EditIcon } from "lucide-react"
-import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
@@ -18,11 +18,10 @@ import {
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
-import { InputFormField } from "@/shared/components/forms/InputFormField"
-import UploadFilesFormField from "../../../../shared/components/forms/UploadFilesFormField"
-import { FilePreview } from "@/shared/components/ui/file-preview"
-import { Separator } from "@/shared/components/ui/separator"
 import SubmitButton from "../../../../shared/components/forms/SubmitButton"
+import { InputFormField } from "@/shared/components/forms/InputFormField"
+import { Separator } from "@/shared/components/ui/separator"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
@@ -50,7 +49,6 @@ export function UpdateFileFormSheet({
 	areaValue,
 	parentFolderId,
 }: UpdateFileFormProps) {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [uploading, setUploading] = useState(false)
 	const [open, setOpen] = useState(false)
 
@@ -166,28 +164,20 @@ export function UpdateFileFormSheet({
 					<SheetDescription>Complete el formulario para actualizar el documento.</SheetDescription>
 				</SheetHeader>
 
-				<div className="flex flex-col gap-5 px-4 pt-4 lg:flex-row">
-					<UploadFilesFormField
-						name="file"
-						maxFileSize={200}
-						isMultiple={false}
-						control={form.control}
-						className="hidden lg:grid"
-						containerClassName="w-full lg:w-2/3"
-						selectedFileIndex={selectedFileIndex}
-						setSelectedFileIndex={setSelectedFileIndex}
-					/>
-
-					<FilePreview file={form.getValues("file")[0]} className="hidden lg:block lg:w-1/3" />
-				</div>
-
-				<Separator className="mt-6 mb-4" />
-
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-3 gap-y-6 px-4 sm:grid-cols-2"
+						className="grid gap-x-3 gap-y-6 px-4 pt-4 sm:grid-cols-2"
 					>
+						<FileTable
+							name="file"
+							label="Archivo"
+							control={form.control}
+							className="sm:col-span-2"
+						/>
+
+						<Separator className="sm:col-span-2" />
+
 						<div className="sm:col-span-2">
 							<h3 className="text-lg font-semibold">Información del Documento</h3>
 							<p className="text-muted-foreground text-sm">

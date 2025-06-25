@@ -1,12 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { PlusCircleIcon } from "lucide-react"
+import { PenBoxIcon, PlusCircleIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { createMaintenancePlanTask } from "@/project/maintenance-plan/actions/createMaintenancePlanTask"
+import { updateMaintenancePlanTask } from "@/project/maintenance-plan/actions/updateMaintenancePlanTask"
 import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
@@ -33,17 +34,27 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
+import { cn } from "@/lib/utils"
 
 interface MaintenancePlanTaskFormProps {
 	userId: string
 	equipmentId: string
 	maintenancePlanSlug: string
+	initialData?: {
+		id: string
+		name: string
+		description?: string
+		frequency: string
+		nextDate: Date
+		equipmentId?: string
+	}
 }
 
 export default function MaintenancePlanTaskForm({
 	userId,
 	equipmentId,
 	maintenancePlanSlug,
+	initialData,
 }: MaintenancePlanTaskFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
@@ -51,14 +62,15 @@ export default function MaintenancePlanTaskForm({
 	const form = useForm<MaintenancePlanTaskSchema>({
 		resolver: zodResolver(maintenancePlanTaskSchema),
 		defaultValues: {
-			name: "",
+			name: initialData?.name ?? "",
 			attachments: [],
-			description: "",
+			description: initialData?.description ?? "",
 			createdById: userId,
 			maintenancePlanSlug,
-			nextDate: undefined,
-			frequency: undefined,
-			equipmentId: undefined,
+			nextDate: initialData?.nextDate,
+			frequency:
+				(initialData?.frequency as (typeof TaskFrequencyOptions)[number]["value"]) ?? undefined,
+			equipmentId: initialData?.equipmentId ?? undefined,
 		},
 	})
 
@@ -79,36 +91,70 @@ export default function MaintenancePlanTaskForm({
 		}
 
 		try {
-			const { ok, message } = await createMaintenancePlanTask({
-				values: {
-					...values,
-					attachments: [],
-				},
-				attachments: uploadResults,
-			})
+			let response
+			if (initialData?.id) {
+				response = await updateMaintenancePlanTask({
+					values: {
+						...values,
+						attachments: [],
+					},
+					attachments: uploadResults,
+					taskId: initialData.id,
+				})
+			} else {
+				response = await createMaintenancePlanTask({
+					values: {
+						...values,
+						attachments: [],
+					},
+					attachments: uploadResults,
+				})
+			}
+
+			const { ok, message } = response
 
 			if (ok) {
-				toast.success("Tarea de mantenimiento creada exitosamente", {
-					description: "La tarea de mantenimiento ha sido creada exitosamente",
-					duration: 3000,
-				})
+				toast.success(
+					initialData
+						? "Tarea de mantenimiento actualizada exitosamente"
+						: "Tarea de mantenimiento creada exitosamente",
+					{
+						description: initialData
+							? "La tarea de mantenimiento ha sido actualizada exitosamente"
+							: "La tarea de mantenimiento ha sido creada exitosamente",
+						duration: 3000,
+					}
+				)
 				setOpen(false)
 				queryClient.invalidateQueries({
 					queryKey: ["maintenance-plans-tasks", { planSlug: maintenancePlanSlug }],
 				})
 				form.reset()
 			} else {
-				toast.error("Error al crear la tarea de mantenimiento", {
-					description: message,
-					duration: 5000,
-				})
+				toast.error(
+					initialData
+						? "Error al actualizar la tarea de mantenimiento"
+						: "Error al crear la tarea de mantenimiento",
+					{
+						description: message,
+						duration: 5000,
+					}
+				)
 			}
 		} catch (error) {
 			console.log(error)
-			toast.error("Error al crear la tarea de mantenimiento", {
-				description: "Ocurrió un error al intentar crear la tarea de mantenimiento",
-				duration: 5000,
-			})
+			toast.error(
+				initialData
+					? "Error al actualizar la tarea de mantenimiento"
+					: "Error al crear la tarea de mantenimiento",
+				{
+					description:
+						"Ocurrió un error al intentar " +
+						(initialData ? "actualizar" : "crear") +
+						" la tarea de mantenimiento",
+					duration: 5000,
+				}
+			)
 		} finally {
 			setIsSubmitting(false)
 		}
@@ -118,19 +164,31 @@ export default function MaintenancePlanTaskForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button
-					size={"lg"}
-					className="gap-1.5 bg-white text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600"
+					size={"icon"}
+					className={cn(
+						"gap-1.5 bg-white text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600",
+						{
+							"size-7 bg-fuchsia-600 text-white hover:bg-fuchsia-600 hover:text-white": initialData,
+						}
+					)}
 				>
-					<PlusCircleIcon className="size-4" />
-					Tarea de Mantenimiento
+					{initialData ? (
+						<PenBoxIcon className="size-4" />
+					) : (
+						<>
+							<PlusCircleIcon className="size-4" />
+							Tarea de Mantenimiento
+						</>
+					)}
 				</Button>
 			</SheetTrigger>
 
 			<SheetContent className="w-full gap-0 sm:max-w-2xl">
 				<SheetHeader className="shadow">
-					<SheetTitle>Crear Tarea de Mantenimiento</SheetTitle>
+					<SheetTitle>{initialData ? "Editar" : "Crear"} Tarea de Mantenimiento</SheetTitle>
 					<SheetDescription>
-						Complete el formulario para crear una nueva tarea de mantenimiento.
+						Complete el formulario para {initialData ? "editar la" : "crear una nueva"} tarea de
+						mantenimiento.
 					</SheetDescription>
 				</SheetHeader>
 
@@ -214,7 +272,7 @@ export default function MaintenancePlanTaskForm({
 							</Button>
 
 							<SubmitButton
-								label="Crear tarea"
+								label={initialData ? "Guardar cambios" : "Crear tarea"}
 								isSubmitting={isSubmitting}
 								className="w-1/2 bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white"
 							/>

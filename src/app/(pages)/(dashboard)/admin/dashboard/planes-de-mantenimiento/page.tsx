@@ -39,7 +39,7 @@ export default async function MaintenancePlansPage() {
 
 			<MaintenancePlanStatsContainer />
 
-			<MaintenancePlanTable />
+			<MaintenancePlanTable userId={session.user.id} />
 		</div>
 	)
 }
