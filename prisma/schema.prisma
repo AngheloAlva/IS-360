@@ -121,11 +121,13 @@ model User {
   environmentalDocumentReviewer   EnvironmentalDocument[]   @relation("EnvironmentalDocumentReviewer")
   basicDocument                   BasicDocument[]           @relation("BasicDocumentUploadedBy")
   basicDocumentReviewer           BasicDocument[]           @relation("BasicDocumentReviewer")
+  basicFolder                     BasicFolder[]             @relation("BasicFolderWorker")
   workRequestApproves             WorkRequest[]             @relation("WorkRequestApprovalBy")
   workRequestComments             WorkRequestComment[]
   workPermitAttachments           WorkPermitAttachment[]
   activityLogs                    ActivityLog[]
   WorkRequest                     WorkRequest[]
+  basicFolderReviewer             BasicFolder[]             @relation("BasicFolderReviewer")
 
   @@unique([email])
   @@unique([rut])
@@ -1057,8 +1059,7 @@ model StartupFolder {
   workOrderId            String?                 @unique
   workerFolders          WorkerFolder[]          @relation("WorkerFolderStartupFolder")
   vehicleFolders         VehicleFolder[]         @relation("VehicleFolderStartupFolder")
-  basicFolderId          String?
-  basicFolder            BasicFolder?
+  basicFolders           BasicFolder[]
 
   @@map("startup_folder")
 }
@@ -1071,10 +1072,15 @@ model BasicFolder {
   createdAt                    DateTime     @default(now())
   updatedAt                    DateTime     @updatedAt
 
-  startupFolderId String          @unique
+  reviewerId      String?
+  reviewer        User?           @relation("BasicFolderReviewer", fields: [reviewerId], references: [id])
+  workerId        String
+  worker          User            @relation("BasicFolderWorker", fields: [workerId], references: [id])
+  startupFolderId String
   startupFolder   StartupFolder   @relation(fields: [startupFolderId], references: [id])
   documents       BasicDocument[]
 
+  @@unique([workerId, startupFolderId])
   @@map("basic_folder")
 }
 

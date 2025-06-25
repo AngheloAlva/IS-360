@@ -25,6 +25,68 @@ export async function getCompanyEntities({
 }> {
 	try {
 		switch (category) {
+			case "BASIC":
+				const vinculatedBasicUsers = await prisma.startupFolder.findUnique({
+					where: {
+						id: startupFolderId,
+					},
+					select: {
+						id: true,
+						name: true,
+						basicFolders: {
+							where: {
+								worker: {
+									companyId,
+									isActive: true,
+									accessRole: USER_ROLE.PARTNER_COMPANY,
+								},
+							},
+							select: {
+								status: true,
+								worker: {
+									select: {
+										id: true,
+										name: true,
+									},
+								},
+							},
+						},
+					},
+				})
+
+				const allBasicFolders = await prisma.user.findMany({
+					where: {
+						companyId,
+						isActive: true,
+						accessRole: USER_ROLE.PARTNER_COMPANY,
+						NOT: {
+							id: {
+								in: vinculatedBasicUsers?.basicFolders.map((wf) => wf.worker?.id),
+							},
+						},
+					},
+					select: {
+						id: true,
+						name: true,
+					},
+					orderBy: {
+						name: "asc",
+					},
+				})
+
+				return {
+					allEntities: allBasicFolders.map((user) => ({
+						id: user.id,
+						name: user.name,
+						status: ReviewStatus.DRAFT,
+					})),
+					vinculatedEntities:
+						vinculatedBasicUsers?.basicFolders?.map((basicFolder) => ({
+							id: basicFolder.worker?.id,
+							status: basicFolder.status,
+							name: basicFolder.worker?.name,
+						})) ?? [],
+				}
 			case "PERSONNEL":
 				const vinculatedUsers = await prisma.startupFolder.findUnique({
 					where: {

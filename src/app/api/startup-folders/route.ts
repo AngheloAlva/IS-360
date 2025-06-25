@@ -45,7 +45,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						rut: true,
 					},
 				},
-				basicFolder: {
+				basicFolders: {
 					include: {
 						documents: {
 							select: {
@@ -111,22 +111,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		}
 		const processedFolders = startupFolders.map((folder) => ({
 			...folder,
-			basicFolder: {
-				...folder.basicFolder,
+			basicFolder: folder.basicFolders.map((basic) => ({
+				...basic,
 				totalDocuments: BASIC_FOLDER_STRUCTURE.documents.length,
-				approvedDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "APPROVED")
-					.length,
-				rejectedDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "REJECTED")
-					.length,
-				submittedDocuments: folder.basicFolder?.documents?.filter(
-					(doc) => doc.status === "SUBMITTED"
-				).length,
-				draftDocuments: folder.basicFolder?.documents?.filter((doc) => doc.status === "DRAFT")
-					.length,
+				approvedDocuments: basic.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: basic.documents.filter((doc) => doc.status === "REJECTED").length,
+				submittedDocuments: basic.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: basic.documents.filter((doc) => doc.status === "DRAFT").length,
+				documents: undefined,
 				isCompleted:
-					folder.basicFolder?.documents.length === BASIC_FOLDER_STRUCTURE.documents.length &&
-					folder.basicFolder?.documents?.every((doc) => doc.status === "APPROVED"),
-			},
+					basic.documents.length === BASIC_FOLDER_STRUCTURE.documents.length &&
+					basic.documents?.every((doc) => doc.status === "APPROVED"),
+			})),
 			safetyAndHealthFolders: folder.safetyAndHealthFolders.map((shf) => ({
 				...shf,
 				totalDocuments: SAFETY_AND_HEALTH_STRUCTURE.documents.length,

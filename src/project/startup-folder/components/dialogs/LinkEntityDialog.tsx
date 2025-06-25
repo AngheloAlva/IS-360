@@ -76,7 +76,7 @@ export function LinkEntityDialog({
 			{
 				onSuccess: () => {
 					toast.success("Entidad vinculada", {
-						description: `${category === "PERSONNEL" ? "Trabajador" : "Vehículo"} vinculado exitosamente.`,
+						description: `${category === "VEHICLES" ? "Vehículo" : "Trabajador"} vinculado exitosamente.`,
 					})
 					form.reset()
 					onSuccess()
@@ -98,9 +98,9 @@ export function LinkEntityDialog({
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Vincular {category === "PERSONNEL" ? "Trabajador" : "Vehículo"}</DialogTitle>
+					<DialogTitle>Vincular {category === "VEHICLES" ? "Vehículo" : "Trabajador"}</DialogTitle>
 					<DialogDescription>
-						Seleccione {category === "PERSONNEL" ? "un trabajador" : "un vehículo"} para vincular a
+						Seleccione {category === "VEHICLES" ? "un vehículo" : "un trabajador"} para vincular a
 						esta carpeta de arranque.
 					</DialogDescription>
 				</DialogHeader>
@@ -112,7 +112,7 @@ export function LinkEntityDialog({
 							name="entityId"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{category === "PERSONNEL" ? "Trabajador" : "Vehículo"}</FormLabel>
+									<FormLabel>{category === "VEHICLES" ? "Vehículo" : "Trabajador"}</FormLabel>
 									<Select
 										onValueChange={field.onChange}
 										defaultValue={field.value}
@@ -122,7 +122,7 @@ export function LinkEntityDialog({
 											<SelectTrigger>
 												<SelectValue
 													placeholder={`Seleccione ${
-														category === "PERSONNEL" ? "un trabajador" : "un vehículo"
+														category === "VEHICLES" ? "un vehículo" : "un trabajador"
 													}`}
 												/>
 											</SelectTrigger>

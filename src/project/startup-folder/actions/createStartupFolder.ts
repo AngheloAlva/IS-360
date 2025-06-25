@@ -74,20 +74,6 @@ export const createStartupFolder = async ({ name, companyId, type }: CreateStart
 			if (!startupFolder || !safetyAndHealthFolder || !environmentalFolder) {
 				throw new Error("Error al crear la carpeta de arranque")
 			}
-		} else if (type === StartupFolderType.BASIC) {
-			const basicFolder = await prisma.basicFolder.create({
-				data: {
-					startupFolder: {
-						connect: {
-							id: startupFolder.id,
-						},
-					},
-				},
-			})
-
-			if (!startupFolder || !basicFolder) {
-				throw new Error("Error al crear la carpeta básica")
-			}
 		}
 
 		logActivity({

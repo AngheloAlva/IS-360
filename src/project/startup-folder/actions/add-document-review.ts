@@ -274,6 +274,10 @@ export const addDocumentReview = async ({
 					},
 				})
 
+				if (!document.folder.workerId) {
+					throw Error()
+				}
+
 				allDocuments = await prisma.workerFolder.findFirst({
 					where: {
 						workerId: document.folder.workerId,
@@ -480,14 +484,23 @@ export const addDocumentReview = async ({
 							},
 						},
 					},
-					include: {
+					select: {
+						folder: {
+							select: {
+								workerId: true,
+							},
+						},
 						uploadedBy: true,
 					},
 				})
 
+				if (!document.folder.workerId) {
+					throw Error()
+				}
+
 				allDocuments = await prisma.basicFolder.findUnique({
 					where: {
-						startupFolderId,
+						workerId_startupFolderId: { workerId: document.folder.workerId, startupFolderId },
 					},
 					select: {
 						id: true,
@@ -516,7 +529,12 @@ export const addDocumentReview = async ({
 					allDocuments.documents.length === totalDocuments
 				) {
 					await prisma.basicFolder.update({
-						where: { startupFolderId },
+						where: {
+							workerId_startupFolderId: {
+								workerId: document.folder.workerId,
+								startupFolderId,
+							},
+						},
 						data: {
 							status: ReviewStatus.APPROVED,
 						},
@@ -545,7 +563,12 @@ export const addDocumentReview = async ({
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.basicFolder.update({
-						where: { startupFolderId },
+						where: {
+							workerId_startupFolderId: {
+								workerId: document.folder.workerId,
+								startupFolderId,
+							},
+						},
 						data: {
 							status: ReviewStatus.DRAFT,
 						},
@@ -596,7 +619,7 @@ type Document =
 	| Prisma.WorkerDocumentGetPayload<{ select: { folder: { select: { workerId: true } } } }>
 	| Prisma.VehicleDocumentGetPayload<{ select: { folder: { select: { vehicleId: true } } } }>
 	| Prisma.EnvironmentalDocumentGetPayload<{ include: { uploadedBy: true } }>
-	| Prisma.BasicDocumentGetPayload<{ include: { uploadedBy: true } }>
+	| Prisma.BasicDocumentGetPayload<{ select: { folder: { select: { workerId: true } } } }>
 
 type AllDocuments =
 	| Prisma.SafetyAndHealthFolderGetPayload<{

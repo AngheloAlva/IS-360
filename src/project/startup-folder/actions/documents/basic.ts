@@ -123,9 +123,11 @@ export const updateExpirationDateBasicDocument = async ({
 export const submitBasicDocumentForReview = async ({
 	emails,
 	userId,
+	workerId,
 	folderId,
 }: {
 	userId: string
+	workerId: string
 	emails: string[]
 	folderId: string
 }) => {
@@ -145,7 +147,12 @@ export const submitBasicDocumentForReview = async ({
 
 	try {
 		const folder = await prisma.basicFolder.findUnique({
-			where: { startupFolderId: folderId },
+			where: {
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
+			},
 			select: {
 				startupFolder: {
 					select: {

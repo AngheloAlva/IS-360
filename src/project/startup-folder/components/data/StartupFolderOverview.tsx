@@ -31,7 +31,7 @@ import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
 import BackButton from "@/shared/components/BackButton"
 
-import type { DocumentCategory } from "@prisma/client"
+import { DocumentCategory } from "@prisma/client"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -179,11 +179,22 @@ export default function StartupFolderOverview({
 													)}
 												</div>
 
-												<StartupFolderTable
-													subFolders={folder}
-													startupFolderType={folder.type}
-													onCategorySelect={setSelectedCategory}
-												/>
+												{folder.type === "BASIC" ? (
+													<StartupFolderDocuments
+														userId={userId}
+														companyId={companyId}
+														isOtcMember={isOtcMember}
+														startupFolderId={folder.id}
+														category={DocumentCategory.BASIC}
+														onBack={() => {}}
+													/>
+												) : (
+													<StartupFolderTable
+														subFolders={folder}
+														startupFolderType={folder.type}
+														onCategorySelect={setSelectedCategory}
+													/>
+												)}
 											</div>
 										)}
 									</div>

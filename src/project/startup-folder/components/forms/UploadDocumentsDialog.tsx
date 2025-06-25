@@ -49,6 +49,7 @@ import type {
 	SafetyAndHealthDocumentType,
 	BasicDocumentType,
 } from "@prisma/client"
+import { createBasicDocument } from "../../actions/create-basic-document"
 
 interface UploadDocumentsDialogProps {
 	userId: string
@@ -186,6 +187,8 @@ export function UploadDocumentsDialog({
 					throw new Error("Document type, name and expiration date are required")
 				}
 
+				console.log(docType, docName, docExpiration, workerId, vehicleId, category, startupFolderId)
+
 				switch (category) {
 					case "PERSONNEL": {
 						if (!workerId) throw new Error("Worker ID is required for personnel documents")
@@ -205,6 +208,19 @@ export function UploadDocumentsDialog({
 						await createVehicleDocument({
 							userId,
 							vehicleId,
+							startupFolderId,
+							documentName: docName,
+							documentType: docType,
+							url: uploadResult.url,
+							expirationDate: docExpiration,
+						})
+						break
+					}
+					case "BASIC": {
+						if (!workerId) throw new Error("Worker ID is required for personnel documents")
+						const {} = await createBasicDocument({
+							userId,
+							workerId,
 							startupFolderId,
 							documentName: docName,
 							documentType: docType,

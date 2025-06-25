@@ -103,14 +103,51 @@ export async function linkFolderEntity({
 					ok: true,
 					message: "Carpeta del vehiculo creada y asignada",
 				}
+			case "BASIC":
+				const newWorkerBasicFolder = await prisma.basicFolder.create({
+					data: {
+						worker: {
+							connect: {
+								id: entityId,
+							},
+						},
+						startupFolder: {
+							connect: {
+								id: folder.id,
+							},
+						},
+					},
+				})
+
+				if (!newWorkerBasicFolder) {
+					throw new Error("Carpeta de usuario no creada")
+				}
+
+				await logActivity({
+					userId,
+					module: MODULES.STARTUP_FOLDERS,
+					action: ACTIVITY_TYPE.CREATE,
+					entityId: newWorkerBasicFolder.id,
+					entityType: "BasicFolder",
+					metadata: {
+						startupFolderId,
+						workerId: entityId,
+						category,
+					},
+				})
+
+				return {
+					ok: true,
+					message: "Carpeta de documentos básicos creada y asignada",
+				}
 			default:
 				throw new Error(`Cannot link entity for category: ${category}`)
 		}
 	} catch (error) {
+		console.error("Error linking folder entity:", error)
 		if (error instanceof Error && error.message.includes("Unique constraint")) {
 			throw new Error("Esta entidad ya está vinculada a la carpeta de arranque")
 		}
-		console.error("Error linking folder entity:", error)
 		throw new Error("No se pudo vincular la entidad a la carpeta de arranque")
 	}
 }

@@ -50,6 +50,7 @@ interface WorkerFolderDocumentsProps {
 	onBack: () => void
 	isOtcMember: boolean
 	startupFolderId: string
+	category: "BASIC" | "PERSONNEL"
 	documents: {
 		name: string
 		description?: string
@@ -67,6 +68,7 @@ export function WorkerFolderDocuments({
 	userId,
 	workerId,
 	companyId,
+	category,
 	documents,
 	isOtcMember,
 	startupFolderId,
@@ -85,7 +87,7 @@ export function WorkerFolderDocuments({
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({
-		category: DocumentCategory.PERSONNEL,
+		category: category,
 		startupFolderId,
 		workerId,
 	})
@@ -281,7 +283,7 @@ export function WorkerFolderDocuments({
 
 			{showUploadDialog && (
 				<UploadDocumentsDialog
-					category="PERSONNEL"
+					category={category}
 					userId={userId}
 					workerId={workerId}
 					isOpen={showUploadDialog}

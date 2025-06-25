@@ -157,6 +157,10 @@ export function SubmitReviewRequestDialog({
 					folderId,
 				})
 			} else if (category === "BASIC") {
+				if (!workerId) {
+					return { ok: false, message: "ID de trabajador es requerido" }
+				}
+
 				const { submitBasicDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/basic"
 				)
@@ -164,6 +168,7 @@ export function SubmitReviewRequestDialog({
 					emails,
 					userId,
 					folderId,
+					workerId,
 				})
 			} else {
 				result = {

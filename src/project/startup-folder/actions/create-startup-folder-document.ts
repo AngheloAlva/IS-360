@@ -5,12 +5,7 @@ import { z } from "zod"
 import { MODULES, ACTIVITY_TYPE } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
-import {
-	DocumentCategory,
-	BasicDocumentType,
-	EnvironmentalDocType,
-	SafetyAndHealthDocumentType,
-} from "@prisma/client"
+import { DocumentCategory, EnvironmentalDocType, SafetyAndHealthDocumentType } from "@prisma/client"
 
 const createDocumentSchema = z.object({
 	userId: z.string(),
@@ -44,7 +39,7 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 		select: {
 			id: true,
 			companyId: true,
-			basicFolder: {
+			basicFolders: {
 				select: {
 					id: true,
 				},
@@ -131,26 +126,6 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 					folderId: folder.id,
 					uploadedById: userId,
 					type: documentType as SafetyAndHealthDocumentType,
-				},
-			})
-		}
-
-		case "BASIC": {
-			const folder = startupFolder.basicFolder
-
-			if (!folder) {
-				throw new Error("Safety and health folder not found")
-			}
-
-			return await prisma.basicDocument.create({
-				data: {
-					url,
-					category,
-					expirationDate,
-					name: documentName,
-					folderId: folder.id,
-					uploadedById: userId,
-					type: documentType as BasicDocumentType,
 				},
 			})
 		}

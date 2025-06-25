@@ -35,6 +35,7 @@ import {
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
+import DeleteEntityDialog from "@/project/maintenance-plan/components/forms/DeleteEntityDialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
@@ -55,11 +56,9 @@ import {
 
 import type {
 	StartupFolderDocument,
-	BasicStartupFolderDocument,
-	SafetyAndHealthStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
+	SafetyAndHealthStartupFolderDocument,
 } from "../../types"
-import DeleteEntityDialog from "@/project/maintenance-plan/components/forms/DeleteEntityDialog"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -109,7 +108,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 
 	const fetchEntities = useCallback(async () => {
 		try {
-			if (category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES) {
+			if (
+				category === DocumentCategory.PERSONNEL ||
+				category === DocumentCategory.VEHICLES ||
+				category === DocumentCategory.BASIC
+			) {
 				const { allEntities, vinculatedEntities } = await getCompanyEntities({
 					companyId,
 					category,
@@ -143,12 +146,13 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
 	if (selectedEntity) {
-		if (category === DocumentCategory.PERSONNEL) {
+		if (category === DocumentCategory.PERSONNEL || category === DocumentCategory.BASIC) {
 			return (
 				<WorkerFolderDocuments
 					userId={userId}
 					companyId={companyId}
 					documents={documents}
+					category={category}
 					isOtcMember={isOtcMember}
 					workerId={selectedEntity.id}
 					startupFolderId={startupFolderId}
@@ -171,16 +175,20 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	}
 
 	const isVehicleOrWorkerCategory =
-		category === DocumentCategory.PERSONNEL || category === DocumentCategory.VEHICLES
+		category === DocumentCategory.PERSONNEL ||
+		category === DocumentCategory.VEHICLES ||
+		category === DocumentCategory.BASIC
 
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
-					<Button variant="outline" size={"sm"} className="gap-2" onClick={onBack}>
-						<ChevronLeft className="h-4 w-4" />
-						Volver
-					</Button>
+					{category !== DocumentCategory.BASIC && (
+						<Button variant="outline" size={"sm"} className="gap-2" onClick={onBack}>
+							<ChevronLeft className="h-4 w-4" />
+							Volver
+						</Button>
+					)}
 					<h2 className="text-lg font-bold">{title}</h2>
 
 					{!isVehicleOrWorkerCategory && (
@@ -212,7 +220,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					<div className="flex items-center gap-2">
 						<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
 							<FolderIcon className="h-4 w-4" />
-							Vincular {category === DocumentCategory.PERSONNEL ? "Personal" : "Vehículo"}
+							Vincular {category === DocumentCategory.VEHICLES ? "Vehículo" : "Personal"}
 						</Button>
 					</div>
 				)}
@@ -380,16 +388,6 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 																selectedDoc = envDoc
 																break
 															}
-															case DocumentCategory.BASIC: {
-																const basDoc: BasicStartupFolderDocument = {
-																	...baseDoc,
-																	category: DocumentCategory.BASIC,
-																	type: doc.type as BasicDocumentType,
-																	reviewer: doc.reviewer,
-																}
-																selectedDoc = basDoc
-																break
-															}
 															default:
 																throw new Error(`Invalid category: ${category}`)
 														}
@@ -489,26 +487,27 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 				/>
 			)}
 
-			{showLinkDialog && (category === "PERSONNEL" || category === "VEHICLES") && (
-				<LinkEntityDialog
-					userId={userId}
-					category={category}
-					entities={allEntities}
-					isOpen={showLinkDialog}
-					startupFolderId={startupFolderId}
-					onClose={() => setShowLinkDialog(false)}
-					onSuccess={() => {
-						queryClient.invalidateQueries({
-							queryKey: [
-								"startupFolderDocuments",
-								{ startupFolderId, category, workerId: null, vehicleId: null },
-							],
-						})
-						refetch()
-						setShowLinkDialog(false)
-					}}
-				/>
-			)}
+			{showLinkDialog &&
+				(category === "PERSONNEL" || category === "VEHICLES" || category === "BASIC") && (
+					<LinkEntityDialog
+						userId={userId}
+						category={category}
+						entities={allEntities}
+						isOpen={showLinkDialog}
+						startupFolderId={startupFolderId}
+						onClose={() => setShowLinkDialog(false)}
+						onSuccess={() => {
+							queryClient.invalidateQueries({
+								queryKey: [
+									"startupFolderDocuments",
+									{ startupFolderId, category, workerId: null, vehicleId: null },
+								],
+							})
+							refetch()
+							setShowLinkDialog(false)
+						}}
+					/>
+				)}
 
 			{showSubmitDialog && (
 				<SubmitReviewRequestDialog
