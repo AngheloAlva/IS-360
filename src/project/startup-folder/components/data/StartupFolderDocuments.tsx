@@ -59,6 +59,7 @@ import type {
 	EnvironmentalStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
 } from "../../types"
+import { format } from "date-fns"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -321,11 +322,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								</TableCell>
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
-									{doc.expirationDate ? new Date(doc.expirationDate).toLocaleDateString() : "N/A"}
+									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
 								<TableCell>
-									{doc.reviewedAt ? new Date(doc.reviewedAt).toLocaleDateString() : ""}
+									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy") : ""}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">

@@ -42,6 +42,7 @@ import type {
 	BasicDocumentType,
 } from "@prisma/client"
 import { SAFETY_AND_HEALTH_STRUCTURE } from "@/lib/consts/startup-folders-structure"
+import { format } from "date-fns"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
@@ -179,11 +180,11 @@ export function WorkerFolderDocuments({
 								</TableCell>
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
-									{doc.expirationDate ? new Date(doc.expirationDate).toLocaleDateString() : "N/A"}
+									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
 								<TableCell>
-									{doc.reviewedAt ? new Date(doc.reviewedAt).toLocaleDateString() : ""}
+									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy") : ""}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">

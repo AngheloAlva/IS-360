@@ -43,6 +43,7 @@ import {
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
 import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
+import { format } from "date-fns"
 
 interface VehicleFolderDocumentsProps {
 	userId: string
@@ -178,11 +179,11 @@ export function VehicleFolderDocuments({
 								</TableCell>
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
-									{doc.expirationDate ? new Date(doc.expirationDate).toLocaleDateString() : "N/A"}
+									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
-									{doc.reviewedAt ? new Date(doc.reviewedAt).toLocaleDateString() : "N/A"}
+									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy") : "N/A"}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">

@@ -114,7 +114,6 @@ export function UploadDocumentsDialog({
 		documentType,
 		(updatedFiles) => {
 			if (updatedFiles) {
-				// Keep document type and name from props or existing file
 				form.setValue("documentType", documentType?.type || updatedFiles.documentType || "")
 				form.setValue("documentName", documentType?.name || updatedFiles.documentName || "")
 				form.setValue("expirationDate", updatedFiles.expirationDate || defaultExpirationDate)
@@ -181,13 +180,11 @@ export function UploadDocumentsDialog({
 			} else if (file && uploadResult) {
 				const docType = documentType?.type || file.documentType
 				const docName = documentType?.name || file.documentName
-				const docExpiration = file.expirationDate
+				const docExpiration = data.expirationDate
 
 				if (!docType || !docName || !docExpiration) {
 					throw new Error("Document type, name and expiration date are required")
 				}
-
-				console.log(docType, docName, docExpiration, workerId, vehicleId, category, startupFolderId)
 
 				switch (category) {
 					case "PERSONNEL": {
