@@ -104,7 +104,7 @@ export async function getStartupFolderDocuments({
 					})
 				case "BASIC":
 					if (!workerId) {
-						throw new Error("No se pudo obtener las carpetas")
+						return null
 					}
 					return prisma.basicFolder.findUnique({
 						where: { workerId_startupFolderId: { workerId, startupFolderId } },

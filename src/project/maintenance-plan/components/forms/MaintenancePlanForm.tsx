@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, ChevronsUpDown, PlusCircleIcon } from "lucide-react"
+import { Check, ChevronsUpDown, PenBoxIcon, PlusCircleIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
@@ -67,8 +67,8 @@ export default function MaintenancePlanForm({
 	const form = useForm<MaintenancePlanSchema>({
 		resolver: zodResolver(maintenancePlanSchema),
 		defaultValues: {
-			name: initialData?.name ?? "",
 			createdById: userId,
+			name: initialData?.name ?? "",
 			equipmentId: initialData?.equipmentId ?? undefined,
 		},
 	})
@@ -78,8 +78,8 @@ export default function MaintenancePlanForm({
 	const onSubmit = async (values: MaintenancePlanSchema) => {
 		setIsSubmitting(true)
 		try {
-			let response;
-			if (initialData?.slug) {
+			let response
+			if (initialData) {
 				response = await updateMaintenancePlan({ values, slug: initialData.slug })
 			} else {
 				response = await createMaintenancePlan({ values })
@@ -132,7 +132,10 @@ export default function MaintenancePlanForm({
 					? "Error al actualizar el plan de mantenimiento"
 					: "Error al crear el plan de mantenimiento",
 				{
-					description: "Ocurrió un error al intentar " + (initialData ? "actualizar" : "crear") + " el plan de mantenimiento",
+					description:
+						"Ocurrió un error al intentar " +
+						(initialData ? "actualizar" : "crear") +
+						" el plan de mantenimiento",
 					duration: 5000,
 				}
 			)
@@ -145,21 +148,31 @@ export default function MaintenancePlanForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button
-					size={"lg"}
-					className="gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600"
+					size={initialData ? "icon" : "lg"}
+					className={cn(
+						"gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600",
+						{
+							"size-7 bg-fuchsia-600 text-white hover:bg-fuchsia-600 hover:text-white": initialData,
+						}
+					)}
 				>
-					<PlusCircleIcon />
-					Plan de Mantenimiento
+					{initialData ? (
+						<PenBoxIcon className="size-4" />
+					) : (
+						<>
+							<PlusCircleIcon className="size-4" />
+							Plan de Mantenimiento
+						</>
+					)}
 				</Button>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">
 				<SheetHeader className="shadow">
-					<SheetTitle>
-						{initialData ? "Editar" : "Crear"} Plan de Mantenimiento
-					</SheetTitle>
+					<SheetTitle>{initialData ? "Editar" : "Crear"} Plan de Mantenimiento</SheetTitle>
 					<SheetDescription>
-						Complete el formulario para {initialData ? "editar el" : "crear un nuevo"} plan de mantenimiento.
+						Complete el formulario para {initialData ? "editar el" : "crear un nuevo"} plan de
+						mantenimiento.
 					</SheetDescription>
 				</SheetHeader>
 

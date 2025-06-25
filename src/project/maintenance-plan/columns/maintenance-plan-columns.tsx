@@ -5,14 +5,30 @@ import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 
 import type { MaintenancePlan } from "@/project/maintenance-plan/hooks/use-maintenance-plans"
+import Link from "next/link"
+import MaintenancePlanForm from "../components/forms/MaintenancePlanForm"
 
-export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
+export const MaintenancePlanColumns = ({
+	userId,
+}: {
+	userId: string
+}): ColumnDef<MaintenancePlan>[] => [
 	{
 		accessorKey: "name",
 		header: "Nombre",
 		cell: ({ row }) => {
 			const name = row.getValue("name") as string
-			return <span className="font-semibold text-purple-600">{name || "-"}</span>
+			const slug = row.original.slug as string
+			const equipmentId = row.original.equipment?.id as string
+
+			return (
+				<Link
+					href={`/admin/dashboard/planes-de-mantenimiento/${slug + "_" + equipmentId}/tareas`}
+					className="font-semibold text-purple-600 hover:underline"
+				>
+					{name || "-"}
+				</Link>
+			)
 		},
 	},
 	{
@@ -63,6 +79,23 @@ export const MaintenancePlanColumns: ColumnDef<MaintenancePlan>[] = [
 		cell: ({ row }) => {
 			const date = row.getValue("createdAt") as Date
 			return <span>{format(new Date(date), "dd-MM-yyyy")}</span>
+		},
+	},
+	{
+		id: "actions",
+		cell: ({ row }) => {
+			return (
+				<div className="flex items-center gap-2">
+					<MaintenancePlanForm
+						userId={userId}
+						initialData={{
+							name: row.original.name,
+							equipmentId: row.original.equipment?.id ?? "",
+							slug: row.original.slug,
+						}}
+					/>
+				</div>
+			)
 		},
 	},
 ]

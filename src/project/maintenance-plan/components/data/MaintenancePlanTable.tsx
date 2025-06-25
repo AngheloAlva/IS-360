@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import {
 	flexRender,
@@ -43,14 +42,12 @@ interface MaintenancePlanTableProps {
 
 export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [planToEdit, setPlanToEdit] = useState<MaintenancePlan | null>(null)
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [orderBy, setOrderBy] = useState<OrderBy>("name")
 	const [order, setOrder] = useState<Order>("asc")
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
-	const [planToEdit, setPlanToEdit] = useState<MaintenancePlan | null>(null)
-
-	const router = useRouter()
 
 	const debouncedSearch = useDebounce(search)
 
@@ -65,10 +62,10 @@ export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
 	const table = useReactTable<MaintenancePlan>({
 		data: data?.maintenancePlans ?? [],
 		onSortingChange: setSorting,
-		columns: MaintenancePlanColumns,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
+		columns: MaintenancePlanColumns({ userId }),
 		getPaginationRowModel: getPaginationRowModel(),
 		state: {
 			sorting,
@@ -81,10 +78,6 @@ export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
 		manualPagination: true,
 		pageCount: data?.pages ?? 0,
 	})
-
-	const handleRowClick = (slug: string, equipmentId: string) => {
-		router.push(`/admin/dashboard/planes-de-mantenimiento/${slug + "_" + equipmentId}/tareas`)
-	}
 
 	const prefetchMaintenancePlan = (slug: string) => {
 		return queryClient.prefetchQuery({
@@ -186,9 +179,7 @@ export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
 							: table.getRowModel().rows.map((row) => (
 									<TableRow
 										key={row.id}
-										className="cursor-pointer"
 										data-state={row.getIsSelected() && "selected"}
-										onClick={() => handleRowClick(row.original.slug, row.original.equipment.id)}
 										onMouseEnter={() => prefetchMaintenancePlan(row.original.slug)}
 									>
 										{row.getVisibleCells().map((cell) => (

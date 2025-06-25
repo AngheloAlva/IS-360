@@ -9,12 +9,13 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { type UploadDocumentsFormData, uploadDocumentsSchema } from "../../schemas/document.schema"
+import { ManagedFile, useFileManager } from "@/project/startup-folder/hooks/use-file-manager"
 import { createStartupFolderDocument } from "../../actions/create-startup-folder-document"
 import { updateStartupFolderDocument } from "../../actions/update-startup-folder-document"
 import { getDocumentTypesByCategory } from "@/lib/consts/startup-folders-structure"
-import { useFileManager } from "@/project/startup-folder/hooks/use-file-manager"
-import { createWorkerDocument } from "../../actions/create-worker-document"
 import { createVehicleDocument } from "../../actions/create-vehicle-document"
+import { createWorkerDocument } from "../../actions/create-worker-document"
+import { createBasicDocument } from "../../actions/create-basic-document"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
@@ -49,7 +50,6 @@ import type {
 	SafetyAndHealthDocumentType,
 	BasicDocumentType,
 } from "@prisma/client"
-import { createBasicDocument } from "../../actions/create-basic-document"
 
 interface UploadDocumentsDialogProps {
 	userId: string
@@ -98,7 +98,7 @@ export function UploadDocumentsDialog({
 		},
 	})
 
-	const initialFile = documentToUpdate
+	const initialFile: ManagedFile | null = documentToUpdate
 		? Object.assign({
 				file: undefined,
 				documentType: documentToUpdate.type,
@@ -127,6 +127,7 @@ export function UploadDocumentsDialog({
 	const onSubmit = async (data: z.infer<typeof uploadDocumentsSchema>) => {
 		try {
 			setIsSubmitting(true)
+			console.log({ file })
 
 			if (!documentToUpdate && !file) {
 				toast.error("No se seleccionaron archivos")
@@ -135,17 +136,17 @@ export function UploadDocumentsDialog({
 
 			let uploadResult: UploadResult | undefined
 
-			if (file) {
+			if (file?.file) {
 				const results = await uploadFilesToCloud({
 					files: [
 						{
-							file,
 							url: "",
 							preview: "",
+							file: file.file,
 							type: data.documentType,
 							title: data.documentName,
-							fileSize: file.size || 0,
-							mimeType: file.type || "",
+							fileSize: file.file.size || 0,
+							mimeType: file.file.type || "",
 						},
 					],
 					randomString: startupFolderId || workerId || vehicleId || "",
@@ -167,7 +168,7 @@ export function UploadDocumentsDialog({
 					uploadedFile: uploadResult || {
 						url: documentToUpdate.url || "",
 						type: data.documentType,
-						size: file?.size || 0,
+						size: file?.file?.size || 0,
 						name: data.documentName,
 					},
 					userId,
@@ -350,9 +351,9 @@ export function UploadDocumentsDialog({
 								</TableHeader>
 								<TableBody>
 									{file && (
-										<TableRow key={file.name}>
-											<TableCell>{file.documentName || file.name}</TableCell>
-											<TableCell>{Math.round((file as File).size / 1024)} KB</TableCell>
+										<TableRow key={file.file?.name}>
+											<TableCell>{file.documentName || file.file?.name}</TableCell>
+											<TableCell>{Math.round((file.file?.size || 0) / 1024)} KB</TableCell>
 											<TableCell>
 												{documentTypes.find((dt) => dt.type === file.documentType)?.name}
 											</TableCell>

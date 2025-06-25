@@ -9,7 +9,7 @@ import type {
 	BasicDocumentType,
 } from "@prisma/client"
 
-export type ManagedFile = File & {
+export type ManagedFile = { file: File } & {
 	documentType?: string
 	documentName?: string
 	expirationDate?: Date
@@ -39,7 +39,7 @@ export function useFileManager(
 	const addFiles = (newFile: File | null) => {
 		if (!newFile) return
 
-		const managedFile: ManagedFile = newFile
+		const managedFile: ManagedFile = { file: newFile }
 
 		if (documentType || initialFile) {
 			managedFile.documentType = documentType?.type || initialFile?.documentType || ""

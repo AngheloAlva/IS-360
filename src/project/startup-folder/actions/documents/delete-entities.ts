@@ -128,3 +128,64 @@ export const deleteVehicleFolder = async ({ folderId, vehicleId }: DeleteVehicle
 		return { ok: false, message: "Error al procesar la solicitud" }
 	}
 }
+
+interface DeleteBasicFolderProps {
+	folderId: string
+	workerId: string
+}
+
+export const deleteBasicFolder = async ({ folderId, workerId }: DeleteBasicFolderProps) => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return { ok: false, message: "No autorizado - Sesión no encontrada" }
+	}
+
+	try {
+		const folder = await prisma.basicFolder.findUnique({
+			where: { workerId_startupFolderId: { startupFolderId: folderId, workerId } },
+			select: {
+				id: true,
+				worker: true,
+				documents: true,
+			},
+		})
+
+		if (!folder) {
+			return { ok: false, message: "Carpeta de personal no encontrada" }
+		}
+
+		if (folder.documents.length > 0) {
+			await Promise.all(
+				folder.documents.map(async (document) => {
+					await prisma.basicDocument.delete({
+						where: { id: document.id },
+					})
+				})
+			)
+		}
+
+		await prisma.basicFolder.delete({
+			where: { id: folder.id },
+		})
+
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.STARTUP_FOLDERS,
+			action: ACTIVITY_TYPE.DELETE,
+			entityId: folderId,
+			entityType: "BasicFolder",
+			metadata: {
+				workerId,
+				folderId,
+			},
+		})
+
+		return { ok: true, message: "Carpeta de personal eliminada correctamente" }
+	} catch (error) {
+		console.error("Error al eliminar la carpeta:", error)
+		return { ok: false, message: "Error al procesar la solicitud" }
+	}
+}

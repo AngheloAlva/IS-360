@@ -5,8 +5,9 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import {
-	deleteVehicleFolder,
+	deleteBasicFolder,
 	deleteWorkerFolder,
+	deleteVehicleFolder,
 } from "@/project/startup-folder/actions/documents/delete-entities"
 
 import { Button } from "@/shared/components/ui/button"
@@ -26,7 +27,7 @@ interface DeleteEntityDialogProps {
 	entityId: string
 	folderId: string
 	entityName: string
-	entityCategory: "WORKER" | "VEHICLE"
+	entityCategory: "WORKER" | "VEHICLE" | "BASIC"
 	onSuccess: () => void
 }
 
@@ -55,6 +56,11 @@ export default function DeleteEntityDialog({
 				response = await deleteVehicleFolder({
 					folderId,
 					vehicleId: entityId,
+				})
+			} else if (entityCategory === "BASIC") {
+				response = await deleteBasicFolder({
+					folderId,
+					workerId: entityId,
 				})
 			}
 

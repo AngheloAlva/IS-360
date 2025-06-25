@@ -164,7 +164,7 @@ export default function MaintenancePlanTaskForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button
-					size={"icon"}
+					size={initialData ? "icon" : "lg"}
 					className={cn(
 						"gap-1.5 bg-white text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600",
 						{

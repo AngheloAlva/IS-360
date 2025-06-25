@@ -35,7 +35,7 @@ import {
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
-import DeleteEntityDialog from "@/project/maintenance-plan/components/forms/DeleteEntityDialog"
+import DeleteEntityDialog from "@/project/startup-folder/components/dialogs/DeleteEntityDialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
@@ -271,7 +271,11 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 												entityName={entity.name}
 												folderId={startupFolderId}
 												entityCategory={
-													category === DocumentCategory.PERSONNEL ? "WORKER" : "VEHICLE"
+													category === DocumentCategory.PERSONNEL
+														? "WORKER"
+														: category === DocumentCategory.VEHICLES
+															? "VEHICLE"
+															: "BASIC"
 												}
 												onSuccess={() => {
 													queryClient.invalidateQueries({
