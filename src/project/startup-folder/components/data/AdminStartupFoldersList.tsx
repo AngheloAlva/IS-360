@@ -183,14 +183,20 @@ export function AdminStartupFoldersList() {
 									</h2>
 
 									<div className="mt-1.5 flex flex-wrap gap-1.5 text-sm">
-										{company.StartupFolders.map((folder) => (
-											<Badge
-												key={folder.id}
-												className="bg-accent text-text flex items-center text-wrap whitespace-normal"
-											>
-												{folder.name}
+										{company.StartupFolders?.length > 0 ? (
+											company.StartupFolders.map((folder) => (
+												<Badge
+													key={folder.id}
+													className="bg-accent text-text flex items-center text-wrap whitespace-normal"
+												>
+													{folder.name}
+												</Badge>
+											))
+										) : (
+											<Badge className="bg-accent text-text flex items-center text-wrap whitespace-normal">
+												No hay carpetas de arranque
 											</Badge>
-										))}
+										)}
 									</div>
 								</div>
 							</CardContent>

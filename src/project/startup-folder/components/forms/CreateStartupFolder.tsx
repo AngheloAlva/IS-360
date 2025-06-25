@@ -57,7 +57,7 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 			})
 
 			queryClient.invalidateQueries({
-				queryKey: ["startupFolder", companyId],
+				queryKey: ["startupFolder", { companyId }],
 			})
 
 			setIsOpen(false)
