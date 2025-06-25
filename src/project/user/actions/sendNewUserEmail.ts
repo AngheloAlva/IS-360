@@ -13,7 +13,7 @@ export const sendNewUserEmail = async ({ email, name, password }: SendNewUserEma
 	try {
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
-			to: [email],
+			to: [email, "anghelo.alva@ingenieriasimple.cl", "soporte@ingenieriasimple.cl"],
 			subject: `Bienvenido a OTC 360`,
 			react: await NewUserEmail({
 				name,

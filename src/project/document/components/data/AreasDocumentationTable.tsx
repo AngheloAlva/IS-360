@@ -45,18 +45,18 @@ export default function AreasDocumentationTable(): React.ReactElement {
 						<Link key={index} href={`/admin/dashboard/documentacion/${key}`}>
 							<Card
 								className={cn(
-									"group h-full border-transparent transition-all duration-300 hover:scale-[1.01] hover:shadow-md",
+									"group h-full gap-2 border-transparent transition-all duration-300 hover:scale-[1.01] hover:shadow-md md:gap-4",
 									area.className
 								)}
 							>
 								<CardHeader className={`flex w-full flex-row items-center justify-between`}>
 									<div className="flex items-center gap-2">
-										<div className="flex min-h-11 min-w-11 items-center justify-center rounded-lg bg-current/10">
+										<div className="flex min-h-9 min-w-9 items-center justify-center rounded-lg bg-current/10 md:min-h-11 md:min-w-11">
 											{getIconForArea(key)}
 										</div>
 
 										<div>
-											<CardTitle className="text-lg font-semibold capitalize">
+											<CardTitle className="text-base font-semibold capitalize md:text-lg">
 												{area.title}
 											</CardTitle>
 										</div>

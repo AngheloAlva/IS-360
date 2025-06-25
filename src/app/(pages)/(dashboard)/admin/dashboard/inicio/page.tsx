@@ -18,11 +18,11 @@ export default function DashboardHomePage() {
 					className="object-cover"
 					src="/images/home/hero.jpg"
 				/>
-				<div className="absolute inset-0 bg-gradient-to-br from-black/60 to-transparent" />
+				<div className="absolute inset-0 bg-gradient-to-b from-black/80 to-transparent sm:bg-gradient-to-br" />
 
 				<div className="relative z-10 text-start text-white">
-					<h1 className="text-4xl font-bold drop-shadow-2xl">Bienvenido a OTC 360</h1>
-					<p className="mt-2 text-lg drop-shadow-2xl">
+					<h1 className="text-3xl font-bold drop-shadow-2xl md:text-4xl">Bienvenido a OTC 360</h1>
+					<p className="mt-2 text-base drop-shadow-2xl md:text-lg">
 						Gestiona y supervisa todos los distintos módulos de la plataforma.
 					</p>
 				</div>

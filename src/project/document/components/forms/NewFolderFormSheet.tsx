@@ -107,7 +107,7 @@ export default function NewFolderForm({
 				onClick={() => setOpen(true)}
 			>
 				<FolderIcon className="h-4 w-4" />
-				<span className="hidden text-nowrap sm:inline">Nueva Carpeta</span>
+				<span className="hidden text-nowrap sm:inline md:hidden xl:inline">Nueva Carpeta</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">

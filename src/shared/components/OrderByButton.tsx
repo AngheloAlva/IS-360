@@ -38,16 +38,20 @@ export default function OrderByButton({
 
 			<SelectContent>
 				<SelectItem value="name-desc">
-					<ArrowDown10Icon className="size-4" /> Nombre Desc.
+					<ArrowDownAZIcon className="size-4" />
+					Nombre Desc.
 				</SelectItem>
 				<SelectItem value="name-asc">
-					<ArrowDownZAIcon className="size-4" /> Nombre Asc.
+					<ArrowDownZAIcon className="size-4" />
+					Nombre Asc.
 				</SelectItem>
 				<SelectItem value="createdAt-asc">
-					<ArrowDownAZIcon className="size-4" /> Fecha de creación Asc.
+					<ArrowDown10Icon className="size-4" />
+					Fecha de creación Asc.
 				</SelectItem>
 				<SelectItem value="createdAt-desc">
-					<ArrowDown01Icon className="size-4" /> Fecha de creación Desc.
+					<ArrowDown01Icon className="size-4" />
+					Fecha de creación Desc.
 				</SelectItem>
 			</SelectContent>
 		</Select>

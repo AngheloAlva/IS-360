@@ -124,35 +124,37 @@ export function FileExplorer({
 
 	return (
 		<>
-			<div className="mb-8 flex gap-4 md:items-center md:justify-between">
+			<div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<div className="flex items-center gap-3">
 					<BackButton href={backPath || "/admin/dashboard/documentacion"} />
 
-					<h1 className="text-text text-3xl font-bold">{areaName}</h1>
+					<h1 className="text-text text-2xl font-bold lg:text-3xl">{areaName}</h1>
 				</div>
 
-				{canCreate && (
-					<div className="ml-auto flex gap-2">
-						<OrderByButton
-							className="h-10"
-							onChange={(orderBy, order) => {
-								setOrderBy(orderBy)
-								setOrder(order)
-							}}
-						/>
+				<div className="flex w-full items-center gap-2 md:w-fit">
+					<OrderByButton
+						className="h-10 w-full md:w-fit"
+						onChange={(orderBy, order) => {
+							setOrderBy(orderBy)
+							setOrder(order)
+						}}
+					/>
 
-						<NewFileFormSheet
-							area={area}
-							order={order}
-							userId={userId}
-							orderBy={orderBy}
-							areaValue={areaValue}
-							parentFolderId={actualFolderId}
-						/>
+					{canCreate && (
+						<>
+							<NewFileFormSheet
+								area={area}
+								order={order}
+								userId={userId}
+								orderBy={orderBy}
+								areaValue={areaValue}
+								parentFolderId={actualFolderId}
+							/>
 
-						<NewFolderFormSheet area={area} userId={userId} order={order} orderBy={orderBy} />
-					</div>
-				)}
+							<NewFolderFormSheet area={area} userId={userId} order={order} orderBy={orderBy} />
+						</>
+					)}
+				</div>
 			</div>
 
 			<div className="grid gap-4 sm:grid-cols-2">

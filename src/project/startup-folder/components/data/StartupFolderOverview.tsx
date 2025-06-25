@@ -171,9 +171,10 @@ export default function StartupFolderOverview({
 
 													{isOtcMember && hasPermission && (
 														<UpdateStartupFolder
-															startupFolderId={folder.id}
-															companyId={companyId}
+															type={folder.type}
 															name={folder.name}
+															companyId={companyId}
+															startupFolderId={folder.id}
 														/>
 													)}
 												</div>

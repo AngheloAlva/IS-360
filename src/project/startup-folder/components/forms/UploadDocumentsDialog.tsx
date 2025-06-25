@@ -349,6 +349,7 @@ export function UploadDocumentsDialog({
 													name="expirationDate"
 													control={form.control}
 													label="Fecha de vencimiento"
+													toYear={new Date().getFullYear() + 10}
 													disabledCondition={(date: Date) => date < new Date()}
 												/>
 											</TableCell>

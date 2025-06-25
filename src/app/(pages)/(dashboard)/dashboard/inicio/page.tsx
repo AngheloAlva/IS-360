@@ -1,7 +1,7 @@
-import Image from "next/image"
-
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
+import Image from "next/image"
+
 import { auth } from "@/lib/auth"
 
 import { CompanyDashboardContent } from "@/project/home/components/stats/company-dashboard-content"

@@ -2,8 +2,9 @@ import { Building2, Settings, Users, FileText, Shield, Wrench, FolderOpen } from
 import Link from "next/link"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
-import { SystemOverviewData } from "@/project/home/hooks/use-homepage-stats"
 import { Skeleton } from "@/shared/components/ui/skeleton"
+
+import type { SystemOverviewData } from "@/project/home/hooks/use-homepage-stats"
 
 interface SystemOverviewCardsProps {
 	data: SystemOverviewData

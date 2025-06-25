@@ -21,6 +21,8 @@ import type { Control, FieldValues, Path } from "react-hook-form"
 interface DatePickerFormFieldProps<T extends FieldValues> {
 	name: Path<T>
 	label: string
+	toYear?: number
+	fromYear?: number
 	optional?: boolean
 	className?: string
 	control: Control<T>
@@ -33,6 +35,8 @@ interface DatePickerFormFieldProps<T extends FieldValues> {
 export function DatePickerFormField<T extends FieldValues>({
 	name,
 	label,
+	toYear,
+	fromYear,
 	control,
 	className,
 	description,
@@ -82,8 +86,8 @@ export function DatePickerFormField<T extends FieldValues>({
 								defaultMonth={field.value}
 								captionLayout={"dropdown"}
 								disabled={disabledCondition}
-								toYear={new Date().getFullYear() + 1}
-								fromYear={new Date().getFullYear() - 1}
+								toYear={toYear || new Date().getFullYear() + 1}
+								fromYear={fromYear || new Date().getFullYear() - 1}
 							/>
 						</PopoverContent>
 					</Popover>

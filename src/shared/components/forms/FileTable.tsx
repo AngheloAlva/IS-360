@@ -1,6 +1,6 @@
 "use client"
 
-import { Eye, Trash2, Upload, File, FileText, ImageIcon } from "lucide-react"
+import { Eye, Trash2, Upload, File, FileText, ImageIcon, InfoIcon } from "lucide-react"
 import { useController, type Control } from "react-hook-form"
 
 import { cn, formatBytes, getFileExtension } from "@/lib/utils"
@@ -30,6 +30,7 @@ import type { FieldValues, Path } from "react-hook-form"
 interface FileTableProps<T extends FieldValues> {
 	name: Path<T>
 	label?: string
+	required?: boolean
 	className?: string
 	control: Control<T>
 	isMultiple?: boolean
@@ -42,10 +43,11 @@ export default function FileTable<T extends FieldValues>({
 	name,
 	label,
 	control,
-	className,
 	onUpload,
-	maxFileSize = 10,
+	className,
+	required = false,
 	isMultiple = true,
+	maxFileSize = 100,
 	acceptedFileTypes,
 }: FileTableProps<T>) {
 	const { field } = useController({
@@ -102,7 +104,7 @@ export default function FileTable<T extends FieldValues>({
 	}
 
 	return (
-		<div className={cn("space-y-4", className)}>
+		<div className={cn("space-y-2", className)}>
 			{(files.length === 0 || isMultiple) && (
 				<div className="mb-3 flex items-center justify-between">
 					{label && <p className="text-sm font-semibold">{label}</p>}
@@ -127,7 +129,7 @@ export default function FileTable<T extends FieldValues>({
 			{files.length > 0 ? (
 				<>
 					<div
-						className={cn("rounded-md border border-dashed border-gray-300", {
+						className={cn("max-w-[80dvw] rounded-md border border-dashed border-gray-300", {
 							"border-none": files.length > 0,
 						})}
 					>
@@ -140,6 +142,7 @@ export default function FileTable<T extends FieldValues>({
 									<TableHead className="w-[20%] text-right">Acciones</TableHead>
 								</TableRow>
 							</TableHeader>
+
 							<TableBody>
 								{files.map((file, index) => (
 									<TableRow key={index}>
@@ -147,11 +150,11 @@ export default function FileTable<T extends FieldValues>({
 											<div className="flex items-center gap-2">
 												<span>
 													{file.type?.startsWith("image/") ? (
-														<ImageIcon className="h-5 w-5 text-yellow-500" />
+														<ImageIcon className="size-4 text-yellow-500 sm:size-5" />
 													) : file.type === "application/pdf" ? (
-														<FileText className="h-5 w-5 text-red-500" />
+														<FileText className="size-4 text-red-500 sm:size-5" />
 													) : (
-														<File className="h-5 w-5 text-blue-500" />
+														<File className="size-4 text-blue-500 sm:size-5" />
 													)}
 												</span>
 												<span className="max-w-[200px] truncate" title={file.title}>
@@ -159,7 +162,7 @@ export default function FileTable<T extends FieldValues>({
 												</span>
 											</div>
 										</TableCell>
-										<TableCell>{getFileExtension(file.url || "")}</TableCell>
+										<TableCell>{getFileExtension(file.url || file.title || "")}</TableCell>
 										<TableCell>{formatBytes(file.fileSize)}</TableCell>
 										<TableCell className="text-right">
 											<div className="flex justify-end">
@@ -197,17 +200,17 @@ export default function FileTable<T extends FieldValues>({
 
 					{files.length > 0 && (
 						<div className="flex items-center justify-between">
-							<p className="text-muted-foreground text-sm">
+							<p className="text-muted-foreground text-xs sm:text-sm">
 								{files.length}{" "}
 								{files.length === 1 ? "archivo seleccionado" : "archivos seleccionados"}
 							</p>
 							<Button
 								variant="ghost"
-								className="text-red-500 hover:bg-red-500 hover:text-white"
+								className="gap-1 text-red-500 hover:bg-red-500 hover:text-white"
 								size="sm"
 								onClick={removeAllFiles}
 							>
-								<Trash2 className="mr-1.5 h-3.5 w-3.5" />
+								<Trash2 className="h-3.5 w-3.5" />
 								Eliminar todos
 							</Button>
 						</div>
@@ -216,14 +219,16 @@ export default function FileTable<T extends FieldValues>({
 			) : (
 				<div
 					className={cn(
-						"bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed p-10 transition-all",
+						"bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed p-5 text-center transition-all sm:p-7",
 						{ "border-teal-500 bg-teal-400/10": isDragging }
 					)}
 					{...dragEvents}
 				>
-					<Upload className="text-muted-foreground mb-4 h-10 w-10" />
-					<h3 className="text-lg font-medium">Arrastra y suelta archivos aquí</h3>
-					<p className="text-muted-foreground mb-4 text-sm">O navega entre tus archivos</p>
+					<Upload className="text-muted-foreground mb-4 size-8 sm:size-10" />
+					<h3 className="font-semibold sm:text-lg">Arrastra y suelta archivos aquí</h3>
+					<p className="text-muted-foreground mb-4 text-xs sm:text-sm">
+						O navega entre tus archivos
+					</p>
 
 					<div className="relative">
 						<input
@@ -235,10 +240,16 @@ export default function FileTable<T extends FieldValues>({
 						/>
 					</div>
 
-					<p className="text-muted-foreground mt-2 text-xs">
+					<p className="text-muted-foreground mt-2 text-xs sm:text-sm">
 						PDF, DOCX, XLSX, PPTX (MAX. {maxFileSize}MB)
 					</p>
 				</div>
+			)}
+
+			{required && files.length === 0 && (
+				<p className="flex items-center gap-2 text-sm text-red-500">
+					<InfoIcon className="size-3" /> Debes subir al menos un archivo
+				</p>
 			)}
 		</div>
 	)

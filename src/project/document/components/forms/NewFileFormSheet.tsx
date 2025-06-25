@@ -132,10 +132,10 @@ export function NewFileFormSheet({
 				onClick={() => setOpen(true)}
 			>
 				<UploadIcon className="h-4 w-4" />
-				<span className="hidden text-nowrap sm:inline">Nuevo Archivo</span>
+				<span className="hidden text-nowrap sm:inline md:hidden xl:inline">Nuevo Archivo</span>
 			</SheetTrigger>
 
-			<SheetContent className="gap-0 overflow-y-scroll pb-14 sm:max-w-[60dvw] 2xl:max-w-[50dvw]">
+			<SheetContent className="w-full max-w-[95dvw] gap-0 overflow-y-scroll sm:max-w-[70dvw] 2xl:max-w-[50dvw]">
 				<SheetHeader className="shadow">
 					<SheetTitle>Nuevo Documento</SheetTitle>
 					<SheetDescription>Complete el formulario para crear un nuevo documento.</SheetDescription>
@@ -144,10 +144,11 @@ export function NewFileFormSheet({
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className="grid gap-x-3 gap-y-5 px-4 pt-4 sm:grid-cols-2"
+						className="grid gap-x-3 gap-y-5 overflow-x-hidden overflow-y-auto px-4 pt-4 pb-14 sm:grid-cols-2"
 					>
 						<FileTable<FileFormSchema>
 							name="files"
+							required={true}
 							label="Archivos"
 							isMultiple={true}
 							control={form.control}
@@ -204,6 +205,7 @@ export function NewFileFormSheet({
 							control={form.control}
 							name="registrationDate"
 							label="Fecha de Registro"
+							itemClassName="sm:col-span-2 lg:col-span-1"
 							description="Fecha en la que se registro el documento originalmente. NO es la fecha de registro en este sistema."
 						/>
 
@@ -211,19 +213,23 @@ export function NewFileFormSheet({
 							name="expirationDate"
 							control={form.control}
 							label="Fecha de Expiración"
-							itemClassName="h-full flex flex-col items-start"
+							toYear={new Date().getFullYear() + 10}
+							fromYear={new Date().getFullYear() - 5}
+							itemClassName="h-full flex flex-col items-start sm:col-span-2 lg:col-span-1"
 						/>
 
-						<Button variant={"outline"} onClick={() => setOpen(false)}>
-							Cancelar
-						</Button>
+						<div className="mt-6 flex items-center gap-2 sm:col-span-2">
+							<Button variant={"outline"} className="w-1/2" onClick={() => setOpen(false)}>
+								Cancelar
+							</Button>
 
-						<SubmitButton
-							label="Subir Documento"
-							isSubmitting={isSubmitting}
-							disabled={form.getValues("files")?.length === 0}
-							className="bg-green-600 text-white hover:bg-green-700 hover:text-white"
-						/>
+							<SubmitButton
+								label="Subir Documento"
+								isSubmitting={isSubmitting}
+								disabled={form.getValues("files")?.length === 0}
+								className="w-1/2 bg-green-600 text-white hover:bg-green-700 hover:text-white"
+							/>
+						</div>
 					</form>
 				</Form>
 			</SheetContent>

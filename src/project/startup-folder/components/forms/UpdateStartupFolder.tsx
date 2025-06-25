@@ -32,12 +32,14 @@ interface UpdateStartupFolderProps {
 	startupFolderId: string
 	companyId: string
 	name: string
+	type: "BASIC" | "FULL"
 }
 
 export function UpdateStartupFolder({
-	startupFolderId,
-	companyId,
+	type,
 	name,
+	companyId,
+	startupFolderId,
 }: UpdateStartupFolderProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -46,6 +48,7 @@ export function UpdateStartupFolder({
 		resolver: zodResolver(newStartupFolderSchema),
 		defaultValues: {
 			name,
+			type,
 		},
 	})
 
