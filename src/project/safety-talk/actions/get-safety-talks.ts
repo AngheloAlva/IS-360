@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 
-import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { ACTIVITY_TYPE, MODULES, SAFETY_TALK_CATEGORY } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
@@ -17,18 +17,16 @@ export async function getSafetyTalks() {
 		return null
 	}
 
-	const safetyTalks = await prisma.safetyTalk.findMany({
-		include: {
-			resources: true,
-			questions: {
-				include: {
-					options: true,
-				},
-			},
+	// Get user's safety talks
+	const userSafetyTalks = await prisma.userSafetyTalk.findMany({
+		where: {
+			userId: session.user.id,
 		},
-		cacheStrategy: {
-			ttl: 10,
-			swr: 10,
+		include: {
+			approvalBy: true,
+		},
+		orderBy: {
+			createdAt: "desc",
 		},
 	})
 
@@ -37,16 +35,16 @@ export async function getSafetyTalks() {
 		module: MODULES.SAFETY_TALK,
 		action: ACTIVITY_TYPE.VIEW,
 		entityId: "all",
-		entityType: "SafetyTalk",
+		entityType: "UserSafetyTalk",
 		metadata: {
-			count: safetyTalks.length,
+			count: userSafetyTalks.length,
 		},
 	})
 
-	return safetyTalks
+	return userSafetyTalks
 }
 
-export async function getSafetyTalkBySlug(slug: string) {
+export async function getSafetyTalkByCategory(category: SAFETY_TALK_CATEGORY) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -55,50 +53,39 @@ export async function getSafetyTalkBySlug(slug: string) {
 		return null
 	}
 
-	const safetyTalk = await prisma.safetyTalk.findUnique({
-		where: { slug },
-		include: {
-			resources: true,
-			questions: {
-				include: {
-					options: true,
-				},
-			},
-			_count: {
-				select: {
-					questions: true,
-					userSafetyTalks: true,
-				},
-			},
+	// Get user's latest attempt for this category
+	const userSafetyTalk = await prisma.userSafetyTalk.findFirst({
+		where: {
+			userId: session.user.id,
+			category,
 		},
-		cacheStrategy: {
-			ttl: 10,
-			swr: 10,
+		include: {
+			approvalBy: true,
+		},
+		orderBy: {
+			createdAt: "desc",
 		},
 	})
 
-	if (!safetyTalk) {
-		return null
+	if (userSafetyTalk) {
+		logActivity({
+			userId: session.user.id,
+			module: MODULES.SAFETY_TALK,
+			action: ACTIVITY_TYPE.VIEW,
+			entityId: userSafetyTalk.id,
+			entityType: "UserSafetyTalk",
+			metadata: {
+				category,
+				status: userSafetyTalk.status,
+				score: userSafetyTalk.score,
+			},
+		})
 	}
 
-	logActivity({
-		userId: session.user.id,
-		module: MODULES.SAFETY_TALK,
-		action: ACTIVITY_TYPE.VIEW,
-		entityId: safetyTalk.id,
-		entityType: "SafetyTalk",
-		metadata: {
-			title: safetyTalk.title,
-			slug: safetyTalk.slug,
-			questionsCount: safetyTalk._count.questions,
-			userSafetyTalksCount: safetyTalk._count.userSafetyTalks,
-		},
-	})
-
-	return safetyTalk
+	return userSafetyTalk
 }
 
-export async function deleteSafetyTalk(id: string) {
+export async function deleteSafetyTalkAttempt(id: string) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -111,7 +98,7 @@ export async function deleteSafetyTalk(id: string) {
 	}
 
 	try {
-		const safetyTalk = await prisma.safetyTalk.delete({
+		const userSafetyTalk = await prisma.userSafetyTalk.delete({
 			where: { id },
 		})
 
@@ -119,11 +106,11 @@ export async function deleteSafetyTalk(id: string) {
 			userId: session.user.id,
 			module: MODULES.SAFETY_TALK,
 			action: ACTIVITY_TYPE.DELETE,
-			entityId: safetyTalk.id,
-			entityType: "SafetyTalk",
+			entityId: userSafetyTalk.id,
+			entityType: "UserSafetyTalk",
 			metadata: {
-				title: safetyTalk.title,
-				slug: safetyTalk.slug,
+				category: userSafetyTalk.category,
+				status: userSafetyTalk.status,
 			},
 		})
 
@@ -131,13 +118,13 @@ export async function deleteSafetyTalk(id: string) {
 
 		return {
 			ok: true,
-			message: "Charla de seguridad eliminada exitosamente",
+			message: "Intento de charla eliminado exitosamente",
 		}
 	} catch (error) {
-		console.error("[DELETE_SAFETY_TALK]", error)
+		console.error("[DELETE_SAFETY_TALK_ATTEMPT]", error)
 		return {
 			ok: false,
-			message: error instanceof Error ? error.message : "Error al eliminar la charla de seguridad",
+			message: error instanceof Error ? error.message : "Error al eliminar el intento de charla",
 		}
 	}
 }

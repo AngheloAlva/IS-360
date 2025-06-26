@@ -10,49 +10,60 @@ import { z } from "zod"
 
 import { cn } from "@/lib/utils"
 
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/shared/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group"
-import { Separator } from "@/shared/components/ui/separator"
-import { Progress } from "@/shared/components/ui/progress"
+import { Form } from "@/shared/components/ui/form"
+
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { Button } from "@/shared/components/ui/button"
-import { Input } from "@/shared/components/ui/input"
-import { Label } from "@/shared/components/ui/label"
-import {
-	Card,
-	CardTitle,
-	CardHeader,
-	CardFooter,
-	CardContent,
-	CardDescription,
-} from "@/shared/components/ui/card"
+import { Progress } from "@/shared/components/ui/progress"
+import { Separator } from "@/shared/components/ui/separator"
+import Image from "next/image"
+
+type QuestionType = "single" | "matching" | "image-labels"
 
 interface Question {
-	id: string
-	type: "MULTIPLE_CHOICE" | "IMAGE_ZONES" | "TRUE_FALSE" | "SHORT_ANSWER"
+	id: number
+	type: QuestionType
 	question: string
-	imageUrl: string | null
-	description: string | null
+	description?: string
+	imageUrl?: string
 	options: {
 		id: string
 		text: string
-		isCorrect: boolean
-		zoneLabel: string | null
-		zoneId: string | null
-		order: number | string
+		label?: string
 	}[]
 }
 
 interface SafetyTalkExamProps {
-	safetyTalkId: string
+	category: string
 	title: string
-	description: string | null
-	minimumScore: number
-	timeLimit: number | null
+	description: string
+	timeLimit: number
 	questions: Question[]
+	minimumScore: number
+}
+
+// Server action para enviar las respuestas
+const submitSafetyTalkAnswers = async (data: {
+	category: string
+	answers: { questionId: number; answer: string | string[] }[]
+}) => {
+	const response = await fetch("/api/safety-talks/submit", {
+		method: "POST",
+		body: JSON.stringify(data),
+		headers: {
+			"Content-Type": "application/json",
+		},
+	})
+
+	if (!response.ok) {
+		throw new Error("Error al enviar las respuestas")
+	}
+
+	return response.json()
 }
 
 export function SafetyTalkExam({
-	safetyTalkId,
+	category,
 	title,
 	description,
 	timeLimit,
@@ -60,12 +71,11 @@ export function SafetyTalkExam({
 }: SafetyTalkExamProps) {
 	const router = useRouter()
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-	const [timeRemaining, setTimeRemaining] = useState<number | null>(
-		timeLimit ? timeLimit * 60 : null
-	) // en segundos
-	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-	const [answers, setAnswers] = useState<Record<string, unknown>>({})
+	const [timeRemaining, setTimeRemaining] = useState(timeLimit * 60) // en segundos
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [answers, setAnswers] = useState<Record<number, string | string[]>>({})
 	const [showTimeWarning, setShowTimeWarning] = useState(false)
+	setShowTimeWarning(false)
 
 	// Crear un esquema dinámico basado en las preguntas
 	const createFormSchema = () => {
@@ -76,34 +86,25 @@ export function SafetyTalkExam({
 		const questionId = currentQuestion.id
 
 		switch (currentQuestion.type) {
-			case "MULTIPLE_CHOICE":
+			case "single":
 				return z.object({
 					[questionId]: z.string({
 						required_error: "Debes seleccionar una opción",
 					}),
 				})
 
-			case "IMAGE_ZONES":
+			case "matching":
 				return z.object({
-					[questionId]: z.string({
-						required_error: "Debes seleccionar una zona",
+					[questionId]: z.array(z.string(), {
+						required_error: "Debes relacionar todas las opciones",
 					}),
 				})
 
-			case "TRUE_FALSE":
+			case "image-labels":
 				return z.object({
-					[questionId]: z.string({
-						required_error: "Debes seleccionar verdadero o falso",
+					[questionId]: z.array(z.string(), {
+						required_error: "Debes etiquetar todas las zonas",
 					}),
-				})
-
-			case "SHORT_ANSWER":
-				return z.object({
-					[questionId]: z
-						.string({
-							required_error: "Debes proporcionar una respuesta",
-						})
-						.min(1, "La respuesta no puede estar vacía"),
 				})
 
 			default:
@@ -112,7 +113,7 @@ export function SafetyTalkExam({
 	}
 
 	// Configurar el formulario para la pregunta actual
-	const form = useForm<Record<string, unknown>>({
+	const form = useForm<Record<number, string | string[]>>({
 		resolver: zodResolver(createFormSchema()),
 		defaultValues: {
 			[questions[currentQuestionIndex]?.id]: answers[questions[currentQuestionIndex]?.id] || "",
@@ -131,23 +132,13 @@ export function SafetyTalkExam({
 
 	// Gestionar el temporizador
 	useEffect(() => {
-		if (timeRemaining === null) return
-
 		const timer = setInterval(() => {
 			setTimeRemaining((prev) => {
-				if (prev === null) return null
 				if (prev <= 0) {
 					clearInterval(timer)
 					handleTimeExpired()
 					return 0
 				}
-
-				// Mostrar advertencia cuando queden 2 minutos
-				if (prev === 120) {
-					setShowTimeWarning(true)
-					setTimeout(() => setShowTimeWarning(false), 5000)
-				}
-
 				return prev - 1
 			})
 		}, 1000)
@@ -156,37 +147,32 @@ export function SafetyTalkExam({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [timeRemaining])
 
-	const handleTimeExpired = () => {
-		toast.error("Se ha agotado el tiempo. Tus respuestas serán enviadas automáticamente.")
-		handleSubmitAllAnswers()
-	}
-
 	// Formatear el tiempo restante
 	const formatTimeRemaining = () => {
-		if (timeRemaining === null) return ""
-
 		const minutes = Math.floor(timeRemaining / 60)
 		const seconds = timeRemaining % 60
-
-		return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+		return `${minutes}:${seconds.toString().padStart(2, "0")}`
 	}
 
 	// Manejar el envío de una pregunta
-	const handleQuestionSubmit = (data: Record<string, unknown>) => {
-		const updatedAnswers = { ...answers, ...data }
-		setAnswers(updatedAnswers)
+	const handleQuestionSubmit = (data: Record<number, string | string[]>) => {
+		// Guardar la respuesta actual
+		setAnswers((prev) => ({ ...prev, ...data }))
 
-		if (currentQuestionIndex < questions.length - 1) {
-			setCurrentQuestionIndex(currentQuestionIndex + 1)
-		} else {
+		// Si es la última pregunta, enviar todas las respuestas
+		if (currentQuestionIndex === questions.length - 1) {
 			handleSubmitAllAnswers()
+			return
 		}
+
+		// Avanzar a la siguiente pregunta
+		setCurrentQuestionIndex((prev) => prev + 1)
 	}
 
 	// Navegar a la pregunta anterior
 	const handlePreviousQuestion = () => {
 		if (currentQuestionIndex > 0) {
-			setCurrentQuestionIndex(currentQuestionIndex - 1)
+			setCurrentQuestionIndex((prev) => prev - 1)
 		}
 	}
 
@@ -196,154 +182,126 @@ export function SafetyTalkExam({
 			setIsSubmitting(true)
 
 			// Preparar los datos para enviar
-			const payload = {
-				safetyTalkId,
+			const data = {
+				category,
 				answers: Object.entries(answers).map(([questionId, answer]) => ({
-					questionId,
-					answer: typeof answer === "string" ? answer : JSON.stringify(answer),
+					questionId: parseInt(questionId),
+					answer,
 				})),
 			}
 
-			console.log(payload)
+			// Enviar las respuestas al servidor
+			await submitSafetyTalkAnswers(data)
 
-			// Redirigir a la página de resultados después del envío exitoso
-			router.push(`/dashboard/charlas-de-seguridad`)
-			toast.success("¡Charla completada con éxito!")
+			// Redirigir al usuario a la página de detalles
+			router.push(`/dashboard/charlas-de-seguridad/${category.toLowerCase()}`)
 		} catch (error) {
-			console.error("Error al enviar las respuestas:", error)
-			toast.error("Ocurrió un error al enviar tus respuestas. Por favor, intenta nuevamente.")
+			console.error(error)
+			toast.error("Hubo un error al enviar tus respuestas. Por favor, inténtalo de nuevo.")
 		} finally {
 			setIsSubmitting(false)
 		}
 	}
 
+	// Manejar cuando se acaba el tiempo
+	const handleTimeExpired = () => {
+		handleSubmitAllAnswers()
+	}
+
 	// Calcular el progreso de la evaluación
 	const progress = Math.round(((currentQuestionIndex + 1) / questions.length) * 100)
 
-	// Renderizar la pregunta actual
+	// Renderizar el contenido de la pregunta actual
 	const renderCurrentQuestion = () => {
-		if (!questions.length) return null
-
 		const currentQuestion = questions[currentQuestionIndex]
+
+		if (!currentQuestion) return null
 
 		return (
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleQuestionSubmit)} className="space-y-6">
 					<Card>
 						<CardHeader>
-							<div className="flex items-start justify-between">
-								<div>
-									<CardTitle className="text-lg">
-										Pregunta {currentQuestionIndex + 1} de {questions.length}
-									</CardTitle>
-									<CardDescription>{currentQuestion.question}</CardDescription>
-								</div>
-								{currentQuestion.type === "MULTIPLE_CHOICE" && (
-									<div className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
-										Selección única
-									</div>
-								)}
-								{currentQuestion.type === "TRUE_FALSE" && (
-									<div className="rounded-full bg-green-50 px-3 py-1 text-xs text-green-700">
-										Verdadero / Falso
-									</div>
-								)}
-								{currentQuestion.type === "SHORT_ANSWER" && (
-									<div className="rounded-full bg-purple-50 px-3 py-1 text-xs text-purple-700">
-										Respuesta corta
-									</div>
-								)}
-								{currentQuestion.type === "IMAGE_ZONES" && (
-									<div className="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-700">
-										Zonas de imagen
-									</div>
-								)}
-							</div>
+							<CardTitle className="text-lg">
+								Pregunta {currentQuestionIndex + 1} de {questions.length}
+							</CardTitle>
 						</CardHeader>
 
 						<CardContent className="space-y-4">
-							{currentQuestion.description && (
-								<div className="text-muted-foreground text-sm">{currentQuestion.description}</div>
-							)}
+							<div className="space-y-2">
+								<p className="text-lg font-medium">{currentQuestion.question}</p>
 
-							{currentQuestion.imageUrl && (
-								<div className="my-4 overflow-hidden rounded-md border">
-									{/* eslint-disable-next-line @next/next/no-img-element */}
-									<img
-										src={currentQuestion.imageUrl}
-										alt={currentQuestion.question}
-										className="max-h-[300px] w-full object-contain"
-									/>
-								</div>
-							)}
+								{currentQuestion.description && (
+									<p className="text-muted-foreground">{currentQuestion.description}</p>
+								)}
 
-							<FormField
+								{currentQuestion.imageUrl && (
+									<div className="relative aspect-video w-full overflow-hidden rounded-lg">
+										<Image
+											src={currentQuestion.imageUrl}
+											alt={currentQuestion.question}
+											fill
+											className="object-cover"
+										/>
+									</div>
+								)}
+							</div>
+
+							{/* <FormField
 								control={form.control}
-								name={currentQuestion.id}
+								name={currentQuestion.id.toString()}
 								render={({ field }) => (
 									<FormItem>
 										<FormControl>
-											<>
-												{currentQuestion.type === "MULTIPLE_CHOICE" && (
-													<RadioGroup
-														onValueChange={field.onChange}
-														defaultValue={field.value as string | undefined}
-														className="space-y-3"
-													>
-														{currentQuestion.options.map((option) => (
-															<div key={option.id} className="flex items-center space-x-2">
-																<RadioGroupItem value={option.id} id={option.id} />
-																<Label htmlFor={option.id} className="cursor-pointer">
-																	{option.text}
-																</Label>
-															</div>
-														))}
-													</RadioGroup>
-												)}
+											{currentQuestion.type === "single" && (
+												<RadioGroup
+													onValueChange={field.onChange}
+													defaultValue={field.value}
+													className="space-y-3"
+												>
+													{currentQuestion.options.map((option) => (
+														<div key={option.id} className="flex items-center space-x-2">
+															<RadioGroupItem value={option.id} id={option.id} />
+															<FormLabel htmlFor={option.id}>{option.text}</FormLabel>
+														</div>
+													))}
+												</RadioGroup>
+											)}
 
-												{currentQuestion.type === "TRUE_FALSE" && (
-													<RadioGroup
-														onValueChange={field.onChange}
-														defaultValue={field.value as string | undefined}
-														className="space-y-3"
-													>
-														{currentQuestion.options.map((option) => (
-															<div key={option.id} className="flex items-center space-x-2">
-																<RadioGroupItem value={option.id} id={option.id} />
-																<Label htmlFor={option.id} className="cursor-pointer">
-																	{option.text}
-																</Label>
-															</div>
-														))}
-													</RadioGroup>
-												)}
+											{currentQuestion.type === "matching" && (
+												<div className="grid grid-cols-2 gap-4">
+													{currentQuestion.options.map((option) => (
+														<div key={option.id} className="space-y-2">
+															<FormLabel>{option.text}</FormLabel>
+															<Input
+																type="text"
+																{...field}
+																name={`${currentQuestion.id}.${option.id}`}
+															/>
+														</div>
+													))}
+												</div>
+											)}
 
-												{currentQuestion.type === "SHORT_ANSWER" && (
-													<Input
-														placeholder="Escribe tu respuesta aquí"
-														{...field}
-														value={field.value as string}
-													/>
-												)}
-
-												{currentQuestion.type === "IMAGE_ZONES" && (
-													<div className="space-y-3">
-														{currentQuestion.options.map((option) => (
-															<div key={option.id} className="flex items-center space-x-2">
-																<RadioGroupItem {...field} value={option.id as string} />
-																<Label htmlFor={option.id} className="cursor-pointer">
-																	{option.zoneLabel || option.text}
-																</Label>
-															</div>
-														))}
-													</div>
-												)}
-											</>
+											{currentQuestion.type === "image-labels" && (
+												<div className="grid grid-cols-2 gap-4">
+													{currentQuestion.options.map((option) => (
+														<div key={option.id} className="space-y-2">
+															<FormLabel>{option.label}</FormLabel>
+															<Input
+																type="text"
+																{...field}
+																name={`${currentQuestion.id}.${option.id}`}
+															/>
+														</div>
+													))}
+												</div>
+											)}
 										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}
-							/>
+							/> */}
 						</CardContent>
 
 						<CardFooter className="flex justify-between">

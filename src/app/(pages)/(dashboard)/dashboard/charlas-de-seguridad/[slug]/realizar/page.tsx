@@ -1,9 +1,8 @@
 import { notFound, redirect } from "next/navigation"
-import Link from "next/link"
 
-import { getSafetyTalkBySlug } from "@/project/safety-talk/actions/get-safety-talks"
-import { SafetyTalkExam } from "@/project/safety-talk/components/SafetyTalkExam"
-import { Button } from "@/shared/components/ui/button"
+import { getSafetyTalkByCategory } from "@/project/safety-talk/actions/get-safety-talks"
+import { environmentalQuestions } from "@/project/safety-talk/utils/environmental-questions"
+import { irlQuestions } from "@/project/safety-talk/utils/irl-questions"
 
 export default async function TakeSafetyTalkPage({
 	params,
@@ -11,38 +10,44 @@ export default async function TakeSafetyTalkPage({
 	params: Promise<{ slug: string }>
 }) {
 	const { slug } = await params
+	const category = slug === "environmental" ? "ENVIRONMENT" : "IRL"
+	const userSafetyTalk = await getSafetyTalkByCategory(category as "ENVIRONMENT" | "IRL")
 
-	const safetyTalk = await getSafetyTalkBySlug(slug)
+	const safetyTalkInfo = {
+		environmental: {
+			title: "Medio Ambiente",
+			description: "Charla sobre prácticas ambientales y manejo de residuos",
+			minScore: 70,
+			questions: environmentalQuestions,
+		},
+		irl: {
+			title: "Introducción a Riesgos Laborales",
+			description: "Charla sobre riesgos laborales básicos y prevención",
+			minScore: 70,
+			questions: irlQuestions,
+		},
+	}[slug]
 
-	if (!safetyTalk) {
+	if (!safetyTalkInfo) {
 		notFound()
 	}
 
-	// Si la charla es presencial, no se puede realizar en línea
-	if (safetyTalk.isPresential) {
+	// Si el usuario ya tiene un intento en progreso o está bloqueado, redirigir
+	if (userSafetyTalk?.status === "IN_PROGRESS" || userSafetyTalk?.status === "BLOCKED") {
 		redirect(`/dashboard/charlas-de-seguridad/${slug}`)
 	}
 
-	// Mapear las preguntas al formato esperado por el componente
-	const questions = safetyTalk.questions.map((question) => ({
-		id: question.id,
-		type: question.type,
-		question: question.question,
-		imageUrl: question.imageUrl,
-		description: question.description,
-		options: question.options.map((option) => ({
-			id: option.id,
-			text: option.text,
-			isCorrect: option.isCorrect,
-			zoneLabel: option.zoneLabel,
-			zoneId: option.zoneId,
-			order: option.order,
-		})),
-	}))
+	// Si el usuario tiene intentos fallidos, verificar si puede intentar de nuevo
+	if (userSafetyTalk?.status === "FAILED" && userSafetyTalk.nextAttemptAt) {
+		const nextAttemptDate = new Date(userSafetyTalk.nextAttemptAt)
+		if (nextAttemptDate > new Date()) {
+			redirect(`/dashboard/charlas-de-seguridad/${slug}`)
+		}
+	}
 
 	return (
 		<div className="space-y-6">
-			{safetyTalk.questions.length === 0 ? (
+			{/* {safetyTalkInfo.questions.length === 0 ? (
 				<div className="rounded-lg border p-8 text-center">
 					<h2 className="mb-4 text-xl font-semibold">No hay preguntas disponibles</h2>
 					<p className="text-muted-foreground mb-6">
@@ -55,14 +60,14 @@ export default async function TakeSafetyTalkPage({
 				</div>
 			) : (
 				<SafetyTalkExam
-					safetyTalkId={safetyTalk.id}
-					title={safetyTalk.title}
-					description={safetyTalk.description}
-					minimumScore={safetyTalk.minimumScore}
-					timeLimit={safetyTalk.timeLimit}
-					questions={questions}
+					category={category as "ENVIRONMENT" | "IRL"}
+					title={safetyTalkInfo.title}
+					description={safetyTalkInfo.description}
+					minimumScore={safetyTalkInfo.minScore}
+					timeLimit={30}
+					questions={safetyTalkInfo.questions}
 				/>
-			)}
+			)} */}
 		</div>
 	)
 }
