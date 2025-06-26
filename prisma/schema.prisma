@@ -81,6 +81,8 @@ model User {
   folders                         Folder[]
   workTrackers                    WorkTracker[]
   safetyTalks                     UserSafetyTalk[]
+  safetyTalkAttempts              SafetyTalkAttempt[]
+  safetyTalkApproval              UserSafetyTalk[]          @relation("UserSafetyTalkApproval")
   company                         Company?                  @relation(fields: [companyId], references: [id])
   companiesCreatedBy              Company[]                 @relation("CompanyCreatedBy")
   companyId                       String?
@@ -708,120 +710,67 @@ model WorkRequestCounter {
   @@map("work_request_counter")
 }
 
-enum RESOURCE_TYPE {
-  VIDEO
-  PRESENTATION
-  DOCUMENT
+enum SAFETY_TALK_CATEGORY {
+  ENVIRONMENT
+  IRL
 }
 
-model SafetyTalk {
-  id                String               @id @default(cuid())
-  slug              String               @unique
-  title             String
-  description       String?
-  isPresential      Boolean              @default(false)
-  questions         Question[]
-  resources         SafetyTalkResource[]
-  expiresAt         DateTime
-  timeLimit         Int?
-  minimumScore      Float                @default(70.0)
-  pdfGenerations    Int                  @default(0)
-  lastPdfGeneration DateTime?
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-
-  userSafetyTalks UserSafetyTalk[]
-
-  @@map("safety_talk")
+enum SAFETY_TALK_STATUS {
+  PENDING
+  IN_PROGRESS
+  PASSED
+  FAILED
+  BLOCKED
+  MANUALLY_APPROVED
 }
 
-model SafetyTalkResource {
-  id           String        @id @default(cuid())
-  title        String
-  description  String?
-  type         RESOURCE_TYPE
-  url          String
-  fileSize     Int?
-  mimeType     String?
-  order        Int
-  safetyTalk   SafetyTalk    @relation(fields: [safetyTalkId], references: [id])
-  safetyTalkId String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+model SafetyTalkAttempt {
+  id            String               @id @default(cuid())
+  category      SAFETY_TALK_CATEGORY
+  score         Float
+  passed        Boolean
+  answers       Json
+  attemptNumber Int
+  completedAt   DateTime
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
-  @@map("safety_talk_resource")
-}
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+  userSafetyTalkId String
+  userSafetyTalk   UserSafetyTalk @relation(fields: [userSafetyTalkId], references: [id])
 
-enum QUESTION_TYPE {
-  MULTIPLE_CHOICE // Opción múltiple tradicional
-  IMAGE_ZONES // Preguntas con zonas en imágenes
-  TRUE_FALSE // Verdadero/Falso
-  SHORT_ANSWER // Respuesta corta
-}
-
-model Question {
-  id           String           @id @default(cuid())
-  type         QUESTION_TYPE    @default(MULTIPLE_CHOICE)
-  question     String
-  imageUrl     String?
-  description  String?
-  options      QuestionOption[]
-  safetyTalk   SafetyTalk       @relation(fields: [safetyTalkId], references: [id])
-  safetyTalkId String
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-
-  userAnswers UserSafetyTalkAnswer[]
-
-  @@map("question")
-}
-
-model QuestionOption {
-  id         String   @id @default(cuid())
-  text       String
-  isCorrect  Boolean
-  zoneLabel  String? // Para IMAGE_ZONES, etiqueta de la zona (ej: 'A', 'B', 'C')
-  zoneId     String? // Identificador único de la zona en la imagen
-  order      Int      @default(0) // Orden de la opción
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  userAnswers UserSafetyTalkAnswer[]
-
-  @@map("question_option")
+  @@index([userId])
+  @@index([userSafetyTalkId])
+  @@map("safety_talk_attempt")
 }
 
 model UserSafetyTalk {
-  id           String                 @id @default(cuid())
-  user         User                   @relation(fields: [userId], references: [id])
-  userId       String
-  safetyTalk   SafetyTalk             @relation(fields: [safetyTalkId], references: [id])
-  safetyTalkId String
-  score        Float
-  passed       Boolean
-  completedAt  DateTime
-  expiresAt    DateTime
-  answers      UserSafetyTalkAnswer[]
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
+  id                  String               @id @default(cuid())
+  category            SAFETY_TALK_CATEGORY
+  status              SAFETY_TALK_STATUS   @default(PENDING)
+  currentAttempts     Int                  @default(0)
+  lastAttemptAt       DateTime?
+  nextAttemptAt       DateTime?
+  score               Float?
+  minRequiredScore    Float                @default(70.0)
+  completedAt         DateTime?
+  expiresAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  manuallyApproved    Boolean              @default(false)
+  inPersonSessionDate DateTime?
+  approvalById        String?
+  approvalBy          User?                @relation("UserSafetyTalkApproval", fields: [approvalById], references: [id])
 
+  userId   String
+  user     User                @relation(fields: [userId], references: [id])
+  attempts SafetyTalkAttempt[]
+
+  @@index([userId])
+  @@index([category])
+  @@index([status])
   @@map("user_safety_talk")
-}
-
-model UserSafetyTalkAnswer {
-  id               String         @id @default(cuid())
-  userSafetyTalk   UserSafetyTalk @relation(fields: [userSafetyTalkId], references: [id])
-  userSafetyTalkId String
-  question         Question       @relation(fields: [questionId], references: [id])
-  questionId       String
-  selectedOption   QuestionOption @relation(fields: [selectedOptionId], references: [id])
-  selectedOptionId String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-
-  @@map("user_safety_talk_answer")
 }
 
 model AttachmentHistory {

@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
 		const skip = (page - 1) * limit
 
-		const [companies, total, safetyTalks] = await Promise.all([
+		const [companies, total] = await Promise.all([
 			prisma.company.findMany({
 				where: {
 					isActive: true,
@@ -58,21 +58,6 @@ export async function GET(req: NextRequest) {
 							id: true,
 							name: true,
 							isSupervisor: true,
-							safetyTalks: {
-								select: {
-									score: true,
-									passed: true,
-									completedAt: true,
-									expiresAt: true,
-									safetyTalk: {
-										select: {
-											id: true,
-											title: true,
-											minimumScore: true,
-										},
-									},
-								},
-							},
 						},
 					},
 					createdAt: true,
@@ -103,42 +88,10 @@ export async function GET(req: NextRequest) {
 					swr: 10,
 				},
 			}),
-			prisma.safetyTalk.findMany({
-				select: {
-					id: true,
-					title: true,
-					minimumScore: true,
-					expiresAt: true,
-					isPresential: true,
-				},
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
-				},
-			}),
 		])
 
-		const processedCompanies = companies.map((company) => ({
-			...company,
-			users: company.users.map((user) => ({
-				...user,
-				safetyTalks: safetyTalks.map((talk) => {
-					const userTalk = user.safetyTalks.find((ut) => ut.safetyTalk.id === talk.id)
-
-					return {
-						...talk,
-						completed: !!userTalk,
-						score: userTalk?.score,
-						passed: userTalk?.passed,
-						completedAt: userTalk?.completedAt,
-						expiresAt: userTalk?.expiresAt,
-					}
-				}),
-			})),
-		}))
-
 		return NextResponse.json({
-			companies: processedCompanies,
+			companies,
 			total,
 			pages: Math.ceil(total / limit),
 		})
