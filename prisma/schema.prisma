@@ -750,6 +750,7 @@ model UserSafetyTalk {
   category            SAFETY_TALK_CATEGORY
   status              SAFETY_TALK_STATUS   @default(PENDING)
   currentAttempts     Int                  @default(0)
+  startedAt           DateTime?
   lastAttemptAt       DateTime?
   nextAttemptAt       DateTime?
   score               Float?

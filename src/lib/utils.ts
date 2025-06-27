@@ -37,3 +37,15 @@ export const formatRut = (value: string): string => {
 	if (parts.length === 1) return numberPart
 	return `${numberPart}-${parts[1]}`
 }
+
+export const formatDate = (date: Date | string | null) => {
+	if (!date) return "-"
+
+	return new Date(date).toLocaleDateString("es-CL", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+		hour: "numeric",
+		minute: "numeric",
+	})
+}

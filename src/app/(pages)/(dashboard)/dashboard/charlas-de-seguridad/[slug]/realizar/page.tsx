@@ -1,8 +1,11 @@
 import { notFound, redirect } from "next/navigation"
+import Link from "next/link"
 
-import { getSafetyTalkByCategory } from "@/project/safety-talk/actions/get-safety-talks"
 import { environmentalQuestions } from "@/project/safety-talk/utils/environmental-questions"
-import { irlQuestions } from "@/project/safety-talk/utils/irl-questions"
+import { getSafetyTalkByCategory } from "@/project/safety-talk/actions/get-safety-talks"
+
+import { SafetyTalkExam } from "@/project/safety-talk/components/SafetyTalkExam"
+import { Button } from "@/shared/components/ui/button"
 
 export default async function TakeSafetyTalkPage({
 	params,
@@ -24,7 +27,7 @@ export default async function TakeSafetyTalkPage({
 			title: "Introducción a Riesgos Laborales",
 			description: "Charla sobre riesgos laborales básicos y prevención",
 			minScore: 70,
-			questions: irlQuestions,
+			questions: [],
 		},
 	}[slug]
 
@@ -32,12 +35,6 @@ export default async function TakeSafetyTalkPage({
 		notFound()
 	}
 
-	// Si el usuario ya tiene un intento en progreso o está bloqueado, redirigir
-	if (userSafetyTalk?.status === "IN_PROGRESS" || userSafetyTalk?.status === "BLOCKED") {
-		redirect(`/dashboard/charlas-de-seguridad/${slug}`)
-	}
-
-	// Si el usuario tiene intentos fallidos, verificar si puede intentar de nuevo
 	if (userSafetyTalk?.status === "FAILED" && userSafetyTalk.nextAttemptAt) {
 		const nextAttemptDate = new Date(userSafetyTalk.nextAttemptAt)
 		if (nextAttemptDate > new Date()) {
@@ -46,8 +43,8 @@ export default async function TakeSafetyTalkPage({
 	}
 
 	return (
-		<div className="space-y-6">
-			{/* {safetyTalkInfo.questions.length === 0 ? (
+		<div className="w-full max-w-screen-lg space-y-6">
+			{safetyTalkInfo.questions.length === 0 ? (
 				<div className="rounded-lg border p-8 text-center">
 					<h2 className="mb-4 text-xl font-semibold">No hay preguntas disponibles</h2>
 					<p className="text-muted-foreground mb-6">
@@ -67,7 +64,7 @@ export default async function TakeSafetyTalkPage({
 					timeLimit={30}
 					questions={safetyTalkInfo.questions}
 				/>
-			)} */}
+			)}
 		</div>
 	)
 }

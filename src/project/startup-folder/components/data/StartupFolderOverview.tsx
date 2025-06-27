@@ -12,6 +12,7 @@ import {
 	FolderKanbanIcon,
 	SquareActivityIcon,
 	InfoIcon,
+	PartyPopperIcon,
 } from "lucide-react"
 
 import {
@@ -228,12 +229,11 @@ export default function StartupFolderOverview({
 												</div>
 												Documentación básica:{" "}
 											</div>
-											{(
-												((selectedFolder?.basicFolder.approvedDocuments || 0) /
-													(selectedFolder?.basicFolder.totalDocuments || 0)) *
-												100
-											).toFixed(0)}
-											% completado
+											{selectedFolder.basicFolder.reduce(
+												(acc, wf) => acc + (wf.isCompleted ? 1 : 0),
+												0
+											)}{" "}
+											/ {selectedFolder.basicFolder.length} completados
 										</li>
 									)}
 
@@ -246,12 +246,11 @@ export default function StartupFolderOverview({
 													</div>
 													Seguridad y Salud Ocupacional:{" "}
 												</div>
-												{(
-													((selectedFolder?.safetyAndHealthFolders[0].approvedDocuments || 0) /
-														(selectedFolder?.safetyAndHealthFolders[0].totalDocuments || 0)) *
-													100
-												).toFixed(0)}
-												% completado
+												{selectedFolder.workersFolders.reduce(
+													(acc, wf) => acc + (wf.isCompleted ? 1 : 0),
+													0
+												)}{" "}
+												/ {selectedFolder.workersFolders.length} completados
 											</li>
 
 											<li className="flex items-center justify-between">
@@ -302,35 +301,45 @@ export default function StartupFolderOverview({
 							</CardContent>
 						</Card>
 
-						{selectedFolder?.type === "BASIC" && selectedFolder.basicFolder.isCompleted && (
-							<Card>
-								<CardHeader>
-									<CardTitle>
-										{!isOtcMember
-											? "¡Felicidades! Carpeta completada"
-											: "Carpeta de arranque completada"}
-									</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<div>
-										{!isOtcMember ? (
-											"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos"
-										) : (
-											<div className="flex flex-wrap items-center justify-between gap-2">
-												<p className="w-fit">La carpeta esta lista para ser aprobada</p>
+						{selectedFolder?.type === "BASIC" &&
+							selectedFolder.basicFolder.every((wf) => wf.isCompleted) && (
+								<Card className="gap-3">
+									<CardHeader>
+										<CardTitle className="flex items-center justify-between gap-2 text-lg">
+											{!isOtcMember
+												? "¡Felicidades! Carpeta completada"
+												: "Carpeta de arranque completada"}
 
-												<Button
-													disabled
-													className="bg-teal-600 text-white transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"
-												>
-													Aprobar carpeta
-												</Button>
+											<div className="rounded-lg bg-teal-500/20 p-2">
+												<PartyPopperIcon className="size-7 text-teal-500" />
 											</div>
-										)}
-									</div>
-								</CardContent>
-							</Card>
-						)}
+										</CardTitle>
+									</CardHeader>
+
+									<CardContent>
+										<div>
+											{!isOtcMember ? (
+												"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos."
+											) : (
+												<div className="flex flex-wrap items-center justify-between gap-2">
+													<p className="w-fit">
+														La carpeta esta lista para ser aprobada. Al aprovar la carpeta se
+														notificara a la empresa que esta lista para iniciar con los trabajos
+														respectivos.
+													</p>
+
+													<Button
+														disabled
+														className="bg-teal-600 text-white transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"
+													>
+														Aprobar carpeta
+													</Button>
+												</div>
+											)}
+										</div>
+									</CardContent>
+								</Card>
+							)}
 
 						{selectedFolder?.type === "FULL" &&
 							selectedFolder.workersFolders.every((wf) => wf.isCompleted) &&

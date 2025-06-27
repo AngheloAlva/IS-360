@@ -35,7 +35,7 @@ export interface StartupFolder extends StartupFolderModel {
 		submittedDocuments: number
 		draftDocuments: number
 		isCompleted: boolean
-	}
+	}[]
 	safetyAndHealthFolders: {
 		totalDocuments: number
 		approvedDocuments: number

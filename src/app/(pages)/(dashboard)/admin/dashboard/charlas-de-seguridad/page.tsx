@@ -1,28 +1,20 @@
-import { Plus } from "lucide-react"
-import Link from "next/link"
+"use client"
 
-import { SafetyTalkDataTable } from "@/project/safety-talk/components/data/SafetyTalkDataTable"
-import { Button } from "@/shared/components/ui/button"
+import { SafetyTalksDashboard } from "@/project/safety-talk/components/admin/SafetyTalksDashboard"
 
-export default async function SafetyTalksPage(): Promise<React.ReactElement> {
+export default function SafetyTalksAdminPage() {
 	return (
-		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="w-fit text-3xl font-bold">Charlas de Seguridad</h1>
-					<p className="text-muted-foreground">
-						En este modulo puedes gestionar las charlas de seguridad de la empresa.
-					</p>
+		<div className="w-full flex-1 space-y-6">
+			<div className="rounded-lg bg-gradient-to-r from-emerald-600 to-sky-700 p-6 shadow-lg">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Charlas de Seguridad</h1>
+						<p className="opacity-90">Gestión y seguimiento de charlas de seguridad</p>
+					</div>
 				</div>
-				<Link href="/admin/dashboard/charlas-de-seguridad/agregar" className="md:ml-auto">
-					<Button size={"lg"}>
-						Nueva Charla
-						<Plus className="ml-1" />
-					</Button>
-				</Link>
 			</div>
 
-			<SafetyTalkDataTable />
+			<SafetyTalksDashboard />
 		</div>
 	)
 }

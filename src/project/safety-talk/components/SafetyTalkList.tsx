@@ -7,11 +7,23 @@ import {
 } from "@/shared/components/ui/card"
 import { Badge } from "@/shared/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { Separator } from "@/shared/components/ui/separator"
+import { Button } from "@/shared/components/ui/button"
+import Link from "next/link"
 
 import type { UserSafetyTalk } from "@prisma/client"
 
+type Attempt = {
+	id: string
+	score: number
+	completedAt: Date | null
+}
+
 interface SafetyTalkListProps {
-	userSafetyTalks: UserSafetyTalk[]
+	userSafetyTalks: (UserSafetyTalk & {
+		attempts: Pick<Attempt, "id" | "score" | "completedAt">[]
+		approvalBy: { name: string } | null
+	})[]
 }
 
 export function SafetyTalkList({ userSafetyTalks }: SafetyTalkListProps) {
@@ -21,12 +33,14 @@ export function SafetyTalkList({ userSafetyTalks }: SafetyTalkListProps) {
 			title: "Medio Ambiente",
 			description: "Charla sobre prácticas ambientales y manejo de residuos",
 			category: "ENVIRONMENT",
+			disabled: false,
 		},
 		{
 			id: "irl",
 			title: "Introducción a Riesgos Laborales",
 			description: "Charla sobre riesgos laborales básicos y prevención",
 			category: "IRL",
+			disabled: true,
 		},
 	]
 
@@ -40,9 +54,16 @@ export function SafetyTalkList({ userSafetyTalks }: SafetyTalkListProps) {
 				const isInProgress = userTalk?.status === "IN_PROGRESS"
 				const hasFailedAttempts = userTalk?.status === "FAILED"
 				const nextAttemptAt = userTalk?.nextAttemptAt
+				const isDisabled: boolean =
+					talk.disabled ||
+					isBlocked ||
+					isInProgress ||
+					hasFailedAttempts ||
+					isExpired ||
+					!nextAttemptAt
 
 				return (
-					<Card key={talk.id} className={cn(isPassed && "border-green-200 bg-green-50")}>
+					<Card key={talk.id} className={cn(isPassed && "border-green-500/20")}>
 						<CardHeader>
 							<div className="flex items-center justify-between">
 								<CardTitle>{talk.title}</CardTitle>
@@ -53,32 +74,60 @@ export function SafetyTalkList({ userSafetyTalks }: SafetyTalkListProps) {
 							</div>
 							<CardDescription>{talk.description}</CardDescription>
 						</CardHeader>
-						<CardContent>
-							{isPassed && userTalk?.expiresAt && (
-								<p className="text-muted-foreground text-sm">
-									Expira el: {new Date(userTalk.expiresAt).toLocaleDateString()}
-								</p>
+
+						<CardContent className="mt-auto">
+							{userTalk && (
+								<div className="mb-4 space-y-4">
+									{/* Información de expiración */}
+									{isPassed && userTalk.expiresAt && (
+										<p className="text-muted-foreground text-sm">
+											Expira el: {new Date(userTalk.expiresAt).toLocaleDateString()}
+										</p>
+									)}
+
+									{/* Información de próximo intento */}
+									{hasFailedAttempts && nextAttemptAt && (
+										<p className="text-muted-foreground text-sm">
+											Próximo intento disponible: {new Date(nextAttemptAt).toLocaleString()}
+										</p>
+									)}
+
+									{/* Detalles del último intento */}
+									{userTalk.attempts.length > 0 && (
+										<div className="space-y-2">
+											<Separator />
+											<p className="text-sm font-medium">Último intento:</p>
+											<div className="text-muted-foreground space-y-1 text-sm">
+												<p>
+													Puntuación: {userTalk.attempts[0].score}/{userTalk.minRequiredScore} (
+													{((userTalk.attempts[0].score / userTalk.minRequiredScore) * 100).toFixed(
+														0
+													)}
+													%)
+												</p>
+												<p>Fecha: {userTalk.attempts[0].completedAt?.toLocaleString()}</p>
+												{userTalk.approvalBy && <p>Aprobado por: {userTalk.approvalBy.name}</p>}
+											</div>
+										</div>
+									)}
+								</div>
 							)}
-							{hasFailedAttempts && nextAttemptAt && (
-								<p className="text-muted-foreground text-sm">
-									Próximo intento disponible: {new Date(nextAttemptAt).toLocaleString()}
-								</p>
-							)}
+
 							<div className="mt-4">
-								{/* <Button
-									asChild
-									className="w-full"
-									variant={isPassed ? "outline" : "default"}
-									disabled={
-										isBlocked ||
-										isInProgress ||
-										(hasFailedAttempts && nextAttemptAt && new Date(nextAttemptAt) > new Date())
-									}
+								<Button
+									className={cn(
+										"w-full bg-teal-600 px-0 py-0 text-white hover:bg-teal-700 hover:text-white",
+										isPassed && "bg-emerald-600 hover:bg-emerald-700"
+									)}
+									disabled={isDisabled}
 								>
-									<Link href={`/dashboard/charlas-de-seguridad/${talk.id}`}>
+									<Link
+										href={`/dashboard/charlas-de-seguridad/${talk.id}`}
+										className="flex h-full w-full items-center justify-center font-semibold tracking-wider"
+									>
 										{isPassed ? "Ver Detalles" : "Realizar Charla"}
 									</Link>
-								</Button> */}
+								</Button>
 							</div>
 						</CardContent>
 					</Card>
