@@ -246,11 +246,12 @@ export default function StartupFolderOverview({
 													</div>
 													Seguridad y Salud Ocupacional:{" "}
 												</div>
-												{selectedFolder.workersFolders.reduce(
-													(acc, wf) => acc + (wf.isCompleted ? 1 : 0),
-													0
-												)}{" "}
-												/ {selectedFolder.workersFolders.length} completados
+												{(
+													((selectedFolder?.safetyAndHealthFolders[0].approvedDocuments || 0) /
+														(selectedFolder?.safetyAndHealthFolders[0].totalDocuments || 0)) *
+													100
+												).toFixed(0)}
+												% completado
 											</li>
 
 											<li className="flex items-center justify-between">

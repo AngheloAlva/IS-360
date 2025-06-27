@@ -7,7 +7,7 @@ export default function AdminStartupFoldersPage() {
 			<div className="rounded-lg bg-gradient-to-r from-teal-600 to-cyan-700 p-6 shadow-lg">
 				<div className="flex items-center justify-between">
 					<div className="text-white">
-						<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
+						<h1 className="text-2xl font-bold tracking-tight md:text-3xl">Carpetas de Arranque</h1>
 						<p className="opacity-90">Gestión de documentación para inicio de proyectos</p>
 					</div>
 				</div>

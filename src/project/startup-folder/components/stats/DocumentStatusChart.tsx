@@ -44,9 +44,10 @@ export function DocumentStatusChart({ data }: DocumentStatusChartProps) {
 					<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
 				</div>
 			</CardHeader>
-			<CardContent>
+
+			<CardContent className="flex max-w-[90dvw] items-center justify-center">
 				<ChartContainer
-					className="h-[300px] w-full"
+					className="h-[300px]"
 					config={{
 						DRAFT: {
 							label: "Borrador",

@@ -15,11 +15,11 @@ import {
 } from "@/project/work-order/schemas/otc-inspections.schema"
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
-import UploadFilesFormField from "@/shared/components/forms/UploadFilesFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
@@ -37,7 +37,6 @@ export default function OtcInspectorForm({
 	userId: string
 	workOrderId: string
 }): React.ReactElement {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
@@ -184,15 +183,12 @@ export default function OtcInspectorForm({
 							</p>
 						</div>
 
-						<UploadFilesFormField<OtcInspectionSchema>
+						<FileTable<OtcInspectionSchema>
 							name="files"
 							isMultiple={true}
 							maxFileSize={500}
-							className="hidden"
 							control={form.control}
-							selectedFileIndex={selectedFileIndex}
-							containerClassName="w-full sm:col-span-2"
-							setSelectedFileIndex={setSelectedFileIndex}
+							className="w-full sm:col-span-2"
 						/>
 
 						<SubmitButton

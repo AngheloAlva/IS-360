@@ -61,7 +61,7 @@ export function DocumentsByFolderChart({ data }: DocumentsByFolderChartProps) {
 					<BarChartIcon className="text-muted-foreground h-5 min-w-5" />
 				</div>
 			</CardHeader>
-			<CardContent className="p-0">
+			<CardContent className="max-w-[90dvw] items-center justify-center p-0">
 				<div className="h-[300px] w-full">
 					<ChartContainer
 						config={{

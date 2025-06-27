@@ -25,7 +25,10 @@ export const createVehicleDocument = async ({
 
 		const folder = await prisma.vehicleFolder.findUnique({
 			where: {
-				id: folderId,
+				vehicleId_startupFolderId: {
+					vehicleId,
+					startupFolderId: folderId,
+				},
 			},
 		})
 
@@ -183,6 +186,7 @@ export const updateExpirationDateVehicleDocument = async ({
 export const submitVehicleDocumentForReview = async ({
 	emails,
 	userId,
+	folderId,
 	companyId,
 	vehicleId,
 }: {
@@ -208,9 +212,12 @@ export const submitVehicleDocumentForReview = async ({
 		}
 
 		await prisma.$transaction(async (tx) => {
-			const folder = await tx.vehicleFolder.findFirst({
+			const folder = await tx.vehicleFolder.findUnique({
 				where: {
-					vehicleId,
+					vehicleId_startupFolderId: {
+						vehicleId,
+						startupFolderId: folderId,
+					},
 				},
 				select: {
 					id: true,

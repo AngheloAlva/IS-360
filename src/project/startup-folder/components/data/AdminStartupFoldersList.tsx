@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avat
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
 import { Button } from "@/shared/components/ui/button"
+import { Badge } from "@/shared/components/ui/badge"
 import {
 	Card,
 	CardTitle,
@@ -33,7 +34,6 @@ import {
 } from "@/shared/components/ui/select"
 
 import type { WORK_ORDER_STATUS } from "@prisma/client"
-import { Badge } from "@/shared/components/ui/badge"
 
 export function AdminStartupFoldersList() {
 	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
@@ -54,12 +54,12 @@ export function AdminStartupFoldersList() {
 
 	return (
 		<>
-			<div className="mb-4 flex flex-col items-end gap-2 md:flex-row">
+			<div className="mb-4 grid w-full grid-cols-2 gap-2">
 				<SearchInput
 					value={searchTerm}
-					className="flex-1"
 					onChange={setSearchTerm}
 					inputClassName="bg-background"
+					className="col-span-2 sm:col-span-1"
 					placeholder="Buscar por nombre o RUT de empresa..."
 				/>
 
@@ -73,7 +73,7 @@ export function AdminStartupFoldersList() {
 					}}
 					value={otStatus ?? "all"}
 				>
-					<SelectTrigger className="border-input bg-background w-full border sm:w-fit">
+					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
 						<SelectValue placeholder="Estado" />
 					</SelectTrigger>
 					<SelectContent>
@@ -101,7 +101,7 @@ export function AdminStartupFoldersList() {
 					}}
 					value={withOtActive ? "true" : "false"}
 				>
-					<SelectTrigger className="border-input bg-background w-fit border">
+					<SelectTrigger className="border-input bg-background w-full border">
 						<SelectValue placeholder="Mostrar todas las empresas" />
 					</SelectTrigger>
 					<SelectContent>
@@ -117,6 +117,7 @@ export function AdminStartupFoldersList() {
 						setOrderBy(orderBy)
 						setOrder(order)
 					}}
+					className="w-full"
 				/>
 			</div>
 
@@ -209,7 +210,7 @@ export function AdminStartupFoldersList() {
 										folder.workersFolders.some((folder) => folder.status === "SUBMITTED") ||
 										folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED")
 								) && (
-									<div className="w-full rounded-md bg-teal-500/10 px-3 py-2 text-sm">
+									<div className="w-full rounded-md bg-teal-500/10 px-3 py-2 text-xs md:text-sm">
 										<span className="flex items-center font-medium text-teal-500">
 											<InfoIcon className="mr-1.5 size-3.5" />
 											Hay carpetas pendientes de revisión
@@ -219,7 +220,6 @@ export function AdminStartupFoldersList() {
 
 								<Button
 									asChild
-									variant="outline"
 									className="w-full bg-teal-600 text-white transition-colors hover:bg-teal-700 hover:text-white"
 								>
 									<Link href={`/admin/dashboard/carpetas-de-arranques/${company.id}`}>

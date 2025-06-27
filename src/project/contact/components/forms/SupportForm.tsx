@@ -11,10 +11,10 @@ import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 
 import { supportFormSchema, type SupportFormSchema } from "@/project/contact/schemas/support.schema"
 
-import UploadFilesFormField from "@/shared/components/forms/UploadFilesFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Card, CardContent } from "@/shared/components/ui/card"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Form } from "@/shared/components/ui/form"
 
 import type { Session } from "@/lib/auth"
@@ -24,7 +24,6 @@ interface SupportFormProps {
 }
 
 export default function SupportForm({ user }: SupportFormProps) {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const router = useRouter()
@@ -91,15 +90,12 @@ export default function SupportForm({ user }: SupportFormProps) {
 							control={form.control}
 						/>
 
-						<UploadFilesFormField
+						<FileTable<SupportFormSchema>
 							name="files"
 							isMultiple={true}
 							maxFileSize={500}
-							canPreview={false}
+							className="w-full"
 							control={form.control}
-							containerClassName="w-full"
-							selectedFileIndex={selectedFileIndex}
-							setSelectedFileIndex={setSelectedFileIndex}
 						/>
 
 						<SubmitButton label="Enviar mensaje" isSubmitting={isSubmitting} />

@@ -82,6 +82,7 @@ export async function createWorkerDocument(input: CreateWorkerDocumentInput) {
 				documentType,
 				workerId,
 				startupFolderId,
+				documentUrl: url,
 				expirationDate: expirationDate.toISOString(),
 			},
 		})

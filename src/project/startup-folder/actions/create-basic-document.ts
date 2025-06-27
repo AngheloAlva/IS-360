@@ -84,6 +84,7 @@ export async function createBasicDocument(input: CreateBasicDocumentInput) {
 				documentType,
 				workerId,
 				startupFolderId,
+				documentUrl: url,
 				expirationDate: expirationDate.toISOString(),
 			},
 		})

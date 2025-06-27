@@ -19,13 +19,13 @@ import {
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TimePickerFormField } from "@/shared/components/forms/TimePickerFormField"
-import UploadFilesFormField from "@/shared/components/forms/UploadFilesFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Form, FormLabel } from "@/shared/components/ui/form"
 import { Separator } from "@/shared/components/ui/separator"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -50,7 +50,6 @@ export default function ActivityForm({
 	workOrderId: string
 	entryType: ENTRY_TYPE
 }): React.ReactElement {
-	const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [users, setUsers] = useState<User[]>([])
 
@@ -273,15 +272,12 @@ export default function ActivityForm({
 							</p>
 						</div>
 
-						<UploadFilesFormField<DailyActivitySchema>
+						<FileTable<DailyActivitySchema>
 							name="files"
 							isMultiple={true}
 							maxFileSize={500}
-							className="hidden"
 							control={form.control}
-							selectedFileIndex={selectedFileIndex}
-							containerClassName="w-full sm:col-span-2"
-							setSelectedFileIndex={setSelectedFileIndex}
+							className="w-full sm:col-span-2"
 						/>
 
 						<Separator className="my-4 sm:col-span-2" />

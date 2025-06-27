@@ -46,7 +46,10 @@ export const createWorkerDocument = async ({
 		// Buscar o crear la carpeta del trabajador
 		const workerFolder = await prisma.workerFolder.findUnique({
 			where: {
-				id: folderId,
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
 			},
 		})
 
@@ -196,6 +199,7 @@ export const submitWorkerDocumentForReview = async ({
 	userId,
 	emails,
 	workerId,
+	folderId,
 	companyId,
 }: {
 	userId: string
@@ -220,9 +224,12 @@ export const submitWorkerDocumentForReview = async ({
 		}
 
 		await prisma.$transaction(async (tx) => {
-			const folder = await tx.workerFolder.findFirst({
+			const folder = await tx.workerFolder.findUnique({
 				where: {
-					workerId,
+					workerId_startupFolderId: {
+						workerId,
+						startupFolderId: folderId,
+					},
 				},
 				select: {
 					id: true,
@@ -262,8 +269,6 @@ export const submitWorkerDocumentForReview = async ({
 					status: true,
 				},
 			})
-
-			console.log(documents)
 
 			await Promise.all(
 				documents.map(async (document) => {

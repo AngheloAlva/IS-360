@@ -180,7 +180,12 @@ export const submitBasicDocumentForReview = async ({
 		}
 
 		await prisma.basicFolder.update({
-			where: { id: folder.id },
+			where: {
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
+			},
 			data: {
 				submittedAt: new Date(),
 				status: ReviewStatus.SUBMITTED,

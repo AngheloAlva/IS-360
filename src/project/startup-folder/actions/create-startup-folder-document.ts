@@ -87,6 +87,7 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 			category,
 			workerId,
 			vehicleId,
+			documentUrl: url,
 			expirationDate: expirationDate.toISOString(),
 		},
 	})

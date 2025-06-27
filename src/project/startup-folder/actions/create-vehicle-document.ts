@@ -82,6 +82,7 @@ export async function createVehicleDocument(input: CreateVehicleDocumentInput) {
 				vehicleId,
 				startupFolderId,
 				expirationDate: expirationDate.toISOString(),
+				documentUrl: url,
 			},
 		})
 
