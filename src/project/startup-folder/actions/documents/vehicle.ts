@@ -9,14 +9,14 @@ import type { UpdateStartupFolderDocumentSchema } from "@/project/startup-folder
 import type { UploadStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/new-file.schema"
 import type { UpdateExpirationDateSchema } from "@/project/startup-folder/schemas/update-expiration-date"
 import type { UploadResult } from "@/lib/upload-files"
-import { sendRequestReviewEmail } from "../send-request-review-email"
+import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 
 export const createVehicleDocument = async ({
 	data: { folderId, name, type, expirationDate, vehicleId, documentId },
 	uploadedFile,
 	userId,
 }: {
-	data: UploadStartupFolderDocumentSchema // This schema now includes vehicleId?: string
+	data: UploadStartupFolderDocumentSchema
 	uploadedFile: UploadResult
 	userId: string
 }) => {

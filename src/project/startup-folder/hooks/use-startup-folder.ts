@@ -3,8 +3,10 @@ import { type QueryFunction, useQuery } from "@tanstack/react-query"
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 import type {
 	Company,
+	BasicFolder,
 	WorkerFolder,
 	VehicleFolder,
+	BasicDocument,
 	WorkerDocument,
 	VehicleDocument,
 	StartupFolderType,
@@ -14,6 +16,7 @@ import type {
 	SafetyAndHealthFolder,
 	SafetyAndHealthDocument,
 	StartupFolder as StartupFolderModel,
+	StartupFolderStatus,
 } from "@prisma/client"
 
 export interface StartupFolder extends StartupFolderModel {
@@ -68,6 +71,14 @@ export interface StartupFolder extends StartupFolderModel {
 		draftDocuments: number
 		isCompleted: boolean
 	}[]
+	basicFolders: {
+		totalDocuments: number
+		approvedDocuments: number
+		rejectedDocuments: number
+		submittedDocuments: number
+		draftDocuments: number
+		isCompleted: boolean
+	}[]
 }
 
 interface UseStartupFolderParams {
@@ -109,10 +120,13 @@ interface CompanyWithStartupFolders extends Company {
 		id: string
 		name: string
 		createdAt: Date
+		type: StartupFolderType
+		status: StartupFolderStatus
 		workersFolders: WorkerFolder[] & { documents: WorkerDocument[] }
 		vehiclesFolders: VehicleFolder[] & { documents: VehicleDocument[] }
 		safetyAndHealthFolders: SafetyAndHealthFolder[] & { documents: SafetyAndHealthDocument[] }
 		environmentalFolders: EnvironmentalFolder[] & { documents: EnvironmentalDocument[] }
+		basicFolders: BasicFolder[] & { documents: BasicDocument[] }
 	}[]
 }
 

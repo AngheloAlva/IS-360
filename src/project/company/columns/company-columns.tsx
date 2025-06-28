@@ -1,8 +1,10 @@
 "use client"
 
+import { ArrowRightIcon, EyeIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { EyeIcon } from "lucide-react"
 import Link from "next/link"
+
+import { StartupFolderStatus } from "@prisma/client"
 
 import CompanyDetailsDialog from "@/project/company/components/dialogs/CompanyDetailsDialog"
 import DeleteCompanyDialog from "@/project/company/components/forms/DeleteCompanyDialog"
@@ -67,6 +69,32 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 						</li>
 					)}
 				</ul>
+			)
+		},
+	},
+	{
+		accessorKey: "startupFolders",
+		header: "Carpetas de arranque",
+		cell: ({ row }) => {
+			const startupFolders = row.original.StartupFolders
+			const startupFoldersCompleted = startupFolders.filter(
+				(folder) => folder.status === StartupFolderStatus.COMPLETED
+			).length
+
+			return (
+				<div className="flex items-center gap-2">
+					<span className="text-sm">
+						{startupFolders.length} Carpeta{startupFolders.length > 1 ? "s" : ""} /{" "}
+						{startupFoldersCompleted} Completada{startupFoldersCompleted > 1 ? "s" : ""}
+					</span>
+
+					<Link
+						href={`/admin/dashboard/carpetas-de-arranques/${row.original.id}`}
+						className="roundedtracking-wider flex size-6 items-center justify-center rounded-full text-blue-600 transition-all hover:scale-105 hover:bg-blue-600 hover:text-white"
+					>
+						<ArrowRightIcon className="size-4" />
+					</Link>
+				</div>
 			)
 		},
 	},

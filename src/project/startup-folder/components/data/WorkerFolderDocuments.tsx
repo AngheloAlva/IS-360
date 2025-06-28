@@ -1,5 +1,6 @@
 "use client"
 
+import { format } from "date-fns"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -13,6 +14,7 @@ import {
 } from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
+import { WORKER_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import { queryClient } from "@/lib/queryClient"
 import { ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
@@ -35,14 +37,12 @@ import {
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
 import type {
+	BasicDocumentType,
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
-	BasicDocumentType,
 } from "@prisma/client"
-import { SAFETY_AND_HEALTH_STRUCTURE } from "@/lib/consts/startup-folders-structure"
-import { format } from "date-fns"
 
 interface WorkerFolderDocumentsProps {
 	userId: string
@@ -98,7 +98,7 @@ export function WorkerFolderDocuments({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
-	const totalDocumentsToUpload = SAFETY_AND_HEALTH_STRUCTURE.documents.length
+	const totalDocumentsToUpload = WORKER_STRUCTURE.documents.length
 	const progress =
 		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
@@ -117,13 +117,14 @@ export function WorkerFolderDocuments({
 
 				<Progress
 					value={progress}
-					className="mr-4 ml-auto max-w-24"
+					className="mr-2 ml-auto max-w-24"
 					indicatorClassName="bg-emerald-600"
 				/>
+				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
 				{!isOtcMember && data?.folderStatus === "DRAFT" && documents.length > 0 && (
 					<Button
-						className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 						onClick={() => setShowSubmitDialog(true)}
 					>
 						<SendIcon className="h-4 w-4" />

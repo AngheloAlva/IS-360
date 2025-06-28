@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import {
 	CarIcon,
+	InfoIcon,
 	EarthIcon,
 	FilesIcon,
 	UsersIcon,
@@ -11,10 +12,10 @@ import {
 	BookTextIcon,
 	FolderKanbanIcon,
 	SquareActivityIcon,
-	InfoIcon,
 	PartyPopperIcon,
 } from "lucide-react"
 
+import { DocumentCategory, StartupFolderStatus } from "@prisma/client"
 import {
 	useStartupFolder,
 	type StartupFolder,
@@ -25,14 +26,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import { CreateStartupFolder } from "../forms/CreateStartupFolder"
+import CompleteFolderDialog from "../dialogs/CompleteFolderDialog"
 import { StartupFolderDocuments } from "./StartupFolderDocuments"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
-import { Button } from "@/shared/components/ui/button"
 import BackButton from "@/shared/components/BackButton"
-
-import { DocumentCategory } from "@prisma/client"
+import { Button } from "@/shared/components/ui/button"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -302,7 +302,9 @@ export default function StartupFolderOverview({
 							</CardContent>
 						</Card>
 
-						{selectedFolder?.type === "BASIC" &&
+						{selectedFolder?.basicFolder &&
+							selectedFolder?.basicFolder?.length > 0 &&
+							selectedFolder?.type === "BASIC" &&
 							selectedFolder.basicFolder.every((wf) => wf.isCompleted) && (
 								<Card className="gap-3">
 									<CardHeader>
@@ -322,19 +324,21 @@ export default function StartupFolderOverview({
 											{!isOtcMember ? (
 												"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos."
 											) : (
-												<div className="flex flex-wrap items-center justify-between gap-2">
+												<div className="flex flex-wrap items-center justify-between gap-4">
 													<p className="w-fit">
 														La carpeta esta lista para ser aprobada. Al aprovar la carpeta se
 														notificara a la empresa que esta lista para iniciar con los trabajos
 														respectivos.
 													</p>
 
-													<Button
-														disabled
-														className="bg-teal-600 text-white transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"
-													>
-														Aprobar carpeta
-													</Button>
+													{isOtcMember &&
+														hasPermission &&
+														selectedFolder.status !== StartupFolderStatus.COMPLETED && (
+															<CompleteFolderDialog
+																folderId={selectedFolder.id}
+																onSuccess={() => refetch()}
+															/>
+														)}
 												</div>
 											)}
 										</div>
@@ -360,15 +364,17 @@ export default function StartupFolderOverview({
 											{!isOtcMember ? (
 												"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos"
 											) : (
-												<div className="flex flex-wrap items-center justify-between gap-2">
+												<div className="flex flex-wrap items-center justify-between gap-4">
 													<p className="w-fit">La carpeta esta lista para ser aprobada</p>
 
-													<Button
-														disabled
-														className="bg-teal-600 text-white transition-all hover:scale-105 hover:bg-teal-700 hover:text-white"
-													>
-														Aprobar carpeta
-													</Button>
+													{isOtcMember &&
+														hasPermission &&
+														selectedFolder.status !== StartupFolderStatus.COMPLETED && (
+															<CompleteFolderDialog
+																folderId={selectedFolder.id}
+																onSuccess={() => refetch()}
+															/>
+														)}
 												</div>
 											)}
 										</div>

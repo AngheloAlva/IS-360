@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { format } from "date-fns"
 import { toast } from "sonner"
 import {
 	EyeIcon,
@@ -59,7 +60,6 @@ import type {
 	EnvironmentalStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
 } from "../../types"
-import { format } from "date-fns"
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -201,13 +201,14 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					<>
 						<Progress
 							value={progress}
-							className="mr-4 ml-auto max-w-24"
+							className="mr-2 ml-auto max-w-24"
 							indicatorClassName="bg-emerald-600"
 						/>
+						<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
 						{!isOtcMember && data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
 							<Button
-								className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+								className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 								onClick={() => setShowSubmitDialog(true)}
 							>
 								<SendIcon className="h-4 w-4" />

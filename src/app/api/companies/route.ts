@@ -60,6 +60,12 @@ export async function GET(req: NextRequest) {
 							isSupervisor: true,
 						},
 					},
+					StartupFolders: {
+						select: {
+							id: true,
+							status: true,
+						},
+					},
 					createdAt: true,
 				},
 				orderBy: {

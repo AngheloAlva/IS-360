@@ -2,7 +2,7 @@
 
 import { DocumentCategory, type Prisma, ReviewStatus, MODULES, ACTIVITY_TYPE } from "@prisma/client"
 import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
-import { sendReviewNotificationEmail } from "./send-review-notification-email"
+import { sendReviewNotificationEmail } from "./emails/send-review-notification-email"
 import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
 import {

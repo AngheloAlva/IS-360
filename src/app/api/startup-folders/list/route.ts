@@ -63,6 +63,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					select: {
 						id: true,
 						name: true,
+						status: true,
 						createdAt: true,
 						safetyAndHealthFolders: {
 							include: {
@@ -117,6 +118,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 									},
 								},
 								vehicle: true,
+							},
+						},
+						basicFolders: {
+							include: {
+								documents: {
+									orderBy: {
+										name: "asc",
+									},
+								},
 							},
 						},
 					},

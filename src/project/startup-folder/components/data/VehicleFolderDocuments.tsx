@@ -1,5 +1,6 @@
 "use client"
 
+import { format } from "date-fns"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -14,6 +15,7 @@ import {
 } from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
+import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import { queryClient } from "@/lib/queryClient"
 import {
 	ReviewStatus,
@@ -42,8 +44,6 @@ import {
 } from "@/shared/components/ui/table"
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
-import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
-import { format } from "date-fns"
 
 interface VehicleFolderDocumentsProps {
 	userId: string
@@ -116,13 +116,14 @@ export function VehicleFolderDocuments({
 
 				<Progress
 					value={progress}
-					className="mr-4 ml-auto max-w-24"
+					className="mr-2 ml-auto max-w-24"
 					indicatorClassName="bg-emerald-600"
 				/>
+				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
 				{!isOtcMember && data?.folderStatus === "DRAFT" && documents.length > 0 && (
 					<Button
-						className="gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 						onClick={() => setShowSubmitDialog(true)}
 					>
 						<SendIcon className="h-4 w-4" />

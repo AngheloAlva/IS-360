@@ -2,7 +2,7 @@
 
 import { z } from "zod"
 
-import { sendRequestReviewEmail } from "../send-request-review-email"
+import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import prisma from "@/lib/prisma"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/update-file.schema"

@@ -127,7 +127,6 @@ export function UploadDocumentsDialog({
 	const onSubmit = async (data: z.infer<typeof uploadDocumentsSchema>) => {
 		try {
 			setIsSubmitting(true)
-			console.log({ file })
 
 			if (!documentToUpdate && !file) {
 				toast.error("No se seleccionaron archivos")

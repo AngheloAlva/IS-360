@@ -33,7 +33,8 @@ import {
 	SelectSeparator,
 } from "@/shared/components/ui/select"
 
-import type { WORK_ORDER_STATUS } from "@prisma/client"
+import { StartupFolderStatus, type WORK_ORDER_STATUS } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
 export function AdminStartupFoldersList() {
 	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
@@ -188,7 +189,13 @@ export function AdminStartupFoldersList() {
 											company.StartupFolders.map((folder) => (
 												<Badge
 													key={folder.id}
-													className="bg-accent text-text flex items-center text-wrap whitespace-normal"
+													className={cn(
+														"bg-accent text-text flex items-center text-wrap whitespace-normal",
+														{
+															"border border-cyan-500 bg-cyan-500/10 text-cyan-600":
+																folder.status === StartupFolderStatus.COMPLETED,
+														}
+													)}
 												>
 													{folder.name}
 												</Badge>
@@ -208,7 +215,8 @@ export function AdminStartupFoldersList() {
 										folder.environmentalFolders.some((folder) => folder.status === "SUBMITTED") ||
 										folder.safetyAndHealthFolders.some((folder) => folder.status === "SUBMITTED") ||
 										folder.workersFolders.some((folder) => folder.status === "SUBMITTED") ||
-										folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED")
+										folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED") ||
+										folder.basicFolders.some((folder) => folder.status === "SUBMITTED")
 								) && (
 									<div className="w-full rounded-md bg-teal-500/10 px-3 py-2 text-xs md:text-sm">
 										<span className="flex items-center font-medium text-teal-500">

@@ -32,6 +32,10 @@ export interface Company {
 		id: string
 		name: string
 	}
+	StartupFolders: {
+		id: string
+		status: string
+	}[]
 }
 
 interface UseCompaniesParams {

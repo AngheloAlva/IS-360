@@ -5,7 +5,6 @@ import {
 	SidebarGroup,
 	SidebarMenuItem,
 	SidebarMenuButton,
-	SidebarGroupContent,
 } from "@/shared/components/ui/sidebar"
 
 import type { LucideIcon } from "lucide-react"
@@ -22,26 +21,22 @@ export function NavSecondary({
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
 	return (
 		<SidebarGroup {...props}>
-			<SidebarGroupContent>
-				<SidebarMenu>
-					{items.map((item) => (
-						<SidebarMenuItem key={item.title}>
-							<SidebarMenuButton
-								asChild
-								size="sm"
-								className="hover:bg-primary/5 hover:text-primary"
-							>
-								<Link href={item.url}>
-									<div className="flex gap-1 [&>svg]:size-4">
-										<item.icon />
-										<span>{item.title}</span>
-									</div>
-								</Link>
-							</SidebarMenuButton>
-						</SidebarMenuItem>
-					))}
-				</SidebarMenu>
-			</SidebarGroupContent>
+			<SidebarMenu>
+				{items.map((item) => (
+					<SidebarMenuItem key={item.title}>
+						<SidebarMenuButton
+							asChild
+							size="sm"
+							className="hover:bg-text/10 hover:border-text hover:text-text rounded-full border border-transparent font-medium transition-colors"
+						>
+							<Link href={item.url} className="flex [&>svg]:size-4">
+								<item.icon />
+								<span>{item.title}</span>
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				))}
+			</SidebarMenu>
 		</SidebarGroup>
 	)
 }

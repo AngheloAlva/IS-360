@@ -992,12 +992,19 @@ enum StartupFolderType {
   FULL
 }
 
+enum StartupFolderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
 model StartupFolder {
-  id        String            @id @default(uuid())
-  name      String            @default("Carpeta de arranque")
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  type      StartupFolderType @default(FULL)
+  id        String              @id @default(uuid())
+  name      String              @default("Carpeta de arranque")
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  type      StartupFolderType   @default(FULL)
+  status    StartupFolderStatus @default(PENDING)
 
   workersFolders         WorkerFolder[]
   vehiclesFolders        VehicleFolder[]
