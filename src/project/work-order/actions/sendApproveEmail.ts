@@ -2,7 +2,7 @@
 
 import { resend } from "@/lib/resend"
 
-import { ApproveClousureEmail } from "@/project/startup-folder/components/emails/ApproveClousureEmail"
+import { ApproveClousureEmail } from "@/project/work-order/components/emails/ApproveClousureEmail"
 
 interface SendApproveClosureEmailProps {
 	workOrderName: string

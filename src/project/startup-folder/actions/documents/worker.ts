@@ -223,34 +223,52 @@ export const submitWorkerDocumentForReview = async ({
 			return { ok: false, message: "Usuario no encontrado." }
 		}
 
-		await prisma.$transaction(async (tx) => {
-			const folder = await tx.workerFolder.findUnique({
-				where: {
-					workerId_startupFolderId: {
-						workerId,
-						startupFolderId: folderId,
+		const folder = await prisma.workerFolder.findUnique({
+			where: {
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
+			},
+			select: {
+				id: true,
+				status: true,
+				worker: {
+					select: {
+						name: true,
+						rut: true,
+						phone: true,
+						email: true,
 					},
 				},
-				select: {
-					id: true,
-					status: true,
+				startupFolder: {
+					select: {
+						name: true,
+						company: {
+							select: {
+								name: true,
+							},
+						},
+					},
 				},
-			})
+			},
+		})
 
-			if (!folder) {
-				return { ok: false, message: "No se encontró la carpeta." }
+		if (!folder) {
+			return { ok: false, message: "No se encontró la carpeta." }
+		}
+
+		const invalidFolder =
+			folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
+
+		if (invalidFolder) {
+			return {
+				ok: false,
+				message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
 			}
+		}
 
-			const invalidFolder =
-				folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
-
-			if (invalidFolder) {
-				return {
-					ok: false,
-					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
-				}
-			}
-
+		await prisma.$transaction(async (tx) => {
 			await tx.workerFolder.update({
 				where: { id: folder.id },
 				data: {
@@ -295,6 +313,7 @@ export const submitWorkerDocumentForReview = async ({
 				id: companyId,
 			},
 			select: {
+				id: true,
 				name: true,
 			},
 		})
@@ -311,8 +330,10 @@ export const submitWorkerDocumentForReview = async ({
 				email: user.email,
 			},
 			companyName: company.name,
-			folderName: "Carpeta de Trabajadores",
+			solicitationDate: new Date(),
 			documentCategory: DocumentCategory.PERSONNEL,
+			folderName: folder.startupFolder.name + " - " + folder.worker.name,
+			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${company.id}`,
 		})
 
 		return {

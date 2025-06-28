@@ -196,6 +196,7 @@ export const submitEnvironmentalDocumentForReview = async ({
 			name: true,
 			email: true,
 			phone: true,
+			companyId: true,
 		},
 	})
 
@@ -209,7 +210,12 @@ export const submitEnvironmentalDocumentForReview = async ({
 			select: {
 				startupFolder: {
 					select: {
-						company: true,
+						name: true,
+						company: {
+							select: {
+								name: true,
+							},
+						},
 					},
 				},
 				id: true,
@@ -271,9 +277,11 @@ export const submitEnvironmentalDocumentForReview = async ({
 				rut: user.rut,
 				phone: user.phone,
 			},
+			solicitationDate: new Date(),
 			companyName: folder.startupFolder.company.name,
-			folderName: "Carpeta Medio Ambiente",
 			documentCategory: DocumentCategory.ENVIRONMENTAL,
+			folderName: folder.startupFolder.name + " - " + "Medio Ambiente",
+			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
 		})
 
 		return {

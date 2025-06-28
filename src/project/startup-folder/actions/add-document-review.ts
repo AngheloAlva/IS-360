@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 
+import { headers } from "next/headers"
+
 import { DocumentCategory, type Prisma, ReviewStatus, MODULES, ACTIVITY_TYPE } from "@prisma/client"
-import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 import { sendReviewNotificationEmail } from "./emails/send-review-notification-email"
+import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 import { logActivity } from "@/lib/activity/log"
+import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import {
 	WORKER_STRUCTURE,
@@ -29,6 +33,17 @@ export const addDocumentReview = async ({
 	reviewerId,
 	startupFolderId,
 }: AddDocumentReviewProps): Promise<{ ok: boolean; message: string }> => {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user) {
+		return {
+			ok: false,
+			message: "No se encontro usuario",
+		}
+	}
+
 	try {
 		const newStatus =
 			status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.REJECTED
@@ -80,12 +95,15 @@ export const addDocumentReview = async ({
 						id: true,
 						documents: {
 							select: {
+								name: true,
 								status: true,
+								reviewNotes: true,
 							},
 						},
 						additionalNotificationEmails: true,
 						startupFolder: {
 							select: {
+								name: true,
 								company: {
 									select: {
 										name: true,
@@ -111,9 +129,16 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Seguridad y Salud Ocupacional",
-							companyName: allDocuments?.startupFolder.company.name,
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: true,
+							reviewDate: new Date(),
 							emails: allDocuments.additionalNotificationEmails,
+							companyName: allDocuments?.startupFolder.company.name,
+							folderName: allDocuments.startupFolder.name + " - Seguridad y Salud Ocupacional",
 						})
 					}
 
@@ -140,8 +165,21 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Seguridad y Salud Ocupacional",
+							folderName: allDocuments.startupFolder.name + " - Seguridad y Salud Ocupacional",
 							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -178,12 +216,15 @@ export const addDocumentReview = async ({
 						id: true,
 						documents: {
 							select: {
+								name: true,
 								status: true,
+								reviewNotes: true,
 							},
 						},
 						additionalNotificationEmails: true,
 						startupFolder: {
 							select: {
+								name: true,
 								company: {
 									select: {
 										name: true,
@@ -209,8 +250,21 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Medio Ambiente",
-							companyName: allDocuments?.startupFolder.company.name,
+							folderName: allDocuments.startupFolder.name + " - Medio Ambiente",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -238,8 +292,21 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Medio Ambiente",
-							companyName: allDocuments?.startupFolder.company.name,
+							folderName: allDocuments.startupFolder.name + " - Medio Ambiente",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -284,14 +351,22 @@ export const addDocumentReview = async ({
 					},
 					select: {
 						id: true,
+						worker: {
+							select: {
+								name: true,
+							},
+						},
 						documents: {
 							select: {
 								status: true,
+								name: true,
+								reviewNotes: true,
 							},
 						},
 						additionalNotificationEmails: true,
 						startupFolder: {
 							select: {
+								name: true,
 								company: {
 									select: {
 										name: true,
@@ -319,8 +394,16 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Documentación Personal",
-							companyName: allDocuments?.startupFolder.company.name,
+							folderName:
+								allDocuments.startupFolder.name + " - " + (allDocuments as any)?.worker?.name || "",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: true,
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -350,8 +433,22 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Documentación Personal",
-							companyName: allDocuments?.startupFolder.company.name,
+							folderName:
+								allDocuments.startupFolder.name + " - " + (allDocuments as any)?.worker?.name || "",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -392,14 +489,24 @@ export const addDocumentReview = async ({
 					},
 					select: {
 						id: true,
+						vehicle: {
+							select: {
+								plate: true,
+								brand: true,
+								model: true,
+							},
+						},
 						documents: {
 							select: {
+								name: true,
 								status: true,
+								reviewNotes: true,
 							},
 						},
 						additionalNotificationEmails: true,
 						startupFolder: {
 							select: {
+								name: true,
 								company: {
 									select: {
 										name: true,
@@ -427,8 +534,22 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Vehículos y Equipos",
+							folderName:
+								allDocuments.startupFolder.name +
+								" - " +
+								(allDocuments as any)?.vehicle?.plate +
+								" " +
+								(allDocuments as any)?.vehicle?.brand +
+								" " +
+								(allDocuments as any)?.vehicle?.model,
 							companyName: allDocuments?.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: true,
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -458,8 +579,28 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Vehículos y Equipos",
+							folderName:
+								allDocuments.startupFolder.name +
+								" - " +
+								(allDocuments as any)?.vehicle?.plate +
+								" " +
+								(allDocuments as any)?.vehicle?.brand +
+								" " +
+								(allDocuments as any)?.vehicle?.model,
 							companyName: allDocuments?.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: true,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -504,14 +645,22 @@ export const addDocumentReview = async ({
 					},
 					select: {
 						id: true,
+						worker: {
+							select: {
+								name: true,
+							},
+						},
 						documents: {
 							select: {
+								name: true,
 								status: true,
+								reviewNotes: true,
 							},
 						},
 						additionalNotificationEmails: true,
 						startupFolder: {
 							select: {
+								name: true,
 								company: {
 									select: {
 										name: true,
@@ -542,8 +691,16 @@ export const addDocumentReview = async ({
 
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
-							folderName: "Documentos Básicos",
+							folderName:
+								allDocuments.startupFolder.name + " - " + (allDocuments as any)?.worker?.name || "",
 							companyName: allDocuments?.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: true,
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -578,6 +735,19 @@ export const addDocumentReview = async ({
 						sendReviewNotificationEmail({
 							folderName: "Documentos Básicos",
 							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: true,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
 							emails: allDocuments.additionalNotificationEmails,
 						})
 					}
@@ -625,40 +795,43 @@ type AllDocuments =
 	| Prisma.SafetyAndHealthFolderGetPayload<{
 			select: {
 				id: true
-				documents: { select: { status: true } }
-				startupFolder: { select: { company: { select: { name: true } } } }
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: { select: { company: { select: { name: true } }; name: true } }
 				additionalNotificationEmails: true
 			}
 	  }>
 	| Prisma.WorkerFolderGetPayload<{
 			select: {
 				id: true
-				documents: { select: { status: true } }
-				startupFolder: { select: { company: { select: { name: true } } } }
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				worker: { select: { name: true } }
 				additionalNotificationEmails: true
 			}
 	  }>
 	| Prisma.VehicleFolderGetPayload<{
 			select: {
 				id: true
-				documents: { select: { status: true } }
-				startupFolder: { select: { company: { select: { name: true } } } }
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				vehicle: { select: { plate: true; model: true; brand: true } }
 				additionalNotificationEmails: true
 			}
 	  }>
 	| Prisma.EnvironmentalFolderGetPayload<{
 			select: {
 				id: true
-				documents: { select: { status: true } }
-				startupFolder: { select: { company: { select: { name: true } } } }
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: { select: { company: { select: { name: true } }; name: true } }
 				additionalNotificationEmails: true
 			}
 	  }>
 	| Prisma.BasicFolderGetPayload<{
 			select: {
 				id: true
-				documents: { select: { status: true } }
-				startupFolder: { select: { company: { select: { name: true } } } }
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				worker?: { select: { name: true } }
 				additionalNotificationEmails: true
 			}
 	  }>

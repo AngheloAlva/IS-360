@@ -2,7 +2,7 @@
 
 import { resend } from "@/lib/resend"
 
-import { RejectClousureEmail } from "@/project/startup-folder/components/emails/RejectClousureEmail"
+import { RejectClousureEmail } from "@/project/work-order/components/emails/RejectClousureEmail"
 
 interface SendRejectClosureEmailProps {
 	email: string

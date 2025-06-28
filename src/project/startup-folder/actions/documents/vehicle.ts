@@ -3,13 +3,13 @@
 import { z } from "zod"
 
 import { DocumentCategory, ReviewStatus, type VehicleDocumentType } from "@prisma/client"
+import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import prisma from "@/lib/prisma"
 
 import type { UpdateStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/update-file.schema"
 import type { UploadStartupFolderDocumentSchema } from "@/project/startup-folder/schemas/new-file.schema"
 import type { UpdateExpirationDateSchema } from "@/project/startup-folder/schemas/update-expiration-date"
 import type { UploadResult } from "@/lib/upload-files"
-import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 
 export const createVehicleDocument = async ({
 	data: { folderId, name, type, expirationDate, vehicleId, documentId },
@@ -211,40 +211,68 @@ export const submitVehicleDocumentForReview = async ({
 			return { ok: false, message: "Usuario no encontrado." }
 		}
 
-		await prisma.$transaction(async (tx) => {
-			const folder = await tx.vehicleFolder.findUnique({
-				where: {
-					vehicleId_startupFolderId: {
-						vehicleId,
-						startupFolderId: folderId,
+		const folder = await prisma.vehicleFolder.findUnique({
+			where: {
+				vehicleId_startupFolderId: {
+					vehicleId,
+					startupFolderId: folderId,
+				},
+			},
+			select: {
+				id: true,
+				status: true,
+				vehicle: {
+					select: {
+						plate: true,
+						brand: true,
+						model: true,
 					},
 				},
-				select: {
-					id: true,
-					status: true,
+				startupFolder: {
+					select: {
+						name: true,
+						company: {
+							select: {
+								name: true,
+							},
+						},
+					},
 				},
-			})
+			},
+		})
 
-			if (!folder) {
-				return { ok: false, message: "No se encontró la carpeta." }
+		if (!folder) {
+			return { ok: false, message: "No se encontró la carpeta." }
+		}
+
+		const invalidFolder =
+			folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
+
+		if (invalidFolder) {
+			return {
+				ok: false,
+				message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
 			}
+		}
 
-			const invalidFolder =
-				folder.status !== ReviewStatus.DRAFT && folder.status !== ReviewStatus.REJECTED
-
-			if (invalidFolder) {
-				return {
-					ok: false,
-					message: `La carpeta no se puede enviar a revisión porque su estado actual es '${folder.status}'. Solo carpetas en DRAFT o REJECTED pueden ser enviadas.`,
-				}
-			}
-
+		await prisma.$transaction(async (tx) => {
 			await tx.vehicleFolder.update({
 				where: { id: folder.id },
 				data: {
 					submittedAt: new Date(),
 					status: ReviewStatus.SUBMITTED,
 					additionalNotificationEmails: [...emails, user.email],
+				},
+				select: {
+					startupFolder: {
+						select: {
+							company: {
+								select: {
+									name: true,
+								},
+							},
+						},
+					},
 				},
 			})
 
@@ -283,6 +311,7 @@ export const submitVehicleDocumentForReview = async ({
 				id: companyId,
 			},
 			select: {
+				id: true,
 				name: true,
 			},
 		})
@@ -292,15 +321,24 @@ export const submitVehicleDocumentForReview = async ({
 		}
 
 		await sendRequestReviewEmail({
-			documentCategory: DocumentCategory.VEHICLES,
-			companyName: company.name,
-			folderName: "Carpeta de Equipos y Vehículos",
 			solicitator: {
 				email: user.email,
 				name: user.name,
 				rut: user.rut,
 				phone: user.phone,
 			},
+			companyName: company.name,
+			solicitationDate: new Date(),
+			documentCategory: DocumentCategory.VEHICLES,
+			folderName:
+				folder.startupFolder.name +
+				" - " +
+				folder.vehicle.plate +
+				" " +
+				folder.vehicle.brand +
+				" " +
+				folder.vehicle.model,
+			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${company.id}`,
 		})
 
 		return {

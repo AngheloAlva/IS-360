@@ -2,13 +2,15 @@
 
 import { resend } from "@/lib/resend"
 
-import { RequestReviewEmail } from "@/project/startup-folder/components/emails/RequestReviewEmail"
-
 import { DocumentCategory } from "@prisma/client"
 
+import { RequestReviewEmail } from "@/project/startup-folder/components/emails/RequestReviewEmail"
+
 interface SendRequestReviewEmailProps {
+	reviewUrl: string
 	folderName: string
 	companyName: string
+	solicitationDate: Date
 	documentCategory: DocumentCategory
 	solicitator: {
 		rut: string
@@ -19,9 +21,11 @@ interface SendRequestReviewEmailProps {
 }
 
 export const sendRequestReviewEmail = async ({
-	solicitator,
+	reviewUrl,
 	folderName,
+	solicitator,
 	companyName,
+	solicitationDate,
 	documentCategory,
 }: SendRequestReviewEmailProps) => {
 	try {
@@ -71,11 +75,13 @@ export const sendRequestReviewEmail = async ({
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: emailNotification,
-			subject: `Solicitud de Revisión Carpetas de arranque - ${companyName} - ${folderName}`,
+			subject: `Solicitud de Revisión ${folderName} - ${companyName}`,
 			react: await RequestReviewEmail({
+				reviewUrl,
 				folderName,
-				companyName,
 				solicitator,
+				companyName,
+				solicitationDate,
 			}),
 		})
 

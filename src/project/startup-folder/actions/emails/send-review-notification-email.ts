@@ -8,12 +8,27 @@ interface SendReviewNotificationEmailProps {
 	emails: string[]
 	folderName: string
 	companyName: string
+	reviewDate: Date
+	reviewer: {
+		name: string
+		email: string
+		phone: string | null
+	}
+	isApproved: boolean
+	rejectedDocuments?: Array<{
+		name: string
+		reason: string
+	}>
 }
 
 export const sendReviewNotificationEmail = async ({
 	emails,
+	reviewer,
+	reviewDate,
 	folderName,
+	isApproved,
 	companyName,
+	rejectedDocuments,
 }: SendReviewNotificationEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
@@ -21,8 +36,12 @@ export const sendReviewNotificationEmail = async ({
 			to: emails,
 			subject: `Revisión de Carpetas de arranque - ${folderName}`,
 			react: await ReviewEmail({
+				reviewer,
 				folderName,
 				companyName,
+				reviewDate,
+				isApproved,
+				rejectedDocuments,
 			}),
 		})
 

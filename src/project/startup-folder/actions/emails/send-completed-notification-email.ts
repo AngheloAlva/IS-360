@@ -8,12 +8,20 @@ interface SendCompletedNotificationEmailProps {
 	emails: string[]
 	folderName: string
 	companyName: string
+	completedBy: {
+		name: string
+		email: string
+		phone: string | null
+	}
+	completeDate: Date
 }
 
 export const sendCompletedNotificationEmail = async ({
 	emails,
 	folderName,
 	companyName,
+	completedBy,
+	completeDate,
 }: SendCompletedNotificationEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
@@ -23,6 +31,8 @@ export const sendCompletedNotificationEmail = async ({
 			react: await CompleteFolderEmail({
 				folderName,
 				companyName,
+				completedBy,
+				completeDate,
 			}),
 		})
 

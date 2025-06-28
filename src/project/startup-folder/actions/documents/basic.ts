@@ -138,6 +138,7 @@ export const submitBasicDocumentForReview = async ({
 			name: true,
 			email: true,
 			phone: true,
+			companyId: true,
 		},
 	})
 
@@ -154,8 +155,14 @@ export const submitBasicDocumentForReview = async ({
 				},
 			},
 			select: {
+				worker: {
+					select: {
+						name: true,
+					},
+				},
 				startupFolder: {
 					select: {
+						name: true,
 						company: {
 							select: {
 								name: true,
@@ -227,9 +234,11 @@ export const submitBasicDocumentForReview = async ({
 				rut: user.rut,
 				phone: user.phone,
 			},
-			companyName: folder.startupFolder.company.name,
-			folderName: "Documentos Básicos",
+			solicitationDate: new Date(),
 			documentCategory: DocumentCategory.BASIC,
+			companyName: folder.startupFolder.company.name,
+			folderName: folder.startupFolder.name + " - " + folder.worker.name,
+			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
 		})
 
 		return {

@@ -196,6 +196,7 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 			name: true,
 			email: true,
 			phone: true,
+			companyId: true,
 		},
 	})
 
@@ -209,6 +210,7 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 			select: {
 				startupFolder: {
 					select: {
+						name: true,
 						company: {
 							select: {
 								name: true,
@@ -275,9 +277,11 @@ export const submitSafetyAndHealthDocumentForReview = async ({
 				rut: user.rut,
 				phone: user.phone,
 			},
+			solicitationDate: new Date(),
 			companyName: folder.startupFolder.company.name,
-			folderName: "Carpeta de Seguridad y Salud Ocupacional",
 			documentCategory: DocumentCategory.SAFETY_AND_HEALTH,
+			folderName: folder.startupFolder.name + " - " + "Seguridad y Salud Ocupacional",
+			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
 		})
 
 		return {

@@ -46,6 +46,12 @@ export const completeFolder = async ({ startupFolderId }: CompleteFolderParams) 
 		})
 
 		sendCompletedNotificationEmail({
+			completeDate: new Date(),
+			completedBy: {
+				name: session.user.name,
+				email: session.user.email,
+				phone: session.user.phone || null,
+			},
 			folderName: startupFolder.name,
 			companyName: startupFolder.company.name,
 			emails: startupFolder.company.users.map((user) => user.email),
