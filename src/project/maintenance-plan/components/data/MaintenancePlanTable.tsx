@@ -37,10 +37,11 @@ import {
 } from "@/shared/components/ui/table"
 
 interface MaintenancePlanTableProps {
+	id: string
 	userId: string
 }
 
-export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
+export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [planToEdit, setPlanToEdit] = useState<MaintenancePlan | null>(null)
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -114,7 +115,7 @@ export function MaintenancePlanTable({ userId }: MaintenancePlanTableProps) {
 	}
 
 	return (
-		<Card>
+		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				{planToEdit && (
 					<MaintenancePlanForm

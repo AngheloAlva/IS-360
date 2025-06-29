@@ -41,7 +41,12 @@ import {
 
 import type { ApiUser } from "@/project/user/types/api-user"
 
-export function UsersTable({ hasPermission }: { hasPermission: boolean }) {
+interface UsersTableProps {
+	hasPermission: boolean
+	id?: string
+}
+
+export function UsersTable({ hasPermission, id }: UsersTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [search, setSearch] = useState("")
@@ -73,7 +78,7 @@ export function UsersTable({ hasPermission }: { hasPermission: boolean }) {
 	})
 
 	return (
-		<Card>
+		<Card id={id}>
 			<CardContent className="mt-4 flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col items-start justify-between lg:flex-row">
 					<h2 className="text-text text-2xl font-bold">Lista de Usuarios</h2>

@@ -141,6 +141,6 @@
 		@apply border-input outline-ring/50;
 	}
 	body {
-		@apply bg-background;
+		@apply bg-background scroll-smooth;
 	}
 }

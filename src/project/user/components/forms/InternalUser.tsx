@@ -134,6 +134,7 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 					})
 
 					setOpen(false)
+					form.reset()
 					queryClient.invalidateQueries({
 						queryKey: ["users", { showOnlyInternal: true }],
 					})

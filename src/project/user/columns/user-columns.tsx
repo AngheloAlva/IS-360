@@ -66,11 +66,7 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 		accessorKey: "area",
 		header: "Área",
 		cell: ({ row }) => {
-			const role = row.getValue("role") as string
-			if (role === "PARTNER_COMPANY") return null
-
 			const area = row.getValue("area") as keyof typeof AreasLabels
-			if (!area) return null
 
 			return (
 				<Badge variant="outline" className="bg-primary/10">

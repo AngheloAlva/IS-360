@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth"
 import { UserStatsContainer } from "@/project/user/components/stats/UserStatsContainer"
 import InternalUser from "@/project/user/components/forms/InternalUser"
 import { UsersTable } from "@/project/user/components/data/UsersTable"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -32,13 +33,20 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 						<p className="opacity-90">Gestión y seguimiento de usuarios registrados</p>
 					</div>
 
-					{hasPermission.success && <InternalUser />}
+					<div className="flex flex-wrap items-center justify-end gap-2">
+						<ScrollToTableButton
+							id="users-table"
+							label="Lista Usuarios"
+							className="text-indigo-600 hover:bg-white hover:text-indigo-600"
+						/>
+						{hasPermission.success && <InternalUser />}
+					</div>
 				</div>
 			</div>
 
 			<UserStatsContainer />
 
-			<UsersTable hasPermission={hasPermission.success} />
+			<UsersTable id="users-table" hasPermission={hasPermission.success} />
 		</div>
 	)
 }

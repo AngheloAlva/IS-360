@@ -27,10 +27,10 @@ export default async function AdminDashboardLayout({
 			<SidebarProvider>
 				<AppSidebar session={session} />
 
-				<SidebarInset className="overflow-hidden shadow">
+				<SidebarInset className="overflow-x-hidden shadow">
 					<Header session={session} />
 
-					<main className="bg-secondary-background flex min-h-full flex-col items-center gap-8 p-4 pb-20 lg:p-8 lg:pb-32">
+					<main className="bg-secondary-background flex h-full flex-col items-center gap-8 p-4 pb-20 lg:p-8 lg:pb-32">
 						{children}
 					</main>
 

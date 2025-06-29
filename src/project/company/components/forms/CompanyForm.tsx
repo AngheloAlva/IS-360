@@ -167,7 +167,7 @@ export default function CompanyForm(): React.ReactElement {
 				onClick={() => setOpen(true)}
 			>
 				<PlusIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Nueva Empresa</span>
+				<span className="hidden md:inline">Nueva Empresa</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-md">

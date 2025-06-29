@@ -7,7 +7,6 @@ import {
 	Html,
 	Hr,
 	Img,
-	Preview,
 	Section,
 	Text,
 	Tailwind,
@@ -17,8 +16,7 @@ import {
 import { format } from "date-fns"
 import { WorkOrderTypeLabels } from "../../../../lib/consts/work-order-types"
 import { WorkOrderPriorityLabels } from "../../../../lib/consts/work-order-priority"
-
-const systemUrl = "https://otc360.ingsimple.cl"
+import { systemUrl } from "@/lib/consts/systemUrl"
 
 interface NewWorkOrderEmailProps {
 	workOrder: {
@@ -43,81 +41,78 @@ interface NewWorkOrderEmailProps {
 }
 
 const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
-	const currentYear = new Date().getFullYear()
+	const getPriorityColor = (priority: string) => {
+		switch (priority?.toLowerCase()) {
+			case "alta":
+				return "text-red-600 bg-red-50 border-red-200"
+			case "media":
+				return "text-yellow-600 bg-yellow-50 border-yellow-200"
+			case "baja":
+				return "text-green-600 bg-green-50 border-green-200"
+			default:
+				return "text-gray-600 bg-gray-50 border-gray-200"
+		}
+	}
 
 	return (
 		<Html>
 			<Tailwind>
-				<Head>
-					<title>Nueva Orden de Trabajo Asignada - {workOrder.otNumber}</title>
-					<Preview>
-						Se ha creado una nueva orden de trabajo {workOrder.otNumber} que requiere su atención
-					</Preview>
-				</Head>
+				<Head />
 				<Body className="bg-gray-100 py-[40px] font-sans">
-					<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white p-[20px]">
-						<Section className="mb-[32px] text-center">
+					<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
+						{/* Header with Logo */}
+						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								width="150"
-								height="142"
+								src="https://otc360.ingsimple.cl/logo.png"
 								alt="OTC 360 Logo"
-								src={`${systemUrl}/logo.png`}
-								className="mx-auto h-auto w-[150px] object-cover"
+								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
 
-						<Section>
-							<Heading className="mb-[24px] text-center text-[24px] font-bold text-gray-800">
+						{/* Main Content */}
+						<Section className="px-[40px] py-[32px]">
+							<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
 								Nueva Orden de Trabajo Asignada
 							</Heading>
 
-							<Text className="mb-[16px] text-[16px] text-gray-600">
-								Estimado/a {workOrder.supervisor.name},
+							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
+								Estimado/a <strong>{workOrder.supervisor.name}</strong>, se le ha asignado una nueva
+								Orden de Trabajo en el sistema OTC 360.
 							</Text>
 
-							<Text className="mb-[24px] text-[16px] text-gray-600">
-								Le informamos que se ha creado una nueva <strong>Orden de Trabajo</strong> que ha
-								sido asignada a su empresa. Es necesario que cree el libro de obras correspondiente
-								e inicie la planificación de actividades.
-							</Text>
-
-							<Section className="mb-[24px] rounded-[8px] border border-gray-200 bg-gray-50 p-[24px]">
-								<Heading className="mb-[16px] text-[18px] font-bold text-gray-800">
+							{/* Work Order Details */}
+							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-blue-500 bg-blue-50 p-[24px]">
+								<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
 									Detalles de la Orden de Trabajo
 								</Heading>
 
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Número OT:</strong>
+								<Row className="mb-[12px]">
+									<Column className="w-[50%]">
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Número OT:
+										</Text>
+										<Text className="mb-[12px] text-[16px] leading-none font-bold text-blue-600">
+											{workOrder.otNumber}
 										</Text>
 									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] text-gray-800">{workOrder.otNumber}</Text>
-									</Column>
-								</Row>
-
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Tipo:</strong>
+									<Column className="w-[50%]">
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Tipo:
 										</Text>
-									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] text-gray-800">
+										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 											{WorkOrderTypeLabels[workOrder.type as keyof typeof WorkOrderTypeLabels]}
 										</Text>
 									</Column>
 								</Row>
 
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Prioridad:</strong>
+								<Row className="mb-[12px]">
+									<Column className="w-[50%]">
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Prioridad:
 										</Text>
-									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] font-bold text-gray-800">
+										<Text
+											className={`inline-block rounded-[4px] border px-[8px] py-[4px] text-[14px] leading-none font-semibold ${getPriorityColor(workOrder.priority)}`}
+										>
 											{
 												WorkOrderPriorityLabels[
 													workOrder.priority as keyof typeof WorkOrderPriorityLabels
@@ -125,112 +120,131 @@ const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
 											}
 										</Text>
 									</Column>
-								</Row>
-
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Equipo:</strong>
+									<Column className="w-[50%]">
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Responsable:
 										</Text>
-									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] text-gray-800">
-											{workOrder.equipment.map((equipment) => equipment.name).join(", ")}
+										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+											{workOrder.responsible.name}
 										</Text>
 									</Column>
 								</Row>
 
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Fecha programada:</strong>
+								<Row className="mb-[12px]">
+									<Column>
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Fecha Programada:
 										</Text>
-									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] text-gray-800">
-											{format(workOrder.programDate, "dd/MM/yyyy") || "No definida"}
+										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+											{format(workOrder.programDate, "dd/MM/yyyy")}
 										</Text>
 									</Column>
 								</Row>
 
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Tiempo estimado:</strong>
+								<Row className="mb-[12px]">
+									<Column className="w-[50%]">
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Duración Estimada:
 										</Text>
-									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] text-gray-800">
+										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 											{workOrder.estimatedDays} días ({workOrder.estimatedHours} horas)
 										</Text>
 									</Column>
 								</Row>
 
-								<Row className="mb-[8px]">
-									<Column className="w-[40%]">
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Responsable de OTC:</strong>
-										</Text>
-									</Column>
-									<Column className="w-[60%]">
-										<Text className="mb-[8px] text-[16px] text-gray-800">
-											{workOrder.responsible.name}
-										</Text>
-									</Column>
-								</Row>
+								{workOrder.equipment && workOrder.equipment.length > 0 && (
+									<Row className="mb-[12px]">
+										<Column>
+											<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+												Equipos Involucrados:
+											</Text>
+											{workOrder.equipment.map((eq, index) => (
+												<Text
+													key={index}
+													className="mb-[4px] text-[14px] leading-none text-gray-600"
+												>
+													• {eq.name}
+												</Text>
+											))}
+										</Column>
+									</Row>
+								)}
+
+								{workOrder.workDescription && (
+									<Row>
+										<Column>
+											<Text className="mb-[4px] text-[14px] font-semibold text-gray-700">
+												Descripción del Trabajo:
+											</Text>
+											<Text className="rounded-[4px] border border-gray-200 bg-white p-[12px] text-[14px] leading-[20px] text-gray-600">
+												{workOrder.workDescription}
+											</Text>
+										</Column>
+									</Row>
+								)}
 							</Section>
 
-							{workOrder.workDescription && (
-								<Section className="mb-[24px]">
-									<Heading className="mb-[16px] text-[18px] font-bold text-gray-800">
-										Descripción del trabajo
-									</Heading>
-									<Text className="mb-[16px] rounded-[8px] border border-gray-200 bg-gray-50 p-[16px] text-[16px] text-gray-700">
-										{workOrder.workDescription}
-									</Text>
-								</Section>
-							)}
+							{/* Action Steps */}
+							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
+								<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
+									Próximos Pasos a Seguir
+								</Heading>
 
-							<Text className="mb-[24px] text-[16px] text-gray-600">
-								<strong>Acciones requeridas:</strong>
-							</Text>
+								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+									<strong>1.</strong> Asegúrese de completar su Carpeta de Arranque y si no está
+									completa, completarla
+								</Text>
+								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+									<strong>2.</strong> Crear su permiso de trabajo con la OT
+								</Text>
+								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+									<strong>3.</strong> Crear su libro de obras con la OT
+								</Text>
+								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+									<strong>4.</strong> Establecer sus hitos en el libro de obras
+								</Text>
+								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+									<strong>5.</strong> Comenzar a agregar actividades diarias
+								</Text>
+							</Section>
 
-							<Text className="mb-[8px] text-[16px] text-gray-600">
-								1. Crear el libro de obras para esta OT
-							</Text>
-							<Text className="mb-[8px] text-[16px] text-gray-600">
-								2. Planificar las actividades a realizar
-							</Text>
-							<Text className="mb-[24px] text-[16px] text-gray-600">
-								3. Iniciar el registro de actividades cuando comience la obra
-							</Text>
+							{/* Important Notice */}
+							<Section className="mb-[24px] rounded-[8px] border border-yellow-200 bg-yellow-50 p-[20px]">
+								<Text className="mb-[8px] text-[14px] font-semibold text-yellow-800">
+									⚠️ Importante
+								</Text>
+								<Text className="text-[14px] leading-[20px] text-yellow-700">
+									Es fundamental completar todos los pasos mencionados antes de iniciar los
+									trabajos. La documentación completa es requisito obligatorio para el cumplimiento
+									normativo.
+								</Text>
+							</Section>
 
-							<Section className="mb-[16px] text-center">
+							{/* Action Button */}
+							<Section className="mb-[32px] text-center">
 								<Button
 									href={systemUrl}
-									className="mb-[16px] box-border rounded-[4px] bg-green-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
+									className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 								>
-									Ingresar al sistema
+									Acceder a OTC 360
 								</Button>
 							</Section>
 
-							<Text className="mb-[16px] text-[16px] text-gray-600">
-								Si tiene alguna pregunta o necesita más información, por favor contacte al
-								responsable de la orden de trabajo o al equipo de soporte técnico.
-							</Text>
+							<Hr className="my-[24px] border-gray-200" />
 
-							<Text className="mb-[8px] text-[16px] text-gray-600">Saludos cordiales,</Text>
-
-							<Text className="mb-[24px] text-[16px] font-bold text-gray-700">
-								El equipo de OTC 360
+							<Text className="text-[14px] leading-[20px] text-gray-600">
+								Para cualquier consulta sobre esta Orden de Trabajo o el proceso a seguir, contacte
+								al administrador del sistema o al responsable del proyecto.
 							</Text>
 						</Section>
 
-						<Hr className="my-[24px] border-t border-gray-300" />
-
-						<Section>
-							<Text className="m-0 text-center text-[14px] text-gray-500">
-								© {currentYear} OTC 360. Todos los derechos reservados.
+						{/* Footer */}
+						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
+							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
+								© {new Date().getFullYear()} OTC 360
+							</Text>
+							<Text className="m-0 text-center text-[12px] text-gray-500">
+								Notificación Automática del Sistema - No Responder
 							</Text>
 						</Section>
 					</Container>

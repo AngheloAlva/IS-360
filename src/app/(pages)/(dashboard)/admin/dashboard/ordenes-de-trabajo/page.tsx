@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth"
 import { WorkOrderStatsContainer } from "@/project/work-order/components/stats/work-order/WorkOrderStatsContainer"
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -32,7 +33,14 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 						<p className="opacity-90">Gestión y seguimiento de órdenes de trabajo</p>
 					</div>
 
-					{hasPermission.success && <CreateWorkOrderForm />}
+					<div className="flex flex-wrap items-center justify-end gap-2">
+						<ScrollToTableButton
+							id="work-order-table"
+							label="Lista Órdenes"
+							className="text-red-600 hover:bg-white hover:text-red-600"
+						/>
+						{hasPermission.success && <CreateWorkOrderForm />}
+					</div>
 				</div>
 			</div>
 
@@ -40,7 +48,7 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 				<WorkOrderStatsContainer />
 			</div>
 
-			<WorkOrderTable />
+			<WorkOrderTable id="work-order-table" />
 		</div>
 	)
 }

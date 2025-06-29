@@ -36,7 +36,11 @@ import {
 import { StartupFolderStatus, type WORK_ORDER_STATUS } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
-export function AdminStartupFoldersList() {
+interface AdminStartupFoldersListProps {
+	id: string
+}
+
+export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
 	const [withOtActive, setWithOtActive] = useState(false)
 	const [orderBy, setOrderBy] = useState<OrderBy>("name")
@@ -55,7 +59,7 @@ export function AdminStartupFoldersList() {
 
 	return (
 		<>
-			<div className="mb-4 grid w-full grid-cols-2 gap-2">
+			<div className="mb-4 grid w-full grid-cols-2 gap-2" id={id}>
 				<SearchInput
 					value={searchTerm}
 					onChange={setSearchTerm}

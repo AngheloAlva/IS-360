@@ -56,7 +56,11 @@ import {
 } from "@/shared/components/ui/dropdown-menu"
 import { useDebounce } from "@/shared/hooks/useDebounce"
 
-export function WorkOrderTable() {
+interface WorkOrderTableProps {
+	id?: string
+}
+
+export function WorkOrderTable({ id }: WorkOrderTableProps) {
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [statusFilter, setStatusFilter] = useState<string | null>(null)
@@ -133,7 +137,7 @@ export function WorkOrderTable() {
 	}
 
 	return (
-		<Card>
+		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-wrap items-center gap-2 md:w-full md:flex-row">
 					<div className="flex flex-col">

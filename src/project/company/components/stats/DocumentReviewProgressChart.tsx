@@ -69,7 +69,7 @@ export function DocumentReviewProgressChart({ data }: DocumentReviewProgressChar
 				</div>
 			</CardHeader>
 
-			<CardContent className="p-0">
+			<CardContent className="max-w-[90dvw] p-0">
 				<ChartContainer className="h-[350px] w-full" config={config}>
 					<BarChart data={chartData} margin={{ right: 30, left: 0 }} layout="vertical">
 						<CartesianGrid strokeDasharray="3 3" />

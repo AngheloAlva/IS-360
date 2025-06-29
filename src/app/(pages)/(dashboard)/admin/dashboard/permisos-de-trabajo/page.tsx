@@ -4,6 +4,7 @@ import { Metadata } from "next"
 
 import { auth } from "@/lib/auth"
 
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import WorkPermitStatsContainer from "@/project/work-permit/components/stats/WorkPermitStatsContainer"
 import WorkPermitsTable from "@/project/work-permit/components/data/WorkPermitsTable"
 
@@ -38,12 +39,22 @@ export default async function WorkPermitsAdminPage() {
 							Gestión y monitoreo de permisos de trabajo para empresas contratistas
 						</p>
 					</div>
+
+					<ScrollToTableButton
+						id="work-permit-table"
+						label="Lista Permisos"
+						className="text-rose-600 hover:bg-white hover:text-rose-600"
+					/>
 				</div>
 			</div>
 
 			<WorkPermitStatsContainer />
 
-			<WorkPermitsTable hasPermission={hasPermission.success} userId={session.user.id} />
+			<WorkPermitsTable
+				id="work-permit-table"
+				hasPermission={hasPermission.success}
+				userId={session.user.id}
+			/>
 		</div>
 	)
 }

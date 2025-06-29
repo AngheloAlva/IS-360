@@ -155,9 +155,10 @@ export function WorkEntryActivityChart({ data }: WorkEntryActivityChartProps) {
 					<ChartSplineIcon className="text-muted-foreground h-5 min-w-5" />
 				</div>
 			</CardHeader>
-			<CardContent className="py-0">
+
+			<CardContent className="max-w-[90dvw] p-0">
 				<ChartContainer config={config} className="h-[350px] w-full">
-					<AreaChart data={chartData} margin={{ top: 10 }}>
+					<AreaChart data={chartData} margin={{ top: 10, left: 15, right: 15 }}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
 						<XAxis dataKey="date" tickLine={false} axisLine={false} label="Fecha" />
 						<YAxis

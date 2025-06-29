@@ -14,6 +14,7 @@ import {
 	Tailwind,
 	Container,
 } from "@react-email/components"
+import { systemUrl } from "@/lib/consts/systemUrl"
 
 interface RejectClosureEmailTemplateProps {
 	workOrderName: string
@@ -21,9 +22,8 @@ interface RejectClosureEmailTemplateProps {
 	companyName: string
 	supervisorName: string
 	rejectionReason?: string
+	rejectionDate?: Date
 }
-
-const systemUrl = "https://otc360.ingsimple.cl"
 
 export const RejectClousureEmail: React.FC<Readonly<RejectClosureEmailTemplateProps>> = ({
 	workOrderName,
@@ -31,6 +31,7 @@ export const RejectClousureEmail: React.FC<Readonly<RejectClosureEmailTemplatePr
 	companyName,
 	supervisorName,
 	rejectionReason,
+	rejectionDate,
 }) => (
 	<Html>
 		<Tailwind>
@@ -39,130 +40,145 @@ export const RejectClousureEmail: React.FC<Readonly<RejectClosureEmailTemplatePr
 				<Preview>El cierre del libro de obras {workOrderName} ha sido rechazado</Preview>
 			</Head>
 			<Body className="bg-gray-100 py-[40px] font-sans">
-				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white p-[40px]">
-					<Section className="mb-[32px] text-center">
+				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
+					{/* Header with Logo */}
+					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							width="150"
-							height="142"
+							src="https://otc360.ingsimple.cl/logo.png"
 							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
-							className="mx-auto h-auto w-[150px] object-cover"
+							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>
 
-					<Section>
-						<Heading className="mb-[24px] text-center text-[24px] font-bold text-gray-800">
+					{/* Main Content */}
+					<Section className="px-[40px] py-[32px]">
+						<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
 							Cierre de Libro de Obras Rechazado
 						</Heading>
 
-						<Text className="mb-[16px] text-[16px] text-gray-600">Estimado(a) Supervisor(a),</Text>
-
-						<Text className="mb-[24px] text-[16px] text-gray-600">
-							Le informamos que su solicitud de cierre ha sido <strong>rechazada</strong>.
+						<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
+							Estimado/a supervisor/a, le informamos que su solicitud de cierre del libro de obras
+							<strong> {workOrderName} </strong> ha sido <strong>rechazada</strong>.
 						</Text>
 
-						<Section className="mb-[24px] rounded-[8px] border border-gray-200 bg-gray-50 p-[24px]">
-							<Heading className="mb-[16px] text-[18px] font-bold text-gray-800">
+						{/* Work Order Details */}
+						<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-blue-500 bg-blue-50 p-[24px]">
+							<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
 								Detalles del Libro de Obras
 							</Heading>
 
-							<Row>
-								<Column>
-									<Text className="mb-[8px] text-[16px] text-gray-700">
-										<strong>Nombre:</strong>
+							<Row className="mb-[12px]">
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Nombre:
 									</Text>
-								</Column>
-								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 										{workOrderName}
 									</Text>
 								</Column>
-							</Row>
-
-							<Row>
-								<Column>
-									<Text className="mb-[8px] text-[16px] text-gray-700">
-										<strong>Número OT:</strong>
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Número OT:
 									</Text>
-								</Column>
-								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+									<Text className="mb-[12px] text-[16px] leading-none text-blue-600 font-bold">
 										{workOrderNumber}
 									</Text>
 								</Column>
 							</Row>
 
-							<Row>
-								<Column>
-									<Text className="mb-[8px] text-[16px] text-gray-700">
-										<strong>Empresa:</strong>
+							<Row className="mb-[12px]">
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Empresa:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+										{companyName}
 									</Text>
 								</Column>
-								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">{companyName}</Text>
-								</Column>
-							</Row>
-
-							<Row>
-								<Column>
-									<Text className="mb-[8px] text-[16px] text-gray-700">
-										<strong>Rechazado por:</strong>
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Rechazado por:
 									</Text>
-								</Column>
-								<Column>
-									<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 										{supervisorName}
 									</Text>
 								</Column>
 							</Row>
 
+							{rejectionDate && (
+								<Row className="mb-[12px]">
+									<Column>
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Fecha de Rechazo:
+										</Text>
+										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+											{rejectionDate.toLocaleDateString("es-CL", {
+												day: "2-digit",
+												month: "long",
+												year: "numeric",
+											})}
+										</Text>
+									</Column>
+								</Row>
+							)}
+
 							{rejectionReason && (
 								<Row>
 									<Column>
-										<Text className="mb-[8px] text-[16px] text-gray-700">
-											<strong>Razón del rechazo:</strong>
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Razón del Rechazo:
 										</Text>
-									</Column>
-									<Column>
-										<Text className="mb-[8px] ml-auto text-[16px] text-gray-800">
+										<Text className="text-[14px] leading-[20px] text-gray-600 rounded-[4px] border border-gray-200 bg-white p-[12px]">
 											{rejectionReason}
 										</Text>
 									</Column>
 								</Row>
 							)}
+
 						</Section>
 
-						<Text className="mb-[24px] text-[16px] text-gray-600">
-							Por favor, revise los motivos del rechazo y realice las correcciones necesarias antes
-							de volver a solicitar el cierre.
-						</Text>
+						{/* Next Steps */}
+						<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-red-500 bg-red-50 p-[24px]">
+							<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
+								Próximos Pasos
+							</Heading>
 
+							<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+								<strong>1.</strong> Revisar los motivos del rechazo detalladamente
+							</Text>
+							<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+								<strong>2.</strong> Realizar las correcciones necesarias en el libro de obras
+							</Text>
+							<Text className="text-[14px] leading-[20px] text-gray-600">
+								<strong>3.</strong> Volver a solicitar el cierre una vez corregidas las observaciones
+							</Text>
+						</Section>
+
+						{/* Action Button */}
 						<Section className="mb-[32px] text-center">
 							<Button
 								href={`${systemUrl}/admin/dashboard/ordenes-de-trabajo`}
-								className="box-input rounded-[4px] bg-blue-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
+								className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 							>
 								Ver Libro de Obras
 							</Button>
 						</Section>
 
-						<Text className="mb-[16px] text-[16px] text-gray-600">
+						<Hr className="my-[24px] border-gray-200" />
+
+						<Text className="text-[14px] leading-[20px] text-gray-600">
 							Si tiene alguna pregunta o necesita asistencia, no dude en contactar a nuestro equipo
 							de soporte técnico.
 						</Text>
-
-						<Text className="mb-[8px] text-[16px] text-gray-600">Saludos cordiales,</Text>
-
-						<Text className="mb-[24px] text-[16px] font-bold text-gray-700">
-							El equipo de OTC 360
-						</Text>
 					</Section>
 
-					<Hr className="my-[24px] border-t border-gray-300" />
-
-					<Section>
-						<Text className="m-0 text-center text-[14px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360. Todos los derechos reservados.
+					{/* Footer */}
+					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
+						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
+							© {new Date().getFullYear()} OTC 360
+						</Text>
+						<Text className="m-0 text-center text-[12px] text-gray-500">
+							Notificación Automática del Sistema - No Responder
 						</Text>
 					</Section>
 				</Container>

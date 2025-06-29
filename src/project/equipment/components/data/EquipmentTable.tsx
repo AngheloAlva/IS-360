@@ -50,11 +50,12 @@ import {
 } from "@/shared/components/ui/select"
 
 interface EquipmentTableProps {
-	lastPath: string
 	parentId: string | null
+	lastPath: string
+	id?: string
 }
 
-export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
+export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [showAll, setShowAll] = useState<boolean>(parentId ? false : true)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
@@ -166,7 +167,7 @@ export function EquipmentTable({ parentId, lastPath }: EquipmentTableProps) {
 	}
 
 	return (
-		<Card>
+		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex w-full items-center gap-4">

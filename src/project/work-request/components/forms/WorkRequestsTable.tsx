@@ -58,7 +58,12 @@ import {
 
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
 
-export default function WorkRequestsTable({ hasPermission }: { hasPermission: boolean }) {
+interface WorkRequestsTableProps {
+	id: string
+	hasPermission: boolean
+}
+
+export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTableProps) {
 	const [page, setPage] = useState(1)
 	const [search, setSearch] = useState("")
 	const [status, setStatus] = useState("all")
@@ -140,7 +145,7 @@ export default function WorkRequestsTable({ hasPermission }: { hasPermission: bo
 
 	return (
 		<>
-			<Card>
+			<Card id={id}>
 				<CardContent className="flex w-full flex-col items-start gap-4">
 					<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
 						<div className="flex flex-col">

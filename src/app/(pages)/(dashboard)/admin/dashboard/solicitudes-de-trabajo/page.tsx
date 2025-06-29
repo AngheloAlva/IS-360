@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth"
 import WorkRequestStatsContainer from "@/project/work-request/components/stats/WorkRequestStatsContainer"
 import CreateWorkRequestButton from "@/project/work-request/components/forms/CreateWorkRequestForm"
 import WorkRequestsTable from "@/project/work-request/components/forms/WorkRequestsTable"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
 
 export default async function WorkRequestsPage() {
 	const session = await auth.api.getSession({
@@ -32,13 +33,21 @@ export default async function WorkRequestsPage() {
 						<p className="opacity-90">Gestión y aprobación de solicitudes de trabajo</p>
 					</div>
 
-					{hasPermission.success && <CreateWorkRequestButton userId={session.user.id} />}
+					<div className="flex flex-wrap items-center justify-end gap-2">
+						<ScrollToTableButton
+							id="work-requests-list"
+							label="Lista Solicitud"
+							className="text-sky-600 hover:bg-white hover:text-sky-600"
+						/>
+
+						{hasPermission.success && <CreateWorkRequestButton userId={session.user.id} />}
+					</div>
 				</div>
 			</div>
 
 			<WorkRequestStatsContainer />
 
-			<WorkRequestsTable hasPermission={hasPermission.success} />
+			<WorkRequestsTable hasPermission={hasPermission.success} id="work-requests-list" />
 		</div>
 	)
 }

@@ -102,8 +102,8 @@ export const sendApproveMilestoneEmail = async ({
 interface SendRejectMilestoneEmailProps {
 	comment?: string
 	otNumber: string
-	supervisorEmail: string
 	milestoneName: string
+	supervisorEmail: string
 }
 
 export const sendRejectMilestoneEmail = async ({

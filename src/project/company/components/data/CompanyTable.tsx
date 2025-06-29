@@ -59,7 +59,7 @@ export function CompanyTable() {
 	})
 
 	return (
-		<Card>
+		<Card id="company-table">
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-fit flex-col flex-wrap items-start gap-2 md:w-full md:flex-row">
 					<div className="flex flex-col">
@@ -123,6 +123,7 @@ export function CompanyTable() {
 					table={table}
 					isLoading={isLoading}
 					onPageChange={setPage}
+					total={data?.total ?? 0}
 					pageCount={data?.pages ?? 0}
 				/>
 			</CardContent>

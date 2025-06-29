@@ -1,25 +1,26 @@
 import {
 	Hr,
 	Img,
+	Row,
 	Html,
 	Text,
 	Body,
 	Head,
 	Button,
+	Column,
 	Section,
 	Heading,
 	Preview,
 	Tailwind,
 	Container,
 } from "@react-email/components"
+import { systemUrl } from "@/lib/consts/systemUrl"
 
 interface ApproveMilestoneEmailProps {
 	otNumber: string
 	milestoneName: string
 	comment?: string
 }
-
-const systemUrl = "https://otc360.ingsimple.cl"
 
 export const ApproveMilestoneEmail: React.FC<Readonly<ApproveMilestoneEmailProps>> = ({
 	comment,
@@ -29,61 +30,115 @@ export const ApproveMilestoneEmail: React.FC<Readonly<ApproveMilestoneEmailProps
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>Hito {otNumber} aprobado - OTC 360 - OTC</title>
+				<title>Hito {otNumber} aprobado - OTC 360</title>
 				<Preview>
 					El hito {milestoneName} de la orden de trabajo {otNumber} ha sido aprobado
 				</Preview>
 			</Head>
 			<Body className="bg-gray-100 py-[40px] font-sans">
-				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white p-[40px]">
-					<Section className="mb-[32px] text-center">
+				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
+					{/* Header with Logo */}
+					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							width="150"
-							height="142"
+							src="https://otc360.ingsimple.cl/logo.png"
 							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
-							className="mx-auto h-auto w-[150px] object-cover"
+							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>
 
-					<Section>
-						<Text className="mb-[16px] text-[16px] text-gray-600">Estimado usuario,</Text>
-
-						<Heading className="mb-[24px] text-center text-[24px] font-bold text-gray-800">
-							El hito {milestoneName} de la orden de trabajo {otNumber} ha sido aprobado
+					{/* Main Content */}
+					<Section className="px-[40px] py-[32px]">
+						<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
+							Hito Aprobado
 						</Heading>
 
-						<Section className="mb-[24px] rounded-[8px] border border-gray-200 bg-gray-50 p-[24px] text-center">
-							<Text className="my-[8px] text-[32px] font-bold tracking-[5px] text-blue-600">
-								{otNumber}
+						<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
+							Estimado/a usuario, le informamos que el hito <strong>{milestoneName}</strong> de la
+							orden de trabajo <strong>{otNumber}</strong> ha sido aprobado.
+						</Text>
+
+						{/* Milestone Details */}
+						<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-blue-500 bg-blue-50 p-[24px]">
+							<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
+								Detalles del Hito
+							</Heading>
+
+							<Row className="mb-[12px]">
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Nombre del Hito:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+										{milestoneName}
+									</Text>
+								</Column>
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Número OT:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none font-bold text-blue-600">
+										{otNumber}
+									</Text>
+								</Column>
+							</Row>
+
+							{comment && (
+								<Row>
+									<Column>
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Comentario:
+										</Text>
+										<Text className="rounded-[4px] border border-gray-200 bg-white p-[12px] text-[14px] leading-[20px] text-gray-600">
+											{comment}
+										</Text>
+									</Column>
+								</Row>
+							)}
+						</Section>
+
+						{/* Next Steps */}
+						<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
+							<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
+								Próximos Pasos
+							</Heading>
+
+							<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+								<strong>1.</strong> Continuar con la ejecución de los siguientes hitos planificados
+							</Text>
+							<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+								<strong>2.</strong> Mantener actualizado el libro de obras con las actividades
+								diarias
+							</Text>
+							<Text className="text-[14px] leading-[20px] text-gray-600">
+								<strong>3.</strong> Asegurar el cumplimiento de los plazos establecidos
 							</Text>
 						</Section>
 
-						{comment && (
-							<Text className="mb-[24px] text-[16px] text-gray-600">Comentario: {comment}</Text>
-						)}
-
+						{/* Action Button */}
 						<Section className="mb-[32px] text-center">
 							<Button
 								href={systemUrl}
-								className="box-input rounded-[4px] bg-blue-600 px-[24px] py-[12px] text-center font-bold text-white no-underline"
+								className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 							>
-								Ir al Sistema
+								Acceder a OTC 360
 							</Button>
 						</Section>
 
-						<Text className="mb-[8px] text-[16px] text-gray-600">Saludos cordiales,</Text>
+						<Hr className="my-[24px] border-gray-200" />
 
-						<Text className="mb-[24px] text-[16px] font-bold text-gray-700">
-							El equipo de OTC 360
+						<Text className="text-[14px] leading-[20px] text-gray-600">
+							Si tiene alguna pregunta o necesita asistencia, no dude en contactar a nuestro equipo
+							de soporte técnico.
 						</Text>
 					</Section>
 
-					<Hr className="my-[24px] border-t border-gray-300" />
-
-					<Section>
-						<Text className="m-0 text-center text-[14px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360. Todos los derechos reservados.
+					{/* Footer */}
+					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
+						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
+							© {new Date().getFullYear()} OTC 360
+						</Text>
+						<Text className="m-0 text-center text-[12px] text-gray-500">
+							Notificación Automática del Sistema - No Responder
 						</Text>
 					</Section>
 				</Container>

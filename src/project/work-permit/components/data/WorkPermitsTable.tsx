@@ -30,13 +30,13 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-export default function WorkPermitsTable({
-	hasPermission,
-	userId,
-}: {
+interface WorkPermitsTableProps {
 	hasPermission: boolean
 	userId: string
-}) {
+	id?: string
+}
+
+export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPermitsTableProps) {
 	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [order, setOrder] = useState<Order>("desc")
@@ -72,7 +72,7 @@ export default function WorkPermitsTable({
 	})
 
 	return (
-		<Card>
+		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex w-full items-center justify-between gap-4">
@@ -149,9 +149,10 @@ export default function WorkPermitsTable({
 				{data && (
 					<TablePagination
 						table={table}
+						total={data.total}
+						isLoading={isLoading}
 						pageCount={data.pages}
 						onPageChange={setPage}
-						isLoading={isLoading}
 						className="border-rose-600 text-rose-600 hover:bg-rose-600"
 					/>
 				)}
