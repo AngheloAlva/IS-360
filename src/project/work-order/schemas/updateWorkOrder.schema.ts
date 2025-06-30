@@ -3,6 +3,7 @@ import { WORK_ORDER_STATUS_VALUES_ARRAY } from "@/lib/consts/work-order-status"
 import { WORK_ORDER_CAPEX_VALUES_ARRAY } from "@/lib/consts/work-order-capex"
 import { WORK_ORDER_TYPE_VALUES_ARRAY } from "@/lib/consts/work-order-types"
 import { z } from "zod"
+import { fileSchema } from "@/shared/schemas/file.schema"
 
 export const updateWorkOrderSchema = z.object({
 	type: z.enum(WORK_ORDER_TYPE_VALUES_ARRAY, { message: "El tipo no es válido" }),
@@ -41,6 +42,7 @@ export const updateWorkOrderSchema = z.object({
 	companyId: z.string().optional(),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),
 	responsibleId: z.string().nonempty({ message: "El responsable no puede estar vacío" }),
+	endReport: fileSchema.optional(),
 })
 
 export type UpdateWorkOrderSchema = z.infer<typeof updateWorkOrderSchema>

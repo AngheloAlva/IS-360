@@ -56,6 +56,9 @@ import {
 import type { Company } from "@/project/company/hooks/use-companies"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { addDays } from "date-fns"
+import FileTable from "@/shared/components/forms/FileTable"
+import { Button } from "@/shared/components/ui/button"
+import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 
 interface UpdateWorkOrderFormProps {
 	workOrder: WorkOrder
@@ -94,6 +97,11 @@ export default function UpdateWorkOrderForm({
 			solicitationDate: workOrder.solicitationDate ?? new Date(),
 			equipment: workOrder.equipment.map((equipment) => equipment.id),
 			solicitationTime: workOrder.solicitationTime ?? new Date().toTimeString().split(" ")[0],
+			endReport: workOrder.endReport
+				? {
+						url: workOrder.endReport.url,
+					}
+				: undefined,
 		},
 	})
 
@@ -118,9 +126,25 @@ export default function UpdateWorkOrderForm({
 		setIsSubmitting(true)
 
 		try {
+			const file = form.getValues("endReport")
+			let endReport: UploadResult[] | undefined
+
+			if (file) {
+				endReport = await uploadFilesToCloud({
+					files: [file],
+					containerType: "files",
+					nameStrategy: "original",
+					randomString: workOrder.id,
+				})
+			}
+
 			const { ok, message } = await updateWorkOrderById({
 				id: workOrder.id,
-				values,
+				values: {
+					endReport: undefined,
+					...values,
+				},
+				endReport,
 			})
 
 			if (!ok) throw new Error(message)
@@ -366,10 +390,28 @@ export default function UpdateWorkOrderForm({
 							label="Días Estimados"
 						/>
 
+						<FileTable<UpdateWorkOrderSchema>
+							name="endReport"
+							isMultiple={false}
+							label="Reporte Final"
+							control={form.control}
+							className="my-4 sm:col-span-2"
+						/>
+
+						<Button
+							size="lg"
+							type="button"
+							variant={"outline"}
+							disabled={isSubmitting}
+							onClick={() => setOpen(false)}
+						>
+							Cancelar
+						</Button>
+
 						<SubmitButton
 							label="Actualizar OT"
-							className="sm:col-span-2"
 							isSubmitting={isSubmitting}
+							className="bg-orange-600 text-white hover:bg-orange-600 hover:text-white"
 						/>
 					</form>
 				</Form>

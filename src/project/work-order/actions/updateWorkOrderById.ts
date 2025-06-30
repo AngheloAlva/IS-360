@@ -9,10 +9,12 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
 import type { UpdateWorkOrderSchema } from "@/project/work-order/schemas/updateWorkOrder.schema"
+import type { UploadResult } from "@/lib/upload-files"
 
 interface UpdateWorkOrderParams {
 	id: string
 	values: UpdateWorkOrderSchema
+	endReport?: UploadResult[]
 }
 
 interface UpdateWorkOrderResponse {
@@ -23,6 +25,7 @@ interface UpdateWorkOrderResponse {
 export const updateWorkOrderById = async ({
 	id,
 	values,
+	endReport,
 }: UpdateWorkOrderParams): Promise<UpdateWorkOrderResponse> => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -96,6 +99,16 @@ export const updateWorkOrderById = async ({
 				equipment: {
 					set: values.equipment.map((id) => ({ id })),
 				},
+				...(endReport?.length && {
+					endReport: {
+						create: {
+							url: endReport[0].url,
+							name: endReport[0].name,
+							size: endReport[0].size,
+							type: endReport[0].type,
+						},
+					},
+				}),
 			},
 		})
 

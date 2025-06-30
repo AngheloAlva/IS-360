@@ -133,6 +133,9 @@ model User {
 
   @@unique([email])
   @@unique([rut])
+  @@index([email], name: "email_idx")
+  @@index([companyId], name: "company_id_idx")
+  @@index([accessRole, isActive], name: "access_role_is_active_idx")
   @@map("user")
 }
 
@@ -210,6 +213,9 @@ model Company {
   updatedAt DateTime @updatedAt
 
   @@unique([id])
+  @@index([rut], name: "rut_idx")
+  @@index([name], name: "name_idx")
+  @@index([isActive], name: "is_active_idx")
   @@map("company")
 }
 
@@ -350,6 +356,9 @@ model WorkOrder {
 
   @@unique([id])
   @@unique([otNumber])
+  @@index([status], name: "status_idx")
+  @@index([otNumber], name: "ot_number_idx")
+  @@index([companyId, status], name: "company_status_idx")
   @@map("work_order")
 }
 
@@ -489,8 +498,9 @@ model WorkEntry {
   attachments         Attachment[]
 
   @@unique([id])
-  @@index([workOrderId, createdAt])
   @@index([milestoneId])
+  @@index([workOrderId, createdAt])
+  @@index([workOrderId, entryType])
   @@map("work_book_entry")
 }
 
@@ -649,6 +659,8 @@ model Folder {
   files      File[]
 
   @@unique([slug, parentId, userId])
+  @@index([area, isActive], name: "folder_area_idx")
+  @@index([parentId, isActive], name: "folder_parent_idx")
   @@map("folder")
 }
 
@@ -678,6 +690,8 @@ model File {
   userId   String
   comments FileComment[]
 
+  @@index([folderId, isActive], name: "file_folder_idx")
+  @@index([area, isActive], name: "file_area_idx")
   @@map("file")
 }
 
@@ -1018,6 +1032,7 @@ model StartupFolder {
   vehicleFolders         VehicleFolder[]         @relation("VehicleFolderStartupFolder")
   basicFolders           BasicFolder[]
 
+  @@index([companyId, status], name: "startup_folder_company_status_idx")
   @@map("startup_folder")
 }
 
