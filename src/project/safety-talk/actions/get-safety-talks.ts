@@ -74,7 +74,6 @@ export async function getSafetyTalkByCategory(category: SAFETY_TALK_CATEGORY) {
 	}
 
 	try {
-		// Get user's latest attempt for this category
 		const userSafetyTalk = await prisma.userSafetyTalk.findFirst({
 			where: {
 				userId: session.user.id,

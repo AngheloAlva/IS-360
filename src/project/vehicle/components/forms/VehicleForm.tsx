@@ -6,10 +6,10 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { VehicleTypeOptions, VEHICLE_TYPE_VALUES_ARRAY } from "@/lib/consts/vehicle-types"
 import { useVehicleById } from "@/project/vehicle/hooks/use-vehicle-by-id"
 import { updateVehicle } from "@/project/vehicle/actions/updateVehicle"
 import { createVehicle } from "@/project/vehicle/actions/createVehicle"
+import { VehicleTypeOptions } from "@/lib/consts/vehicle-types"
 import { queryClient } from "@/lib/queryClient"
 import {
 	vehicleSchema,
@@ -40,6 +40,7 @@ import {
 	SheetDescription,
 	SheetTrigger,
 } from "@/shared/components/ui/sheet"
+import { VEHICLE_TYPE } from "@prisma/client"
 
 interface VehicleFormProps {
 	companyId: string
@@ -78,7 +79,7 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 				color: vehicleData.color || "",
 				isMain: vehicleData.isMain || false,
 				year: vehicleData.year || undefined,
-				type: vehicleData.type as (typeof VEHICLE_TYPE_VALUES_ARRAY)[number],
+				type: vehicleData.type as VEHICLE_TYPE,
 			})
 		}
 	}, [isUpdate, vehicleData, form])

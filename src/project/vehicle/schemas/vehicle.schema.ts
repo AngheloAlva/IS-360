@@ -1,14 +1,5 @@
+import { VEHICLE_TYPE } from "@prisma/client"
 import { z } from "zod"
-
-export const VEHICLE_TYPE_VALUES_ARRAY = [
-	"CAR",
-	"BUS",
-	"TRUCK",
-	"OTHER",
-	"TRACTOR",
-	"TRAILER",
-	"MOTORCYCLE",
-] as const
 
 export const vehicleSchema = z.object({
 	model: z.string().min(1, { message: "El modelo o nombre es requerido" }),
@@ -21,9 +12,9 @@ export const vehicleSchema = z.object({
 		})
 		.optional(),
 	brand: z.string().optional(),
-	type: z.enum(VEHICLE_TYPE_VALUES_ARRAY, { message: "El tipo no es válido" }),
+	type: z.nativeEnum(VEHICLE_TYPE, { message: "El tipo no es válido" }),
 	color: z.string().optional(),
-	isMain: z.boolean().default(false),
+	isMain: z.boolean().default(false).optional(),
 })
 
 export type VehicleSchema = z.infer<typeof vehicleSchema>

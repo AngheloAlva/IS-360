@@ -1,5 +1,3 @@
-import { VEHICLE_TYPE_VALUES_ARRAY } from "../../project/vehicle/schemas/vehicle.schema"
-
 export const VehicleTypeOptions = [
 	{ value: "CAR", label: "Automóvil" },
 	{ value: "TRUCK", label: "Camión" },
@@ -9,5 +7,3 @@ export const VehicleTypeOptions = [
 	{ value: "TRAILER", label: "Remolque" },
 	{ value: "OTHER", label: "Otro" },
 ]
-
-export { VEHICLE_TYPE_VALUES_ARRAY }
