@@ -37,7 +37,7 @@ import { Button } from "@/shared/components/ui/button"
 interface StartupFolderOverviewProps {
 	userId: string
 	companyId: string
-	companyName: string
+	companyName?: string
 	isOtcMember?: boolean
 	hasPermission?: boolean
 }
@@ -104,7 +104,9 @@ export default function StartupFolderOverview({
 						/>
 
 						<div className="text-white">
-							<h1 className="text-3xl font-bold tracking-tight">{companyName}</h1>
+							<h1 className="text-3xl font-bold tracking-tight">
+								{companyName || "Carpeta de arranque"}
+							</h1>
 							<p className="flex flex-col opacity-90">
 								{isOtcMember
 									? "Revisión de documentación de empresa contratista"
