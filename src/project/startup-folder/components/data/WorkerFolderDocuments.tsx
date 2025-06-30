@@ -186,7 +186,7 @@ export function WorkerFolderDocuments({
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
 								<TableCell>
-									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy") : ""}
+									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy HH:mm") : ""}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">

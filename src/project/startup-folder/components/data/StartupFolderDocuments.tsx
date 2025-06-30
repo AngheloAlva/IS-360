@@ -8,11 +8,13 @@ import {
 	PenIcon,
 	SendIcon,
 	InfoIcon,
+	UserIcon,
 	UploadIcon,
 	FolderIcon,
 	ChevronLeft,
 	FileTextIcon,
 	ChevronRightIcon,
+	CalendarX2Icon,
 } from "lucide-react"
 
 import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
@@ -325,12 +327,22 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								<TableCell>
 									<StartupFolderStatusBadge status={doc.status} />
 								</TableCell>
-								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
+								<TableCell>
+									<div className="flex items-center gap-1">
+										<UserIcon className="text-muted-foreground size-3.5" />
+										{doc.uploadedBy?.name ?? "Usuario desconocido"}
+									</div>
+								</TableCell>
 								<TableCell>
 									{doc.uploadedAt ? format(new Date(doc.uploadedAt), "dd/MM/yyyy HH:mm") : "N/A"}
 								</TableCell>
 								<TableCell>
-									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
+									<div className="flex items-center gap-1">
+										<CalendarX2Icon className="text-muted-foreground size-3.5" />
+										{doc.expirationDate
+											? format(new Date(doc.expirationDate), "dd/MM/yyyy")
+											: "N/A"}
+									</div>
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
 								<TableCell>

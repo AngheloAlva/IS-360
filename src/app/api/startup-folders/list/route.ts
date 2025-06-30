@@ -25,11 +25,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 		const companiesWithStartupFolders = await prisma.company.findMany({
 			where: {
+				isActive: true,
 				...(search
 					? {
 							OR: [
 								{ name: { contains: search, mode: "insensitive" as const } },
 								{ rut: { contains: search, mode: "insensitive" as const } },
+								{
+									StartupFolders: {
+										some: { name: { contains: search, mode: "insensitive" as const } },
+									},
+								},
 							],
 						}
 					: {}),

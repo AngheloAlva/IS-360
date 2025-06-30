@@ -188,7 +188,7 @@ export function VehicleFolderDocuments({
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? "Usuario desconocido"}</TableCell>
 								<TableCell>
-									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy") : "N/A"}
+									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy HH:mm") : "N/A"}
 								</TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
