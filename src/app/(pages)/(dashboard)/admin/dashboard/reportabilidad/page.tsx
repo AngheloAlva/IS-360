@@ -1,11 +1,11 @@
 "use client"
 
-import { DatabaseZapIcon, HandshakeIcon, SirenIcon } from "lucide-react"
+import { DatabaseZapIcon, HandshakeIcon, SirenIcon, StarIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 
-type DashboardId = "dashboard1" | "dashboard2" | "dashboard3"
+type DashboardId = "dashboard1" | "dashboard2" | "dashboard3" | "dashboard4"
 
 type Dashboard = {
 	title: string
@@ -27,6 +27,7 @@ export default function PowerBIDashboardPage() {
 		dashboard1: true,
 		dashboard2: true,
 		dashboard3: true,
+		dashboard4: true,
 	})
 	const [activeTab, setActiveTab] = useState<DashboardId>("dashboard1")
 
@@ -46,6 +47,11 @@ export default function PowerBIDashboardPage() {
 			title: "Reporte Operaciones",
 			url: "https://app.powerbi.com/view?r=eyJrIjoiMjIxYzY3ZmItYmY3MS00Y2MxLWE5YTgtYTUzZmVmMzY5MGFmIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
 			icon: <DatabaseZapIcon className="h-4 w-4" />,
+		},
+		dashboard4: {
+			title: "Reporte OTA-OTC",
+			url: "https://app.powerbi.com/view?r=eyJrIjoiYTYyMDc0ZmUtYzZjNS00MTdhLWFkYjktMzJjYWZiNmRkZjBkIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
+			icon: <StarIcon className="h-4 w-4" />,
 		},
 	}
 
