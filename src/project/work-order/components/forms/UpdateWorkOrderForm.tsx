@@ -2,19 +2,22 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { SquarePen } from "lucide-react"
+import { addDays } from "date-fns"
 import { toast } from "sonner"
 
 import { updateWorkOrderById } from "@/project/work-order/actions/updateWorkOrderById"
 import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
+import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
-import { WorkOrder } from "@/project/work-order/hooks/use-work-order"
-import { useCompanies } from "@/project/company/hooks/use-companies"
+import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
+import { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
+import { useCompanies } from "@/project/company/hooks/use-companies"
 import { useUsers } from "@/project/user/hooks/use-users"
+import { queryClient } from "@/lib/queryClient"
 import {
 	updateWorkOrderSchema,
 	type UpdateWorkOrderSchema,
@@ -28,7 +31,9 @@ import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Skeleton } from "@/shared/components/ui/skeleton"
+import { Button } from "@/shared/components/ui/button"
 import {
 	Form,
 	FormItem,
@@ -54,11 +59,6 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { Company } from "@/project/company/hooks/use-companies"
-import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
-import { addDays } from "date-fns"
-import FileTable from "@/shared/components/forms/FileTable"
-import { Button } from "@/shared/components/ui/button"
-import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 
 interface UpdateWorkOrderFormProps {
 	workOrder: WorkOrder
@@ -74,8 +74,6 @@ export default function UpdateWorkOrderForm({
 	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
 	const { data: equipmentsData } = useEquipments({ limit: 100 })
 	const { data: usersData } = useUsers({ limit: 100 })
-
-	const router = useRouter()
 
 	const form = useForm<UpdateWorkOrderSchema>({
 		resolver: zodResolver(updateWorkOrderSchema),
@@ -98,9 +96,11 @@ export default function UpdateWorkOrderForm({
 			equipment: workOrder.equipment.map((equipment) => equipment.id),
 			solicitationTime: workOrder.solicitationTime ?? new Date().toTimeString().split(" ")[0],
 			endReport: workOrder.endReport
-				? {
-						url: workOrder.endReport.url,
-					}
+				? [
+						{
+							url: workOrder.endReport.url,
+						},
+					]
 				: undefined,
 		},
 	})
@@ -126,7 +126,7 @@ export default function UpdateWorkOrderForm({
 		setIsSubmitting(true)
 
 		try {
-			const file = form.getValues("endReport")
+			const file = form.getValues("endReport")?.[0]
 			let endReport: UploadResult[] | undefined
 
 			if (file) {
@@ -150,7 +150,16 @@ export default function UpdateWorkOrderForm({
 			if (!ok) throw new Error(message)
 
 			toast.success("Orden de trabajo actualizada exitosamente")
-			router.push(`/admin/dashboard/ordenes-de-trabajo/`)
+			queryClient.invalidateQueries({
+				queryKey: [
+					"workOrders",
+					{
+						companyId: null,
+					},
+				],
+			})
+			setOpen(false)
+			form.reset()
 		} catch (error) {
 			console.error(error)
 			toast.error("Error al actualizar la orden de trabajo", {

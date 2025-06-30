@@ -17,6 +17,7 @@ import {
 	MonitorPlayIcon,
 	FilePlus2Icon,
 	UserIcon,
+	ChartColumnIcon,
 } from "lucide-react"
 
 import { NavSecondary } from "./navSecondary"
@@ -114,13 +115,13 @@ const data = {
 			url: "/admin/dashboard/solicitudes-de-trabajo",
 			icon: FilePlus2Icon,
 		},
+		{
+			name: "Reportabilidad",
+			url: "/admin/dashboard/reportabilidad",
+			icon: ChartColumnIcon,
+		},
 	],
 	navSecondary: [
-		// {
-		// 	title: "Mi Cuenta",
-		// 	url: "/dashboard/mi-cuenta",
-		// 	icon: UserIcon,
-		// },
 		{
 			title: "Soporte | Contacto",
 			url: "/dashboard/soporte",

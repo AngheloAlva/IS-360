@@ -943,6 +943,7 @@ enum WorkerDocumentType {
   PREVENTION_EXPERT // Experto en Prevención de riesgos
   HIGH_RISK_TRAINING // Cursos para trabajos de alto riesgo
   ENVIRONMENTAL_TRAINING // Capacitaciones ambientales
+  ALCOHOL_AND_DRUGS_EXAM // Examen de alcohol y drogas
 }
 
 enum VehicleDocumentType {
@@ -1125,6 +1126,7 @@ model WorkerFolder {
   submittedAt                  DateTime?
   createdAt                    DateTime     @default(now())
   updatedAt                    DateTime     @updatedAt
+  isDriver                     Boolean      @default(true)
 
   reviewerId      String?
   reviewer        User?            @relation("WorkerFolderReviewer", fields: [reviewerId], references: [id])

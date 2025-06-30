@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { addDays } from "date-fns"
 import { toast } from "sonner"
@@ -17,6 +16,7 @@ import { useCompanies } from "@/project/company/hooks/use-companies"
 import { OPERATOR_LIST } from "@/lib/consts/operator-list"
 import { useUsers } from "@/project/user/hooks/use-users"
 import { uploadFilesToCloud } from "@/lib/upload-files"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
 	workOrderSchema,
@@ -70,8 +70,6 @@ export default function CreateWorkOrderForm({
 	const { data: companiesData } = useCompanies({ limit: 1000, orderBy: "name", order: "desc" })
 	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "" })
 	const { data: equipmentsData } = useEquipments({ limit: 1000 })
-
-	const router = useRouter()
 
 	const form = useForm<WorkOrderSchema>({
 		resolver: zodResolver(workOrderSchema),
@@ -148,7 +146,14 @@ export default function CreateWorkOrderForm({
 
 			toast.success("Solicitud creada exitosamente")
 			setOpen(false)
-			router.refresh()
+			queryClient.invalidateQueries({
+				queryKey: [
+					"workOrders",
+					{
+						companyId: null,
+					},
+				],
+			})
 			form.reset()
 		} catch (error) {
 			console.error(error)

@@ -287,7 +287,7 @@ export const VEHICLE_STRUCTURE: StartupFolderStructure = {
 	],
 }
 
-export const WORKER_STRUCTURE: StartupFolderStructure = {
+export const BASE_WORKER_STRUCTURE: StartupFolderStructure = {
 	title: "Personal",
 	category: DocumentCategory.PERSONNEL,
 	description: "Documentación individual obligatoria para trabajadores que ingresen a OTC.",
@@ -313,19 +313,9 @@ export const WORKER_STRUCTURE: StartupFolderStructure = {
 			description: "Fotocopia por ambos lados del documento de identidad.",
 		},
 		{
-			type: WorkerDocumentType.DRIVING_LICENSE,
-			name: "Licencia de conducir",
-			description: "Licencia vigente por ambos lados (si aplica).",
-		},
-		{
 			type: WorkerDocumentType.HEALTH_EXAM,
 			name: "Examen médico vigente",
 			description: "Emitido por OAL según batería exigida por OTC.",
-		},
-		{
-			type: WorkerDocumentType.PSYCHOTECHNICAL_EXAM,
-			name: "Examen psicosensotécnico",
-			description: "Requerido si el trabajador posee licencia profesional.",
 		},
 		{
 			type: WorkerDocumentType.RISK_MATRIX_TRAINING,
@@ -341,16 +331,6 @@ export const WORKER_STRUCTURE: StartupFolderStructure = {
 			type: WorkerDocumentType.EMERGENCY_PROCEDURE_TRAINING,
 			name: "Capacitación en procedimientos de emergencia",
 			description: "Capacitación sobre respuesta ante incidentes y accidentes.",
-		},
-		{
-			type: WorkerDocumentType.DEFENSIVE_DRIVING_TRAINING,
-			name: "Curso de manejo defensivo",
-			description: "Solo para quienes desempeñan labores de conducción.",
-		},
-		{
-			type: WorkerDocumentType.MOUNTAIN_DEFENSIVE_DRIVING,
-			name: "Curso de manejo en alta montaña",
-			description: "Para quienes transiten hacia Buta Mallín o zonas cordilleranas.",
 		},
 		{
 			type: WorkerDocumentType.TOOLS_MAINTENANCE_TRAINING,
@@ -380,7 +360,41 @@ export const WORKER_STRUCTURE: StartupFolderStructure = {
 	],
 }
 
-export function getDocumentTypesByCategory(category: DocumentCategory) {
+export const DRIVER_WORKER_STRUCTURE: StartupFolderStructure = {
+	title: "Personal",
+	category: DocumentCategory.PERSONNEL,
+	description: "Documentación individual obligatoria para conductores que ingresen a OTC.",
+	documents: [
+		...BASE_WORKER_STRUCTURE.documents,
+		{
+			type: WorkerDocumentType.DRIVING_LICENSE,
+			name: "Licencia de conducir",
+			description: "Licencia vigente por ambos lados (si aplica).",
+		},
+		{
+			type: WorkerDocumentType.PSYCHOTECHNICAL_EXAM,
+			name: "Examen psicosensotécnico",
+			description: "Requerido si el trabajador posee licencia profesional.",
+		},
+		{
+			type: WorkerDocumentType.DEFENSIVE_DRIVING_TRAINING,
+			name: "Curso de manejo defensivo",
+			description: "Solo para quienes desempeñan labores de conducción.",
+		},
+		{
+			type: WorkerDocumentType.MOUNTAIN_DEFENSIVE_DRIVING,
+			name: "Curso de manejo en alta montaña",
+			description: "Para quienes transiten hacia Buta Mallín o zonas cordilleranas.",
+		},
+		{
+			type: WorkerDocumentType.ALCOHOL_AND_DRUGS_EXAM,
+			name: "Examen de alcohol y drogas",
+			description: "Examen de alcohol y drogas.",
+		},
+	],
+}
+
+export function getDocumentTypesByCategory(category: DocumentCategory, isDriver?: boolean) {
 	switch (category) {
 		case DocumentCategory.SAFETY_AND_HEALTH:
 			return {
@@ -399,8 +413,10 @@ export function getDocumentTypesByCategory(category: DocumentCategory) {
 			}
 		case DocumentCategory.PERSONNEL:
 			return {
-				title: WORKER_STRUCTURE.title,
-				documentTypes: WORKER_STRUCTURE.documents,
+				title: BASE_WORKER_STRUCTURE.title,
+				documentTypes: isDriver
+					? DRIVER_WORKER_STRUCTURE.documents
+					: BASE_WORKER_STRUCTURE.documents,
 			}
 		default:
 			return {
@@ -430,10 +446,26 @@ export const getDocumentsByCategory = (category: DocumentCategory) => {
 				documents: VEHICLE_STRUCTURE.documents,
 				category: DocumentCategory.VEHICLES,
 			}
+		case DocumentCategory.BASIC:
+			return {
+				title: BASIC_FOLDER_STRUCTURE.title,
+				documents: BASIC_FOLDER_STRUCTURE.documents,
+				category: DocumentCategory.BASIC,
+			}
+		default:
+			return {
+				title: "",
+				documents: [],
+			}
+	}
+}
+
+export const getDocumentsByWorkerIsDriver = (category: DocumentCategory, isDriver?: boolean) => {
+	switch (category) {
 		case DocumentCategory.PERSONNEL:
 			return {
-				title: WORKER_STRUCTURE.title,
-				documents: WORKER_STRUCTURE.documents,
+				title: BASE_WORKER_STRUCTURE.title,
+				documents: isDriver ? DRIVER_WORKER_STRUCTURE.documents : BASE_WORKER_STRUCTURE.documents,
 				category: DocumentCategory.PERSONNEL,
 			}
 		case DocumentCategory.BASIC:

@@ -151,9 +151,8 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 			return (
 				<WorkerFolderDocuments
 					userId={userId}
-					companyId={companyId}
-					documents={documents}
 					category={category}
+					companyId={companyId}
 					isOtcMember={isOtcMember}
 					workerId={selectedEntity.id}
 					startupFolderId={startupFolderId}
@@ -234,6 +233,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						<TableHead>Nombre</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
+						<TableHead>Subido el</TableHead>
 						<TableHead>Vencimiento</TableHead>
 						<TableHead>Revisado por</TableHead>
 						<TableHead>Revisado el</TableHead>
@@ -264,7 +264,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									<TableCell>
 										<StartupFolderStatusBadge status={entity.status} />
 									</TableCell>
-									<TableCell colSpan={4}></TableCell>
+									<TableCell colSpan={5}></TableCell>
 									<TableCell>
 										<div className="flex items-center gap-2">
 											<DeleteEntityDialog
@@ -326,6 +326,9 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 									<StartupFolderStatusBadge status={doc.status} />
 								</TableCell>
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
+								<TableCell>
+									{doc.uploadedAt ? format(new Date(doc.uploadedAt), "dd/MM/yyyy HH:mm") : "N/A"}
+								</TableCell>
 								<TableCell>
 									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>

@@ -10,8 +10,9 @@ import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import {
-	WORKER_STRUCTURE,
 	VEHICLE_STRUCTURE,
+	BASE_WORKER_STRUCTURE,
+	DRIVER_WORKER_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
@@ -335,6 +336,7 @@ export const addDocumentReview = async ({
 						folder: {
 							select: {
 								workerId: true,
+								isDriver: true,
 							},
 						},
 						uploadedBy: true,
@@ -377,7 +379,9 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				totalDocuments = WORKER_STRUCTURE.documents.length
+				totalDocuments = (document.folder as { isDriver: boolean }).isDriver
+					? DRIVER_WORKER_STRUCTURE.documents.length
+					: BASE_WORKER_STRUCTURE.documents.length
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
@@ -786,7 +790,9 @@ export const addDocumentReview = async ({
 
 type Document =
 	| Prisma.SafetyAndHealthDocumentGetPayload<{ include: { uploadedBy: true } }>
-	| Prisma.WorkerDocumentGetPayload<{ select: { folder: { select: { workerId: true } } } }>
+	| Prisma.WorkerDocumentGetPayload<{
+			select: { folder: { select: { workerId: true; isDriver: true } } }
+	  }>
 	| Prisma.VehicleDocumentGetPayload<{ select: { folder: { select: { vehicleId: true } } } }>
 	| Prisma.EnvironmentalDocumentGetPayload<{ include: { uploadedBy: true } }>
 	| Prisma.BasicDocumentGetPayload<{ select: { folder: { select: { workerId: true } } } }>

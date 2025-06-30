@@ -5,8 +5,9 @@ import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-struc
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import {
-	WORKER_STRUCTURE,
 	VEHICLE_STRUCTURE,
+	BASE_WORKER_STRUCTURE,
+	DRIVER_WORKER_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
@@ -149,14 +150,19 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			})),
 			workersFolders: folder.workersFolders.map((wf) => ({
 				...wf,
-				totalDocuments: WORKER_STRUCTURE.documents.length,
+				totalDocuments: wf.isDriver
+					? DRIVER_WORKER_STRUCTURE.documents.length
+					: BASE_WORKER_STRUCTURE.documents.length,
 				approvedDocuments: wf.documents.filter((doc) => doc.status === "APPROVED").length,
 				rejectedDocuments: wf.documents.filter((doc) => doc.status === "REJECTED").length,
 				submittedDocuments: wf.documents.filter((doc) => doc.status === "SUBMITTED").length,
 				draftDocuments: wf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 				isCompleted:
-					wf.documents.length === WORKER_STRUCTURE.documents.length &&
+					wf.documents.length ===
+						(wf.isDriver
+							? DRIVER_WORKER_STRUCTURE.documents.length
+							: BASE_WORKER_STRUCTURE.documents.length) &&
 					wf.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
 			vehiclesFolders: folder.vehiclesFolders.map((vf) => ({

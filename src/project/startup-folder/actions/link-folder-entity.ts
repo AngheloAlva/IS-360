@@ -8,6 +8,7 @@ interface LinkFolderEntityParams {
 	startupFolderId: string
 	entityId: string
 	category: DocumentCategory
+	isDriver?: boolean
 	userId: string
 }
 
@@ -16,6 +17,7 @@ export async function linkFolderEntity({
 	entityId,
 	category,
 	userId,
+	isDriver,
 }: LinkFolderEntityParams) {
 	try {
 		const folder = await prisma.startupFolder.findUnique({
@@ -32,6 +34,7 @@ export async function linkFolderEntity({
 			case "PERSONNEL":
 				const newWorkerFolder = await prisma.workerFolder.create({
 					data: {
+						isDriver,
 						worker: {
 							connect: {
 								id: entityId,
@@ -59,6 +62,7 @@ export async function linkFolderEntity({
 						startupFolderId,
 						workerId: entityId,
 						category,
+						isDriver,
 					},
 				})
 

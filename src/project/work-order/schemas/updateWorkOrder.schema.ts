@@ -42,7 +42,7 @@ export const updateWorkOrderSchema = z.object({
 	companyId: z.string().optional(),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),
 	responsibleId: z.string().nonempty({ message: "El responsable no puede estar vacío" }),
-	endReport: fileSchema.optional(),
+	endReport: z.array(fileSchema).optional(),
 })
 
 export type UpdateWorkOrderSchema = z.infer<typeof updateWorkOrderSchema>

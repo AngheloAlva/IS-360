@@ -138,6 +138,7 @@ export function VehicleFolderDocuments({
 						<TableHead>Nombre</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
+						<TableHead>Subido el</TableHead>
 						<TableHead>Vencimiento</TableHead>
 						<TableHead>Revisado por</TableHead>
 						<TableHead>Fecha de revisión</TableHead>
@@ -179,6 +180,9 @@ export function VehicleFolderDocuments({
 									<StartupFolderStatusBadge status={doc.status} />
 								</TableCell>
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
+								<TableCell>
+									{doc.uploadedAt ? format(new Date(doc.uploadedAt), "dd/MM/yyyy HH:mm") : "N/A"}
+								</TableCell>
 								<TableCell>
 									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>

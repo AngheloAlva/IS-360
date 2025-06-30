@@ -32,8 +32,10 @@ import {
 	SelectValue,
 } from "@/shared/components/ui/select"
 import { toast } from "sonner"
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 
 const linkEntitySchema = z.object({
+	isDriver: z.boolean().default(false).optional(),
 	entityId: z.string().min(1, "Seleccione una entidad"),
 })
 
@@ -62,6 +64,7 @@ export function LinkEntityDialog({
 		resolver: zodResolver(linkEntitySchema),
 		defaultValues: {
 			entityId: "",
+			isDriver: false,
 		},
 	})
 
@@ -72,6 +75,7 @@ export function LinkEntityDialog({
 				category,
 				startupFolderId,
 				entityId: data.entityId,
+				isDriver: data.isDriver,
 			},
 			{
 				onSuccess: () => {
@@ -139,6 +143,10 @@ export function LinkEntityDialog({
 								</FormItem>
 							)}
 						/>
+
+						{category === DocumentCategory.PERSONNEL && (
+							<SwitchFormField name="isDriver" label="¿Es conductor?" control={form.control} />
+						)}
 
 						<DialogFooter>
 							<Button

@@ -26,8 +26,10 @@ export async function getStartupFolderDocuments({
 	folderStatus: ReviewStatus
 	totalDocuments: number
 	approvedDocuments: number
+	isDriver: boolean
 }> {
 	try {
+		console.log(workerId)
 		let folderStatus: ReviewStatus = "DRAFT"
 
 		const folder = await (async () => {
@@ -121,8 +123,16 @@ export async function getStartupFolderDocuments({
 			}
 		})()
 
+		console.log(folder)
+
 		if (!folder) {
-			return { documents: [], folderStatus, totalDocuments: 0, approvedDocuments: 0 }
+			return {
+				documents: [],
+				folderStatus,
+				totalDocuments: 0,
+				approvedDocuments: 0,
+				isDriver: false,
+			}
 		}
 
 		folderStatus = folder.status
@@ -286,7 +296,13 @@ export async function getStartupFolderDocuments({
 		const totalDocuments = folder._count.documents
 		const approvedDocuments = documents.filter((doc) => doc.status === "APPROVED").length
 
-		return { documents, folderStatus, totalDocuments, approvedDocuments }
+		return {
+			documents,
+			folderStatus,
+			totalDocuments,
+			approvedDocuments,
+			isDriver: (folder as unknown as { isDriver: boolean })?.isDriver ?? false,
+		}
 	} catch (error) {
 		console.error("Error fetching startup folder documents:", error)
 		throw new Error("Could not fetch startup folder documents")

@@ -13,8 +13,12 @@ import {
 	FileTextIcon,
 } from "lucide-react"
 
+import {
+	BASE_WORKER_STRUCTURE,
+	DRIVER_WORKER_STRUCTURE,
+	getDocumentsByWorkerIsDriver,
+} from "@/lib/consts/startup-folders-structure"
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { WORKER_STRUCTURE } from "@/lib/consts/startup-folders-structure"
 import { queryClient } from "@/lib/queryClient"
 import { ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
@@ -52,16 +56,6 @@ interface WorkerFolderDocumentsProps {
 	isOtcMember: boolean
 	startupFolderId: string
 	category: "BASIC" | "PERSONNEL"
-	documents: {
-		name: string
-		description?: string
-		type:
-			| SafetyAndHealthDocumentType
-			| VehicleDocumentType
-			| WorkerDocumentType
-			| EnvironmentalDocType
-			| BasicDocumentType
-	}[]
 }
 
 export function WorkerFolderDocuments({
@@ -70,7 +64,6 @@ export function WorkerFolderDocuments({
 	workerId,
 	companyId,
 	category,
-	documents,
 	isOtcMember,
 	startupFolderId,
 }: WorkerFolderDocumentsProps) {
@@ -94,11 +87,15 @@ export function WorkerFolderDocuments({
 	})
 	const documentsData = data?.documents ?? []
 
+	const { documents } = getDocumentsByWorkerIsDriver(category, data?.isDriver)
+
 	const documentsNotUploaded = documents.filter(
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
-	const totalDocumentsToUpload = WORKER_STRUCTURE.documents.length
+	const totalDocumentsToUpload = (data as unknown as { isDriver: boolean })?.isDriver
+		? DRIVER_WORKER_STRUCTURE.documents.length
+		: BASE_WORKER_STRUCTURE.documents.length
 	const progress =
 		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
@@ -139,7 +136,8 @@ export function WorkerFolderDocuments({
 						<TableHead>Nombre</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
-						<TableHead>Fecha de vencimiento</TableHead>
+						<TableHead>Subido el</TableHead>
+						<TableHead>Vencimiento</TableHead>
 						<TableCell>Revisado por</TableCell>
 						<TableCell>Revisado el</TableCell>
 						<TableHead className="w-[100px]"></TableHead>
@@ -180,6 +178,9 @@ export function WorkerFolderDocuments({
 									<StartupFolderStatusBadge status={doc.status} />
 								</TableCell>
 								<TableCell>{doc.uploadedBy?.name ?? "Usuario desconocido"}</TableCell>
+								<TableCell>
+									{doc.uploadedAt ? format(new Date(doc.uploadedAt), "dd/MM/yyyy HH:mm") : "N/A"}
+								</TableCell>
 								<TableCell>
 									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>
