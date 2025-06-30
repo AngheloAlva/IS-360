@@ -34,16 +34,42 @@ export function ModuleActivityChart({ data, isLoading }: ModuleActivityChartProp
 			</CardHeader>
 			<CardContent className="px-2 py-0">
 				<div className="h-[250px] w-full">
-					<ChartContainer config={{}} className="h-full w-full">
+					<ChartContainer
+						config={{
+							STARTUP_FOLDERS: {
+								label: "Carpetas de Arranque",
+							},
+							WORK_ORDERS: {
+								label: "Órdenes de Trabajo",
+							},
+							WORK_PERMITS: {
+								label: "Permisos de Trabajo",
+							},
+							MAINTENANCE_PLANS: {
+								label: "Planes de Mantenimiento",
+							},
+							EQUIPMENT: {
+								label: "Equipos",
+							},
+							USERS: {
+								label: "Usuarios",
+							},
+							COMPANIES: {
+								label: "Empresas",
+							},
+						}}
+						className="h-full w-full"
+					>
 						<BarChart data={data} layout="vertical">
 							<CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
 							<XAxis type="number" domain={[0, 100]} />
-							<YAxis dataKey="module" type="category" width={90} />
+							<YAxis dataKey="name" type="category" />
 
 							<ChartTooltip
 								content={<ChartTooltipContent formatter={(value) => [`${value}%`, "Actividad"]} />}
 							/>
-							<Bar dataKey="percentage" name="% Activo" barSize={20} radius={[0, 4, 4, 0]}>
+
+							<Bar dataKey="percentage" name="% Activo" radius={[0, 4, 4, 0]}>
 								{data.map((entry, index) => {
 									let color = "var(--color-red-500)"
 									if (entry.percentage >= 80) color = "var(--color-green-500)"

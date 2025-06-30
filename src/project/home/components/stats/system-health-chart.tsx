@@ -1,14 +1,14 @@
 import { PieChart, Pie, Cell } from "recharts"
 import { Activity } from "lucide-react"
 
+import { Skeleton } from "@/shared/components/ui/skeleton"
 import {
 	Card,
+	CardTitle,
+	CardHeader,
 	CardContent,
 	CardDescription,
-	CardHeader,
-	CardTitle,
 } from "@/shared/components/ui/card"
-import { Skeleton } from "@/shared/components/ui/skeleton"
 import {
 	ChartLegend,
 	ChartTooltip,
@@ -17,10 +17,10 @@ import {
 	ChartTooltipContent,
 } from "@/shared/components/ui/chart"
 
-import type { SystemHealthItem } from "@/project/home/hooks/use-homepage-stats"
+import type { ShapeChartItem } from "@/project/home/hooks/use-homepage-stats"
 
 interface SystemHealthChartProps {
-	data: SystemHealthItem[]
+	data: ShapeChartItem[]
 	isLoading: boolean
 }
 
@@ -55,6 +55,10 @@ export function SystemHealthChart({ data, isLoading }: SystemHealthChartProps) {
 						className="h-[250px] w-full"
 					>
 						<PieChart>
+							<ChartTooltip
+								content={<ChartTooltipContent formatter={(value) => [value, "Valor"]} />}
+							/>
+
 							<Pie
 								data={data}
 								cx="50%"
@@ -63,15 +67,14 @@ export function SystemHealthChart({ data, isLoading }: SystemHealthChartProps) {
 								outerRadius={80}
 								paddingAngle={2}
 								dataKey="value"
-								label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+								label={({ label }) => `${label}`}
 							>
-								{data.map((entry, index) => (
-									<Cell key={`cell-${index}`} fill={entry.color} />
-								))}
+								{data.map((_, index) => {
+									// Asignar colores según el índice
+									const colors = ["#10b981", "#f59e0b", "#0ea5e9", "#8b5cf6", "#ef4444"]
+									return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+								})}
 							</Pie>
-							<ChartTooltip
-								content={<ChartTooltipContent formatter={(value) => [`${value}%`, "Porcentaje"]} />}
-							/>
 							<ChartLegend content={<ChartLegendContent />} />
 						</PieChart>
 					</ChartContainer>

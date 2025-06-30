@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers"
 
-import { sendRejectClosureEmail } from "./sendRejectClosure"
+import { sendCloseWorkBookEmail } from "./sendCloseWorkBookEmail"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
@@ -10,7 +10,7 @@ import prisma from "@/lib/prisma"
 
 interface CloseWorkBookProps {
 	userId: string
-	reason?: string
+	reason: string
 	workBookId: string
 }
 
@@ -34,7 +34,7 @@ export async function closeWorkBook({ userId, workBookId, reason }: CloseWorkBoo
 				status: true,
 				otNumber: true,
 				workName: true,
-				closureRequestedBy: {
+				supervisor: {
 					select: {
 						id: true,
 						name: true,
@@ -57,7 +57,7 @@ export async function closeWorkBook({ userId, workBookId, reason }: CloseWorkBoo
 		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: workBookId },
 			data: {
-				status: "CANCELLED",
+				status: "COMPLETED",
 				closureRejectedReason: reason || null,
 			},
 			select: {
@@ -100,16 +100,18 @@ export async function closeWorkBook({ userId, workBookId, reason }: CloseWorkBoo
 				workEntryComments: workEntry.comments,
 				companyId: workOrder.company?.id,
 				companyName: workOrder.company?.name,
+				closureReason: reason,
 			},
 		})
 
-		if (workOrder.closureRequestedBy?.email) {
-			await sendRejectClosureEmail({
-				rejectionReason: reason,
+		if (workOrder.supervisor.email) {
+			await sendCloseWorkBookEmail({
+				closureReason: reason,
+				otNumber: workOrder.otNumber,
 				supervisorName: session.user.name,
+				email: workOrder.supervisor.email,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: workOrder.workName || "",
-				email: workOrder.closureRequestedBy.email,
 				companyName: workOrder?.company?.name || "Interno",
 			})
 		}

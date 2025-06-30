@@ -21,6 +21,7 @@ import {
 } from "@/shared/components/ui/accordion"
 
 import type { WorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 
 interface WorkBookGeneralDataProps {
 	userId: string
@@ -155,11 +156,12 @@ export default function WorkBookGeneralData({
 							</div>
 						</div>
 
-						{(hasPermission || data.responsibleId === userId) && (
-							<div className="flex justify-end">
-								<CloseWorkBook userId={data.responsible.id} workOrderId={data.id} />
-							</div>
-						)}
+						{(hasPermission || data.responsibleId === userId) &&
+							data.status !== WORK_ORDER_STATUS.COMPLETED && (
+								<div className="flex justify-end">
+									<CloseWorkBook userId={data.responsible.id} workOrderId={data.id} />
+								</div>
+							)}
 					</AccordionContent>
 				</AccordionItem>
 

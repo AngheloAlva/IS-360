@@ -1,11 +1,11 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { CircleXIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { closeWorkBook } from "@/project/work-order/actions/closeWorkBook"
+import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 
 import { Textarea } from "@/shared/components/ui/textarea"
@@ -30,7 +30,6 @@ export function CloseWorkBook({ userId, className, workOrderId }: CloseWorkBookP
 	const [rejectionReason, setRejectionReason] = useState("")
 	const [isLoading, setIsLoading] = useState(false)
 	const [isOpen, setIsOpen] = useState(false)
-	const router = useRouter()
 
 	const handleAction = async () => {
 		try {
@@ -58,7 +57,9 @@ export function CloseWorkBook({ userId, className, workOrderId }: CloseWorkBookP
 			})
 
 			setIsOpen(false)
-			router.refresh()
+			queryClient.invalidateQueries({
+				queryKey: ["workBooks", { workOrderId }],
+			})
 		} catch (error) {
 			console.error("[WORK_BOOK_CLOSE]", error)
 			toast.error(`No se pudo cerrar el libro de obras`)

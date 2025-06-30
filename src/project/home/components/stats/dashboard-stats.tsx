@@ -3,10 +3,7 @@ import { HomepageStatsResponse } from "@/project/home/hooks/use-homepage-stats"
 import { SystemOverviewCards } from "./system-overview-cards"
 import { ModuleActivityChart } from "./module-activity-chart"
 import { WeeklyActivityChart } from "./weekly-activity-chart"
-import { SystemHealthChart } from "./system-health-chart"
 import { RecentActivity } from "./recent-activity"
-import { SystemAlerts } from "./system-alerts"
-import { KeyMetrics } from "./key-metrics"
 
 interface DashboardStatsProps {
 	data?: HomepageStatsResponse
@@ -16,70 +13,122 @@ interface DashboardStatsProps {
 export function DashboardStats({ data, isLoading }: DashboardStatsProps) {
 	return (
 		<div className="space-y-6">
-			{/* System Overview Cards */}
 			<SystemOverviewCards
 				data={
-					data?.systemOverviewData || {
-						companies: { total: 0, active: 0, withPendingDocs: 0 },
-						equipment: { total: 0, operational: 0, critical: 0 },
-						users: { total: 0, active: 0, admins: 0 },
-						workOrders: { total: 0, inProgress: 0, critical: 0 },
-						permits: { total: 0, active: 0, critical: 0 },
-						maintenancePlans: { total: 0, active: 0, overdue: 0 },
-						startupFolders: { total: 0, completed: 0, overdue: 0 },
+					data?.systemOverview || {
+						companies: 0,
+						equipment: 0,
+						users: 0,
+						workOrders: 0,
+						permits: 0,
+						maintenancePlans: 0,
+						startupFolders: 0,
+						activeUsers: 0,
+						adminUsers: 0,
+						operationalEquipment: 0,
+						criticalEquipment: 0,
+						inProgressWorkOrders: 0,
+						criticalWorkOrders: 0,
+						activePermits: 0,
+						activeMaintenancePlans: 0,
+						completedStartupFolders: 0,
+						inProgressStartupFolders: 0,
+						activeCompanies: 0,
+						companiesWithPendingDocs: 0,
 					}
 				}
 				isLoading={isLoading}
 			/>
 
-			{/* Main Charts */}
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-				<SystemHealthChart
-					data={
-						data?.systemHealthData || [
-							{ name: "Óptimo", value: 50, color: "#10b981" },
-							{ name: "Estable", value: 30, color: "#f59e0b" },
-							{ name: "Crítico", value: 20, color: "#ef4444" },
-						]
-					}
-					isLoading={isLoading}
-				/>
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
 				<ModuleActivityChart
 					data={
-						data?.moduleActivityData || [
-							{ module: "Equipos", percentage: 0 },
-							{ module: "Usuarios", percentage: 0 },
-							{ module: "Órdenes", percentage: 0 },
-							{ module: "Permisos", percentage: 0 },
-							{ module: "Mant.", percentage: 0 },
+						data?.moduleActivityChart || [
+							{ name: "Órdenes de Trabajo", percentage: 0 },
+							{ name: "Permisos de Trabajo", percentage: 0 },
+							{ name: "Mantenimiento", percentage: 0 },
+							{ name: "Equipos", percentage: 0 },
+							{ name: "Usuarios", percentage: 0 },
 						]
 					}
 					isLoading={isLoading}
 				/>
 				<WeeklyActivityChart
 					data={
-						data?.weeklyActivityData || [
-							{ day: "Lun", workOrders: 0, permits: 0, maintenance: 0 },
-							{ day: "Mar", workOrders: 0, permits: 0, maintenance: 0 },
-							{ day: "Mie", workOrders: 0, permits: 0, maintenance: 0 },
-							{ day: "Jue", workOrders: 0, permits: 0, maintenance: 0 },
-							{ day: "Vie", workOrders: 0, permits: 0, maintenance: 0 },
-							{ day: "Sab", workOrders: 0, permits: 0, maintenance: 0 },
-							{ day: "Dom", workOrders: 0, permits: 0, maintenance: 0 },
+						data?.weeklyActivityChart || [
+							{
+								day: "Lunes",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
+							{
+								day: "Martes",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
+							{
+								day: "Miércoles",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
+							{
+								day: "Jueves",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
+							{
+								day: "Viernes",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
+							{
+								day: "Sábado",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
+							{
+								day: "Domingo",
+								workOrders: 0,
+								permits: 0,
+								maintenance: 0,
+								equipment: 0,
+								users: 0,
+								other: 0,
+							},
 						]
 					}
 					isLoading={isLoading}
 				/>
 			</div>
 
-			{/* Alerts and Recent Activity */}
-			<div className="grid gap-4 md:grid-cols-2">
-				<SystemAlerts alerts={data?.alerts || []} isLoading={isLoading} />
+			{/* Recent Activity */}
+			<div className="grid gap-4 md:grid-cols-1">
 				<RecentActivity activities={data?.recentActivity || []} isLoading={isLoading} />
 			</div>
-
-			{/* Key Metrics */}
-			<KeyMetrics isLoading={isLoading} />
 		</div>
 	)
 }

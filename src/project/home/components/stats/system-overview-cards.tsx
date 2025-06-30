@@ -4,10 +4,10 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 
-import type { SystemOverviewData } from "@/project/home/hooks/use-homepage-stats"
+import type { SystemOverview } from "@/project/home/hooks/use-homepage-stats"
 
 interface SystemOverviewCardsProps {
-	data: SystemOverviewData
+	data: SystemOverview
 	isLoading: boolean
 }
 
@@ -29,10 +29,9 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.companies.total}</div>
+							<div className="text-2xl font-bold">{data.companies}</div>
 							<p className="text-muted-foreground text-xs">
-								{data.companies.active} activas, {data.companies.withPendingDocs} con docs
-								pendientes
+								{data.activeCompanies} activas, {data.companiesWithPendingDocs} con docs pendientes
 							</p>
 						</CardContent>
 					</Card>
@@ -48,9 +47,9 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.equipment.total}</div>
+							<div className="text-2xl font-bold">{data.equipment}</div>
 							<p className="text-muted-foreground text-xs">
-								{data.equipment.operational} operacionales, {data.equipment.critical} críticos
+								{data.operationalEquipment} operacionales, {data.criticalEquipment} críticos
 							</p>
 						</CardContent>
 					</Card>
@@ -66,9 +65,9 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.users.total}</div>
+							<div className="text-2xl font-bold">{data.users}</div>
 							<p className="text-muted-foreground text-xs">
-								{data.users.active} activos, {data.users.admins} administradores
+								{data.activeUsers} activos, {data.adminUsers} administradores
 							</p>
 						</CardContent>
 					</Card>
@@ -84,9 +83,9 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.workOrders.total}</div>
+							<div className="text-2xl font-bold">{data.workOrders}</div>
 							<p className="text-muted-foreground text-xs">
-								{data.workOrders.inProgress} en progreso, {data.workOrders.critical} crítica
+								{data.inProgressWorkOrders} en progreso, {data.criticalWorkOrders} crítica
 							</p>
 						</CardContent>
 					</Card>
@@ -95,7 +94,7 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 
 			{/* Segunda fila de módulos */}
 			<div className="grid gap-4 md:grid-cols-3">
-				<Link href="/admin/dashboard/permisos">
+				<Link href="/admin/dashboard/permisos-de-trabajo">
 					<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
 						<div className="bg-gradient-to-br from-red-500 to-red-600 p-1.5" />
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -105,13 +104,13 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.permits.total}</div>
-							<p className="text-muted-foreground text-xs">{data.permits.active} activos</p>
+							<div className="text-2xl font-bold">{data.permits}</div>
+							<p className="text-muted-foreground text-xs">{data.activePermits} activos</p>
 						</CardContent>
 					</Card>
 				</Link>
 
-				<Link href="/admin/dashboard/mantenimiento">
+				<Link href="/admin/dashboard/planes-de-mantenimiento">
 					<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
 						<div className="bg-gradient-to-br from-indigo-500 to-indigo-600 p-1.5" />
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -121,15 +120,13 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.maintenancePlans.total}</div>
-							<p className="text-muted-foreground text-xs">
-								{data.maintenancePlans.active} activos
-							</p>
+							<div className="text-2xl font-bold">{data.maintenancePlans}</div>
+							<p className="text-muted-foreground text-xs">{data.activeMaintenancePlans} activos</p>
 						</CardContent>
 					</Card>
 				</Link>
 
-				<Link href="/admin/dashboard/carpetas">
+				<Link href="/admin/dashboard/carpetas-de-arranques">
 					<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
 						<div className="bg-gradient-to-br from-teal-500 to-teal-600 p-1.5" />
 						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -139,9 +136,9 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div className="text-2xl font-bold">{data.startupFolders.total}</div>
+							<div className="text-2xl font-bold">{data.startupFolders}</div>
 							<p className="text-muted-foreground text-xs">
-								{data.startupFolders.completed || 0} completadas
+								{data.completedStartupFolders || 0} completadas
 							</p>
 						</CardContent>
 					</Card>

@@ -1,54 +1,37 @@
 import { useQuery } from "@tanstack/react-query"
 
-// Interface for system overview data
-export interface SystemOverviewData {
-  companies: {
-    total: number
-    active: number
-    withPendingDocs: number
-  }
-  equipment: {
-    total: number
-    operational: number
-    critical: number
-  }
-  users: {
-    total: number
-    active: number
-    admins: number
-  }
-  workOrders: {
-    total: number
-    inProgress: number
-    critical: number
-  }
-  permits: {
-    total: number
-    active: number
-    critical: number
-  }
-  maintenancePlans: {
-    total: number
-    active: number
-    overdue: number
-  }
-  startupFolders: {
-    total: number
-    completed: number
-    overdue: number
-  }
+// Interface for system overview data (estructura plana como lo devuelve la API)
+export interface SystemOverview {
+  companies: number
+  equipment: number
+  users: number
+  workOrders: number
+  permits: number
+  maintenancePlans: number
+  startupFolders: number
+  activeUsers: number
+  adminUsers: number
+  operationalEquipment: number
+  criticalEquipment: number
+  inProgressWorkOrders: number
+  criticalWorkOrders: number
+  activePermits: number
+  activeMaintenancePlans: number
+  completedStartupFolders: number
+  inProgressStartupFolders: number
+  activeCompanies: number
+  companiesWithPendingDocs: number
 }
 
-// Interface for system health data
-export interface SystemHealthItem {
-  name: string
-  value: number
-  color: string
+// Interface for system health data (ShapeChart)
+export interface ShapeChartItem {
+  label: string
+  value: string
 }
 
 // Interface for module activity data
 export interface ModuleActivityItem {
-  module: string
+  name: string
   percentage: number
 }
 
@@ -58,33 +41,26 @@ export interface WeeklyActivityItem {
   workOrders: number
   permits: number
   maintenance: number
-}
-
-// Interface for alert data
-export interface AlertItem {
-  id: number
-  type: "info" | "warning" | "urgent"
-  message: string
-  module: string
-  time: string
+  equipment: number
+  users: number
+  other: number
 }
 
 // Interface for recent activity data
 export interface RecentActivityItem {
-  id: number
-  action: string
+  id: string
+  description: string
   module: string
-  user: string
   time: string
+  user: string
 }
 
 // Interface for the complete homepage stats response
 export interface HomepageStatsResponse {
-  systemOverviewData: SystemOverviewData
-  systemHealthData: SystemHealthItem[]
-  moduleActivityData: ModuleActivityItem[]
-  weeklyActivityData: WeeklyActivityItem[]
-  alerts: AlertItem[]
+  systemOverview: SystemOverview
+  shapeChart: ShapeChartItem[]
+  moduleActivityChart: ModuleActivityItem[]
+  weeklyActivityChart: WeeklyActivityItem[]
   recentActivity: RecentActivityItem[]
 }
 
@@ -96,6 +72,7 @@ async function getHomepageStats(): Promise<HomepageStatsResponse> {
     throw new Error("Error al obtener las estadísticas del dashboard")
   }
 
+  // La respuesta ya está en formato compatible con HomepageStatsResponse
   return response.json()
 }
 

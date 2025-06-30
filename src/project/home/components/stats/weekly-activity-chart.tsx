@@ -1,14 +1,14 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts"
 import { TrendingUp } from "lucide-react"
 
+import { Skeleton } from "@/shared/components/ui/skeleton"
 import {
 	Card,
+	CardTitle,
+	CardHeader,
 	CardContent,
 	CardDescription,
-	CardHeader,
-	CardTitle,
 } from "@/shared/components/ui/card"
-import { Skeleton } from "@/shared/components/ui/skeleton"
 import {
 	ChartLegend,
 	ChartTooltip,
@@ -29,6 +29,20 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 		return <WeeklyActivityChartSkeleton />
 	}
 
+	// Ejemplo de nueva estructura de datos:
+	// [
+	//   {
+	//     "day": "Lunes",
+	//     "workOrders": 3,
+	//     "permits": 1,
+	//     "maintenance": 0,
+	//     "equipment": 2,
+	//     "users": 0,
+	//     "other": 0
+	//   },
+	//   ...
+	// ]
+
 	return (
 		<Card className="border-none">
 			<CardHeader className="flex flex-row items-center justify-between">
@@ -40,25 +54,24 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 			</CardHeader>
 			<CardContent className="py-0 pl-2">
 				<div className="h-[250px] w-full">
-					<ChartContainer
+					<ChartContainer 
 						config={{
-							workOrders: {
-								label: "Órdenes de trabajo",
-							},
-							permits: {
-								label: "Permisos de trabajo",
-							},
-							maintenance: {
-								label: "Planes de mantenimiento",
-							},
+							workOrders: { label: "Órdenes de trabajo" },
+							permits: { label: "Permisos de trabajo" },
+							maintenance: { label: "Planes de mantenimiento" },
+							equipment: { label: "Equipos" },
+							users: { label: "Usuarios" },
+							other: { label: "Otros" }
 						}}
 						className="h-[250px] w-full"
 					>
 						<AreaChart data={data}>
+							<ChartTooltip content={<ChartTooltipContent />} />
+
 							<CartesianGrid strokeDasharray="3 3" opacity={0.5} />
 							<XAxis dataKey="day" />
 							<YAxis />
-							<ChartTooltip content={<ChartTooltipContent />} />
+
 							<ChartLegend content={<ChartLegendContent />} />
 							<defs>
 								<linearGradient id="fillWorkOrders" x1="0" y1="0" x2="0" y2="1">
@@ -72,6 +85,18 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 								<linearGradient id="fillMaintenance" x1="0" y1="0" x2="0" y2="1">
 									<stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
 									<stop offset="95%" stopColor="#6366f1" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillEquipment" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillUsers" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillOther" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.1} />
 								</linearGradient>
 							</defs>
 
@@ -98,6 +123,30 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 								stroke="#6366f1"
 								fill="url(#fillMaintenance)"
 								name="Mantenimiento"
+							/>
+							<Area
+								type="monotone"
+								dataKey="equipment"
+								stackId="1"
+								stroke="#10b981"
+								fill="url(#fillEquipment)"
+								name="Equipos"
+							/>
+							<Area
+								type="monotone"
+								dataKey="users"
+								stackId="1"
+								stroke="#8b5cf6"
+								fill="url(#fillUsers)"
+								name="Usuarios"
+							/>
+							<Area
+								type="monotone"
+								dataKey="other"
+								stackId="1"
+								stroke="#0ea5e9"
+								fill="url(#fillOther)"
+								name="Otros"
 							/>
 						</AreaChart>
 					</ChartContainer>
