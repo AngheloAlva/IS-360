@@ -10,7 +10,7 @@ export default async function StartupFolderReviewPage({
 }: {
 	params: Promise<{ companyId: string }>
 }) {
-	const { companyId } = await params
+	const asyncParams = await params
 
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -27,11 +27,15 @@ export default async function StartupFolderReviewPage({
 		},
 	})
 
+	const companyId = asyncParams.companyId.split("_")[1]
+	const companyName = asyncParams.companyId.split("_")[0].replaceAll("-", " ")
+
 	return (
 		<div className="w-full flex-1 space-y-6">
 			<StartupFolderOverview
 				companyId={companyId}
 				userId={session.user.id}
+				companyName={companyName}
 				hasPermission={hasPermission.success}
 				isOtcMember={session.user.accessRole === "ADMIN"}
 			/>

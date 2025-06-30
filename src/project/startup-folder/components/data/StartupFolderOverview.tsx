@@ -37,6 +37,7 @@ import { Button } from "@/shared/components/ui/button"
 interface StartupFolderOverviewProps {
 	userId: string
 	companyId: string
+	companyName: string
 	isOtcMember?: boolean
 	hasPermission?: boolean
 }
@@ -44,6 +45,7 @@ interface StartupFolderOverviewProps {
 export default function StartupFolderOverview({
 	userId,
 	companyId,
+	companyName,
 	isOtcMember = false,
 	hasPermission = false,
 }: StartupFolderOverviewProps): React.ReactElement {
@@ -102,7 +104,7 @@ export default function StartupFolderOverview({
 						/>
 
 						<div className="text-white">
-							<h1 className="text-3xl font-bold tracking-tight">Carpetas de Arranque</h1>
+							<h1 className="text-3xl font-bold tracking-tight">{companyName}</h1>
 							<p className="flex flex-col opacity-90">
 								{isOtcMember
 									? "Revisión de documentación de empresa contratista"

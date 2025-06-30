@@ -234,7 +234,9 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 									asChild
 									className="w-full bg-teal-600 text-white transition-colors hover:bg-teal-700 hover:text-white"
 								>
-									<Link href={`/admin/dashboard/carpetas-de-arranques/${company.id}`}>
+									<Link
+										href={`/admin/dashboard/carpetas-de-arranques/${company.name.replaceAll(" ", "-")}_${company.id}`}
+									>
 										Ver carpeta
 									</Link>
 								</Button>
