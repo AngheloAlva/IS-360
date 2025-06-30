@@ -51,6 +51,11 @@ export async function approveMilestone({
 								email: true,
 							},
 						},
+						supervisor: {
+							select: {
+								email: true,
+							},
+						},
 					},
 				},
 			},
@@ -106,7 +111,7 @@ export async function approveMilestone({
 			comment: closureComment,
 			milestoneName: milestone.name,
 			otNumber: milestone.workOrder.otNumber,
-			supervisorEmail: milestone.workOrder.responsible.email,
+			supervisorEmail: milestone.workOrder.supervisor.email,
 		})
 
 		return {
@@ -149,6 +154,11 @@ export async function rejectMilestone({
 						otNumber: true,
 						workProgressStatus: true,
 						responsible: {
+							select: {
+								email: true,
+							},
+						},
+						supervisor: {
 							select: {
 								email: true,
 							},
@@ -208,7 +218,7 @@ export async function rejectMilestone({
 			comment: closureComment,
 			milestoneName: milestone.name,
 			otNumber: milestone.workOrder.otNumber,
-			supervisorEmail: milestone.workOrder.responsible.email,
+			supervisorEmail: milestone.workOrder.supervisor.email,
 		})
 
 		return {

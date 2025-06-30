@@ -83,7 +83,7 @@ export default function CloseMilestoneDialog({
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogTrigger className="mt-auto w-full rounded-md bg-indigo-500 px-2 py-2 text-white hover:bg-indigo-600">
-				Aprovar o rechazar
+				Aprobar o rechazar
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
