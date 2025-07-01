@@ -35,9 +35,7 @@ export const updateWorkOrderSchema = z.object({
 	requiresBreak: z.boolean().optional(),
 	breakDays: z.string().optional(),
 	estimatedEndDate: z.date({ message: "La fecha de fin estimada no es válida" }).optional(),
-	workProgressStatus: z
-		.string()
-		.regex(/^([0-9]|[1-9][0-9]|100)$/, { message: "El progreso debe ser un número entre 0 y 100" }),
+	workProgressStatus: z.array(z.number()),
 
 	companyId: z.string().optional(),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),

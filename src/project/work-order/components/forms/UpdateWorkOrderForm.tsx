@@ -27,6 +27,7 @@ import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithS
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
+import { SliderFormField } from "@/shared/components/forms/SliderFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
@@ -91,9 +92,9 @@ export default function UpdateWorkOrderForm({
 			programDate: new Date(workOrder.programDate),
 			estimatedHours: `${workOrder.estimatedHours}`,
 			workDescription: workOrder.workDescription ?? "",
-			workProgressStatus: `${workOrder.workProgressStatus}`,
-			solicitationDate: workOrder.solicitationDate ?? new Date(),
+			workProgressStatus: [workOrder.workProgressStatus],
 			equipment: workOrder.equipment.map((equipment) => equipment.id),
+			solicitationDate: new Date(workOrder.solicitationDate) ?? new Date(),
 			solicitationTime: workOrder.solicitationTime ?? new Date().toTimeString().split(" ")[0],
 			endReport: workOrder.endReport
 				? [
@@ -112,6 +113,10 @@ export default function UpdateWorkOrderForm({
 			)
 		}
 	}, [companiesData, workOrder.company])
+
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
 
 	useEffect(() => {
 		const estimatedHours = Number(form.watch("estimatedHours"))
@@ -288,6 +293,13 @@ export default function UpdateWorkOrderForm({
 							itemClassName="sm:col-span-2"
 							label="Descripción del Trabajo"
 							placeholder="Ingrese la descripción del trabajo"
+						/>
+
+						<SliderFormField<UpdateWorkOrderSchema>
+							label="Progreso"
+							control={form.control}
+							name="workProgressStatus"
+							itemClassName="sm:col-span-2"
 						/>
 
 						<Separator className="my-2 sm:col-span-2" />

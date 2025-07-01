@@ -24,6 +24,7 @@ export interface WorkOrder {
 	status: WORK_ORDER_STATUS
 	solicitationTime: string
 	workRequest: string
+	createdAt: Date
 	capex: WORK_ORDER_CAPEX
 	workDescription: string
 	priority: WORK_ORDER_PRIORITY

@@ -1,7 +1,7 @@
 "use client"
 
 import { DateRange } from "react-day-picker"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, FileSpreadsheetIcon } from "lucide-react"
 import { useState } from "react"
 import {
 	flexRender,
@@ -55,6 +55,10 @@ import {
 	DropdownMenuCheckboxItem,
 } from "@/shared/components/ui/dropdown-menu"
 import { useDebounce } from "@/shared/hooks/useDebounce"
+import { toast } from "sonner"
+import Spinner from "@/shared/components/Spinner"
+import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 
 interface WorkOrderTableProps {
 	id?: string
@@ -64,6 +68,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [statusFilter, setStatusFilter] = useState<string | null>(null)
+	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [dateRange, setDateRange] = useState<DateRange | null>(null)
 	const [typeFilter, setTypeFilter] = useState<string | null>(null)
 	const [companyId, setCompanyId] = useState<string | null>(null)
@@ -136,6 +141,60 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		})
 	}
 
+	const handleExportToExcel = async () => {
+		try {
+			setExportLoading(true)
+
+			const res: { workOrders: WorkOrder[] } = await fetch(
+				`/api/work-order?page=1&order=desc&orderBy=createdAt&limit=10000`
+			).then((res) => res.json())
+			if (!res?.workOrders?.length) {
+				toast.error("No hay órdenes de trabajo para exportar")
+				return
+			}
+
+			const XLSX = await import("xlsx")
+
+			const workbook = XLSX.utils.book_new()
+			const worksheet = XLSX.utils.json_to_sheet(
+				res?.workOrders.map((workOrder: WorkOrder) => ({
+					otNumber: workOrder.otNumber,
+					solicitationDate: workOrder.solicitationDate,
+					type: workOrder.type,
+					status: workOrder.status,
+					solicitationTime: workOrder.solicitationTime,
+					workRequest: workOrder.workRequest,
+					createdAt: workOrder.createdAt,
+					capex: WorkOrderCAPEXLabels[workOrder.capex],
+					workDescription: workOrder.workDescription,
+					priority: WorkOrderPriorityLabels[workOrder.priority],
+					workProgressStatus: workOrder.workProgressStatus,
+					programDate: workOrder.programDate,
+					estimatedHours: workOrder.estimatedHours,
+					estimatedDays: workOrder.estimatedDays,
+					estimatedEndDate: workOrder.estimatedEndDate,
+					equipment: workOrder.equipment.map((equipment) => ({
+						id: equipment.id,
+						name: equipment.name,
+					})),
+					company: workOrder.company?.name,
+					supervisor: workOrder.supervisor?.name + " " + workOrder.supervisor?.email,
+					responsible: workOrder.responsible?.name + " " + workOrder.responsible?.email,
+					_count: workOrder._count.workEntries,
+				}))
+			)
+
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Órdenes de Trabajo")
+			XLSX.writeFile(workbook, "ordenes-de-trabajo.xlsx")
+			toast.success("Órdenes de trabajo exportadas exitosamente")
+		} catch (error) {
+			console.error("[EXPORT_EXCEL]", error)
+			toast.error("Error al exportar órdenes de trabajo")
+		} finally {
+			setExportLoading(false)
+		}
+	}
+
 	return (
 		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
@@ -159,6 +218,15 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 				</div>
 
 				<div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-full md:flex-row">
+					<Button
+						onClick={handleExportToExcel}
+						disabled={isLoading || exportLoading || !data?.workOrders?.length}
+						className="cursor-pointer gap-1 bg-orange-500 text-white transition-all hover:scale-105 hover:bg-orange-600 hover:text-white"
+					>
+						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+						Exportar
+					</Button>
+
 					<Select
 						onValueChange={(value) => {
 							if (value === "all") {

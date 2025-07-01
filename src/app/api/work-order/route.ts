@@ -102,6 +102,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					workDescription: true,
 					workProgressStatus: true,
 					priority: true,
+					createdAt: true,
 					initReport: {
 						select: {
 							url: true,

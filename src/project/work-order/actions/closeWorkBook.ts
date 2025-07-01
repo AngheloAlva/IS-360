@@ -59,6 +59,7 @@ export async function closeWorkBook({ userId, workBookId, reason }: CloseWorkBoo
 			data: {
 				status: "COMPLETED",
 				closureRejectedReason: reason || null,
+				workProgressStatus: 100,
 			},
 			select: {
 				id: true,
