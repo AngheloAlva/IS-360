@@ -95,7 +95,6 @@ export const createWorkOrder = async ({
 			companyId,
 			supervisorId,
 			responsibleId,
-			isInternalResponsible,
 			...rest
 		} = values
 
@@ -108,11 +107,7 @@ export const createWorkOrder = async ({
 					},
 				},
 				supervisor: {
-					connect: {
-						...(isInternalResponsible
-							? { email: "scontrol.trm@oleotrasandino.cl" }
-							: { id: supervisorId }),
-					},
+					connect: { id: supervisorId },
 				},
 				...(companyId
 					? {
