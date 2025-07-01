@@ -70,6 +70,7 @@ interface WorkOrdersParams {
 	limit: number
 	search: string
 	orderBy: OrderBy
+	isOtcMember?: boolean
 	permitFilter?: boolean
 	companyId: string | null
 	typeFilter: string | null
@@ -92,13 +93,14 @@ export const fetchWorkOrders: QueryFunction<
 			page: number
 			limit: number
 			search: string
+			order: Order
+			orderBy: OrderBy
+			isOtcMember?: boolean
+			permitFilter?: boolean
+			companyId: string | null
 			typeFilter: string | null
 			statusFilter: string | null
-			companyId: string | null
 			dateRange: DateRange | null
-			permitFilter?: boolean
-			orderBy: OrderBy
-			order: Order
 		},
 	]
 > = async ({ queryKey }) => {
@@ -107,14 +109,15 @@ export const fetchWorkOrders: QueryFunction<
 		{
 			page,
 			limit,
-			search,
-			typeFilter,
-			statusFilter,
-			companyId,
-			dateRange,
-			permitFilter,
-			orderBy,
 			order,
+			search,
+			orderBy,
+			dateRange,
+			companyId,
+			typeFilter,
+			isOtcMember,
+			statusFilter,
+			permitFilter,
 		},
 	] = queryKey
 
@@ -130,6 +133,7 @@ export const fetchWorkOrders: QueryFunction<
 	if (permitFilter) searchParams.set("permitFilter", "true")
 	if (orderBy) searchParams.set("orderBy", orderBy)
 	if (order) searchParams.set("order", order)
+	if (isOtcMember) searchParams.set("isOtcMember", isOtcMember.toString())
 
 	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching work orders")
@@ -141,27 +145,29 @@ export const useWorkOrders = ({
 	page = 1,
 	limit = 10,
 	search = "",
+	order = "desc",
 	companyId = null,
 	dateRange = null,
 	typeFilter = null,
 	statusFilter = null,
 	permitFilter = false,
 	orderBy = "createdAt",
-	order = "desc",
+	isOtcMember = false,
 }: WorkOrdersParams) => {
 	const queryKey = [
 		"workOrders",
 		{
 			page,
 			limit,
-			search,
-			typeFilter,
-			statusFilter,
-			companyId,
-			dateRange,
-			permitFilter,
-			orderBy,
 			order,
+			search,
+			orderBy,
+			dateRange,
+			companyId,
+			typeFilter,
+			isOtcMember,
+			statusFilter,
+			permitFilter,
 		},
 	] as const
 

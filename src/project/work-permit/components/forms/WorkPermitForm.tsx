@@ -5,7 +5,7 @@ import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Plus, X } from "lucide-react"
+import { CirclePlusIcon, Plus, Trash2Icon, X } from "lucide-react"
 import { es } from "date-fns/locale"
 import { toast } from "sonner"
 
@@ -82,6 +82,7 @@ export default function WorkPermitForm({
 			otNumber: initialValues?.otNumber?.otNumber || "",
 			otherMutuality: initialValues?.otherMutuality || "",
 			otherPreChecks: initialValues?.otherPreChecks || "",
+			operatorWorker: initialValues?.operatorWorker || "",
 			generateWaste: initialValues?.generateWaste || false,
 			workWillBeOther: initialValues?.workWillBeOther || "",
 			additionalObservations: initialValues?.observations || "",
@@ -89,6 +90,10 @@ export default function WorkPermitForm({
 			wasteDisposalLocation: initialValues?.wasteDisposalLocation || "",
 			preventiveControlMeasures: initialValues?.preventiveControlMeasures || [],
 			otherPreventiveControlMeasures: initialValues?.otherPreventiveControlMeasures || "",
+			activityDetails: initialValues?.activityDetails?.map((activity) => ({ activity })) || [
+				{ activity: "" },
+				{ activity: "" },
+			],
 			participants: initialValues?.participants.map((participant) => ({
 				userId: participant.id,
 			})) || [
@@ -147,6 +152,7 @@ export default function WorkPermitForm({
 		companyId,
 		limit: 100,
 		search: "",
+		isOtcMember,
 		order: "desc",
 		dateRange: null,
 		typeFilter: null,
@@ -157,9 +163,9 @@ export default function WorkPermitForm({
 
 	const { data: usersData } = useUsersByCompany({
 		page: 1,
-		companyId,
 		search: "",
 		limit: 1000,
+		companyId: isOtcMember ? "cmbbc0dqr00062z0vcpigjy9l" : companyId,
 	})
 
 	useEffect(() => {
@@ -260,6 +266,15 @@ export default function WorkPermitForm({
 	} = useFieldArray({
 		control: form.control,
 		name: "participants",
+	})
+
+	const {
+		fields: activityDetailsFields,
+		append: appendActivityDetails,
+		remove: removeActivityDetail,
+	} = useFieldArray({
+		control: form.control,
+		name: "activityDetails",
 	})
 
 	return (
@@ -385,6 +400,20 @@ export default function WorkPermitForm({
 									<p className="text-muted-foreground">
 										{workOrderSelected?.estimatedDays || "N/A"} día
 										{workOrderSelected?.estimatedDays === 1 ? "" : "s"}
+									</p>
+								</div>
+								<div>
+									<h3 className="text-sm font-semibold">Empresa:</h3>
+									<p className="text-muted-foreground">
+										{workOrderSelected?.company?.name || "N/A"}
+									</p>
+								</div>
+								<div>
+									<h3 className="text-sm font-semibold">
+										{isOtcMember ? "Operador" : "Supervisor"}:
+									</h3>
+									<p className="text-muted-foreground">
+										{workOrderSelected?.supervisor.name || "N/A"}
 									</p>
 								</div>
 							</div>
@@ -516,10 +545,60 @@ export default function WorkPermitForm({
 							</>
 						)}
 
+						<Separator className="my-2 md:col-span-2" />
+
+						<div>
+							<h2 className="text-lg font-semibold">Detalle de actividades</h2>
+							<p className="text-muted-foreground text-sm">
+								Debe detallar las actividades que se realizarán durante el permiso de trabajo.
+							</p>
+						</div>
+
+						<div className="flex items-center justify-end">
+							<Button
+								type="button"
+								variant="ghost"
+								className="w-fit"
+								onClick={() => appendActivityDetails({ activity: "" })}
+							>
+								<CirclePlusIcon className="h-4 w-4" />
+								Agregar actividad
+							</Button>
+						</div>
+
+						{activityDetailsFields.map((field, index) => (
+							<div key={field.id} className="flex w-full flex-nowrap items-end gap-1">
+								<InputFormField<WorkPermitSchema>
+									label={`Actividad ${index + 1}`}
+									control={form.control}
+									itemClassName="w-full"
+									placeholder="Especifique la actividad"
+									name={`activityDetails.${index}.activity`}
+								/>
+
+								{index > 0 && (
+									<Button
+										size={"icon"}
+										type="button"
+										variant="ghost"
+										onClick={() => removeActivityDetail(index)}
+									>
+										<Trash2Icon />
+									</Button>
+								)}
+							</div>
+						))}
+
 						<Separator className="mt-2 md:col-span-2" />
 
 						<div className="flex w-full items-center justify-between md:col-span-2">
-							<h2 className="text-lg font-semibold md:col-span-2">Registro de participacion</h2>
+							<div className="md:col-span-2">
+								<h2 className="text-lg font-semibold">Registro de participacion</h2>
+								<p className="text-muted-foreground text-sm">
+									Debe registrar los participantes que se van a registrar en el permiso de trabajo.
+									Estos serán utilizados como opciones en el libro de obras.
+								</p>
+							</div>
 
 							<Button
 								type="button"

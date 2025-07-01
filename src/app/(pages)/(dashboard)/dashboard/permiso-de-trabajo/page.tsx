@@ -1,11 +1,11 @@
+import { PlusCircleIcon } from "lucide-react"
 import { headers } from "next/headers"
+import Link from "next/link"
 
 import { auth } from "@/lib/auth"
 
 import { WorkPermitsTableByCompany } from "@/project/work-permit/components/data/WorkPermitsTableByCompany"
-import Link from "next/link"
 import { Button } from "@/shared/components/ui/button"
-import { PlusCircleIcon } from "lucide-react"
 
 export default async function WorkPermitPage() {
 	const res = await auth.api.getSession({

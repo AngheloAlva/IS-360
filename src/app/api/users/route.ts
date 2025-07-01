@@ -5,6 +5,8 @@ import { USER_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -20,6 +22,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
 		const showOnlyInternal = searchParams.get("showOnlyInternal") === "true"
+		const orderBy = searchParams.get("orderBy") as OrderBy
+		const order = searchParams.get("order") as Order
 
 		const skip = (page - 1) * limit
 
@@ -64,7 +68,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				skip,
 				take: limit,
 				orderBy: {
-					createdAt: "desc",
+					[orderBy]: order,
 				},
 				cacheStrategy: {
 					ttl: 10,

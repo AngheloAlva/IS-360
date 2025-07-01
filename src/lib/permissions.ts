@@ -12,6 +12,7 @@ export const statement = {
 	equipment: ["create", "update", "delete", "list"],
 	company: ["create", "update", "delete", "list"],
 	workRequest: ["create", "update", "delete", "list"],
+	workBook: ["create", "update", "delete", "list"],
 } as const
 
 export const ac = createAccessControl(statement)
@@ -27,6 +28,7 @@ export const admin = ac.newRole({
 	equipment: ["create", "update", "delete", "list"],
 	company: ["create", "update", "delete", "list"],
 	workRequest: ["create", "update", "delete", "list"],
+	workBook: ["create", "update", "delete", "list"],
 })
 
 export const user = ac.newRole({
@@ -197,6 +199,20 @@ export const workRequestOperator = ac.newRole({
 	workRequest: ["list", "create", "update", "delete"],
 })
 
+export const operator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list", "create", "update", "delete"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+	workRequest: ["list", "create", "update", "delete"],
+	workBook: ["list", "create", "update", "delete"],
+})
+
 export const USER_ROLE = {
 	user: "user",
 	admin: "admin",
@@ -210,6 +226,7 @@ export const USER_ROLE = {
 	companyOperator: "companyOperator",
 	userOperator: "userOperator",
 	workRequestOperator: "workRequestOperator",
+	operator: "operator",
 }
 
 export const USER_ROLE_LABELS = {
@@ -225,6 +242,7 @@ export const USER_ROLE_LABELS = {
 	[USER_ROLE.companyOperator]: "Empresas",
 	[USER_ROLE.userOperator]: "Usuarios",
 	[USER_ROLE.workRequestOperator]: "Solicitudes de Trabajo",
+	[USER_ROLE.operator]: "Operador",
 }
 
 export const USER_ROLE_ARRAY = [
@@ -240,4 +258,5 @@ export const USER_ROLE_ARRAY = [
 	"companyOperator",
 	"userOperator",
 	"workRequestOperator",
+	"operator",
 ] as const

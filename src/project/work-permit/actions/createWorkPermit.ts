@@ -28,11 +28,12 @@ export const createWorkPermit = async ({ values, userId, companyId }: CreateWork
 	}
 
 	try {
-		const { participants, ...rest } = values
+		const { participants, activityDetails, ...rest } = values
 
 		const workPermit = await prisma.workPermit.create({
 			data: {
 				...rest,
+				activityDetails: activityDetails.map((activityDetail) => activityDetail.activity),
 				otNumber: {
 					connect: {
 						otNumber: values.otNumber,

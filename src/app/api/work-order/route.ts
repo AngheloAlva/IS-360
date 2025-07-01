@@ -30,6 +30,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const permitFilter = searchParams.get("permitFilter") === "true"
 		const order = searchParams.get("order") as Order
 		const orderBy = searchParams.get("orderBy") as OrderBy
+		const isOtcMember = searchParams.get("isOtcMember") === "true"
 
 		let orderByField: string
 
@@ -69,6 +70,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			...(companyId
 				? {
 						companyId: companyId,
+					}
+				: {}),
+			...(isOtcMember
+				? {
+						companyId: "cmbbc0dqr00062z0vcpigjy9l",
 					}
 				: {}),
 			...(startDate || endDate

@@ -285,7 +285,7 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 
 							<SubmitButton
 								isSubmitting={loading}
-								className="mt-5 w-1/2 bg-purple-500 hover:bg-purple-600"
+								className="mt-5 w-1/2 bg-purple-500 hover:bg-purple-600 hover:text-white"
 								label={initialData ? "Actualizar Usuario" : "Crear Usuario"}
 							/>
 						</div>

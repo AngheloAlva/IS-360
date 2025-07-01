@@ -10,14 +10,15 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
-import { UserColumns } from "../../columns/user-columns"
 import { useUsers } from "@/project/user/hooks/use-users"
+import { UserColumns } from "../../columns/user-columns"
 import { AreasLabels } from "@/lib/consts/areas"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import InternalUser from "@/project/user/components/forms/InternalUser"
 import DeleteUser from "@/project/user/components/forms/DeleteUser"
 import { Card, CardContent } from "@/shared/components/ui/card"
+import OrderByButton from "@/shared/components/OrderByButton"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Input } from "@/shared/components/ui/input"
@@ -39,6 +40,7 @@ import {
 	SelectContent,
 } from "@/shared/components/ui/select"
 
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 import type { ApiUser } from "@/project/user/types/api-user"
 
 interface UsersTableProps {
@@ -49,12 +51,16 @@ interface UsersTableProps {
 export function UsersTable({ hasPermission, id }: UsersTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
+	const [orderBy, setOrderBy] = useState<OrderBy>("name")
+	const [order, setOrder] = useState<Order>("asc")
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
 
 	const { data, isLoading, refetch, isFetching } = useUsers({
 		page,
+		order,
 		search,
+		orderBy,
 		limit: 15,
 	})
 
@@ -117,6 +123,15 @@ export function UsersTable({ hasPermission, id }: UsersTableProps) {
 								</SelectGroup>
 							</SelectContent>
 						</Select>
+
+						<OrderByButton
+							initialOrder={order}
+							initialOrderBy={orderBy}
+							onChange={(orderBy, order) => {
+								setOrderBy(orderBy)
+								setOrder(order)
+							}}
+						/>
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
 					</div>

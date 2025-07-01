@@ -612,6 +612,7 @@ model WorkPermit {
   company                        Company                @relation(fields: [companyId], references: [id])
   companyId                      String
   vehicles                       Vehicle[]
+  operatorWorker                 String?
   attachments                    WorkPermitAttachment[]
 
   @@map("work_permit")

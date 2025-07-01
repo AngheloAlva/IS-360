@@ -28,6 +28,10 @@ export const workPermitSchema = z.object({
 	additionalObservations: z.string().optional(),
 	startDate: z.date(),
 	endDate: z.date(),
+	activityDetails: z
+		.array(z.object({ activity: z.string() }))
+		.min(1, { message: "Debe especificar al menos una actividad" }),
+	operatorWorker: z.string().optional(),
 
 	participants: z.array(
 		z.object({

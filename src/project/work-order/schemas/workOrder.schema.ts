@@ -4,7 +4,6 @@ import { WORK_ORDER_CAPEX, WORK_ORDER_PRIORITY, WORK_ORDER_TYPE } from "@prisma/
 import { fileSchema } from "@/shared/schemas/file.schema"
 
 export const workOrderSchema = z.object({
-	isInternalResponsible: z.boolean().optional(),
 	type: z.nativeEnum(WORK_ORDER_TYPE, { message: "El tipo no es válido" }),
 	solicitationDate: z.date({ message: "La fecha de solicitud no es válida" }),
 	solicitationTime: z.string({ message: "La hora de solicitud no es válida" }),

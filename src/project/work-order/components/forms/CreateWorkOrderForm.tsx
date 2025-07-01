@@ -13,7 +13,6 @@ import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/project/company/hooks/use-companies"
-import { OPERATOR_LIST } from "@/lib/consts/operator-list"
 import { useUsers } from "@/project/user/hooks/use-users"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
@@ -28,7 +27,6 @@ import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormF
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
-import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { Form, FormItem, FormLabel } from "@/shared/components/ui/form"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
@@ -165,8 +163,6 @@ export default function CreateWorkOrderForm({
 		}
 	}
 
-	const isInternalResponsible = form.watch("isInternalResponsible")
-
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
@@ -292,63 +288,34 @@ export default function CreateWorkOrderForm({
 							</span>
 						</div>
 
-						<SwitchFormField<WorkOrderSchema>
+						<SelectWithSearchFormField<WorkOrderSchema>
+							name="companyId"
 							control={form.control}
-							label="Responsable Interno"
-							name="isInternalResponsible"
-							itemClassName="sm:col-span-2"
-							onCheckedChange={(checked) => {
-								form.setValue("isInternalResponsible", checked)
-								form.setValue("companyId", "")
-								form.setValue("supervisorId", "")
-								setSelectedCompany(undefined)
+							options={
+								companiesData?.companies.map((company) => ({
+									value: company.id,
+									label: company.name,
+								})) ?? []
+							}
+							label="Empresa Responsable"
+							onChange={(value) => {
+								setSelectedCompany(companiesData?.companies.find((company) => company.id === value))
 							}}
 						/>
 
-						{!isInternalResponsible ? (
-							<>
-								<SelectWithSearchFormField<WorkOrderSchema>
-									name="companyId"
-									control={form.control}
-									options={
-										companiesData?.companies.map((company) => ({
-											value: company.id,
-											label: company.name,
-										})) ?? []
-									}
-									label="Empresa Responsable"
-									onChange={(value) => {
-										setSelectedCompany(
-											companiesData?.companies.find((company) => company.id === value)
-										)
-									}}
-								/>
-
-								{selectedCompany && (
-									<SelectWithSearchFormField<WorkOrderSchema>
-										name="supervisorId"
-										control={form.control}
-										options={
-											selectedCompany?.users
-												.filter((user) => user.isSupervisor)
-												.map((user) => ({
-													value: user.id,
-													label: user.name,
-												})) ?? []
-										}
-										label="Supervisor"
-									/>
-								)}
-							</>
-						) : (
+						{selectedCompany && (
 							<SelectWithSearchFormField<WorkOrderSchema>
 								name="supervisorId"
 								control={form.control}
-								options={OPERATOR_LIST.map((operator) => ({
-									value: operator,
-									label: operator,
-								}))}
-								label="Responsable Interno"
+								options={
+									selectedCompany?.users
+										.filter((user) => user.isSupervisor)
+										.map((user) => ({
+											value: user.id,
+											label: user.name,
+										})) ?? []
+								}
+								label="Supervisor"
 							/>
 						)}
 
