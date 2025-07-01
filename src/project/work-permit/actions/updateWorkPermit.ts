@@ -26,7 +26,7 @@ export const updateWorkPermit = async ({ id, values }: UpdateWorkPermitProps) =>
 	}
 
 	try {
-		const { participants, ...rest } = values
+		const { participants, activityDetails, ...rest } = values
 
 		const updatedWorkPermit = await prisma.workPermit.update({
 			where: {
@@ -39,6 +39,7 @@ export const updateWorkPermit = async ({ id, values }: UpdateWorkPermitProps) =>
 						id: participant.userId,
 					})),
 				},
+				activityDetails: activityDetails.map((activityDetail) => activityDetail.activity),
 			},
 		})
 
