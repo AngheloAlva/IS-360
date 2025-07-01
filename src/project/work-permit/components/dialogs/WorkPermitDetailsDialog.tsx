@@ -15,6 +15,7 @@ import {
 	ClipboardListIcon,
 	CloudUploadIcon,
 	PaperclipIcon,
+	CheckCircle2Icon,
 } from "lucide-react"
 
 import { WorkPermitStatus, WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
@@ -191,6 +192,25 @@ export default function WorkPermitDetailsDialog({
 								</div>
 							</div>
 						</div>
+
+						{workPermit.activityDetails.length > 0 && (
+							<>
+								<Separator className="my-4" />
+
+								<h2 className="flex items-center gap-2 text-lg font-semibold">
+									<CheckCircle2Icon className="h-5 w-5" />
+									Detalle de actividades
+								</h2>
+
+								<ul className="space-y-1">
+									{workPermit.activityDetails.map((activityDetail, index) => (
+										<li key={index} className="flex items-center gap-2">
+											{activityDetail}
+										</li>
+									))}
+								</ul>
+							</>
+						)}
 
 						<Separator className="my-4" />
 

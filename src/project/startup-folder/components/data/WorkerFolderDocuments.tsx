@@ -40,6 +40,7 @@ import {
 } from "@/shared/components/ui/table"
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
+import { BASIC_FOLDER_STRUCTURE } from "../../../../lib/consts/basic-startup-folders-structure"
 import type {
 	BasicDocumentType,
 	WorkerDocumentType,
@@ -95,7 +96,10 @@ export function WorkerFolderDocuments({
 
 	const totalDocumentsToUpload = (data as unknown as { isDriver: boolean })?.isDriver
 		? DRIVER_WORKER_STRUCTURE.documents.length
-		: BASE_WORKER_STRUCTURE.documents.length
+		: category === "BASIC"
+			? BASIC_FOLDER_STRUCTURE.documents.length
+			: BASE_WORKER_STRUCTURE.documents.length
+
 	const progress =
 		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
 
@@ -181,7 +185,12 @@ export function WorkerFolderDocuments({
 								<TableCell>
 									{doc.uploadedAt ? format(new Date(doc.uploadedAt), "dd/MM/yyyy HH:mm") : "N/A"}
 								</TableCell>
-								<TableCell>
+								<TableCell
+									className={cn({
+										"font-semibold text-rose-500":
+											doc.expirationDate && doc.expirationDate < new Date(),
+									})}
+								>
 									{doc.expirationDate ? format(new Date(doc.expirationDate), "dd/MM/yyyy") : "N/A"}
 								</TableCell>
 								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
