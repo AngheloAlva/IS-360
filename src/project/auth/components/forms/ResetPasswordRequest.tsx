@@ -47,7 +47,7 @@ export default function ResetPasswordRequest(): React.ReactElement {
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger className="text-primary text-sm font-medium tracking-wide hover:underline">
+			<DialogTrigger className="text-sm font-medium tracking-wide text-green-600 hover:underline">
 				¿Olvidaste tu contraseña?
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">

@@ -312,6 +312,12 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
+								<Text style={styles.label}>Empresa:</Text>
+								<Text style={styles.value}>{workPermit.company.name}</Text>
+							</View>
+						</View>
+						<View style={styles.column}>
+							<View style={styles.row}>
 								<Text style={styles.label}>Lugar exacto:</Text>
 								<Text style={styles.value}>{workPermit.exactPlace}</Text>
 							</View>

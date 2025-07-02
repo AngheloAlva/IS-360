@@ -3,7 +3,7 @@ import Link from "next/link"
 export default function HomePage(): React.ReactElement {
 	return (
 		<main>
-			<section className="relative flex min-h-screen w-full items-center justify-center bg-[url('/images/home/hero.jpg')] bg-cover bg-center bg-no-repeat sm:items-center sm:justify-start">
+			<section className="relative flex min-h-screen w-full items-center justify-center bg-[url('/images/home/hero.jpeg')] bg-cover bg-center bg-no-repeat sm:items-center sm:justify-start">
 				<div className="absolute inset-0 bg-gray-900/75 sm:bg-transparent sm:bg-gradient-to-r sm:from-gray-900/95 sm:to-gray-900/25"></div>
 
 				<div className="relative mx-auto max-w-screen-xl px-4 sm:mx-0 sm:px-6 md:px-10 lg:flex lg:h-screen lg:items-center lg:px-16">

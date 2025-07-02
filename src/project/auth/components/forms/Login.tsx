@@ -57,14 +57,15 @@ export default function Login(): React.ReactElement {
 	}
 
 	return (
-		<Card>
-			<CardHeader>
+		<Card className="w-full border-none sm:w-4/5">
+			<CardHeader className="gap-1">
 				<h2 className="text-2xl font-bold">Iniciar Sesión</h2>
+				<p className="text-text/80 leading-relaxed">Ingresa tus datos para acceder a tu cuenta.</p>
 			</CardHeader>
 
 			<CardContent>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-3">
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-4">
 						<InputFormField<LoginSchema>
 							control={form.control}
 							name="email"
@@ -83,7 +84,7 @@ export default function Login(): React.ReactElement {
 						<SubmitButton
 							label="Iniciar sesión"
 							isSubmitting={loading}
-							className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white"
+							className="mt-4 bg-green-600 text-white hover:bg-green-600 hover:text-white"
 						/>
 					</form>
 				</Form>
