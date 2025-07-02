@@ -6,7 +6,9 @@ import Link from "next/link"
 
 import { useStartupFoldersList } from "@/project/startup-folder/hooks/use-startup-folder"
 import { WorkOrderStatusSimpleOptions } from "@/lib/consts/work-order-status"
+import { StartupFolderStatus, type WORK_ORDER_STATUS } from "@prisma/client"
 import { useDebounce } from "@/shared/hooks/useDebounce"
+import { cn } from "@/lib/utils"
 
 import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
@@ -33,9 +35,6 @@ import {
 	SelectSeparator,
 } from "@/shared/components/ui/select"
 
-import { StartupFolderStatus, type WORK_ORDER_STATUS } from "@prisma/client"
-import { cn } from "@/lib/utils"
-
 interface AdminStartupFoldersListProps {
 	id: string
 }
@@ -59,12 +58,12 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 
 	return (
 		<>
-			<div className="mb-4 grid w-full grid-cols-2 gap-2" id={id}>
+			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-5" id={id}>
 				<SearchInput
 					value={searchTerm}
 					onChange={setSearchTerm}
 					inputClassName="bg-background"
-					className="col-span-2 sm:col-span-1"
+					className="col-span-2 sm:col-span-1 lg:col-span-2"
 					placeholder="Buscar por nombre o RUT de empresa..."
 				/>
 
@@ -166,7 +165,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{companiesWithFolders?.map((company) => (
 						<Card key={company.id} className="group relative transition-all hover:shadow-md">
-							<CardHeader className="pb-2">
+							<CardHeader className="sm:pb-2">
 								<div className="flex items-center gap-4">
 									<Avatar className="size-14 text-lg">
 										<AvatarImage src={company.image || ""} />
@@ -182,7 +181,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 								</div>
 							</CardHeader>
 
-							<CardContent className="space-y-4">
+							<CardContent>
 								<div>
 									<h2 className="text-muted-foreground text-sm font-medium">
 										Carpetas de arranque:
@@ -194,7 +193,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 												<Badge
 													key={folder.id}
 													className={cn(
-														"bg-accent text-text flex items-center text-wrap whitespace-normal",
+														"bg-accent text-text flex items-center text-xs text-wrap whitespace-normal sm:text-sm",
 														{
 															"border border-cyan-500 bg-cyan-500/10 text-cyan-600":
 																folder.status === StartupFolderStatus.COMPLETED,

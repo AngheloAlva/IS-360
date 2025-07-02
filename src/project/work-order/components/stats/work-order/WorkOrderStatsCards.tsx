@@ -12,7 +12,7 @@ interface WorkOrderStatCardsProps {
 
 export function WorkOrderStatCards({ data }: WorkOrderStatCardsProps) {
 	return (
-		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+		<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 			<Card className="overflow-hidden border-none pt-0">
 				<div className="bg-gradient-to-br from-orange-500 to-orange-600 p-1.5" />
 				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

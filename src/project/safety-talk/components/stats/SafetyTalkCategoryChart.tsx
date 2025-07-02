@@ -33,7 +33,8 @@ export function SafetyTalkCategoryChart({ data }: SafetyTalkCategoryChartProps) 
 					<ChartPieIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>
 			</CardHeader>
-			<CardContent className="flex justify-center">
+
+			<CardContent className="px-0">
 				<ChartContainer
 					config={{
 						ENVIRONMENT: {
@@ -43,7 +44,7 @@ export function SafetyTalkCategoryChart({ data }: SafetyTalkCategoryChartProps) 
 							label: "IRL",
 						},
 					}}
-					className="h-[250px] w-full"
+					className="h-[250px] w-full max-w-[90dvw]"
 				>
 					<PieChart>
 						<Pie

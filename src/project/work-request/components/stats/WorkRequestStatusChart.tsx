@@ -39,7 +39,7 @@ export default function WorkRequestStatusChart({ data }: WorkRequestStatusChartP
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<div className="h-[250px] w-full px-2">
+				<div className="h-[250px] w-full max-w-[90dvw] px-2">
 					<ChartContainer
 						config={{
 							Atendidas: {

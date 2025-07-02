@@ -54,7 +54,7 @@ export function SafetyTalkStatusChart({ data }: SafetyTalkStatusChartProps) {
 				</div>
 			</CardHeader>
 			<CardContent className="px-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<BarChart data={formattedData} margin={{ bottom: 20, top: 10, right: 15 }}>
 						<ChartTooltip content={<ChartTooltipContent />} />
 						<CartesianGrid strokeDasharray="3 3" opacity={0.5} />

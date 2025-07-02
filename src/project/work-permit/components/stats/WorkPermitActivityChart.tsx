@@ -32,7 +32,7 @@ export default function WorkPermitActivityChart({ data }: WorkPermitActivityChar
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<AreaChart data={data} margin={{ right: 15 }}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
 

@@ -63,7 +63,7 @@ export default function WorkRequestUrgencyChart({ data }: WorkRequestUrgencyChar
 								label: "Pendientes",
 							},
 						}}
-						className="h-[250px] w-full"
+						className="h-[250px] w-full max-w-[90dvw]"
 					>
 						<BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
 							<CartesianGrid strokeDasharray="3 3" />

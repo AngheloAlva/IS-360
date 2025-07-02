@@ -51,7 +51,7 @@ export default function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
 								label: "Atendidas",
 							},
 						}}
-						className="h-[250px] w-full"
+						className="h-[250px] w-full max-w-[90dvw]"
 					>
 						<AreaChart data={data} margin={{ right: 20 }}>
 							<CartesianGrid strokeDasharray="3 3" />

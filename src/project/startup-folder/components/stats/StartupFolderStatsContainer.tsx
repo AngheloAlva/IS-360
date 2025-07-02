@@ -22,8 +22,8 @@ export function StartupFolderStatsContainer() {
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-teal-500 to-teal-600 p-1.5" />
 
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Total de carpetas</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 md:pb-2">
+						<CardTitle className="text-sm font-medium md:text-base">Total de carpetas</CardTitle>
 						<div className="rounded-lg bg-teal-500/20 p-1.5 text-teal-500">
 							<FolderIcon className="h-5 w-5 text-teal-500" />
 						</div>
@@ -37,8 +37,8 @@ export function StartupFolderStatsContainer() {
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-teal-600 to-cyan-500 p-1.5" />
 
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Carpetas por revisar</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 md:pb-2">
+						<CardTitle className="text-sm font-medium md:text-base">Carpetas por revisar</CardTitle>
 						<div className="rounded-lg bg-teal-600/20 p-1.5 text-teal-600">
 							<ClipboardCheckIcon className="h-5 w-5 text-teal-600" />
 						</div>
@@ -52,8 +52,8 @@ export function StartupFolderStatsContainer() {
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-cyan-500 to-cyan-600 p-1.5" />
 
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Carpetas activas</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 md:pb-2">
+						<CardTitle className="text-sm font-medium md:text-base">Carpetas activas</CardTitle>
 						<div className="rounded-lg bg-cyan-500/20 p-1.5 text-cyan-500">
 							<UsersIcon className="h-5 w-5 text-cyan-500" />
 						</div>
@@ -67,8 +67,8 @@ export function StartupFolderStatsContainer() {
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-cyan-600 to-cyan-700 p-1.5" />
 
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Empresas aprobadas</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 md:pb-2">
+						<CardTitle className="text-sm font-medium md:text-base">Empresas aprobadas</CardTitle>
 						<div className="rounded-lg bg-cyan-600/20 p-1.5 text-cyan-600">
 							<BuildingIcon className="h-5 w-5 text-cyan-600" />
 						</div>

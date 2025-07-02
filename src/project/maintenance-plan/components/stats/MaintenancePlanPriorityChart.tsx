@@ -26,7 +26,7 @@ export default function MaintenancePlanPriorityChart({ data }: MaintenancePlanPr
 				<CardTitle className="text-lg">Órdenes por Prioridad</CardTitle>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<BarChart data={data}>
 						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis dataKey="name" />

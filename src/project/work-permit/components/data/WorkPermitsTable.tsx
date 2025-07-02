@@ -75,15 +75,15 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
-					<div className="flex w-full items-center justify-between gap-4">
+					<div className="flex w-full flex-col items-end justify-between gap-4 lg:flex-row">
 						<SearchInput
 							value={search}
 							onChange={setSearch}
 							placeholder="Buscar permisos..."
-							className="w-[150px] lg:w-[250px]"
+							className="w-full lg:w-[250px]"
 						/>
 
-						<div className="flex items-center gap-2">
+						<div className="flex items-center justify-end gap-2">
 							<OrderByButton
 								onChange={(orderBy, order) => {
 									setOrderBy(orderBy)

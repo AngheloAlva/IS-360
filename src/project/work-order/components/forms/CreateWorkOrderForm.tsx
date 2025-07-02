@@ -177,7 +177,7 @@ export default function CreateWorkOrderForm({
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">
+				<span className="hidden lg:inline">
 					{equipmentName ? "Nueva OT" : "Nueva Orden de Trabajo"}
 				</span>
 			</SheetTrigger>

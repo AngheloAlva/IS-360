@@ -47,9 +47,9 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 					<PieChartIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="px-0">
 				<ChartContainer
-					className="h-[250px] w-full"
+					className="h-[250px] w-full max-w-[90dvw]"
 					config={{
 						IN_PROGRESS: {
 							label: "En Progreso",

@@ -39,7 +39,7 @@ export function UserWorkOrdersChart({ data }: UserWorkOrdersChartProps) {
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<BarChart data={chartData}>
 						<XAxis
 							dataKey="name"

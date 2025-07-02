@@ -30,7 +30,7 @@ export function WorkBookProgressChart() {
 					<CardTitle>Progreso en el Tiempo</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<Skeleton className="h-[250px] w-full" />
+					<Skeleton className="h-[250px] w-full max-w-[90dvw]" />
 				</CardContent>
 			</Card>
 		)

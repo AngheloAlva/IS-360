@@ -18,7 +18,7 @@ export default function MaintenancePlanChart({ data }: MaintenancePlanChartProps
 				<CardTitle className="text-lg">Tareas Creadas por Mes</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<AreaChart
 						data={data}
 						margin={{

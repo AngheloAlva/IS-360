@@ -40,7 +40,7 @@ export default function EquipmentTypeChart({ data }: EquipmentTypeChartProps) {
 
 			<CardContent className="p-4">
 				<div className="h-[240px] w-full">
-					<ChartContainer config={{}} className="h-[250px] w-full">
+					<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 						<BarChart
 							data={chartData}
 							layout="vertical"

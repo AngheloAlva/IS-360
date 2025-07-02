@@ -13,6 +13,7 @@ import {
 	CardTitle,
 } from "@/shared/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/components/ui/chart"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 
 interface WorkOrderPriorityChartProps {
 	data: WorkOrderStatsResponse
@@ -27,6 +28,7 @@ const PRIORITY_COLORS: Record<string, string> = {
 export function WorkOrderPriorityChart({ data }: WorkOrderPriorityChartProps) {
 	const priorityData = data.charts.priority.map((item) => ({
 		...item,
+		name: WorkOrderPriorityLabels[item.name as keyof typeof WorkOrderPriorityLabels],
 		color: PRIORITY_COLORS[item.name] || "var(--color-gray-500)",
 	}))
 
@@ -43,7 +45,7 @@ export function WorkOrderPriorityChart({ data }: WorkOrderPriorityChartProps) {
 			</CardHeader>
 			<CardContent className="p-0">
 				<ChartContainer
-					className="h-[250px] w-full"
+					className="h-[250px] w-full max-w-[90dvw]"
 					config={{
 						LOW: {
 							label: "Baja",
@@ -57,10 +59,10 @@ export function WorkOrderPriorityChart({ data }: WorkOrderPriorityChartProps) {
 					}}
 				>
 					<BarChart data={priorityData} margin={{ top: 10, right: 20, left: 0 }}>
+						<ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
 						<XAxis dataKey="name" />
 						<YAxis dataKey="value" />
-						<ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
 
 						<Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={60}>
 							{priorityData.map((entry, index) => (

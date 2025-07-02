@@ -25,8 +25,8 @@ export function SafetyTalkStats({ data, isLoading }: SafetyTalkStatsProps) {
 			<Card className="overflow-hidden border-none pt-0">
 				<div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-1.5" />
 
-				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-					<CardTitle className="text-base font-medium">Total Completadas</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+					<CardTitle className="text-sm font-medium sm:text-base">Total Completadas</CardTitle>
 					<div className="rounded-lg bg-emerald-500/20 p-1.5 text-emerald-500">
 						<CheckCircle2 className="h-5 w-5 text-emerald-500" />
 					</div>
@@ -39,8 +39,8 @@ export function SafetyTalkStats({ data, isLoading }: SafetyTalkStatsProps) {
 
 			<Card className="overflow-hidden border-none pt-0">
 				<div className="bg-gradient-to-br from-emerald-600 to-sky-500 p-1.5" />
-				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-					<CardTitle className="text-base font-medium">Aprobadas</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+					<CardTitle className="text-sm font-medium sm:text-base">Aprobadas</CardTitle>
 					<div className="rounded-lg bg-emerald-600/20 p-1.5 text-emerald-600">
 						<CheckCircle2 className="h-5 w-5 text-emerald-500" />
 					</div>
@@ -53,8 +53,8 @@ export function SafetyTalkStats({ data, isLoading }: SafetyTalkStatsProps) {
 
 			<Card className="overflow-hidden border-none pt-0">
 				<div className="bg-gradient-to-br from-sky-500 to-sky-600 p-1.5" />
-				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-					<CardTitle className="text-base font-medium">Reprobadas</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+					<CardTitle className="text-sm font-medium sm:text-base">Reprobadas</CardTitle>
 					<div className="rounded-lg bg-sky-500/20 p-1.5 text-sky-500">
 						<XCircle className="h-5 w-5 text-sky-500" />
 					</div>
@@ -67,8 +67,8 @@ export function SafetyTalkStats({ data, isLoading }: SafetyTalkStatsProps) {
 
 			<Card className="overflow-hidden border-none pt-0">
 				<div className="bg-gradient-to-br from-sky-600 to-sky-700 p-1.5" />
-				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-					<CardTitle className="text-base font-medium">Pendientes</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+					<CardTitle className="text-sm font-medium sm:text-base">Pendientes</CardTitle>
 					<div className="rounded-lg bg-sky-600/20 p-1.5 text-sky-600">
 						<Clock className="h-5 w-5 text-sky-600" />
 					</div>

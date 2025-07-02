@@ -57,7 +57,7 @@ export function WorkOrderMonthlyChart({ data }: WorkOrderMonthlyChartProps) {
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer className="h-[250px] w-full" config={{}}>
+				<ChartContainer className="h-[250px] w-full max-w-[90dvw]" config={{}}>
 					<AreaChart data={monthlyData} margin={{ top: 10, right: 20, left: 0 }}>
 						<defs>
 							<linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">

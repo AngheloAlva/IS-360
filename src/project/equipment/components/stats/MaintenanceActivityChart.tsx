@@ -37,7 +37,7 @@ export default function MaintenanceActivityChart({ data }: MaintenanceActivityCh
 			</CardHeader>
 
 			<CardContent className="py-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<AreaChart
 						data={data}
 						margin={{

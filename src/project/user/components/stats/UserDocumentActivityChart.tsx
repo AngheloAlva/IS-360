@@ -107,7 +107,7 @@ export function UserDocumentActivityChart({ data }: UserDocumentActivityChartPro
 				</div>
 			</CardHeader>
 			<CardContent className="px-2 py-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<AreaChart data={chartData}>
 						<CartesianGrid strokeDasharray="3 3" opacity={0.5} />
 						<XAxis

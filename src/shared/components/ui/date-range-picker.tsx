@@ -55,10 +55,11 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 
 				<PopoverContent className="w-auto p-0" align="start">
 					<Calendar
-						initialFocus
 						mode="range"
+						captionLayout={"dropdown"}
 						defaultMonth={date?.from}
 						selected={date ?? undefined}
+						fromYear={2024}
 						onSelect={(newDate) => {
 							setDate(newDate ?? null)
 							onChange?.(newDate ?? null)

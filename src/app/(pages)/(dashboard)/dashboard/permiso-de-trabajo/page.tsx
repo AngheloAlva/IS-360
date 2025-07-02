@@ -32,7 +32,7 @@ export default async function WorkPermitPage() {
 					<Link href="/dashboard/permiso-de-trabajo/agregar">
 						<Button className="gap-1.5 bg-white font-semibold tracking-wide text-purple-600 transition-all hover:scale-105 hover:bg-white hover:text-purple-700">
 							<PlusCircleIcon className="ml-1" />
-							Nuevo Permiso de Trabajo
+							Permiso de Trabajo
 						</Button>
 					</Link>
 				</div>

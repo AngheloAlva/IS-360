@@ -38,13 +38,15 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	return (
 		<div className={"flex h-full w-full flex-1 flex-col gap-8 transition-all"}>
 			<div className="rounded-lg bg-gradient-to-r from-orange-600 to-red-600 p-6 shadow-lg">
-				<div className="flex items-center justify-between">
-					<div className="text-white">
-						<h1 className="text-3xl font-bold tracking-tight">Órdenes de Trabajo</h1>
-						<p className="opacity-90">Gestión y seguimiento de órdenes de trabajo</p>
+				<div className="flex flex-col items-center justify-between gap-3 lg:flex-row">
+					<div className="w-full text-white">
+						<h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Órdenes de Trabajo</h1>
+						<p className="text-sm opacity-90 sm:text-base">
+							Gestión y seguimiento de órdenes de trabajo
+						</p>
 					</div>
 
-					<div className="flex flex-wrap items-center justify-end gap-2">
+					<div className="flex w-full flex-wrap items-center justify-end gap-2">
 						<ScrollToTableButton
 							id="work-order-table"
 							label="Lista Órdenes"

@@ -157,7 +157,7 @@ export default function NewWorkBookForm({
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Nuevo Libro de Obras</span>
+				<span className="hidden lg:inline">Libro de Obras</span>
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-xl">

@@ -33,8 +33,6 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 		}),
 	])
 
-	console.log(hasPermission, hassWorkBookPermission)
-
 	return (
 		<WorkBookMain
 			workBookId={id}

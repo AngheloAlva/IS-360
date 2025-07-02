@@ -39,7 +39,7 @@ export function SystemHealthChart({ data, isLoading }: SystemHealthChartProps) {
 				<Activity className="text-muted-foreground h-4 w-4" />
 			</CardHeader>
 			<CardContent className="flex justify-center">
-				<div className="h-[250px] w-full">
+				<div className="h-[250px] w-full max-w-[90dvw]">
 					<ChartContainer
 						config={{
 							Saludable: {
@@ -52,7 +52,7 @@ export function SystemHealthChart({ data, isLoading }: SystemHealthChartProps) {
 								label: "Crítico",
 							},
 						}}
-						className="h-[250px] w-full"
+						className="h-[250px] w-full max-w-[90dvw]"
 					>
 						<PieChart>
 							<ChartTooltip
@@ -95,7 +95,7 @@ function SystemHealthChartSkeleton() {
 				<Skeleton className="h-4 w-4 rounded" />
 			</CardHeader>
 			<CardContent className="flex justify-center">
-				<div className="flex h-[250px] w-full items-center justify-center">
+				<div className="flex h-[250px] w-full max-w-[90dvw] items-center justify-center">
 					<Skeleton className="h-[160px] w-[160px] rounded-full" />
 				</div>
 			</CardContent>

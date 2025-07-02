@@ -54,7 +54,7 @@ export default function MaintenancePlanFrequencyChart({
 							label: "Anual",
 						},
 					}}
-					className="h-[250px] w-full"
+					className="h-[250px] w-full max-w-[90dvw]"
 				>
 					<PieChart>
 						<Pie

@@ -32,7 +32,7 @@ export function SafetyTalkMonthlyTrendChart({ data }: SafetyTalkMonthlyTrendChar
 				</div>
 			</CardHeader>
 			<CardContent className="px-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<AreaChart data={data} margin={{ bottom: 20, top: 10, right: 15 }}>
 						<CartesianGrid strokeDasharray="3 3" opacity={0.5} />
 						<XAxis angle={-25} dataKey="name" textAnchor="end" />

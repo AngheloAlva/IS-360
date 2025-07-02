@@ -11,7 +11,7 @@ export function SafetyTalkChartsContainer() {
 	if (isLoading || !charts) return null
 
 	return (
-		<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+		<div className="grid gap-4 lg:grid-cols-3">
 			<SafetyTalkCategoryChart data={charts.byCategory} />
 			<SafetyTalkStatusChart data={charts.byStatus} />
 			<SafetyTalkMonthlyTrendChart data={charts.monthlyTrend} />

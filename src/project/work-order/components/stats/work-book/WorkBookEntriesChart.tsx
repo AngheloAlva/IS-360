@@ -38,7 +38,7 @@ export function WorkBookEntriesChart() {
 					<CardTitle>Entradas por Tipo</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<Skeleton className="h-[250px] w-full" />
+					<Skeleton className="h-[250px] w-full max-w-[90dvw]" />
 				</CardContent>
 			</Card>
 		)

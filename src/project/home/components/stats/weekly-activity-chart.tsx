@@ -53,17 +53,17 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 				<TrendingUp className="text-muted-foreground h-4 w-4" />
 			</CardHeader>
 			<CardContent className="py-0 pl-2">
-				<div className="h-[250px] w-full">
-					<ChartContainer 
+				<div className="h-[250px] w-full max-w-[90dvw]">
+					<ChartContainer
 						config={{
 							workOrders: { label: "Órdenes de trabajo" },
 							permits: { label: "Permisos de trabajo" },
 							maintenance: { label: "Planes de mantenimiento" },
 							equipment: { label: "Equipos" },
 							users: { label: "Usuarios" },
-							other: { label: "Otros" }
+							other: { label: "Otros" },
 						}}
-						className="h-[250px] w-full"
+						className="h-[250px] w-full max-w-[90dvw]"
 					>
 						<AreaChart data={data}>
 							<ChartTooltip content={<ChartTooltipContent />} />
@@ -167,7 +167,7 @@ function WeeklyActivityChartSkeleton() {
 				<Skeleton className="h-4 w-4 rounded" />
 			</CardHeader>
 			<CardContent>
-				<div className="h-[250px] w-full">
+				<div className="h-[250px] w-full max-w-[90dvw]">
 					<Skeleton className="h-full w-full rounded" />
 				</div>
 			</CardContent>

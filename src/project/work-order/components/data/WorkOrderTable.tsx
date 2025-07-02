@@ -1,8 +1,9 @@
 "use client"
 
-import { DateRange } from "react-day-picker"
 import { ChevronDown, FileSpreadsheetIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
 import { useState } from "react"
+import { toast } from "sonner"
 import {
 	flexRender,
 	SortingState,
@@ -16,9 +17,12 @@ import {
 import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-book-milestones"
 import { useWorkOrders, WorkOrder } from "@/project/work-order/hooks/use-work-order"
 import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { useCompanies } from "@/project/company/hooks/use-companies"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
+import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
+import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
 
 import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
@@ -30,6 +34,7 @@ import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
 import { Button } from "@/shared/components/ui/button"
+import Spinner from "@/shared/components/Spinner"
 import {
 	Table,
 	TableRow,
@@ -54,11 +59,6 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuCheckboxItem,
 } from "@/shared/components/ui/dropdown-menu"
-import { useDebounce } from "@/shared/hooks/useDebounce"
-import { toast } from "sonner"
-import Spinner from "@/shared/components/Spinner"
-import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
-import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 
 interface WorkOrderTableProps {
 	id?: string
@@ -202,7 +202,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-wrap items-center gap-2 md:w-full md:flex-row">
 					<div className="flex flex-col">
-						<h2 className="text-2xl font-semibold">Lista de Órdenes de Trabajo</h2>
+						<h2 className="text-xl font-semibold lg:text-2xl">Lista de Órdenes de Trabajo</h2>
 						<p className="text-muted-foreground text-sm">
 							Gestión y seguimiento de todas las órdenes
 						</p>
@@ -210,9 +210,8 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 
 					<SearchInput
 						value={search}
-						className="ml-auto"
 						onChange={setSearch}
-						inputClassName="bg-background w-72"
+						className="ml-auto w-full md:w-72"
 						placeholder="Buscar por número de OT, trabajo..."
 					/>
 
@@ -223,7 +222,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					<Button
 						onClick={handleExportToExcel}
 						disabled={isLoading || exportLoading || !data?.workOrders?.length}
-						className="cursor-pointer gap-1 bg-orange-500 text-white transition-all hover:scale-105 hover:bg-orange-600 hover:text-white"
+						className="hidden cursor-pointer gap-1 bg-orange-500 text-white transition-all hover:scale-105 hover:bg-orange-600 hover:text-white md:flex"
 					>
 						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
 						Exportar

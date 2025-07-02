@@ -32,7 +32,7 @@ export default function WorkPermitTypeChart({ data }: WorkPermitTypeChartProps) 
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer config={{}} className="h-[250px] w-full">
+				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
 					<BarChart data={data} margin={{ right: 15, top: 15 }}>
 						<ChartTooltip content={<ChartTooltipContent />} />
 

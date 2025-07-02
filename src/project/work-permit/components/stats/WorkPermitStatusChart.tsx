@@ -58,7 +58,7 @@ export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusC
 							label: "Expirado",
 						},
 					}}
-					className="h-[250px] w-full"
+					className="h-[250px] w-full max-w-[90dvw]"
 				>
 					<PieChart>
 						<ChartTooltip content={<ChartTooltipContent nameKey="status" />} />

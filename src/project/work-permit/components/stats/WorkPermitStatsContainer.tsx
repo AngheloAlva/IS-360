@@ -20,8 +20,8 @@ export default function WorkPermitStatsContainer() {
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-pink-600 to-pink-700 p-1.5" />
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Total de Permisos</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+						<CardTitle className="text-sm font-medium sm:text-base">Total de Permisos</CardTitle>
 						<div className="rounded-lg bg-pink-600/20 p-1.5 text-pink-600">
 							<ClipboardListIcon className="text-pink-6s00 h-5 w-5" />
 						</div>
@@ -34,8 +34,8 @@ export default function WorkPermitStatsContainer() {
 
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-pink-700 to-rose-500 p-1.5" />
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Permisos Activos</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+						<CardTitle className="text-sm font-medium sm:text-base">Permisos Activos</CardTitle>
 						<div className="rounded-lg bg-pink-700/20 p-1.5 text-pink-700">
 							<FileCheckIcon className="h-5 w-5 text-pink-700" />
 						</div>
@@ -50,8 +50,8 @@ export default function WorkPermitStatsContainer() {
 
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-rose-500 to-rose-600 p-1.5" />
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Permisos En Progreso</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+						<CardTitle className="text-sm font-medium sm:text-base">Permisos En Progreso</CardTitle>
 						<div className="rounded-lg bg-rose-500/20 p-1.5 text-rose-500">
 							<FileWarningIcon className="h-5 w-5 text-rose-500" />
 						</div>
@@ -66,8 +66,10 @@ export default function WorkPermitStatsContainer() {
 
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-rose-600 to-rose-700 p-1.5" />
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-base font-medium">Empresas con Permisos</CardTitle>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
+						<CardTitle className="text-sm font-medium sm:text-base">
+							Empresas con Permisos
+						</CardTitle>
 						<div className="rounded-lg bg-rose-600/20 p-1.5 text-rose-600">
 							<UsersIcon className="h-5 w-5 text-rose-600" />
 						</div>
