@@ -61,6 +61,7 @@ import type {
 	EnvironmentalStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
 } from "../../types"
+
 interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
@@ -522,6 +523,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 								],
 							})
 							refetch()
+							fetchEntities()
 							setShowLinkDialog(false)
 						}}
 					/>

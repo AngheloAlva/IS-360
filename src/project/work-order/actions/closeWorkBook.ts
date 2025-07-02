@@ -11,10 +11,11 @@ import prisma from "@/lib/prisma"
 interface CloseWorkBookProps {
 	userId: string
 	reason: string
+	progress: number
 	workBookId: string
 }
 
-export async function closeWorkBook({ userId, workBookId, reason }: CloseWorkBookProps) {
+export async function closeWorkBook({ userId, workBookId, reason, progress }: CloseWorkBookProps) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -59,7 +60,7 @@ export async function closeWorkBook({ userId, workBookId, reason }: CloseWorkBoo
 			data: {
 				status: "COMPLETED",
 				closureRejectedReason: reason || null,
-				workProgressStatus: 100,
+				workProgressStatus: progress,
 			},
 			select: {
 				id: true,

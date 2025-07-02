@@ -104,7 +104,7 @@ export default function StartupFolderOverview({
 						/>
 
 						<div className="text-white">
-							<h1 className="text-3xl font-bold tracking-tight">
+							<h1 className="text-3xl font-bold tracking-tight capitalize">
 								{companyName || "Carpeta de arranque"}
 							</h1>
 							<p className="flex flex-col opacity-90">

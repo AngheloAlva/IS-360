@@ -19,6 +19,7 @@ import {
 	AlertDialogContent,
 	AlertDialogDescription,
 } from "@/shared/components/ui/alert-dialog"
+import { Slider } from "@/shared/components/ui/slider"
 
 interface CloseWorkBookProps {
 	userId: string
@@ -27,9 +28,10 @@ interface CloseWorkBookProps {
 }
 
 export function CloseWorkBook({ userId, className, workOrderId }: CloseWorkBookProps) {
-	const [rejectionReason, setRejectionReason] = useState("")
-	const [isLoading, setIsLoading] = useState(false)
-	const [isOpen, setIsOpen] = useState(false)
+	const [rejectionReason, setRejectionReason] = useState<string>("")
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [progress, setProgress] = useState<number[]>([0])
+	const [isOpen, setIsOpen] = useState<boolean>(false)
 
 	const handleAction = async () => {
 		try {
@@ -42,6 +44,7 @@ export function CloseWorkBook({ userId, className, workOrderId }: CloseWorkBookP
 
 			const response = await closeWorkBook({
 				userId,
+				progress: progress[0],
 				workBookId: workOrderId,
 				reason: rejectionReason,
 			})
@@ -107,6 +110,16 @@ export function CloseWorkBook({ userId, className, workOrderId }: CloseWorkBookP
 							onChange={(e) => setRejectionReason(e.target.value)}
 							placeholder="Ingrese la razón por la que cierra el libro de obras..."
 						/>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="progress">Progreso de cierre</Label>
+
+						<div className="flex items-center gap-2">
+							<Slider value={progress} onValueChange={setProgress} />
+
+							<span className="text-sm font-semibold">{progress}%</span>
+						</div>
 					</div>
 				</div>
 

@@ -34,6 +34,7 @@ import {
 	SelectContent,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
+import { generateSlug } from "@/lib/generateSlug"
 
 interface AdminStartupFoldersListProps {
 	id: string
@@ -234,7 +235,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 									className="w-full bg-teal-600 text-white transition-colors hover:bg-teal-700 hover:text-white"
 								>
 									<Link
-										href={`/admin/dashboard/carpetas-de-arranques/${company.name.replaceAll(" ", "-")}_${company.id}`}
+										href={`/admin/dashboard/carpetas-de-arranques/${generateSlug(company.name)}_${company.id}`}
 									>
 										Ver carpeta
 									</Link>

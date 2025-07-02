@@ -1,38 +1,38 @@
 "use client"
 
-import * as React from "react"
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DocumentCategory } from "@prisma/client"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 
 import { useLinkEntity } from "../../hooks/use-link-entity"
+
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
+import { Button } from "@/shared/components/ui/button"
 import {
 	Dialog,
+	DialogTitle,
+	DialogHeader,
+	DialogFooter,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
 } from "@/shared/components/ui/dialog"
 import {
 	Form,
-	FormControl,
-	FormField,
 	FormItem,
 	FormLabel,
+	FormField,
 	FormMessage,
+	FormControl,
 } from "@/shared/components/ui/form"
-import { Button } from "@/shared/components/ui/button"
 import {
 	Select,
-	SelectContent,
 	SelectItem,
-	SelectTrigger,
 	SelectValue,
+	SelectTrigger,
+	SelectContent,
 } from "@/shared/components/ui/select"
-import { toast } from "sonner"
-import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 
 const linkEntitySchema = z.object({
 	isDriver: z.boolean().default(false).optional(),
