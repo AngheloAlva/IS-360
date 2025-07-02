@@ -19,6 +19,7 @@ interface WorkBookMilestonesProps {
 	hasPermission: boolean
 	workOrderStartDate: Date
 	canRequestClosure: boolean
+	hassWorkBookPermission: boolean
 }
 
 export default function WorkBookMilestones({
@@ -30,6 +31,7 @@ export default function WorkBookMilestones({
 	hasPermission,
 	canRequestClosure,
 	workOrderStartDate,
+	hassWorkBookPermission,
 }: WorkBookMilestonesProps) {
 	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
 
@@ -76,13 +78,14 @@ export default function WorkBookMilestones({
 				</h2>
 
 				<div className="flex gap-2">
-					{data?.milestones.length === 0 && userId === supervisorId && (
+					{data?.milestones.length === 0 && (userId === supervisorId || hassWorkBookPermission) && (
 						<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
 					)}
 
-					{canRequestClosure && (
-						<RequestWorkBookClosure workOrderId={workOrderId} userId={userId} />
-					)}
+					{canRequestClosure ||
+						(canRequestClosure && hassWorkBookPermission && (
+							<RequestWorkBookClosure workOrderId={workOrderId} userId={userId} />
+						))}
 				</div>
 			</CardHeader>
 
@@ -95,6 +98,7 @@ export default function WorkBookMilestones({
 					responsibleId={responsibleId}
 					hasPermission={hasPermission}
 					milestones={data?.milestones || []}
+					hassWorkBookPermission={hassWorkBookPermission}
 				/>
 			</CardContent>
 		</Card>

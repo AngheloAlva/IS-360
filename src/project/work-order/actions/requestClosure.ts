@@ -25,18 +25,17 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 			message: "No autorizado",
 		}
 	}
+
+	const hassWorkBookPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				workBook: ["create"],
+			},
+		},
+	})
+
 	try {
-		const user = await prisma.user.findUnique({
-			where: { id: userId },
-		})
-
-		if (!user) {
-			return {
-				ok: false,
-				message: "Usuario no encontrado",
-			}
-		}
-
 		const workOrder = await prisma.workOrder.findUnique({
 			where: { id: workBookId },
 			include: {
@@ -72,7 +71,7 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 		}
 
 		// Verificar que el usuario sea supervisor de la empresa colaboradora
-		if (user.id !== workOrder.supervisor.id) {
+		if (session.user.id !== workOrder.supervisor.id && !hassWorkBookPermission.success) {
 			return {
 				ok: false,
 				message: "Forbidden",
@@ -124,7 +123,7 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 		if (workOrder.responsible.email) {
 			await sendRequestClosureEmail({
 				workOrderId: workOrder.id,
-				supervisorName: user.name,
+				supervisorName: session.user.name,
 				email: workOrder.responsible.email,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: `Libro de Obras ${workOrder.otNumber}`,

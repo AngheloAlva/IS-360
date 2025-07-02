@@ -54,10 +54,12 @@ import { Button } from "@/shared/components/ui/button"
 interface WorkBookFormProps {
 	userId: string
 	companyId: string
+	className?: string
 }
 
 export default function NewWorkBookForm({
 	userId,
+	className,
 	companyId,
 }: WorkBookFormProps): React.ReactElement {
 	const [loading, setLoading] = useState<boolean>(false)
@@ -148,7 +150,10 @@ export default function NewWorkBookForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 text-sm font-semibold tracking-wide text-blue-600 transition-all hover:scale-105"
+				className={cn(
+					"flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 text-sm font-semibold tracking-wide text-blue-600 transition-all hover:scale-105",
+					className
+				)}
 				onClick={() => setOpen(true)}
 			>
 				<PlusCircleIcon className="h-4 w-4" />

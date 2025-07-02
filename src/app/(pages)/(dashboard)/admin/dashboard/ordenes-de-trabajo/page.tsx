@@ -7,6 +7,7 @@ import { WorkOrderStatsContainer } from "@/project/work-order/components/stats/w
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import NewWorkBookForm from "@/project/work-order/components/forms/NewWorkBookForm"
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -15,14 +16,24 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 
 	if (!session?.user?.id) return notFound()
 
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permissions: {
-				workOrder: ["create"],
+	const [hasPermission, hassWorkBookPermission] = await Promise.all([
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workOrder: ["create"],
+				},
 			},
-		},
-	})
+		}),
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workBook: ["create"],
+				},
+			},
+		}),
+	])
 
 	return (
 		<div className={"flex h-full w-full flex-1 flex-col gap-8 transition-all"}>
@@ -40,6 +51,13 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 							className="text-red-600 hover:bg-white hover:text-red-600"
 						/>
 						{hasPermission.success && <CreateWorkOrderForm />}
+						{hassWorkBookPermission.success && (
+							<NewWorkBookForm
+								userId={session.user.id}
+								companyId={process.env.NEXT_PUBLIC_OTC_COMPANY_ID!}
+								className="text-amber-600 hover:bg-white hover:text-amber-600"
+							/>
+						)}
 					</div>
 				</div>
 			</div>

@@ -1,3 +1,4 @@
+"use client"
 /* eslint-disable jsx-a11y/alt-text */
 
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer"
@@ -9,164 +10,201 @@ import type { WorkPermitData } from "@/app/api/work-permit/pdf/[id]/types"
 // Estilos para el PDF
 const styles = StyleSheet.create({
 	page: {
-		padding: 30,
+		padding: 35,
 		fontSize: 10,
+		backgroundColor: "#fff",
+		fontFamily: "Helvetica",
 	},
 	header: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginBottom: 20,
-		borderBottomWidth: 1,
+		marginBottom: 25,
+		borderBottomWidth: 2,
 		borderBottomStyle: "solid",
-		borderBottomColor: "#ccc",
-		paddingBottom: 10,
+		borderBottomColor: "#3B82F6", // Azul moderno
+		paddingBottom: 12,
 	},
 	title: {
-		fontSize: 18,
+		fontSize: 20,
 		fontWeight: "bold",
-		marginBottom: 15,
+		marginBottom: 18,
 		textAlign: "center",
+		color: "#1E3A8A", // Azul oscuro
 	},
 	subtitle: {
-		fontSize: 12,
+		fontSize: 13,
 		fontWeight: "bold",
-		marginTop: 10,
-		marginBottom: 5,
+		marginTop: 12,
+		marginBottom: 6,
 		borderBottomWidth: 1,
 		borderBottomStyle: "solid",
-		borderBottomColor: "#ccc",
-		paddingBottom: 3,
+		borderBottomColor: "#3B82F6", // Azul moderno
+		paddingBottom: 4,
+		color: "#1E3A8A", // Azul oscuro
 	},
 	section: {
-		marginBottom: 10,
+		marginBottom: 14,
+		padding: 8,
+		borderRadius: 4,
+		backgroundColor: "#F9FAFB", // Gris muy claro
 	},
 	row: {
 		flexDirection: "row",
-		marginBottom: 5,
+		marginBottom: 7,
 	},
 	column: {
 		flex: 1,
+		paddingHorizontal: 4,
 	},
 	label: {
 		fontWeight: "bold",
 		marginRight: 5,
+		color: "#4B5563", // Gris medio
 	},
 	value: {
 		flex: 1,
+		color: "#111827", // Casi negro
 	},
 	field: {
 		borderBottomWidth: 1,
 		borderBottomStyle: "solid",
-		borderBottomColor: "#ccc",
-		padding: 5,
-		marginBottom: 5,
+		borderBottomColor: "#D1D5DB", // Gris claro
+		padding: 6,
+		marginBottom: 6,
+		borderRadius: 2,
 	},
 	customLargeField: {
-		borderBottomWidth: 1,
-		borderBottomStyle: "dotted",
-		borderBottomColor: "#000",
-		padding: 5,
-		height: 35,
-		marginBottom: 5,
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: "#D1D5DB", // Gris claro
+		padding: 6,
+		height: 38,
+		marginBottom: 6,
+		borderRadius: 2,
+		backgroundColor: "#F9FAFB", // Gris muy claro
 	},
 	customField: {
 		borderBottomWidth: 1,
-		borderBottomStyle: "dotted",
-		borderBottomColor: "#000",
+		borderBottomStyle: "solid",
+		borderBottomColor: "#D1D5DB", // Gris claro
 		height: 5,
-		padding: 5,
+		padding: 6,
+		borderRadius: 2,
 	},
 	signatureBox: {
 		height: 80,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "#000",
-		marginTop: 5,
-		marginBottom: 5,
-		padding: 5,
+		borderColor: "#D1D5DB", // Gris claro
+		marginTop: 6,
+		marginBottom: 6,
+		padding: 6,
+		borderRadius: 4,
+		backgroundColor: "#F9FAFB", // Gris muy claro
+		breakInside: "avoid",
 	},
 	signatureLabel: {
 		textAlign: "center",
-		marginTop: 5,
+		marginTop: 6,
+		fontWeight: "medium",
+		color: "#4B5563", // Gris medio
+		breakInside: "avoid",
 	},
 	signatureSection: {
 		flexDirection: "row",
 		justifyContent: "space-between",
-		marginTop: 30,
+		marginTop: 35,
+		paddingTop: 12,
+		borderTopWidth: 1,
+		borderTopColor: "#E5E7EB", // Gris muy claro
+		borderTopStyle: "solid",
+		breakInside: "avoid",
 	},
 	signatureColumn: {
 		width: "30%",
+		paddingHorizontal: 8,
+		breakInside: "avoid",
 	},
 	footer: {
 		position: "absolute",
-		bottom: 30,
-		left: 30,
-		right: 30,
+		bottom: 35,
+		left: 35,
+		right: 35,
 		textAlign: "center",
 		fontSize: 8,
-		color: "grey",
+		color: "#6B7280", // Gris medio
+		borderTopWidth: 1,
+		borderTopColor: "#E5E7EB",
+		borderTopStyle: "solid",
+		paddingTop: 8,
 	},
 	logo: {
-		width: 100,
+		width: 50,
 		height: 50,
 		objectFit: "contain",
 	},
 	checkBox: {
-		width: 12,
-		height: 12,
+		width: 14,
+		height: 14,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "#000",
+		borderColor: "#3B82F6", // Azul moderno
 		marginRight: 5,
+		borderRadius: 2,
 	},
 	checkBoxChecked: {
-		width: 12,
-		height: 12,
+		width: 14,
+		height: 14,
 		borderWidth: 1,
 		borderStyle: "solid",
-		borderColor: "#000",
-		backgroundColor: "#000",
+		borderColor: "#3B82F6", // Azul moderno
+		backgroundColor: "#3B82F6", // Azul moderno
 		marginRight: 5,
+		borderRadius: 2,
 	},
 	checkBoxRow: {
 		flexDirection: "row",
 		alignItems: "center",
-		marginVertical: 3,
+		marginVertical: 4,
 	},
 	table: {
 		display: "flex",
 		width: "100%",
 		borderWidth: 1,
-		borderColor: "#000",
+		borderColor: "#D1D5DB", // Gris claro
 		marginVertical: 10,
+		borderRadius: 4,
+		overflow: "hidden",
 	},
 	tableRow: {
 		flexDirection: "row",
 		borderBottomWidth: 1,
-		borderColor: "#000",
+		borderColor: "#D1D5DB", // Gris claro
 	},
 	tableCol: {
 		borderStyle: "solid",
 		borderRightWidth: 1,
-		borderColor: "#000",
-		padding: 5,
+		borderColor: "#D1D5DB", // Gris claro
+		padding: 6,
 	},
 	tableHeader: {
-		backgroundColor: "#f0f0f0",
+		backgroundColor: "#EFF6FF", // Azul muy claro
+		color: "#1E3A8A", // Azul oscuro
 		fontWeight: "bold",
 		textAlign: "center",
-		padding: 5,
+		padding: 6,
 	},
 	tableCell: {
-		padding: 5,
+		padding: 6,
 		textAlign: "center",
+		color: "#374151", // Gris oscuro
 	},
 	measurementCol: {
 		width: "25%",
 		height: 35,
 		borderStyle: "solid",
 		borderRightWidth: 1,
-		borderColor: "#000",
+		borderColor: "#D1D5DB", // Gris claro
 	},
 	lastCol: {
 		borderRightWidth: 0,
@@ -175,14 +213,16 @@ const styles = StyleSheet.create({
 		display: "flex",
 		width: "100%",
 		borderWidth: 1,
-		borderColor: "#000",
+		borderColor: "#D1D5DB", // Gris claro
 		marginTop: 10,
+		borderRadius: 4,
+		overflow: "hidden",
 	},
 	participantsCol: {
 		flex: 1,
 		borderStyle: "solid",
 		borderRightWidth: 1,
-		borderColor: "#000",
+		borderColor: "#D1D5DB", // Gris claro
 	},
 })
 
@@ -211,14 +251,15 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 				<View style={styles.header}>
 					<Image
 						style={styles.logo}
-						src="https://otc360.ingsimple.cl/logo.jpeg"
-						source="https://otc360.ingsimple.cl/logo.jpeg"
+						src="https://otc360.ingsimple.cl/logo.png"
+						source="https://otc360.ingsimple.cl/logo.png"
 					/>
 					<View>
 						<Text>PERMISO DE TRABAJO</Text>
 						<Text>Fecha de emisión: {format(new Date(), "dd/MM/yyyy", { locale: es })}</Text>
 						<Text>
-							Fecha de vencimiento: {format(workPermit.endDate, "dd/MM/yyyy", { locale: es })}
+							Fecha de vencimiento:{" "}
+							{format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es })}
 						</Text>
 					</View>
 				</View>
@@ -233,8 +274,17 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>OT N°:</Text>
-								<Text style={styles.value}>{workPermit.otNumber.otNumber}</Text>
+								<Text style={styles.label}>
+									{" "}
+									N°
+									{workPermit.otNumber.otNumber}
+								</Text>
+							</View>
+						</View>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Empresa:</Text>
+								<Text style={styles.value}>{workPermit.company.name}</Text>
 							</View>
 						</View>
 					</View>
@@ -242,19 +292,20 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Trabajo:</Text>
-								<Text style={styles.value}>{workPermit.otNumber.workName}</Text>
-							</View>
-						</View>
-						<View style={styles.column}>
-							<View style={styles.row}>
 								<Text style={styles.label}>Cargo del solicitante:</Text>
 								<Text style={styles.value}>{workPermit.user.internalRole || ""}</Text>
 							</View>
+						</View>
+
+						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Adm. contrato OTC:</Text>
 								<View style={styles.value}>
-									{workPermit.otNumber.supervisor.name + " - " + workPermit.otNumber.supervisor.rut}
+									<Text style={styles.value}>
+										{workPermit.otNumber.responsible.name +
+											" - " +
+											workPermit.otNumber.responsible.rut}
+									</Text>
 								</View>
 							</View>
 						</View>
@@ -312,10 +363,13 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Empresa:</Text>
-								<Text style={styles.value}>{workPermit.company.name}</Text>
+								<Text style={styles.label}>Trabajo:</Text>
+								<Text style={styles.value}>{workPermit.otNumber.workName}</Text>
 							</View>
 						</View>
+					</View>
+
+					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Lugar exacto:</Text>
@@ -578,6 +632,9 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 									<View style={[styles.participantsCol, styles.tableHeader]}>
 										<Text>Cargo</Text>
 									</View>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>Empresa</Text>
+									</View>
 									<View style={[styles.participantsCol, styles.tableHeader, styles.lastCol]}>
 										<Text>Firma</Text>
 									</View>
@@ -593,6 +650,9 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 											</View>
 											<View style={styles.participantsCol}>
 												<Text style={styles.tableCell}>{participant.internalRole || ""}</Text>
+											</View>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}></Text>
 											</View>
 											<View style={[styles.participantsCol, styles.lastCol]}>
 												<Text style={styles.tableCell}></Text>

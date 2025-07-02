@@ -6,6 +6,10 @@ export interface WorkPermitData extends WorkPermit {
 			name: string
 			rut: string
 		}
+		responsible: {
+			name: string
+			rut: string
+		}
 	}
 	user: User
 	company: Company

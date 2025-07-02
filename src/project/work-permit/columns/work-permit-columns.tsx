@@ -133,7 +133,7 @@ export const getWorkPermitColumns = (
 						<ApproveWorkPermit workPermitId={id} userId={userId} />
 					)}
 
-					<Link href={`/api/work-permit/pdf/${id}`} target="_blank">
+					<Link href={`/admin/dashboard/permisos-de-trabajo/${id}/pdf`}>
 						<Button
 							size={"icon"}
 							variant={"ghost"}

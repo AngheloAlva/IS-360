@@ -26,6 +26,7 @@ interface WorkBookMainProps {
 	userRole: string
 	workBookId: string
 	hasPermission: boolean
+	hassWorkBookPermission: boolean
 }
 
 export default function WorkBookMain({
@@ -33,6 +34,7 @@ export default function WorkBookMain({
 	userRole,
 	workBookId,
 	hasPermission,
+	hassWorkBookPermission,
 }: WorkBookMainProps): React.ReactElement {
 	const { data, isLoading, isError, isFetching } = useWorkBookById({ workOrderId: workBookId })
 
@@ -88,7 +90,9 @@ export default function WorkBookMain({
 	const canAddActivities =
 		workBook.status === WORK_ORDER_STATUS.IN_PROGRESS ||
 		workBook.status === WORK_ORDER_STATUS.PLANNED
-	const canRequestClosure = workBook.supervisorId === userId && workBook.workProgressStatus === 100
+	const canRequestClosure =
+		(workBook.supervisorId === userId || hassWorkBookPermission) &&
+		workBook.workProgressStatus === 100
 
 	return (
 		<>
@@ -153,6 +157,7 @@ export default function WorkBookMain({
 						supervisorId={workBook.supervisorId}
 						canRequestClosure={canRequestClosure}
 						responsibleId={workBook.responsibleId}
+						hassWorkBookPermission={hassWorkBookPermission}
 						workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
 					/>
 				</TabsContent>
@@ -188,25 +193,25 @@ export default function WorkBookMain({
 													</Alert>
 												)
 											))}
+									</>
+								)}
 
-										{hasPermission && (
-											<>
-												<ActivityForm
-													userId={userId}
-													startDate={new Date()}
-													workOrderId={workBook.id}
-													entryType="ADDITIONAL_ACTIVITY"
-												/>
+								{hasPermission && (
+									<>
+										<ActivityForm
+											userId={userId}
+											startDate={new Date()}
+											workOrderId={workBook.id}
+											entryType="ADDITIONAL_ACTIVITY"
+										/>
 
-												<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
+										<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
 
-												{hasPermission &&
-													userId === workBook.responsibleId &&
-													workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
-														<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />
-													)}
-											</>
-										)}
+										{hasPermission &&
+											userId === workBook.responsibleId &&
+											workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
+												<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />
+											)}
 									</>
 								)}
 							</div>

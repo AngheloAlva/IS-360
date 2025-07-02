@@ -23,6 +23,7 @@ export default async function WorkBooksPage({ params }: { params: Promise<{ id: 
 				hasPermission={false}
 				userId={session.user.id}
 				userRole={session.user.role!}
+				hassWorkBookPermission={false}
 			/>
 		</>
 	)

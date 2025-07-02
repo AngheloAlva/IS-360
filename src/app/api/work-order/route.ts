@@ -74,7 +74,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				: {}),
 			...(isOtcMember
 				? {
-						companyId: "cmbbc0dqr00062z0vcpigjy9l",
+						companyId: process.env.NEXT_PUBLIC_OTC_COMPANY_ID!,
 					}
 				: {}),
 			...(startDate || endDate

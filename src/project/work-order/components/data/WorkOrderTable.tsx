@@ -79,7 +79,9 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
 
-	const { data: companies } = useCompanies()
+	const { data: companies } = useCompanies({
+		limit: 1000,
+	})
 
 	const debouncedSearch = useDebounce(search)
 

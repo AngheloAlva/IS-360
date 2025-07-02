@@ -14,14 +14,26 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 
 	if (!session?.user?.id) return notFound()
 
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permissions: {
-				workOrder: ["create"],
+	const [hasPermission, hassWorkBookPermission] = await Promise.all([
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workOrder: ["create"],
+				},
 			},
-		},
-	})
+		}),
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workBook: ["create"],
+				},
+			},
+		}),
+	])
+
+	console.log(hasPermission, hassWorkBookPermission)
 
 	return (
 		<WorkBookMain
@@ -29,6 +41,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 			userId={session.user.id}
 			userRole={session.user.role!}
 			hasPermission={hasPermission.success}
+			hassWorkBookPermission={hassWorkBookPermission.success}
 		/>
 	)
 }

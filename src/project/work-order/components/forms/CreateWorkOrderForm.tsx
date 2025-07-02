@@ -383,7 +383,7 @@ export default function CreateWorkOrderForm({
 						<SubmitButton
 							label="Crear Nueva OT"
 							isSubmitting={isSubmitting}
-							className={cn("bg-orange-600 hover:bg-orange-600", {
+							className={cn("bg-orange-600 hover:bg-orange-600 hover:text-white", {
 								"bg-indigo-600 hover:bg-indigo-600": equipmentId && maintenancePlanTaskId,
 							})}
 						/>

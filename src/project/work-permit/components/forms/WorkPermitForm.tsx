@@ -165,7 +165,7 @@ export default function WorkPermitForm({
 		page: 1,
 		search: "",
 		limit: 1000,
-		companyId: isOtcMember ? "cmbbc0dqr00062z0vcpigjy9l" : companyId,
+		companyId: isOtcMember ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID! : companyId,
 	})
 
 	useEffect(() => {

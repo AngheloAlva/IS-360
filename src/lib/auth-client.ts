@@ -6,6 +6,7 @@ import {
 	ac,
 	user,
 	admin,
+	operator,
 	userOperator,
 	partnerCompany,
 	companyOperator,
@@ -33,6 +34,7 @@ export const authClient = createAuthClient({
 			roles: {
 				admin,
 				user,
+				operator,
 				userOperator,
 				partnerCompany,
 				companyOperator,

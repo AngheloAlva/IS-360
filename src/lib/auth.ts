@@ -9,6 +9,7 @@ import {
 	ac,
 	user,
 	admin,
+	operator,
 	userOperator,
 	partnerCompany,
 	companyOperator,
@@ -110,6 +111,7 @@ export const auth = betterAuth({
 			roles: {
 				admin,
 				user,
+				operator,
 				userOperator,
 				partnerCompany,
 				companyOperator,

@@ -37,6 +37,7 @@ interface MilestoneCardsProps {
 	responsibleId: string
 	hasPermission: boolean
 	milestones: Milestone[]
+	hassWorkBookPermission: boolean
 }
 
 export default function MilestoneCards({
@@ -47,6 +48,7 @@ export default function MilestoneCards({
 	supervisorId,
 	responsibleId,
 	hasPermission,
+	hassWorkBookPermission,
 }: MilestoneCardsProps) {
 	if (milestones.length === 0) {
 		return (
@@ -226,13 +228,14 @@ export default function MilestoneCards({
 								</div>
 							)}
 
-							{milestone.status === MILESTONE_STATUS.IN_PROGRESS && userId === supervisorId && (
-								<RequestCloseMilestoneDialog
-									userId={userId}
-									workOrderId={workOrderId}
-									milestoneId={milestone.id}
-								/>
-							)}
+							{milestone.status === MILESTONE_STATUS.IN_PROGRESS &&
+								(userId === supervisorId || hassWorkBookPermission) && (
+									<RequestCloseMilestoneDialog
+										userId={userId}
+										workOrderId={workOrderId}
+										milestoneId={milestone.id}
+									/>
+								)}
 
 							{hasPermission &&
 								milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
