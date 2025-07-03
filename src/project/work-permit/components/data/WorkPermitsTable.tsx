@@ -29,6 +29,17 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
+import { useCompanies } from "@/project/company/hooks/use-companies"
+import {
+	Select,
+	SelectItem,
+	SelectValue,
+	SelectGroup,
+	SelectLabel,
+	SelectContent,
+	SelectTrigger,
+	SelectSeparator,
+} from "@/shared/components/ui/select"
 
 interface WorkPermitsTableProps {
 	hasPermission: boolean
@@ -37,6 +48,7 @@ interface WorkPermitsTableProps {
 }
 
 export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPermitsTableProps) {
+	const [companyId, setCompanyId] = useState<string | null>(null)
 	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [order, setOrder] = useState<Order>("desc")
@@ -50,10 +62,14 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 		order,
 		orderBy,
 		limit: 15,
-		companyId: null,
+		companyId,
 		dateRange: null,
 		statusFilter: null,
 		search: debouncedSearch,
+	})
+
+	const { data: companies } = useCompanies({
+		limit: 1000,
 	})
 
 	const table = useReactTable({
@@ -75,7 +91,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
-					<div className="flex w-full flex-col items-end justify-between gap-4 lg:flex-row">
+					<div className="flex w-full flex-col items-end gap-4 lg:flex-row">
 						<SearchInput
 							value={search}
 							onChange={setSearch}
@@ -83,7 +99,34 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							className="w-full lg:w-[250px]"
 						/>
 
-						<div className="flex items-center justify-end gap-2">
+						<Select
+							onValueChange={(value) => {
+								if (value === "all") {
+									setCompanyId(null)
+								} else {
+									setCompanyId(value)
+								}
+							}}
+							value={companyId ?? "all"}
+						>
+							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+								<SelectValue placeholder="Empresa" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Empresa</SelectLabel>
+									<SelectSeparator />
+									<SelectItem value="all">Todas las empresas</SelectItem>
+									{companies?.companies?.map((company) => (
+										<SelectItem key={company.id} value={company.id}>
+											{company.name}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+
+						<div className="ml-auto flex items-center justify-end gap-2">
 							<OrderByButton
 								onChange={(orderBy, order) => {
 									setOrderBy(orderBy)

@@ -17,6 +17,7 @@ import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
+import CloseWorkPermit from "../components/forms/CloseWorkPermit"
 
 export const getWorkPermitColumns = (
 	hasPermission: boolean,
@@ -86,12 +87,16 @@ export const getWorkPermitColumns = (
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber.workName
-			return <div className="w-96 text-wrap">{workOrder}</div>
+			return <div className="w-72 text-wrap">{workOrder}</div>
 		},
 	},
 	{
 		accessorKey: "exactPlace",
 		header: "Lugar exacto",
+		cell: ({ row }) => {
+			const exactPlace = row.original.exactPlace
+			return <div className="w-72 text-wrap">{exactPlace}</div>
+		},
 	},
 	{
 		accessorKey: "startDate",
@@ -130,7 +135,11 @@ export const getWorkPermitColumns = (
 			return (
 				<div className="z-50 flex items-center gap-2">
 					{hasPermission && row.original.status === WORK_PERMIT_STATUS.REVIEW_PENDING && (
-						<ApproveWorkPermit workPermitId={id} userId={userId} />
+						<ApproveWorkPermit workPermitId={id} />
+					)}
+
+					{hasPermission && row.original.status === WORK_PERMIT_STATUS.ACTIVE && (
+						<CloseWorkPermit workPermitId={id} />
 					)}
 
 					<Link href={`/admin/dashboard/permisos-de-trabajo/${id}/pdf`}>

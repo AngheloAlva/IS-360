@@ -20,11 +20,11 @@ import { queryClient } from "@/lib/queryClient"
 import {
 	ReviewStatus,
 	DocumentCategory,
+	BasicDocumentType,
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
-	BasicDocumentType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"

@@ -99,6 +99,7 @@ model User {
   workPermitsAsPreventionOfficer  WorkPermit[]              @relation("PreventionOfficer")
   workPermits                     WorkPermit[]              @relation("WorkPermitUser")
   workPermitApproval              WorkPermit[]              @relation("WorkPermitApproval")
+  workPermitClosing               WorkPermit[]              @relation("WorkPermitClosing")
   attachmentsHistory              AttachmentHistory[]
   equipmentHistory                EquipmentHistory[]
   fileHistory                     FileHistory[]
@@ -602,6 +603,9 @@ model WorkPermit {
   approvalDate                   DateTime?
   approvalBy                     User?                  @relation("WorkPermitApproval", fields: [approvalById], references: [id])
   approvalById                   String?
+  closingDate                    DateTime?
+  closingBy                      User?                  @relation("WorkPermitClosing", fields: [closingById], references: [id])
+  closingById                    String?
   preventionOfficerUser          User?                  @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
   preventionOfficerId            String?
   otNumber                       WorkOrder              @relation(fields: [otNumberId], references: [id])

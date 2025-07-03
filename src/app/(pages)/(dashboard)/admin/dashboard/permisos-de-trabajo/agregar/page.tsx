@@ -38,7 +38,9 @@ export default async function CreateWorkPermitPage() {
 
 						<div className="text-white">
 							<h1 className="text-3xl font-bold tracking-tight">Nuevo Permiso de Trabajo Seguro</h1>
-							<p className="opacity-90">Gestión de permisos de trabajo seguro</p>
+							<p className="opacity-90">
+								Crea un nuevo permiso de trabajo completando los campos del formulario
+							</p>
 						</div>
 					</div>
 				</div>

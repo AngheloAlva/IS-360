@@ -6,17 +6,15 @@ import { ACTIVITY_TYPE, MODULES, WORK_PERMIT_STATUS } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { ApproveWorkPermitSchema } from "../../schemas/approve-work-permit.schema"
 
-interface ApproveWorkPermitProps {
+import type { CloseWorkPermitSchema } from "../../schemas/close-work-permit.schema"
+
+interface CloseWorkPermitProps {
 	workPermitId: string
-	values: ApproveWorkPermitSchema
+	values: CloseWorkPermitSchema
 }
 
-export const approveOrRejectWorkPermit = async ({
-	values,
-	workPermitId,
-}: ApproveWorkPermitProps) => {
+export const closeWorkPermit = async ({ values, workPermitId }: CloseWorkPermitProps) => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -28,7 +26,7 @@ export const approveOrRejectWorkPermit = async ({
 		}
 	}
 
-	const { action, approvedBy } = values
+	const { closedBy } = values
 
 	try {
 		const workPermit = await prisma.workPermit.update({
@@ -36,19 +34,19 @@ export const approveOrRejectWorkPermit = async ({
 				id: workPermitId,
 			},
 			data: {
-				status: action === "approve" ? WORK_PERMIT_STATUS.ACTIVE : WORK_PERMIT_STATUS.REJECTED,
-				approvalDate: new Date(),
-				approvalBy: {
+				status: WORK_PERMIT_STATUS.COMPLETED,
+				closingDate: new Date(),
+				closingBy: {
 					connect: {
-						id: approvedBy,
+						id: closedBy,
 					},
 				},
 			},
 			select: {
 				id: true,
 				status: true,
-				approvalDate: true,
-				approvalById: true,
+				closingDate: true,
+				closingById: true,
 				otNumber: {
 					select: {
 						otNumber: true,
@@ -61,13 +59,13 @@ export const approveOrRejectWorkPermit = async ({
 		logActivity({
 			userId: session.user.id,
 			module: MODULES.WORK_PERMITS,
-			action: action === "approve" ? ACTIVITY_TYPE.APPROVE : ACTIVITY_TYPE.REJECT,
+			action: ACTIVITY_TYPE.COMPLETE,
 			entityId: workPermit.id,
 			entityType: "WorkPermit",
 			metadata: {
 				status: workPermit.status,
-				approvalDate: workPermit.approvalDate,
-				approvalById: workPermit.approvalById,
+				closingDate: workPermit.closingDate,
+				closingById: workPermit.closingById,
 				otNumber: workPermit.otNumber?.otNumber,
 				workName: workPermit.otNumber?.workName,
 			},
@@ -75,19 +73,13 @@ export const approveOrRejectWorkPermit = async ({
 
 		return {
 			ok: true,
-			message:
-				action === "approve"
-					? "Permiso de trabajo aprobado exitosamente"
-					: "Permiso de trabajo rechazado exitosamente",
+			message: "Permiso de trabajo cerrado exitosamente",
 		}
 	} catch (error) {
-		console.error("[APPROVE_OR_REJECT_WORK_PERMIT]", error)
+		console.error("[CLOSE_WORK_PERMIT]", error)
 		return {
 			ok: false,
-			message:
-				action === "approve"
-					? "Error al aprobar el permiso de trabajo"
-					: "Error al rechazar el permiso de trabajo",
+			message: "Error al cerrar el permiso de trabajo",
 		}
 	}
 }

@@ -62,6 +62,18 @@ export interface WorkPermit {
 			name: string
 		}
 	}>
+	approvalDate: Date | null
+	approvalBy: {
+		id: string
+		rut: string
+		name: string
+	} | null
+	closingDate: Date | null
+	closingBy: {
+		id: string
+		rut: string
+		name: string
+	} | null
 }
 
 interface WorkPermitsParams {

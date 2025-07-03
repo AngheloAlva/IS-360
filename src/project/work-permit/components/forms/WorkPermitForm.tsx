@@ -5,7 +5,7 @@ import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { CirclePlusIcon, Plus, Trash2Icon, X } from "lucide-react"
+import { CirclePlusIcon, InfoIcon, Layers2Icon, Plus, Trash2Icon, X } from "lucide-react"
 import { es } from "date-fns/locale"
 import { toast } from "sonner"
 
@@ -46,6 +46,7 @@ import { Form } from "@/shared/components/ui/form"
 import { queryClient } from "@/lib/queryClient"
 
 import type { WorkPermit } from "../../hooks/use-work-permit"
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 
 interface WorkPermitFormProps {
 	userId: string
@@ -63,6 +64,7 @@ export default function WorkPermitForm({
 	isOtcMember = false,
 }: WorkPermitFormProps): React.ReactElement {
 	const [workOrderSelected, setWorkOrderSelected] = useState<WorkOrder | null>(null)
+	const [expirationMessage, setExpirationMessage] = useState("")
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const form = useForm<WorkPermitSchema>({
@@ -195,8 +197,8 @@ export default function WorkPermitForm({
 
 			form.setValue("endDate", endDate)
 			form.setValue("startDate", startDate)
-			toast.info(expirationMessage)
 			setWorkOrderSelected(workOrder)
+			setExpirationMessage(expirationMessage)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("otNumber")])
@@ -329,10 +331,21 @@ export default function WorkPermitForm({
 										control={form.control}
 									/>
 								)}
+
+								{expirationMessage && (
+									<Alert>
+										<InfoIcon />
+										<AlertTitle>Fecha de expiración</AlertTitle>
+										<AlertDescription>{expirationMessage}</AlertDescription>
+									</Alert>
+								)}
 							</div>
 
 							<div className="bg-secondary-background/20 grid w-1/2 gap-y-4 rounded-lg p-3 shadow sm:col-span-2 sm:grid-cols-2">
-								<h2 className="text-lg font-semibold sm:col-span-2">Información de la OT:</h2>
+								<h2 className="flex items-center gap-2 text-lg font-semibold sm:col-span-2">
+									<Layers2Icon className="text-muted-foreground size-5" />
+									Información de la OT:
+								</h2>
 
 								<div>
 									<h3 className="text-sm font-semibold">Trabajo solicitado:</h3>

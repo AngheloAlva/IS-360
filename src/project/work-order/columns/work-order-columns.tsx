@@ -59,12 +59,12 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	},
 	{
 		accessorKey: "company",
-		header: "Empresa - Supervisor",
+		header: "Nombre de la empresa",
 		cell: ({ row }) => {
 			const company = row.getValue("company") as { name: string } | null
 
 			return (
-				<div className="flex items-center gap-2">
+				<div className="flex w-64 max-w-56 items-center gap-2 text-wrap">
 					<Building2Icon className="text-muted-foreground h-4 w-4" />
 					{company?.name ? company.name : "Interno"}
 				</div>
@@ -78,7 +78,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 			const supervisor = row.getValue("supervisor") as { name: string } | null
 
 			return (
-				<div className="flex items-center gap-2">
+				<div className="flex w-64 max-w-56 items-center gap-2 text-wrap">
 					<UserIcon className="text-muted-foreground h-4 w-4" />
 					{supervisor?.name}
 				</div>
@@ -90,7 +90,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 		header: "Trabajo Solicitado",
 		cell: ({ row }) => {
 			const request = row.getValue("workRequest") as string
-			return <div className="w-80 max-w-80 text-wrap">{request}</div>
+			return <div className="w-72 max-w-72 text-wrap">{request}</div>
 		},
 	},
 	{
@@ -123,7 +123,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 						"bg-orange-500/10 text-orange-500": status === WORK_ORDER_STATUS.IN_PROGRESS,
 						"bg-orange-600/10 text-orange-600": status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
 						"bg-red-600/10 text-red-600": status === WORK_ORDER_STATUS.PENDING,
-						"bg-orange-700/10 text-orange-700": status === WORK_ORDER_STATUS.COMPLETED,
+						"bg-emerald-600/10 text-emerald-600": status === WORK_ORDER_STATUS.COMPLETED,
 						"bg-red-700/10 text-red-700": status === WORK_ORDER_STATUS.CANCELLED,
 					})}
 				>

@@ -13,15 +13,16 @@ import {
 	FileTextIcon,
 } from "lucide-react"
 
+import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
+import { BASIC_FOLDER_STRUCTURE } from "../../../../lib/consts/basic-startup-folders-structure"
+import { queryClient } from "@/lib/queryClient"
+import { ReviewStatus } from "@prisma/client"
+import { cn } from "@/lib/utils"
 import {
 	BASE_WORKER_STRUCTURE,
 	DRIVER_WORKER_STRUCTURE,
 	getDocumentsByWorkerIsDriver,
 } from "@/lib/consts/startup-folders-structure"
-import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { queryClient } from "@/lib/queryClient"
-import { ReviewStatus } from "@prisma/client"
-import { cn } from "@/lib/utils"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
@@ -40,7 +41,6 @@ import {
 } from "@/shared/components/ui/table"
 
 import type { StartupFolderDocument } from "@/project/startup-folder/types"
-import { BASIC_FOLDER_STRUCTURE } from "../../../../lib/consts/basic-startup-folders-structure"
 import type {
 	BasicDocumentType,
 	WorkerDocumentType,

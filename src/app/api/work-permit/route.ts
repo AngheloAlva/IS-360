@@ -70,6 +70,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			prisma.workPermit.findMany({
 				where: filter,
 				include: {
+					approvalBy: {
+						select: {
+							id: true,
+							rut: true,
+							name: true,
+						},
+					},
+					closingBy: {
+						select: {
+							id: true,
+							rut: true,
+							name: true,
+						},
+					},
 					otNumber: {
 						select: {
 							otNumber: true,

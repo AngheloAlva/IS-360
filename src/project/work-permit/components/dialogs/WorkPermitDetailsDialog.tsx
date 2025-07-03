@@ -16,6 +16,8 @@ import {
 	CloudUploadIcon,
 	PaperclipIcon,
 	CheckCircle2Icon,
+	DotIcon,
+	ShieldUserIcon,
 } from "lucide-react"
 
 import { WorkPermitStatus, WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
@@ -205,10 +207,62 @@ export default function WorkPermitDetailsDialog({
 								<ul className="space-y-1">
 									{workPermit.activityDetails.map((activityDetail, index) => (
 										<li key={index} className="flex items-center gap-2">
+											<DotIcon className="size-4" />
 											{activityDetail}
 										</li>
 									))}
 								</ul>
+							</>
+						)}
+
+						{workPermit.approvalBy?.name && workPermit.approvalDate && (
+							<>
+								<Separator className="my-4" />
+
+								<h2 className="flex items-center gap-2 text-lg font-semibold">
+									<ShieldUserIcon className="h-5 w-5" />
+									Aprobación y cierre
+								</h2>
+
+								<div className="grid grid-cols-2 gap-2">
+									<div>
+										<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+											<UserIcon className="h-4 w-4" />
+											Aprobado por
+										</p>
+										<p className="font-medium">{workPermit.approvalBy?.name}</p>
+									</div>
+
+									<div>
+										<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+											<CalendarIcon className="h-4 w-4" />
+											Fecha de aprobación
+										</p>
+										<p className="font-medium">
+											{format(workPermit.approvalDate, "dd/MM/yyyy HH:mm", { locale: es })}
+										</p>
+									</div>
+								</div>
+
+								<div>
+									<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+										<UserIcon className="h-4 w-4" />
+										Cerrado por
+									</p>
+									<p className="font-medium">{workPermit.closingBy?.name || "-"}</p>
+								</div>
+
+								<div>
+									<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+										<CalendarIcon className="h-4 w-4" />
+										Fecha de cierre
+									</p>
+									<p className="font-medium">
+										{workPermit.closingDate
+											? format(workPermit.closingDate, "dd/MM/yyyy HH:mm", { locale: es })
+											: "-"}
+									</p>
+								</div>
 							</>
 						)}
 
