@@ -83,6 +83,7 @@ interface WorkPermitsParams {
 	search: string
 	orderBy: OrderBy
 	companyId: string | null
+	approvedBy: string | null
 	statusFilter: string | null
 	dateRange: DateRange | null
 }
@@ -104,18 +105,23 @@ export const fetchWorkPermits: QueryFunction<
 			search: string
 			orderBy: OrderBy
 			companyId: string | null
+			approvedBy: string | null
 			statusFilter: string | null
 			dateRange: DateRange | null
 		},
 	]
 > = async ({ queryKey }) => {
-	const [, { page, limit, search, statusFilter, companyId, dateRange, orderBy, order }] = queryKey
+	const [
+		,
+		{ page, limit, search, statusFilter, companyId, approvedBy, dateRange, orderBy, order },
+	] = queryKey
 
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())
 	searchParams.set("limit", limit.toString())
 	if (search) searchParams.set("search", search)
 	if (companyId) searchParams.set("companyId", companyId)
+	if (approvedBy) searchParams.set("approvedBy", approvedBy)
 	if (statusFilter) searchParams.set("statusFilter", statusFilter)
 	if (dateRange?.from) searchParams.set("startDate", dateRange.from.toISOString())
 	if (dateRange?.to) searchParams.set("endDate", dateRange.to.toISOString())
@@ -133,14 +139,15 @@ export const useWorkPermits = ({
 	limit = 10,
 	search = "",
 	order = "desc",
-	companyId = null,
 	dateRange = null,
+	companyId = null,
+	approvedBy = null,
 	statusFilter = null,
 	orderBy = "createdAt",
 }: WorkPermitsParams) => {
 	const queryKey = [
 		"workPermits",
-		{ page, limit, search, order, statusFilter, companyId, dateRange, orderBy },
+		{ page, limit, search, order, statusFilter, companyId, approvedBy, dateRange, orderBy },
 	] as const
 
 	return useQuery<WorkPermitsResponse>({

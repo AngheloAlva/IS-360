@@ -423,7 +423,7 @@ export default function WorkPermitForm({
 								</div>
 								<div>
 									<h3 className="text-sm font-semibold">
-										{isOtcMember ? "Operador" : "Supervisor"}:
+										{isOtcMember ? "Operador/Mantenedor" : "Supervisor"}:
 									</h3>
 									<p className="text-muted-foreground">
 										{workOrderSelected?.supervisor.name || "N/A"}

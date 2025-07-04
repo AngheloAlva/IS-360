@@ -12,7 +12,9 @@ import {
 	WORK_PERMIT_STATUS,
 	StartupFolderStatus,
 	MODULES,
+	ACTIVITY_TYPE,
 } from "@prisma/client"
+import { ModulesLabels } from "@/lib/consts/modules"
 
 export async function GET() {
 	const session = await auth.api.getSession({
@@ -24,14 +26,13 @@ export async function GET() {
 	}
 
 	try {
-		// Get activity logs for the last 30 days
-		const thirtyDaysAgo = subDays(new Date(), 30)
+		const oneWeekAgo = subDays(new Date(), 7)
 
 		// Get activity logs for recent activities and module stats
 		const activityLogs = await prisma.activityLog.findMany({
 			where: {
 				timestamp: {
-					gte: thirtyDaysAgo,
+					gte: oneWeekAgo,
 				},
 			},
 			include: {
@@ -44,7 +45,6 @@ export async function GET() {
 			orderBy: {
 				timestamp: "desc",
 			},
-			take: 100, // Limit to avoid excessive data
 		})
 
 		// Get system overview data
@@ -162,8 +162,6 @@ export async function GET() {
 			}),
 		])
 
-		// Procesar los datos del ActivityLog para obtener estadísticas reales
-
 		// 1. Calcular la actividad por módulo
 		const moduleActivity = activityLogs.reduce(
 			(acc, log) => {
@@ -180,6 +178,29 @@ export async function GET() {
 						moduleName = "Usuarios"
 						break
 					case MODULES.WORK_ORDERS:
+						moduleName = "Órdenes de trabajo"
+						break
+					case MODULES.WORK_PERMITS:
+						moduleName = "Permisos de trabajo"
+						break
+					case MODULES.MAINTENANCE_PLANS:
+						moduleName = "Planes de mantenimiento"
+						break
+					case MODULES.STARTUP_FOLDERS:
+						moduleName = "Carpetas de arranque"
+						break
+					case MODULES.COMPANY:
+						moduleName = "Empresas"
+						break
+					case MODULES.WORK_REQUESTS:
+						moduleName = "Solicitudes de trabajo"
+						break
+					case MODULES.DOCUMENTATION:
+						moduleName = "Documentación"
+						break
+					case MODULES.VEHICLES:
+						moduleName = "Vehículos"
+						break
 						moduleName = "Órdenes de Trabajo"
 						break
 					case MODULES.WORK_PERMITS:
@@ -228,19 +249,7 @@ export async function GET() {
 			.slice(0, 5) // Mostrar solo los 5 módulos más activos
 
 		// 2. Calcular la actividad semanal por módulo y por día
-		const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-		const orderedDayNames = [
-			"Lunes",
-			"Martes",
-			"Miércoles",
-			"Jueves",
-			"Viernes",
-			"Sábado",
-			"Domingo",
-		]
-
-		// Definimos los módulos para mejor legibilidad
-		// (No usamos esta variable directamente, pero es útil para el contexto)
+		const dayNames = ["Sábado", "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 
 		// Inicializar la estructura para rastrear actividad por día y módulo
 		type DailyModuleActivity = {
@@ -249,18 +258,26 @@ export async function GET() {
 			maintenance: number
 			equipment: number
 			users: number
-			other: number
+			companies: number
+			workRequests: number
+			documentation: number
+			vehicles: number
+			startupFolders: number
 		}
 
 		const dailyActivity: Record<string, DailyModuleActivity> = {}
-		orderedDayNames.forEach((day) => {
+		dayNames.forEach((day) => {
 			dailyActivity[day] = {
 				workOrders: 0,
 				permits: 0,
 				maintenance: 0,
 				equipment: 0,
 				users: 0,
-				other: 0,
+				companies: 0,
+				workRequests: 0,
+				documentation: 0,
+				vehicles: 0,
+				startupFolders: 0,
 			}
 		})
 
@@ -282,54 +299,53 @@ export async function GET() {
 			} else if (moduleType === MODULES.USERS) {
 				dailyActivity[dayName].users++
 			} else if (moduleType === MODULES.STARTUP_FOLDERS) {
-				dailyActivity[dayName].other++
+				dailyActivity[dayName].startupFolders++
 			} else if (moduleType === MODULES.COMPANY) {
-				dailyActivity[dayName].other++
+				dailyActivity[dayName].companies++
 			} else if (moduleType === MODULES.WORK_REQUESTS) {
-				dailyActivity[dayName].other++
+				dailyActivity[dayName].workRequests++
 			} else if (moduleType === MODULES.DOCUMENTATION) {
-				dailyActivity[dayName].other++
+				dailyActivity[dayName].documentation++
 			} else if (moduleType === MODULES.VEHICLES) {
-				dailyActivity[dayName].other++
-			} else {
-				dailyActivity[dayName].other++
+				dailyActivity[dayName].vehicles++
 			}
 		})
 
 		// Reorganizar para que comience en lunes y mantener el formato esperado
-		const weeklyActivityChart = orderedDayNames.map((day) => ({
+		const weeklyActivityChart = dayNames.map((day) => ({
 			day,
 			workOrders: dailyActivity[day].workOrders || 0,
 			permits: dailyActivity[day].permits || 0,
 			maintenance: dailyActivity[day].maintenance || 0,
 			equipment: dailyActivity[day].equipment || 0,
 			users: dailyActivity[day].users || 0,
-			other: dailyActivity[day].other || 0,
+			companies: dailyActivity[day].companies || 0,
+			workRequests: dailyActivity[day].workRequests || 0,
+			documentation: dailyActivity[day].documentation || 0,
+			vehicles: dailyActivity[day].vehicles || 0,
+			startupFolders: dailyActivity[day].startupFolders || 0,
 		}))
+
+		const ActionLabels = {
+			[ACTIVITY_TYPE.CREATE]: "creó",
+			[ACTIVITY_TYPE.UPDATE]: "actualizó",
+			[ACTIVITY_TYPE.DELETE]: "eliminó",
+			[ACTIVITY_TYPE.APPROVE]: "aprobó",
+			[ACTIVITY_TYPE.SUBMIT]: "envió",
+			[ACTIVITY_TYPE.REJECT]: "rechazó",
+			[ACTIVITY_TYPE.ASSIGN]: "asignó",
+			[ACTIVITY_TYPE.LOGIN]: "ingresó",
+			[ACTIVITY_TYPE.LOGOUT]: "salió",
+			[ACTIVITY_TYPE.UPLOAD]: "subió",
+		}
 
 		// 3. Preparar la actividad reciente
 		const recentActivity = activityLogs
 			.slice(0, 10) // Mostrar solo las 10 actividades más recientes
 			.map((log) => {
-				const actionText = log.action?.toLowerCase() || ""
-				const moduleText = log.module?.toLowerCase() || ""
 				const userName = log.user?.name || "Usuario desconocido"
 
-				// Crear una descripción legible de la acción
-				let description = `${userName} `
-				switch (actionText) {
-					case "create":
-						description += `creó un nuevo ${moduleText}`
-						break
-					case "update":
-						description += `actualizó un ${moduleText}`
-						break
-					case "delete":
-						description += `eliminó un ${moduleText}`
-						break
-					default:
-						description += `${actionText} ${moduleText}`
-				}
+				const description = `${userName} ${ActionLabels[log.action as keyof typeof ActionLabels]} en ${ModulesLabels[log.module]}`
 
 				// Formatear el timestamp
 				const timeAgo = formatDistance(new Date(log.timestamp), new Date(), {
@@ -377,8 +393,6 @@ export async function GET() {
 			},
 		]
 
-		// Eliminar la estructura anterior de systemOverviewData ya que ahora enviamos datos más detallados
-
 		return NextResponse.json({
 			systemOverview: {
 				companies: companiesCount,
@@ -388,7 +402,7 @@ export async function GET() {
 				permits: permitsCount,
 				maintenancePlans: maintenancePlansCount,
 				startupFolders: startupFoldersCount,
-				activeUsers, // Cambiado de activeCompanies a activeUsers para consistencia
+				activeUsers,
 				adminUsers,
 				operationalEquipment,
 				criticalEquipment,

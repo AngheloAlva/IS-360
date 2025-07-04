@@ -40,6 +40,7 @@ import {
 	SelectTrigger,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
+import { useOperators } from "@/shared/hooks/use-operators"
 
 interface WorkPermitsTableProps {
 	hasPermission: boolean
@@ -48,6 +49,7 @@ interface WorkPermitsTableProps {
 }
 
 export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPermitsTableProps) {
+	const [approvedBy, setApprovedBy] = useState<string | null>(null)
 	const [companyId, setCompanyId] = useState<string | null>(null)
 	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -63,6 +65,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 		orderBy,
 		limit: 15,
 		companyId,
+		approvedBy,
 		dateRange: null,
 		statusFilter: null,
 		search: debouncedSearch,
@@ -70,6 +73,11 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 
 	const { data: companies } = useCompanies({
 		limit: 1000,
+	})
+
+	const { data: operators } = useOperators({
+		limit: 100,
+		page: 1,
 	})
 
 	const table = useReactTable({
@@ -120,6 +128,33 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 									{companies?.companies?.map((company) => (
 										<SelectItem key={company.id} value={company.id}>
 											{company.name}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+
+						<Select
+							onValueChange={(value) => {
+								if (value === "all") {
+									setApprovedBy(null)
+								} else {
+									setApprovedBy(value)
+								}
+							}}
+							value={approvedBy ?? "all"}
+						>
+							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+								<SelectValue placeholder="Seleccione operador" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Aprovado por</SelectLabel>
+									<SelectSeparator />
+									<SelectItem value="all">Todos los Operadores</SelectItem>
+									{operators?.operators?.map((operator) => (
+										<SelectItem key={operator.id} value={operator.id}>
+											{operator.name}
 										</SelectItem>
 									))}
 								</SelectGroup>

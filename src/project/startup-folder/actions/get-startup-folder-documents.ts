@@ -29,7 +29,6 @@ export async function getStartupFolderDocuments({
 	isDriver: boolean
 }> {
 	try {
-		console.log(workerId)
 		let folderStatus: ReviewStatus = "DRAFT"
 
 		const folder = await (async () => {
@@ -122,8 +121,6 @@ export async function getStartupFolderDocuments({
 					throw new Error(`Invalid category: ${category}`)
 			}
 		})()
-
-		console.log(folder)
 
 		if (!folder) {
 			return {

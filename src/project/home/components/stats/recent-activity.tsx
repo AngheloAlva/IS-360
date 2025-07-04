@@ -43,11 +43,9 @@ export function RecentActivity({ activities, isLoading }: RecentActivityProps) {
 								</div>
 								<div className="min-w-0 flex-1">
 									<p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-										{activity.module}
+										{activity.description}
 									</p>
 									<div className="text-muted-foreground mt-1 flex items-center text-xs">
-										<span className="font-medium">{activity.module}</span>
-										<span className="mx-1">•</span>
 										<span>{activity.user}</span>
 										<span className="mx-1">•</span>
 										<span>{activity.time}</span>

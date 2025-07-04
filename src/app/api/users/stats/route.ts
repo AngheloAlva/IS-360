@@ -18,20 +18,28 @@ export async function GET(): Promise<NextResponse> {
 	try {
 		// Estadísticas básicas
 		const [totalUsers, twoFactorEnabled, totalContractors, totalSupervisors] = await Promise.all([
-			prisma.user.count(),
 			prisma.user.count({
 				where: {
+					accessRole: USER_ROLE.ADMIN,
+					isActive: true,
+				},
+			}),
+			prisma.user.count({
+				where: {
+					isActive: true,
 					twoFactorEnabled: true,
 					accessRole: USER_ROLE.ADMIN,
 				},
 			}),
 			prisma.user.count({
 				where: {
+					isActive: true,
 					accessRole: USER_ROLE.PARTNER_COMPANY,
 				},
 			}),
 			prisma.user.count({
 				where: {
+					isActive: true,
 					accessRole: USER_ROLE.SUPERVISOR,
 				},
 			}),

@@ -34,22 +34,22 @@ export default function PowerBIDashboardPage() {
 	// Power BI embed URLs
 	const dashboards: DashboardsMap = {
 		dashboard1: {
-			title: "Mantención - Análisis Alarmas",
+			title: "Análisis Alarmas (DAS)",
 			url: "https://app.powerbi.com/view?r=eyJrIjoiYTViOWRiM2ItMmY0Yi00Y2VmLTllNWUtZDI5YjdiYWFhMzkxIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
 			icon: <SirenIcon className="h-4 w-4" />,
 		},
 		dashboard2: {
-			title: "Gerencia Operaciones",
+			title: "Seguimiento de Tareas",
 			url: "https://app.powerbi.com/view?r=eyJrIjoiZjVmNDE0OGItNDg5ZC00ZmQxLTkzM2EtYmExMTJhNmY2MzI2IiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
 			icon: <HandshakeIcon className="h-4 w-4" />,
 		},
 		dashboard3: {
-			title: "Reporte Operaciones",
+			title: "Reporte Mensual Interno",
 			url: "https://app.powerbi.com/view?r=eyJrIjoiMjIxYzY3ZmItYmY3MS00Y2MxLWE5YTgtYTUzZmVmMzY5MGFmIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
 			icon: <DatabaseZapIcon className="h-4 w-4" />,
 		},
 		dashboard4: {
-			title: "Reporte OTA-OTC",
+			title: "Reporte Directorio",
 			url: "https://app.powerbi.com/view?r=eyJrIjoiYTYyMDc0ZmUtYzZjNS00MTdhLWFkYjktMzJjYWZiNmRkZjBkIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
 			icon: <StarIcon className="h-4 w-4" />,
 		},

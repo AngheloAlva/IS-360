@@ -16,10 +16,24 @@ import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Form } from "@/shared/components/ui/form"
+import { CheckIcon } from "lucide-react"
 
 interface ResetPasswordFormProps {
 	token: string
 }
+
+interface PasswordRequirement {
+	regex: RegExp
+	label: string
+}
+
+const passwordRequirements: PasswordRequirement[] = [
+	{ regex: /^.{8,}$/, label: "Mínimo 8 caracteres" },
+	{ regex: /[A-Z]/, label: "Al menos una mayúscula" },
+	{ regex: /[a-z]/, label: "Al menos una minúscula" },
+	{ regex: /[0-9]/, label: "Al menos un número" },
+	{ regex: /[^A-Za-z0-9]/, label: "Al menos un carácter especial" },
+]
 
 export default function ResetPassword({ token }: ResetPasswordFormProps): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -61,27 +75,49 @@ export default function ResetPassword({ token }: ResetPasswordFormProps): React.
 		)
 	}
 
+	const password = form.watch("password")
+
 	return (
-		<Card>
-			<CardHeader>
+		<Card className="w-full border-none sm:w-4/5">
+			<CardHeader className="gap-1">
 				<h2 className="text-2xl font-bold">Restablecer contraseña</h2>
+				<p className="text-text/80 leading-relaxed">Ingresa tu nueva contraseña</p>
 			</CardHeader>
 
 			<CardContent>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-3">
-						<InputFormField<ResetPasswordSchema>
-							control={form.control}
-							name="password"
-							type="password"
-							label="Nueva contraseña"
-							placeholder="Nueva contraseña"
-						/>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full flex-col gap-4">
+						<div className="space-y-4">
+							<InputFormField<ResetPasswordSchema>
+								control={form.control}
+								name="password"
+								type="password"
+								label="Nueva contraseña"
+								placeholder="Nueva contraseña"
+							/>
+
+							<div className="space-y-2">
+								<p className="text-sm font-medium">Requisitos de contraseña:</p>
+								<ul className="space-y-1">
+									{passwordRequirements.map((req, index) => (
+										<li
+											key={index}
+											className={`text-sm ${
+												req.regex.test(password) ? "text-green-600" : "text-red-500"
+											}`}
+										>
+											<CheckIcon className="mr-1 inline size-3.5" />
+											{req.label}
+										</li>
+									))}
+								</ul>
+							</div>
+						</div>
 
 						<SubmitButton
 							isSubmitting={loading}
 							label="Restablecer contraseña"
-							className="hover:bg-primary/80"
+							className="mt-4 bg-green-600 text-white hover:bg-green-600 hover:text-white"
 						/>
 					</form>
 				</Form>

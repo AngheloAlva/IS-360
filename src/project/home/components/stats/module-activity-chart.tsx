@@ -33,7 +33,7 @@ export function ModuleActivityChart({ data, isLoading }: ModuleActivityChartProp
 				<BarChart3 className="text-muted-foreground h-4 w-4" />
 			</CardHeader>
 			<CardContent className="px-2 py-0">
-				<div className="h-[250px] w-full max-w-[90dvw]">
+				<div className="h-[350px] w-full max-w-[90dvw]">
 					<ChartContainer
 						config={{
 							STARTUP_FOLDERS: {
@@ -96,7 +96,7 @@ function ModuleActivityChartSkeleton() {
 				<Skeleton className="h-4 w-4 rounded" />
 			</CardHeader>
 			<CardContent>
-				<div className="h-[250px] w-full max-w-[90dvw]">
+				<div className="h-[350px] w-full max-w-[90dvw]">
 					<Skeleton className="h-full w-full rounded" />
 				</div>
 			</CardContent>

@@ -29,20 +29,6 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 		return <WeeklyActivityChartSkeleton />
 	}
 
-	// Ejemplo de nueva estructura de datos:
-	// [
-	//   {
-	//     "day": "Lunes",
-	//     "workOrders": 3,
-	//     "permits": 1,
-	//     "maintenance": 0,
-	//     "equipment": 2,
-	//     "users": 0,
-	//     "other": 0
-	//   },
-	//   ...
-	// ]
-
 	return (
 		<Card className="border-none">
 			<CardHeader className="flex flex-row items-center justify-between">
@@ -53,7 +39,7 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 				<TrendingUp className="text-muted-foreground h-4 w-4" />
 			</CardHeader>
 			<CardContent className="py-0 pl-2">
-				<div className="h-[250px] w-full max-w-[90dvw]">
+				<div className="h-[350px] w-full max-w-[90dvw]">
 					<ChartContainer
 						config={{
 							workOrders: { label: "Órdenes de trabajo" },
@@ -61,9 +47,13 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 							maintenance: { label: "Planes de mantenimiento" },
 							equipment: { label: "Equipos" },
 							users: { label: "Usuarios" },
-							other: { label: "Otros" },
+							companies: { label: "Empresas" },
+							workRequests: { label: "Solicitudes de trabajo" },
+							documentation: { label: "Documentación" },
+							vehicles: { label: "Vehículos" },
+							startupFolders: { label: "Carpeta de arranque" },
 						}}
-						className="h-[250px] w-full max-w-[90dvw]"
+						className="h-[350px] w-full max-w-[90dvw]"
 					>
 						<AreaChart data={data}>
 							<ChartTooltip content={<ChartTooltipContent />} />
@@ -72,31 +62,47 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 							<XAxis dataKey="day" />
 							<YAxis />
 
-							<ChartLegend content={<ChartLegendContent />} />
+							<ChartLegend className="flex-wrap" content={<ChartLegendContent />} />
 							<defs>
 								<linearGradient id="fillWorkOrders" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#f97316" stopOpacity={0.8} />
-									<stop offset="95%" stopColor="#f97316" stopOpacity={0.1} />
+									<stop offset="5%" stopColor="var(--color-orange-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-orange-500)" stopOpacity={0.1} />
 								</linearGradient>
 								<linearGradient id="fillPermits" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#dc2626" stopOpacity={0.8} />
-									<stop offset="95%" stopColor="#dc2626" stopOpacity={0.1} />
+									<stop offset="5%" stopColor="var(--color-purple-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-purple-500)" stopOpacity={0.1} />
 								</linearGradient>
 								<linearGradient id="fillMaintenance" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
-									<stop offset="95%" stopColor="#6366f1" stopOpacity={0.1} />
+									<stop offset="5%" stopColor="var(--color-indigo-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-indigo-500)" stopOpacity={0.1} />
 								</linearGradient>
 								<linearGradient id="fillEquipment" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
-									<stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
+									<stop offset="5%" stopColor="var(--color-emerald-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-emerald-500)" stopOpacity={0.1} />
 								</linearGradient>
 								<linearGradient id="fillUsers" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-									<stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
+									<stop offset="5%" stopColor="var(--color-purple-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-purple-500)" stopOpacity={0.1} />
 								</linearGradient>
-								<linearGradient id="fillOther" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.8} />
-									<stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.1} />
+								<linearGradient id="fillCompanies" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="var(--color-blue-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-blue-500)" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillWorkRequests" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="var(--color-cyan-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-cyan-500)" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillDocumentation" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="var(--color-amber-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-amber-500)" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillVehicles" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="var(--color-green-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-green-500)" stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id="fillStartupFolders" x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor="var(--color-teal-500)" stopOpacity={0.8} />
+									<stop offset="95%" stopColor="var(--color-teal-500)" stopOpacity={0.1} />
 								</linearGradient>
 							</defs>
 
@@ -104,7 +110,7 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 								type="monotone"
 								dataKey="workOrders"
 								stackId="1"
-								stroke="#f97316"
+								stroke="var(--color-orange-500)"
 								fill="url(#fillWorkOrders)"
 								name="Órdenes"
 							/>
@@ -112,7 +118,7 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 								type="monotone"
 								dataKey="permits"
 								stackId="1"
-								stroke="#dc2626"
+								stroke="var(--color-purple-500)"
 								fill="url(#fillPermits)"
 								name="Permisos"
 							/>
@@ -120,33 +126,65 @@ export function WeeklyActivityChart({ data, isLoading }: WeeklyActivityChartProp
 								type="monotone"
 								dataKey="maintenance"
 								stackId="1"
-								stroke="#6366f1"
+								stroke="var(--color-indigo-500)"
 								fill="url(#fillMaintenance)"
 								name="Mantenimiento"
 							/>
 							<Area
 								type="monotone"
 								dataKey="equipment"
-								stackId="1"
-								stroke="#10b981"
+								stackId="2"
+								stroke="var(--color-emerald-500)"
 								fill="url(#fillEquipment)"
 								name="Equipos"
 							/>
 							<Area
 								type="monotone"
 								dataKey="users"
-								stackId="1"
-								stroke="#8b5cf6"
+								stackId="3"
+								stroke="var(--color-purple-500)"
 								fill="url(#fillUsers)"
 								name="Usuarios"
 							/>
 							<Area
 								type="monotone"
-								dataKey="other"
-								stackId="1"
-								stroke="#0ea5e9"
-								fill="url(#fillOther)"
-								name="Otros"
+								dataKey="companies"
+								stackId="4"
+								stroke="var(--color-blue-500)"
+								fill="url(#fillCompanies)"
+								name="Empresas"
+							/>
+							<Area
+								type="monotone"
+								dataKey="workRequests"
+								stackId="5"
+								stroke="var(--color-cyan-500)"
+								fill="url(#fillWorkRequests)"
+								name="Solicitudes"
+							/>
+							<Area
+								type="monotone"
+								dataKey="vehicles"
+								stackId="6"
+								stroke="var(--color-green-500)"
+								fill="url(#fillVehicles)"
+								name="Vehículos"
+							/>
+							<Area
+								type="monotone"
+								dataKey="startupFolders"
+								stackId="7"
+								stroke="var(--color-teal-500)"
+								fill="url(#fillStartupFolders)"
+								name="Carpetas de arranque"
+							/>
+							<Area
+								type="monotone"
+								dataKey="documentation"
+								stackId="8"
+								stroke="var(--color-amber-500)"
+								fill="url(#fillDocumentation)"
+								name="Documentación"
 							/>
 						</AreaChart>
 					</ChartContainer>
@@ -167,7 +205,7 @@ function WeeklyActivityChartSkeleton() {
 				<Skeleton className="h-4 w-4 rounded" />
 			</CardHeader>
 			<CardContent>
-				<div className="h-[250px] w-full max-w-[90dvw]">
+				<div className="h-[350px] w-full max-w-[90dvw]">
 					<Skeleton className="h-full w-full rounded" />
 				</div>
 			</CardContent>

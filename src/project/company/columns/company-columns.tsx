@@ -11,6 +11,7 @@ import DeleteCompanyDialog from "@/project/company/components/forms/DeleteCompan
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 
 import type { Company } from "@/project/company/hooks/use-companies"
+import { generateSlug } from "@/lib/generateSlug"
 
 export const CompanyColumns: ColumnDef<Company>[] = [
 	{
@@ -29,7 +30,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 	},
 	{
 		accessorKey: "name",
-		header: "Nombre",
+		header: "Nombre Empresa",
 		cell: ({ row }) => {
 			const company = row.original
 			return (
@@ -43,7 +44,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 	},
 	{
 		accessorKey: "rut",
-		header: "RUT",
+		header: "RUT Empresa",
 	},
 	{
 		accessorKey: "users",
@@ -89,7 +90,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 					</span>
 
 					<Link
-						href={`/admin/dashboard/carpetas-de-arranques/${row.original.id}`}
+						href={`/admin/dashboard/carpetas-de-arranques/${generateSlug(row.original.name)}_${row.original.id}`}
 						className="roundedtracking-wider flex size-6 items-center justify-center rounded-full text-blue-600 transition-all hover:scale-105 hover:bg-blue-600 hover:text-white"
 					>
 						<ArrowRightIcon className="size-4" />

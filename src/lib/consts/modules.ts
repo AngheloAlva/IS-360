@@ -1,13 +1,20 @@
 import { MODULES } from "@prisma/client"
 
 export const ModulesValuesArray = [
-	MODULES.ALL,
-	MODULES.EQUIPMENT,
-	MODULES.SAFETY_TALK,
-	MODULES.WORK_ORDERS,
-	MODULES.WORK_PERMITS,
-	MODULES.DOCUMENTATION,
-	MODULES.NONE,
+	MODULES.ALL, // Todo
+	MODULES.EQUIPMENT, // Equipos y Ubicacioens
+	MODULES.SAFETY_TALK, // Charlas de seguridad
+	MODULES.WORK_ORDERS, // Ordenes de Trabajo y Libros de obras
+	MODULES.WORK_PERMITS, // Permisos de Trabajo
+	MODULES.DOCUMENTATION, // Documentacion
+	MODULES.WORK_REQUESTS, // Solicitudes de Trabajo
+	MODULES.COMPANY, // Empresas
+	MODULES.USERS, // Usuarios
+	MODULES.MAINTENANCE_PLANS, // Planes de Mantenimiento y Tareas de los planes
+	MODULES.STARTUP_FOLDERS, // Carpetas de Arranque
+	MODULES.VEHICLES, // Vehiculos (acceso contratista, no OTC)
+	MODULES.CONTACT, // Contacto y Soporte
+	MODULES.NONE, // Sin módulo
 ] as const
 
 export const ModuleOptions = [
@@ -48,5 +55,12 @@ export const ModulesLabels = {
 	[MODULES.WORK_ORDERS]: "Ordenes de trabajo",
 	[MODULES.WORK_PERMITS]: "Permisos de trabajo",
 	[MODULES.DOCUMENTATION]: "Documentacion",
+	[MODULES.WORK_REQUESTS]: "Solicitudes de trabajo",
+	[MODULES.COMPANY]: "Empresas",
+	[MODULES.USERS]: "Usuarios",
+	[MODULES.MAINTENANCE_PLANS]: "Planes de mantenimiento",
+	[MODULES.STARTUP_FOLDERS]: "Carpetas de arranque",
+	[MODULES.VEHICLES]: "Vehículos",
+	[MODULES.CONTACT]: "Contacto y soporte",
 	[MODULES.NONE]: "Ninguno",
 }

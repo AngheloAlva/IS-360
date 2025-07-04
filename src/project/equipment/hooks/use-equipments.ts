@@ -25,9 +25,12 @@ export interface WorkEquipment {
 	isOperational: boolean
 	type: string | null
 	tag: string
+	barcode: string
 	children: WorkEquipment[]
 	parentId: string | null
 	attachments: Attachment[]
+	imageUrl?: string | null
+	criticality?: string | null
 	_count: {
 		workOrders: number
 		children: number

@@ -27,6 +27,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const endDate = searchParams.get("endDate") || null
 		const orderBy = searchParams.get("orderBy") as OrderBy
 		const order = searchParams.get("order") as Order
+		const approvedBy = searchParams.get("approvedBy") || null
 
 		const skip = (page - 1) * limit
 
@@ -61,6 +62,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						solicitationDate: {
 							...(startDate ? { gte: new Date(startDate) } : {}),
 							...(endDate ? { lte: new Date(endDate) } : {}),
+						},
+					}
+				: {}),
+			...(approvedBy
+				? {
+						approvalBy: {
+							id: approvedBy,
 						},
 					}
 				: {}),

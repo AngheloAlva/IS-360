@@ -131,6 +131,7 @@ model User {
   activityLogs                    ActivityLog[]
   WorkRequest                     WorkRequest[]
   basicFolderReviewer             BasicFolder[]             @relation("BasicFolderReviewer")
+  equipment                       Equipment[]               @relation("EquipmentCreatedBy")
 
   @@unique([email])
   @@unique([rut])
@@ -416,6 +417,7 @@ model Equipment {
   type          String?
   tag           String
   criticality   CRITICALITY?
+  imageUrl      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -428,6 +430,8 @@ model Equipment {
   MaintenancePlan     MaintenancePlan[]
   MaintenancePlanTask MaintenancePlanTask[]
   attachments         Attachment[]
+  createdBy           User?                 @relation("EquipmentCreatedBy", fields: [createdById], references: [id])
+  createdById         String?
 
   @@unique([id])
   @@unique([tag])
@@ -902,7 +906,7 @@ model MaintenancePlanTask {
 enum ReviewStatus {
   DRAFT // Edicion
   SUBMITTED // Enviado
-  APPROVED // Aprovado
+  APPROVED // Aprobado
   REJECTED // Rechazado
   EXPIRED // Expirado
 }

@@ -399,7 +399,6 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					</View>
 
 					{workPermit.workWillBe === "Espacio confinado" ||
-					workPermit.workWillBe === "Acceso Limitado" ||
 					workPermit.workWillBe === "En Caliente" ? (
 						<View style={styles.row}>
 							<View style={styles.column}>
@@ -679,11 +678,14 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						<Text style={styles.signatureLabel}>{workPermit.user.name}</Text>
 					</View>
 
-					<View style={styles.signatureColumn}>
-						<View style={styles.signatureBox}></View>
-						<Text style={styles.signatureLabel}>Firma Prevención</Text>
-						<Text style={styles.signatureLabel}>Riesgos OTC</Text>
-					</View>
+					{workPermit.workWillBe === "Espacio confinado" ||
+						(workPermit.workWillBe === "En Caliente" && (
+							<View style={styles.signatureColumn}>
+								<View style={styles.signatureBox}></View>
+								<Text style={styles.signatureLabel}>Firma Prevención</Text>
+								<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+							</View>
+						))}
 
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>

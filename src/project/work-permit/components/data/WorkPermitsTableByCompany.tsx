@@ -71,6 +71,7 @@ export function WorkPermitsTableByCompany({
 		companyId,
 		statusFilter,
 		dateRange: null,
+		approvedBy: null,
 	})
 
 	const table = useReactTable({

@@ -6,6 +6,8 @@ import { auth } from "@/lib/auth"
 import { EquipmentTable } from "@/project/equipment/components/data/EquipmentTable"
 import CreateEquipmentForm from "@/project/equipment/components/forms/CreateEquipmentForm"
 import BackButton from "@/shared/components/BackButton"
+import EquipmentDetailPage from "@/project/equipment/components/dashboard/EquipmentDetailPage"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
 
 export default async function EquipmentsPage({
 	params,
@@ -56,11 +58,21 @@ export default async function EquipmentsPage({
 						</div>
 					</div>
 
-					{hasPermission.success && <CreateEquipmentForm parentId={actualParentId} />}
+					<div className="flex items-center gap-2 lg:gap-3">
+						<ScrollToTableButton
+							id="equipment-table"
+							label="Lista Equipos Hijos"
+							className="text-teal-700 hover:bg-white hover:text-teal-700"
+						/>
+
+						{hasPermission.success && <CreateEquipmentForm parentId={actualParentId} />}
+					</div>
 				</div>
 			</div>
 
-			<EquipmentTable lastPath={backPath} parentId={actualParentId} />
+			<EquipmentDetailPage equipmentId={actualParentId} />
+
+			<EquipmentTable lastPath={backPath} parentId={actualParentId} id="equipment-table" />
 		</div>
 	)
 }
