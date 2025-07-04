@@ -52,6 +52,11 @@ export const createEquipment = async ({ values, uploadResults }: CreateEquipment
 		const equipment = await prisma.equipment.create({
 			data: {
 				barcode,
+				createdBy: {
+					connect: {
+						id: session.user.id,
+					},
+				},
 				...(parentId && { parent: { connect: { id: parentId } } }),
 				...(uploadResults.length > 0 && {
 					attachments: {
@@ -76,6 +81,7 @@ export const createEquipment = async ({ values, uploadResults }: CreateEquipment
 			metadata: {
 				name: equipment.name,
 				barcode: equipment.barcode,
+				createdBy: session.user.id,
 				parentId: equipment.parentId,
 				attachments: uploadResults.length,
 			},
