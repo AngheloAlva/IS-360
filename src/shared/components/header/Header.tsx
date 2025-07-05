@@ -11,10 +11,10 @@ export default function Header({
 	session: Session
 }>): React.ReactElement {
 	return (
-		<header className="border-input bg-background flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:px-8">
+		<header className="bg-background flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 shadow transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:px-8">
 			<div className="flex items-center gap-2">
-				<SidebarTrigger className="-ml-1" />
-				<Separator orientation="vertical" className="mr-2 h-4" />
+				<SidebarTrigger className="border-input -ml-1 size-8 border" />
+				<Separator orientation="vertical" className="mx-2 min-h-8" />
 				<PageName externalPath={session.user.accessRole === "PARTNER_COMPANY"} />
 			</div>
 
