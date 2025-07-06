@@ -5,8 +5,8 @@ import { format } from "date-fns"
 import Image from "next/image"
 import {
 	UserIcon,
-	MapPinIcon,
 	ZoomInIcon,
+	SettingsIcon,
 	BuildingIcon,
 	CalendarIcon,
 	FileTextIcon,
@@ -63,19 +63,6 @@ export default function WorkRequestDetailsDialog({
 		}
 	}
 
-	const locationText = (location: string) => {
-		switch (location) {
-			case "PRS":
-				return "PRS"
-			case "TRM":
-				return "TRM"
-			case "OTHER":
-				return workRequest.customLocation || "Otro"
-			default:
-				return location
-		}
-	}
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="overflow-hidden p-0">
@@ -128,9 +115,11 @@ export default function WorkRequestDetailsDialog({
 									value={workRequest.user?.company?.name || "N/A"}
 								/>
 								<DialogLabel
-									icon={<MapPinIcon className="size-4" />}
-									label="Ubicación"
-									value={locationText(workRequest.location)}
+									icon={<SettingsIcon className="size-4" />}
+									label="Equipo / Ubicación"
+									value={
+										workRequest.equipments[0].name + " - " + workRequest.equipments[0].location
+									}
 								/>
 							</div>
 						</div>

@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
-import { TableSelector } from "./TableSelector"
-import { FieldPicker } from "./FieldPicker"
-import { FilterBuilder } from "./FilterBuilder"
+// import { useState } from "react"
+// import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+// import { TableSelector } from "./TableSelector"
+// import { FieldPicker } from "./FieldPicker"
+// import { FilterBuilder } from "./FilterBuilder"
 import { SchemaInfo } from "../../hooks/useSchemaInfo"
-import { ScrollArea } from "@/shared/components/ui/scroll-area"
+// import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { FilterCondition } from "../../hooks/useDynamicQuery"
 
 interface DataSelectionPanelProps {
@@ -19,20 +19,12 @@ interface DataSelectionPanelProps {
 	onFilterChange: (filters: FilterCondition[]) => void
 }
 
-export function DataSelectionPanel({
-	schemaInfo,
-	selectedTables,
-	onTableSelect,
-	selectedFields,
-	onFieldSelect,
-	filters,
-	onFilterChange,
-}: DataSelectionPanelProps) {
-	const [, setActiveTab] = useState("tables")
+export function DataSelectionPanel({}: DataSelectionPanelProps) {
+	// const [, setActiveTab] = useState("tables")
 
 	return (
 		<div className="h-full">
-			<Tabs defaultValue="tables" className="w-full" onValueChange={setActiveTab}>
+			{/* <Tabs defaultValue="tables" className="w-full" onValueChange={setActiveTab}>
 				<div className="px-4 pt-4">
 					<TabsList className="grid w-full grid-cols-3">
 						<TabsTrigger value="tables">Tablas</TabsTrigger>
@@ -46,33 +38,35 @@ export function DataSelectionPanel({
 				</div>
 
 				<ScrollArea className="h-[calc(100vh-250px)] px-4 py-2">
-					<TabsContent value="tables" className="mt-0 pt-4">
-						<TableSelector
-							tables={schemaInfo?.tables || []}
-							selectedTables={selectedTables}
-							onTableSelect={onTableSelect}
-						/>
-					</TabsContent>
+					<TabsContents>
+						<TabsContent value="tables" className="mt-0 pt-4">
+							<TableSelector
+								tables={schemaInfo?.tables || []}
+								selectedTables={selectedTables}
+								onTableSelect={onTableSelect}
+							/>
+						</TabsContent>
 
-					<TabsContent value="fields" className="mt-0 pt-4">
-						<FieldPicker
-							tables={schemaInfo?.tables || []}
-							selectedTables={selectedTables}
-							selectedFields={selectedFields}
-							onFieldSelect={onFieldSelect}
-						/>
-					</TabsContent>
+						<TabsContent value="fields" className="mt-0 pt-4">
+							<FieldPicker
+								tables={schemaInfo?.tables || []}
+								selectedTables={selectedTables}
+								selectedFields={selectedFields}
+								onFieldSelect={onFieldSelect}
+							/>
+						</TabsContent>
 
-					<TabsContent value="filters" className="mt-0 pt-4">
-						<FilterBuilder
-							tables={schemaInfo?.tables || []}
-							selectedFields={selectedFields}
-							filters={filters}
-							onFilterChange={onFilterChange}
-						/>
-					</TabsContent>
+						<TabsContent value="filters" className="mt-0 pt-4">
+							<FilterBuilder
+								tables={schemaInfo?.tables || []}
+								selectedFields={selectedFields}
+								filters={filters}
+								onFilterChange={onFilterChange}
+							/>
+						</TabsContent>
+					</TabsContents>
 				</ScrollArea>
-			</Tabs>
+			</Tabs> */}
 		</div>
 	)
 }

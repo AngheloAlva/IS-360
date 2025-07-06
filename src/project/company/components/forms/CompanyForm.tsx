@@ -14,7 +14,7 @@ import { VehicleTypeOptions } from "@/lib/consts/vehicle-type"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { ColorPickerFormField } from "@/shared/components/forms/ColorPickerFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
@@ -236,179 +236,185 @@ export default function CompanyForm(): React.ReactElement {
 									Vehículos
 								</TabsTrigger>
 							</TabsList>
-							<TabsContent
-								value="supervisors"
-								className="flex w-full flex-col space-y-4 gap-y-4 pt-2"
-							>
-								{supervisorsFields.map((field, index) => (
-									<div key={field.id} className="grid gap-x-2 gap-y-4 sm:grid-cols-2">
-										<div className="flex items-center justify-between sm:col-span-2">
-											<h4 className="flex items-center gap-1 text-sm font-medium">
-												<IdCard className="h-4.5 w-4.5" />
-												Datos del Supervisor {index + 1}
-											</h4>
 
-											<Button
-												type="button"
-												className="text-text w-fit bg-transparent shadow-none hover:text-red-500"
-												onClick={() => removeSupervisor(index)}
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</div>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.name`}
-											control={form.control}
-											label="Nombre completo"
-											placeholder="Nombre del supervisor"
-										/>
-
-										<RutFormField<CompanySchema>
-											name={`supervisors.${index}.rut`}
-											label="RUT"
-											control={form.control}
-											placeholder="RUT del supervisor"
-										/>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.email`}
-											label="Email"
-											control={form.control}
-											placeholder="Email del supervisor"
-											itemClassName="sm:col-span-2"
-										/>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.phone`}
-											label="Telefono"
-											control={form.control}
-											placeholder="Telefono del supervisor"
-											itemClassName="sm:col-span-2"
-										/>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.internalArea`}
-											label="Area interna"
-											control={form.control}
-											itemClassName="sm:col-span-2"
-											placeholder="Area interna del supervisor"
-										/>
-
-										<InputFormField<CompanySchema>
-											name={`supervisors.${index}.internalRole`}
-											label="Cargo"
-											control={form.control}
-											itemClassName="sm:col-span-2"
-											placeholder="Cargo del supervisor"
-										/>
-									</div>
-								))}
-
-								<Button
-									type="button"
-									onClick={() =>
-										appendSupervisor({
-											rut: "",
-											name: "",
-											email: "",
-											phone: "",
-											internalArea: "",
-											internalRole: "",
-											isSupervisor: true,
-										})
-									}
-									className="text-primary w-fit bg-transparent shadow-none hover:underline"
+							<TabsContents>
+								<TabsContent
+									value="supervisors"
+									className="flex w-full flex-col space-y-4 gap-y-4 pt-2"
 								>
-									<PlusCircleIcon className="h-4 w-4" />
-									Añadir Supervisor
-								</Button>
-							</TabsContent>
+									{supervisorsFields.map((field, index) => (
+										<div key={field.id} className="grid gap-x-2 gap-y-4 sm:grid-cols-2">
+											<div className="flex items-center justify-between sm:col-span-2">
+												<h4 className="flex items-center gap-1 text-sm font-medium">
+													<IdCard className="h-4.5 w-4.5" />
+													Datos del Supervisor {index + 1}
+												</h4>
 
-							<TabsContent value="vehicles" className="flex w-full flex-col space-y-4 gap-y-4 pt-2">
-								{vehiclesFields.map((field, index) => (
-									<div className="grid gap-x-2 gap-y-4 sm:grid-cols-2" key={field.id}>
-										<div className="flex items-center justify-between sm:col-span-2">
-											<h3 className="flex items-center gap-1 text-sm font-semibold">
-												<Car className="h-4.5 w-4.5" />
-												Vehículo {index === 0 ? "Principal" : index + 1}
-											</h3>
+												<Button
+													type="button"
+													className="text-text w-fit bg-transparent shadow-none hover:text-red-500"
+													onClick={() => removeSupervisor(index)}
+												>
+													<Trash2 className="h-4 w-4" />
+												</Button>
+											</div>
 
-											<Button
-												type="button"
-												size={"icon"}
-												className="text-text bg-transparent shadow-none hover:text-red-500"
-												onClick={() => removeVehicle(index)}
-											>
-												<Trash2 />
-											</Button>
+											<InputFormField<CompanySchema>
+												name={`supervisors.${index}.name`}
+												control={form.control}
+												label="Nombre completo"
+												placeholder="Nombre del supervisor"
+											/>
+
+											<RutFormField<CompanySchema>
+												name={`supervisors.${index}.rut`}
+												label="RUT"
+												control={form.control}
+												placeholder="RUT del supervisor"
+											/>
+
+											<InputFormField<CompanySchema>
+												name={`supervisors.${index}.email`}
+												label="Email"
+												control={form.control}
+												placeholder="Email del supervisor"
+												itemClassName="sm:col-span-2"
+											/>
+
+											<InputFormField<CompanySchema>
+												name={`supervisors.${index}.phone`}
+												label="Telefono"
+												control={form.control}
+												placeholder="Telefono del supervisor"
+												itemClassName="sm:col-span-2"
+											/>
+
+											<InputFormField<CompanySchema>
+												name={`supervisors.${index}.internalArea`}
+												label="Area interna"
+												control={form.control}
+												itemClassName="sm:col-span-2"
+												placeholder="Area interna del supervisor"
+											/>
+
+											<InputFormField<CompanySchema>
+												name={`supervisors.${index}.internalRole`}
+												label="Cargo"
+												control={form.control}
+												itemClassName="sm:col-span-2"
+												placeholder="Cargo del supervisor"
+											/>
 										</div>
+									))}
 
-										<InputFormField<CompanySchema>
-											min={2000}
-											label="Año"
-											type="number"
-											placeholder="Año"
-											control={form.control}
-											max={new Date().getFullYear()}
-											name={`vehicles.${index}.year`}
-										/>
+									<Button
+										type="button"
+										onClick={() =>
+											appendSupervisor({
+												rut: "",
+												name: "",
+												email: "",
+												phone: "",
+												internalArea: "",
+												internalRole: "",
+												isSupervisor: true,
+											})
+										}
+										className="text-primary w-fit bg-transparent shadow-none hover:underline"
+									>
+										<PlusCircleIcon className="h-4 w-4" />
+										Añadir Supervisor
+									</Button>
+								</TabsContent>
 
-										<InputFormField<CompanySchema>
-											label="Patente"
-											placeholder="Patente"
-											control={form.control}
-											name={`vehicles.${index}.plate`}
-										/>
-
-										<InputFormField<CompanySchema>
-											label="Marca"
-											placeholder="Marca"
-											control={form.control}
-											name={`vehicles.${index}.brand`}
-										/>
-
-										<InputFormField<CompanySchema>
-											label="Modelo"
-											placeholder="Modelo"
-											control={form.control}
-											name={`vehicles.${index}.model`}
-										/>
-
-										<ColorPickerFormField<CompanySchema>
-											label="Color"
-											control={form.control}
-											name={`vehicles.${index}.color`}
-										/>
-
-										<SelectFormField<CompanySchema>
-											label="Tipo"
-											control={form.control}
-											name={`vehicles.${index}.type`}
-											options={VehicleTypeOptions}
-										/>
-									</div>
-								))}
-
-								<Button
-									type="button"
-									className="text-primary w-fit bg-transparent shadow-none hover:underline"
-									onClick={() =>
-										appendVehicle({
-											plate: "",
-											brand: "",
-											model: "",
-											color: "",
-											type: "CAR",
-											year: "2000",
-											isMain: false,
-										})
-									}
+								<TabsContent
+									value="vehicles"
+									className="flex w-full flex-col space-y-4 gap-y-4 pt-2"
 								>
-									<PlusCircleIcon className="h-3 w-3" />
-									Añadir Vehículo
-								</Button>
-							</TabsContent>
+									{vehiclesFields.map((field, index) => (
+										<div className="grid gap-x-2 gap-y-4 sm:grid-cols-2" key={field.id}>
+											<div className="flex items-center justify-between sm:col-span-2">
+												<h3 className="flex items-center gap-1 text-sm font-semibold">
+													<Car className="h-4.5 w-4.5" />
+													Vehículo {index === 0 ? "Principal" : index + 1}
+												</h3>
+
+												<Button
+													type="button"
+													size={"icon"}
+													className="text-text bg-transparent shadow-none hover:text-red-500"
+													onClick={() => removeVehicle(index)}
+												>
+													<Trash2 />
+												</Button>
+											</div>
+
+											<InputFormField<CompanySchema>
+												min={2000}
+												label="Año"
+												type="number"
+												placeholder="Año"
+												control={form.control}
+												max={new Date().getFullYear()}
+												name={`vehicles.${index}.year`}
+											/>
+
+											<InputFormField<CompanySchema>
+												label="Patente"
+												placeholder="Patente"
+												control={form.control}
+												name={`vehicles.${index}.plate`}
+											/>
+
+											<InputFormField<CompanySchema>
+												label="Marca"
+												placeholder="Marca"
+												control={form.control}
+												name={`vehicles.${index}.brand`}
+											/>
+
+											<InputFormField<CompanySchema>
+												label="Modelo"
+												placeholder="Modelo"
+												control={form.control}
+												name={`vehicles.${index}.model`}
+											/>
+
+											<ColorPickerFormField<CompanySchema>
+												label="Color"
+												control={form.control}
+												name={`vehicles.${index}.color`}
+											/>
+
+											<SelectFormField<CompanySchema>
+												label="Tipo"
+												control={form.control}
+												name={`vehicles.${index}.type`}
+												options={VehicleTypeOptions}
+											/>
+										</div>
+									))}
+
+									<Button
+										type="button"
+										className="text-primary w-fit bg-transparent shadow-none hover:underline"
+										onClick={() =>
+											appendVehicle({
+												plate: "",
+												brand: "",
+												model: "",
+												color: "",
+												type: "CAR",
+												year: "2000",
+												isMain: false,
+											})
+										}
+									>
+										<PlusCircleIcon className="h-3 w-3" />
+										Añadir Vehículo
+									</Button>
+								</TabsContent>
+							</TabsContents>
 						</Tabs>
 
 						<Separator className="my-4" />

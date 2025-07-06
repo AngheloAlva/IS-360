@@ -3,9 +3,9 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { VehiclesByCompanyTable } from "@/project/vehicle/components/data/VehiclesByCompanyTable"
 import { UsersByCompanyTable } from "@/project/user/components/data/UsersByCompanyTable"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import CreateUsersForm from "@/project/user/components/forms/CreateUsersForm"
 import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
 import BackButton from "@/shared/components/BackButton"
@@ -66,22 +66,24 @@ export default async function CompanyByIdAdminPage({
 					</div>
 				</div>
 
-				<TabsList className="mt-6 h-12 w-full">
-					<TabsTrigger className="h-10" value="users">
+				<TabsList className="mt-6 h-11 w-full">
+					<TabsTrigger className="h-9" value="users">
 						Colaboradores
 					</TabsTrigger>
-					<TabsTrigger className="h-10" value="vehicles">
+					<TabsTrigger className="h-9" value="vehicles">
 						Vehículos
 					</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value="users">
-					<UsersByCompanyTable companyId={companyId} />
-				</TabsContent>
+				<TabsContents>
+					<TabsContent value="users">
+						<UsersByCompanyTable companyId={companyId} />
+					</TabsContent>
 
-				<TabsContent value="vehicles">
-					<VehiclesByCompanyTable companyId={companyId} />
-				</TabsContent>
+					<TabsContent value="vehicles">
+						<VehiclesByCompanyTable companyId={companyId} />
+					</TabsContent>
+				</TabsContents>
 			</Tabs>
 		</div>
 	)

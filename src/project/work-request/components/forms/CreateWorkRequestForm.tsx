@@ -12,14 +12,11 @@ import { uploadFilesToCloud } from "@/lib/upload-files"
 import {
 	workRequestSchema,
 	type WorkRequestSchema,
-	LOCATION_VALUES_ARRAY,
 } from "@/project/work-request/schemas/work-request.schema"
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
-import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
-import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
 import FileTable from "@/shared/components/forms/FileTable"
@@ -33,6 +30,8 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
+import { useEquipments } from "@/project/equipment/hooks/use-equipments"
+import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 
 export default function CreateWorkRequestForm({ userId }: { userId: string }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -46,13 +45,15 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 			isUrgent: false,
 			requestDate: new Date(),
 			observations: "",
-			location: undefined,
-			customLocation: "",
 			attachments: [],
+			equipments: [],
 		},
 	})
 
-	const watchLocation = form.watch("location")
+	const { data: equipmentsData } = useEquipments({
+		limit: 10000,
+		showAll: true,
+	})
 
 	async function onSubmit(values: WorkRequestSchema) {
 		setIsSubmitting(true)
@@ -151,34 +152,24 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 
 						<DatePickerFormField<WorkRequestSchema>
 							name="requestDate"
+							control={form.control}
 							label="Fecha de solicitud"
-							control={form.control}
+							itemClassName="sm:col-span-2"
 						/>
 
-						<SelectFormField<WorkRequestSchema>
-							name="location"
-							label="Ubicación"
+						<SelectWithSearchFormField<WorkRequestSchema>
+							name="equipments"
 							control={form.control}
-							placeholder="Selecciona la ubicación"
-							options={LOCATION_VALUES_ARRAY.map((value) => ({
-								value,
-								label:
-									value === "TRM"
-										? "Terminal (TRM)"
-										: value === "PRS"
-											? "Planta (PRS)"
-											: "Otra ubicación",
-							}))}
+							label="Equipo / Ubicación"
+							itemClassName="sm:col-span-2"
+							placeholder="Selecciona el equipo o ubicación"
+							options={
+								equipmentsData?.equipments.map((equipment) => ({
+									value: equipment.id,
+									label: equipment.name + " *(" + equipment.location + ")",
+								})) || []
+							}
 						/>
-
-						{watchLocation === "OTHER" && (
-							<InputFormField<WorkRequestSchema>
-								name="customLocation"
-								control={form.control}
-								label="Ubicación personalizada"
-								placeholder="Especifica la ubicación"
-							/>
-						)}
 
 						<TextAreaFormField<WorkRequestSchema>
 							name="observations"

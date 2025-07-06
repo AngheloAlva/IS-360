@@ -31,7 +31,6 @@ export async function GET(req: NextRequest) {
 							area,
 						},
 					],
-					isExternal: false,
 					isActive: true,
 				},
 				include: {

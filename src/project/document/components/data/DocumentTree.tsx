@@ -1,14 +1,13 @@
 "use client"
 
-import { ChevronRight, ChevronDown, Folder, File, FolderOpen } from "lucide-react"
-import { useCallback, useMemo, memo, useState, useEffect } from "react"
-import Link from "next/link"
+import { useCallback, useMemo, useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 import { Areas } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 
+import { Files, Folder, File } from "@/shared/components/ui/files"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { useRouter } from "next/navigation"
 
 type TreeNode = {
 	id: string
@@ -21,139 +20,130 @@ type TreeNode = {
 
 type DocumentTreeProps = {
 	area: string
+	folderId?: string
 	className?: string
 }
 
-const TreeNode = memo(function TreeNode({
+const TreeNodeItem = ({
 	node,
 	area,
-	level,
-	nodes,
-	router,
-	onToggle,
 	loadedNodes,
 	loadingNodes,
 	expandedNodes,
+	toggleNode,
+	router,
 }: {
-	area: string
-	level: number
 	node: TreeNode
-	nodes: TreeNode[]
+	area: string
+	loadedNodes: Record<string, TreeNode[]>
 	loadingNodes: Set<string>
 	expandedNodes: Set<string>
-	onToggle: (nodeId: string) => void
+	toggleNode: (nodeId: string) => void
 	router: ReturnType<typeof useRouter>
-	loadedNodes: Record<string, TreeNode[]>
-}) {
-	const handleToggle = useCallback(() => {
-		if (node.type === "folder") {
-			onToggle(node.id)
-		}
-	}, [node, onToggle])
+}) => {
+	const childNodes = loadedNodes[node.id] || []
+	const isExpanded = expandedNodes.has(node.id)
+	const isLoading = loadingNodes.has(node.id)
 
-	const handleFolderDoubleClick = useCallback(() => {
-		if (node.type === "folder") {
-			if (!area) return
+	const handleFolderClick = () => {
+		toggleNode(node.id)
+	}
 
+	const handleFolderDoubleClick = (e: React.MouseEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
+		if (node.type === "folder" && node.slug) {
 			router.push(`/admin/dashboard/documentacion/${area}/${node.slug + "_" + node.id}`)
 		}
-	}, [node, router, area])
+	}
+
+	const handleFileClick = () => {
+		if (node.url) {
+			window.open(node.url, "_blank", "noopener,noreferrer")
+		}
+	}
+
+	if (node.type === "folder") {
+		return (
+			<Folder
+				key={node.id}
+				name={node.name}
+				defaultOpen={isExpanded ? [node.id] : []}
+				onClick={handleFolderClick}
+				onDoubleClick={handleFolderDoubleClick}
+			>
+				{isLoading ? (
+					<div className="space-y-2 py-2">
+						<Skeleton className="h-6 w-3/4" />
+						<Skeleton className="h-6 w-3/4" />
+						<Skeleton className="h-6 w-3/4" />
+					</div>
+				) : childNodes.length > 0 ? (
+					<>
+						{childNodes.map((childNode) => (
+							<TreeNodeItem
+								key={childNode.id}
+								node={childNode}
+								area={area}
+								loadedNodes={loadedNodes}
+								loadingNodes={loadingNodes}
+								expandedNodes={expandedNodes}
+								toggleNode={toggleNode}
+								router={router}
+							/>
+						))}
+					</>
+				) : null}
+			</Folder>
+		)
+	} else {
+		return (
+			<File
+				key={node.id}
+				name={node.name}
+				onClick={handleFileClick}
+				className="cursor-pointer hover:underline"
+			/>
+		)
+	}
+}
+
+const RenderTreeNodes = ({
+	nodes,
+	area,
+	loadedNodes,
+	loadingNodes,
+	expandedNodes,
+	toggleNode,
+	router,
+}: {
+	nodes: TreeNode[]
+	area: string
+	loadedNodes: Record<string, TreeNode[]>
+	loadingNodes: Set<string>
+	expandedNodes: Set<string>
+	toggleNode: (nodeId: string) => void
+	router: ReturnType<typeof useRouter>
+}) => {
+	if (!nodes.length) return null
 
 	return (
-		<div>
-			<div
-				onDoubleClick={handleFolderDoubleClick}
-				className={cn(
-					"hover:bg-accent/50 flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-sm",
-					"transition-colors duration-200",
-					{
-						"ml-0": level === 0,
-						"ml-4": level === 1,
-						"ml-8": level === 2,
-						"ml-12": level === 3,
-						"ml-16": level === 4,
-						"ml-20": level === 5,
-						"ml-24": level === 6,
-						"ml-28": level === 7,
-						"ml-32": level > 8,
-					}
-				)}
-				onClick={handleToggle}
-			>
-				{node.type === "folder" && (
-					<div className="flex h-5 w-5 items-center justify-center">
-						{node.hasChildren &&
-							(expandedNodes.has(node.id) ? (
-								<ChevronDown className="h-5 w-5" />
-							) : (
-								<ChevronRight className="h-5 w-5" />
-							))}
-					</div>
-				)}
-
-				{node.type === "folder" ? (
-					!expandedNodes.has(node.id) ? (
-						<Folder className="h-5 min-h-5 w-5 min-w-5 text-blue-500" />
-					) : (
-						<FolderOpen className="h-5 min-h-5 w-5 min-w-5 text-blue-800" />
-					)
-				) : (
-					<File className="ml-5 h-5 min-h-5 w-5 min-w-5 text-sky-500" />
-				)}
-
-				<span
-					className={cn("truncate text-base font-semibold", {
-						"rounded-sm bg-blue-800/10 px-1": expandedNodes.has(node.id),
-					})}
-				>
-					{node.type === "file" && node.url ? (
-						<Link
-							target="_blank"
-							href={node.url || "#"}
-							rel="noopener noreferrer"
-							className="hover:underline"
-							onClick={(e) => e.stopPropagation()}
-						>
-							{node.name}
-						</Link>
-					) : (
-						node.name
-					)}
-				</span>
-			</div>
-
-			{expandedNodes.has(node.id) && (
-				<div className="space-y-1">
-					{loadingNodes.has(node.id) && (
-						<div className="space-y-2 pt-2 pl-8">
-							<Skeleton className="h-6 w-3/4" />
-							<Skeleton className="h-6 w-3/4" />
-							<Skeleton className="h-6 w-3/4" />
-						</div>
-					)}
-					{nodes.length > 0 && (
-						<div className="space-y-1">
-							{nodes.map((child) => (
-								<TreeNode
-									area={area}
-									node={child}
-									key={child.id}
-									router={router}
-									level={level + 1}
-									nodes={loadedNodes[child.id] || []}
-									expandedNodes={expandedNodes}
-									loadingNodes={loadingNodes}
-									loadedNodes={loadedNodes}
-									onToggle={onToggle}
-								/>
-							))}
-						</div>
-					)}
-				</div>
-			)}
-		</div>
+		<>
+			{nodes.map((node) => (
+				<TreeNodeItem
+					key={node.id}
+					node={node}
+					area={area}
+					loadedNodes={loadedNodes}
+					loadingNodes={loadingNodes}
+					expandedNodes={expandedNodes}
+					toggleNode={toggleNode}
+					router={router}
+				/>
+			))}
+		</>
 	)
-})
+}
 
 const useFetchTreeData = (areaValue: string) => {
 	const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
@@ -195,6 +185,7 @@ const useFetchTreeData = (areaValue: string) => {
 				return newExpanded
 			})
 
+			// Luego cargamos los datos si es necesario (similar al archivo original)
 			if (!loadedNodes[nodeId]) {
 				setLoadingNodes((prev) => new Set([...prev, nodeId]))
 				const { folders, files } = await fetchNodeData(nodeId)
@@ -232,7 +223,7 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 	return (
 		<div
 			className={cn(
-				"relative hidden h-full max-h-[88dvh] w-full overflow-y-scroll border-r lg:block",
+				"relative hidden h-full max-h-[88dvh] w-full overflow-y-auto border-r p-4 lg:block",
 				className
 			)}
 		>
@@ -248,22 +239,17 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 					<Skeleton className="h-6 w-3/4" />
 				</div>
 			) : rootNodes.length > 0 ? (
-				<div className="space-y-1 pr-2">
-					{rootNodes.map((node) => (
-						<TreeNode
-							level={0}
-							node={node}
-							area={area}
-							key={node.id}
-							router={router}
-							nodes={loadedNodes[node.id] || []}
-							expandedNodes={expandedNodes}
-							loadingNodes={loadingNodes}
-							loadedNodes={loadedNodes}
-							onToggle={toggleNode}
-						/>
-					))}
-				</div>
+				<Files className="border-none">
+					<RenderTreeNodes
+						nodes={rootNodes}
+						area={area}
+						loadedNodes={loadedNodes}
+						loadingNodes={loadingNodes}
+						expandedNodes={expandedNodes}
+						toggleNode={toggleNode}
+						router={router}
+					/>
+				</Files>
 			) : (
 				<p className="text-text px-4">No hay carpetas ni archivos para mostrar</p>
 			)}

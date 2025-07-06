@@ -21,8 +21,8 @@ import {
 	type StartupFolder,
 } from "@/project/startup-folder/hooks/use-startup-folder"
 
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import { CreateStartupFolder } from "../forms/CreateStartupFolder"
@@ -149,73 +149,76 @@ export default function StartupFolderOverview({
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
 						</div>
 
-						{startupFolders && startupFolders.length > 0 ? (
-							startupFolders.map((folder) => (
-								<TabsContent
-									value={folder.id}
-									key={folder.id}
-									className="bg-background rounded-lg p-4"
-								>
-									<div className="space-y-6">
-										{selectedCategory ? (
-											<StartupFolderDocuments
-												userId={userId}
-												companyId={companyId}
-												isOtcMember={isOtcMember}
-												category={selectedCategory}
-												startupFolderId={folder.id}
-												onBack={() => setSelectedCategory(null)}
-											/>
-										) : (
-											<div className="space-y-4">
-												<div className="flex items-center justify-between">
-													<h2 className="flex items-center gap-2 text-lg font-bold">
-														<FolderKanbanIcon className="size-5" />
-														{folder.name}
-													</h2>
+						<TabsContents>
+							{startupFolders && startupFolders.length > 0 ? (
+								startupFolders.map((folder) => (
+									<TabsContent
+										value={folder.id}
+										key={folder.id}
+										className="bg-background rounded-lg p-4"
+									>
+										<div className="space-y-6">
+											{selectedCategory ? (
+												<StartupFolderDocuments
+													userId={userId}
+													companyId={companyId}
+													isOtcMember={isOtcMember}
+													category={selectedCategory}
+													startupFolderId={folder.id}
+													onBack={() => setSelectedCategory(null)}
+												/>
+											) : (
+												<div className="space-y-4">
+													<div className="flex items-center justify-between">
+														<h2 className="flex items-center gap-2 text-lg font-bold">
+															<FolderKanbanIcon className="size-5" />
+															{folder.name}
+														</h2>
 
-													{isOtcMember && hasPermission && (
-														<UpdateStartupFolder
-															type={folder.type}
-															name={folder.name}
+														{isOtcMember && hasPermission && (
+															<UpdateStartupFolder
+																type={folder.type}
+																name={folder.name}
+																companyId={companyId}
+																startupFolderId={folder.id}
+															/>
+														)}
+													</div>
+
+													{folder.type === "BASIC" ? (
+														<StartupFolderDocuments
+															userId={userId}
 															companyId={companyId}
+															isOtcMember={isOtcMember}
 															startupFolderId={folder.id}
+															category={DocumentCategory.BASIC}
+															onBack={() => {}}
+														/>
+													) : (
+														<StartupFolderTable
+															subFolders={folder}
+															startupFolderType={folder.type}
+															onCategorySelect={setSelectedCategory}
 														/>
 													)}
 												</div>
-
-												{folder.type === "BASIC" ? (
-													<StartupFolderDocuments
-														userId={userId}
-														companyId={companyId}
-														isOtcMember={isOtcMember}
-														startupFolderId={folder.id}
-														category={DocumentCategory.BASIC}
-														onBack={() => {}}
-													/>
-												) : (
-													<StartupFolderTable
-														subFolders={folder}
-														startupFolderType={folder.type}
-														onCategorySelect={setSelectedCategory}
-													/>
-												)}
-											</div>
-										)}
+											)}
+										</div>
+									</TabsContent>
+								))
+							) : (
+								<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
+									<FilesIcon className="text-muted-foreground h-8 w-4" />
+									<div>
+										<p className="text-lg font-medium">No hay carpeta de arranque</p>
+										<p className="text-muted-foreground text-sm">
+											Su empresa aún no tiene una carpeta de arranque. Por favor contacte con
+											soporte.
+										</p>
 									</div>
-								</TabsContent>
-							))
-						) : (
-							<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
-								<FilesIcon className="text-muted-foreground h-8 w-4" />
-								<div>
-									<p className="text-lg font-medium">No hay carpeta de arranque</p>
-									<p className="text-muted-foreground text-sm">
-										Su empresa aún no tiene una carpeta de arranque. Por favor contacte con soporte.
-									</p>
 								</div>
-							</div>
-						)}
+							)}
+						</TabsContents>
 					</Tabs>
 
 					<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

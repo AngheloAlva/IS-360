@@ -33,6 +33,12 @@ export interface WorkRequest extends WorkRequestModel {
 			}
 		}
 	>
+	equipments: Array<{
+		id: string
+		name: string
+		tag: string
+		location: string
+	}>
 }
 
 interface WorkRequestResponse {

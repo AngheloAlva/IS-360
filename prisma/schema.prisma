@@ -432,6 +432,7 @@ model Equipment {
   attachments         Attachment[]
   createdBy           User?                 @relation("EquipmentCreatedBy", fields: [createdById], references: [id])
   createdById         String?
+  workRequests        WorkRequest[]
 
   @@unique([id])
   @@unique([tag])
@@ -1263,15 +1264,15 @@ enum WORK_REQUEST_STATUS {
 }
 
 model WorkRequest {
-  id             String                    @id @default(cuid())
-  requestNumber  String                    @unique
+  id             String                     @id @default(cuid())
+  requestNumber  String                     @unique
   description    String
-  isUrgent       Boolean                   @default(false)
-  requestDate    DateTime                  @default(now())
+  isUrgent       Boolean                    @default(false)
+  requestDate    DateTime                   @default(now())
   observations   String?
   customLocation String?
-  location       MAINTENANCE_PLAN_LOCATION
-  status         WORK_REQUEST_STATUS       @default(REPORTED)
+  location       MAINTENANCE_PLAN_LOCATION?
+  status         WORK_REQUEST_STATUS        @default(REPORTED)
 
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
@@ -1283,6 +1284,7 @@ model WorkRequest {
   attachments  Attachment[]
   comments     WorkRequestComment[]
   workOrders   WorkOrder[]
+  equipments   Equipment[]
 
   @@map("work_request")
 }

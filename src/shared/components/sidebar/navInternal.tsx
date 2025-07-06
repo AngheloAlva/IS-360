@@ -34,13 +34,10 @@ export function NavInternal({
 					<SidebarMenuItem key={item.name}>
 						<SidebarMenuButton
 							asChild
-							className={cn(
-								"hover:bg-text/10 hover:border-text hover:text-text h-8.5 rounded-full border border-transparent font-medium transition-colors",
-								{
-									"bg-text hover:bg-text hover:text-background text-background border-text font-bold":
-										pathName.includes(item.url),
-								}
-							)}
+							className={cn({
+								"bg-text hover:bg-text hover:text-background text-background border-text font-bold":
+									pathName.includes(item.url),
+							})}
 						>
 							<Link href={item.url}>
 								<item.icon />

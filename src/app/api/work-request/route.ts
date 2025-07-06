@@ -66,6 +66,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							},
 						},
 					},
+					equipments: {
+						select: {
+							id: true,
+							name: true,
+							tag: true,
+							location: true,
+						},
+					},
 				},
 				orderBy: {
 					createdAt: "desc",

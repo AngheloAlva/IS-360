@@ -1,10 +1,11 @@
 "use server"
 
-import prisma from "@/lib/prisma"
-import { AREAS } from "@prisma/client"
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
+
+import { AREAS } from "@prisma/client"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
 	try {

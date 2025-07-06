@@ -110,7 +110,7 @@ export default function FileTable<T extends FieldValues>({
 					{label && <p className="text-sm font-semibold">{label}</p>}
 
 					<div className="group relative cursor-pointer">
-						<Button className="flex gap-2 bg-emerald-600/10 text-emerald-600 transition-all group-hover:scale-105 group-hover:text-emerald-700">
+						<Button className="flex cursor-pointer gap-2 bg-emerald-600/10 text-emerald-600 transition-all group-hover:scale-105 group-hover:text-emerald-700">
 							<Upload className="h-4 w-4" />
 							<span>{files.length === 0 ? "Subir archivo" : "Subir más archivos"}</span>
 						</Button>
@@ -219,9 +219,13 @@ export default function FileTable<T extends FieldValues>({
 			) : (
 				<div
 					className={cn(
-						"bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed p-5 text-center transition-all sm:p-7",
+						"bg-muted/30 hover:bg-muted/50 flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed p-5 text-center transition-all sm:p-7",
 						{ "border-teal-500 bg-teal-400/10": isDragging }
 					)}
+					onClick={() => {
+						const input = document.getElementById(name) as HTMLInputElement
+						input.click()
+					}}
 					{...dragEvents}
 				>
 					<Upload className="text-muted-foreground mb-4 size-8 sm:size-10" />

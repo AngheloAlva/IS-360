@@ -47,13 +47,10 @@ export function NavOther({
 									<SidebarMenuSubItem key={subItem.name}>
 										<SidebarMenuSubButton
 											asChild
-											className={cn(
-												"hover:bg-text/10 hover:border-text hover:text-text h-7 rounded-full border border-transparent font-medium transition-colors",
-												{
-													"bg-text hover:bg-text hover:text-background [&>svg]:text-background text-background border-text font-bold":
-														pathName.includes(subItem.url),
-												}
-											)}
+											className={cn({
+												"bg-text hover:bg-text hover:text-background [&>svg]:text-background text-background border-text font-bold":
+													pathName.includes(subItem.url),
+											})}
 										>
 											<Link href={subItem.url}>
 												{subItem.icon && <subItem.icon />}

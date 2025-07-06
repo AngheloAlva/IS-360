@@ -154,7 +154,10 @@ export default function VehicleForm({ vehicleId, companyId }: VehicleFormProps) 
 						Editar Vehículo/Equipo
 					</>
 				) : (
-					<Button className="hover:bg-scale-105 gap-1.5 bg-white font-semibold text-teal-600 transition-all hover:scale-105 hover:text-teal-700">
+					<Button
+						size={"lg"}
+						className="hover:bg-scale-105 gap-1.5 bg-white font-semibold text-teal-600 transition-all hover:scale-105 hover:text-teal-700"
+					>
 						<PlusCircleIcon className="size-4 text-teal-600" />
 						Crear Vehículo/Equipo
 					</Button>

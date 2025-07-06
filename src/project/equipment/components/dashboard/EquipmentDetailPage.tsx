@@ -12,7 +12,7 @@ import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { WORK_ORDER_STATUS } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
-import { Tabs, TabsContent } from "@/shared/components/ui/tabs"
+import { Tabs, TabsContent, TabsContents } from "@/shared/components/ui/tabs"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Button } from "@/shared/components/ui/button"
@@ -128,153 +128,155 @@ export default function EquipmentDetailPage({ equipmentId }: EquipmentDetailPage
 
 					<Card className="p-0">
 						<CardContent className="p-0">
-							<TabsContent value="work-orders" className="p-4">
-								<h3 className="mb-4 text-lg font-semibold">Órdenes de Trabajo Relacionadas</h3>
+							<TabsContents>
+								<TabsContent value="work-orders" className="p-4">
+									<h3 className="mb-4 text-lg font-semibold">Órdenes de Trabajo Relacionadas</h3>
 
-								{isLoadingWorkOrders ? (
-									<WorkOrdersSkeleton />
-								) : workOrders && workOrders.length > 0 ? (
-									<div className="space-y-4">
-										{workOrders.map((workOrder) => (
-											<div key={workOrder.id} className="hover:bg-muted/50 rounded-lg border p-4">
-												<div className="flex items-center justify-between">
-													<div>
-														<Link
-															href={`/admin/dashboard/ordenes-de-trabajo/${workOrder.id}`}
-															className="hover:underline"
-														>
-															<h4 className="font-medium text-emerald-500 hover:underline">
-																{workOrder.otNumber}
-															</h4>
+									{isLoadingWorkOrders ? (
+										<WorkOrdersSkeleton />
+									) : workOrders && workOrders.length > 0 ? (
+										<div className="space-y-4">
+											{workOrders.map((workOrder) => (
+												<div key={workOrder.id} className="hover:bg-muted/50 rounded-lg border p-4">
+													<div className="flex items-center justify-between">
+														<div>
+															<Link
+																href={`/admin/dashboard/ordenes-de-trabajo/${workOrder.id}`}
+																className="hover:underline"
+															>
+																<h4 className="font-medium text-emerald-500 hover:underline">
+																	{workOrder.otNumber}
+																</h4>
+																<p className="text-muted-foreground text-sm">
+																	{workOrder.description}
+																</p>
+															</Link>
+														</div>
+
+														<div className="flex flex-col items-end">
+															<Badge
+																className={cn("bg-yellow-500/10 text-yellow-500", {
+																	"bg-orange-500/10 text-orange-500":
+																		workOrder.status === WORK_ORDER_STATUS.IN_PROGRESS,
+																	"bg-orange-600/10 text-orange-600":
+																		workOrder.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
+																	"bg-red-600/10 text-red-600":
+																		workOrder.status === WORK_ORDER_STATUS.PENDING,
+																	"bg-emerald-600/10 text-emerald-600":
+																		workOrder.status === WORK_ORDER_STATUS.COMPLETED,
+																	"bg-red-700/10 text-red-700":
+																		workOrder.status === WORK_ORDER_STATUS.CANCELLED,
+																})}
+															>
+																{WorkOrderStatusLabels[workOrder.status]}
+															</Badge>
+															<span className="text-muted-foreground mt-1 text-xs">
+																Solicitado el:{" "}
+																{format(new Date(workOrder.solicitationDate), "dd/MM/yyyy")}
+															</span>
+														</div>
+													</div>
+
+													<div className="mt-2 flex flex-wrap gap-4 text-xs">
+														<div>
+															<span className="font-medium">Tipo:</span>{" "}
+															{
+																WorkOrderTypeLabels[
+																	workOrder.type as keyof typeof WorkOrderTypeLabels
+																]
+															}
+														</div>
+
+														<div>
+															<span className="font-medium">Responsable:</span>{" "}
+															{workOrder.responsible?.name}
+														</div>
+
+														<div>
+															<span className="font-medium">Empresa - Supervisor:</span>{" "}
+															{workOrder.company.name} - {workOrder.supervisor?.name}
+														</div>
+													</div>
+												</div>
+											))}
+
+											<div className="mt-4 flex justify-center">
+												<Button variant="outline" disabled size="sm">
+													Ver todas las órdenes (En desarrollo)
+												</Button>
+											</div>
+										</div>
+									) : (
+										<div className="flex h-40 items-center justify-center">
+											<p className="text-muted-foreground">
+												No hay órdenes de trabajo asociadas a este equipo
+											</p>
+										</div>
+									)}
+								</TabsContent>
+
+								<TabsContent value="maintenance-plans" className="p-4">
+									<h3 className="mb-4 text-lg font-semibold">Planes de Mantenimiento</h3>
+
+									{isLoadingMaintenancePlans ? (
+										<MaintenancePlansSkeleton />
+									) : maintenancePlans && maintenancePlans.length > 0 ? (
+										<div className="space-y-4">
+											{maintenancePlans.map((plan) => (
+												<div key={plan.id} className="hover:bg-muted/50 rounded-lg border p-4">
+													<div className="flex items-center justify-between">
+														<div>
+															<h4 className="font-medium">{plan.name}</h4>
 															<p className="text-muted-foreground text-sm">
-																{workOrder.description}
+																{plan.description || "Sin descripción"}
 															</p>
-														</Link>
+														</div>
+														<div className="flex flex-col items-end">
+															<span
+																className={`rounded-full px-2 py-1 text-xs ${
+																	plan.status === "ACTIVE"
+																		? "bg-green-100 text-green-800"
+																		: "bg-red-100 text-red-800"
+																}`}
+															>
+																{plan.status}
+															</span>
+															<span className="text-muted-foreground mt-1 text-xs">
+																{new Date(plan.startDate).toLocaleDateString()} -{" "}
+																{new Date(plan.endDate).toLocaleDateString()}
+															</span>
+														</div>
 													</div>
 
-													<div className="flex flex-col items-end">
-														<Badge
-															className={cn("bg-yellow-500/10 text-yellow-500", {
-																"bg-orange-500/10 text-orange-500":
-																	workOrder.status === WORK_ORDER_STATUS.IN_PROGRESS,
-																"bg-orange-600/10 text-orange-600":
-																	workOrder.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED,
-																"bg-red-600/10 text-red-600":
-																	workOrder.status === WORK_ORDER_STATUS.PENDING,
-																"bg-emerald-600/10 text-emerald-600":
-																	workOrder.status === WORK_ORDER_STATUS.COMPLETED,
-																"bg-red-700/10 text-red-700":
-																	workOrder.status === WORK_ORDER_STATUS.CANCELLED,
-															})}
-														>
-															{WorkOrderStatusLabels[workOrder.status]}
-														</Badge>
-														<span className="text-muted-foreground mt-1 text-xs">
-															Solicitado el:{" "}
-															{format(new Date(workOrder.solicitationDate), "dd/MM/yyyy")}
-														</span>
+													<div className="mt-2 flex flex-wrap gap-4 text-xs">
+														<div>
+															<span className="font-medium">Frecuencia:</span> {plan.frequency}
+														</div>
+														<div>
+															<span className="font-medium">Ubicación:</span> {plan.location}
+														</div>
+														<div>
+															<span className="font-medium">Tareas:</span> {plan._count?.tasks || 0}
+														</div>
 													</div>
 												</div>
+											))}
 
-												<div className="mt-2 flex flex-wrap gap-4 text-xs">
-													<div>
-														<span className="font-medium">Tipo:</span>{" "}
-														{
-															WorkOrderTypeLabels[
-																workOrder.type as keyof typeof WorkOrderTypeLabels
-															]
-														}
-													</div>
-
-													<div>
-														<span className="font-medium">Responsable:</span>{" "}
-														{workOrder.responsible?.name}
-													</div>
-
-													<div>
-														<span className="font-medium">Empresa - Supervisor:</span>{" "}
-														{workOrder.company.name} - {workOrder.supervisor?.name}
-													</div>
-												</div>
+											<div className="mt-4 flex justify-center">
+												<Button variant="outline" disabled size="sm">
+													Ver todos los planes (En desarrollo)
+												</Button>
 											</div>
-										))}
-
-										<div className="mt-4 flex justify-center">
-											<Button variant="outline" disabled size="sm">
-												Ver todas las órdenes (En desarrollo)
-											</Button>
 										</div>
-									</div>
-								) : (
-									<div className="flex h-40 items-center justify-center">
-										<p className="text-muted-foreground">
-											No hay órdenes de trabajo asociadas a este equipo
-										</p>
-									</div>
-								)}
-							</TabsContent>
-
-							<TabsContent value="maintenance-plans" className="p-4">
-								<h3 className="mb-4 text-lg font-semibold">Planes de Mantenimiento</h3>
-
-								{isLoadingMaintenancePlans ? (
-									<MaintenancePlansSkeleton />
-								) : maintenancePlans && maintenancePlans.length > 0 ? (
-									<div className="space-y-4">
-										{maintenancePlans.map((plan) => (
-											<div key={plan.id} className="hover:bg-muted/50 rounded-lg border p-4">
-												<div className="flex items-center justify-between">
-													<div>
-														<h4 className="font-medium">{plan.name}</h4>
-														<p className="text-muted-foreground text-sm">
-															{plan.description || "Sin descripción"}
-														</p>
-													</div>
-													<div className="flex flex-col items-end">
-														<span
-															className={`rounded-full px-2 py-1 text-xs ${
-																plan.status === "ACTIVE"
-																	? "bg-green-100 text-green-800"
-																	: "bg-red-100 text-red-800"
-															}`}
-														>
-															{plan.status}
-														</span>
-														<span className="text-muted-foreground mt-1 text-xs">
-															{new Date(plan.startDate).toLocaleDateString()} -{" "}
-															{new Date(plan.endDate).toLocaleDateString()}
-														</span>
-													</div>
-												</div>
-
-												<div className="mt-2 flex flex-wrap gap-4 text-xs">
-													<div>
-														<span className="font-medium">Frecuencia:</span> {plan.frequency}
-													</div>
-													<div>
-														<span className="font-medium">Ubicación:</span> {plan.location}
-													</div>
-													<div>
-														<span className="font-medium">Tareas:</span> {plan._count?.tasks || 0}
-													</div>
-												</div>
-											</div>
-										))}
-
-										<div className="mt-4 flex justify-center">
-											<Button variant="outline" disabled size="sm">
-												Ver todos los planes (En desarrollo)
-											</Button>
+									) : (
+										<div className="flex h-40 items-center justify-center">
+											<p className="text-muted-foreground">
+												No hay planes de mantenimiento asociados a este equipo
+											</p>
 										</div>
-									</div>
-								) : (
-									<div className="flex h-40 items-center justify-center">
-										<p className="text-muted-foreground">
-											No hay planes de mantenimiento asociados a este equipo
-										</p>
-									</div>
-								)}
-							</TabsContent>
+									)}
+								</TabsContent>
+							</TabsContents>
 						</CardContent>
 					</Card>
 				</Tabs>

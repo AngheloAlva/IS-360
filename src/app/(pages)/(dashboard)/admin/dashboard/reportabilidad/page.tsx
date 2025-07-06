@@ -3,7 +3,7 @@
 import { DatabaseZapIcon, HandshakeIcon, SirenIcon, StarIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 
 type DashboardId = "dashboard1" | "dashboard2" | "dashboard3" | "dashboard4"
 
@@ -106,29 +106,34 @@ export default function PowerBIDashboardPage() {
 					))}
 				</TabsList>
 
-				{(Object.entries(dashboards) as [DashboardId, Dashboard][]).map(([key, dashboard]) => (
-					<TabsContent key={key} value={key} className="mt-0">
-						<div className="overflow-hidden rounded-lg border border-gray-200 shadow-lg">
-							{loadingStatus[key] && (
-								<div className="flex items-center justify-center" style={{ height: iframeHeight }}>
-									<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
-								</div>
-							)}
+				<TabsContents>
+					{(Object.entries(dashboards) as [DashboardId, Dashboard][]).map(([key, dashboard]) => (
+						<TabsContent key={key} value={key} className="mt-0">
+							<div className="overflow-hidden rounded-lg shadow-lg">
+								{loadingStatus[key] && (
+									<div
+										className="flex items-center justify-center"
+										style={{ height: iframeHeight }}
+									>
+										<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+									</div>
+								)}
 
-							<div className={loadingStatus[key] ? "hidden" : "block"}>
-								<iframe
-									title={dashboard.title}
-									width="100%"
-									height={iframeHeight}
-									src={dashboard.url}
-									frameBorder="0"
-									allowFullScreen={true}
-									onLoad={() => handleIframeLoad(key)}
-								/>
+								<div className={loadingStatus[key] ? "hidden" : "block"}>
+									<iframe
+										title={dashboard.title}
+										width="100%"
+										height={iframeHeight}
+										src={dashboard.url}
+										frameBorder="0"
+										allowFullScreen={true}
+										onLoad={() => handleIframeLoad(key)}
+									/>
+								</div>
 							</div>
-						</div>
-					</TabsContent>
-				))}
+						</TabsContent>
+					))}
+				</TabsContents>
 			</Tabs>
 		</div>
 	)

@@ -4,8 +4,8 @@ import { headers } from "next/headers"
 
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
-import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 import type { WorkRequestSchema } from "@/project/work-request/schemas/work-request.schema"
 import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
@@ -52,9 +52,12 @@ export const createWorkRequest = async ({
 				isUrgent: values.isUrgent,
 				requestDate: values.requestDate,
 				observations: values.observations || null,
-				location: values.location,
-				customLocation: values.location === "OTHER" ? values.customLocation : null,
 				userId,
+				equipments: {
+					connect: values.equipments.map((equipmentId) => ({
+						id: equipmentId,
+					})),
+				},
 				...(attachments && attachments.length > 0
 					? {
 							attachments: {

@@ -8,10 +8,10 @@ import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { WORK_ORDER_STATUS } from "@prisma/client"
 
 import { ApproveWorkBookClosure } from "@/project/work-order/components/forms/ApproveWorkBookClosure"
+import { Tabs, TabsContent, TabsList, TabsTrigger, TabsContents } from "@/shared/components/ui/tabs"
 import WorkBookEntriesTable from "@/project/work-order/components/data/WorkBookEntriesTable"
 import WorkBookGeneralData from "@/project/work-order/components/data/WorkBookGeneralData"
 import WorkBookMilestones from "@/project/work-order/components/data/WorkBookMilestones"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import OtcInspectorForm from "@/project/work-order/components/forms/OtcInspectorForm"
 import ActivityForm from "@/project/work-order/components/forms/WorkBookActivityForm"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
@@ -148,80 +148,82 @@ export default function WorkBookMain({
 					</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value="milestones">
-					<WorkBookMilestones
-						userId={userId}
-						userRole={userRole}
-						workOrderId={workBook.id}
-						hasPermission={hasPermission}
-						supervisorId={workBook.supervisorId}
-						canRequestClosure={canRequestClosure}
-						responsibleId={workBook.responsibleId}
-						hassWorkBookPermission={hassWorkBookPermission}
-						workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
-					/>
-				</TabsContent>
+				<TabsContents>
+					<TabsContent value="milestones">
+						<WorkBookMilestones
+							userId={userId}
+							userRole={userRole}
+							workOrderId={workBook.id}
+							hasPermission={hasPermission}
+							supervisorId={workBook.supervisorId}
+							canRequestClosure={canRequestClosure}
+							responsibleId={workBook.responsibleId}
+							hassWorkBookPermission={hassWorkBookPermission}
+							workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
+						/>
+					</TabsContent>
 
-				<TabsContent value="activities">
-					<Card>
-						<CardHeader className="flex w-full flex-row items-center justify-between gap-2">
-							<h2 className="text-text flex items-center gap-2 text-2xl font-bold">
-								<div className="size-10 rounded-md bg-red-500/10 p-1.5">
-									<ListOrderedIcon className="h-auto w-full text-red-500" />
+					<TabsContent value="activities">
+						<Card>
+							<CardHeader className="flex w-full flex-row items-center justify-between gap-2">
+								<h2 className="text-text flex items-center gap-2 text-2xl font-bold">
+									<div className="size-10 rounded-md bg-red-500/10 p-1.5">
+										<ListOrderedIcon className="h-auto w-full text-red-500" />
+									</div>
+									Lista de Actividades
+								</h2>
+
+								<div className="flex gap-2">
+									{canAddActivities && (
+										<>
+											{!canRequestClosure &&
+												(workBook._count.milestones > 0 ? (
+													<ActivityForm
+														userId={userId}
+														startDate={new Date()}
+														workOrderId={workBook.id}
+														entryType="DAILY_ACTIVITY"
+													/>
+												) : (
+													workBook.supervisorId === userId && (
+														<Alert>
+															<InfoIcon className="h-4 w-4" />
+															<AlertTitle>
+																Debe crear su(s) hito(s) para agregar actividades diarias
+															</AlertTitle>
+														</Alert>
+													)
+												))}
+										</>
+									)}
+
+									{hasPermission && (
+										<>
+											<ActivityForm
+												userId={userId}
+												startDate={new Date()}
+												workOrderId={workBook.id}
+												entryType="ADDITIONAL_ACTIVITY"
+											/>
+
+											<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
+
+											{hasPermission &&
+												userId === workBook.responsibleId &&
+												workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
+													<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />
+												)}
+										</>
+									)}
 								</div>
-								Lista de Actividades
-							</h2>
+							</CardHeader>
 
-							<div className="flex gap-2">
-								{canAddActivities && (
-									<>
-										{!canRequestClosure &&
-											(workBook._count.milestones > 0 ? (
-												<ActivityForm
-													userId={userId}
-													startDate={new Date()}
-													workOrderId={workBook.id}
-													entryType="DAILY_ACTIVITY"
-												/>
-											) : (
-												workBook.supervisorId === userId && (
-													<Alert>
-														<InfoIcon className="h-4 w-4" />
-														<AlertTitle>
-															Debe crear su(s) hito(s) para agregar actividades diarias
-														</AlertTitle>
-													</Alert>
-												)
-											))}
-									</>
-								)}
-
-								{hasPermission && (
-									<>
-										<ActivityForm
-											userId={userId}
-											startDate={new Date()}
-											workOrderId={workBook.id}
-											entryType="ADDITIONAL_ACTIVITY"
-										/>
-
-										<OtcInspectorForm userId={userId} workOrderId={workBook.id} />
-
-										{hasPermission &&
-											userId === workBook.responsibleId &&
-											workBook.status === WORK_ORDER_STATUS.CLOSURE_REQUESTED && (
-												<ApproveWorkBookClosure workOrderId={workBook.id} userId={userId} />
-											)}
-									</>
-								)}
-							</div>
-						</CardHeader>
-
-						<CardContent>
-							<WorkBookEntriesTable workOrderId={workBook.id} />
-						</CardContent>
-					</Card>
-				</TabsContent>
+							<CardContent>
+								<WorkBookEntriesTable workOrderId={workBook.id} />
+							</CardContent>
+						</Card>
+					</TabsContent>
+				</TabsContents>
 			</Tabs>
 		</>
 	)

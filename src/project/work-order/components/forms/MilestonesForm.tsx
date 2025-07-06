@@ -14,7 +14,7 @@ import {
 	type WorkBookMilestonesSchema,
 } from "@/project/work-order/schemas/milestones.schema"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger, TabsContents } from "@/shared/components/ui/tabs"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { Form, FormDescription, FormMessage } from "@/shared/components/ui/form"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
@@ -228,15 +228,17 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 							</div>
 
 							<div className="border-l-0 pl-0 md:w-3/4 md:border-l md:pl-4">
-								{milestoneFields.map((field, index) => (
-									<TabsContent key={field.id} value={index.toString()} className="m-0 pt-4">
-										<MilestoneForm
-											form={form}
-											index={index}
-											workOrderStartDate={workOrderStartDate}
-										/>
-									</TabsContent>
-								))}
+								<TabsContents>
+									{milestoneFields.map((field, index) => (
+										<TabsContent key={field.id} value={index.toString()} className="m-0 pt-4">
+											<MilestoneForm
+												form={form}
+												index={index}
+												workOrderStartDate={workOrderStartDate}
+											/>
+										</TabsContent>
+									))}
+								</TabsContents>
 							</div>
 						</Tabs>
 
