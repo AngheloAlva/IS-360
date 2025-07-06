@@ -4,6 +4,9 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+
 import WorkOrderDetailsDialog from "@/project/work-order/components/dialogs/WorkOrderDetailsDialog"
 
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
@@ -20,6 +23,21 @@ import { Badge } from "@/shared/components/ui/badge"
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 
 export const workOrderColumns: ColumnDef<WorkOrder>[] = [
+	{
+		id: "actions",
+		header: "",
+		cell: ({ row }) => {
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+							<UpdateWorkOrderForm workOrder={row.original} />
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
 	{
 		accessorKey: "id",
 		cell: ({ row }) => {
@@ -244,13 +262,6 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 					</Link>
 				</Button>
 			)
-		},
-	},
-	{
-		id: "actions",
-		header: "Acciones",
-		cell: ({ row }) => {
-			return <UpdateWorkOrderForm workOrder={row.original} />
 		},
 	},
 ]

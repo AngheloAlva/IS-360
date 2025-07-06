@@ -5,6 +5,8 @@ import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 
@@ -93,15 +95,18 @@ export const SafetyTalkColumns: ColumnDef<SafetyTalk>[] = [
 		cell: ({ row }) => {
 			const slug = row.original.slug
 			return (
-				<div className="flex items-center justify-center gap-2">
-					<Link
-						href={`/admin/dashboard/charlas-de-seguridad/${slug}/editar`}
-						className="text-blue-500 hover:text-blue-700"
-					>
-						<Edit className="h-4 w-4" />
-					</Link>
-					{/* Implementar lógica de eliminación aquí si es necesario */}
-				</div>
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/admin/dashboard/charlas-de-seguridad/${slug}/editar`}
+								className="flex cursor-pointer px-3 font-medium text-white"
+							>
+								<Edit className="mr-2 h-4 w-4" /> Editar
+							</Link>
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
 			)
 		},
 		header: "Acciones",

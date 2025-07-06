@@ -107,12 +107,9 @@ export default function WorkPermitAttachmentForm({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button
-					size={"icon"}
-					variant={"ghost"}
-					className="cursor-pointer text-purple-500 hover:bg-purple-500 hover:text-white"
-				>
-					<FilePlusIcon className="h-4 w-4" />
+				<Button variant={"ghost"} className="cursor-pointer">
+					<FilePlusIcon className="h-4 w-4 text-purple-500" />
+					Adjuntar archivo
 				</Button>
 			</DialogTrigger>
 

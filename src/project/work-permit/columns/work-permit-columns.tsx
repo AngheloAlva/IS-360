@@ -1,6 +1,6 @@
 "use client"
 
-import { Building2Icon, PenBoxIcon, PrinterIcon, UserIcon } from "lucide-react"
+import { Building2Icon, MapPinnedIcon, PenBoxIcon, PrinterIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -12,17 +12,69 @@ import { cn } from "@/lib/utils"
 
 import WorkPermitAttachmentForm from "../components/forms/WorkPermitAttachmentForm"
 import WorkPermitDetailsDialog from "../components/dialogs/WorkPermitDetailsDialog"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
 import ApproveWorkPermit from "../components/forms/ApproveWorkPermit"
-import { Button } from "@/shared/components/ui/button"
+import CloseWorkPermit from "../components/forms/CloseWorkPermit"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
-import CloseWorkPermit from "../components/forms/CloseWorkPermit"
 
 export const getWorkPermitColumns = (
 	hasPermission: boolean,
 	userId: string
 ): ColumnDef<WorkPermit>[] => [
+	{
+		accessorKey: "actions",
+		header: "",
+		cell: ({ row }) => {
+			const id = row.original.id
+
+			return (
+				<ActionDataMenu>
+					<>
+						{hasPermission && row.original.status === WORK_PERMIT_STATUS.REVIEW_PENDING && (
+							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+								<ApproveWorkPermit workPermitId={id} />
+							</DropdownMenuItem>
+						)}
+
+						{hasPermission && row.original.status === WORK_PERMIT_STATUS.ACTIVE && (
+							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+								<CloseWorkPermit workPermitId={id} />
+							</DropdownMenuItem>
+						)}
+
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/admin/dashboard/permisos-de-trabajo/${id}/pdf`}
+								className="flex cursor-pointer px-3 font-medium text-white"
+							>
+								<PrinterIcon className="h-4 w-4 text-rose-500" /> Imprimir
+							</Link>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<WorkPermitAttachmentForm
+								userId={userId}
+								workPermitId={row.original.id}
+								companyId={row.original.company.id}
+							/>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/admin/dashboard/permisos-de-trabajo/${id}`}
+								className="flex cursor-pointer px-3 font-medium text-white"
+							>
+								<PenBoxIcon className="h-4 w-4 text-indigo-500" /> Editar
+							</Link>
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
 	{
 		accessorKey: "otNumber",
 		header: "OT",
@@ -55,12 +107,16 @@ export const getWorkPermitColumns = (
 		accessorKey: "executanCompany",
 		header: "Empresa ejecutora",
 		cell: ({ row }) => {
-			const company = row.original.company.name
+			const company = row.original.company
+
 			return (
-				<div className="flex items-center gap-1.5 truncate">
+				<Link
+					href={`/admin/dashboard/empresas/${company.id}`}
+					className="flex items-center gap-1.5 truncate hover:text-rose-500 hover:underline"
+				>
 					<Building2Icon className="text-muted-foreground size-4" />
-					{company}
-				</div>
+					{company.name}
+				</Link>
 			)
 		},
 	},
@@ -95,7 +151,12 @@ export const getWorkPermitColumns = (
 		header: "Lugar exacto",
 		cell: ({ row }) => {
 			const exactPlace = row.original.exactPlace
-			return <div className="w-72 text-wrap">{exactPlace}</div>
+			return (
+				<div className="flex w-72 items-center gap-1.5 text-wrap">
+					<MapPinnedIcon className="text-muted-foreground size-4" />
+					{exactPlace}
+				</div>
+			)
 		},
 	},
 	{
@@ -122,51 +183,6 @@ export const getWorkPermitColumns = (
 			return (
 				<div>
 					{participants > 1 ? participants + " participantes" : participants + " participante"}
-				</div>
-			)
-		},
-	},
-	{
-		accessorKey: "actions",
-		header: "Acciones",
-		cell: ({ row }) => {
-			const id = row.original.id
-
-			return (
-				<div className="z-50 flex items-center gap-2">
-					{hasPermission && row.original.status === WORK_PERMIT_STATUS.REVIEW_PENDING && (
-						<ApproveWorkPermit workPermitId={id} />
-					)}
-
-					{hasPermission && row.original.status === WORK_PERMIT_STATUS.ACTIVE && (
-						<CloseWorkPermit workPermitId={id} />
-					)}
-
-					<Link href={`/admin/dashboard/permisos-de-trabajo/${id}/pdf`}>
-						<Button
-							size={"icon"}
-							variant={"ghost"}
-							className="cursor-pointer text-rose-500 hover:bg-rose-500 hover:text-white"
-						>
-							<PrinterIcon className="h-4 w-4" />
-						</Button>
-					</Link>
-
-					<WorkPermitAttachmentForm
-						userId={userId}
-						workPermitId={row.original.id}
-						companyId={row.original.company.id}
-					/>
-
-					<Link href={`/admin/dashboard/permisos-de-trabajo/${id}`}>
-						<Button
-							size={"icon"}
-							variant={"ghost"}
-							className="cursor-pointer text-indigo-500 hover:bg-indigo-500 hover:text-white"
-						>
-							<PenBoxIcon className="h-4 w-4" />
-						</Button>
-					</Link>
 				</div>
 			)
 		},

@@ -47,8 +47,9 @@ export default function DeleteCompanyDialog({ companyId }: { companyId: string }
 
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogTrigger className="flex size-8 items-center justify-center rounded-md bg-rose-500 text-white transition-all hover:scale-105 hover:bg-rose-600 hover:text-white">
-				<Trash2Icon className="size-4" />
+			<AlertDialogTrigger className="flex cursor-pointer items-center justify-start gap-1.5 px-1 transition-all">
+				<Trash2Icon className="size-4 text-rose-500" />
+				Eliminar
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>

@@ -83,12 +83,9 @@ export default function CloseWorkPermit({
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button
-					size={"icon"}
-					variant={"ghost"}
-					className="cursor-pointer text-pink-500 hover:bg-pink-500 hover:text-white"
-				>
-					<BookmarkXIcon className="h-4 w-4" />
+				<Button variant={"ghost"} className="cursor-pointer">
+					<BookmarkXIcon className="h-4 w-4 text-pink-500" />
+					Cerrar Permiso
 				</Button>
 			</DialogTrigger>
 

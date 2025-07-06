@@ -93,12 +93,9 @@ export default function ApproveWorkPermit({
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button
-					size={"icon"}
-					variant={"ghost"}
-					className="cursor-pointer text-cyan-500 hover:bg-cyan-500 hover:text-white"
-				>
-					<CheckCircleIcon className="h-4 w-4" />
+				<Button variant={"ghost"} className="cursor-pointer">
+					<CheckCircleIcon className="h-4 w-4 text-cyan-500" />
+					Aprobar Permiso
 				</Button>
 			</DialogTrigger>
 

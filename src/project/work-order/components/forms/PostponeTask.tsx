@@ -54,9 +54,11 @@ export default function PostponeTaskDialog({
 
 	return (
 		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogTrigger className="flex size-7 cursor-pointer items-center justify-center rounded-md bg-purple-600 text-white transition-all hover:scale-105 hover:bg-purple-700 hover:text-white">
-				<ClockFadingIcon className="size-4 min-w-4" />
+			<AlertDialogTrigger className="flex cursor-pointer items-center justify-center gap-1.5 rounded-md px-3">
+				<ClockFadingIcon className="size-4 min-w-4 text-purple-600" />
+				Posponer
 			</AlertDialogTrigger>
+
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>Posponer tarea</AlertDialogTitle>

@@ -2,8 +2,10 @@
 
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import Link from "next/link"
 import {
 	UserIcon,
+	LinkIcon,
 	UsersIcon,
 	ClockIcon,
 	CalendarIcon,
@@ -126,6 +128,41 @@ export default function WorkOrderDetailsDialog({
 								<DialogLabel label="Descripción del Trabajo" value={workOrder.workDescription} />
 							</div>
 						</div>
+
+						{(workOrder.initReport || workOrder.endReport) && (
+							<div className="flex flex-col gap-4">
+								<h2 className="flex items-center gap-2 text-lg font-semibold">
+									<FileTextIcon className="size-5" />
+									Informes
+								</h2>
+
+								<div className="grid gap-2">
+									{workOrder.initReport && (
+										<Link
+											target="_blank"
+											rel="noopener noreferrer"
+											href={workOrder.initReport.url}
+											className="flex w-fit items-center gap-2 rounded-lg bg-orange-600/10 px-2 py-1 font-medium text-orange-600 hover:bg-orange-600 hover:text-white"
+										>
+											<LinkIcon className="h-4 w-4" />
+											Reporte Inicial
+										</Link>
+									)}
+
+									{workOrder.endReport && (
+										<Link
+											target="_blank"
+											rel="noopener noreferrer"
+											href={workOrder.endReport.url}
+											className="flex w-fit items-center gap-2 rounded-lg bg-orange-600/10 px-2 py-1 font-medium text-orange-600 hover:bg-orange-600 hover:text-white"
+										>
+											<LinkIcon className="h-4 w-4" />
+											Reporte Final
+										</Link>
+									)}
+								</div>
+							</div>
+						)}
 
 						<Separator />
 

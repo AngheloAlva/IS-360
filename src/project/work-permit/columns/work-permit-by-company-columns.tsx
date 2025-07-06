@@ -12,12 +12,53 @@ import { cn } from "@/lib/utils"
 
 import WorkPermitAttachmentForm from "../components/forms/WorkPermitAttachmentForm"
 import WorkPermitDetailsDialog from "../components/dialogs/WorkPermitDetailsDialog"
-import { Button } from "@/shared/components/ui/button"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
 
 export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPermit>[] => [
+	{
+		accessorKey: "actions",
+		header: "",
+		cell: ({ row }) => {
+			const id = row.original.id
+
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/api/work-permit/pdf/${id}`}
+								target="_blank"
+								className="flex cursor-pointer px-3 font-medium text-white"
+							>
+								<PrinterIcon className="h-4 w-4 text-rose-500" /> Imprimir
+							</Link>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<WorkPermitAttachmentForm
+								userId={userId}
+								workPermitId={row.original.id}
+								companyId={row.original.company.id}
+							/>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/dashboard/permiso-de-trabajo/${id}`}
+								className="flex cursor-pointer px-3 font-medium text-white"
+							>
+								<PenBoxIcon className="h-4 w-4 text-indigo-500" /> Editar
+							</Link>
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
 	{
 		accessorKey: "otNumber",
 		header: "OT",
@@ -113,43 +154,6 @@ export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPer
 			return (
 				<div>
 					{participants > 1 ? participants + " participantes" : participants + " participante"}
-				</div>
-			)
-		},
-	},
-	{
-		accessorKey: "actions",
-		header: "Acciones",
-		cell: ({ row }) => {
-			const id = row.original.id
-
-			return (
-				<div className="z-50 flex items-center gap-2">
-					<Link href={`/api/work-permit/pdf/${id}`} target="_blank">
-						<Button
-							size={"icon"}
-							variant={"ghost"}
-							className="cursor-pointer text-indigo-500 hover:bg-indigo-500 hover:text-white"
-						>
-							<PrinterIcon className="h-4 w-4" />
-						</Button>
-					</Link>
-
-					<WorkPermitAttachmentForm
-						userId={userId}
-						workPermitId={row.original.id}
-						companyId={row.original.company.id}
-					/>
-
-					<Link href={`/dashboard/permiso-de-trabajo/${id}`}>
-						<Button
-							size={"icon"}
-							variant={"ghost"}
-							className="cursor-pointer text-rose-500 hover:bg-rose-500 hover:text-white"
-						>
-							<PenBoxIcon className="h-4 w-4" />
-						</Button>
-					</Link>
 				</div>
 			)
 		},

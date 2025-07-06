@@ -5,15 +5,43 @@ import { ColumnDef } from "@tanstack/react-table"
 import Link from "next/link"
 
 import { StartupFolderStatus } from "@prisma/client"
+import { generateSlug } from "@/lib/generateSlug"
 
 import CompanyDetailsDialog from "@/project/company/components/dialogs/CompanyDetailsDialog"
 import DeleteCompanyDialog from "@/project/company/components/forms/DeleteCompanyDialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 
 import type { Company } from "@/project/company/hooks/use-companies"
-import { generateSlug } from "@/lib/generateSlug"
 
 export const CompanyColumns: ColumnDef<Company>[] = [
+	{
+		accessorKey: "actions",
+		header: "",
+		cell: ({ row }) => {
+			const id = row.original.id
+
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem asChild>
+							<Link
+								href={`/admin/dashboard/empresas/${id}`}
+								className="z-10 flex cursor-pointer px-3 font-medium text-white"
+							>
+								<EyeIcon className="size-4" /> Ver detalles
+							</Link>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+							<DeleteCompanyDialog companyId={id} />
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
 	{
 		accessorKey: "image",
 		cell: ({ row }) => {
@@ -95,26 +123,6 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 					>
 						<ArrowRightIcon className="size-4" />
 					</Link>
-				</div>
-			)
-		},
-	},
-	{
-		accessorKey: "actions",
-		header: "Acciones",
-		cell: ({ row }) => {
-			const id = row.original.id
-
-			return (
-				<div className="flex items-center gap-2">
-					<Link
-						href={`/admin/dashboard/empresas/${id}`}
-						className="flex size-8 items-center justify-center rounded-lg bg-blue-600 tracking-wider text-white transition-all hover:scale-105 hover:bg-blue-700"
-					>
-						<EyeIcon className="size-4" />
-					</Link>
-
-					<DeleteCompanyDialog companyId={id} />
 				</div>
 			)
 		},

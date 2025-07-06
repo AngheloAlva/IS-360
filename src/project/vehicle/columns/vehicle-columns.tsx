@@ -1,20 +1,11 @@
-import { MoreHorizontal } from "lucide-react"
-
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-types"
 
 import VehicleDetailsDialog from "@/project/vehicle/components/dialogs/VehicleDetailsDialog"
 import DeleteVehicleDialog from "@/project/vehicle/components/forms/DeleteVehicle"
 import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
-import { Button } from "@/shared/components/ui/button"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Badge } from "@/shared/components/ui/badge"
-import {
-	DropdownMenu,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuSeparator,
-} from "@/shared/components/ui/dropdown-menu"
 
 import type { Vehicle } from "../hooks/use-vehicles-by-company"
 import type { ColumnDef } from "@tanstack/react-table"
@@ -78,16 +69,8 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 			const vehicle = row.original
 
 			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<span className="sr-only">Abrir menú</span>
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
-						<DropdownMenuSeparator />
+				<ActionDataMenu>
+					<>
 						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 							<VehicleForm companyId={vehicle.companyId} vehicleId={vehicle.id} />
 						</DropdownMenuItem>
@@ -95,8 +78,8 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 							<DeleteVehicleDialog vehicleId={vehicle.id} companyId={vehicle.companyId} />
 						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+					</>
+				</ActionDataMenu>
 			)
 		},
 	},

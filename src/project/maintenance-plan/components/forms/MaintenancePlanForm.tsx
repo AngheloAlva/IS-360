@@ -148,19 +148,16 @@ export default function MaintenancePlanForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button
-					size={initialData ? "icon" : "lg"}
+					size={initialData ? "default" : "lg"}
 					className={cn(
-						"gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600",
-						{
-							"size-7 bg-fuchsia-600 text-white hover:bg-fuchsia-600 hover:text-white": initialData,
-						}
+						"gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600"
 					)}
 				>
 					{initialData ? (
-						<PenBoxIcon className="size-4" />
+						<PenBoxIcon className="size-4 text-fuchsia-600" />
 					) : (
 						<>
-							<PlusCircleIcon className="size-4" />
+							<PlusCircleIcon className="size-4 text-indigo-600" />
 							Plan de Mantenimiento
 						</>
 					)}

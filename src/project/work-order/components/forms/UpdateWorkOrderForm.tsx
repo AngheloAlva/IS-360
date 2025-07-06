@@ -178,17 +178,18 @@ export default function UpdateWorkOrderForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex h-10 items-center justify-center gap-1 rounded-md bg-orange-600 px-3 text-sm text-white hover:bg-orange-700"
+				className="flex cursor-pointer items-center justify-center gap-2 font-medium"
 				onClick={() => setOpen(true)}
 			>
 				<SquarePen className="h-4 w-4" />
+				Editar
 			</SheetTrigger>
 
 			<SheetContent className="gap-0 sm:max-w-xl">
 				<SheetHeader className="shadow">
-					<SheetTitle>Nueva Orden de Trabajo</SheetTitle>
+					<SheetTitle>Editar Orden de Trabajo</SheetTitle>
 					<SheetDescription>
-						Complete la información en el formulario para crear una nueva OT.
+						Complete la información en el formulario para editar la OT.
 					</SheetDescription>
 				</SheetHeader>
 
@@ -200,7 +201,7 @@ export default function UpdateWorkOrderForm({
 						<div className="sm:col-span-2">
 							<h2 className="text-xl font-bold">Información General</h2>
 							<span className="text-muted-foreground text-sm">
-								Información útil para crear la Orden de Trabajo.
+								Información útil para editar la Orden de Trabajo.
 							</span>
 						</div>
 

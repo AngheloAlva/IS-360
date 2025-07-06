@@ -3,16 +3,40 @@
 import { MapPinIcon, SettingsIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
+import Link from "next/link"
 
 import type { MaintenancePlan } from "@/project/maintenance-plan/hooks/use-maintenance-plans"
-import Link from "next/link"
 import MaintenancePlanForm from "../components/forms/MaintenancePlanForm"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 
 export const MaintenancePlanColumns = ({
 	userId,
 }: {
 	userId: string
 }): ColumnDef<MaintenancePlan>[] => [
+	{
+		id: "actions",
+		header: "",
+		cell: ({ row }) => {
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<MaintenancePlanForm
+								userId={userId}
+								initialData={{
+									name: row.original.name,
+									equipmentId: row.original.equipment?.id ?? "",
+									slug: row.original.slug,
+								}}
+							/>
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
 	{
 		accessorKey: "name",
 		header: "Nombre",
@@ -79,23 +103,6 @@ export const MaintenancePlanColumns = ({
 		cell: ({ row }) => {
 			const date = row.getValue("createdAt") as Date
 			return <span>{format(new Date(date), "dd-MM-yyyy")}</span>
-		},
-	},
-	{
-		id: "actions",
-		cell: ({ row }) => {
-			return (
-				<div className="flex items-center gap-2">
-					<MaintenancePlanForm
-						userId={userId}
-						initialData={{
-							name: row.original.name,
-							equipmentId: row.original.equipment?.id ?? "",
-							slug: row.original.slug,
-						}}
-					/>
-				</div>
-			)
 		},
 	},
 ]

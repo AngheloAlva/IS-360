@@ -1,24 +1,36 @@
 "use client"
 
-import { MoreHorizontal } from "lucide-react"
-
 import UpdateExternalUserForm from "@/project/user/components/forms/UpdateExternalUserForm"
 import DeleteExternalUserDialog from "@/project/user/components/forms/DeleteExternalUser"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
-import { Button } from "@/shared/components/ui/button"
-import {
-	DropdownMenu,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuSeparator,
-} from "@/shared/components/ui/dropdown-menu"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 
 import type { UsersByCompany } from "@/project/user/hooks/use-users-by-company"
 import type { ColumnDef } from "@tanstack/react-table"
 
 export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
+	{
+		id: "actions",
+		header: "",
+		cell: ({ row }) => {
+			const user = row.original
+
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<UpdateExternalUserForm user={user} />
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<DeleteExternalUserDialog userId={user.id} companyId={user.companyId} />
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
 	{
 		accessorKey: "image",
 		cell: ({ row }) => {
@@ -64,35 +76,6 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 			const isSupervisor = row.getValue("isSupervisor") as boolean
 
 			return isSupervisor ? "Sí" : "No"
-		},
-	},
-	{
-		id: "actions",
-		header: "Acciones",
-		cell: ({ row }) => {
-			const user = row.original
-
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<span className="sr-only">Abrir menú</span>
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Acciones</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-							<UpdateExternalUserForm user={user} />
-						</DropdownMenuItem>
-
-						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-							<DeleteExternalUserDialog userId={user.id} companyId={user.companyId} />
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			)
 		},
 	},
 ]

@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils"
 
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 import PostponeTaskDialog from "@/project/work-order/components/forms/PostponeTask"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
@@ -29,29 +31,37 @@ export const MaintenancePlanTaskColumns = ({
 		accessorKey: "actions",
 		header: "",
 		cell: ({ row }) => (
-			<div className="flex items-center justify-center gap-2">
-				<MaintenancePlanTaskForm
-					userId={userId}
-					maintenancePlanSlug={maintenancePlanSlug}
-					equipmentId={row.original.equipment?.id ?? undefined}
-					initialData={{
-						id: row.original.id,
-						name: row.original.name,
-						description: row.original.description ?? undefined,
-						frequency: row.original.frequency,
-						nextDate: row.original.nextDate,
-						equipmentId: row.original.equipment?.id ?? undefined,
-					}}
-				/>
+			<ActionDataMenu>
+				<>
+					<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+						<MaintenancePlanTaskForm
+							userId={userId}
+							maintenancePlanSlug={maintenancePlanSlug}
+							equipmentId={row.original.equipment?.id ?? undefined}
+							initialData={{
+								id: row.original.id,
+								name: row.original.name,
+								description: row.original.description ?? undefined,
+								frequency: row.original.frequency,
+								nextDate: row.original.nextDate,
+								equipmentId: row.original.equipment?.id ?? undefined,
+							}}
+						/>
+					</DropdownMenuItem>
 
-				<PostponeTaskDialog taskId={row.original.id} nextDate={row.original.nextDate} />
+					<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+						<PostponeTaskDialog taskId={row.original.id} nextDate={row.original.nextDate} />
+					</DropdownMenuItem>
 
-				<CreateWorkOrderForm
-					equipmentId={row.original.equipment.id}
-					maintenancePlanTaskId={row.original.id}
-					equipmentName={row.original.equipment.name}
-				/>
-			</div>
+					<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+						<CreateWorkOrderForm
+							equipmentId={row.original.equipment.id}
+							maintenancePlanTaskId={row.original.id}
+							equipmentName={row.original.equipment.name}
+						/>
+					</DropdownMenuItem>
+				</>
+			</ActionDataMenu>
 		),
 	},
 	{
