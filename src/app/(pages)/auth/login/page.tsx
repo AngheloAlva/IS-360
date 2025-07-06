@@ -1,8 +1,21 @@
+import { redirect } from "next/navigation"
 import Image from "next/image"
 
 import Login from "@/project/auth/components/forms/Login"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { USER_ROLE } from "@prisma/client"
 
-export default function LoginPage(): React.ReactElement {
+export default async function LoginPage(): Promise<React.ReactElement> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (session?.user) {
+		if (session.user.accessRole === USER_ROLE.ADMIN) redirect("/admin/dashboard/inicio")
+		else redirect("/dashboard/inicio")
+	}
+
 	return (
 		<section className="bg-secondary-background h-screen p-4 xl:p-6">
 			<div className="h-full lg:grid lg:grid-cols-12 lg:gap-4">
@@ -39,20 +52,6 @@ export default function LoginPage(): React.ReactElement {
 						src="/images/auth/login.jpeg"
 						className="absolute inset-0 h-full w-full object-cover object-center"
 					/>
-
-					{/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent sm:bg-gradient-to-tr" />
-
-					<div className="hidden lg:relative lg:block lg:p-12">
-						<Image src={"/logo.svg"} alt="Logo" width={40} height={40} />
-
-						<h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
-							¡Bienvenido de nuevo!
-						</h2>
-
-						<p className="mt-4 leading-relaxed text-white/90">
-							Ingresa tus datos para acceder a tu cuenta.
-						</p>
-					</div> */}
 				</section>
 			</div>
 		</section>

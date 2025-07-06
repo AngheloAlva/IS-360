@@ -14,7 +14,6 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 	SidebarContent,
-	SidebarMenuButton,
 } from "@/shared/components/ui/sidebar"
 
 import type { ComponentProps } from "react"
@@ -36,7 +35,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 	return (
 		<Sidebar collapsible="icon" variant="sidebar" {...props}>
 			<SidebarHeader>
-				<SidebarMenuButton size="lg">
+				<div className="flex h-12 w-full items-center gap-2 overflow-hidden p-2 text-left text-sm">
 					<div className="flex aspect-square size-8 items-center justify-center">
 						<Image alt="Logo" width={50} height={52} src="/logo.svg" />
 					</div>
@@ -44,7 +43,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 						<span className="truncate font-bold">OTC</span>
 						<span className="truncate text-xs">360 ERP</span>
 					</div>
-				</SidebarMenuButton>
+				</div>
 			</SidebarHeader>
 
 			<SidebarContent>
