@@ -100,7 +100,7 @@ export const SafetyTalkColumns: ColumnDef<SafetyTalk>[] = [
 						<DropdownMenuItem asChild>
 							<Link
 								href={`/admin/dashboard/charlas-de-seguridad/${slug}/editar`}
-								className="flex cursor-pointer px-3 font-medium text-white"
+								className="text-text flex cursor-pointer px-3 font-medium"
 							>
 								<Edit className="mr-2 h-4 w-4" /> Editar
 							</Link>

@@ -48,7 +48,7 @@ export const getWorkPermitColumns = (
 						<DropdownMenuItem asChild>
 							<Link
 								href={`/admin/dashboard/permisos-de-trabajo/${id}/pdf`}
-								className="flex cursor-pointer px-3 font-medium text-white"
+								className="text-text flex cursor-pointer px-3 font-medium"
 							>
 								<PrinterIcon className="h-4 w-4 text-rose-500" /> Imprimir
 							</Link>
@@ -65,7 +65,7 @@ export const getWorkPermitColumns = (
 						<DropdownMenuItem asChild>
 							<Link
 								href={`/admin/dashboard/permisos-de-trabajo/${id}`}
-								className="flex cursor-pointer px-3 font-medium text-white"
+								className="text-text flex cursor-pointer px-3 font-medium"
 							>
 								<PenBoxIcon className="h-4 w-4 text-indigo-500" /> Editar
 							</Link>
