@@ -5,6 +5,8 @@ import type {
 	VehicleDocumentType,
 	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
+	TechSpecsDocumentType,
+	EnvironmentDocType,
 } from "@prisma/client"
 
 export interface BaseStartupFolderDocument {
@@ -50,9 +52,19 @@ export interface EnvironmentalStartupFolderDocument extends BaseStartupFolderDoc
 	type: EnvironmentalDocType
 }
 
+export interface EnvironmentStartupFolderDocument extends BaseStartupFolderDocument {
+	category: "ENVIRONMENT"
+	type: EnvironmentDocType
+}
+
 export interface BasicStartupFolderDocument extends BaseStartupFolderDocument {
 	category: "BASIC"
 	type: BasicDocumentType
+}
+
+export interface TechSpecsStartupFolderDocument extends BaseStartupFolderDocument {
+	category: "TECHNICAL_SPECS"
+	type: TechSpecsDocumentType
 }
 
 export type StartupFolderDocument =
@@ -60,4 +72,6 @@ export type StartupFolderDocument =
 	| VehicleStartupFolderDocument
 	| SafetyAndHealthStartupFolderDocument
 	| EnvironmentalStartupFolderDocument
+	| EnvironmentStartupFolderDocument
+	| TechSpecsStartupFolderDocument
 	| BasicStartupFolderDocument

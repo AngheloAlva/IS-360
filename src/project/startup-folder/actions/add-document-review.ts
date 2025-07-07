@@ -15,6 +15,9 @@ import {
 	DRIVER_WORKER_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
+	ENVIRONMENT_STRUCTURE,
+	EXTENDED_ENVIRONMENT_STRUCTURE,
+	TECH_SPEC_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
 
 interface AddDocumentReviewProps {
@@ -294,6 +297,267 @@ export const addDocumentReview = async ({
 					if (allDocuments.startupFolder) {
 						sendReviewNotificationEmail({
 							folderName: allDocuments.startupFolder.name + " - Medio Ambiente",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
+					return {
+						ok: true,
+						message: "Revisión procesada exitosamente",
+					}
+				}
+
+				break
+			case DocumentCategory.ENVIRONMENT:
+				document = await prisma.environmentDocument.update({
+					where: { id: documentId },
+					data: {
+						status: newStatus,
+						reviewNotes: comments,
+						reviewedAt: now,
+						reviewer: {
+							connect: {
+								id: reviewerId,
+							},
+						},
+					},
+					include: {
+						uploadedBy: true,
+					},
+				})
+
+				allDocuments = await prisma.environmentFolder.findUnique({
+					where: {
+						startupFolderId,
+					},
+					select: {
+						id: true,
+						documents: {
+							select: {
+								name: true,
+								status: true,
+								reviewNotes: true,
+							},
+						},
+						additionalNotificationEmails: true,
+						startupFolder: {
+							select: {
+								name: true,
+								moreMonthDuration: true,
+								company: {
+									select: {
+										name: true,
+									},
+								},
+							},
+						},
+					},
+				})
+
+				totalDocuments = (allDocuments?.startupFolder as { moreMonthDuration: boolean })
+					.moreMonthDuration
+					? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length + 1
+					: ENVIRONMENT_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
+					await prisma.environmentFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.APPROVED,
+						},
+					})
+
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: allDocuments.startupFolder.name + " - Medio Ambiente",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
+					return {
+						ok: true,
+						message: "Revisión procesada exitosamente",
+					}
+				}
+
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments <= totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.environmentFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: allDocuments.startupFolder.name + " - Medio Ambiente",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
+					return {
+						ok: true,
+						message: "Revisión procesada exitosamente",
+					}
+				}
+
+				break
+			case DocumentCategory.TECHNICAL_SPECS:
+				document = await prisma.techSpecsDocument.update({
+					where: { id: documentId },
+					data: {
+						status: newStatus,
+						reviewNotes: comments,
+						reviewedAt: now,
+						reviewer: {
+							connect: {
+								id: reviewerId,
+							},
+						},
+					},
+					include: {
+						uploadedBy: true,
+					},
+				})
+
+				allDocuments = await prisma.techSpecsFolder.findUnique({
+					where: {
+						startupFolderId,
+					},
+					select: {
+						id: true,
+						documents: {
+							select: {
+								name: true,
+								status: true,
+								reviewNotes: true,
+							},
+						},
+						additionalNotificationEmails: true,
+						startupFolder: {
+							select: {
+								name: true,
+								moreMonthDuration: true,
+								company: {
+									select: {
+										name: true,
+									},
+								},
+							},
+						},
+					},
+				})
+
+				totalDocuments = TECH_SPEC_STRUCTURE.documents.length
+
+				if (
+					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
+					allDocuments.documents.length === totalDocuments
+				) {
+					await prisma.techSpecsFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.APPROVED,
+						},
+					})
+
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: allDocuments.startupFolder.name + " - Especificaciones Técnicas",
+							companyName: allDocuments.startupFolder.company.name,
+							reviewDate: new Date(),
+							reviewer: {
+								name: session.user.name,
+								email: session.user.email,
+								phone: session.user.phone || null,
+							},
+							isApproved: false,
+							rejectedDocuments: allDocuments.documents
+								.filter((d) => d.status === ReviewStatus.REJECTED)
+								.map((d) => ({
+									name: d.name,
+									reason: d.reviewNotes || "",
+								})),
+							emails: allDocuments.additionalNotificationEmails,
+						})
+					}
+
+					return {
+						ok: true,
+						message: "Revisión procesada exitosamente",
+					}
+				}
+
+				totalReviewedDocuments =
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
+					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
+
+				if (
+					totalReviewedDocuments <= totalDocuments &&
+					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
+				) {
+					await prisma.techSpecsFolder.update({
+						where: { startupFolderId },
+						data: {
+							status: ReviewStatus.DRAFT,
+						},
+					})
+
+					if (allDocuments.startupFolder) {
+						sendReviewNotificationEmail({
+							folderName: allDocuments.startupFolder.name + " - Especificaciones Técnicas",
 							companyName: allDocuments.startupFolder.company.name,
 							reviewDate: new Date(),
 							reviewer: {
@@ -795,6 +1059,8 @@ type Document =
 	  }>
 	| Prisma.VehicleDocumentGetPayload<{ select: { folder: { select: { vehicleId: true } } } }>
 	| Prisma.EnvironmentalDocumentGetPayload<{ include: { uploadedBy: true } }>
+	| Prisma.EnvironmentDocumentGetPayload<{ include: { uploadedBy: true } }>
+	| Prisma.TechSpecsDocumentGetPayload<{ include: { uploadedBy: true } }>
 	| Prisma.BasicDocumentGetPayload<{ select: { folder: { select: { workerId: true } } } }>
 
 type AllDocuments =
@@ -802,7 +1068,9 @@ type AllDocuments =
 			select: {
 				id: true
 				documents: { select: { status: true; name: true; reviewNotes: true } }
-				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true; moreMonthDuration: true }
+				}
 				additionalNotificationEmails: true
 			}
 	  }>
@@ -810,7 +1078,9 @@ type AllDocuments =
 			select: {
 				id: true
 				documents: { select: { status: true; name: true; reviewNotes: true } }
-				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true; moreMonthDuration: true }
+				}
 				worker: { select: { name: true } }
 				additionalNotificationEmails: true
 			}
@@ -819,7 +1089,9 @@ type AllDocuments =
 			select: {
 				id: true
 				documents: { select: { status: true; name: true; reviewNotes: true } }
-				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true; moreMonthDuration: true }
+				}
 				vehicle: { select: { plate: true; model: true; brand: true } }
 				additionalNotificationEmails: true
 			}
@@ -828,7 +1100,31 @@ type AllDocuments =
 			select: {
 				id: true
 				documents: { select: { status: true; name: true; reviewNotes: true } }
-				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true; moreMonthDuration: true }
+				}
+				additionalNotificationEmails: true
+			}
+	  }>
+	| Prisma.EnvironmentFolderGetPayload<{
+			select: {
+				id: true
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true }
+					moreMonthDuration: true
+				}
+				additionalNotificationEmails: true
+			}
+	  }>
+	| Prisma.TechSpecsFolderGetPayload<{
+			select: {
+				id: true
+				documents: { select: { status: true; name: true; reviewNotes: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true }
+					moreMonthDuration: true
+				}
 				additionalNotificationEmails: true
 			}
 	  }>
@@ -836,7 +1132,10 @@ type AllDocuments =
 			select: {
 				id: true
 				documents: { select: { status: true; name: true; reviewNotes: true } }
-				startupFolder: { select: { company: { select: { name: true } }; name: true } }
+				startupFolder: {
+					select: { company: { select: { name: true } }; name: true }
+					moreMonthDuration: true
+				}
 				worker?: { select: { name: true } }
 				additionalNotificationEmails: true
 			}

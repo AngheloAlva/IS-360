@@ -36,6 +36,8 @@ import type {
 	EnvironmentalDocument,
 	SafetyAndHealthDocument,
 	BasicDocument,
+	TechSpecsDocument,
+	EnvironmentDocument,
 } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
@@ -52,6 +54,8 @@ interface DocumentReviewFormProps {
 		| WorkerDocument
 		| VehicleDocument
 		| BasicDocument
+		| TechSpecsDocument
+		| EnvironmentDocument
 }
 
 export function DocumentReviewForm({

@@ -7,8 +7,10 @@ import {
 	BasicStartupFolderDocument,
 	WorkerStartupFolderDocument,
 	VehicleStartupFolderDocument,
-	SafetyAndHealthStartupFolderDocument,
+	TechSpecsStartupFolderDocument,
+	EnvironmentStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
+	SafetyAndHealthStartupFolderDocument,
 } from "../types"
 
 export async function getStartupFolderDocuments({
@@ -105,6 +107,17 @@ export async function getStartupFolderDocuments({
 					})
 				case "ENVIRONMENT":
 					return prisma.environmentFolder.findUnique({
+						where: { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
+					})
+				case "TECHNICAL_SPECS":
+					return prisma.techSpecsFolder.findUnique({
 						where: { startupFolderId },
 						include: {
 							_count: {
@@ -223,6 +236,44 @@ export async function getStartupFolderDocuments({
 						},
 						orderBy: { uploadedAt: "desc" },
 					})
+				case "ENVIRONMENT":
+					return prisma.environmentDocument.findMany({
+						where: { folderId: folder.id },
+						include: {
+							uploadedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+							reviewer: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+						},
+						orderBy: { uploadedAt: "desc" },
+					})
+				case "TECHNICAL_SPECS":
+					return prisma.techSpecsDocument.findMany({
+						where: { folderId: folder.id },
+						include: {
+							uploadedBy: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+							reviewer: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
+						},
+						orderBy: { uploadedAt: "desc" },
+					})
 				case "BASIC":
 					return prisma.basicDocument.findMany({
 						where: { folderId: folder.id },
@@ -290,6 +341,18 @@ export async function getStartupFolderDocuments({
 						category: "ENVIRONMENTAL",
 						type: doc.type,
 					} as EnvironmentalStartupFolderDocument
+				case "ENVIRONMENT":
+					return {
+						...baseDoc,
+						category: "ENVIRONMENT",
+						type: doc.type,
+					} as EnvironmentStartupFolderDocument
+				case "TECHNICAL_SPECS":
+					return {
+						...baseDoc,
+						category: "TECHNICAL_SPECS",
+						type: doc.type,
+					} as TechSpecsStartupFolderDocument
 				case "BASIC":
 					return {
 						...baseDoc,

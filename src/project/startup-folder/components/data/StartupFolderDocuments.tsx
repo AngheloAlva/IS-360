@@ -65,6 +65,8 @@ import type {
 	StartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
+	EnvironmentStartupFolderDocument,
+	TechSpecsStartupFolderDocument,
 } from "../../types"
 
 interface StartupFolderDocumentsProps {
@@ -115,6 +117,8 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documentsData = data?.documents ?? []
+	console.log({ startupFolderId, category })
+	console.log(documentsData)
 
 	const { title, documents } = getDocumentsByCategory(category, moreMonthDuration)
 
@@ -425,6 +429,26 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 																	...baseDoc,
 																	category: DocumentCategory.ENVIRONMENTAL,
 																	type: doc.type as EnvironmentalDocType,
+																	reviewer: doc.reviewer,
+																}
+																selectedDoc = envDoc
+																break
+															}
+															case DocumentCategory.ENVIRONMENT: {
+																const envDoc: EnvironmentStartupFolderDocument = {
+																	...baseDoc,
+																	category: DocumentCategory.ENVIRONMENT,
+																	type: doc.type as EnvironmentDocType,
+																	reviewer: doc.reviewer,
+																}
+																selectedDoc = envDoc
+																break
+															}
+															case DocumentCategory.TECHNICAL_SPECS: {
+																const envDoc: TechSpecsStartupFolderDocument = {
+																	...baseDoc,
+																	category: DocumentCategory.TECHNICAL_SPECS,
+																	type: doc.type as TechSpecsDocumentType,
 																	reviewer: doc.reviewer,
 																}
 																selectedDoc = envDoc

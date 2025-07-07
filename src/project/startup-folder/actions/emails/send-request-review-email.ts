@@ -35,55 +35,55 @@ export const sendRequestReviewEmail = async ({
 			case DocumentCategory.SAFETY_AND_HEALTH:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"cristian.pavez@oleotrasandino.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
+					// "cristian.pavez@oleotrasandino.cl",
+					// "katherine.burgos@oleotrasandino.cl",
+					// "soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.ENVIRONMENTAL:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"bcarrillo@dbj.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
+					// "bcarrillo@dbj.cl",
+					// "katherine.burgos@oleotrasandino.cl",
+					// "soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.ENVIRONMENT:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"bcarrillo@dbj.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
+					// "bcarrillo@dbj.cl",
+					// "katherine.burgos@oleotrasandino.cl",
+					// "soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.TECHNICAL_SPECS:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"", //Jaime
-					"soporte@ingenieriasimple.cl",
+					// "", //Jaime
+					// "soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.PERSONNEL:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"cristian.pavez@oleotrasandino.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
+					// "cristian.pavez@oleotrasandino.cl",
+					// "katherine.burgos@oleotrasandino.cl",
+					// "soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.VEHICLES:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"cristian.pavez@oleotrasandino.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
+					// "cristian.pavez@oleotrasandino.cl",
+					// "katherine.burgos@oleotrasandino.cl",
+					// "soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.BASIC:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
+					// "katherine.burgos@oleotrasandino.cl",
+					// "soporte@ingenieriasimple.cl",
 				]
 		}
 

@@ -39,8 +39,6 @@ const submitReviewRequestSchema = z.object({
 
 type SubmitReviewRequestSchema = z.infer<typeof submitReviewRequestSchema>
 
-// TODO: Error cuando se envía la solicitud sin ningun archivo subido por parte externa
-
 export function SubmitReviewRequestDialog({
 	userId,
 	isOpen,
@@ -147,11 +145,29 @@ export function SubmitReviewRequestDialog({
 					userId,
 					folderId,
 				})
+			} else if (category === "ENVIRONMENT") {
+				const { submitEnvironmentDocumentForReview } = await import(
+					"@/project/startup-folder/actions/documents/environment"
+				)
+				result = await submitEnvironmentDocumentForReview({
+					emails,
+					userId,
+					folderId,
+				})
 			} else if (category === "SAFETY_AND_HEALTH") {
 				const { submitSafetyAndHealthDocumentForReview } = await import(
 					"@/project/startup-folder/actions/documents/safety-and-health"
 				)
 				result = await submitSafetyAndHealthDocumentForReview({
+					emails,
+					userId,
+					folderId,
+				})
+			} else if (category === "TECHNICAL_SPECS") {
+				const { submitTechSpecsDocumentForReview } = await import(
+					"@/project/startup-folder/actions/documents/technical-specs"
+				)
+				result = await submitTechSpecsDocumentForReview({
 					emails,
 					userId,
 					folderId,

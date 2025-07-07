@@ -59,6 +59,12 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 			environmentalFolders: {
 				select: { id: true },
 			},
+			environmentFolders: {
+				select: { id: true },
+			},
+			techSpecsFolders: {
+				select: { id: true },
+			},
 			safetyAndHealthFolders: {
 				select: { id: true },
 			},
@@ -113,7 +119,7 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 		}
 
 		case "ENVIRONMENT": {
-			const folder = startupFolder.environmentalFolders[0]
+			const folder = startupFolder.environmentFolders[0]
 			if (!folder) {
 				throw new Error("Environmental folder not found")
 			}
@@ -132,7 +138,7 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 		}
 
 		case "TECHNICAL_SPECS": {
-			const folder = startupFolder.environmentalFolders[0]
+			const folder = startupFolder.techSpecsFolders[0]
 			if (!folder) {
 				throw new Error("Technical specs folder not found")
 			}
