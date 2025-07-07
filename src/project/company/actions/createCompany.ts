@@ -53,7 +53,14 @@ export const createCompany = async ({
 	}
 
 	try {
-		const { vehicles, supervisors, startupFolderName, startupFolderType, ...rest } = values
+		const {
+			vehicles,
+			supervisors,
+			startupFolderName,
+			startupFolderType,
+			startupFolderMoreMonthDuration,
+			...rest
+		} = values
 
 		const existingCompany = await prisma.company.findUnique({
 			where: {
@@ -98,7 +105,7 @@ export const createCompany = async ({
 			companyId: company.id,
 			type: startupFolderType,
 			name: startupFolderName || "Carpeta de arranque",
-			moreMonthDuration: values.startupFolderMoreMonthDuration || false,
+			moreMonthDuration: startupFolderMoreMonthDuration || false,
 		})
 
 		if (vehicles && vehicles.length > 0) {
