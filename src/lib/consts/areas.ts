@@ -142,14 +142,12 @@ export const UserAreaOptions = [
 	{ value: AREAS.LEGAL, label: "Juridica / Legal" },
 	{ value: AREAS.OPERATIONS, label: "Operaciones" },
 	{ value: AREAS.OPERATIONAL_SAFETY, label: "Seguridad Operacional" },
-	{ value: AREAS.PROJECTS, label: "Proyectos" },
 	{
 		value: AREAS.QUALITY_AND_OPERATIONAL_EXCELLENCE,
 		label: "Calidad y Excelencia Operacional",
 	},
 	{ value: AREAS.PURCHASING, label: "Compras" },
 	{ value: AREAS.ADMINISTRATION_AND_FINANCES, label: "Administración y Finanzas" },
-	{ value: AREAS.IT, label: "Informática" },
 	{ value: AREAS.GERENCY, label: "Gerencia" },
 ]
 
@@ -164,9 +162,7 @@ export const AreasLabels = {
 	[AREAS.REGULATORY_COMPLIANCE]: "Cumplimiento Normativo",
 	[AREAS.LEGAL]: "Juridica",
 	[AREAS.COMMUNITIES]: "Comunidades",
-	[AREAS.PROJECTS]: "Proyectos",
 	[AREAS.PURCHASING]: "Compras",
 	[AREAS.ADMINISTRATION_AND_FINANCES]: "Administración y Finanzas",
-	[AREAS.IT]: "Informática",
 	[AREAS.GERENCY]: "Gerencia",
 }

@@ -12,7 +12,7 @@ import {
 
 import { useUsers } from "@/project/user/hooks/use-users"
 import { UserColumns } from "../../columns/user-columns"
-import { AreasLabels } from "@/lib/consts/areas"
+import { UserAreaOptions } from "@/lib/consts/areas"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import InternalUser from "@/project/user/components/forms/InternalUser"
@@ -115,9 +115,9 @@ export function UsersTable({ hasPermission, id }: UsersTableProps) {
 								<SelectGroup>
 									<SelectLabel>Áreas</SelectLabel>
 									<SelectItem value="all">Todas las áreas</SelectItem>
-									{Object.keys(AreasLabels).map((area) => (
-										<SelectItem key={area} value={area}>
-											{AreasLabels[area as keyof typeof AreasLabels]}
+									{UserAreaOptions.map((area) => (
+										<SelectItem key={area.value} value={area.value}>
+											{area.label}
 										</SelectItem>
 									))}
 								</SelectGroup>

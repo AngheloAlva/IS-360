@@ -271,8 +271,16 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 										className="cursor-pointer font-medium hover:text-teal-600"
 										onClick={() => setSelectedEntity(entity)}
 									>
-										<div className="flex items-center gap-2">
-											<FolderIcon className="h-4 w-4 text-teal-500" />
+										<div
+											className={cn("flex items-center gap-2", {
+												"text-yellow-500": entity.status === "SUBMITTED",
+											})}
+										>
+											<FolderIcon
+												className={cn("h-4 w-4 text-teal-500", {
+													"text-yellow-500": entity.status === "SUBMITTED",
+												})}
+											/>
 											{entity.name}
 										</div>
 									</TableCell>

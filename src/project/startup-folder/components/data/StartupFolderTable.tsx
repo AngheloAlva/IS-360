@@ -154,8 +154,16 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 						onClick={() => onCategorySelect(category.category)}
 					>
 						<TableCell className="my-2 font-semibold">
-							<div className="flex items-center gap-2">
-								<FolderIcon className="h-4 w-4 text-teal-500" />
+							<div
+								className={cn("flex items-center gap-2", {
+									"text-yellow-500": category.pendingCount > 0,
+								})}
+							>
+								<FolderIcon
+									className={cn("h-4 w-4 text-teal-500", {
+										"text-yellow-500": category.pendingCount > 0,
+									})}
+								/>
 								{category.title}
 							</div>
 						</TableCell>

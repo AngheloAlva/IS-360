@@ -22,7 +22,7 @@ export function StartupFolderStatusBadge({ status, className }: StartupFolderSta
 		},
 		SUBMITTED: {
 			label: "En revisión",
-			className: "bg-cyan-600/20 text-cyan-600 dark:bg-cyan-500/20 dark:text-cyan-500",
+			className: "bg-yellow-600/20 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-500",
 		},
 		APPROVED: {
 			label: "Aprobado",
