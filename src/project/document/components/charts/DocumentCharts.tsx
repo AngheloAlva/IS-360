@@ -109,7 +109,7 @@ export default function DocumentCharts() {
 										<div>
 											<CardTitle>Actividad de Documentación</CardTitle>
 											<CardDescription>
-												Creación de carpetas y archivos en los últimos 30 días
+												Creación de carpetas y archivos en los últimos 15 días
 											</CardDescription>
 										</div>
 
@@ -253,7 +253,7 @@ export default function DocumentCharts() {
 								<CardHeader>
 									<CardTitle>Cambios por Día</CardTitle>
 									<CardDescription>
-										Modificaciones realizadas en los últimos 30 días
+										Modificaciones realizadas en los últimos 15 días
 									</CardDescription>
 								</CardHeader>
 								<CardContent className="pl-2">

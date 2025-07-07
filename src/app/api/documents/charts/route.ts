@@ -227,8 +227,8 @@ export async function GET() {
 		},
 	})
 
-	// Get activity by day (last 30 days)
-	const last30Days = Array.from({ length: 30 }, (_, i) => {
+	// Get last 15 days for changes per day
+	const last15Days = Array.from({ length: 15 }, (_, i) => {
 		const date = subDays(new Date(), i)
 		return format(date, "yyyy-MM-dd")
 	}).reverse()
@@ -236,7 +236,7 @@ export async function GET() {
 	const [activityByDay, changesPerDay] = await Promise.all([
 		// Activity (files and folders created)
 		Promise.all(
-			last30Days.map(async (date) => {
+			last15Days.map(async (date) => {
 				const [filesCount, foldersCount] = await Promise.all([
 					// Files created on this day
 					prisma.file.count({
@@ -269,9 +269,9 @@ export async function GET() {
 				}
 			})
 		),
-		// Changes per day
+		// Changes per day (only last 15 days)
 		Promise.all(
-			last30Days.map(async (date) => {
+			last15Days.map(async (date) => {
 				const count = await prisma.fileHistory.count({
 					where: {
 						modifiedAt: {

@@ -69,7 +69,7 @@ export function FileExplorerBySearch() {
 		<div className="grid w-full gap-4 sm:grid-cols-2">
 			<div className="mb-4 flex flex-col gap-4 sm:col-span-2 md:flex-row md:items-center md:justify-between">
 				<div className="flex items-center gap-3">
-					<BackButton href={"/dashboard/documentacion"} />
+					<BackButton href={"/admin/dashboard/documentacion"} />
 
 					<h1 className="text-text text-3xl font-bold">Búsqueda</h1>
 				</div>
