@@ -24,8 +24,19 @@ interface StartupFolderTableProps {
 }
 
 export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFolderTableProps) {
-	const categories = useMemo(
-		() => [
+	interface CategoryItem {
+		title: string
+		category: DocumentCategory
+		description: string
+		documentsCount: number
+		completedCount: number
+		rejectedCount: number
+		pendingCount: number
+		draftCount: number
+	}
+
+	const categories = useMemo<CategoryItem[]>(() => {
+		const baseCategories: CategoryItem[] = [
 			{
 				title: "Seguridad y Salud Ocupacional",
 				category: DocumentCategory.SAFETY_AND_HEALTH,
@@ -35,16 +46,6 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 				rejectedCount: subFolders.safetyAndHealthFolders[0]?.rejectedDocuments ?? 0,
 				pendingCount: subFolders.safetyAndHealthFolders[0]?.submittedDocuments ?? 0,
 				draftCount: subFolders.safetyAndHealthFolders[0]?.draftDocuments ?? 0,
-			},
-			{
-				title: "Medio Ambiente",
-				category: DocumentCategory.ENVIRONMENTAL,
-				description: "Documentación relacionada con gestión ambiental y manejo de residuos.",
-				documentsCount: subFolders.environmentalFolders[0]?.totalDocuments ?? 0,
-				completedCount: subFolders.environmentalFolders[0]?.approvedDocuments ?? 0,
-				rejectedCount: subFolders.environmentalFolders[0]?.rejectedDocuments ?? 0,
-				pendingCount: subFolders.environmentalFolders[0]?.submittedDocuments ?? 0,
-				draftCount: subFolders.environmentalFolders[0]?.draftDocuments ?? 0,
 			},
 			{
 				title: "Vehículos y Equipos",
@@ -88,9 +89,49 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 					.map((wf) => wf.draftDocuments)
 					.reduce((a, b) => a + b, 0),
 			},
-		],
-		[subFolders]
-	)
+		]
+
+		if (subFolders.environmentalFolders.length > 0) {
+			baseCategories.splice(1, 0, {
+				title: "Medio Ambiente",
+				category: DocumentCategory.ENVIRONMENTAL,
+				description: "Documentación relacionada con gestión ambiental y manejo de residuos.",
+				documentsCount: subFolders.environmentalFolders[0]?.totalDocuments ?? 0,
+				completedCount: subFolders.environmentalFolders[0]?.approvedDocuments ?? 0,
+				rejectedCount: subFolders.environmentalFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.environmentalFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.environmentalFolders[0]?.draftDocuments ?? 0,
+			})
+		}
+
+		if (subFolders.environmentFolders.length > 0) {
+			baseCategories.splice(1, 0, {
+				title: "Medio Ambiente (nuevo)",
+				category: DocumentCategory.ENVIRONMENT,
+				description: "Documentación relacionada con gestión ambiental y manejo de residuos.",
+				documentsCount: subFolders.environmentFolders[0]?.totalDocuments ?? 0,
+				completedCount: subFolders.environmentFolders[0]?.approvedDocuments ?? 0,
+				rejectedCount: subFolders.environmentFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.environmentFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.environmentFolders[0]?.draftDocuments ?? 0,
+			})
+		}
+
+		if (subFolders.techSpecsFolders.length > 0) {
+			baseCategories.splice(2, 0, {
+				title: "Especificaciones Técnicas",
+				category: DocumentCategory.TECHNICAL_SPECS,
+				description: "Documentación técnica.",
+				documentsCount: subFolders.techSpecsFolders[0]?.totalDocuments ?? 0,
+				completedCount: subFolders.techSpecsFolders[0]?.approvedDocuments ?? 0,
+				rejectedCount: subFolders.techSpecsFolders[0]?.rejectedDocuments ?? 0,
+				pendingCount: subFolders.techSpecsFolders[0]?.submittedDocuments ?? 0,
+				draftCount: subFolders.techSpecsFolders[0]?.draftDocuments ?? 0,
+			})
+		}
+
+		return baseCategories
+	}, [subFolders])
 
 	return (
 		<Table>
@@ -108,7 +149,7 @@ export function StartupFolderTable({ onCategorySelect, subFolders }: StartupFold
 			<TableBody>
 				{categories.map((category) => (
 					<TableRow
-						key={category?.category}
+						key={category.category}
 						className="hover:bg-muted/50 h-12 cursor-pointer transition-colors"
 						onClick={() => onCategorySelect(category.category)}
 					>

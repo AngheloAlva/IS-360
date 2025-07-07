@@ -33,6 +33,7 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import { StartupFolderType, type User } from "@prisma/client"
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 
 export default function CompanyForm(): React.ReactElement {
 	const [loading, setLoading] = useState(false)
@@ -46,6 +47,7 @@ export default function CompanyForm(): React.ReactElement {
 			vehicles: [],
 			supervisors: [],
 			startupFolderName: "",
+			startupFolderMoreMonthDuration: false,
 			startupFolderType: StartupFolderType.FULL,
 		},
 	})
@@ -160,6 +162,8 @@ export default function CompanyForm(): React.ReactElement {
 		}
 	}
 
+	const folderType = form.watch("startupFolderType")
+
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
@@ -216,6 +220,14 @@ export default function CompanyForm(): React.ReactElement {
 							placeholder="Nombre de la carpeta de arranque"
 							description="Este nombre se usará para crear la primera carpeta de arranque de la empresa"
 						/>
+
+						{folderType === StartupFolderType.FULL && (
+							<SwitchFormField
+								control={form.control}
+								name="startupFolderMoreMonthDuration"
+								label="¿La empresa estará más de un mes?"
+							/>
+						)}
 
 						<Separator className="my-2" />
 

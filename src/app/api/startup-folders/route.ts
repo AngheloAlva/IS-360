@@ -2,14 +2,17 @@ import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
 import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
-import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 import {
 	VEHICLE_STRUCTURE,
+	TECH_SPEC_STRUCTURE,
 	BASE_WORKER_STRUCTURE,
+	ENVIRONMENT_STRUCTURE,
 	DRIVER_WORKER_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
+	EXTENDED_ENVIRONMENT_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
@@ -65,6 +68,24 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					},
 				},
 				environmentalFolders: {
+					include: {
+						documents: {
+							select: {
+								status: true,
+							},
+						},
+					},
+				},
+				environmentFolders: {
+					include: {
+						documents: {
+							select: {
+								status: true,
+							},
+						},
+					},
+				},
+				techSpecsFolders: {
 					include: {
 						documents: {
 							select: {
@@ -148,6 +169,32 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					ef.documents.length === ENVIRONMENTAL_STRUCTURE.documents.length &&
 					ef.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
+			environmentFolders: folder.environmentFolders.map((ef) => ({
+				...ef,
+				totalDocuments: folder.moreMonthDuration
+					? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
+					: ENVIRONMENT_STRUCTURE.documents.length,
+				approvedDocuments: ef.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: ef.documents.filter((doc) => doc.status === "REJECTED").length,
+				submittedDocuments: ef.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: ef.documents.filter((doc) => doc.status === "DRAFT").length,
+				documents: undefined,
+				isCompleted:
+					ef.documents.length === ENVIRONMENTAL_STRUCTURE.documents.length &&
+					ef.documents?.every((doc) => doc.status === "APPROVED"),
+			})),
+			techSpecsFolders: folder.techSpecsFolders.map((tsf) => ({
+				...tsf,
+				totalDocuments: TECH_SPEC_STRUCTURE.documents.length,
+				approvedDocuments: tsf.documents.filter((doc) => doc.status === "APPROVED").length,
+				rejectedDocuments: tsf.documents.filter((doc) => doc.status === "REJECTED").length,
+				submittedDocuments: tsf.documents.filter((doc) => doc.status === "SUBMITTED").length,
+				draftDocuments: tsf.documents.filter((doc) => doc.status === "DRAFT").length,
+				documents: undefined,
+				isCompleted:
+					tsf.documents.length === TECH_SPEC_STRUCTURE.documents.length &&
+					tsf.documents?.every((doc) => doc.status === "APPROVED"),
+			})),
 			workersFolders: folder.workersFolders.map((wf) => ({
 				...wf,
 				totalDocuments: wf.isDriver
@@ -159,7 +206,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				draftDocuments: wf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 				isCompleted:
-					wf.documents.length ===
+					wf.documents.length >=
 						(wf.isDriver
 							? DRIVER_WORKER_STRUCTURE.documents.length
 							: BASE_WORKER_STRUCTURE.documents.length) &&
@@ -174,7 +221,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				draftDocuments: vf.documents.filter((doc) => doc.status === "DRAFT").length,
 				documents: undefined,
 				isCompleted:
-					vf.documents.length === VEHICLE_STRUCTURE.documents.length &&
+					vf.documents.length >= VEHICLE_STRUCTURE.documents.length &&
 					vf.documents?.every((doc) => doc.status === "APPROVED"),
 			})),
 		}))

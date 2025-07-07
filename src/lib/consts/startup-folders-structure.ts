@@ -3,7 +3,9 @@ import {
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	TechSpecsDocumentType,
 	SafetyAndHealthDocumentType,
+	EnvironmentDocType,
 } from "@prisma/client"
 import { BASIC_FOLDER_STRUCTURE } from "./basic-startup-folders-structure"
 
@@ -19,6 +21,8 @@ export interface StartupFolderStructure {
 			| VehicleDocumentType
 			| WorkerDocumentType
 			| EnvironmentalDocType
+			| TechSpecsDocumentType
+			| EnvironmentDocType
 	}[]
 }
 
@@ -242,6 +246,98 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 	],
 }
 
+export const ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
+	title: "Medio Ambiente",
+	category: DocumentCategory.ENVIRONMENT,
+	description: "Documentación medio ambiental obligatoria según normativa OTC.",
+	documents: [
+		{
+			type: EnvironmentDocType.WORK_PROCEDURE,
+			name: "Procedimiento de trabajo",
+			description: "Procedimiento de trabajo que incluya apartado de medio ambiente",
+		},
+		{
+			type: EnvironmentDocType.ENVIRONMENTAL_ASPECTS_AND_IMPACTS_MATRIX,
+			name: "Matriz de Aspecto e Impactos Ambientales",
+			description: "Matriz de Aspecto e Impactos Ambientales",
+		},
+		{
+			type: EnvironmentDocType.SAFETY_DATA_SHEET_FOR_CHEMICALS,
+			name: "Hoja de seguridad de productos químicos",
+			description: "Hoja de seguridad de productos químicos a utilizar (en caso que aplique)",
+		},
+		{
+			type: EnvironmentDocType.WORKER_TRAINING_RECORD,
+			name: "Programa de capacitación en materia ambiental",
+			description:
+				"Registro de capacitación a trabajadores de Matriz de aspectos ambientales y procedimiento",
+		},
+		{
+			type: EnvironmentDocType.HEALTH_RESOLUTION_FOR_WORKERS_DRINKING_WATER,
+			name: "Resolución sanitaria del agua de consumo de trabajadores",
+			description: "Resolución sanitaria del agua de consumo de trabajadores",
+		},
+		{
+			type: EnvironmentDocType.HEALTH_RESOLUTION_FOR_THE_CHEMICAL_TOILET,
+			name: "Resolución sanitaria del baño químico a utilizar en instalaciones",
+			description: "Resolución sanitaria del baño químico a utilizar en instalaciones",
+		},
+		{
+			type: EnvironmentDocType.RESOLUTION_FOR_THE_SITE_WHERE_DEBRIS_WILL_BE_DISPOSED,
+			name: "Resolución del sitio donde se dispondran escombros",
+			description: "Resolución del sitio donde se dispondran escombros (en caso de aplicar)",
+		},
+		{
+			type: EnvironmentDocType.RESOLUTION_FOR_THE_DEBRIS_TRANSPORTER,
+			name: "Resolución del transportista de escombros",
+			description: "Resolución del transportista de escombros (en caso de aplicar)",
+		},
+		{
+			type: EnvironmentDocType.DEBRIS_TRANSFER_ROUTE,
+			name: "Ruta de Traslado de escombros",
+			description: "Ruta de Traslado de escombros (en caso de aplicar)",
+		},
+	],
+}
+
+export const EXTENDED_ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
+	title: "Medio Ambiente",
+	category: DocumentCategory.ENVIRONMENT,
+	description: "Documentación medio ambiental obligatoria según normativa OTC.",
+	documents: [
+		...ENVIRONMENT_STRUCTURE.documents,
+		{
+			type: EnvironmentDocType.HEALTH_RESOLUTION_FROM_THE_PEST_CONTROL_COMPANY,
+			name: "Resolucion sanitaria de la empresa de control de plagas",
+			description:
+				"Resolucion sanitaria de la empresa de control de plagas que desinfectará y desratizará instalaciones de faena",
+		},
+		{
+			type: EnvironmentDocType.ENVIRONMENTAL_MANAGEMENT_PLAN,
+			name: "Plan de Gestión Ambiental",
+			description: "Plan de Gestión Ambiental",
+		},
+	],
+}
+
+export const TECH_SPEC_STRUCTURE: StartupFolderStructure = {
+	title: "Documentación técnica",
+	category: DocumentCategory.TECHNICAL_SPECS,
+	description: "Documentación técnica obligatoria de equipos y vehículos asignados al proyecto.",
+	documents: [
+		{
+			type: TechSpecsDocumentType.GANTT_CHART,
+			name: "Carta Gantt",
+			description: "Cronograma del proyecto y planificación de actividades.",
+		},
+		{
+			type: TechSpecsDocumentType.TECHNICAL_WORK_PROCEDURE,
+			name: "Procedimiento de trabajo técnico",
+			description: "Procedimiento de trabajo técnico.",
+		},
+	],
+}
+
 export const VEHICLE_STRUCTURE: StartupFolderStructure = {
 	title: "Vehículos y Equipos",
 	category: DocumentCategory.VEHICLES,
@@ -426,7 +522,7 @@ export function getDocumentTypesByCategory(category: DocumentCategory, isDriver?
 	}
 }
 
-export const getDocumentsByCategory = (category: DocumentCategory) => {
+export const getDocumentsByCategory = (category: DocumentCategory, moreMonthDuration: boolean) => {
 	switch (category) {
 		case DocumentCategory.SAFETY_AND_HEALTH:
 			return {
@@ -439,6 +535,22 @@ export const getDocumentsByCategory = (category: DocumentCategory) => {
 				title: ENVIRONMENTAL_STRUCTURE.title,
 				documents: ENVIRONMENTAL_STRUCTURE.documents,
 				category: DocumentCategory.ENVIRONMENTAL,
+			}
+		case DocumentCategory.ENVIRONMENT:
+			return {
+				title: moreMonthDuration
+					? EXTENDED_ENVIRONMENT_STRUCTURE.title
+					: ENVIRONMENT_STRUCTURE.title,
+				documents: moreMonthDuration
+					? EXTENDED_ENVIRONMENT_STRUCTURE.documents
+					: ENVIRONMENT_STRUCTURE.documents,
+				category: DocumentCategory.ENVIRONMENT,
+			}
+		case DocumentCategory.TECHNICAL_SPECS:
+			return {
+				title: TECH_SPEC_STRUCTURE.title,
+				documents: TECH_SPEC_STRUCTURE.documents,
+				category: DocumentCategory.TECHNICAL_SPECS,
 			}
 		case DocumentCategory.VEHICLES:
 			return {

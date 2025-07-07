@@ -98,6 +98,7 @@ export const createCompany = async ({
 			companyId: company.id,
 			type: startupFolderType,
 			name: startupFolderName || "Carpeta de arranque",
+			moreMonthDuration: values.startupFolderMoreMonthDuration || false,
 		})
 
 		if (vehicles && vehicles.length > 0) {

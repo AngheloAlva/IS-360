@@ -14,6 +14,7 @@ import {
 	type NewStartupFolderSchema,
 } from "@/project/startup-folder/schemas/new-startup-folder.schema"
 
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { Button } from "@/shared/components/ui/button"
@@ -35,13 +36,14 @@ interface CreateStartupFolderProps {
 }
 
 export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
-	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [isOpen, setIsOpen] = useState(false)
 
 	const form = useForm<NewStartupFolderSchema>({
 		resolver: zodResolver(newStartupFolderSchema),
 		defaultValues: {
 			name: "",
+			moreMonthDuration: false,
 			type: StartupFolderType.FULL,
 		},
 	})
@@ -54,6 +56,8 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 				companyId,
 				name: data.name,
 				type: data.type,
+				moreMonthDuration:
+					folderType === StartupFolderType.FULL ? data.moreMonthDuration || false : false,
 			})
 
 			queryClient.invalidateQueries({
@@ -71,6 +75,8 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 		}
 	}
 
+	const folderType = form.watch("type")
+
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
@@ -79,7 +85,7 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 					className="gap-0 bg-white font-medium text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600"
 				>
 					<PlusCircleIcon className="mr-2 h-4 w-4" />
-					Carpeta de arranque
+					Carpeta de Arranque
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[525px]">
@@ -108,6 +114,14 @@ export function CreateStartupFolder({ companyId }: CreateStartupFolderProps) {
 								{ value: StartupFolderType.BASIC, label: "Documentos basicos" },
 							]}
 						/>
+
+						{folderType === StartupFolderType.FULL && (
+							<SwitchFormField
+								control={form.control}
+								name="moreMonthDuration"
+								label="¿La empresa estará más de un mes?"
+							/>
+						)}
 
 						<DialogFooter className="mt-4 gap-2">
 							<DialogClose asChild>

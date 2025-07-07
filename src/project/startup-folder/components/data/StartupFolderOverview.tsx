@@ -10,9 +10,10 @@ import {
 	UsersIcon,
 	DownloadIcon,
 	BookTextIcon,
+	PartyPopperIcon,
 	FolderKanbanIcon,
 	SquareActivityIcon,
-	PartyPopperIcon,
+	WrenchIcon,
 } from "lucide-react"
 
 import { DocumentCategory, StartupFolderStatus } from "@prisma/client"
@@ -104,7 +105,7 @@ export default function StartupFolderOverview({
 						/>
 
 						<div className="text-white">
-							<h1 className="text-3xl font-bold tracking-tight capitalize">
+							<h1 className="text-2xl font-bold tracking-tight capitalize">
 								{companyName || "Carpeta de arranque"}
 							</h1>
 							<p className="flex flex-col opacity-90">
@@ -135,26 +136,29 @@ export default function StartupFolderOverview({
 							{startupFolders && startupFolders.length > 1 && (
 								<TabsList className="w-full" onClick={() => setSelectedCategory(null)}>
 									{startupFolders.map((folder) => (
-										<TabsTrigger
-											value={folder.id}
-											key={folder.id}
-											onClick={() => setSelectedFolder(folder)}
-										>
-											{folder.name}
+										<TabsTrigger value={folder.id} key={folder.id} className="p-0">
+											<div
+												onClick={() => {
+													setSelectedFolder(folder)
+												}}
+												className="flex h-full w-full items-center justify-center"
+											>
+												{folder.name}
+											</div>
 										</TabsTrigger>
 									))}
 								</TabsList>
 							)}
 
-							<RefreshButton refetch={refetch} isFetching={isFetching} />
+							<RefreshButton refetch={refetch} isFetching={isFetching} size="lg" />
 						</div>
 
-						<TabsContents>
-							{startupFolders && startupFolders.length > 0 ? (
-								startupFolders.map((folder) => (
+						{startupFolders && startupFolders.length > 0 ? (
+							<TabsContents>
+								{startupFolders.map((folder) => (
 									<TabsContent
-										value={folder.id}
 										key={folder.id}
+										value={folder.id}
 										className="bg-background rounded-lg p-4"
 									>
 										<div className="space-y-6">
@@ -166,6 +170,7 @@ export default function StartupFolderOverview({
 													category={selectedCategory}
 													startupFolderId={folder.id}
 													onBack={() => setSelectedCategory(null)}
+													moreMonthDuration={folder.moreMonthDuration}
 												/>
 											) : (
 												<div className="space-y-4">
@@ -188,11 +193,12 @@ export default function StartupFolderOverview({
 													{folder.type === "BASIC" ? (
 														<StartupFolderDocuments
 															userId={userId}
+															onBack={() => {}}
 															companyId={companyId}
 															isOtcMember={isOtcMember}
 															startupFolderId={folder.id}
 															category={DocumentCategory.BASIC}
-															onBack={() => {}}
+															moreMonthDuration={folder.moreMonthDuration}
 														/>
 													) : (
 														<StartupFolderTable
@@ -205,20 +211,19 @@ export default function StartupFolderOverview({
 											)}
 										</div>
 									</TabsContent>
-								))
-							) : (
-								<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
-									<FilesIcon className="text-muted-foreground h-8 w-4" />
-									<div>
-										<p className="text-lg font-medium">No hay carpeta de arranque</p>
-										<p className="text-muted-foreground text-sm">
-											Su empresa aún no tiene una carpeta de arranque. Por favor contacte con
-											soporte.
-										</p>
-									</div>
+								))}
+							</TabsContents>
+						) : (
+							<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
+								<FilesIcon className="text-muted-foreground h-8 w-4" />
+								<div>
+									<p className="text-lg font-medium">No hay carpeta de arranque</p>
+									<p className="text-muted-foreground text-sm">
+										Su empresa aún no tiene una carpeta de arranque. Por favor contacte con soporte.
+									</p>
 								</div>
-							)}
-						</TabsContents>
+							</div>
+						)}
 					</Tabs>
 
 					<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -261,20 +266,54 @@ export default function StartupFolderOverview({
 												% completado
 											</li>
 
-											<li className="flex items-center justify-between">
-												<div className="flex items-center gap-2 font-semibold">
-													<div className="rounded-full bg-sky-500/20 p-1">
-														<EarthIcon className="size-5 text-sky-500" />
+											{selectedFolder.environmentalFolders.length > 0 ? (
+												<li className="flex items-center justify-between">
+													<div className="flex items-center gap-2 font-semibold">
+														<div className="rounded-full bg-sky-500/20 p-1">
+															<EarthIcon className="size-5 text-sky-500" />
+														</div>
+														Medio Ambiente:{" "}
 													</div>
-													Medio Ambiente:{" "}
-												</div>
-												{(
-													((selectedFolder?.environmentalFolders[0].approvedDocuments || 0) /
-														(selectedFolder?.environmentalFolders[0].totalDocuments || 0)) *
-													100
-												).toFixed(0)}
-												% completado
-											</li>
+													{(
+														((selectedFolder?.environmentalFolders[0].approvedDocuments || 0) /
+															(selectedFolder?.environmentalFolders[0].totalDocuments || 0)) *
+														100
+													).toFixed(0)}
+													% completado
+												</li>
+											) : (
+												<li className="flex items-center justify-between">
+													<div className="flex items-center gap-2 font-semibold">
+														<div className="rounded-full bg-sky-500/20 p-1">
+															<EarthIcon className="size-5 text-sky-500" />
+														</div>
+														Medio Ambiente:{" "}
+													</div>
+													{(
+														((selectedFolder?.environmentFolders[0].approvedDocuments || 0) /
+															(selectedFolder?.environmentFolders[0].totalDocuments || 0)) *
+														100
+													).toFixed(0)}
+													% completado
+												</li>
+											)}
+
+											{selectedFolder.techSpecsFolders.length > 0 && (
+												<li className="flex items-center justify-between">
+													<div className="flex items-center gap-2 font-semibold">
+														<div className="rounded-full bg-blue-500/20 p-1">
+															<WrenchIcon className="size-5 text-blue-500" />
+														</div>
+														Especificaciones Técnicas:{" "}
+													</div>
+													{(
+														((selectedFolder?.techSpecsFolders[0].approvedDocuments || 0) /
+															(selectedFolder?.techSpecsFolders[0].totalDocuments || 0)) *
+														100
+													).toFixed(0)}
+													% completado
+												</li>
+											)}
 
 											<li className="flex items-center justify-between">
 												<div className="flex items-center gap-2 font-semibold">
@@ -356,7 +395,8 @@ export default function StartupFolderOverview({
 						{selectedFolder?.type === "FULL" &&
 							selectedFolder.workersFolders.every((wf) => wf.isCompleted) &&
 							selectedFolder.vehiclesFolders.every((vf) => vf.isCompleted) &&
-							selectedFolder.environmentalFolders[0].isCompleted &&
+							(selectedFolder.environmentalFolders[0]?.isCompleted ||
+								selectedFolder.environmentFolders[0]?.isCompleted) &&
 							selectedFolder.safetyAndHealthFolders[0].isCompleted && (
 								<Card>
 									<CardHeader>

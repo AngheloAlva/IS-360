@@ -2,11 +2,13 @@ import { addYears } from "date-fns"
 import { useState } from "react"
 
 import type {
+	BasicDocumentType,
 	WorkerDocumentType,
+	EnvironmentDocType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	TechSpecsDocumentType,
 	SafetyAndHealthDocumentType,
-	BasicDocumentType,
 } from "@prisma/client"
 
 export type ManagedFile = { file: File } & {
@@ -25,11 +27,13 @@ export function useFileManager(
 	initialFile: ManagedFile | null,
 	documentType?: {
 		type:
+			| BasicDocumentType
 			| WorkerDocumentType
+			| EnvironmentDocType
 			| VehicleDocumentType
 			| EnvironmentalDocType
+			| TechSpecsDocumentType
 			| SafetyAndHealthDocumentType
-			| BasicDocumentType
 		name: string
 	} | null,
 	onFilesChange?: (files: ManagedFile | null) => void

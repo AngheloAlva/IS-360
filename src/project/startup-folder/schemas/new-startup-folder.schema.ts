@@ -7,6 +7,7 @@ export const newStartupFolderSchema = z.object({
 		message: "El nombre debe tener al menos 2 caracteres.",
 	}),
 	type: z.nativeEnum(StartupFolderType),
+	moreMonthDuration: z.boolean().default(false).optional(),
 })
 
 export type NewStartupFolderSchema = z.infer<typeof newStartupFolderSchema>

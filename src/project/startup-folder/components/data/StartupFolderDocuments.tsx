@@ -22,9 +22,12 @@ import { getCompanyEntities } from "../../actions/get-company-entities"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
+	TECH_SPEC_STRUCTURE,
 	getDocumentsByCategory,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
+	ENVIRONMENT_STRUCTURE,
+	EXTENDED_ENVIRONMENT_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
 import {
 	ReviewStatus,
@@ -33,7 +36,9 @@ import {
 	type WorkerDocumentType,
 	type VehicleDocumentType,
 	type EnvironmentalDocType,
+	type TechSpecsDocumentType,
 	type SafetyAndHealthDocumentType,
+	EnvironmentDocType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -69,6 +74,7 @@ interface StartupFolderDocumentsProps {
 	isOtcMember: boolean
 	startupFolderId: string
 	category: DocumentCategory
+	moreMonthDuration: boolean
 }
 
 export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
@@ -78,14 +84,17 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	companyId,
 	isOtcMember,
 	startupFolderId,
+	moreMonthDuration,
 }) => {
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
 		type:
+			| BasicDocumentType
 			| WorkerDocumentType
+			| EnvironmentDocType
 			| VehicleDocumentType
 			| EnvironmentalDocType
+			| TechSpecsDocumentType
 			| SafetyAndHealthDocumentType
-			| BasicDocumentType
 		name: string
 	} | null>(null)
 	const [selectedEntity, setSelectedEntity] = useState<{
@@ -107,7 +116,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documentsData = data?.documents ?? []
 
-	const { title, documents } = getDocumentsByCategory(category)
+	const { title, documents } = getDocumentsByCategory(category, moreMonthDuration)
 
 	const fetchEntities = useCallback(async () => {
 		try {
@@ -141,7 +150,13 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	const totalDocumentsToUpload =
 		category === DocumentCategory.SAFETY_AND_HEALTH
 			? SAFETY_AND_HEALTH_STRUCTURE.documents.length
-			: ENVIRONMENTAL_STRUCTURE.documents.length
+			: category === DocumentCategory.ENVIRONMENTAL
+				? ENVIRONMENTAL_STRUCTURE.documents.length
+				: category === DocumentCategory.ENVIRONMENT
+					? moreMonthDuration
+						? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
+						: ENVIRONMENT_STRUCTURE.documents.length
+					: TECH_SPEC_STRUCTURE.documents.length
 
 	const progress =
 		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0

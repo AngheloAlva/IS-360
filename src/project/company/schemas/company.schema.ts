@@ -9,6 +9,7 @@ export const companySchema = z.object({
 	rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
 	startupFolderType: z.nativeEnum(StartupFolderType),
 	startupFolderName: z.string().optional(),
+	startupFolderMoreMonthDuration: z.boolean().optional(),
 
 	vehicles: z
 		.array(

@@ -122,9 +122,15 @@ model User {
   environmentalFolder             EnvironmentalFolder[]
   environmentalDocument           EnvironmentalDocument[]   @relation("EnvironmentalDocumentUploadedBy")
   environmentalDocumentReviewer   EnvironmentalDocument[]   @relation("EnvironmentalDocumentReviewer")
+  environmentFolder               EnvironmentFolder[]
+  environmentDocument             EnvironmentDocument[]     @relation("EnvironmentDocumentUploadedBy")
+  environmentDocumentReviewer     EnvironmentDocument[]     @relation("EnvironmentDocumentReviewer")
   basicDocument                   BasicDocument[]           @relation("BasicDocumentUploadedBy")
   basicDocumentReviewer           BasicDocument[]           @relation("BasicDocumentReviewer")
   basicFolder                     BasicFolder[]             @relation("BasicFolderWorker")
+  techSpecsFolder                 TechSpecsFolder[]
+  techSpecsDocument               TechSpecsDocument[]       @relation("TechSpecsDocumentUploadedBy")
+  techSpecsDocumentReviewer       TechSpecsDocument[]       @relation("TechSpecsDocumentReviewer")
   workRequestApproves             WorkRequest[]             @relation("WorkRequestApprovalBy")
   workRequestComments             WorkRequestComment[]
   workPermitAttachments           WorkPermitAttachment[]
@@ -997,6 +1003,20 @@ enum EnvironmentalDocType {
   OTHER // Otros documentos
 }
 
+enum EnvironmentDocType {
+  WORK_PROCEDURE // Procedimiento de trabajo con sección ambiental
+  ENVIRONMENTAL_ASPECTS_AND_IMPACTS_MATRIX // Matriz de aspectos ambientales y impactos
+  SAFETY_DATA_SHEET_FOR_CHEMICALS // Hoja de datos de seguridad de sustancias químicas
+  WORKER_TRAINING_RECORD // Planilla de capacitación de los trabajadores
+  HEALTH_RESOLUTION_FOR_WORKERS_DRINKING_WATER // Resolución de salud para el agua potable
+  HEALTH_RESOLUTION_FOR_THE_CHEMICAL_TOILET // Resolución de salud para el baño químico
+  RESOLUTION_FOR_THE_SITE_WHERE_DEBRIS_WILL_BE_DISPOSED // Resolución para el sitio donde se dispondrá el escombros
+  RESOLUTION_FOR_THE_DEBRIS_TRANSPORTER // Resolución para el transportador de escombros
+  DEBRIS_TRANSFER_ROUTE // Ruta de traslado de escombros y/o tierra de excavación masiva
+  HEALTH_RESOLUTION_FROM_THE_PEST_CONTROL_COMPANY // Resolución de salud de la empresa de control de plagas
+  ENVIRONMENTAL_MANAGEMENT_PLAN // Plan de Gestión ambiental
+}
+
 enum BasicDocumentType {
   CONTRACT // Contrato de trabajo o de prestación de servicios.
   INSURANCE // Certificado de cobertura del seguro contra accidentes laborales.
@@ -1004,12 +1024,19 @@ enum BasicDocumentType {
   SAFETY_AND_HEALTH_INFO // Inducción sobre Información de riesgos laborales (DS44), la cual debe incluir Los riesgos a los que se podría estar expuesto en OTC y las respectivas medidas de control.
 }
 
+enum TechSpecsDocumentType {
+  GANTT_CHART // Carta Gantt del trabajo
+  TECHNICAL_WORK_PROCEDURE // Procedimiento de trabajo técnico
+}
+
 enum DocumentCategory {
   VEHICLES
   PERSONNEL
   ENVIRONMENTAL
+  ENVIRONMENT
   SAFETY_AND_HEALTH
   BASIC
+  TECHNICAL_SPECS
 }
 
 enum StartupFolderType {
@@ -1024,12 +1051,13 @@ enum StartupFolderStatus {
 }
 
 model StartupFolder {
-  id        String              @id @default(uuid())
-  name      String              @default("Carpeta de arranque")
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
-  type      StartupFolderType   @default(FULL)
-  status    StartupFolderStatus @default(PENDING)
+  id                String              @id @default(uuid())
+  name              String              @default("Carpeta de arranque")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  type              StartupFolderType   @default(FULL)
+  status            StartupFolderStatus @default(PENDING)
+  moreMonthDuration Boolean             @default(false)
 
   workersFolders         WorkerFolder[]
   vehiclesFolders        VehicleFolder[]
@@ -1041,10 +1069,52 @@ model StartupFolder {
   workOrderId            String?                 @unique
   workerFolders          WorkerFolder[]          @relation("WorkerFolderStartupFolder")
   vehicleFolders         VehicleFolder[]         @relation("VehicleFolderStartupFolder")
+  environmentFolders     EnvironmentFolder[]
   basicFolders           BasicFolder[]
+  techSpecsFolders       TechSpecsFolder[]
 
   @@index([companyId, status], name: "startup_folder_company_status_idx")
   @@map("startup_folder")
+}
+
+model TechSpecsFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?               @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder       @relation(fields: [startupFolderId], references: [id])
+  documents       TechSpecsDocument[]
+
+  @@unique([startupFolderId])
+  @@map("tech_specs_folder")
+}
+
+model TechSpecsDocument {
+  id             String                @id @default(uuid())
+  type           TechSpecsDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime              @default(now())
+  category       DocumentCategory
+  status         ReviewStatus          @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?                 @relation("TechSpecsDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?                 @relation("TechSpecsDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         TechSpecsFolder       @relation(fields: [folderId], references: [id])
+
+  @@map("tech_specs_document")
 }
 
 model BasicFolder {
@@ -1254,6 +1324,46 @@ model EnvironmentalDocument {
   folder         EnvironmentalFolder  @relation(fields: [folderId], references: [id])
 
   @@map("environmental_document")
+}
+
+model EnvironmentFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?                 @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder         @relation(fields: [startupFolderId], references: [id])
+  documents       EnvironmentDocument[]
+
+  @@unique([startupFolderId])
+  @@map("environment_folder")
+}
+
+model EnvironmentDocument {
+  id             String             @id @default(uuid())
+  type           EnvironmentDocType
+  name           String
+  url            String
+  uploadedAt     DateTime           @default(now())
+  category       DocumentCategory
+  status         ReviewStatus       @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?              @relation("EnvironmentDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?              @relation("EnvironmentDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         EnvironmentFolder  @relation(fields: [folderId], references: [id])
+
+  @@map("environment_document")
 }
 
 enum WORK_REQUEST_STATUS {

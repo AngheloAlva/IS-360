@@ -11,9 +11,15 @@ interface CreateStartupFolderProps {
 	name: string
 	companyId: string
 	type: StartupFolderType
+	moreMonthDuration: boolean
 }
 
-export const createStartupFolder = async ({ name, companyId, type }: CreateStartupFolderProps) => {
+export const createStartupFolder = async ({
+	name,
+	companyId,
+	type,
+	moreMonthDuration,
+}: CreateStartupFolderProps) => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -47,6 +53,7 @@ export const createStartupFolder = async ({ name, companyId, type }: CreateStart
 				name,
 				type,
 				companyId,
+				moreMonthDuration,
 			},
 		})
 
@@ -61,7 +68,7 @@ export const createStartupFolder = async ({ name, companyId, type }: CreateStart
 				},
 			})
 
-			const environmentalFolder = await prisma.environmentalFolder.create({
+			const environmentFolder = await prisma.environmentFolder.create({
 				data: {
 					startupFolder: {
 						connect: {
@@ -71,7 +78,17 @@ export const createStartupFolder = async ({ name, companyId, type }: CreateStart
 				},
 			})
 
-			if (!startupFolder || !safetyAndHealthFolder || !environmentalFolder) {
+			const techSpecsFolder = await prisma.techSpecsFolder.create({
+				data: {
+					startupFolder: {
+						connect: {
+							id: startupFolder.id,
+						},
+					},
+				},
+			})
+
+			if (!startupFolder || !safetyAndHealthFolder || !environmentFolder || !techSpecsFolder) {
 				throw new Error("Error al crear la carpeta de arranque")
 			}
 		}

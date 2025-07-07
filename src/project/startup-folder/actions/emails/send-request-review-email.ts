@@ -48,6 +48,21 @@ export const sendRequestReviewEmail = async ({
 					"soporte@ingenieriasimple.cl",
 				]
 				break
+			case DocumentCategory.ENVIRONMENT:
+				emailNotification = [
+					"anghelo.alva@ingsimple.cl",
+					"bcarrillo@dbj.cl",
+					"katherine.burgos@oleotrasandino.cl",
+					"soporte@ingenieriasimple.cl",
+				]
+				break
+			case DocumentCategory.TECHNICAL_SPECS:
+				emailNotification = [
+					"anghelo.alva@ingsimple.cl",
+					"", //Jaime
+					"soporte@ingenieriasimple.cl",
+				]
+				break
 			case DocumentCategory.PERSONNEL:
 				emailNotification = [
 					"anghelo.alva@ingsimple.cl",

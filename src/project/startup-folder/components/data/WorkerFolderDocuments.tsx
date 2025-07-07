@@ -46,7 +46,9 @@ import type {
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	TechSpecsDocumentType,
 	SafetyAndHealthDocumentType,
+	EnvironmentDocType,
 } from "@prisma/client"
 
 interface WorkerFolderDocumentsProps {
@@ -71,11 +73,13 @@ export function WorkerFolderDocuments({
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
 		type:
+			| BasicDocumentType
 			| WorkerDocumentType
+			| EnvironmentDocType
 			| VehicleDocumentType
 			| EnvironmentalDocType
+			| TechSpecsDocumentType
 			| SafetyAndHealthDocumentType
-			| BasicDocumentType
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)

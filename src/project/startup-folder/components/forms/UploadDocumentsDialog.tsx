@@ -44,11 +44,13 @@ import type { StartupFolderDocument } from "../../types"
 import type { UploadResult } from "@/lib/upload-files"
 import type {
 	DocumentCategory,
+	BasicDocumentType,
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	TechSpecsDocumentType,
 	SafetyAndHealthDocumentType,
-	BasicDocumentType,
+	EnvironmentDocType,
 } from "@prisma/client"
 
 interface UploadDocumentsDialogProps {
@@ -63,11 +65,13 @@ interface UploadDocumentsDialogProps {
 	documentToUpdate?: StartupFolderDocument | null
 	documentType?: {
 		type:
+			| BasicDocumentType
 			| WorkerDocumentType
+			| EnvironmentDocType
 			| VehicleDocumentType
 			| EnvironmentalDocType
+			| TechSpecsDocumentType
 			| SafetyAndHealthDocumentType
-			| BasicDocumentType
 		name: string
 	} | null
 }

@@ -24,7 +24,9 @@ import {
 	WorkerDocumentType,
 	VehicleDocumentType,
 	EnvironmentalDocType,
+	TechSpecsDocumentType,
 	SafetyAndHealthDocumentType,
+	EnvironmentDocType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -61,6 +63,8 @@ interface VehicleFolderDocumentsProps {
 			| WorkerDocumentType
 			| EnvironmentalDocType
 			| BasicDocumentType
+			| TechSpecsDocumentType
+			| EnvironmentDocType
 	}[]
 }
 
@@ -76,11 +80,13 @@ export function VehicleFolderDocuments({
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
 		type:
+			| BasicDocumentType
 			| WorkerDocumentType
+			| EnvironmentDocType
 			| VehicleDocumentType
 			| EnvironmentalDocType
+			| TechSpecsDocumentType
 			| SafetyAndHealthDocumentType
-			| BasicDocumentType
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)

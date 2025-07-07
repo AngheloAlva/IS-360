@@ -2,10 +2,10 @@
 
 import { z } from "zod"
 
-import { MODULES, ACTIVITY_TYPE } from "@prisma/client"
+import { DocumentCategory, EnvironmentalDocType, SafetyAndHealthDocumentType } from "@prisma/client"
+import { MODULES, ACTIVITY_TYPE, EnvironmentDocType, TechSpecsDocumentType } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import prisma from "@/lib/prisma"
-import { DocumentCategory, EnvironmentalDocType, SafetyAndHealthDocumentType } from "@prisma/client"
 
 const createDocumentSchema = z.object({
 	userId: z.string(),
@@ -108,6 +108,44 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 					folderId: folder.id,
 					uploadedById: userId,
 					type: documentType as EnvironmentalDocType,
+				},
+			})
+		}
+
+		case "ENVIRONMENT": {
+			const folder = startupFolder.environmentalFolders[0]
+			if (!folder) {
+				throw new Error("Environmental folder not found")
+			}
+
+			return await prisma.environmentDocument.create({
+				data: {
+					url,
+					category,
+					expirationDate,
+					name: documentName,
+					folderId: folder.id,
+					uploadedById: userId,
+					type: documentType as EnvironmentDocType,
+				},
+			})
+		}
+
+		case "TECHNICAL_SPECS": {
+			const folder = startupFolder.environmentalFolders[0]
+			if (!folder) {
+				throw new Error("Technical specs folder not found")
+			}
+
+			return await prisma.techSpecsDocument.create({
+				data: {
+					url,
+					category,
+					expirationDate,
+					name: documentName,
+					folderId: folder.id,
+					uploadedById: userId,
+					type: documentType as TechSpecsDocumentType,
 				},
 			})
 		}

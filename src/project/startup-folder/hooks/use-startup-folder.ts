@@ -55,6 +55,22 @@ export interface StartupFolder extends StartupFolderModel {
 		draftDocuments: number
 		isCompleted: boolean
 	}[]
+	environmentFolders: {
+		totalDocuments: number
+		approvedDocuments: number
+		rejectedDocuments: number
+		submittedDocuments: number
+		draftDocuments: number
+		isCompleted: boolean
+	}[]
+	techSpecsFolders: {
+		totalDocuments: number
+		approvedDocuments: number
+		rejectedDocuments: number
+		submittedDocuments: number
+		draftDocuments: number
+		isCompleted: boolean
+	}[]
 	workersFolders: {
 		totalDocuments: number
 		approvedDocuments: number

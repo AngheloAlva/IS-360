@@ -103,6 +103,17 @@ export async function getStartupFolderDocuments({
 							},
 						},
 					})
+				case "ENVIRONMENT":
+					return prisma.environmentFolder.findUnique({
+						where: { startupFolderId },
+						include: {
+							_count: {
+								select: {
+									documents: true,
+								},
+							},
+						},
+					})
 				case "BASIC":
 					if (!workerId) {
 						return null
