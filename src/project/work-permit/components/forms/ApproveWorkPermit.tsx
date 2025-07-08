@@ -99,9 +99,9 @@ export default function ApproveWorkPermit({
 				</Button>
 			</DialogTrigger>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<DialogContent>
+			<DialogContent>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<DialogHeader>
 							<DialogTitle>Aprobar o Rechazar Permiso de Trabajo</DialogTitle>
 							<DialogDescription>
@@ -139,7 +139,8 @@ export default function ApproveWorkPermit({
 									</FormItem>
 								)}
 							/>
-							<SelectWithSearchFormField
+
+							<SelectWithSearchFormField<ApproveWorkPermitSchema>
 								name="approvedBy"
 								label="Aprobado por"
 								control={form.control}
@@ -166,9 +167,9 @@ export default function ApproveWorkPermit({
 								className="h-9 w-fit cursor-pointer bg-cyan-500 transition-all hover:scale-105 hover:bg-cyan-600"
 							/>
 						</DialogFooter>
-					</DialogContent>
-				</form>
-			</Form>
+					</form>
+				</Form>
+			</DialogContent>
 		</Dialog>
 	)
 }
