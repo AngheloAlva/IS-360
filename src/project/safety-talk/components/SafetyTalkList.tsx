@@ -133,6 +133,33 @@ export function SafetyTalkList({ userSafetyTalks }: SafetyTalkListProps) {
 					</Card>
 				)
 			})}
+
+			<Card>
+				<CardHeader>
+					<div className="flex items-center justify-between">
+						<CardTitle>Charla de Visitas</CardTitle>
+					</div>
+					<CardDescription>
+						Recorrido virtual por la planta OTC con información de seguridad. Puedes realizarla en
+						cualquier momento las veces que desees.
+					</CardDescription>
+				</CardHeader>
+
+				<CardContent className="mt-auto">
+					<Button
+						className={cn(
+							"w-full bg-teal-600 px-0 py-0 text-white hover:bg-teal-700 hover:text-white"
+						)}
+					>
+						<Link
+							href={`/dashboard/charlas-de-seguridad/visitas`}
+							className="flex h-full w-full items-center justify-center font-semibold tracking-wider"
+						>
+							Ver Charla
+						</Link>
+					</Button>
+				</CardContent>
+			</Card>
 		</div>
 	)
 }
