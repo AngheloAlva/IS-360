@@ -54,9 +54,9 @@ export const createWorkRequest = async ({
 				observations: values.observations || null,
 				userId,
 				equipments: {
-					connect: values.equipments.map((equipmentId) => ({
-						id: equipmentId,
-					})),
+					connect: {
+						id: values.equipments,
+					},
 				},
 				...(attachments && attachments.length > 0
 					? {

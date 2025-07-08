@@ -412,7 +412,11 @@ export default function StartupFolderOverview({
 												"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos"
 											) : (
 												<div className="flex flex-wrap items-center justify-between gap-4">
-													<p className="w-fit">La carpeta esta lista para ser aprobada</p>
+													<p className="w-fit">
+														La carpeta esta lista para ser aprobada. Al aprovar la carpeta se
+														notificara a la empresa que esta lista para iniciar con los trabajos
+														respectivos.
+													</p>
 
 													{isOtcMember &&
 														hasPermission &&

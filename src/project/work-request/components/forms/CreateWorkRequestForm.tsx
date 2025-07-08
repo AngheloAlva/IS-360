@@ -46,7 +46,7 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 			requestDate: new Date(),
 			observations: "",
 			attachments: [],
-			equipments: [],
+			equipments: "",
 		},
 	})
 

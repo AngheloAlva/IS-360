@@ -8,7 +8,7 @@ export const workRequestSchema = z.object({
 	requestDate: z.date({ message: "La fecha de solicitud no es válida" }),
 	observations: z.string().optional(),
 	attachments: z.array(fileSchema).optional(),
-	equipments: z.array(z.string().nonempty({ message: "El equipo no puede estar vacío" })).min(1, {
+	equipments: z.string().nonempty({ message: "El equipo no puede estar vacío" }).min(1, {
 		message: "Debe seleccionar al menos un equipo",
 	}),
 })
