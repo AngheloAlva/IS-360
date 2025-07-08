@@ -119,12 +119,21 @@ export default function StartupFolderOverview({
 					<div className="flex items-center gap-2">
 						{isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
 
-						<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
-							<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
-								<DownloadIcon className="mr-2 h-4 w-4" />
-								Documento base
-							</Button>
-						</Link>
+						{selectedFolder?.type === "FULL" ? (
+							<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
+								<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
+									<DownloadIcon className="mr-2 h-4 w-4" />
+									Documento base
+								</Button>
+							</Link>
+						) : (
+							<Link href={"/carpeta-basica-otc.pdf"} target="_blank">
+								<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
+									<DownloadIcon className="mr-2 h-4 w-4" />
+									Documento base
+								</Button>
+							</Link>
+						)}
 					</div>
 				</div>
 			</div>
