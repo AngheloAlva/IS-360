@@ -15,8 +15,8 @@ import {
 	MessageSquareIcon,
 } from "lucide-react"
 
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { DialogLabel } from "@/shared/components/ui/dialog-label"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
@@ -157,61 +157,63 @@ export default function WorkRequestDetailsDialog({
 									</TabsTrigger>
 								</TabsList>
 
-								<TabsContent value="attachments" className="py-4">
-									{workRequest.attachments.length === 0 ? (
-										<p className="text-muted-foreground py-8 text-center">
-											No hay archivos adjuntos
-										</p>
-									) : (
-										<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-											{workRequest.attachments.map((attachment) => (
-												<div key={attachment.id} className="overflow-hidden rounded-md border">
-													<div className="relative h-32 w-full">
-														<Image
-															src={attachment.url}
-															alt={attachment.name}
-															fill
-															className="object-cover"
-														/>
-													</div>
-													<div className="truncate p-2 text-sm">{attachment.name}</div>
-												</div>
-											))}
-										</div>
-									)}
-								</TabsContent>
-
-								<TabsContent value="comments" className="py-4">
-									{workRequest.comments.length === 0 ? (
-										<p className="text-muted-foreground py-8 text-center">No hay comentarios</p>
-									) : (
-										<div className="space-y-4">
-											{workRequest.comments.map((comment) => (
-												<div key={comment.id} className="flex gap-3">
-													<Avatar className="h-8 w-8">
-														<AvatarImage src={comment.user?.image || undefined} />
-														<AvatarFallback>
-															{comment.user?.name?.slice(0, 2) || "U"}
-														</AvatarFallback>
-													</Avatar>
-													<div className="flex-1 space-y-1">
-														<div className="flex items-center justify-between">
-															<p className="text-sm font-medium">
-																{comment.user?.name || "Usuario"}
-															</p>
-															<p className="text-muted-foreground text-xs">
-																{format(new Date(comment.createdAt), "dd/MM/yyyy HH:mm", {
-																	locale: es,
-																})}
-															</p>
+								<TabsContents>
+									<TabsContent value="attachments" className="py-4">
+										{workRequest.attachments.length === 0 ? (
+											<p className="text-muted-foreground py-8 text-center">
+												No hay archivos adjuntos
+											</p>
+										) : (
+											<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+												{workRequest.attachments.map((attachment) => (
+													<div key={attachment.id} className="overflow-hidden rounded-md border">
+														<div className="relative h-32 w-full">
+															<Image
+																src={attachment.url}
+																alt={attachment.name}
+																fill
+																className="object-cover"
+															/>
 														</div>
-														<p className="text-sm">{comment.content}</p>
+														<div className="truncate p-2 text-sm">{attachment.name}</div>
 													</div>
-												</div>
-											))}
-										</div>
-									)}
-								</TabsContent>
+												))}
+											</div>
+										)}
+									</TabsContent>
+
+									<TabsContent value="comments" className="py-4">
+										{workRequest.comments.length === 0 ? (
+											<p className="text-muted-foreground py-8 text-center">No hay comentarios</p>
+										) : (
+											<div className="space-y-4">
+												{workRequest.comments.map((comment) => (
+													<div key={comment.id} className="flex gap-3">
+														<Avatar className="h-8 w-8">
+															<AvatarImage src={comment.user?.image || undefined} />
+															<AvatarFallback>
+																{comment.user?.name?.slice(0, 2) || "U"}
+															</AvatarFallback>
+														</Avatar>
+														<div className="flex-1 space-y-1">
+															<div className="flex items-center justify-between">
+																<p className="text-sm font-medium">
+																	{comment.user?.name || "Usuario"}
+																</p>
+																<p className="text-muted-foreground text-xs">
+																	{format(new Date(comment.createdAt), "dd/MM/yyyy HH:mm", {
+																		locale: es,
+																	})}
+																</p>
+															</div>
+															<p className="text-sm">{comment.content}</p>
+														</div>
+													</div>
+												))}
+											</div>
+										)}
+									</TabsContent>
+								</TabsContents>
 							</Tabs>
 						</div>
 					</div>

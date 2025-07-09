@@ -10,14 +10,6 @@ import {
 	getFilteredRowModel,
 	type ColumnFiltersState,
 } from "@tanstack/react-table"
-import {
-	EyeIcon,
-	XCircleIcon,
-	MoreVertical,
-	AlertCircleIcon,
-	CheckCircleIcon,
-	MessageCircleIcon,
-} from "lucide-react"
 
 import { updateWorkRequestStatus } from "@/project/work-request/actions/update-work-request-status"
 import { useWorkRequests, WorkRequest } from "@/project/work-request/hooks/use-work-request"
@@ -28,15 +20,8 @@ import WorkRequestDetailsDialog from "../dialogs/WorkRequestDetailsDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
 import CommentDialog from "./CommentDialog"
-import {
-	DropdownMenu,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-} from "@/shared/components/ui/dropdown-menu"
 import {
 	Table,
 	TableRow,
@@ -57,6 +42,7 @@ import {
 } from "@/shared/components/ui/select"
 
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
+import { queryClient } from "@/lib/queryClient"
 
 interface WorkRequestsTableProps {
 	id: string
@@ -83,25 +69,6 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 		limit: 15,
 	})
 
-	const table = useReactTable({
-		data: data?.workRequests ?? [],
-		onSortingChange: setSorting,
-		getCoreRowModel: getCoreRowModel(),
-		onColumnFiltersChange: setColumnFilters,
-		getFilteredRowModel: getFilteredRowModel(),
-		columns: getWorkRequestColumns(hasPermission),
-		state: {
-			sorting,
-			columnFilters,
-			pagination: {
-				pageIndex: page - 1,
-				pageSize: 10,
-			},
-		},
-		manualPagination: true,
-		pageCount: data?.pages ?? 0,
-	})
-
 	const handleStatusUpdate = async (id: string, status: WORK_REQUEST_STATUS) => {
 		setIsStatusLoading(true)
 
@@ -120,8 +87,9 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 					description: result.success,
 				})
 
-				// Recargar la página para actualizar los datos
-				window.location.reload()
+				queryClient.invalidateQueries({
+					queryKey: ["workRequests"],
+				})
 			}
 		} catch (err: unknown) {
 			console.error("Error al actualizar el estado de la solicitud:", err)
@@ -142,6 +110,31 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 		setSelectedRequest(request)
 		setIsCommentOpen(true)
 	}
+
+	const table = useReactTable({
+		data: data?.workRequests ?? [],
+		onSortingChange: setSorting,
+		getCoreRowModel: getCoreRowModel(),
+		onColumnFiltersChange: setColumnFilters,
+		getFilteredRowModel: getFilteredRowModel(),
+		columns: getWorkRequestColumns({
+			hasPermission,
+			isStatusLoading,
+			handleStatusUpdate,
+			handleOpenDetails,
+			handleOpenComment,
+		}),
+		state: {
+			sorting,
+			columnFilters,
+			pagination: {
+				pageIndex: page - 1,
+				pageSize: 10,
+			},
+		},
+		manualPagination: true,
+		pageCount: data?.pages ?? 0,
+	})
 
 	return (
 		<>
@@ -232,8 +225,6 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 											</TableHead>
 										)
 									})}
-
-									<TableHead className="text-right">Acciones</TableHead>
 								</TableRow>
 							))}
 						</TableHeader>
@@ -261,57 +252,6 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</TableCell>
 										))}
-
-										<TableCell className="text-right">
-											<DropdownMenu>
-												<DropdownMenuTrigger asChild>
-													<Button variant="ghost" size="sm">
-														<MoreVertical className="h-4 w-4" />
-														<span className="sr-only">Abrir menú</span>
-													</Button>
-												</DropdownMenuTrigger>
-												<DropdownMenuContent align="end">
-													<DropdownMenuItem onClick={() => handleOpenDetails(row.original)}>
-														<EyeIcon className="mr-2 h-4 w-4" /> Ver detalles
-													</DropdownMenuItem>
-													<DropdownMenuItem onClick={() => handleOpenComment(row.original)}>
-														<MessageCircleIcon className="mr-2 h-4 w-4" /> Comentar
-													</DropdownMenuItem>
-
-													{hasPermission && (
-														<>
-															{row.original.status !== "ATTENDED" && (
-																<DropdownMenuItem
-																	onClick={() => handleStatusUpdate(row.original.id, "ATTENDED")}
-																	disabled={isStatusLoading}
-																>
-																	<CheckCircleIcon className="mr-2 h-4 w-4 text-sky-500" /> Marcar
-																	como atendida
-																</DropdownMenuItem>
-															)}
-															{row.original.status !== "CANCELLED" && (
-																<DropdownMenuItem
-																	onClick={() => handleStatusUpdate(row.original.id, "CANCELLED")}
-																	disabled={isStatusLoading}
-																>
-																	<XCircleIcon className="mr-2 h-4 w-4 text-rose-500" /> Cancelar
-																	solicitud
-																</DropdownMenuItem>
-															)}
-															{row.original.status !== "REPORTED" && (
-																<DropdownMenuItem
-																	onClick={() => handleStatusUpdate(row.original.id, "REPORTED")}
-																	disabled={isStatusLoading}
-																>
-																	<AlertCircleIcon className="mr-2 h-4 w-4 text-amber-500" /> Marcar
-																	como reportada
-																</DropdownMenuItem>
-															)}
-														</>
-													)}
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</TableCell>
 									</TableRow>
 								))
 							)}

@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { addWorkRequestComment } from "@/project/work-request/actions/add-work-request-comment"
+import { queryClient } from "@/lib/queryClient"
 
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/shared/components/ui/form"
 import { Textarea } from "@/shared/components/ui/textarea"
@@ -67,8 +68,9 @@ export default function CommentDialog({
 				})
 				form.reset()
 				onOpenChange(false)
-				// Recargar la página para ver el nuevo comentario
-				window.location.reload()
+				queryClient.invalidateQueries({
+					queryKey: ["workRequests"],
+				})
 			}
 		} catch (error) {
 			console.error("Error al agregar el comentario:", error)

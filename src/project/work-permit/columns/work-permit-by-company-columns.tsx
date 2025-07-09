@@ -30,8 +30,7 @@ export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPer
 					<>
 						<DropdownMenuItem asChild>
 							<Link
-								href={`/api/work-permit/pdf/${id}`}
-								target="_blank"
+								href={`/dashboard/permiso-de-trabajo/${id}/pdf`}
 								className="text-text flex cursor-pointer px-3 font-medium"
 							>
 								<PrinterIcon className="h-4 w-4 text-rose-500" /> Imprimir

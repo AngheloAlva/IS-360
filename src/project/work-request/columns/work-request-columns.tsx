@@ -10,6 +10,15 @@ import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWor
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import ApproveWorkRequest from "../components/forms/ApproveWorkRequest"
 import { Badge } from "@/shared/components/ui/badge"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
+import { DropdownMenuItem, DropdownMenuSeparator } from "@/shared/components/ui/dropdown-menu"
+import {
+	AlertCircleIcon,
+	CheckCircleIcon,
+	EyeIcon,
+	MessageCircleIcon,
+	XCircleIcon,
+} from "lucide-react"
 
 const statusBadgeVariant = (status: WORK_REQUEST_STATUS) => {
 	switch (status) {
@@ -41,22 +50,83 @@ const statusText = (status: WORK_REQUEST_STATUS) => {
 	}
 }
 
-export const getWorkRequestColumns = (hasPermission: boolean): ColumnDef<WorkRequest>[] => [
+interface WorkRequestColumnsProps {
+	hasPermission: boolean
+	isStatusLoading: boolean
+	handleOpenDetails: (request: WorkRequest) => void
+	handleOpenComment: (request: WorkRequest) => void
+	handleStatusUpdate: (id: string, status: WORK_REQUEST_STATUS) => void
+}
+
+export const getWorkRequestColumns = ({
+	hasPermission,
+	isStatusLoading,
+	handleOpenDetails,
+	handleOpenComment,
+	handleStatusUpdate,
+}: WorkRequestColumnsProps): ColumnDef<WorkRequest>[] => [
 	{
 		accessorKey: "workOrder",
-		header: "Orden de trabajo",
+		header: "",
 		cell: ({ row }) => {
 			const status = row.original.status
 
-			return hasPermission && status === "APPROVED" ? (
-				<CreateWorkOrderForm
-					workRequestId={row.original.id}
-					className="h-8 bg-cyan-500 text-white hover:bg-cyan-600"
-				/>
-			) : (
-				hasPermission && status === "REPORTED" && (
-					<ApproveWorkRequest userId={row.original.userId} workRequestId={row.original.id} />
-				)
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem onClick={() => handleOpenDetails(row.original)}>
+							<EyeIcon className="h-4 w-4" /> Ver detalles
+						</DropdownMenuItem>
+
+						<DropdownMenuItem onClick={() => handleOpenComment(row.original)}>
+							<MessageCircleIcon className="h-4 w-4" /> Comentar
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild>
+							{hasPermission && status === "APPROVED" ? (
+								<CreateWorkOrderForm
+									workRequestId={row.original.id}
+									equipmentId={row.original.equipments[0].id}
+								/>
+							) : (
+								hasPermission &&
+								status === "REPORTED" && (
+									<ApproveWorkRequest
+										userId={row.original.userId}
+										workRequestId={row.original.id}
+									/>
+								)
+							)}
+						</DropdownMenuItem>
+
+						<DropdownMenuSeparator />
+
+						{row.original.status !== "ATTENDED" && (
+							<DropdownMenuItem
+								onClick={() => handleStatusUpdate(row.original.id, "ATTENDED")}
+								disabled={isStatusLoading}
+							>
+								<CheckCircleIcon className="h-4 w-4 text-teal-500" /> Marcar como atendida
+							</DropdownMenuItem>
+						)}
+						{row.original.status !== "CANCELLED" && (
+							<DropdownMenuItem
+								onClick={() => handleStatusUpdate(row.original.id, "CANCELLED")}
+								disabled={isStatusLoading}
+							>
+								<XCircleIcon className="h-4 w-4 text-rose-500" /> Cancelar solicitud
+							</DropdownMenuItem>
+						)}
+						{row.original.status !== "REPORTED" && (
+							<DropdownMenuItem
+								onClick={() => handleStatusUpdate(row.original.id, "REPORTED")}
+								disabled={isStatusLoading}
+							>
+								<AlertCircleIcon className="h-4 w-4 text-amber-500" /> Marcar como reportada
+							</DropdownMenuItem>
+						)}
+					</>
+				</ActionDataMenu>
 			)
 		},
 	},
