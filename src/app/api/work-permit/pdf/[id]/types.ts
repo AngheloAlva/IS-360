@@ -1,7 +1,9 @@
-import { Company, User, WorkOrder, WorkPermit } from "@prisma/client"
+import type { WorkPermit } from "@prisma/client"
 
 export interface WorkPermitData extends WorkPermit {
-	otNumber: WorkOrder & {
+	otNumber: {
+		otNumber: string
+		workName: string
 		supervisor: {
 			name: string
 			rut: string
@@ -11,7 +13,18 @@ export interface WorkPermitData extends WorkPermit {
 			rut: string
 		}
 	}
-	user: User
-	company: Company
-	participants: User[]
+	user: {
+		name: string
+		rut: string
+		internalRole: string
+	}
+	company: {
+		name: string
+		rut: string
+	}
+	participants: {
+		name: string
+		rut: string
+		internalRole: string
+	}[]
 }

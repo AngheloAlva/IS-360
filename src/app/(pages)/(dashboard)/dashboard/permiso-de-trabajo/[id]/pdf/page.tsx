@@ -26,22 +26,11 @@ export default async function page({
 	}
 
 	return (
-		<main className="flex w-full flex-1 flex-col gap-4">
-			<div className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-700 p-6">
-				<div className="flex items-center justify-between">
-					<div className="mx-auto flex w-full max-w-screen-xl items-center justify-start gap-3">
-						<BackButton
-							href="/dashboard/permiso-de-trabajo"
-							className="bg-white/30 text-white hover:bg-white/50"
-						/>
-
-						<div className="text-white">
-							<h1 className="text-3xl font-bold tracking-tight">Permiso de Trabajo</h1>
-							<p className="opacity-90">Vista previa del permiso de trabajo</p>
-						</div>
-					</div>
-				</div>
-			</div>
+		<main className="flex w-full flex-1 flex-col gap-2">
+			<BackButton
+				href="/dashboard/permiso-de-trabajo"
+				className="size-7 bg-white/30 text-white hover:bg-white/50"
+			/>
 
 			<WorkPermitPDFViewer workPermitId={id} />
 		</main>

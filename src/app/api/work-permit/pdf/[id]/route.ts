@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
-export async function GET(
-	req: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
-): Promise<NextResponse> {
+export async function GET({ params }: { params: Promise<{ id: string }> }): Promise<NextResponse> {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -25,7 +22,8 @@ export async function GET(
 			},
 			include: {
 				otNumber: {
-					include: {
+					select: {
+						workName: true,
 						supervisor: {
 							select: {
 								name: true,
@@ -40,9 +38,26 @@ export async function GET(
 						},
 					},
 				},
-				user: true,
-				company: true,
-				participants: true,
+				user: {
+					select: {
+						name: true,
+						rut: true,
+						internalRole: true,
+					},
+				},
+				company: {
+					select: {
+						name: true,
+						rut: true,
+					},
+				},
+				participants: {
+					select: {
+						name: true,
+						rut: true,
+						internalRole: true,
+					},
+				},
 			},
 		})
 

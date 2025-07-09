@@ -301,11 +301,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							<View style={styles.row}>
 								<Text style={styles.label}>Adm. contrato OTC:</Text>
 								<View style={styles.value}>
-									<Text style={styles.value}>
-										{workPermit.otNumber.responsible.name +
-											" - " +
-											workPermit.otNumber.responsible.rut}
-									</Text>
+									<Text style={styles.value}>{workPermit.otNumber.responsible.name}</Text>
 								</View>
 							</View>
 						</View>
@@ -352,19 +348,23 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 								<Text style={styles.value}>{workPermit.mutuality}</Text>
 							</View>
 						</View>
-						<View style={styles.column}>
-							<View style={styles.row}>
-								<Text style={styles.label}>Otra Mutualidad:</Text>
-								<Text style={styles.value}>{workPermit.otherMutuality || "N/A"}</Text>
+						{workPermit.otherMutuality && (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otra Mutualidad:</Text>
+									<Text style={styles.value}>{workPermit.otherMutuality || "N/A"}</Text>
+								</View>
 							</View>
-						</View>
+						)}
 					</View>
 
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Trabajo:</Text>
-								<Text style={styles.value}>{workPermit.otNumber.workName}</Text>
+								<Text style={styles.value}>
+									{workPermit.otNumber.workName || "No especificado"}
+								</Text>
 							</View>
 						</View>
 					</View>
@@ -390,12 +390,15 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 								<Text style={styles.value}>{workPermit.workWillBe}</Text>
 							</View>
 						</View>
-						<View style={styles.column}>
-							<View style={styles.row}>
-								<Text style={styles.label}>Otro tipo:</Text>
-								<Text style={styles.value}>{workPermit.workWillBeOther || "N/A"}</Text>
+
+						{workPermit.workWillBe === "Otro" && (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otro tipo:</Text>
+									<Text style={styles.value}>{workPermit.workWillBeOther || "N/A"}</Text>
+								</View>
 							</View>
-						</View>
+						)}
 					</View>
 
 					{workPermit.workWillBe === "Espacio confinado" ||

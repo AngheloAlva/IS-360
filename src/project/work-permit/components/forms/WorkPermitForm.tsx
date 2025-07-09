@@ -70,9 +70,9 @@ export default function WorkPermitForm({
 	const form = useForm<WorkPermitSchema>({
 		resolver: zodResolver(workPermitSchema),
 		defaultValues: {
-			preChecks: [],
 			tools: initialValues?.tools || [],
 			acceptTerms: isOtcMember ? true : false,
+			preChecks: initialValues?.preChecks || [],
 			otherRisk: initialValues?.otherRisk || "",
 			wasteType: initialValues?.wasteType || "",
 			mutuality: initialValues?.mutuality || "",
@@ -80,7 +80,6 @@ export default function WorkPermitForm({
 			otherTools: initialValues?.otherTools || "",
 			workWillBe: initialValues?.workWillBe || "",
 			aplicantPt: initialValues?.user.name || userName,
-			startDate: initialValues?.startDate || undefined,
 			otNumber: initialValues?.otNumber?.otNumber || "",
 			otherMutuality: initialValues?.otherMutuality || "",
 			otherPreChecks: initialValues?.otherPreChecks || "",
@@ -91,7 +90,9 @@ export default function WorkPermitForm({
 			riskIdentification: initialValues?.riskIdentification || [],
 			wasteDisposalLocation: initialValues?.wasteDisposalLocation || "",
 			preventiveControlMeasures: initialValues?.preventiveControlMeasures || [],
+			endDate: initialValues?.endDate ? new Date(initialValues?.endDate) : undefined,
 			otherPreventiveControlMeasures: initialValues?.otherPreventiveControlMeasures || "",
+			startDate: initialValues?.startDate ? new Date(initialValues?.startDate) : undefined,
 			activityDetails: initialValues?.activityDetails?.map((activity) => ({ activity })) || [
 				{ activity: "" },
 				{ activity: "" },

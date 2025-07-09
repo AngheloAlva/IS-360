@@ -10,7 +10,7 @@ import type { WorkPermitSchema } from "../schemas/work-permit.schema"
 
 interface UpdateWorkPermitProps {
 	id: string
-	values: Omit<WorkPermitSchema, "otNumber" | "userId" | "companyId">
+	values: WorkPermitSchema
 }
 
 export const updateWorkPermit = async ({ id, values }: UpdateWorkPermitProps) => {
@@ -26,7 +26,8 @@ export const updateWorkPermit = async ({ id, values }: UpdateWorkPermitProps) =>
 	}
 
 	try {
-		const { participants, activityDetails, ...rest } = values
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { participants, activityDetails, otNumber, ...rest } = values
 
 		const updatedWorkPermit = await prisma.workPermit.update({
 			where: {
