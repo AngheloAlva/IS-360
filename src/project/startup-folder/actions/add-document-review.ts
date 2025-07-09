@@ -862,7 +862,7 @@ export const addDocumentReview = async ({
 								email: session.user.email,
 								phone: session.user.phone || null,
 							},
-							isApproved: true,
+							isApproved: false,
 							rejectedDocuments: allDocuments.documents
 								.filter((d) => d.status === ReviewStatus.REJECTED)
 								.map((d) => ({
@@ -1009,7 +1009,7 @@ export const addDocumentReview = async ({
 								email: session.user.email,
 								phone: session.user.phone || null,
 							},
-							isApproved: true,
+							isApproved: false,
 							rejectedDocuments: allDocuments.documents
 								.filter((d) => d.status === ReviewStatus.REJECTED)
 								.map((d) => ({
