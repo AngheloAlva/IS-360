@@ -27,10 +27,7 @@ export default async function page({
 
 	return (
 		<main className="flex w-full flex-1 flex-col gap-2">
-			<BackButton
-				href="/dashboard/permiso-de-trabajo"
-				className="size-7 bg-white/30 text-white hover:bg-white/50"
-			/>
+			<BackButton href="/dashboard/permiso-de-trabajo" className="size-7 bg-white/30" />
 
 			<WorkPermitPDFViewer workPermitId={id} />
 		</main>

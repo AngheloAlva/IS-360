@@ -143,7 +143,7 @@ export const getWorkPermitColumns = (
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber.workName
-			return <div className="w-72 text-wrap">{workOrder}</div>
+			return <div className="max-w-56 min-w-36 text-wrap">{workOrder}</div>
 		},
 	},
 	{
@@ -152,7 +152,7 @@ export const getWorkPermitColumns = (
 		cell: ({ row }) => {
 			const exactPlace = row.original.exactPlace
 			return (
-				<div className="flex w-72 items-center gap-1.5 text-wrap">
+				<div className="flex max-w-56 min-w-32 items-center gap-1.5 text-wrap">
 					<MapPinnedIcon className="text-muted-foreground size-4" />
 					{exactPlace}
 				</div>

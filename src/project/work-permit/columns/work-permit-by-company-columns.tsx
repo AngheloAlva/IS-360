@@ -1,6 +1,6 @@
 "use client"
 
-import { Building2Icon, PenBoxIcon, PrinterIcon, UserIcon } from "lucide-react"
+import { Building2Icon, MapPinnedIcon, PenBoxIcon, PrinterIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -122,12 +122,21 @@ export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPer
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber.workName
-			return <div className="w-96 text-wrap">{workOrder}</div>
+			return <div className="max-w-56 min-w-36 text-wrap">{workOrder}</div>
 		},
 	},
 	{
 		accessorKey: "exactPlace",
 		header: "Lugar exacto",
+		cell: ({ row }) => {
+			const exactPlace = row.original.exactPlace
+			return (
+				<div className="flex max-w-56 min-w-32 items-center gap-1.5 truncate">
+					<MapPinnedIcon className="text-muted-foreground size-4" />
+					{exactPlace}
+				</div>
+			)
+		},
 	},
 	{
 		accessorKey: "startDate",
