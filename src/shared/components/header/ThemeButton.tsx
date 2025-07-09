@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
-import { Switch } from "@/shared/components/ui/switch"
+import { Button } from "../ui/button"
 
 export default function ThemeButton(): React.ReactElement | null {
 	const { setTheme, theme } = useTheme()
@@ -14,19 +14,18 @@ export default function ThemeButton(): React.ReactElement | null {
 		setMounted(true)
 	}, [])
 
+	const handleThemeChange = () => {
+		setTheme(theme === "dark" ? "light" : "dark")
+	}
+
 	if (!mounted) {
 		return null
 	}
 
 	return (
-		<div className="flex items-center gap-2">
-			<Sun className="h-[1.2rem] w-[1.2rem] text-yellow-500" />
-			<Switch
-				checked={theme === "dark"}
-				onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-			/>
-			<Moon className="text-text h-[1.2rem] w-[1.2rem]" />
+		<Button size="icon" variant="outline" onClick={handleThemeChange} className="size-8">
+			{theme === "dark" ? <Moon className="text-text" /> : <Sun className="text-yellow-500" />}
 			<span className="sr-only">Alternar Tema</span>
-		</div>
+		</Button>
 	)
 }
