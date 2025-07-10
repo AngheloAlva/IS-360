@@ -56,7 +56,6 @@ export default async function CompanyByIdAdminPage({
 								<CreateUsersForm
 									isSupervisor={true}
 									companyId={companyId}
-									userId={session.user.id}
 									className="text-blue-600 hover:text-blue-700"
 								/>
 

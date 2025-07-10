@@ -68,10 +68,7 @@ export interface TechSpecsStartupFolderDocument extends BaseStartupFolderDocumen
 }
 
 export type StartupFolderDocument =
-	| WorkerStartupFolderDocument
-	| VehicleStartupFolderDocument
 	| SafetyAndHealthStartupFolderDocument
 	| EnvironmentalStartupFolderDocument
 	| EnvironmentStartupFolderDocument
 	| TechSpecsStartupFolderDocument
-	| BasicStartupFolderDocument

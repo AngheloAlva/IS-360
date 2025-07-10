@@ -8,12 +8,12 @@ import {
 	EarthIcon,
 	FilesIcon,
 	UsersIcon,
+	WrenchIcon,
 	DownloadIcon,
 	BookTextIcon,
 	PartyPopperIcon,
 	FolderKanbanIcon,
 	SquareActivityIcon,
-	WrenchIcon,
 } from "lucide-react"
 
 import { DocumentCategory, StartupFolderStatus } from "@prisma/client"
@@ -30,10 +30,13 @@ import { CreateStartupFolder } from "../forms/CreateStartupFolder"
 import CompleteFolderDialog from "../dialogs/CompleteFolderDialog"
 import { StartupFolderDocuments } from "./StartupFolderDocuments"
 import RefreshButton from "@/shared/components/RefreshButton"
+import ModuleHeader from "@/shared/components/ModuleHeader"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
-import BackButton from "@/shared/components/BackButton"
 import { Button } from "@/shared/components/ui/button"
+import { WorkerFolder } from "./WorkerFolder"
+import { BasicFolder } from "./BasicFolder"
+import { VehicleFolder } from "./VehicleFolder"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -96,47 +99,34 @@ export default function StartupFolderOverview({
 
 	return (
 		<div className="w-full space-y-6">
-			<div className="rounded-lg bg-gradient-to-r from-teal-600 to-cyan-700 p-6 shadow-lg">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-3">
-						<BackButton
-							href="/admin/dashboard/carpetas-de-arranques"
-							className="bg-white/20 text-white hover:bg-white/50 hover:text-white"
-						/>
+			<ModuleHeader
+				className="from-teal-600 to-cyan-700"
+				title={companyName || "Carpeta de arranque"}
+				backHref="/admin/dashboard/carpetas-de-arranques"
+				description={
+					isOtcMember
+						? "Revisión de documentación de empresa contratista"
+						: "En este módulo podrás gestionar la documentación de la empresa."
+				}
+			>
+				<>
+					{isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
 
-						<div className="text-white">
-							<h1 className="text-2xl font-bold tracking-tight capitalize">
-								{companyName || "Carpeta de arranque"}
-							</h1>
-							<p className="flex flex-col opacity-90">
-								{isOtcMember
-									? "Revisión de documentación de empresa contratista"
-									: "En este módulo podrás gestionar la documentación de la empresa."}
-							</p>
-						</div>
-					</div>
-
-					<div className="flex items-center gap-2">
-						{isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
-
-						{selectedFolder?.type === "FULL" ? (
-							<Link href={"/carpeta-de-arranque-otc.pdf"} target="_blank">
-								<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
-									<DownloadIcon className="mr-2 h-4 w-4" />
-									Documento base
-								</Button>
-							</Link>
-						) : (
-							<Link href={"/carpeta-basica-otc.pdf"} target="_blank">
-								<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
-									<DownloadIcon className="mr-2 h-4 w-4" />
-									Documento base
-								</Button>
-							</Link>
-						)}
-					</div>
-				</div>
-			</div>
+					<Link
+						href={
+							selectedFolder?.type === "FULL"
+								? "/carpeta-de-arranque-otc.pdf"
+								: "/carpeta-basica-otc.pdf"
+						}
+						target="_blank"
+					>
+						<Button className="gap-0 bg-white text-teal-600 transition-all hover:scale-105 hover:bg-white hover:text-teal-600">
+							<DownloadIcon className="mr-2 h-4 w-4" />
+							Documento base
+						</Button>
+					</Link>
+				</>
+			</ModuleHeader>
 
 			{startupFolders && startupFolders.length > 0 ? (
 				<>
@@ -172,15 +162,33 @@ export default function StartupFolderOverview({
 									>
 										<div className="space-y-6">
 											{selectedCategory ? (
-												<StartupFolderDocuments
-													userId={userId}
-													companyId={companyId}
-													isOtcMember={isOtcMember}
-													category={selectedCategory}
-													startupFolderId={folder.id}
-													onBack={() => setSelectedCategory(null)}
-													moreMonthDuration={folder.moreMonthDuration}
-												/>
+												selectedCategory === DocumentCategory.PERSONNEL ? (
+													<WorkerFolder
+														userId={userId}
+														companyId={companyId}
+														isOtcMember={isOtcMember}
+														startupFolderId={folder.id}
+														onBack={() => setSelectedCategory(null)}
+													/>
+												) : selectedCategory === DocumentCategory.VEHICLES ? (
+													<VehicleFolder
+														userId={userId}
+														companyId={companyId}
+														isOtcMember={isOtcMember}
+														startupFolderId={folder.id}
+														onBack={() => setSelectedCategory(null)}
+													/>
+												) : (
+													<StartupFolderDocuments
+														userId={userId}
+														companyId={companyId}
+														isOtcMember={isOtcMember}
+														category={selectedCategory}
+														startupFolderId={folder.id}
+														onBack={() => setSelectedCategory(null)}
+														moreMonthDuration={folder.moreMonthDuration}
+													/>
+												)
 											) : (
 												<div className="space-y-4">
 													<div className="flex items-center justify-between">
@@ -200,14 +208,11 @@ export default function StartupFolderOverview({
 													</div>
 
 													{folder.type === "BASIC" ? (
-														<StartupFolderDocuments
+														<BasicFolder
 															userId={userId}
-															onBack={() => {}}
 															companyId={companyId}
 															isOtcMember={isOtcMember}
 															startupFolderId={folder.id}
-															category={DocumentCategory.BASIC}
-															moreMonthDuration={folder.moreMonthDuration}
 														/>
 													) : (
 														<StartupFolderTable

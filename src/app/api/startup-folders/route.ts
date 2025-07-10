@@ -5,15 +5,17 @@ import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-struc
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import {
-	VEHICLE_STRUCTURE,
 	TECH_SPEC_STRUCTURE,
-	BASE_WORKER_STRUCTURE,
 	ENVIRONMENT_STRUCTURE,
-	DRIVER_WORKER_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
 	EXTENDED_ENVIRONMENT_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
+import {
+	BASE_WORKER_STRUCTURE,
+	DRIVER_WORKER_STRUCTURE,
+} from "@/lib/consts/worker-folder-structure"
+import { VEHICLE_STRUCTURE } from "@/lib/consts/vehicle-folder-structure"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth.api.getSession({

@@ -1,4 +1,4 @@
-import { BasicDocumentType } from "@prisma/client"
+import { BasicDocumentType, DocumentCategory } from "@prisma/client"
 
 export interface BasicStartupFolderStructure {
 	title: string
@@ -36,4 +36,12 @@ export const BASIC_FOLDER_STRUCTURE: BasicStartupFolderStructure = {
 				"Inducción sobre Información de riesgos laborales (DS44), la cual debe incluir, los riesgos a los que se podría estar expuesto en OTC y las respectivas medidas de control.",
 		},
 	],
+}
+
+export const getBasicDocuments = () => {
+	return {
+		category: DocumentCategory.BASIC,
+		title: BASIC_FOLDER_STRUCTURE.title,
+		documents: BASIC_FOLDER_STRUCTURE.documents,
+	}
 }

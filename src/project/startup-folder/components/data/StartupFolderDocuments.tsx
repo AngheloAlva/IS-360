@@ -1,7 +1,7 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
 import { format } from "date-fns"
+import { useState } from "react"
 import { toast } from "sonner"
 import {
 	EyeIcon,
@@ -10,31 +10,18 @@ import {
 	InfoIcon,
 	UserIcon,
 	UploadIcon,
-	FolderIcon,
 	ChevronLeft,
 	FileTextIcon,
-	ChevronRightIcon,
 	CalendarX2Icon,
 } from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { getCompanyEntities } from "../../actions/get-company-entities"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
-import {
-	TECH_SPEC_STRUCTURE,
-	getDocumentsByCategory,
-	ENVIRONMENTAL_STRUCTURE,
-	SAFETY_AND_HEALTH_STRUCTURE,
-	ENVIRONMENT_STRUCTURE,
-	EXTENDED_ENVIRONMENT_STRUCTURE,
-} from "@/lib/consts/startup-folders-structure"
+import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import {
 	ReviewStatus,
 	DocumentCategory,
-	BasicDocumentType,
-	type WorkerDocumentType,
-	type VehicleDocumentType,
 	type EnvironmentalDocType,
 	type TechSpecsDocumentType,
 	type SafetyAndHealthDocumentType,
@@ -42,14 +29,10 @@ import {
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
-import DeleteEntityDialog from "@/project/startup-folder/components/dialogs/DeleteEntityDialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
-import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
-import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
-import { LinkEntityDialog } from "../dialogs/LinkEntityDialog"
 import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -90,113 +73,27 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 }) => {
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
 		type:
-			| BasicDocumentType
-			| WorkerDocumentType
 			| EnvironmentDocType
-			| VehicleDocumentType
 			| EnvironmentalDocType
 			| TechSpecsDocumentType
 			| SafetyAndHealthDocumentType
 		name: string
 	} | null>(null)
-	const [selectedEntity, setSelectedEntity] = useState<{
-		id: string
-		name: string
-		status: ReviewStatus
-	} | null>(null)
-	const [allEntities, setAllEntities] = useState<
-		Array<{ id: string; name: string; status: ReviewStatus }>
-	>([])
-	const [entities, setEntities] = useState<
-		Array<{ id: string; name: string; status: ReviewStatus }>
-	>([])
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
-	const [showLinkDialog, setShowLinkDialog] = useState(false)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documentsData = data?.documents ?? []
-	console.log({ startupFolderId, category })
-	console.log(documentsData)
 
 	const { title, documents } = getDocumentsByCategory(category, moreMonthDuration)
-
-	const fetchEntities = useCallback(async () => {
-		try {
-			if (
-				category === DocumentCategory.PERSONNEL ||
-				category === DocumentCategory.VEHICLES ||
-				category === DocumentCategory.BASIC
-			) {
-				const { allEntities, vinculatedEntities } = await getCompanyEntities({
-					companyId,
-					category,
-					startupFolderId,
-				})
-				setEntities(vinculatedEntities)
-				setAllEntities(allEntities)
-			}
-		} catch (error) {
-			console.error("Error fetching entities:", error)
-			toast.error("Error al cargar las entidades")
-		}
-	}, [category, companyId, startupFolderId])
-
-	useEffect(() => {
-		fetchEntities()
-	}, [fetchEntities])
 
 	const documentsNotUploaded = documents.filter(
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
-	const totalDocumentsToUpload =
-		category === DocumentCategory.SAFETY_AND_HEALTH
-			? SAFETY_AND_HEALTH_STRUCTURE.documents.length
-			: category === DocumentCategory.ENVIRONMENTAL
-				? ENVIRONMENTAL_STRUCTURE.documents.length
-				: category === DocumentCategory.ENVIRONMENT
-					? moreMonthDuration
-						? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
-						: ENVIRONMENT_STRUCTURE.documents.length
-					: TECH_SPEC_STRUCTURE.documents.length
-
 	const progress =
-		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
-
-	if (selectedEntity) {
-		if (category === DocumentCategory.PERSONNEL || category === DocumentCategory.BASIC) {
-			return (
-				<WorkerFolderDocuments
-					userId={userId}
-					category={category}
-					companyId={companyId}
-					isOtcMember={isOtcMember}
-					workerId={selectedEntity.id}
-					startupFolderId={startupFolderId}
-					onBack={() => setSelectedEntity(null)}
-				/>
-			)
-		} else if (category === DocumentCategory.VEHICLES) {
-			return (
-				<VehicleFolderDocuments
-					userId={userId}
-					companyId={companyId}
-					documents={documents}
-					isOtcMember={isOtcMember}
-					vehicleId={selectedEntity.id}
-					startupFolderId={startupFolderId}
-					onBack={() => setSelectedEntity(null)}
-				/>
-			)
-		}
-	}
-
-	const isVehicleOrWorkerCategory =
-		category === DocumentCategory.PERSONNEL ||
-		category === DocumentCategory.VEHICLES ||
-		category === DocumentCategory.BASIC
+		data && documentsData.length > 0 ? (data.approvedDocuments / documents.length) * 100 : 0
 
 	return (
 		<div className="space-y-4">
@@ -210,39 +107,24 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					)}
 					<h2 className="text-lg font-bold">{title}</h2>
 
-					{!isVehicleOrWorkerCategory && (
-						<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
-					)}
+					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
-				{!isVehicleOrWorkerCategory && (
-					<>
-						<Progress
-							value={progress}
-							className="mr-2 ml-auto max-w-24"
-							indicatorClassName="bg-emerald-600"
-						/>
-						<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
+				<Progress
+					value={progress}
+					className="mr-2 ml-auto max-w-24"
+					indicatorClassName="bg-emerald-600"
+				/>
+				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
-						{!isOtcMember && data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
-							<Button
-								className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
-								onClick={() => setShowSubmitDialog(true)}
-							>
-								<SendIcon className="h-4 w-4" />
-								Enviar a revisión
-							</Button>
-						)}
-					</>
-				)}
-
-				{!isOtcMember && isVehicleOrWorkerCategory && (
-					<div className="flex items-center gap-2">
-						<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
-							<FolderIcon className="h-4 w-4" />
-							Vincular {category === DocumentCategory.VEHICLES ? "Vehículo" : "Personal"}
-						</Button>
-					</div>
+				{!isOtcMember && data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
+					<Button
+						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
+						onClick={() => setShowSubmitDialog(true)}
+					>
+						<SendIcon className="h-4 w-4" />
+						Enviar a revisión
+					</Button>
 				)}
 			</div>
 
@@ -263,70 +145,10 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 				<TableBody>
 					{isLoading ? (
 						<TableRow>
-							<TableCell colSpan={7} className="h-24 text-center">
+							<TableCell colSpan={8} className="h-24 text-center">
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
-					) : isVehicleOrWorkerCategory ? (
-						entities?.length > 0 ? (
-							entities?.map((entity) => (
-								<TableRow key={entity.id}>
-									<TableCell
-										className="cursor-pointer font-medium hover:text-teal-600"
-										onClick={() => setSelectedEntity(entity)}
-									>
-										<div
-											className={cn("flex items-center gap-2", {
-												"text-yellow-500": entity.status === "SUBMITTED",
-											})}
-										>
-											<FolderIcon
-												className={cn("h-4 w-4 text-teal-500", {
-													"text-yellow-500": entity.status === "SUBMITTED",
-												})}
-											/>
-											{entity.name}
-										</div>
-									</TableCell>
-									<TableCell>
-										<StartupFolderStatusBadge status={entity.status} />
-									</TableCell>
-									<TableCell colSpan={5}></TableCell>
-									<TableCell>
-										<div className="flex items-center gap-2">
-											<DeleteEntityDialog
-												entityId={entity.id}
-												entityName={entity.name}
-												folderId={startupFolderId}
-												entityCategory={
-													category === DocumentCategory.PERSONNEL
-														? "WORKER"
-														: category === DocumentCategory.VEHICLES
-															? "VEHICLE"
-															: "BASIC"
-												}
-												onSuccess={() => {
-													queryClient.invalidateQueries({
-														queryKey: [
-															"startupFolderDocuments",
-															{ startupFolderId, category, workerId: null, vehicleId: null },
-														],
-													})
-													refetch()
-												}}
-											/>
-											<ChevronRightIcon className="h-4 w-4" />
-										</div>
-									</TableCell>
-								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell colSpan={7} className="h-24 text-center">
-									No hay documentos subidos en esta subcarpeta
-								</TableCell>
-							</TableRow>
-						)
 					) : (
 						documentsData.map((doc: StartupFolderDocument) => (
 							<TableRow key={doc.id}>
@@ -482,7 +304,6 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					)}
 
 					{documentsNotUploaded.length > 0 &&
-						!isVehicleOrWorkerCategory &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
 								<TableCell className="font-medium">
@@ -552,29 +373,6 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 					}}
 				/>
 			)}
-
-			{showLinkDialog &&
-				(category === "PERSONNEL" || category === "VEHICLES" || category === "BASIC") && (
-					<LinkEntityDialog
-						userId={userId}
-						category={category}
-						entities={allEntities}
-						isOpen={showLinkDialog}
-						startupFolderId={startupFolderId}
-						onClose={() => setShowLinkDialog(false)}
-						onSuccess={() => {
-							queryClient.invalidateQueries({
-								queryKey: [
-									"startupFolderDocuments",
-									{ startupFolderId, category, workerId: null, vehicleId: null },
-								],
-							})
-							refetch()
-							fetchEntities()
-							setShowLinkDialog(false)
-						}}
-					/>
-				)}
 
 			{showSubmitDialog && (
 				<SubmitReviewRequestDialog

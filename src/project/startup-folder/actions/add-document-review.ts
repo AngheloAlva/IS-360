@@ -6,18 +6,20 @@ import { headers } from "next/headers"
 import { DocumentCategory, type Prisma, ReviewStatus, MODULES, ACTIVITY_TYPE } from "@prisma/client"
 import { sendReviewNotificationEmail } from "./emails/send-review-notification-email"
 import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
+import { VEHICLE_STRUCTURE } from "@/lib/consts/vehicle-folder-structure"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import {
-	VEHICLE_STRUCTURE,
 	BASE_WORKER_STRUCTURE,
 	DRIVER_WORKER_STRUCTURE,
+} from "@/lib/consts/worker-folder-structure"
+import {
+	TECH_SPEC_STRUCTURE,
+	ENVIRONMENT_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
-	ENVIRONMENT_STRUCTURE,
 	EXTENDED_ENVIRONMENT_STRUCTURE,
-	TECH_SPEC_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
 
 interface AddDocumentReviewProps {

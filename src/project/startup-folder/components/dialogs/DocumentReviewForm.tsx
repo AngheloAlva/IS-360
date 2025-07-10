@@ -191,11 +191,12 @@ export function DocumentReviewForm({
 					</div>
 
 					<DialogFooter className="flex justify-end pt-4">
-						<DialogClose>
+						<DialogClose asChild>
 							<Button type="button" variant={"outline"}>
 								Cancelar
 							</Button>
 						</DialogClose>
+
 						<Button
 							type="submit"
 							disabled={

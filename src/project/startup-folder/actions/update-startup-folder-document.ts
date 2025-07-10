@@ -13,11 +13,11 @@ import {
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
 
-import { updateSafetyAndHealthDocument } from "./documents/safety-and-health"
-import { updateEnvironmentalDocument } from "./documents/environmental"
-import { updateVehicleDocument } from "./documents/vehicle"
-import { updateWorkerDocument } from "./documents/worker"
-import { updateBasicDocument } from "./documents/basic"
+import { updateSafetyAndHealthDocument } from "./safety-and-health/update-safety-document"
+import { updateEnvironmentalDocument } from "./environmental/update-environmental-document"
+import { updateVehicleDocument } from "./vehicle/update-vehicle-document"
+import { updateWorkerDocument } from "./worker/update-worker-document"
+import { updateBasicDocument } from "./basic/update-basic-document"
 
 import type { UploadResult } from "@/lib/upload-files"
 

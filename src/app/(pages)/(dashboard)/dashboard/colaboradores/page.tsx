@@ -24,9 +24,7 @@ export default async function UsersByCompanyPage(): Promise<React.ReactElement> 
 						<p className="opacity-90">Gestión del personal de la empresa</p>
 					</div>
 
-					{session.user.isSupervisor && (
-						<CreateUsersForm userId={session.user.id} companyId={session.user.companyId} />
-					)}
+					{session.user.isSupervisor && <CreateUsersForm companyId={session.user.companyId} />}
 				</div>
 			</div>
 

@@ -14,20 +14,9 @@ import {
 	FileTextIcon,
 } from "lucide-react"
 
-import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
-import { VEHICLE_STRUCTURE } from "@/lib/consts/startup-folders-structure"
+import { ReviewStatus, DocumentCategory, type VehicleDocumentType } from "@prisma/client"
+import { useVehicleFolderDocuments } from "../../hooks/use-vehicle-folder-documents"
 import { queryClient } from "@/lib/queryClient"
-import {
-	ReviewStatus,
-	DocumentCategory,
-	BasicDocumentType,
-	WorkerDocumentType,
-	VehicleDocumentType,
-	EnvironmentalDocType,
-	TechSpecsDocumentType,
-	SafetyAndHealthDocumentType,
-	EnvironmentDocType,
-} from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
@@ -45,7 +34,7 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-import type { StartupFolderDocument } from "@/project/startup-folder/types"
+import type { VehicleStartupFolderDocument } from "@/project/startup-folder/types"
 
 interface VehicleFolderDocumentsProps {
 	userId: string
@@ -57,14 +46,7 @@ interface VehicleFolderDocumentsProps {
 	documents: {
 		name: string
 		description?: string
-		type:
-			| SafetyAndHealthDocumentType
-			| VehicleDocumentType
-			| WorkerDocumentType
-			| EnvironmentalDocType
-			| BasicDocumentType
-			| TechSpecsDocumentType
-			| EnvironmentDocType
+		type: VehicleDocumentType
 	}[]
 }
 
@@ -77,23 +59,17 @@ export function VehicleFolderDocuments({
 	isOtcMember,
 	startupFolderId,
 }: VehicleFolderDocumentsProps) {
-	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
+	const [selectedDocument, setSelectedDocument] = useState<VehicleStartupFolderDocument | null>(
+		null
+	)
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
-		type:
-			| BasicDocumentType
-			| WorkerDocumentType
-			| EnvironmentDocType
-			| VehicleDocumentType
-			| EnvironmentalDocType
-			| TechSpecsDocumentType
-			| SafetyAndHealthDocumentType
+		type: VehicleDocumentType
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
 
-	const { data, isLoading, refetch } = useStartupFolderDocuments({
-		category: DocumentCategory.VEHICLES,
+	const { data, isLoading, refetch } = useVehicleFolderDocuments({
 		startupFolderId,
 		vehicleId,
 	})
@@ -103,9 +79,8 @@ export function VehicleFolderDocuments({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
-	const totalDocumentsToUpload = VEHICLE_STRUCTURE.documents.length
 	const progress =
-		data && documentsData.length > 0 ? (data.approvedDocuments / totalDocumentsToUpload) * 100 : 0
+		data && documentsData.length > 0 ? (data.approvedDocuments / documents.length) * 100 : 0
 
 	return (
 		<div className="space-y-4">
@@ -127,7 +102,7 @@ export function VehicleFolderDocuments({
 				/>
 				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
-				{!isOtcMember && data?.folderStatus === "DRAFT" && documents.length > 0 && (
+				{!isOtcMember && data?.folderStatus === "DRAFT" && (
 					<Button
 						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 						onClick={() => setShowSubmitDialog(true)}
@@ -155,7 +130,7 @@ export function VehicleFolderDocuments({
 				<TableBody>
 					{isLoading ? (
 						<TableRow>
-							<TableCell colSpan={7} className="h-24 text-center">
+							<TableCell colSpan={8} className="h-24 text-center">
 								Cargando documentos...
 							</TableCell>
 						</TableRow>
@@ -302,10 +277,7 @@ export function VehicleFolderDocuments({
 					documentType={selectedDocumentType}
 					onClose={() => {
 						queryClient.invalidateQueries({
-							queryKey: [
-								"startupFolderDocuments",
-								{ startupFolderId, category: DocumentCategory.VEHICLES, vehicleId, workerId: null },
-							],
+							queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
 						})
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
@@ -329,10 +301,7 @@ export function VehicleFolderDocuments({
 					onClose={() => setShowSubmitDialog(false)}
 					onSuccess={async () => {
 						queryClient.invalidateQueries({
-							queryKey: [
-								"startupFolderDocuments",
-								{ startupFolderId, category: DocumentCategory.VEHICLES, vehicleId },
-							],
+							queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
 						})
 						setShowSubmitDialog(false)
 						await refetch()

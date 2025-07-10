@@ -8,7 +8,6 @@ import { toast } from "sonner"
 
 import { useStartupFolderByCompany } from "@/project/startup-folder/hooks/use-startup-folder-by-company"
 import { partnerUsersSchema, type PartnerUsersSchema } from "@/project/user/schemas/users.schema"
-import { linkFolderEntity } from "@/project/startup-folder/actions/link-folder-entity"
 import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { queryClient } from "@/lib/queryClient"
@@ -33,14 +32,13 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { User } from "@prisma/client"
+import { linkEntity } from "@/project/startup-folder/actions/link-entity"
 
 export default function CreateUsersForm({
-	userId,
 	companyId,
 	className,
 	isSupervisor = false,
 }: {
-	userId: string
 	companyId: string
 	className?: string
 	isSupervisor?: boolean
@@ -120,11 +118,10 @@ export default function CreateUsersForm({
 
 					if (employee.startupFoldersId) {
 						employee.startupFoldersId.forEach(async (folderId) => {
-							await linkFolderEntity({
-								userId: userId,
-								category: "PERSONNEL",
-								startupFolderId: folderId,
+							await linkEntity({
 								entityId: newUser.user.id,
+								startupFolderId: folderId,
+								entityCategory: "PERSONNEL",
 							})
 						})
 					}

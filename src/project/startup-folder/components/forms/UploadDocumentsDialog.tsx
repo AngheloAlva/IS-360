@@ -13,9 +13,9 @@ import { ManagedFile, useFileManager } from "@/project/startup-folder/hooks/use-
 import { createStartupFolderDocument } from "../../actions/create-startup-folder-document"
 import { updateStartupFolderDocument } from "../../actions/update-startup-folder-document"
 import { getDocumentTypesByCategory } from "@/lib/consts/startup-folders-structure"
-import { createVehicleDocument } from "../../actions/create-vehicle-document"
-import { createWorkerDocument } from "../../actions/create-worker-document"
-import { createBasicDocument } from "../../actions/create-basic-document"
+import { createVehicleDocument } from "../../actions/vehicle/create-vehicle-document"
+import { createWorkerDocument } from "../../actions/worker/create-worker-document"
+import { createBasicDocument } from "../../actions/basic/create-basic-document"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
@@ -40,7 +40,12 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-import type { StartupFolderDocument } from "../../types"
+import type {
+	BasicStartupFolderDocument,
+	StartupFolderDocument,
+	VehicleStartupFolderDocument,
+	WorkerStartupFolderDocument,
+} from "../../types"
 import type { UploadResult } from "@/lib/upload-files"
 import type {
 	DocumentCategory,
@@ -62,7 +67,12 @@ interface UploadDocumentsDialogProps {
 	startupFolderId: string
 	category: DocumentCategory
 	onUploadComplete?: () => void
-	documentToUpdate?: StartupFolderDocument | null
+	documentToUpdate?:
+		| StartupFolderDocument
+		| VehicleStartupFolderDocument
+		| WorkerStartupFolderDocument
+		| BasicStartupFolderDocument
+		| null
 	documentType?: {
 		type:
 			| BasicDocumentType

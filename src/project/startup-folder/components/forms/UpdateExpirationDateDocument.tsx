@@ -65,10 +65,10 @@ export function UpdateExpirationDateDocument({
 			switch (category) {
 				case "SAFETY_AND_HEALTH":
 					if (documentId) {
-						const { updateExpirationDateSafetyAndHealthDocument } = await import(
-							"@/project/startup-folder/actions/documents/safety-and-health"
+						const { updateSafetyDocumentExpirationDate } = await import(
+							"@/project/startup-folder/actions/safety-and-health/update-safety-document-expiration-date"
 						)
-						result = await updateExpirationDateSafetyAndHealthDocument({
+						result = await updateSafetyDocumentExpirationDate({
 							data: { documentId, expirationDate: values.expirationDate, folderId },
 						})
 					}
@@ -76,10 +76,10 @@ export function UpdateExpirationDateDocument({
 
 				case "PERSONNEL":
 					if (documentId) {
-						const { updateExpirationDateWorkerDocument } = await import(
-							"@/project/startup-folder/actions/documents/worker"
+						const { updateWorkerDocumentExpirationDate } = await import(
+							"@/project/startup-folder/actions/worker/update-worker-document-expiration-date"
 						)
-						result = await updateExpirationDateWorkerDocument({
+						result = await updateWorkerDocumentExpirationDate({
 							data: { documentId, expirationDate: values.expirationDate, folderId },
 						})
 					}
@@ -88,7 +88,7 @@ export function UpdateExpirationDateDocument({
 				case "VEHICLES":
 					if (documentId) {
 						const { updateExpirationDateVehicleDocument } = await import(
-							"@/project/startup-folder/actions/documents/vehicle"
+							"@/project/startup-folder/actions/vehicle/update-vehicle-document-expiration-date"
 						)
 						result = await updateExpirationDateVehicleDocument({
 							data: { documentId, expirationDate: values.expirationDate, folderId },
@@ -98,10 +98,32 @@ export function UpdateExpirationDateDocument({
 
 				case "ENVIRONMENTAL":
 					if (documentId) {
-						const { updateExpirationDateEnvironmentalDocument } = await import(
-							"@/project/startup-folder/actions/documents/environmental"
+						const { updateEnvironmentalDocumentExpirationDate } = await import(
+							"@/project/startup-folder/actions/environmental/update-environmental-document-expiration-date"
 						)
-						result = await updateExpirationDateEnvironmentalDocument({
+						result = await updateEnvironmentalDocumentExpirationDate({
+							data: { documentId, expirationDate: values.expirationDate, folderId },
+						})
+					}
+					break
+
+				case "ENVIRONMENT":
+					if (documentId) {
+						const { updateEnvironmentDocumentExpirationDate } = await import(
+							"@/project/startup-folder/actions/environment/update-environment-document-expiration-date"
+						)
+						result = await updateEnvironmentDocumentExpirationDate({
+							data: { documentId, expirationDate: values.expirationDate, folderId },
+						})
+					}
+					break
+
+				case "BASIC":
+					if (documentId) {
+						const { updateBasicDocumentExpirationDate } = await import(
+							"@/project/startup-folder/actions/basic/update-basic-document-expiration-date"
+						)
+						result = await updateBasicDocumentExpirationDate({
 							data: { documentId, expirationDate: values.expirationDate, folderId },
 						})
 					}

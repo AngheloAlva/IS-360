@@ -1,12 +1,10 @@
 "use server"
 
-import prisma from "@/lib/prisma"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
-import {
+import prisma from "@/lib/prisma"
+
+import type {
 	StartupFolderDocument,
-	BasicStartupFolderDocument,
-	WorkerStartupFolderDocument,
-	VehicleStartupFolderDocument,
 	TechSpecsStartupFolderDocument,
 	EnvironmentStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
@@ -16,8 +14,6 @@ import {
 export async function getStartupFolderDocuments({
 	startupFolderId,
 	category,
-	workerId,
-	vehicleId,
 }: {
 	startupFolderId: string
 	category: DocumentCategory
@@ -35,54 +31,6 @@ export async function getStartupFolderDocuments({
 
 		const folder = await (async () => {
 			switch (category) {
-				case "PERSONNEL":
-					if (workerId) {
-						return prisma.workerFolder.findUnique({
-							where: { workerId_startupFolderId: { workerId, startupFolderId } },
-							include: {
-								_count: {
-									select: {
-										documents: true,
-									},
-								},
-							},
-						})
-					}
-
-					return prisma.workerFolder.findFirst({
-						where: { startupFolderId },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
-				case "VEHICLES":
-					if (vehicleId) {
-						return prisma.vehicleFolder.findUnique({
-							where: { vehicleId_startupFolderId: { vehicleId, startupFolderId } },
-							include: {
-								_count: {
-									select: {
-										documents: true,
-									},
-								},
-							},
-						})
-					}
-
-					return prisma.vehicleFolder.findFirst({
-						where: { startupFolderId },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
 				case "SAFETY_AND_HEALTH":
 					return prisma.safetyAndHealthFolder.findUnique({
 						where: { startupFolderId },
@@ -127,20 +75,6 @@ export async function getStartupFolderDocuments({
 							},
 						},
 					})
-				case "BASIC":
-					if (!workerId) {
-						return null
-					}
-					return prisma.basicFolder.findUnique({
-						where: { workerId_startupFolderId: { workerId, startupFolderId } },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
 				default:
 					throw new Error(`Invalid category: ${category}`)
 			}
@@ -160,44 +94,6 @@ export async function getStartupFolderDocuments({
 
 		const rawDocuments = await (async () => {
 			switch (category) {
-				case "PERSONNEL":
-					return prisma.workerDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { uploadedAt: "desc" },
-					})
-				case "VEHICLES":
-					return prisma.vehicleDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { uploadedAt: "desc" },
-					})
 				case "SAFETY_AND_HEALTH":
 					return prisma.safetyAndHealthDocument.findMany({
 						where: { folderId: folder.id },
@@ -274,25 +170,6 @@ export async function getStartupFolderDocuments({
 						},
 						orderBy: { uploadedAt: "desc" },
 					})
-				case "BASIC":
-					return prisma.basicDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { uploadedAt: "desc" },
-					})
 				default:
 					return []
 			}
@@ -317,18 +194,6 @@ export async function getStartupFolderDocuments({
 			}
 
 			switch (category) {
-				case "PERSONNEL":
-					return {
-						...baseDoc,
-						category: "PERSONNEL",
-						type: doc.type,
-					} as WorkerStartupFolderDocument
-				case "VEHICLES":
-					return {
-						...baseDoc,
-						category: "VEHICLES",
-						type: doc.type,
-					} as VehicleStartupFolderDocument
 				case "SAFETY_AND_HEALTH":
 					return {
 						...baseDoc,
@@ -353,12 +218,6 @@ export async function getStartupFolderDocuments({
 						category: "TECHNICAL_SPECS",
 						type: doc.type,
 					} as TechSpecsStartupFolderDocument
-				case "BASIC":
-					return {
-						...baseDoc,
-						category: "BASIC",
-						type: doc.type,
-					} as BasicStartupFolderDocument
 				default:
 					throw new Error(`Invalid category: ${category}`)
 			}

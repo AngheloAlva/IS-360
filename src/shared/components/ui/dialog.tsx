@@ -135,7 +135,7 @@ function DialogContent({
 							}}
 							transition={transition}
 							className={cn(
-								"bg-background fixed top-[50%] left-[50%] z-50 grid w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-xl border p-6 shadow-lg",
+								"bg-background fixed top-[50%] left-[50%] z-50 grid w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-xl border p-6 shadow-lg ring-4 ring-white/10",
 								className
 							)}
 							{...props}

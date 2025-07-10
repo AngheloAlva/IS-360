@@ -3,10 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DocumentCategory } from "@prisma/client"
 import { useForm } from "react-hook-form"
+import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { useLinkEntity } from "../../hooks/use-link-entity"
+import { linkEntity } from "../../actions/link-entity"
 
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { Button } from "@/shared/components/ui/button"
@@ -40,13 +41,12 @@ const linkEntitySchema = z.object({
 })
 
 interface LinkEntityDialogProps {
-	category: DocumentCategory
-	startupFolderId: string
-	userId: string
-	entities: Array<{ id: string; name: string }>
 	isOpen: boolean
 	onClose: () => void
 	onSuccess: () => void
+	startupFolderId: string
+	category: DocumentCategory
+	entities: Array<{ id: string; name: string }>
 }
 
 export function LinkEntityDialog({
@@ -54,11 +54,10 @@ export function LinkEntityDialog({
 	startupFolderId,
 	entities,
 	isOpen,
-	userId,
 	onClose,
 	onSuccess,
 }: LinkEntityDialogProps) {
-	const linkEntity = useLinkEntity()
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const form = useForm<z.infer<typeof linkEntitySchema>>({
 		resolver: zodResolver(linkEntitySchema),
@@ -69,33 +68,35 @@ export function LinkEntityDialog({
 	})
 
 	const onSubmit = async (data: z.infer<typeof linkEntitySchema>) => {
-		linkEntity.mutate(
-			{
-				userId,
-				category,
+		setIsSubmitting(true)
+
+		try {
+			const res = await linkEntity({
 				startupFolderId,
 				entityId: data.entityId,
 				isDriver: data.isDriver,
-			},
-			{
-				onSuccess: () => {
-					toast.success("Entidad vinculada", {
-						description: `${category === "VEHICLES" ? "Vehículo" : "Trabajador"} vinculado exitosamente.`,
-					})
-					form.reset()
-					onSuccess()
-					onClose()
-				},
-				onError: (error) => {
-					if (error instanceof Error) {
-						form.setError("entityId", { message: error.message })
-						toast.error("Error", {
-							description: error.message,
-						})
-					}
-				},
+				entityCategory: category,
+			})
+
+			if (!res.ok) {
+				toast.error("Error", {
+					description: res.message,
+				})
+				return
 			}
-		)
+
+			toast.success("Entidad vinculada", {
+				description: `${category === "VEHICLES" ? "Vehículo" : "Trabajador"} vinculado exitosamente.`,
+			})
+			form.reset()
+			onSuccess()
+			onClose()
+		} catch (error) {
+			console.error(error)
+			toast.error("Error al vincular la entidad")
+		} finally {
+			setIsSubmitting(false)
+		}
 	}
 
 	return (
@@ -117,11 +118,7 @@ export function LinkEntityDialog({
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>{category === "VEHICLES" ? "Vehículo" : "Trabajador"}</FormLabel>
-									<Select
-										onValueChange={field.onChange}
-										defaultValue={field.value}
-										disabled={linkEntity.isPending}
-									>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
 											<SelectTrigger>
 												<SelectValue
@@ -149,19 +146,14 @@ export function LinkEntityDialog({
 						)}
 
 						<DialogFooter>
-							<Button
-								type="button"
-								variant="outline"
-								onClick={onClose}
-								disabled={linkEntity.isPending}
-							>
+							<Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
 								Cancelar
 							</Button>
 
 							<Button
-								className="bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 								type="submit"
-								disabled={linkEntity.isPending}
+								disabled={isSubmitting}
+								className="bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 							>
 								Vincular
 							</Button>

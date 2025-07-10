@@ -5,6 +5,15 @@ import { auth } from "@/lib/auth"
 
 import { VehiclesByCompanyTable } from "@/project/vehicle/components/data/VehiclesByCompanyTable"
 import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
+import VideoTutorials from "@/shared/components/VideoTutorials"
+
+const vehicleVideos = [
+	{
+		title: "Gestión de vehículos",
+		description: "Gestión y monitoreo de vehículos y equipos",
+		url: "https://youtube.com/embed/o-RjSdokjXQ",
+	},
+]
 
 export default async function VehiclesPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -22,7 +31,10 @@ export default async function VehiclesPage(): Promise<React.ReactElement> {
 						<p className="opacity-90">Gestión y monitoreo de vehículos y equipos</p>
 					</div>
 
-					<VehicleForm companyId={session.user.companyId} />
+					<div className="flex items-center gap-2">
+						<VideoTutorials videos={vehicleVideos} className="text-teal-700" />
+						<VehicleForm companyId={session.user.companyId} />
+					</div>
 				</div>
 			</div>
 

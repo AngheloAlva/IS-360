@@ -22,6 +22,7 @@ type LoadingStatusMap = {
 }
 
 export default function PowerBIDashboardPage() {
+	const [activeTab, setActiveTab] = useState<DashboardId>("dashboard1")
 	const [iframeHeight, setIframeHeight] = useState("800px")
 	const [loadingStatus, setLoadingStatus] = useState<LoadingStatusMap>({
 		dashboard1: true,
@@ -29,9 +30,7 @@ export default function PowerBIDashboardPage() {
 		dashboard3: true,
 		dashboard4: true,
 	})
-	const [activeTab, setActiveTab] = useState<DashboardId>("dashboard1")
 
-	// Power BI embed URLs
 	const dashboards: DashboardsMap = {
 		dashboard1: {
 			title: "Análisis Alarmas (DAS)",
@@ -55,22 +54,15 @@ export default function PowerBIDashboardPage() {
 		},
 	}
 
-	// Handle iframe load events
 	const handleIframeLoad = (dashboardId: DashboardId) => {
 		setLoadingStatus((prev) => ({ ...prev, [dashboardId]: false }))
 	}
-
-	// Adjust height based on viewport
 	useEffect(() => {
 		const updateHeight = () => {
-			// Set iframe height to be 80% of viewport height
 			setIframeHeight(`${Math.floor(window.innerHeight * 0.8)}px`)
 		}
 
-		// Set initial height
 		updateHeight()
-
-		// Update height on window resize
 		window.addEventListener("resize", updateHeight)
 
 		return () => window.removeEventListener("resize", updateHeight)

@@ -1,13 +1,10 @@
 import {
 	DocumentCategory,
-	WorkerDocumentType,
-	VehicleDocumentType,
+	EnvironmentDocType,
 	EnvironmentalDocType,
 	TechSpecsDocumentType,
 	SafetyAndHealthDocumentType,
-	EnvironmentDocType,
 } from "@prisma/client"
-import { BASIC_FOLDER_STRUCTURE } from "./basic-startup-folders-structure"
 
 export interface StartupFolderStructure {
 	title: string
@@ -18,8 +15,6 @@ export interface StartupFolderStructure {
 		description?: string
 		type:
 			| SafetyAndHealthDocumentType
-			| VehicleDocumentType
-			| WorkerDocumentType
 			| EnvironmentalDocType
 			| TechSpecsDocumentType
 			| EnvironmentDocType
@@ -338,159 +333,7 @@ export const TECH_SPEC_STRUCTURE: StartupFolderStructure = {
 	],
 }
 
-export const VEHICLE_STRUCTURE: StartupFolderStructure = {
-	title: "Vehículos y Equipos",
-	category: DocumentCategory.VEHICLES,
-	description: "Documentación obligatoria de equipos y vehículos asignados al proyecto.",
-	documents: [
-		{
-			type: VehicleDocumentType.EQUIPMENT_FILE,
-			name: "Ficha de equipos",
-			description:
-				"Archivo que contenga como mínimo tipo de vehículo, patente, año, marca, modelo, nombre de la compañía de seguro y vigencias de; revisión técnica, permiso de circulación, seguro obligatorio.",
-		},
-		{
-			type: VehicleDocumentType.VEHICLE_REGISTRATION,
-			name: "Inscripción del vehículo motorizado (Padrón)",
-			description: "Fotocopia de inscripción oficial del vehículo.",
-		},
-		{
-			type: VehicleDocumentType.CIRCULATION_PERMIT,
-			name: "Permiso de circulación",
-			description: "Fotocopia del Permiso de circulación vigente.",
-		},
-		{
-			type: VehicleDocumentType.TECHNICAL_REVIEW,
-			name: "Revisión técnica",
-			description: "Fotocopia de la Revisión técnica vigente.",
-		},
-		{
-			type: VehicleDocumentType.INSURANCE,
-			name: "Seguro obligatorio",
-			description: "Fotocopia del Seguro vigente contra accidentes.",
-		},
-		{
-			type: VehicleDocumentType.CHECKLIST,
-			name: "Lista de chequeo previa al ingreso",
-			description:
-				"Revisión interna firmada antes del ingreso a OTC, que asegure las perfectas condiciones previa al servicio.",
-		},
-		{
-			type: VehicleDocumentType.TRANSPORTATION_TO_OTC,
-			name: "Vehículo de transporte de trabajadores",
-			description: "Documentación del vehículo de traslado al sitio de trabajo.",
-		},
-	],
-}
-
-export const BASE_WORKER_STRUCTURE: StartupFolderStructure = {
-	title: "Personal",
-	category: DocumentCategory.PERSONNEL,
-	description: "Documentación individual obligatoria para trabajadores que ingresen a OTC.",
-	documents: [
-		{
-			type: WorkerDocumentType.CONTRACT,
-			name: "Contrato de trabajo",
-			description: "Contrato vigente, incluyendo anexos según corresponda.",
-		},
-		{
-			type: WorkerDocumentType.INTERNAL_REGULATION_RECEIPT,
-			name: "Entrega del reglamento interno",
-			description: "Comprobante de recepción de la última versión del reglamento.",
-		},
-		{
-			type: WorkerDocumentType.RISK_INFORMATION,
-			name: "Inducción de Riesgos Laborales (IRL)",
-			description: "Documento completo con los contenidos mínimos del DS 44.",
-		},
-		{
-			type: WorkerDocumentType.ID_CARD,
-			name: "Cédula de identidad",
-			description: "Fotocopia por ambos lados del documento de identidad.",
-		},
-		{
-			type: WorkerDocumentType.HEALTH_EXAM,
-			name: "Examen médico vigente",
-			description: "Emitido por OAL según batería exigida por OTC.",
-		},
-		{
-			type: WorkerDocumentType.RISK_MATRIX_TRAINING,
-			name: "Capacitación MIPER",
-			description: "Registro de capacitación sobre la matriz de peligros presentada.",
-		},
-		{
-			type: WorkerDocumentType.WORK_PROCEDURE_TRAINING,
-			name: "Capacitación en procedimientos de trabajo",
-			description: "Registro de capacitación de los procedimientos presentados a OTC.",
-		},
-		{
-			type: WorkerDocumentType.EMERGENCY_PROCEDURE_TRAINING,
-			name: "Capacitación en procedimientos de emergencia",
-			description: "Capacitación sobre respuesta ante incidentes y accidentes.",
-		},
-		{
-			type: WorkerDocumentType.TOOLS_MAINTENANCE_TRAINING,
-			name: "Capacitación en mantención de herramientas",
-			description: "Registro de capacitación del procedimiento de mantención.",
-		},
-		{
-			type: WorkerDocumentType.HARASSMENT_TRAINING,
-			name: "Capacitación en Ley Karin",
-			description: "Registro de capacitación del procedimiento contra acoso.",
-		},
-		{
-			type: WorkerDocumentType.PPE_RECEIPT,
-			name: "Entrega de EPP",
-			description: "Registro de entrega de elementos de protección personal.",
-		},
-		{
-			type: WorkerDocumentType.PREVENTION_EXPERT,
-			name: "Experto en prevención de riesgos",
-			description: "Resolución sanitaria, carné y CV del experto, si aplica.",
-		},
-		{
-			type: WorkerDocumentType.HIGH_RISK_TRAINING,
-			name: "Capacitación en trabajos de alto riesgo",
-			description: "Certificados de cursos en altura, espacios confinados, etc.",
-		},
-	],
-}
-
-export const DRIVER_WORKER_STRUCTURE: StartupFolderStructure = {
-	title: "Personal",
-	category: DocumentCategory.PERSONNEL,
-	description: "Documentación individual obligatoria para conductores que ingresen a OTC.",
-	documents: [
-		...BASE_WORKER_STRUCTURE.documents,
-		{
-			type: WorkerDocumentType.DRIVING_LICENSE,
-			name: "Licencia de conducir",
-			description: "Licencia vigente por ambos lados (si aplica).",
-		},
-		{
-			type: WorkerDocumentType.PSYCHOTECHNICAL_EXAM,
-			name: "Examen psicosensotécnico",
-			description: "Requerido si el trabajador posee licencia profesional.",
-		},
-		{
-			type: WorkerDocumentType.DEFENSIVE_DRIVING_TRAINING,
-			name: "Curso de manejo defensivo",
-			description: "Solo para quienes desempeñan labores de conducción.",
-		},
-		{
-			type: WorkerDocumentType.MOUNTAIN_DEFENSIVE_DRIVING,
-			name: "Curso de manejo en alta montaña",
-			description: "Para quienes transiten hacia Buta Mallín o zonas cordilleranas.",
-		},
-		{
-			type: WorkerDocumentType.ALCOHOL_AND_DRUGS_EXAM,
-			name: "Examen de alcohol y drogas",
-			description: "Examen de alcohol y drogas.",
-		},
-	],
-}
-
-export function getDocumentTypesByCategory(category: DocumentCategory, isDriver?: boolean) {
+export function getDocumentTypesByCategory(category: DocumentCategory) {
 	switch (category) {
 		case DocumentCategory.SAFETY_AND_HEALTH:
 			return {
@@ -501,18 +344,6 @@ export function getDocumentTypesByCategory(category: DocumentCategory, isDriver?
 			return {
 				title: ENVIRONMENTAL_STRUCTURE.title,
 				documentTypes: ENVIRONMENTAL_STRUCTURE.documents,
-			}
-		case DocumentCategory.VEHICLES:
-			return {
-				title: VEHICLE_STRUCTURE.title,
-				documentTypes: VEHICLE_STRUCTURE.documents,
-			}
-		case DocumentCategory.PERSONNEL:
-			return {
-				title: BASE_WORKER_STRUCTURE.title,
-				documentTypes: isDriver
-					? DRIVER_WORKER_STRUCTURE.documents
-					: BASE_WORKER_STRUCTURE.documents,
 			}
 		default:
 			return {
@@ -551,40 +382,6 @@ export const getDocumentsByCategory = (category: DocumentCategory, moreMonthDura
 				title: TECH_SPEC_STRUCTURE.title,
 				documents: TECH_SPEC_STRUCTURE.documents,
 				category: DocumentCategory.TECHNICAL_SPECS,
-			}
-		case DocumentCategory.VEHICLES:
-			return {
-				title: VEHICLE_STRUCTURE.title,
-				documents: VEHICLE_STRUCTURE.documents,
-				category: DocumentCategory.VEHICLES,
-			}
-		case DocumentCategory.BASIC:
-			return {
-				title: BASIC_FOLDER_STRUCTURE.title,
-				documents: BASIC_FOLDER_STRUCTURE.documents,
-				category: DocumentCategory.BASIC,
-			}
-		default:
-			return {
-				title: "",
-				documents: [],
-			}
-	}
-}
-
-export const getDocumentsByWorkerIsDriver = (category: DocumentCategory, isDriver?: boolean) => {
-	switch (category) {
-		case DocumentCategory.PERSONNEL:
-			return {
-				title: BASE_WORKER_STRUCTURE.title,
-				documents: isDriver ? DRIVER_WORKER_STRUCTURE.documents : BASE_WORKER_STRUCTURE.documents,
-				category: DocumentCategory.PERSONNEL,
-			}
-		case DocumentCategory.BASIC:
-			return {
-				title: BASIC_FOLDER_STRUCTURE.title,
-				documents: BASIC_FOLDER_STRUCTURE.documents,
-				category: DocumentCategory.BASIC,
 			}
 		default:
 			return {

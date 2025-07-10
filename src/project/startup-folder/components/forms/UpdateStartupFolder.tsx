@@ -80,9 +80,9 @@ export function UpdateStartupFolder({
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
 				<Button
-					variant="outline"
+					variant="ghost"
 					disabled={isSubmitting}
-					className="gap-0 border-cyan-500 font-medium text-cyan-500 transition-all hover:scale-105 hover:bg-cyan-600"
+					className="gap-0 font-medium text-cyan-500 transition-all hover:scale-105 hover:bg-cyan-600"
 				>
 					<SquarePen className="mr-2 h-4 w-4" />
 					Actualizar carpeta

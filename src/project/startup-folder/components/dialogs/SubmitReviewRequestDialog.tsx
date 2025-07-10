@@ -112,10 +112,10 @@ export function SubmitReviewRequestDialog({
 					return { ok: false, message: "ID de trabajador es requerido" }
 				}
 
-				const { submitWorkerDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/worker"
+				const { submitWorkerFolderForReview } = await import(
+					"@/project/startup-folder/actions/worker/submit-worker-folder-for-review"
 				)
-				result = await submitWorkerDocumentForReview({
+				result = await submitWorkerFolderForReview({
 					emails,
 					userId,
 					folderId,
@@ -126,10 +126,10 @@ export function SubmitReviewRequestDialog({
 				if (!vehicleId) {
 					return { ok: false, message: "ID de vehículo es requerido" }
 				}
-				const { submitVehicleDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/vehicle"
+				const { submitVehicleFolderForReview } = await import(
+					"@/project/startup-folder/actions/vehicle/submit-vehicle-folder-for-review"
 				)
-				result = await submitVehicleDocumentForReview({
+				result = await submitVehicleFolderForReview({
 					emails,
 					userId,
 					folderId,
@@ -137,35 +137,35 @@ export function SubmitReviewRequestDialog({
 					companyId,
 				})
 			} else if (category === "ENVIRONMENTAL") {
-				const { submitEnvironmentalDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/environmental"
+				const { submitEnvironmentalFolderForReview } = await import(
+					"@/project/startup-folder/actions/environmental/submit-environmental-folder-for-review"
 				)
-				result = await submitEnvironmentalDocumentForReview({
+				result = await submitEnvironmentalFolderForReview({
 					emails,
 					userId,
 					folderId,
 				})
 			} else if (category === "ENVIRONMENT") {
-				const { submitEnvironmentDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/environment"
+				const { submitEnvironmentFolderForReview } = await import(
+					"@/project/startup-folder/actions/environment/submit-environment-folder-for-review"
 				)
-				result = await submitEnvironmentDocumentForReview({
+				result = await submitEnvironmentFolderForReview({
 					emails,
 					userId,
 					folderId,
 				})
 			} else if (category === "SAFETY_AND_HEALTH") {
-				const { submitSafetyAndHealthDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/safety-and-health"
+				const { submitSafetyAndHealthFolderForReview } = await import(
+					"@/project/startup-folder/actions/safety-and-health/submit-safety-folder-for-review"
 				)
-				result = await submitSafetyAndHealthDocumentForReview({
+				result = await submitSafetyAndHealthFolderForReview({
 					emails,
 					userId,
 					folderId,
 				})
 			} else if (category === "TECHNICAL_SPECS") {
 				const { submitTechSpecsDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/technical-specs"
+					"@/project/startup-folder/actions/technical-specs/submit-technical-folder-for-review"
 				)
 				result = await submitTechSpecsDocumentForReview({
 					emails,
@@ -177,10 +177,10 @@ export function SubmitReviewRequestDialog({
 					return { ok: false, message: "ID de trabajador es requerido" }
 				}
 
-				const { submitBasicDocumentForReview } = await import(
-					"@/project/startup-folder/actions/documents/basic"
+				const { submitBasicFolderForReview } = await import(
+					"@/project/startup-folder/actions/basic/submit-basic-folder-for-review"
 				)
-				result = await submitBasicDocumentForReview({
+				result = await submitBasicFolderForReview({
 					emails,
 					userId,
 					folderId,
