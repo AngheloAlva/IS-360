@@ -7,6 +7,7 @@ import {
 	EyeIcon,
 	SendIcon,
 	InfoIcon,
+	Undo2Icon,
 	UploadIcon,
 	PencilIcon,
 	ChevronLeft,
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Progress } from "@/shared/components/ui/progress"
@@ -62,8 +64,10 @@ export function BasicFolderDocuments({
 		type: BasicDocumentType
 		name: string
 	} | null>(null)
+	const [documentToUndo, setDocumentToUndo] = useState<BasicStartupFolderDocument | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
+	const [showUndoDialog, setShowUndoDialog] = useState(false)
 
 	const { data, isLoading, refetch } = useBasicFolderDocuments({
 		startupFolderId,
@@ -185,6 +189,7 @@ export function BasicFolderDocuments({
 												<EyeIcon className="h-4 w-4" />
 											</Button>
 										)}
+
 										{!isOtcMember &&
 											(doc.status === "DRAFT" ||
 												doc.status === "REJECTED" ||
@@ -201,6 +206,7 @@ export function BasicFolderDocuments({
 													<PencilIcon className="h-4 w-4" />
 												</Button>
 											)}
+
 										{isOtcMember && doc.status === "SUBMITTED" && (
 											<DocumentReviewForm
 												document={doc}
@@ -210,6 +216,20 @@ export function BasicFolderDocuments({
 												startupFolderId={startupFolderId}
 												category={DocumentCategory.BASIC}
 											/>
+										)}
+
+										{isOtcMember && (doc.status === "APPROVED" || doc.status === "REJECTED") && (
+											<Button
+												size={"icon"}
+												variant="ghost"
+												className="text-amber-500"
+												onClick={() => {
+													setDocumentToUndo(doc)
+													setShowUndoDialog(true)
+												}}
+											>
+												<Undo2Icon className="h-4 w-4" />
+											</Button>
 										)}
 									</div>
 								</TableCell>
@@ -293,8 +313,6 @@ export function BasicFolderDocuments({
 								{
 									workerId,
 									startupFolderId,
-									vehicleId: null,
-									category: DocumentCategory.BASIC,
 								},
 							],
 						})
@@ -318,14 +336,33 @@ export function BasicFolderDocuments({
 					onClose={() => setShowSubmitDialog(false)}
 					onSuccess={async () => {
 						queryClient.invalidateQueries({
-							queryKey: [
-								"basicFolderDocuments",
-								{ startupFolderId, category: DocumentCategory.BASIC, workerId },
-							],
+							queryKey: ["basicFolderDocuments", { startupFolderId, workerId }],
 						})
 						setShowSubmitDialog(false)
 						await refetch()
 						toast.success("Documentos enviados a revisión exitosamente")
+					}}
+				/>
+			)}
+
+			{showUndoDialog && documentToUndo && (
+				<UndoDocumentReviewDialog
+					userId={userId}
+					isOpen={showUndoDialog}
+					documentId={documentToUndo.id}
+					category={DocumentCategory.BASIC}
+					onClose={() => {
+						setShowUndoDialog(false)
+						setDocumentToUndo(null)
+					}}
+					onSuccess={async () => {
+						queryClient.invalidateQueries({
+							queryKey: ["basicFolderDocuments", { startupFolderId, workerId }],
+						})
+						setShowUndoDialog(false)
+						setDocumentToUndo(null)
+						await refetch()
+						toast.success("Revisión de documento revertida exitosamente")
 					}}
 				/>
 			)}

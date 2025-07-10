@@ -9,6 +9,7 @@ import {
 	SendIcon,
 	InfoIcon,
 	UserIcon,
+	Undo2Icon,
 	UploadIcon,
 	ChevronLeft,
 	FileTextIcon,
@@ -22,15 +23,16 @@ import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import {
 	ReviewStatus,
 	DocumentCategory,
+	type EnvironmentDocType,
 	type EnvironmentalDocType,
 	type TechSpecsDocumentType,
 	type SafetyAndHealthDocumentType,
-	EnvironmentDocType,
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Progress } from "@/shared/components/ui/progress"
@@ -46,10 +48,10 @@ import {
 
 import type {
 	StartupFolderDocument,
+	TechSpecsStartupFolderDocument,
+	EnvironmentStartupFolderDocument,
 	EnvironmentalStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
-	EnvironmentStartupFolderDocument,
-	TechSpecsStartupFolderDocument,
 } from "../../types"
 
 interface StartupFolderDocumentsProps {
@@ -82,6 +84,10 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
+	const [showUndoReviewDialog, setShowUndoReviewDialog] = useState(false)
+	const [documentToUndoReview, setDocumentToUndoReview] = useState<StartupFolderDocument | null>(
+		null
+	)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documentsData = data?.documents ?? []
@@ -297,6 +303,20 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 												startupFolderId={startupFolderId}
 											/>
 										)}
+
+										{isOtcMember && (doc.status === "APPROVED" || doc.status === "REJECTED") && (
+											<Button
+												size={"icon"}
+												variant="ghost"
+												className="text-amber-500"
+												onClick={() => {
+													setDocumentToUndoReview(doc)
+													setShowUndoReviewDialog(true)
+												}}
+											>
+												<Undo2Icon className="h-4 w-4" />
+											</Button>
+										)}
 									</div>
 								</TableCell>
 							</TableRow>
@@ -391,7 +411,31 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 						})
 						setShowSubmitDialog(false)
 						await refetch()
-						toast.success("Documentos envia	os a revisión exitosamente")
+						toast.success("Documentos enviados a revisión exitosamente")
+					}}
+				/>
+			)}
+
+			{showUndoReviewDialog && documentToUndoReview && (
+				<UndoDocumentReviewDialog
+					userId={userId}
+					category={documentToUndoReview.category}
+					isOpen={showUndoReviewDialog}
+					documentId={documentToUndoReview.id}
+					onClose={() => {
+						setShowUndoReviewDialog(false)
+						setDocumentToUndoReview(null)
+					}}
+					onSuccess={async () => {
+						queryClient.invalidateQueries({
+							queryKey: [
+								"startupFolderDocuments",
+								{ startupFolderId, category, workerId: null, vehicleId: null },
+							],
+						})
+						setShowUndoReviewDialog(false)
+						setDocumentToUndoReview(null)
+						await refetch()
 					}}
 				/>
 			)}

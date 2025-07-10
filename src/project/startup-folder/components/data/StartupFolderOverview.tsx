@@ -155,12 +155,24 @@ export default function StartupFolderOverview({
 						{startupFolders && startupFolders.length > 0 ? (
 							<TabsContents>
 								{startupFolders.map((folder) => (
-									<TabsContent
-										key={folder.id}
-										value={folder.id}
-										className="bg-background rounded-lg p-4"
-									>
-										<div className="space-y-6">
+									<TabsContent key={folder.id} value={folder.id} className="space-y-2">
+										<div className="bg-background flex items-center justify-between rounded-lg px-4 py-1">
+											<h2 className="flex items-center gap-2 text-lg font-bold">
+												<FolderKanbanIcon className="size-5" />
+												{folder.name}
+											</h2>
+
+											{isOtcMember && hasPermission && (
+												<UpdateStartupFolder
+													type={folder.type}
+													name={folder.name}
+													companyId={companyId}
+													startupFolderId={folder.id}
+												/>
+											)}
+										</div>
+
+										<div className="bg-background space-y-6 rounded-lg p-4">
 											{selectedCategory ? (
 												selectedCategory === DocumentCategory.PERSONNEL ? (
 													<WorkerFolder
@@ -190,23 +202,7 @@ export default function StartupFolderOverview({
 													/>
 												)
 											) : (
-												<div className="space-y-4">
-													<div className="flex items-center justify-between">
-														<h2 className="flex items-center gap-2 text-lg font-bold">
-															<FolderKanbanIcon className="size-5" />
-															{folder.name}
-														</h2>
-
-														{isOtcMember && hasPermission && (
-															<UpdateStartupFolder
-																type={folder.type}
-																name={folder.name}
-																companyId={companyId}
-																startupFolderId={folder.id}
-															/>
-														)}
-													</div>
-
+												<>
 													{folder.type === "BASIC" ? (
 														<BasicFolder
 															userId={userId}
@@ -221,7 +217,7 @@ export default function StartupFolderOverview({
 															onCategorySelect={setSelectedCategory}
 														/>
 													)}
-												</div>
+												</>
 											)}
 										</div>
 									</TabsContent>

@@ -8,6 +8,7 @@ import {
 	EyeIcon,
 	InfoIcon,
 	SendIcon,
+	Undo2Icon,
 	PencilIcon,
 	UploadIcon,
 	ChevronLeft,
@@ -21,6 +22,7 @@ import { queryClient } from "@/lib/queryClient"
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Progress } from "@/shared/components/ui/progress"
@@ -68,6 +70,8 @@ export function VehicleFolderDocuments({
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
 	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
+	const [showUndoDialog, setShowUndoDialog] = useState(false)
+	const [documentToUndo, setDocumentToUndo] = useState<VehicleStartupFolderDocument | null>(null)
 
 	const { data, isLoading, refetch } = useVehicleFolderDocuments({
 		startupFolderId,
@@ -208,6 +212,20 @@ export function VehicleFolderDocuments({
 												category={DocumentCategory.VEHICLES}
 											/>
 										)}
+
+										{isOtcMember && (doc.status === "APPROVED" || doc.status === "REJECTED") && (
+											<Button
+												size={"icon"}
+												variant="ghost"
+												className="text-amber-500"
+												onClick={() => {
+													setDocumentToUndo(doc)
+													setShowUndoDialog(true)
+												}}
+											>
+												<Undo2Icon className="h-4 w-4" />
+											</Button>
+										)}
 									</div>
 								</TableCell>
 							</TableRow>
@@ -306,6 +324,28 @@ export function VehicleFolderDocuments({
 						setShowSubmitDialog(false)
 						await refetch()
 						toast.success("Documentos enviados a revisión exitosamente")
+					}}
+				/>
+			)}
+
+			{showUndoDialog && documentToUndo && (
+				<UndoDocumentReviewDialog
+					userId={userId}
+					isOpen={showUndoDialog}
+					documentId={documentToUndo.id}
+					category={DocumentCategory.VEHICLES}
+					onClose={() => {
+						setShowUndoDialog(false)
+						setDocumentToUndo(null)
+					}}
+					onSuccess={async () => {
+						queryClient.invalidateQueries({
+							queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
+						})
+						setShowUndoDialog(false)
+						setDocumentToUndo(null)
+						await refetch()
+						toast.success("Revisión de documento revertida exitosamente")
 					}}
 				/>
 			)}
