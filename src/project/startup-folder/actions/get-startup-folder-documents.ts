@@ -111,7 +111,7 @@ export async function getStartupFolderDocuments({
 								},
 							},
 						},
-						orderBy: { uploadedAt: "desc" },
+						orderBy: { name: "desc" },
 					})
 				case "ENVIRONMENTAL":
 					return prisma.environmentalDocument.findMany({
@@ -130,7 +130,7 @@ export async function getStartupFolderDocuments({
 								},
 							},
 						},
-						orderBy: { uploadedAt: "desc" },
+						orderBy: { name: "desc" },
 					})
 				case "ENVIRONMENT":
 					return prisma.environmentDocument.findMany({
@@ -149,7 +149,7 @@ export async function getStartupFolderDocuments({
 								},
 							},
 						},
-						orderBy: { uploadedAt: "desc" },
+						orderBy: { name: "desc" },
 					})
 				case "TECHNICAL_SPECS":
 					return prisma.techSpecsDocument.findMany({
@@ -168,7 +168,7 @@ export async function getStartupFolderDocuments({
 								},
 							},
 						},
-						orderBy: { uploadedAt: "desc" },
+						orderBy: { name: "desc" },
 					})
 				default:
 					return []

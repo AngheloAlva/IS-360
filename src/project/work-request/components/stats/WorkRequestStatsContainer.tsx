@@ -42,7 +42,7 @@ export default function WorkRequestStatsContainer() {
 						</div>
 					</CardHeader>
 					<CardContent>
-						<div className="text-2xl font-bold">{data?.urgencyStats.urgent.attended || 0}</div>
+						<div className="text-2xl font-bold">{data?.totalUrgent || 0}</div>
 						<p className="text-muted-foreground text-xs">Solicitudes de trabajo urgentes</p>
 					</CardContent>
 				</Card>
@@ -51,15 +51,15 @@ export default function WorkRequestStatsContainer() {
 					<div className="bg-gradient-to-br from-sky-500 to-sky-600 p-1.5" />
 					<CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
 						<CardTitle className="text-base font-medium">
-							Solicitudes de Trabajo No Urgentes
+							Solicitudes de Trabajo Atendidas
 						</CardTitle>
 						<div className="rounded-lg bg-sky-500/20 p-1.5 text-sky-500">
 							<FileSymlinkIcon className="h-5 w-5 text-sky-500" />
 						</div>
 					</CardHeader>
 					<CardContent>
-						<div className="text-2xl font-bold">{data?.urgencyStats.nonUrgent.attended || 0}</div>
-						<p className="text-muted-foreground text-xs">Solicitudes de trabajo no urgentes</p>
+						<div className="text-2xl font-bold">{data?.totalAttended || 0}</div>
+						<p className="text-muted-foreground text-xs">Solicitudes de trabajo atendidas</p>
 					</CardContent>
 				</Card>
 

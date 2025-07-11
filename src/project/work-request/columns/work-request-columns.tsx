@@ -6,12 +6,11 @@ import { format } from "date-fns"
 
 import { WORK_REQUEST_STATUS } from "@prisma/client"
 
+import { DropdownMenuItem, DropdownMenuSeparator } from "@/shared/components/ui/dropdown-menu"
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
-import ApproveWorkRequest from "../components/forms/ApproveWorkRequest"
-import { Badge } from "@/shared/components/ui/badge"
 import ActionDataMenu from "@/shared/components/ActionDataMenu"
-import { DropdownMenuItem, DropdownMenuSeparator } from "@/shared/components/ui/dropdown-menu"
+import { Badge } from "@/shared/components/ui/badge"
 import {
 	AlertCircleIcon,
 	CheckCircleIcon,
@@ -59,7 +58,6 @@ interface WorkRequestColumnsProps {
 }
 
 export const getWorkRequestColumns = ({
-	hasPermission,
 	isStatusLoading,
 	handleOpenDetails,
 	handleOpenComment,
@@ -69,8 +67,6 @@ export const getWorkRequestColumns = ({
 		accessorKey: "workOrder",
 		header: "",
 		cell: ({ row }) => {
-			const status = row.original.status
-
 			return (
 				<ActionDataMenu>
 					<>
@@ -83,20 +79,10 @@ export const getWorkRequestColumns = ({
 						</DropdownMenuItem>
 
 						<DropdownMenuItem asChild>
-							{hasPermission && status === "APPROVED" ? (
-								<CreateWorkOrderForm
-									workRequestId={row.original.id}
-									equipmentId={row.original.equipments[0].id}
-								/>
-							) : (
-								hasPermission &&
-								status === "REPORTED" && (
-									<ApproveWorkRequest
-										userId={row.original.userId}
-										workRequestId={row.original.id}
-									/>
-								)
-							)}
+							<CreateWorkOrderForm
+								workRequestId={row.original.id}
+								equipmentId={row.original.equipments[0].id}
+							/>
 						</DropdownMenuItem>
 
 						<DropdownMenuSeparator />

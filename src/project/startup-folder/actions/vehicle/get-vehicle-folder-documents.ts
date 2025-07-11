@@ -58,7 +58,7 @@ export async function getVehicleFolderDocuments({
 					},
 				},
 			},
-			orderBy: { uploadedAt: "desc" },
+			orderBy: { name: "desc" },
 		})
 
 		const documents: VehicleStartupFolderDocument[] = rawDocuments.map((doc) => {

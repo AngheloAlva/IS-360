@@ -5,6 +5,7 @@ export interface WorkRequestStatsResponse {
 	totalPending: number
 	totalAttended: number
 	totalCancelled: number
+	totalUrgent: number
 	urgencyStats: {
 		urgent: {
 			attended: number

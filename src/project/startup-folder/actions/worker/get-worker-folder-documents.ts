@@ -60,7 +60,7 @@ export async function getWorkerFolderDocuments({
 					},
 				},
 			},
-			orderBy: { uploadedAt: "desc" },
+			orderBy: { name: "desc" },
 		})
 
 		const documents: WorkerStartupFolderDocument[] = rawDocuments.map((doc) => {

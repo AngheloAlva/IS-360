@@ -58,7 +58,7 @@ export async function getBasicFolderDocuments({
 					},
 				},
 			},
-			orderBy: { uploadedAt: "desc" },
+			orderBy: { name: "desc" },
 		})
 
 		const documents: BasicStartupFolderDocument[] = rawDocuments.map((doc) => {

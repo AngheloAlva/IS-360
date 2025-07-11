@@ -21,21 +21,26 @@ export async function GET(): Promise<NextResponse> {
 	}
 
 	try {
-		const [totalWorkRequests, totalPending, totalAttended, totalCancelled] = await Promise.all([
-			prisma.workRequest.count(cacheConfig),
-			prisma.workRequest.count({
-				where: { status: "REPORTED" },
-				...cacheConfig,
-			}),
-			prisma.workRequest.count({
-				where: { status: "ATTENDED" },
-				...cacheConfig,
-			}),
-			prisma.workRequest.count({
-				where: { status: "CANCELLED" },
-				...cacheConfig,
-			}),
-		])
+		const [totalWorkRequests, totalPending, totalAttended, totalUrgent, totalCancelled] =
+			await Promise.all([
+				prisma.workRequest.count(cacheConfig),
+				prisma.workRequest.count({
+					where: { status: "REPORTED" },
+					...cacheConfig,
+				}),
+				prisma.workRequest.count({
+					where: { status: "ATTENDED" },
+					...cacheConfig,
+				}),
+				prisma.workRequest.count({
+					where: { isUrgent: true },
+					...cacheConfig,
+				}),
+				prisma.workRequest.count({
+					where: { status: "CANCELLED" },
+					...cacheConfig,
+				}),
+			])
 
 		const [urgentAttended, urgentPending, nonUrgentAttended, nonUrgentPending] = await Promise.all([
 			prisma.workRequest.count({
@@ -128,6 +133,7 @@ export async function GET(): Promise<NextResponse> {
 			totalWorkRequests,
 			totalPending,
 			totalAttended,
+			totalUrgent,
 			totalCancelled,
 			urgencyStats: {
 				urgent: {
