@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers"
 
+import { sendNewWorkRequestEmail } from "./send-new-work-request"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
@@ -70,6 +71,16 @@ export const createWorkRequest = async ({
 						}
 					: {}),
 			},
+		})
+
+		sendNewWorkRequestEmail({
+			requestNumber,
+			userName: session.user.name,
+			requestDate: values.requestDate,
+			description: values.description,
+			equipmentName: values.equipments,
+			observations: values.observations,
+			isUrgent: values.isUrgent || false,
 		})
 
 		logActivity({

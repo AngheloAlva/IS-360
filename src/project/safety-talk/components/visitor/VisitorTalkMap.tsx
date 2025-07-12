@@ -29,7 +29,7 @@ const mapPoints: MapPoint[] = [
 		description: "Presentación de la planta OTC",
 		position: { x: 7, y: 86 },
 		variant: "default",
-		videoUrl: "https://drive.google.com/file/d/16cysH9ANcfuyuwyU8qIyr7QyWq5Z_H2l/preview",
+		videoUrl: "https://drive.google.com/file/d/1-vMj0XfQDmiIkDXnE5dosUnGRIdU1p_H/preview",
 	},
 	{
 		id: "point2",
