@@ -81,6 +81,7 @@ export const createWorkRequest = async ({
 			equipmentName: values.equipments,
 			observations: values.observations,
 			isUrgent: values.isUrgent || false,
+			baseUrl: process.env.NEXT_PUBLIC_BASE_URL + "/admin/dashboard/solicitudes-de-trabajo",
 		})
 
 		logActivity({

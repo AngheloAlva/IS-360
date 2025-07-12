@@ -7,6 +7,7 @@ import { NewWorkRequestEmail } from "@/project/work-request/components/emails/Ne
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 interface SendNewWorkRequestEmailProps {
+	baseUrl: string
 	userName: string
 	isUrgent: boolean
 	requestDate: Date
@@ -17,13 +18,14 @@ interface SendNewWorkRequestEmailProps {
 }
 
 export async function sendNewWorkRequestEmail({
+	baseUrl,
 	userName,
-	requestNumber,
 	isUrgent,
 	requestDate,
 	description,
-	equipmentName,
 	observations,
+	equipmentName,
+	requestNumber,
 }: SendNewWorkRequestEmailProps) {
 	if (!process.env.RESEND_API_KEY) {
 		console.error("Resend API key not found")
@@ -36,10 +38,10 @@ export async function sendNewWorkRequestEmail({
 		const subject = `Nueva Solicitud de Trabajo ${isUrgent ? "URGENTE" : ""} #${requestNumber}`
 
 		await resend.emails.send({
-			from: "OTC Notificaciones <noreply@otc-notificaciones.cl>",
+			from: "anghelo.alva@ingenieriasimple.cl",
 			to: [
+				"anghelo.alva@ingenieriasimple.cl",
 				"gsereno@oleotrasandino.cl",
-				"anghelo.alva@ingsimple.cl",
 				"katherine.burgos@oleotrasandino.cl",
 				"jaime.chavez@oleotrasandino.cl",
 				"jculloa@oleotrasandino.cl",
@@ -47,6 +49,7 @@ export async function sendNewWorkRequestEmail({
 			],
 			subject,
 			react: NewWorkRequestEmail({
+				baseUrl,
 				userName,
 				isUrgent,
 				requestDate,
@@ -54,7 +57,6 @@ export async function sendNewWorkRequestEmail({
 				observations,
 				equipmentName,
 				requestNumber,
-				baseUrl: "https://otc360.ingsimple.cl",
 			}),
 		})
 
