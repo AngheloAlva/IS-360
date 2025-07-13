@@ -1,11 +1,11 @@
 "use client"
 
 import { ScrollTextIcon } from "lucide-react"
+import Link from "next/link"
 
 import { SafetyTalksDashboard } from "@/project/safety-talk/components/admin/SafetyTalksDashboard"
-// import { IrlSafetyTalkForm } from "@/project/safety-talk/components/forms/IrlSafetyTalkForm"
+import { IrlSafetyTalkForm } from "@/project/safety-talk/components/forms/IrlSafetyTalkForm"
 import ModuleHeader from "@/shared/components/ModuleHeader"
-import Link from "next/link"
 import { Button } from "@/shared/components/ui/button"
 
 export default function SafetyTalksAdminPage() {
@@ -26,7 +26,8 @@ export default function SafetyTalksAdminPage() {
 							Charla de Visitas
 						</Button>
 					</Link>
-					{/* <IrlSafetyTalkForm /> */}
+
+					<IrlSafetyTalkForm />
 				</div>
 			</ModuleHeader>
 

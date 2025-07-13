@@ -2,8 +2,11 @@
 
 import { z } from "zod"
 
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import { generateSlug } from "@/lib/generateSlug"
+import { USER_ROLE } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 
 export const submitBasicFolderForReview = async ({
@@ -51,6 +54,7 @@ export const submitBasicFolderForReview = async ({
 						name: true,
 						company: {
 							select: {
+								id: true,
 								name: true,
 							},
 						},
@@ -113,18 +117,29 @@ export const submitBasicFolderForReview = async ({
 			})
 		)
 
-		await sendRequestReviewEmail({
+		const folderLink = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${generateSlug(folder.startupFolder.company.name)}_${folder.startupFolder.company.id}`
+
+		sendNotification({
+			link: folderLink,
+			creatorId: userId,
+			type: "BASIC_FOLDER_SUBMITTED",
+			title: `Carpeta de arranques básica enviada a revisión`,
+			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta básica de ${folder.worker.name} (${folder.startupFolder.name}) a revisión`,
+		})
+
+		sendRequestReviewEmail({
 			solicitator: {
 				email: user.email,
 				name: user.name,
 				rut: user.rut,
 				phone: user.phone,
 			},
+			reviewUrl: folderLink,
 			solicitationDate: new Date(),
 			documentCategory: DocumentCategory.BASIC,
 			companyName: folder.startupFolder.company.name,
 			folderName: folder.startupFolder.name + " - " + folder.worker.name,
-			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
 		})
 
 		return {

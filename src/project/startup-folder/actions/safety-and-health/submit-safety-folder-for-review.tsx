@@ -5,6 +5,9 @@ import { z } from "zod"
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { generateSlug } from "@/lib/generateSlug"
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
+import { USER_ROLE } from "@/lib/permissions"
 
 export const submitSafetyAndHealthFolderForReview = async ({
 	emails,
@@ -39,6 +42,7 @@ export const submitSafetyAndHealthFolderForReview = async ({
 						name: true,
 						company: {
 							select: {
+								id: true,
 								name: true,
 							},
 						},
@@ -96,7 +100,18 @@ export const submitSafetyAndHealthFolderForReview = async ({
 			})
 		)
 
-		await sendRequestReviewEmail({
+		const folderLink = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${generateSlug(folder.startupFolder.company.name)}_${folder.startupFolder.company.id}`
+
+		sendNotification({
+			link: folderLink,
+			creatorId: userId,
+			type: "ENVIRONMENT_FOLDER_SUBMITTED",
+			title: `Carpeta de seguridad y salud ocupacional enviada a revisión`,
+			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de seguridad y salud ocupacional de la carpeta ${folder.startupFolder.name} a revisión`,
+		})
+
+		sendRequestReviewEmail({
 			solicitator: {
 				email: user.email,
 				name: user.name,

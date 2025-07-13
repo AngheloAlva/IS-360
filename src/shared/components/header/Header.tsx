@@ -1,3 +1,4 @@
+import { NotificationDropdown } from "../notifications/NotificationDropdown"
 import { FontSizeSelector } from "../font-size/FontSizeSelector"
 import { SidebarTrigger } from "../ui/sidebar"
 import { Separator } from "../ui/separator"
@@ -20,6 +21,7 @@ export default function Header({
 			</div>
 
 			<div className="flex items-center gap-2">
+				<NotificationDropdown />
 				<FontSizeSelector />
 				<ThemeButton />
 			</div>

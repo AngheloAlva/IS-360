@@ -2,9 +2,11 @@
 
 import { headers } from "next/headers"
 
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { sendNewWorkRequestEmail } from "./send-new-work-request"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
+import { USER_ROLE } from "@/lib/permissions"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -82,6 +84,15 @@ export const createWorkRequest = async ({
 			observations: values.observations,
 			isUrgent: values.isUrgent || false,
 			baseUrl: process.env.NEXT_PUBLIC_BASE_URL + "/admin/dashboard/solicitudes-de-trabajo",
+		})
+
+		sendNotification({
+			creatorId: userId,
+			type: "WORK_REQUEST_CREATED",
+			targetRoles: [USER_ROLE.admin, USER_ROLE.workRequestOperator],
+			title: `Nueva Solicitud de Trabajo ${values.isUrgent ? "URGENTE 🚨" : ""}`,
+			link: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/solicitudes-de-trabajo`,
+			message: `Se ha creado una nueva solicitud de trabajo ${values.isUrgent ? "URGENTE 🚨" : ""} #${requestNumber} - ${values.description}`,
 		})
 
 		logActivity({

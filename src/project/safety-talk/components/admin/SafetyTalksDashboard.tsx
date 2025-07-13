@@ -1,7 +1,7 @@
 "use client"
 
-import { useSafetyTalkStats } from "../../hooks/use-safety-talk-stats"
 import { SafetyTalkChartsContainer } from "../stats/SafetyTalkChartsContainer"
+import { useSafetyTalkStats } from "../../hooks/use-safety-talk-stats"
 import { SafetyTalksTable } from "../data/SafetyTalksTable"
 import { SafetyTalkStats } from "../stats/SafetyTalkStats"
 

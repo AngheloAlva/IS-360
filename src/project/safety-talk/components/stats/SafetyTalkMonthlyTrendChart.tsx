@@ -3,7 +3,7 @@
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { ChartSplineIcon } from "lucide-react"
 
-import { ChartContainer, ChartTooltip } from "@/shared/components/ui/chart"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/components/ui/chart"
 import {
 	Card,
 	CardTitle,
@@ -37,7 +37,7 @@ export function SafetyTalkMonthlyTrendChart({ data }: SafetyTalkMonthlyTrendChar
 						<CartesianGrid strokeDasharray="3 3" opacity={0.5} />
 						<XAxis angle={-25} dataKey="name" textAnchor="end" />
 						<YAxis />
-						<ChartTooltip />
+						<ChartTooltip content={<ChartTooltipContent />} />
 
 						<defs>
 							<linearGradient id="fillTrend" x1="0" y1="0" x2="0" y2="1">

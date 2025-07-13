@@ -2,8 +2,11 @@
 
 import { z } from "zod"
 
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import { generateSlug } from "@/lib/generateSlug"
+import { USER_ROLE } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 
 export const submitWorkerFolderForReview = async ({
@@ -57,6 +60,7 @@ export const submitWorkerFolderForReview = async ({
 						name: true,
 						company: {
 							select: {
+								id: true,
 								name: true,
 							},
 						},
@@ -133,7 +137,18 @@ export const submitWorkerFolderForReview = async ({
 			return { ok: false, message: "Empresa no encontrada." }
 		}
 
-		await sendRequestReviewEmail({
+		const folderLink = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${generateSlug(folder.startupFolder.company.name)}_${folder.startupFolder.company.id}`
+
+		sendNotification({
+			link: folderLink,
+			creatorId: userId,
+			type: "WORKER_FOLDER_SUBMITTED",
+			title: `Carpeta de personal enviada a revisión`,
+			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de personal ${folder.worker.name} (${folder.startupFolder.name}) a revisión`,
+		})
+
+		sendRequestReviewEmail({
 			solicitator: {
 				name: user.name,
 				rut: user.rut,

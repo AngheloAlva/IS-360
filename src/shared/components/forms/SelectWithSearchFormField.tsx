@@ -30,12 +30,13 @@ interface SelectWithSearchFormFieldProps<T extends FieldValues> {
 	label?: string
 	className?: string
 	optional?: boolean
+	disabled?: boolean
 	control: Control<T>
 	placeholder?: string
 	description?: string
 	itemClassName?: string
-	options: { value: string; label: string }[]
 	onChange?: (value: string) => void
+	options: { value: string; label: string }[]
 }
 
 export function SelectWithSearchFormField<T extends FieldValues>({
@@ -45,6 +46,7 @@ export function SelectWithSearchFormField<T extends FieldValues>({
 	control,
 	optional,
 	onChange,
+	disabled,
 	className,
 	placeholder,
 	description,
@@ -66,6 +68,7 @@ export function SelectWithSearchFormField<T extends FieldValues>({
 								<Button
 									variant="outline"
 									role="combobox"
+									disabled={disabled}
 									className={cn(
 										"justify-between overflow-hidden",
 										!field.value && "text-muted-foreground",

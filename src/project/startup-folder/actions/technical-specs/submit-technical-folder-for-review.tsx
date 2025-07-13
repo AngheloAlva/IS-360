@@ -2,8 +2,11 @@
 
 import { z } from "zod"
 
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
+import { generateSlug } from "@/lib/generateSlug"
+import { USER_ROLE } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 
 export const submitTechSpecsDocumentForReview = async ({
@@ -39,6 +42,7 @@ export const submitTechSpecsDocumentForReview = async ({
 						name: true,
 						company: {
 							select: {
+								id: true,
 								name: true,
 							},
 						},
@@ -96,18 +100,29 @@ export const submitTechSpecsDocumentForReview = async ({
 			})
 		)
 
-		await sendRequestReviewEmail({
+		const folderLink = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${generateSlug(folder.startupFolder.company.name)}_${folder.startupFolder.company.id}`
+
+		sendNotification({
+			link: folderLink,
+			creatorId: userId,
+			type: "TECHNICAL_SPECS_FOLDER_SUBMITTED",
+			title: `Carpeta de especificaciones técnicas enviada a revisión`,
+			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de especificaciones técnicas de la carpeta ${folder.startupFolder.name} a revisión`,
+		})
+
+		sendRequestReviewEmail({
 			solicitator: {
 				email: user.email,
 				name: user.name,
 				rut: user.rut,
 				phone: user.phone,
 			},
+			reviewUrl: folderLink,
 			solicitationDate: new Date(),
 			companyName: folder.startupFolder.company.name,
 			documentCategory: DocumentCategory.TECHNICAL_SPECS,
-			folderName: folder.startupFolder.name + " - " + "Medio Ambiente",
-			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
+			folderName: folder.startupFolder.name + " - " + "Especificaciones Técnicas",
 		})
 
 		return {

@@ -2,8 +2,10 @@
 
 import { headers } from "next/headers"
 
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
+import { USER_ROLE } from "@/lib/permissions"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -55,14 +57,38 @@ export const createWorkPermit = async ({ values, userId, companyId }: CreateWork
 					})),
 				},
 			},
+			select: {
+				id: true,
+				otNumber: {
+					select: {
+						otNumber: true,
+					},
+				},
+				company: {
+					select: {
+						name: true,
+					},
+				},
+			},
+		})
+
+		const folderLink = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/permisos-de-trabajo`
+
+		sendNotification({
+			link: folderLink,
+			creatorId: userId,
+			type: "WORK_PERMIT_SUBMITTED",
+			title: `Nuevo permiso de trabajo`,
+			targetRoles: [USER_ROLE.admin, USER_ROLE.operator],
+			message: `La empresa ${workPermit.company.name} ha creado un nuevo permiso de trabajo para la ${workPermit.otNumber.otNumber}`,
 		})
 
 		logActivity({
 			userId: session.user.id,
-			module: MODULES.WORK_PERMITS,
-			action: ACTIVITY_TYPE.CREATE,
 			entityId: workPermit.id,
 			entityType: "WorkPermit",
+			module: MODULES.WORK_PERMITS,
+			action: ACTIVITY_TYPE.CREATE,
 		})
 
 		return {

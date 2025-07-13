@@ -18,6 +18,7 @@ import {
 	ChartColumnIcon,
 	LockKeyholeIcon,
 	ShieldPlusIcon,
+	BellIcon,
 } from "lucide-react"
 
 export const data = {
@@ -103,6 +104,11 @@ export const data = {
 			name: "Reportabilidad",
 			url: "/admin/dashboard/reportabilidad",
 			icon: ChartColumnIcon,
+		},
+		{
+			name: "Notificaciones",
+			url: "/admin/dashboard/notificaciones",
+			icon: BellIcon,
 		},
 	],
 	navSecondary: [

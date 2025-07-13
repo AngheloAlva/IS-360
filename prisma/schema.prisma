@@ -95,6 +95,7 @@ model User {
   createdEntries                  WorkEntry[]               @relation("WorkEntryCreator")
   signedEntries                   WorkEntry[]               @relation("WorkEntrySigner")
   workEntries                     WorkEntry[]               @relation("WorkEntryApproval")
+  notifications                   Notification[]
   workPermitsAsParticipant        WorkPermit[]              @relation("WorkPermitParticipants")
   workPermitsAsPreventionOfficer  WorkPermit[]              @relation("PreventionOfficer")
   workPermits                     WorkPermit[]              @relation("WorkPermitUser")
@@ -145,6 +146,26 @@ model User {
   @@index([companyId], name: "company_id_idx")
   @@index([accessRole, isActive], name: "access_role_is_active_idx")
   @@map("user")
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  type       String
+  title      String
+  message    String
+  link       String?
+  targetRole String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId], name: "notification_user_id_idx")
+  @@index([isRead], name: "notification_is_read_idx")
+  @@index([targetRole], name: "notification_target_role_idx")
+  @@map("notification")
 }
 
 model RutCounter {
