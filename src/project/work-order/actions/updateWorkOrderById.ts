@@ -77,8 +77,6 @@ export const updateWorkOrderById = async ({
 				programDate: values.programDate,
 				estimatedHours: parseInt(values.estimatedHours),
 				estimatedDays: parseInt(values.estimatedDays),
-				requiresBreak: values.requiresBreak,
-				breakDays: values.breakDays ? parseInt(values.breakDays) : undefined,
 				estimatedEndDate: values.estimatedEndDate,
 				workProgressStatus: +values.workProgressStatus,
 				company: {
