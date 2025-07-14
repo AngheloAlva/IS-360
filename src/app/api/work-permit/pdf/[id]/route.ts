@@ -26,6 +26,7 @@ export async function GET(
 			include: {
 				otNumber: {
 					select: {
+						otNumber: true,
 						workName: true,
 						supervisor: {
 							select: {
