@@ -26,7 +26,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 	const orderBy = searchParams.get("orderBy") as OrderBy
 
 	const skip = (page - 1) * limit
-	const nextWeek = addWeeks(new Date(), 1)
+	const today = new Date()
+	const nextWeek = addWeeks(today, 1)
 
 	try {
 		const [maintenancePlans, total] = await Promise.all([
@@ -62,18 +63,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 							location: true,
 						},
 					},
-					_count: {
-						select: {
-							task: {
-								where: {
-									nextDate: {
-										lte: nextWeek,
-										gte: new Date(),
-									},
-								},
-							},
-						},
-					},
 				},
 				take: limit,
 				orderBy: { [orderBy]: order },
@@ -100,9 +89,40 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 			}),
 		])
 
+		// Get counts for next week tasks and expired tasks
+		const plansWithCounts = await Promise.all(
+			maintenancePlans.map(async (plan) => {
+				const [nextWeekTasks, expiredTasks] = await Promise.all([
+					prisma.maintenancePlanTask.count({
+						where: {
+							maintenancePlanId: plan.id,
+							nextDate: {
+								lte: nextWeek,
+								gte: today,
+							},
+						},
+					}),
+					prisma.maintenancePlanTask.count({
+						where: {
+							maintenancePlanId: plan.id,
+							nextDate: {
+								lt: today,
+							},
+						},
+					}),
+				])
+
+				return {
+					...plan,
+					nextWeekTasksCount: nextWeekTasks,
+					expiredTasksCount: expiredTasks,
+				}
+			})
+		)
+
 		return NextResponse.json({
 			total,
-			maintenancePlans,
+			maintenancePlans: plansWithCounts,
 			pages: Math.ceil(total / limit),
 		})
 	} catch (error) {

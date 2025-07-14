@@ -30,6 +30,7 @@ export const MaintenancePlanColumns = ({
 									equipmentId: row.original.equipment?.id ?? "",
 									slug: row.original.slug,
 								}}
+								className="text-muted-foreground hover:bg-accent w-full justify-start bg-transparent hover:scale-100 hover:text-white"
 							/>
 						</DropdownMenuItem>
 					</>
@@ -82,11 +83,19 @@ export const MaintenancePlanColumns = ({
 		},
 	},
 	{
-		accessorKey: "_count",
+		accessorKey: "expiredTasksCount",
+		header: "Tareas Vencidas",
+		cell: ({ row }) => {
+			const count = row.getValue("expiredTasksCount") as MaintenancePlan["expiredTasksCount"]
+			return <span className={count > 0 ? "text-red-600" : ""}>{count} Tarea(s)</span>
+		},
+	},
+	{
+		accessorKey: "nextWeekTasksCount",
 		header: "Proximas Tareas (1 semana)",
 		cell: ({ row }) => {
-			const count = row.getValue("_count") as MaintenancePlan["_count"]
-			return <span>{count.task} Tarea(s)</span>
+			const count = row.getValue("nextWeekTasksCount") as MaintenancePlan["nextWeekTasksCount"]
+			return <span>{count} Tarea(s)</span>
 		},
 	},
 	{

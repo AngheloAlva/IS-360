@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils"
 
 interface MaintenancePlanTaskFormProps {
 	userId: string
+	className?: string
 	equipmentId: string
 	maintenancePlanSlug: string
 	initialData?: {
@@ -52,9 +53,10 @@ interface MaintenancePlanTaskFormProps {
 
 export default function MaintenancePlanTaskForm({
 	userId,
+	className,
 	equipmentId,
-	maintenancePlanSlug,
 	initialData,
+	maintenancePlanSlug,
 }: MaintenancePlanTaskFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
@@ -169,11 +171,15 @@ export default function MaintenancePlanTaskForm({
 						"gap-1.5 bg-white text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600",
 						{
 							"size-7 bg-fuchsia-600 text-white hover:bg-fuchsia-600 hover:text-white": initialData,
-						}
+						},
+						className
 					)}
 				>
 					{initialData ? (
-						<PenBoxIcon className="size-4" />
+						<>
+							<PenBoxIcon className="size-4" />
+							Editar
+						</>
 					) : (
 						<>
 							<PlusCircleIcon className="size-4" />

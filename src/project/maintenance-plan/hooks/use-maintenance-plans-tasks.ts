@@ -12,6 +12,7 @@ export interface MaintenancePlanTask {
 	description: string
 	location: MAINTENANCE_PLAN_LOCATION
 	createdBy: {
+		id: string
 		name: string
 	}
 	equipment: {

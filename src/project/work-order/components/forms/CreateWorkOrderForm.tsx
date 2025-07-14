@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { PlusCircleIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { addDays } from "date-fns"
+import { addDays, differenceInDays } from "date-fns"
 import { toast } from "sonner"
 
 import { createWorkOrder } from "@/project/work-order/actions/createWorkOrder"
@@ -46,15 +46,20 @@ import {
 import type { Company } from "@/project/company/hooks/use-companies"
 
 interface CreateWorkOrderFormProps {
-	className?: string
 	equipmentId?: string
 	workRequestId?: string
 	equipmentName?: string
 	maintenancePlanTaskId?: string
+	initialData?: {
+		programDate: Date
+		workRequest: string
+		description: string
+		responsibleId: string
+	}
 }
 
 export default function CreateWorkOrderForm({
-	className,
+	initialData,
 	equipmentId,
 	workRequestId,
 	equipmentName,
@@ -73,19 +78,19 @@ export default function CreateWorkOrderForm({
 		resolver: zodResolver(workOrderSchema),
 		defaultValues: {
 			companyId: "",
-			workRequest: "",
 			type: undefined,
 			supervisorId: "",
 			capex: undefined,
-			responsibleId: "",
 			estimatedDays: "",
 			estimatedHours: "",
-			workDescription: "",
 			priority: undefined,
-			programDate: new Date(),
 			estimatedEndDate: new Date(),
 			solicitationDate: new Date(),
 			equipment: equipmentId ? [equipmentId] : [],
+			workRequest: initialData?.workRequest ?? "",
+			responsibleId: initialData?.responsibleId ?? "",
+			workDescription: initialData?.description ?? "",
+			programDate: initialData?.programDate ?? new Date(),
 			solicitationTime: new Date().toTimeString().split(" ")[0],
 		},
 	})
@@ -99,6 +104,15 @@ export default function CreateWorkOrderForm({
 		form.setValue("estimatedEndDate", estimatedEndDate)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("estimatedDays")])
+
+	useEffect(() => {
+		const programDate = new Date(form.watch("programDate"))
+		const estimatedEndDate = new Date(form.watch("estimatedEndDate") ?? new Date())
+		const diffInDays = differenceInDays(estimatedEndDate, programDate)
+
+		form.setValue("estimatedDays", diffInDays.toString())
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("estimatedEndDate")])
 
 	async function onSubmit(values: WorkOrderSchema) {
 		const initReportFile = form.getValues("file")?.[0]
@@ -168,12 +182,9 @@ export default function CreateWorkOrderForm({
 			<SheetTrigger
 				className={cn(
 					"flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-700 transition-all hover:scale-105",
-					className,
 					{
-						"flex h-7 items-center justify-center gap-1 rounded-md bg-indigo-600 px-3 py-1 text-xs font-semibold tracking-wide text-white transition-all hover:scale-105":
-							equipmentId && maintenancePlanTaskId,
-						"hover:bg-accent text-text hover:text-accent-foreground data-[variant=destructive]:text-destructive-foreground data-[variant=destructive]:hover:bg-destructive/10 dark:data-[variant=destructive]:hover:bg-destructive/40 data-[variant=destructive]:hover:text-destructive-foreground data-[variant=destructive]:*:[svg]:!text-destructive-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex h-fit w-full cursor-default items-center gap-2 rounded-sm bg-transparent px-2 py-1.5 text-sm outline-hidden select-none hover:scale-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4":
-							workRequestId,
+						"hover:bg-accent text-text hover:text-accent-foreground data-[variant=destructive]:text-destructive-foreground data-[variant=destructive]:hover:bg-destructive/10 dark:data-[variant=destructive]:hover:bg-destructive/40 data-[variant=destructive]:hover:text-destructive-foreground data-[variant=destructive]:*:[svg]:!text-destructive-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex h-fit w-full cursor-default items-center justify-start gap-2 rounded-sm bg-transparent px-2 py-1.5 text-sm outline-hidden select-none hover:scale-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4":
+							(equipmentId && maintenancePlanTaskId) || workRequestId,
 					}
 				)}
 				onClick={() => setOpen(true)}

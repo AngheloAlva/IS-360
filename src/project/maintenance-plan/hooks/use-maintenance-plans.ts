@@ -16,9 +16,8 @@ export interface MaintenancePlan {
 	createdBy: {
 		name: string
 	}
-	_count: {
-		task: number
-	}
+	nextWeekTasksCount: number
+	expiredTasksCount: number
 }
 
 interface UseMaintenancePlansParams {

@@ -54,12 +54,14 @@ interface MaintenancePlanFormProps {
 		slug: string
 	}
 	onClose?: () => void
+	className?: string
 }
 
 export default function MaintenancePlanForm({
 	userId,
-	initialData,
 	onClose,
+	className,
+	initialData,
 }: MaintenancePlanFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
@@ -148,13 +150,17 @@ export default function MaintenancePlanForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button
-					size={initialData ? "default" : "lg"}
+					size={initialData ? "sm" : "lg"}
 					className={cn(
-						"gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600"
+						"gap-1.5 bg-white font-medium text-indigo-600 transition-all hover:scale-105 hover:bg-white hover:text-indigo-600",
+						className
 					)}
 				>
 					{initialData ? (
-						<PenBoxIcon className="size-4 text-fuchsia-600" />
+						<>
+							<PenBoxIcon className="size-4 text-fuchsia-600" />
+							Editar
+						</>
 					) : (
 						<>
 							<PlusCircleIcon className="size-4 text-indigo-600" />
