@@ -14,33 +14,20 @@ import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { WORK_ORDER_PRIORITY } from "@prisma/client"
 import { queryClient } from "@/lib/queryClient"
+import { cn } from "@/lib/utils"
 import {
 	useWorkBooksByCompany,
 	type WorkBookByCompany,
 } from "@/project/work-order/hooks/use-work-books-by-company"
 
+import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
-import { Skeleton } from "@/shared/components/ui/skeleton"
+import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
-import { cn } from "@/lib/utils"
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormField,
-	FormControl,
-	FormMessage,
-} from "@/shared/components/ui/form"
-import {
-	Select,
-	SelectItem,
-	SelectValue,
-	SelectTrigger,
-	SelectContent,
-} from "@/shared/components/ui/select"
+import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
 	SheetTitle,
@@ -49,7 +36,6 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
-import { Button } from "@/shared/components/ui/button"
 
 interface WorkBookFormProps {
 	userId: string
@@ -83,7 +69,7 @@ export default function NewWorkBookForm({
 		})
 	}, [form])
 
-	const { data, isLoading } = useWorkBooksByCompany({
+	const { data } = useWorkBooksByCompany({
 		page: 1,
 		companyId,
 		limit: 15,
@@ -180,39 +166,18 @@ export default function NewWorkBookForm({
 							</p>
 						</div>
 
-						<FormField
-							control={form.control}
+						<SelectWithSearchFormField<WorkBookSchema>
 							name="workOrderId"
-							render={({ field }) => (
-								<FormItem className="sm:col-span-2">
-									<FormLabel>Número de OT</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder="Seleccione un número de OT" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{isLoading ? (
-												<Skeleton className="h-8 w-full" />
-											) : (
-												data?.workBooks.map((workOrder) => (
-													<SelectItem key={workOrder.id} value={workOrder.id}>
-														{workOrder.otNumber}
-													</SelectItem>
-												))
-											)}
-
-											{data?.workBooks.length === 0 && (
-												<div className="text-muted-foreground py-2 text-center text-sm">
-													No hay ordenes de trabajo
-												</div>
-											)}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
+							label="Número de OT"
+							control={form.control}
+							itemClassName="sm:col-span-2"
+							placeholder="Seleccione una orden de trabajo"
+							options={
+								data?.workBooks?.map((workOrder) => ({
+									value: workOrder.id,
+									label: workOrder.otNumber + " - " + workOrder.workRequest,
+								})) ?? []
+							}
 						/>
 
 						{workOrderSelected && (

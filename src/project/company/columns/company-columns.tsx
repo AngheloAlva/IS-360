@@ -28,7 +28,7 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 						<DropdownMenuItem asChild>
 							<Link
 								href={`/admin/dashboard/empresas/${id}`}
-								className="z-10 flex cursor-pointer px-3 font-medium text-white"
+								className="text-text z-10 flex cursor-pointer px-3 font-medium"
 							>
 								<EyeIcon className="size-4" /> Ver detalles
 							</Link>

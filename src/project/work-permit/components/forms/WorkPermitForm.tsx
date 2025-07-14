@@ -33,6 +33,7 @@ import {
 
 import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
@@ -46,7 +47,6 @@ import { Form } from "@/shared/components/ui/form"
 import { queryClient } from "@/lib/queryClient"
 
 import type { WorkPermit } from "../../hooks/use-work-permit"
-import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 
 interface WorkPermitFormProps {
 	userId: string
@@ -298,14 +298,14 @@ export default function WorkPermitForm({
 										control={form.control}
 									/>
 								) : (
-									<SelectFormField<WorkPermitSchema>
+									<SelectWithSearchFormField<WorkPermitSchema>
 										name="otNumber"
 										label="Número de OT"
 										control={form.control}
 										options={
 											workOrdersData?.workOrders?.map((workOrder) => ({
 												value: workOrder.otNumber,
-												label: workOrder.otNumber,
+												label: workOrder.otNumber + " - " + workOrder.workRequest,
 											})) ?? []
 										}
 									/>

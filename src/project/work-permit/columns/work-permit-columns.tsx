@@ -50,7 +50,7 @@ export const getWorkPermitColumns = (
 								href={`/admin/dashboard/permisos-de-trabajo/${id}/pdf`}
 								className="text-text flex cursor-pointer px-3 font-medium"
 							>
-								<PrinterIcon className="h-4 w-4 text-rose-500" /> Imprimir
+								<PrinterIcon className="h-4 w-4 text-orange-500" /> Imprimir
 							</Link>
 						</DropdownMenuItem>
 

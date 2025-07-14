@@ -90,9 +90,7 @@ export default function WorkBookMain({
 	const canAddActivities =
 		workBook.status === WORK_ORDER_STATUS.IN_PROGRESS ||
 		workBook.status === WORK_ORDER_STATUS.PLANNED
-	const canRequestClosure =
-		(workBook.supervisorId === userId || hassWorkBookPermission) &&
-		workBook.workProgressStatus === 100
+	const canRequestClosure = hassWorkBookPermission || workBook.workProgressStatus === 100
 
 	return (
 		<>

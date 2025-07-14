@@ -1,10 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { addDays, differenceInDays } from "date-fns"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { SquarePen } from "lucide-react"
-import { addDays } from "date-fns"
 import { toast } from "sonner"
 
 import { updateWorkOrderById } from "@/project/work-order/actions/updateWorkOrderById"
@@ -81,7 +81,6 @@ export default function UpdateWorkOrderForm({
 		defaultValues: {
 			type: workOrder.type,
 			status: workOrder.status,
-			estimatedEndDate: undefined,
 			priority: workOrder.priority,
 			companyId: workOrder.company?.id,
 			workRequest: workOrder.workRequest,
@@ -93,6 +92,7 @@ export default function UpdateWorkOrderForm({
 			estimatedHours: `${workOrder.estimatedHours}`,
 			workDescription: workOrder.workDescription ?? "",
 			workProgressStatus: [workOrder.workProgressStatus],
+			estimatedEndDate: workOrder.estimatedEndDate ?? undefined,
 			equipment: workOrder.equipment.map((equipment) => equipment.id),
 			solicitationDate: new Date(workOrder.solicitationDate) ?? new Date(),
 			solicitationTime: workOrder.solicitationTime ?? new Date().toTimeString().split(" ")[0],
@@ -119,13 +119,23 @@ export default function UpdateWorkOrderForm({
 	}, [form.formState.errors])
 
 	useEffect(() => {
-		const estimatedHours = Number(form.watch("estimatedHours"))
-		const estimatedDays = Math.ceil(estimatedHours / 8)
+		const estimatedDays = Number(form.watch("estimatedDays"))
+		const estimatedHours = estimatedDays * 8
+		const estimatedEndDate = addDays(new Date(form.watch("programDate")), estimatedDays)
 
-		form.setValue("estimatedDays", estimatedDays.toString())
-		form.setValue("estimatedEndDate", addDays(new Date(workOrder.programDate), estimatedDays))
+		form.setValue("estimatedHours", estimatedHours.toString())
+		form.setValue("estimatedEndDate", estimatedEndDate)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("estimatedHours")])
+	}, [form.watch("estimatedDays")])
+
+	useEffect(() => {
+		const programDate = new Date(form.watch("programDate"))
+		const estimatedEndDate = new Date(form.watch("estimatedEndDate") ?? new Date())
+		const diffInDays = differenceInDays(estimatedEndDate, programDate)
+
+		form.setValue("estimatedDays", diffInDays.toString())
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("estimatedEndDate")])
 
 	async function onSubmit(values: UpdateWorkOrderSchema) {
 		setIsSubmitting(true)
@@ -400,17 +410,25 @@ export default function UpdateWorkOrderForm({
 
 						<InputFormField<UpdateWorkOrderSchema>
 							type="number"
+							name="estimatedDays"
+							control={form.control}
+							label="Días Estimados"
+						/>
+
+						<DatePickerFormField<UpdateWorkOrderSchema>
+							name="estimatedEndDate"
+							control={form.control}
+							label="Fecha Final Estimada"
+						/>
+
+						<InputFormField<UpdateWorkOrderSchema>
+							type="number"
 							name="estimatedHours"
 							control={form.control}
 							label="Horas Estimadas"
 						/>
 
-						<InputFormField<UpdateWorkOrderSchema>
-							type="number"
-							name="estimatedDays"
-							control={form.control}
-							label="Días Estimados"
-						/>
+						<Separator className="my-2 sm:col-span-2" />
 
 						<FileTable<UpdateWorkOrderSchema>
 							name="endReport"

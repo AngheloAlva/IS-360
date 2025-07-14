@@ -17,6 +17,7 @@ import {
 	dailyActivitySchema,
 } from "@/project/work-order/schemas/daily-activity.schema"
 
+import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TimePickerFormField } from "@/shared/components/forms/TimePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
@@ -306,7 +307,7 @@ export default function ActivityForm({
 									</Button>
 								</div>
 
-								<SelectFormField<DailyActivitySchema>
+								<SelectWithSearchFormField<DailyActivitySchema>
 									options={users.map((user) => ({
 										value: user.id,
 										label: user.name,

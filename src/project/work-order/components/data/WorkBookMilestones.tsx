@@ -78,7 +78,7 @@ export default function WorkBookMilestones({
 				</h2>
 
 				<div className="flex gap-2">
-					{data?.milestones.length === 0 && (userId === supervisorId || hassWorkBookPermission) && (
+					{(data?.milestones.length === 0 || hassWorkBookPermission) && (
 						<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
 					)}
 
