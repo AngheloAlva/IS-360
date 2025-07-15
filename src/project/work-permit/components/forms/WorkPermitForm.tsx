@@ -162,6 +162,7 @@ export default function WorkPermitForm({
 		statusFilter: null,
 		permitFilter: true,
 		orderBy: "createdAt",
+		priorityFilter: null,
 	})
 
 	const { data: usersData } = useUsersByCompany({

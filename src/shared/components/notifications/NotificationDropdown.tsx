@@ -75,7 +75,7 @@ export const NotificationDropdown = () => {
 							{notifications.length > 0 && (
 								<div className="text-center">
 									<Link
-										href="/notifications"
+										href="/admin/dashboard/notificaciones"
 										className="hover:bg-muted/50 flex w-full items-center justify-center gap-1 p-2 text-sm font-medium tracking-wide text-blue-500 hover:underline"
 										onClick={() => setOpen(false)}
 									>

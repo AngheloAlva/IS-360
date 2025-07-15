@@ -1,5 +1,6 @@
 "use client"
 
+import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -21,8 +22,8 @@ type Notification = {
 
 export default function NotificationsPage() {
 	const [notifications, setNotifications] = useState<Notification[]>([])
-	const [isLoading, setIsLoading] = useState(true)
-	const [activeTab, setActiveTab] = useState("all")
+	const [onlyUnread, setOnlyUnread] = useState<boolean>(false)
+	const [isLoading, setIsLoading] = useState<boolean>(true)
 	const [pagination, setPagination] = useState({
 		total: 0,
 		pages: 1,
@@ -30,7 +31,7 @@ export default function NotificationsPage() {
 		limit: 10,
 	})
 
-	const fetchNotifications = async (page = 1, onlyUnread = false) => {
+	const fetchNotifications = async (page = 1) => {
 		try {
 			setIsLoading(true)
 			const response = await fetch(
@@ -60,7 +61,6 @@ export default function NotificationsPage() {
 			})
 
 			if (response.ok) {
-				// Actualizar estado local
 				setNotifications((prev) =>
 					prev.map((notification) =>
 						notification.id === id ? { ...notification, isRead: true } : notification
@@ -72,18 +72,14 @@ export default function NotificationsPage() {
 		}
 	}
 
-	const handleTabChange = (value: string) => {
-		setActiveTab(value)
-		fetchNotifications(1, value === "unread")
-	}
-
 	const handlePageChange = (page: number) => {
-		fetchNotifications(page, activeTab === "unread")
+		fetchNotifications(page)
 	}
 
 	useEffect(() => {
 		fetchNotifications()
-	}, [])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [onlyUnread])
 
 	return (
 		<div className="w-full flex-1 space-y-6">
@@ -93,17 +89,21 @@ export default function NotificationsPage() {
 				description="Puedes ver y gestionar tus notificaciones aquí"
 			/>
 
-			<Tabs value={activeTab} onValueChange={handleTabChange}>
-				<TabsList className="mb-4">
-					<TabsTrigger value="all">Todas</TabsTrigger>
-					<TabsTrigger value="unread">No leídas</TabsTrigger>
+			<Tabs>
+				<TabsList className="w-full">
+					<TabsTrigger onClick={() => setOnlyUnread(false)} value="all">
+						Todas
+					</TabsTrigger>
+					<TabsTrigger onClick={() => setOnlyUnread(true)} value="unread">
+						No leídas
+					</TabsTrigger>
 				</TabsList>
 
 				<TabsContents>
-					<TabsContent value="all" className="space-y-4">
+					<TabsContent value="all" className="space-y-2">
 						{renderNotificationsList()}
 					</TabsContent>
-					<TabsContent value="unread" className="space-y-4">
+					<TabsContent value="unread" className="space-y-2">
 						{renderNotificationsList()}
 					</TabsContent>
 				</TabsContents>
@@ -148,21 +148,35 @@ export default function NotificationsPage() {
 		return notifications.map((notification) => (
 			<div
 				key={notification.id}
-				className={`rounded-lg border p-4 ${!notification.isRead ? "bg-muted/20" : ""}`}
-				onClick={() => !notification.isRead && markAsRead(notification.id)}
+				className={`rounded-lg border p-4 ${notification.isRead ? "bg-background/50" : "bg-background"}`}
 			>
-				<div className="mb-2 flex items-center justify-between">
-					<h3 className="font-medium">{notification.title}</h3>
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2">
+						{notification.isRead ? (
+							<EyeIcon className="text-muted-foreground h-4 w-4" />
+						) : (
+							<EyeClosedIcon className="h-4 w-4 text-blue-500" />
+						)}
+						<h3 className="font-medium">{notification.title}</h3>
+					</div>
+
 					<span className="text-muted-foreground text-sm">
 						{format(new Date(notification.createdAt), "dd MMMM yyyy, HH:mm", {
 							locale: es,
 						})}
 					</span>
 				</div>
-				<p className="text-muted-foreground mb-3">{notification.message}</p>
+
+				<p className="text-muted-foreground mb-3 text-sm">{notification.message}</p>
+
 				{notification.link && (
 					<div className="flex justify-end">
-						<Link href={notification.link}>
+						<Link
+							href={notification.link}
+							onClick={() => {
+								markAsRead(notification.id)
+							}}
+						>
 							<Button variant="outline" size="sm">
 								Ver detalles
 							</Button>
