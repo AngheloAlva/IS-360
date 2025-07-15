@@ -176,7 +176,7 @@ export default function ActivityForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
 				className={cn(
-					"flex h-10 items-center justify-center gap-1 rounded-md bg-orange-600 px-3 text-sm font-semibold text-nowrap text-white transition-all hover:scale-105 hover:bg-orange-700",
+					"flex h-9 items-center justify-center gap-1 rounded-md bg-orange-600 px-3 text-sm font-semibold text-nowrap text-white transition-all hover:scale-105 hover:bg-orange-700",
 					{
 						"bg-yellow-600 hover:bg-yellow-700": entryType === "ADDITIONAL_ACTIVITY",
 					}

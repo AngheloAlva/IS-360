@@ -7,6 +7,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { createOtcInspections } from "@/project/work-order/actions/createOtcInspections"
+import { useWorkBookMilestones } from "../../hooks/use-work-book-milestones"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
 import {
@@ -15,11 +16,14 @@ import {
 } from "@/project/work-order/schemas/otc-inspections.schema"
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
+import { TimePickerFormField } from "@/shared/components/forms/TimePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
+import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
 import FileTable from "@/shared/components/forms/FileTable"
+import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
@@ -44,13 +48,28 @@ export default function OtcInspectorForm({
 		resolver: zodResolver(otcInspectionsSchema),
 		defaultValues: {
 			workOrderId,
+			inspectionName: "",
 			nonConformities: "",
-			activityEndTime: "",
-			activityStartTime: "",
+			activityEndTime: new Date().toLocaleTimeString("en-US", {
+				hour12: false,
+				hour: "2-digit",
+				minute: "2-digit",
+			}),
+			activityStartTime: new Date().toLocaleTimeString("en-US", {
+				hour12: false,
+				hour: "2-digit",
+				minute: "2-digit",
+			}),
 			safetyObservations: "",
+			milestoneId: undefined,
 			supervisionComments: "",
 			executionDate: new Date(),
 		},
+	})
+
+	const { data: milestones, isLoading: isLoadingMilestones } = useWorkBookMilestones({
+		workOrderId,
+		showAll: false,
 	})
 
 	async function onSubmit(values: OtcInspectionSchema) {
@@ -113,7 +132,7 @@ export default function OtcInspectorForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex h-10 items-center justify-center gap-1 rounded-md bg-red-500 px-3 text-sm font-semibold text-nowrap text-white hover:bg-red-500/80"
+				className="flex h-9 items-center justify-center gap-1 rounded-md bg-red-500 px-3 text-sm font-semibold text-nowrap text-white hover:bg-red-500/80"
 				onClick={() => setOpen(true)}
 			>
 				<PlusIcon className="h-4 w-4" />
@@ -133,6 +152,13 @@ export default function OtcInspectorForm({
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="grid w-full gap-x-3 gap-y-5 overflow-y-scroll px-4 pt-4 pb-16 sm:grid-cols-2"
 					>
+						<InputFormField<OtcInspectionSchema>
+							name="inspectionName"
+							control={form.control}
+							label="Nombre de la Inspección"
+							itemClassName="sm:col-span-2"
+						/>
+
 						<DatePickerFormField<OtcInspectionSchema>
 							name="executionDate"
 							control={form.control}
@@ -140,18 +166,38 @@ export default function OtcInspectorForm({
 						/>
 
 						<div className="grid gap-3 md:grid-cols-2">
-							<InputFormField<OtcInspectionSchema>
+							<TimePickerFormField<OtcInspectionSchema>
 								name="activityStartTime"
 								control={form.control}
 								label="Hora de Inicio"
 							/>
 
-							<InputFormField<OtcInspectionSchema>
+							<TimePickerFormField<OtcInspectionSchema>
 								name="activityEndTime"
 								control={form.control}
 								label="Hora de Fin"
 							/>
 						</div>
+
+						{isLoadingMilestones ? (
+							<Skeleton className="h-10 w-full rounded-md sm:col-span-2" />
+						) : (
+							<SelectFormField<OtcInspectionSchema>
+								optional
+								options={
+									milestones?.milestones.map((milestone) => ({
+										value: milestone.id,
+										label: milestone.name,
+									})) || []
+								}
+								name="milestoneId"
+								control={form.control}
+								label="Hito Relacionado"
+								placeholder="Selecciona un hito"
+								itemClassName="sm:col-span-2 mt-2"
+								description="Selecciona un hito para relacionar la inspección con un hito específico."
+							/>
+						)}
 
 						<TextAreaFormField<OtcInspectionSchema>
 							name="nonConformities"
@@ -193,8 +239,8 @@ export default function OtcInspectorForm({
 
 						<SubmitButton
 							label="Crear Inspección"
-							className="sm:col-span-2"
 							isSubmitting={isSubmitting}
+							className="bg-red-500 text-white hover:bg-red-600 hover:text-white sm:col-span-2"
 						/>
 					</form>
 				</Form>

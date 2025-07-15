@@ -1,5 +1,9 @@
 "use client"
 
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
+import Link from "next/link"
+
 import { WorkEntry } from "@/project/work-order/hooks/use-work-entries"
 import { ExternalLink, X } from "lucide-react"
 
@@ -8,14 +12,11 @@ import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Button } from "@/shared/components/ui/button"
 import {
 	Drawer,
-	DrawerClose,
-	DrawerContent,
-	DrawerHeader,
 	DrawerTitle,
+	DrawerClose,
+	DrawerHeader,
+	DrawerContent,
 } from "@/shared/components/ui/drawer"
-import Link from "next/link"
-import { es } from "date-fns/locale"
-import { format } from "date-fns"
 
 interface WorkBookEntryDetailsProps {
 	entry: WorkEntry | null
@@ -115,19 +116,21 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 								</div>
 							)}
 
-							<div className="space-y-2">
-								<h4 className="font-semibold">Usuarios Asignados</h4>
-								<div className="flex flex-wrap gap-2">
-									{entry.assignedUsers.map((user) => (
-										<span
-											key={user.id}
-											className="rounded-lg bg-amber-600/10 px-3 py-1 text-sm text-amber-600"
-										>
-											{user.name} - {user.rut}
-										</span>
-									))}
+							{entry.assignedUsers.length > 0 && (
+								<div className="space-y-2">
+									<h4 className="font-semibold">Participantes</h4>
+									<div className="flex flex-wrap gap-2">
+										{entry.assignedUsers.map((user) => (
+											<span
+												key={user.id}
+												className="rounded-lg bg-amber-600/10 px-3 py-1 text-sm text-amber-600"
+											>
+												{user.name} - {user.rut}
+											</span>
+										))}
+									</div>
 								</div>
-							</div>
+							)}
 
 							{entry.attachments.length > 0 && (
 								<div className="space-y-2">

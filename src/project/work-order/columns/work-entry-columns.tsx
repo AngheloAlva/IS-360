@@ -43,12 +43,6 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		header: "Nombre de la actividad",
 		cell: ({ row }) => {
 			const activityName = row.getValue("activityName") as string
-			const entryType = row.getValue("entryType") as ENTRY_TYPE
-			const nonConformities = row.original.nonConformities
-
-			if (!activityName && entryType === "OTC_INSPECTION" && nonConformities) {
-				return <span className="line-clamp-2">{nonConformities}</span>
-			}
 
 			return activityName || "Sin título"
 		},
@@ -58,6 +52,19 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		header: "Descripción",
 		cell: ({ row }) => {
 			const description = row.getValue("comments") as string
+			const entryType = row.getValue("entryType") as ENTRY_TYPE
+			const nonConformities = row.original.nonConformities
+			const supervisionComments = row.original.supervisionComments
+			const safetyObservations = row.original.safetyObservations
+
+			if (entryType === "OTC_INSPECTION") {
+				return (
+					<p className="max-w-64 truncate">
+						{nonConformities || supervisionComments || safetyObservations}
+					</p>
+				)
+			}
+
 			return <p className="max-w-64 truncate">{description}</p>
 		},
 	},
