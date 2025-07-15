@@ -81,8 +81,8 @@ export default function CreateWorkOrderForm({
 			type: undefined,
 			supervisorId: "",
 			capex: undefined,
-			estimatedDays: "",
-			estimatedHours: "",
+			estimatedDays: "1",
+			estimatedHours: "8",
 			priority: undefined,
 			estimatedEndDate: new Date(),
 			solicitationDate: new Date(),
@@ -114,7 +114,16 @@ export default function CreateWorkOrderForm({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("estimatedEndDate")])
 
+	// Debug: Agregar useEffect para ver errores de validación
+	useEffect(() => {
+		const errors = form.formState.errors
+		if (Object.keys(errors).length > 0) {
+			console.log("Errores de validación:", errors)
+		}
+	}, [form.formState.errors])
+
 	async function onSubmit(values: WorkOrderSchema) {
+		console.log("Formulario enviado con valores:", values)
 		const initReportFile = form.getValues("file")?.[0]
 
 		setIsSubmitting(true)
@@ -382,6 +391,24 @@ export default function CreateWorkOrderForm({
 							control={form.control}
 							className="mb-6 w-full sm:col-span-2"
 						/>
+
+						{/* Botón de debug temporal */}
+						<Button
+							size="lg"
+							type="button"
+							variant="secondary"
+							onClick={() => {
+								const values = form.getValues()
+								const errors = form.formState.errors
+								console.log("=== DEBUG FORMULARIO ===")
+								console.log("Valores actuales:", values)
+								console.log("Errores:", errors)
+								console.log("Es válido:", form.formState.isValid)
+								console.log("========================")
+							}}
+						>
+							🐛 Debug Form
+						</Button>
 
 						<Button
 							size="lg"

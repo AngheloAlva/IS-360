@@ -139,10 +139,10 @@ export default function WorkBookMain({
 			<Tabs defaultValue="milestones" className="w-full">
 				<TabsList className="h-11 w-full">
 					<TabsTrigger value="milestones" className="h-9">
-						Hitos y Tareas
+						Carta Gantt / Hitos
 					</TabsTrigger>
 					<TabsTrigger value="activities" className="h-9">
-						Actividades Diarias
+						Registro Actividades Diarias
 					</TabsTrigger>
 				</TabsList>
 
@@ -168,7 +168,7 @@ export default function WorkBookMain({
 									<div className="size-10 rounded-md bg-red-500/10 p-1.5">
 										<ListOrderedIcon className="h-auto w-full text-red-500" />
 									</div>
-									Lista de Actividades
+									Detalle de Trabajo Diario
 								</h2>
 
 								<div className="flex gap-2">

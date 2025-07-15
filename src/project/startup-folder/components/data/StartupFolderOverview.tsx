@@ -25,8 +25,8 @@ import {
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
-import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import { CreateStartupFolder } from "../forms/CreateStartupFolder"
+import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import CompleteFolderDialog from "../dialogs/CompleteFolderDialog"
 import { StartupFolderDocuments } from "./StartupFolderDocuments"
 import RefreshButton from "@/shared/components/RefreshButton"
@@ -34,9 +34,9 @@ import ModuleHeader from "@/shared/components/ModuleHeader"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
+import { VehicleFolder } from "./VehicleFolder"
 import { WorkerFolder } from "./WorkerFolder"
 import { BasicFolder } from "./BasicFolder"
-import { VehicleFolder } from "./VehicleFolder"
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -381,20 +381,27 @@ export default function StartupFolderOverview({
 												"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos."
 											) : (
 												<div className="flex flex-wrap items-center justify-between gap-4">
-													<p className="w-fit">
-														La carpeta esta lista para ser aprobada. Al aprovar la carpeta se
-														notificara a la empresa que esta lista para iniciar con los trabajos
-														respectivos.
-													</p>
+													{selectedFolder.status === StartupFolderStatus.COMPLETED ? (
+														<p className="w-fit">
+															Carpeta aprobada. El contratista ya puede iniciar con los trabajos
+															respectivos.
+														</p>
+													) : (
+														<>
+															<p className="w-fit">
+																La carpeta esta lista para ser aprobada. Al aprobar la carpeta se
+																notificara a la empresa que esta lista para iniciar con los trabajos
+																respectivos.
+															</p>
 
-													{isOtcMember &&
-														hasPermission &&
-														selectedFolder.status !== StartupFolderStatus.COMPLETED && (
-															<CompleteFolderDialog
-																folderId={selectedFolder.id}
-																onSuccess={() => refetch()}
-															/>
-														)}
+															{isOtcMember && hasPermission && (
+																<CompleteFolderDialog
+																	folderId={selectedFolder.id}
+																	onSuccess={() => refetch()}
+																/>
+															)}
+														</>
+													)}
 												</div>
 											)}
 										</div>
@@ -422,20 +429,27 @@ export default function StartupFolderOverview({
 												"Su carpeta de arranque ha sido completada exitosamente. Ahora puedes iniciar con los trabajos respectivos"
 											) : (
 												<div className="flex flex-wrap items-center justify-between gap-4">
-													<p className="w-fit">
-														La carpeta esta lista para ser aprobada. Al aprovar la carpeta se
-														notificara a la empresa que esta lista para iniciar con los trabajos
-														respectivos.
-													</p>
+													{selectedFolder.status === StartupFolderStatus.COMPLETED ? (
+														<p className="w-fit">
+															Carpeta aprobada. El contratista ya puede iniciar con los trabajos
+															respectivos.
+														</p>
+													) : (
+														<>
+															<p className="w-fit">
+																La carpeta esta lista para ser aprobada. Al aprobar la carpeta se
+																notificara a la empresa que esta lista para iniciar con los trabajos
+																respectivos.
+															</p>
 
-													{isOtcMember &&
-														hasPermission &&
-														selectedFolder.status !== StartupFolderStatus.COMPLETED && (
-															<CompleteFolderDialog
-																folderId={selectedFolder.id}
-																onSuccess={() => refetch()}
-															/>
-														)}
+															{isOtcMember && hasPermission && (
+																<CompleteFolderDialog
+																	folderId={selectedFolder.id}
+																	onSuccess={() => refetch()}
+																/>
+															)}
+														</>
+													)}
 												</div>
 											)}
 										</div>

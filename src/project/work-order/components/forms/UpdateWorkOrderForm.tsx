@@ -188,7 +188,7 @@ export default function UpdateWorkOrderForm({
 	return (
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
-				className="flex cursor-pointer items-center justify-center gap-2 font-medium"
+				className="text-muted-foreground hover:bg-accent flex w-full cursor-pointer items-center justify-start gap-2 rounded-md bg-transparent px-3 py-1 text-sm font-medium hover:scale-100 hover:text-white"
 				onClick={() => setOpen(true)}
 			>
 				<SquarePen className="h-4 w-4" />

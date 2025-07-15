@@ -30,7 +30,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 			return (
 				<ActionDataMenu>
 					<>
-						<DropdownMenuItem onClick={(e) => e.preventDefault()}>
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 							<UpdateWorkOrderForm workOrder={row.original} />
 						</DropdownMenuItem>
 					</>

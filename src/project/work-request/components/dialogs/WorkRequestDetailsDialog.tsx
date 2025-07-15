@@ -25,6 +25,7 @@ import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
+import Link from "next/link"
 
 interface WorkRequestDetailsDialogProps {
 	open: boolean
@@ -166,17 +167,26 @@ export default function WorkRequestDetailsDialog({
 										) : (
 											<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
 												{workRequest.attachments.map((attachment) => (
-													<div key={attachment.id} className="overflow-hidden rounded-md border">
-														<div className="relative h-32 w-full">
-															<Image
-																src={attachment.url}
-																alt={attachment.name}
-																fill
-																className="object-cover"
-															/>
+													<Link
+														target="_blank"
+														key={attachment.id}
+														href={attachment.url}
+														className="hover:bg-text/10 overflow-hidden rounded-md border transition-colors"
+													>
+														<div className="relative flex h-32 w-full items-center justify-center">
+															{attachment.url.includes(".pdf") ? (
+																<FileTextIcon className="size-12" />
+															) : (
+																<Image
+																	src={attachment.url}
+																	alt={attachment.name}
+																	fill
+																	className="object-cover"
+																/>
+															)}
 														</div>
 														<div className="truncate p-2 text-sm">{attachment.name}</div>
-													</div>
+													</Link>
 												))}
 											</div>
 										)}

@@ -74,7 +74,7 @@ export default function WorkBookMilestones({
 					<div className="size-10 rounded-md bg-orange-500/10 p-1.5">
 						<FolderKanbanIcon className="h-auto w-full text-orange-500" />
 					</div>
-					Hitos y Actividades
+					Planificación de trabajo
 				</h2>
 
 				<div className="flex gap-2">
