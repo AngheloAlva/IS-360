@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { BookmarkXIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 import { closeWorkPermit } from "../../actions/admin/closeWorkPermit"
@@ -22,7 +22,6 @@ import {
 	Dialog,
 	DialogClose,
 	DialogTitle,
-	DialogFooter,
 	DialogHeader,
 	DialogTrigger,
 	DialogContent,
@@ -78,6 +77,10 @@ export default function CloseWorkPermit({
 		}
 	}
 
+	useEffect(() => {
+		console.log(form.formState.errors)
+	}, [form.formState.errors])
+
 	const closedBy = form.watch("closedBy")
 
 	return (
@@ -89,32 +92,28 @@ export default function CloseWorkPermit({
 				</Button>
 			</DialogTrigger>
 
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<DialogContent>
-						<DialogHeader>
-							<DialogTitle>Cerrar Permiso de Trabajo</DialogTitle>
-							<DialogDescription>
-								¿Estás seguro de cerrar este permiso de trabajo?
-							</DialogDescription>
-						</DialogHeader>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Cerrar Permiso de Trabajo</DialogTitle>
+					<DialogDescription>¿Estás seguro de cerrar este permiso de trabajo?</DialogDescription>
+				</DialogHeader>
 
-						<div className="flex flex-col gap-6">
-							<SelectWithSearchFormField
-								name="closedBy"
-								label="Cerrado por"
-								control={form.control}
-								placeholder="Selecciona un operador"
-								options={
-									operators?.operators.map((operator) => ({
-										value: operator.id,
-										label: operator.name,
-									})) ?? []
-								}
-							/>
-						</div>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+						<SelectWithSearchFormField
+							name="closedBy"
+							label="Cerrado por"
+							control={form.control}
+							placeholder="Selecciona un operador"
+							options={
+								operators?.operators.map((operator) => ({
+									value: operator.id,
+									label: operator.name,
+								})) ?? []
+							}
+						/>
 
-						<DialogFooter className="mt-4">
+						<div className="mt-4 flex w-full items-center justify-end">
 							<DialogClose asChild>
 								<Button type="button" variant="outline">
 									Cancelar
@@ -127,10 +126,10 @@ export default function CloseWorkPermit({
 								disabled={isLoading || closedBy === ""}
 								className="cursor-pointe h-9 w-fit bg-pink-500 transition-all hover:scale-105 hover:bg-pink-600"
 							/>
-						</DialogFooter>
-					</DialogContent>
-				</form>
-			</Form>
+						</div>
+					</form>
+				</Form>
+			</DialogContent>
 		</Dialog>
 	)
 }

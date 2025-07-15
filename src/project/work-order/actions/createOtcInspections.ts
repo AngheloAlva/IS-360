@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers"
 
+import { sendOtcInspectionNotification } from "./sendOtcInspectionNotification"
 import { UploadResult as UploadFilesResult } from "@/lib/upload-files"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
@@ -106,9 +107,12 @@ export const createOtcInspections = async ({
 				},
 			})
 
+			sendOtcInspectionNotification({ workEntryId: newWorkEntry.id })
+
 			return {
 				ok: true,
-				message: "Inspector creado exitosamente",
+				message: "Inspección creada exitosamente",
+				inspectionId: newWorkEntry.id,
 			}
 		})
 	} catch (error) {
