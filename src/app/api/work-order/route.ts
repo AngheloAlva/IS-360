@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { subDays } from "date-fns"
 
-import { WORK_ORDER_STATUS, WORK_ORDER_TYPE } from "@prisma/client"
+import { type WORK_ORDER_PRIORITY, WORK_ORDER_STATUS, type WORK_ORDER_TYPE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -24,6 +24,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const search = searchParams.get("search") || ""
 		const typeFilter = searchParams.get("typeFilter") || null
 		const statusFilter = searchParams.get("statusFilter") || null
+		const priorityFilter = searchParams.get("priorityFilter") || null
 		const companyId = searchParams.get("companyId") || null
 		const startDate = searchParams.get("startDate") || null
 		const endDate = searchParams.get("endDate") || null
@@ -57,6 +58,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				: permitFilter
 					? { status: { in: [WORK_ORDER_STATUS.PLANNED, WORK_ORDER_STATUS.IN_PROGRESS] } }
 					: {}),
+			...(priorityFilter
+				? {
+						priority: priorityFilter as WORK_ORDER_PRIORITY,
+					}
+				: {}),
 			...(permitFilter
 				? {
 						estimatedEndDate: { gte: subDays(new Date(), 1) },

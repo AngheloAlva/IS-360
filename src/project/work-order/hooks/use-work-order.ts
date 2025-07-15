@@ -77,6 +77,7 @@ interface WorkOrdersParams {
 	typeFilter: string | null
 	statusFilter: string | null
 	dateRange: DateRange | null
+	priorityFilter: string | null
 }
 
 interface WorkOrdersResponse {
@@ -102,6 +103,7 @@ export const fetchWorkOrders: QueryFunction<
 			typeFilter: string | null
 			statusFilter: string | null
 			dateRange: DateRange | null
+			priorityFilter: string | null
 		},
 	]
 > = async ({ queryKey }) => {
@@ -119,6 +121,7 @@ export const fetchWorkOrders: QueryFunction<
 			isOtcMember,
 			statusFilter,
 			permitFilter,
+			priorityFilter,
 		},
 	] = queryKey
 
@@ -135,6 +138,7 @@ export const fetchWorkOrders: QueryFunction<
 	if (orderBy) searchParams.set("orderBy", orderBy)
 	if (order) searchParams.set("order", order)
 	if (isOtcMember) searchParams.set("isOtcMember", isOtcMember.toString())
+	if (priorityFilter) searchParams.set("priorityFilter", priorityFilter)
 
 	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching work orders")
@@ -147,6 +151,7 @@ export const useWorkOrders = ({
 	limit = 10,
 	search = "",
 	order = "desc",
+	priorityFilter,
 	companyId = null,
 	dateRange = null,
 	typeFilter = null,
@@ -169,6 +174,7 @@ export const useWorkOrders = ({
 			isOtcMember,
 			statusFilter,
 			permitFilter,
+			priorityFilter,
 		},
 	] as const
 

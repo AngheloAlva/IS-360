@@ -17,7 +17,7 @@ import {
 import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-book-milestones"
 import { useWorkOrders, WorkOrder } from "@/project/work-order/hooks/use-work-order"
 import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
-import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
+import { WorkOrderPriorityLabels, WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { useCompanies } from "@/project/company/hooks/use-companies"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
@@ -67,6 +67,7 @@ interface WorkOrderTableProps {
 export function WorkOrderTable({ id }: WorkOrderTableProps) {
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [priorityFilter, setPriorityFilter] = useState<string | null>(null)
 	const [statusFilter, setStatusFilter] = useState<string | null>(null)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [dateRange, setDateRange] = useState<DateRange | null>(null)
@@ -94,6 +95,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		limit: 15,
 		typeFilter,
 		statusFilter,
+		priorityFilter,
 		search: debouncedSearch,
 	})
 
@@ -305,6 +307,34 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 								{WorkOrderStatusOptions.map((status) => (
 									<SelectItem key={status.value} value={status.value}>
 										{status.label}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+
+					<Select
+						onValueChange={(value) => {
+							if (value === "all") {
+								setPriorityFilter(null)
+							} else {
+								setPriorityFilter(value)
+							}
+						}}
+						value={priorityFilter ?? "all"}
+					>
+						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+							<SelectValue placeholder="Estado" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Prioridad</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="all">Todas las prioridades</SelectItem>
+
+								{WorkOrderPriorityOptions.map((priority) => (
+									<SelectItem key={priority.value} value={priority.value}>
+										{priority.label}
 									</SelectItem>
 								))}
 							</SelectGroup>

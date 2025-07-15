@@ -4,8 +4,7 @@ import { DatabaseZapIcon, HandshakeIcon, SirenIcon, StarIcon } from "lucide-reac
 import { useEffect, useState } from "react"
 
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
-
-type DashboardId = "dashboard1" | "dashboard2" | "dashboard3" | "dashboard4"
+import { authClient } from "@/lib/auth-client"
 
 type Dashboard = {
 	title: string
@@ -14,12 +13,20 @@ type Dashboard = {
 }
 
 type DashboardsMap = {
-	[key in DashboardId]: Dashboard
+	dashboard1: Dashboard
+	dashboard2: Dashboard
+	dashboard3?: Dashboard
+	dashboard4?: Dashboard
 }
 
 type LoadingStatusMap = {
-	[key in DashboardId]: boolean
+	dashboard1: boolean
+	dashboard2: boolean
+	dashboard3?: boolean
+	dashboard4?: boolean
 }
+
+type DashboardId = "dashboard1" | "dashboard2" | "dashboard3" | "dashboard4"
 
 export default function PowerBIDashboardPage() {
 	const [activeTab, setActiveTab] = useState<DashboardId>("dashboard1")
@@ -30,8 +37,7 @@ export default function PowerBIDashboardPage() {
 		dashboard3: true,
 		dashboard4: true,
 	})
-
-	const dashboards: DashboardsMap = {
+	const [dashboards, setDashboards] = useState<DashboardsMap>({
 		dashboard1: {
 			title: "Análisis Alarmas (DAS)",
 			url: "https://app.powerbi.com/view?r=eyJrIjoiYTViOWRiM2ItMmY0Yi00Y2VmLTllNWUtZDI5YjdiYWFhMzkxIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
@@ -42,17 +48,9 @@ export default function PowerBIDashboardPage() {
 			url: "https://app.powerbi.com/view?r=eyJrIjoiZjVmNDE0OGItNDg5ZC00ZmQxLTkzM2EtYmExMTJhNmY2MzI2IiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
 			icon: <HandshakeIcon className="h-4 w-4" />,
 		},
-		dashboard3: {
-			title: "Reporte Mensual Interno",
-			url: "https://app.powerbi.com/view?r=eyJrIjoiMjIxYzY3ZmItYmY3MS00Y2MxLWE5YTgtYTUzZmVmMzY5MGFmIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
-			icon: <DatabaseZapIcon className="h-4 w-4" />,
-		},
-		dashboard4: {
-			title: "Reporte Directorio",
-			url: "https://app.powerbi.com/view?r=eyJrIjoiYTYyMDc0ZmUtYzZjNS00MTdhLWFkYjktMzJjYWZiNmRkZjBkIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
-			icon: <StarIcon className="h-4 w-4" />,
-		},
-	}
+	})
+
+	const session = authClient.useSession()
 
 	const handleIframeLoad = (dashboardId: DashboardId) => {
 		setLoadingStatus((prev) => ({ ...prev, [dashboardId]: false }))
@@ -67,6 +65,29 @@ export default function PowerBIDashboardPage() {
 
 		return () => window.removeEventListener("resize", updateHeight)
 	}, [])
+
+	useEffect(() => {
+		const authorizedEmails = process.env.NEXT_PUBLIC_GERENCY_EMAILS!.split(",")
+
+		console.log(authorizedEmails)
+		console.log("session.data?.user.email", session.data?.user.email)
+
+		if (authorizedEmails.includes(session.data?.user.email || "")) {
+			setDashboards((prev) => ({
+				...prev,
+				dashboard3: {
+					title: "Reporte Mensual Interno",
+					url: "https://app.powerbi.com/view?r=eyJrIjoiMjIxYzY3ZmItYmY3MS00Y2MxLWE5YTgtYTUzZmVmMzY5MGFmIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
+					icon: <DatabaseZapIcon className="h-4 w-4" />,
+				},
+				dashboard4: {
+					title: "Reporte Directorio",
+					url: "https://app.powerbi.com/view?r=eyJrIjoiYTYyMDc0ZmUtYzZjNS00MTdhLWFkYjktMzJjYWZiNmRkZjBkIiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9",
+					icon: <StarIcon className="h-4 w-4" />,
+				},
+			}))
+		}
+	}, [session.data?.user.email])
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-4 overflow-hidden transition-all">
