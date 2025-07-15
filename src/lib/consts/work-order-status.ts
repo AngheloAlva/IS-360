@@ -28,20 +28,12 @@ export const WorkOrderStatusLabels = {
 
 export const WorkOrderStatusOptions = [
 	{
-		value: WORK_ORDER_STATUS_VALUES.PENDING,
-		label: "Pendiente",
-	},
-	{
 		value: WORK_ORDER_STATUS_VALUES.IN_PROGRESS,
 		label: "En Proceso",
 	},
 	{
 		value: WORK_ORDER_STATUS_VALUES.COMPLETED,
 		label: "Completado",
-	},
-	{
-		value: WORK_ORDER_STATUS_VALUES.CANCELLED,
-		label: "Cancelado",
 	},
 	{
 		value: WORK_ORDER_STATUS_VALUES.CLOSURE_REQUESTED,
