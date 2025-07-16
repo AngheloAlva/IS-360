@@ -143,14 +143,15 @@ export const sendOtcInspectionNotification = async ({
 		}
 
 		// Send emails to all recipients
-		const emailPromises = recipients.map(async (recipient) => {
+		const emailPromises = recipients.map(async (recipient, i) => {
 			const subject = hasSafetyIssues
 				? `🚨 URGENTE: Inspección OTC con No Conformidades - OT ${workOrderData.otNumber}`
 				: `📋 Nueva Inspección OTC Realizada - OT ${workOrderData.otNumber}`
 
 			return resend.emails.send({
-				from: process.env.FROM_EMAIL || "noreply@otc360.ingsimple.cl",
+				from: "anghelo.alva@ingenieriasimple.cl",
 				to: recipient.email,
+				cc: i === 0 ? "soporte@ingenieriasimple.cl" : [],
 				subject,
 				react: await OtcInspectionNotificationEmail({
 					inspection: inspectionData,

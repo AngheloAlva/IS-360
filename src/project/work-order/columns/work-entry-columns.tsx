@@ -49,7 +49,7 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 	},
 	{
 		accessorKey: "comments",
-		header: "Descripción",
+		header: "Descripción / Inspecciones",
 		cell: ({ row }) => {
 			const description = row.getValue("comments") as string
 			const entryType = row.getValue("entryType") as ENTRY_TYPE

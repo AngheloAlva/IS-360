@@ -48,7 +48,6 @@ import {
 	SelectItem,
 	SelectLabel,
 	SelectGroup,
-	SelectValue,
 	SelectTrigger,
 	SelectContent,
 	SelectSeparator,
@@ -241,13 +240,13 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						value={typeFilter ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							<SelectValue placeholder="Tipo de obra" />
+							Tipo OT
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
 								<SelectLabel>Tipo de obra</SelectLabel>
 								<SelectSeparator />
-								<SelectItem value="all">Todos los tipos</SelectItem>
+								<SelectItem value="all">Todos</SelectItem>
 								{WorkOrderTypeOptions.map((type) => (
 									<SelectItem key={type.value} value={type.value}>
 										{type.label}
@@ -268,13 +267,13 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						value={companyId ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							<SelectValue placeholder="Empresa" />
+							Empresa
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
 								<SelectLabel>Empresa</SelectLabel>
 								<SelectSeparator />
-								<SelectItem value="all">Todas las empresas</SelectItem>
+								<SelectItem value="all">Todas</SelectItem>
 								{companies?.companies?.map((company) => (
 									<SelectItem key={company.id} value={company.id}>
 										{company.name}
@@ -297,13 +296,13 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						value={statusFilter ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							<SelectValue placeholder="Estado" />
+							Estado OT
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
 								<SelectLabel>Estado</SelectLabel>
 								<SelectSeparator />
-								<SelectItem value="all">Todos los estados</SelectItem>
+								<SelectItem value="all">Todos</SelectItem>
 								{WorkOrderStatusOptions.map((status) => (
 									<SelectItem key={status.value} value={status.value}>
 										{status.label}
@@ -324,13 +323,13 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						value={priorityFilter ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							<SelectValue placeholder="Estado" />
+							Prioridad OT
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
 								<SelectLabel>Prioridad</SelectLabel>
 								<SelectSeparator />
-								<SelectItem value="all">Todas las prioridades</SelectItem>
+								<SelectItem value="all">Todas</SelectItem>
 
 								{WorkOrderPriorityOptions.map((priority) => (
 									<SelectItem key={priority.value} value={priority.value}>

@@ -61,7 +61,7 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 								<h3 className="text-2xl font-semibold">{entry.activityName}</h3>
 								<p className="text-muted-foreground text-sm">
 									Creado por {entry.createdBy.name} el{" "}
-									{new Date(entry.createdAt).toLocaleDateString()}
+									{format(new Date(entry.createdAt), "dd MMM yyyy HH:mm", { locale: es })}
 								</p>
 							</div>
 
@@ -83,10 +83,12 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 								</div>
 							</div>
 
-							<div className="space-y-2">
-								<h4 className="font-semibold">Descripción</h4>
-								<p className="text-sm">{entry.comments || "Sin descripción"}</p>
-							</div>
+							{entry.comments && (
+								<div className="space-y-2">
+									<h4 className="font-semibold">Descripción</h4>
+									<p className="text-sm">{entry.comments}</p>
+								</div>
+							)}
 
 							{entry.supervisionComments && (
 								<div className="space-y-2">
