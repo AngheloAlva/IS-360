@@ -29,6 +29,7 @@ import { CreateStartupFolder } from "../forms/CreateStartupFolder"
 import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import CompleteFolderDialog from "../dialogs/CompleteFolderDialog"
 import { StartupFolderDocuments } from "./StartupFolderDocuments"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 import RefreshButton from "@/shared/components/RefreshButton"
 import ModuleHeader from "@/shared/components/ModuleHeader"
 import { Skeleton } from "@/shared/components/ui/skeleton"
@@ -110,6 +111,26 @@ export default function StartupFolderOverview({
 				}
 			>
 				<>
+					{!isOtcMember && (
+						<VideoTutorials
+							videos={[
+								{
+									title: "Agregar Colaborador",
+									description: "Tutorial de como agregar un colaborador correctamente.",
+									url:
+										selectedFolder?.type === "FULL"
+											? "https://youtube.com/embed/HQlXE2gNZDo"
+											: "https://youtube.com/embed/j_UqQYTPpik",
+								},
+								{
+									title: "Agregar Vehículo",
+									description: "Tutorial de como agregar un colaborador correctamente.",
+									url: "https://youtube.com/embed/ngYgt8-RQ9k",
+								},
+							]}
+						/>
+					)}
+
 					{isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
 
 					<Link
