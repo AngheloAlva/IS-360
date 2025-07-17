@@ -118,9 +118,9 @@ export default function WorkBookMain({
 						{WorkOrderStatusLabels[workBook.status as keyof typeof WorkOrderStatusLabels]}
 					</Badge>
 
-					<div className="flex items-center justify-between gap-4">
+					<div className="flex items-center justify-between gap-2">
 						<span className="text-sm font-medium">Progreso del trabajo:</span>
-						<span className="text-sm font-bold">{workBook.workProgressStatus}%</span>
+						<span className="text-sm font-bold">{workBook.workProgressStatus || 0}%</span>
 					</div>
 					<Progress
 						value={workBook.workProgressStatus || 0}
@@ -157,6 +157,7 @@ export default function WorkBookMain({
 							canRequestClosure={canRequestClosure}
 							responsibleId={workBook.responsibleId}
 							hassWorkBookPermission={hassWorkBookPermission}
+							isMilestonesApproved={workBook.isMilestonesApproved}
 							workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
 						/>
 					</TabsContent>

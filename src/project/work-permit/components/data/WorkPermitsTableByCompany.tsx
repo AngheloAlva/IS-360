@@ -94,6 +94,7 @@ export function WorkPermitsTableByCompany({
 				<div className="flex w-full flex-wrap items-end justify-start gap-2 md:w-full md:flex-row">
 					<SearchInput
 						value={search}
+						setPage={setPage}
 						onChange={setSearch}
 						inputClassName="w-80"
 						placeholder="Buscar por número de OT, trabajo, ubicación..."

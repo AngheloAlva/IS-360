@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 
 import { CloseWorkBook } from "../forms/CloseWorkBook"
 import {
@@ -21,7 +22,6 @@ import {
 } from "@/shared/components/ui/accordion"
 
 import type { WorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
-import { WORK_ORDER_STATUS } from "@prisma/client"
 
 interface WorkBookGeneralDataProps {
 	userId: string
@@ -158,7 +158,7 @@ export default function WorkBookGeneralData({
 
 						{(hasPermission || data.responsibleId === userId) &&
 							data.status !== WORK_ORDER_STATUS.COMPLETED && (
-								<div className="flex justify-end">
+								<div className="mt-2 flex justify-end gap-2">
 									<CloseWorkBook userId={data.responsible.id} workOrderId={data.id} />
 								</div>
 							)}

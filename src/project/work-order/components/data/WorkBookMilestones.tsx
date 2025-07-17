@@ -8,6 +8,7 @@ import MilestonesForm from "@/project/work-order/components/forms/MilestonesForm
 import MilestoneCards from "@/project/work-order/components/data/MilestoneCards"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { RequestWorkBookClosure } from "../forms/RequestWorkBookClosure"
+import { MilestoneApproval } from "../forms/MilestoneApproval"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 
 interface WorkBookMilestonesProps {
@@ -19,6 +20,7 @@ interface WorkBookMilestonesProps {
 	hasPermission: boolean
 	workOrderStartDate: Date
 	canRequestClosure: boolean
+	isMilestonesApproved: boolean
 	hassWorkBookPermission: boolean
 }
 
@@ -31,6 +33,7 @@ export default function WorkBookMilestones({
 	hasPermission,
 	canRequestClosure,
 	workOrderStartDate,
+	isMilestonesApproved,
 	hassWorkBookPermission,
 }: WorkBookMilestonesProps) {
 	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
@@ -77,10 +80,14 @@ export default function WorkBookMilestones({
 					Planificación de trabajo
 				</h2>
 
-				<div className="flex gap-2">
-					{(data?.milestones.length === 0 || hassWorkBookPermission) && (
-						<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
-					)}
+				<div className="flex items-center gap-2">
+					{!isMilestonesApproved && <MilestoneApproval workOrderId={workOrderId} />}
+
+					<MilestonesForm
+						workOrderId={workOrderId}
+						workOrderStartDate={workOrderStartDate}
+						initialData={data?.milestones}
+					/>
 
 					{canRequestClosure ||
 						(canRequestClosure && hassWorkBookPermission && (

@@ -62,6 +62,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-5" id={id}>
 				<SearchInput
 					value={searchTerm}
+					setPage={() => {}}
 					onChange={setSearchTerm}
 					inputClassName="bg-background"
 					className="col-span-2 sm:col-span-1 lg:col-span-2"

@@ -344,6 +344,8 @@ model WorkOrder {
   isWorkBook            Boolean
   isWorkBookInit        Boolean                    @default(false)
   isInternalResponsible Boolean                    @default(false)
+  canUpdateMilestone    Boolean                    @default(false)
+  isMilestonesApproved  Boolean                    @default(true)
 
   // Work book data
   workName           String?

@@ -1,7 +1,7 @@
 "use client"
 
+import { Trash2Icon, MilestoneIcon, PlusCircleIcon, PenBoxIcon } from "lucide-react"
 import { useFieldArray, useForm } from "react-hook-form"
-import { Trash2Icon, MilestoneIcon, PlusCircleIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -30,12 +30,19 @@ import {
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
 
+import type { Milestone } from "../../hooks/use-work-book-milestones"
+
 interface MilestonesFormProps {
 	workOrderId: string
 	workOrderStartDate: Date
+	initialData?: Milestone[]
 }
 
-export default function MilestonesForm({ workOrderId, workOrderStartDate }: MilestonesFormProps) {
+export default function MilestonesForm({
+	initialData,
+	workOrderId,
+	workOrderStartDate,
+}: MilestonesFormProps) {
 	const [loading, setLoading] = useState<boolean>(false)
 	const [activeTab, setActiveTab] = useState("0")
 	const [open, setOpen] = useState(false)
@@ -44,13 +51,23 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 		resolver: zodResolver(workBookMilestonesSchema),
 		defaultValues: {
 			workOrderId,
-			milestones: [
-				{
-					name: "",
-					weight: "",
-					description: "",
-				},
-			],
+			milestones: initialData
+				? initialData.map((milestone) => ({
+						name: milestone.name,
+						weight: milestone.weight.toString(),
+						endDate: milestone.endDate || new Date(),
+						description: milestone.description || "",
+						startDate: milestone.startDate || new Date(),
+					}))
+				: [
+						{
+							name: "",
+							weight: "",
+							description: "",
+							endDate: undefined,
+							startDate: undefined,
+						},
+					],
 		},
 	})
 
@@ -103,13 +120,22 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 				className="flex h-10 cursor-pointer items-center justify-center gap-1 rounded-md bg-orange-600 px-3 text-sm text-white transition-all hover:scale-105 hover:bg-orange-700"
 				onClick={() => setOpen(true)}
 			>
-				<PlusCircleIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Agregar Hitos</span>
+				{initialData ? (
+					<>
+						<PenBoxIcon className="size-4" />
+						<span className="hidden sm:inline">Editar Hitos</span>
+					</>
+				) : (
+					<>
+						<PlusCircleIcon className="size-4" />
+						<span className="hidden sm:inline">Agregar Hitos</span>
+					</>
+				)}
 			</SheetTrigger>
 
 			<SheetContent side="right" className="gap-0 sm:max-w-[70dvw] lg:max-w-[50dvw]">
 				<SheetHeader className="shadow">
-					<SheetTitle>Agregar Hitos</SheetTitle>
+					<SheetTitle>{initialData ? "Editar Hitos" : "Agregar Hitos"}</SheetTitle>
 					<SheetDescription>
 						Gestione los hitos para el libro de obras. Podrá agregar actividades diarias despues y
 						relacionarlas con los hitos.
@@ -121,7 +147,6 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="h-full space-y-6 overflow-y-auto px-4 pb-24"
 					>
-						{/* Root errors */}
 						{form.formState.errors.milestones?.root && (
 							<div className="rounded-md border border-red-500 bg-red-50 p-3 text-sm text-red-800">
 								<p className="font-medium">Errores de validación:</p>
@@ -130,7 +155,6 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 							</div>
 						)}
 
-						{/* Date errors */}
 						{milestoneFields.some(
 							(_, index) =>
 								form.formState.errors.milestones?.[index]?.startDate ||
@@ -227,7 +251,7 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 								</TabsList>
 							</div>
 
-							<div className="border-l-0 pl-0 md:w-3/4 md:border-l md:pl-4">
+							<div className="border-l-0 pl-0 md:w-3/4 md:border-l">
 								<TabsContents>
 									{milestoneFields.map((field, index) => (
 										<TabsContent key={field.id} value={index.toString()} className="m-0 pt-4">
@@ -242,7 +266,11 @@ export default function MilestonesForm({ workOrderId, workOrderStartDate }: Mile
 							</div>
 						</Tabs>
 
-						<SubmitButton isSubmitting={loading} label="Guardar Hitos" />
+						<SubmitButton
+							isSubmitting={loading}
+							label="Guardar Hitos"
+							className="hover:scale-[1.02]"
+						/>
 					</form>
 				</Form>
 			</SheetContent>
@@ -259,7 +287,7 @@ interface MilestoneFormProps {
 
 function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) {
 	return (
-		<div className="space-y-4">
+		<div className="w-full space-y-4 px-4">
 			<div className="space-y-5">
 				<div className="flex flex-col md:flex-row md:items-center md:justify-between">
 					<h3 className="flex items-center gap-x-2 text-lg font-bold">

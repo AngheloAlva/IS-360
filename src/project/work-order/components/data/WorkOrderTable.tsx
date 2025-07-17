@@ -211,6 +211,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 
 					<SearchInput
 						value={search}
+						setPage={setPage}
 						onChange={setSearch}
 						className="ml-auto w-full md:w-72"
 						placeholder="Buscar por número de OT, trabajo..."
@@ -232,8 +233,10 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					<Select
 						onValueChange={(value) => {
 							if (value === "all") {
+								setPage(1)
 								setTypeFilter(null)
 							} else {
+								setPage(1)
 								setTypeFilter(value)
 							}
 						}}
@@ -259,8 +262,10 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					<Select
 						onValueChange={(value) => {
 							if (value === "all") {
+								setPage(1)
 								setCompanyId(null)
 							} else {
+								setPage(1)
 								setCompanyId(value)
 							}
 						}}
@@ -288,8 +293,10 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					<Select
 						onValueChange={(value) => {
 							if (value === "all") {
+								setPage(1)
 								setStatusFilter(null)
 							} else {
+								setPage(1)
 								setStatusFilter(value)
 							}
 						}}
@@ -315,8 +322,10 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					<Select
 						onValueChange={(value) => {
 							if (value === "all") {
+								setPage(1)
 								setPriorityFilter(null)
 							} else {
+								setPage(1)
 								setPriorityFilter(value)
 							}
 						}}

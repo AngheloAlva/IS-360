@@ -102,6 +102,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 					<div className="flex w-full flex-col items-end gap-4 lg:flex-row">
 						<SearchInput
 							value={search}
+							setPage={setPage}
 							onChange={setSearch}
 							placeholder="Buscar permisos..."
 							className="w-full lg:w-[250px]"

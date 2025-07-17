@@ -13,10 +13,12 @@ interface SearchInputProps {
 	className?: string
 	inputClassName?: string
 	iconClassName?: string
+	setPage: (page: number) => void
 }
 
 export default function SearchInput({
 	value,
+	setPage,
 	onChange,
 	className,
 	inputClassName,
@@ -25,15 +27,20 @@ export default function SearchInput({
 }: SearchInputProps) {
 	return (
 		<div className={cn("relative", className)}>
-			<Search className={cn(
-				"absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground",
-				iconClassName
-			)} />
+			<Search
+				className={cn(
+					"text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2",
+					iconClassName
+				)}
+			/>
 			<Input
 				value={value}
 				placeholder={placeholder}
 				className={cn("pl-8", inputClassName)}
-				onChange={(e) => onChange(e.target.value)}
+				onChange={(e) => {
+					onChange(e.target.value)
+					setPage(1)
+				}}
 			/>
 		</div>
 	)

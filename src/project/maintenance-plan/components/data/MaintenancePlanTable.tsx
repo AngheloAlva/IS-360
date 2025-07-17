@@ -133,6 +133,7 @@ export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) 
 						<SearchInput
 							value={search}
 							className="w-80"
+							setPage={setPage}
 							onChange={setSearch}
 							inputClassName="bg-background"
 							placeholder="Buscar por nombre o RUT de empresa..."
