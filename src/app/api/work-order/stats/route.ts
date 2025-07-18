@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
-import { WORK_ORDER_STATUS, WORK_ORDER_PRIORITY } from "@prisma/client"
-import prisma from "@/lib/prisma"
+
+import { WORK_ORDER_STATUS } from "@prisma/client"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export async function GET(): Promise<NextResponse> {
 	const session = await auth.api.getSession({
@@ -14,29 +15,18 @@ export async function GET(): Promise<NextResponse> {
 	}
 
 	try {
-		// Realizar consultas en paralelo para mejorar el rendimiento
 		const [
-			// Conteo total de órdenes de trabajo
 			totalWorkOrders,
-			// Conteo por estado
 			statusCounts,
-			// Conteo por prioridad
 			priorityCounts,
-			// Órdenes de trabajo por tipo
 			typeDistribution,
-			// Órdenes de trabajo recientes (para gráfico de tendencia)
 			recentWorkOrders,
-			// Top empresas con más órdenes
 			topCompanies,
-			// Órdenes de trabajo por mes (para gráfico de tendencia anual)
 			monthlyWorkOrders,
-			// Porcentaje de finalización (promedio)
 			avgProgress,
 		] = await Promise.all([
-			// Total de órdenes de trabajo
 			prisma.workOrder.count(),
 
-			// Conteo por estado
 			prisma.workOrder.groupBy({
 				by: ["status"],
 				_count: {
@@ -44,7 +34,6 @@ export async function GET(): Promise<NextResponse> {
 				},
 			}),
 
-			// Conteo por prioridad
 			prisma.workOrder.groupBy({
 				by: ["priority"],
 				_count: {
@@ -52,7 +41,6 @@ export async function GET(): Promise<NextResponse> {
 				},
 			}),
 
-			// Distribución por tipo
 			prisma.workOrder.groupBy({
 				by: ["type"],
 				_count: {
@@ -60,12 +48,9 @@ export async function GET(): Promise<NextResponse> {
 				},
 			}),
 
-			// Órdenes de trabajo recientes (últimos 7 días)
 			prisma.workOrder.findMany({
 				where: {
-					createdAt: {
-						gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 días atrás
-					},
+					createdAt: {},
 				},
 				orderBy: {
 					createdAt: "desc",
@@ -87,7 +72,6 @@ export async function GET(): Promise<NextResponse> {
 				take: 10,
 			}),
 
-			// Top empresas con más órdenes de trabajo
 			prisma.company.findMany({
 				select: {
 					id: true,
@@ -106,7 +90,6 @@ export async function GET(): Promise<NextResponse> {
 				take: 5,
 			}),
 
-			// Órdenes de trabajo por mes (para el año actual)
 			prisma.$queryRaw`
         SELECT
           EXTRACT(MONTH FROM "createdAt") as month,
@@ -121,7 +104,6 @@ export async function GET(): Promise<NextResponse> {
           month ASC
       `,
 
-			// Promedio de porcentaje de progreso
 			prisma.workOrder.aggregate({
 				_avg: {
 					workProgressStatus: true,
@@ -134,29 +116,18 @@ export async function GET(): Promise<NextResponse> {
 			}),
 		])
 
-		// Preparar datos para la respuesta
 		const statusCountsFormatted = Object.fromEntries(
 			statusCounts.map((item) => [item.status, item._count.id])
 		)
 
-		const priorityCountsFormatted = Object.fromEntries(
-			priorityCounts.map((item) => [item.priority, item._count.id])
-		)
-
-		// Formatear datos para las tarjetas
 		const cards = {
 			total: totalWorkOrders,
+			planned: statusCountsFormatted[WORK_ORDER_STATUS.PLANNED] || 0,
 			inProgress: statusCountsFormatted[WORK_ORDER_STATUS.IN_PROGRESS] || 0,
-			highPriority: priorityCountsFormatted[WORK_ORDER_PRIORITY.HIGH] || 0,
 			completed: statusCountsFormatted[WORK_ORDER_STATUS.COMPLETED] || 0,
 		}
 
-		// Formatear datos para gráficos
 		const charts = {
-			status: statusCounts.map((item) => ({
-				name: item.status,
-				value: item._count.id,
-			})),
 			priority: priorityCounts.map((item) => ({
 				name: item.priority,
 				value: item._count.id,
@@ -176,7 +147,6 @@ export async function GET(): Promise<NextResponse> {
 			averageProgress: Math.round((avgProgress._avg.workProgressStatus || 0) * 100) / 100,
 		}
 
-		// Construir la respuesta
 		return NextResponse.json({
 			cards,
 			charts,

@@ -3,7 +3,9 @@
 import { PieChart, Pie, Cell } from "recharts"
 import { PieChartIcon } from "lucide-react"
 
-import { WorkOrderStatsResponse } from "@/project/work-order/hooks/use-work-order-stats"
+import { useWorkOrderFiltersStore } from "@/project/work-order/stores/work-order-filters-store"
+
+import type { WorkOrderStatsResponse } from "@/project/work-order/hooks/use-work-order-stats"
 
 import {
 	Card,
@@ -27,22 +29,38 @@ interface WorkOrderStatusChartProps {
 const COLORS = [
 	"var(--color-orange-500)",
 	"var(--color-yellow-500)",
-	"var(--color-orange-600)",
-	"var(--color-red-600)",
-	"var(--color-orange-700)",
-	"var(--color-red-700)",
+	"var(--color-amber-500)",
+	"var(--color-red-500)",
 ]
 
 export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
-	const statusData = data.charts.status
+	const statusData = data.charts.type
+	const { setTypeFilter, statusFilter } = useWorkOrderFiltersStore()
+
+	const handleChartClick = (data: { name: string }) => {
+		const clickedStatus = data.name
+
+		if (statusFilter === clickedStatus) {
+			setTypeFilter(null)
+		} else {
+			setTypeFilter(clickedStatus)
+		}
+
+		// setTimeout(() => {
+		// 	document.getElementById("work-order-table")?.scrollIntoView({
+		// 		behavior: "smooth",
+		// 		block: "start",
+		// 	})
+		// }, 100)
+	}
 
 	return (
-		<Card className="border-none">
+		<Card className="border-none transition-shadow hover:shadow-md">
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>
-						<CardTitle className="text-lg font-semibold">Distribución de Estados</CardTitle>
-						<CardDescription>Órdenes de Trabajo dividas por estado</CardDescription>
+						<CardTitle className="text-lg font-semibold">Distribución por Tipo</CardTitle>
+						<CardDescription>Órdenes de Trabajo dividas por tipo</CardDescription>
 					</div>
 					<PieChartIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>
@@ -51,36 +69,40 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 				<ChartContainer
 					className="h-[250px] w-full max-w-[90dvw]"
 					config={{
-						IN_PROGRESS: {
-							label: "En Progreso",
+						CORRECTIVE: {
+							label: "Correctivas",
 						},
-						COMPLETED: {
-							label: "Completadas",
+						PREVENTIVE: {
+							label: "Preventivas",
 						},
-						PENDING: {
-							label: "Pendientes",
+						PREDICTIVE: {
+							label: "Predictivas",
 						},
-						CANCELLED: {
-							label: "Canceladas",
-						},
-						PLANNED: {
-							label: "Planeadas",
+						PROACTIVE: {
+							label: "Proactivas",
 						},
 					}}
 				>
-					<PieChart>
+					<PieChart margin={{ top: 10 }}>
 						<Pie
-							data={statusData}
+							label
 							cx="50%"
 							cy="50%"
+							nameKey="name"
+							dataKey="value"
 							innerRadius={45}
 							paddingAngle={5}
-							dataKey="value"
-							nameKey="name"
-							label
+							data={statusData}
+							onClick={handleChartClick}
 						>
-							{statusData.map((_, index) => (
-								<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+							{statusData.map((entry, index) => (
+								<Cell
+									key={`cell-${index}`}
+									fill={COLORS[index % COLORS.length]}
+									strokeWidth={statusFilter === entry.name ? 2 : 0}
+									stroke={statusFilter === entry.name ? "var(--text)" : "none"}
+									className="cursor-pointer hover:brightness-75"
+								/>
 							))}
 						</Pie>
 						<ChartTooltip content={<ChartTooltipContent nameKey="name" />} />

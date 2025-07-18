@@ -74,5 +74,6 @@ export const useWorkBookById = ({ workOrderId }: { workOrderId: string }) => {
 	return useQuery<WorkBookByIdResponse>({
 		queryKey: ["workBooks", { workOrderId }],
 		queryFn: (fn) => fetchWorkBookById({ ...fn, queryKey: ["workBooks", { workOrderId }] }),
+		refetchOnWindowFocus: false,
 	})
 }

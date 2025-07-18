@@ -1,17 +1,15 @@
 "use client"
 
 import { Files, InfoIcon } from "lucide-react"
-import { useState } from "react"
 import Link from "next/link"
 
-import { useStartupFoldersList } from "@/project/startup-folder/hooks/use-startup-folder"
 import { WorkOrderStatusSimpleOptions } from "@/lib/consts/work-order-status"
 import { StartupFolderStatus, type WORK_ORDER_STATUS } from "@prisma/client"
-import { useDebounce } from "@/shared/hooks/useDebounce"
+import { generateSlug } from "@/lib/generateSlug"
 import { cn } from "@/lib/utils"
 
-import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
+import OrderByButton from "@/shared/components/OrderByButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
 import { Button } from "@/shared/components/ui/button"
@@ -34,36 +32,27 @@ import {
 	SelectContent,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
-import { generateSlug } from "@/lib/generateSlug"
+import { useStartupFolderFilters } from "../../hooks/use-startup-folder-filters"
 
 interface AdminStartupFoldersListProps {
 	id: string
 }
 
 export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
-	const [otStatus, setOtStatus] = useState<WORK_ORDER_STATUS | undefined>(undefined)
-	const [withOtActive, setWithOtActive] = useState(false)
-	const [orderBy, setOrderBy] = useState<OrderBy>("name")
-	const [searchTerm, setSearchTerm] = useState("")
-	const [order, setOrder] = useState<Order>("asc")
-
-	const debouncedSearch = useDebounce(searchTerm)
-
-	const { data: companiesWithFolders, isLoading } = useStartupFoldersList({
-		order,
-		orderBy,
-		otStatus,
-		withOtActive,
-		search: debouncedSearch,
-	})
+	const {
+		filters,
+		actions,
+		isLoading,
+		startupFolders: companiesWithFolders,
+	} = useStartupFolderFilters()
 
 	return (
 		<>
 			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-5" id={id}>
 				<SearchInput
-					value={searchTerm}
 					setPage={() => {}}
-					onChange={setSearchTerm}
+					value={filters.search}
+					onChange={actions.setSearch}
 					inputClassName="bg-background"
 					className="col-span-2 sm:col-span-1 lg:col-span-2"
 					placeholder="Buscar por nombre o RUT de empresa..."
@@ -72,12 +61,12 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 				<Select
 					onValueChange={(value: "all" | WORK_ORDER_STATUS) => {
 						if (value === "all") {
-							setOtStatus(undefined)
+							actions.setOtStatus(undefined)
 						} else {
-							setOtStatus(value as WORK_ORDER_STATUS)
+							actions.setOtStatus(value as WORK_ORDER_STATUS)
 						}
 					}}
-					value={otStatus ?? "all"}
+					value={filters.otStatus ?? "all"}
 				>
 					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
 						<SelectValue placeholder="Estado" />
@@ -100,12 +89,12 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 				<Select
 					onValueChange={(value: "true" | "false") => {
 						if (value === "true") {
-							setWithOtActive(true)
+							actions.setWithOtActive(true)
 						} else {
-							setWithOtActive(false)
+							actions.setWithOtActive(false)
 						}
 					}}
-					value={withOtActive ? "true" : "false"}
+					value={filters.withOtActive ? "true" : "false"}
 				>
 					<SelectTrigger className="border-input bg-background w-full border">
 						<SelectValue placeholder="Mostrar todas las empresas" />
@@ -120,8 +109,8 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 
 				<OrderByButton
 					onChange={(orderBy, order) => {
-						setOrderBy(orderBy)
-						setOrder(order)
+						actions.setOrderBy(orderBy)
+						actions.setOrder(order)
 					}}
 					className="w-full"
 				/>

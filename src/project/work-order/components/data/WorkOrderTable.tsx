@@ -1,7 +1,6 @@
 "use client"
 
-import { ChevronDown, FileSpreadsheetIcon } from "lucide-react"
-import { DateRange } from "react-day-picker"
+import { ChevronDown, FileSpreadsheetIcon, FilterXIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -14,22 +13,21 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
-import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-book-milestones"
-import { useWorkOrders, WorkOrder } from "@/project/work-order/hooks/use-work-order"
-import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
 import { WorkOrderPriorityLabels, WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
+import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-book-milestones"
+import { useWorkOrderFilters } from "@/project/work-order/hooks/use-work-order-filters"
+import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { useCompanies } from "@/project/company/hooks/use-companies"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
-import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
 
-import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { CalendarDateRangePicker } from "@/shared/components/ui/date-range-picker"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { workOrderColumns } from "../../columns/work-order-columns"
 import { Card, CardContent } from "@/shared/components/ui/card"
+import OrderByButton from "@/shared/components/OrderByButton"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
@@ -59,6 +57,8 @@ import {
 	DropdownMenuCheckboxItem,
 } from "@/shared/components/ui/dropdown-menu"
 
+import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
+
 interface WorkOrderTableProps {
 	id?: string
 }
@@ -66,37 +66,16 @@ interface WorkOrderTableProps {
 export function WorkOrderTable({ id }: WorkOrderTableProps) {
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-	const [priorityFilter, setPriorityFilter] = useState<string | null>(null)
-	const [statusFilter, setStatusFilter] = useState<string | null>(null)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
-	const [dateRange, setDateRange] = useState<DateRange | null>(null)
-	const [typeFilter, setTypeFilter] = useState<string | null>(null)
-	const [companyId, setCompanyId] = useState<string | null>(null)
-	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [rowSelection, setRowSelection] = useState({})
-	const [order, setOrder] = useState<Order>("desc")
-	const [search, setSearch] = useState("")
-	const [page, setPage] = useState(1)
 
 	const { data: companies } = useCompanies({
 		limit: 1000,
 	})
 
-	const debouncedSearch = useDebounce(search)
-
-	const { data, isLoading, refetch, isFetching } = useWorkOrders({
-		page,
-		order,
-		orderBy,
-		dateRange,
-		companyId,
-		limit: 15,
-		typeFilter,
-		statusFilter,
-		priorityFilter,
-		search: debouncedSearch,
-	})
+	const { filters, actions, workOrders } = useWorkOrderFilters()
+	const { data, isLoading, refetch, isFetching } = workOrders
 
 	const table = useReactTable<WorkOrder>({
 		columns: workOrderColumns,
@@ -112,7 +91,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 			sorting,
 			columnFilters,
 			pagination: {
-				pageIndex: page - 1,
+				pageIndex: filters.page - 1,
 				pageSize: 10,
 			},
 			rowSelection,
@@ -210,14 +189,23 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					</div>
 
 					<SearchInput
-						value={search}
-						setPage={setPage}
-						onChange={setSearch}
+						value={filters.search}
+						setPage={actions.setPage}
+						onChange={actions.setSearch}
 						className="ml-auto w-full md:w-72"
 						placeholder="Buscar por número de OT, trabajo..."
 					/>
 
 					<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+					<Button
+						size={"icon"}
+						variant="outline"
+						onClick={actions.resetFilters}
+						className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+					>
+						<FilterXIcon />
+					</Button>
 				</div>
 
 				<div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-full md:flex-row">
@@ -232,15 +220,9 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 
 					<Select
 						onValueChange={(value) => {
-							if (value === "all") {
-								setPage(1)
-								setTypeFilter(null)
-							} else {
-								setPage(1)
-								setTypeFilter(value)
-							}
+							actions.setTypeFilter(value === "all" ? null : value)
 						}}
-						value={typeFilter ?? "all"}
+						value={filters.typeFilter ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
 							Tipo OT
@@ -261,15 +243,9 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 
 					<Select
 						onValueChange={(value) => {
-							if (value === "all") {
-								setPage(1)
-								setCompanyId(null)
-							} else {
-								setPage(1)
-								setCompanyId(value)
-							}
+							actions.setCompanyId(value === "all" ? null : value)
 						}}
-						value={companyId ?? "all"}
+						value={filters.companyId ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
 							Empresa
@@ -288,19 +264,13 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						</SelectContent>
 					</Select>
 
-					<CalendarDateRangePicker value={dateRange} onChange={setDateRange} />
+					<CalendarDateRangePicker value={filters.dateRange} onChange={actions.setDateRange} />
 
 					<Select
 						onValueChange={(value) => {
-							if (value === "all") {
-								setPage(1)
-								setStatusFilter(null)
-							} else {
-								setPage(1)
-								setStatusFilter(value)
-							}
+							actions.setStatusFilter(value === "all" ? null : value)
 						}}
-						value={statusFilter ?? "all"}
+						value={filters.statusFilter ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
 							Estado OT
@@ -321,15 +291,9 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 
 					<Select
 						onValueChange={(value) => {
-							if (value === "all") {
-								setPage(1)
-								setPriorityFilter(null)
-							} else {
-								setPage(1)
-								setPriorityFilter(value)
-							}
+							actions.setPriorityFilter(value === "all" ? null : value)
 						}}
-						value={priorityFilter ?? "all"}
+						value={filters.priorityFilter ?? "all"}
 					>
 						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
 							Prioridad OT
@@ -352,8 +316,8 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					<OrderByButton
 						className="ml-auto"
 						onChange={(orderBy, order) => {
-							setOrderBy(orderBy)
-							setOrder(order)
+							actions.setOrderBy(orderBy)
+							actions.setOrder(order)
 						}}
 					/>
 
@@ -428,8 +392,9 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 				<TablePagination
 					table={table}
 					isLoading={isLoading}
-					onPageChange={setPage}
+					total={data?.total ?? 0}
 					pageCount={data?.pages ?? 0}
+					onPageChange={actions.setPage}
 					className="border-orange-600 text-orange-600 hover:bg-orange-600"
 				/>
 			</CardContent>

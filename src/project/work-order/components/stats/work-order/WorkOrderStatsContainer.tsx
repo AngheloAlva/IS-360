@@ -22,7 +22,7 @@ export function WorkOrderStatsContainer() {
 					<div className="grid gap-4 xl:grid-cols-3">
 						<WorkOrderStatusChart data={data} />
 						<WorkOrderPriorityChart data={data} />
-						<WorkOrderMonthlyChart data={data} />
+						<WorkOrderMonthlyChart data={data.charts} />
 					</div>
 				</>
 			)}

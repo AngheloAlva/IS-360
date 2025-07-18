@@ -47,10 +47,10 @@ export default async function CreateWorkPermitPage() {
 			</div>
 
 			<WorkPermitForm
-				companyId={""}
 				userId={res.user.id}
 				userName={res.user.name}
 				isOtcMember={isOtcMember}
+				companyId={isOtcMember ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID! : ""}
 			/>
 		</div>
 	)

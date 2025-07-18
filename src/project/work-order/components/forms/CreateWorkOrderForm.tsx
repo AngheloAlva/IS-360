@@ -71,7 +71,7 @@ export default function CreateWorkOrderForm({
 	const [open, setOpen] = useState(false)
 
 	const { data: companiesData } = useCompanies({ limit: 1000, orderBy: "name", order: "desc" })
-	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "" })
+	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
 	const { data: equipmentsData } = useEquipments({ limit: 1000 })
 
 	const form = useForm<WorkOrderSchema>({
@@ -114,7 +114,6 @@ export default function CreateWorkOrderForm({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.watch("estimatedEndDate")])
 
-	// Debug: Agregar useEffect para ver errores de validación
 	useEffect(() => {
 		const errors = form.formState.errors
 		if (Object.keys(errors).length > 0) {
