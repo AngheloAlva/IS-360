@@ -10,12 +10,13 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
+import { useCompanyFilters } from "../../hooks/use-company-filters"
 import { CompanyColumns } from "../../columns/company-columns"
-import { useCompanies } from "@/project/company/hooks/use-companies"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
+import OrderByButton from "@/shared/components/OrderByButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Input } from "@/shared/components/ui/input"
 import {
@@ -28,16 +29,14 @@ import {
 } from "@/shared/components/ui/table"
 
 export function CompanyTable() {
-	const [page, setPage] = useState(1)
-	const [search, setSearch] = useState("")
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 
-	const { data, isLoading, refetch, isFetching } = useCompanies({
-		page,
-		search,
-		limit: 15,
-	})
+	const {
+		companies: { isLoading, refetch, isFetching, data },
+		actions,
+		filters,
+	} = useCompanyFilters()
 
 	const table = useReactTable({
 		data: data?.companies ?? [],
@@ -50,7 +49,7 @@ export function CompanyTable() {
 			sorting,
 			columnFilters,
 			pagination: {
-				pageIndex: page - 1,
+				pageIndex: filters.page - 1,
 				pageSize: 10,
 			},
 		},
@@ -70,13 +69,22 @@ export function CompanyTable() {
 					<div className="ml-auto flex items-center gap-2">
 						<Input
 							onChange={(e) => {
-								setSearch(e.target.value)
-								setPage(1)
+								actions.setSearch(e.target.value)
+								actions.setPage(1)
 							}}
-							value={search}
+							value={filters.search}
 							placeholder="Buscar por Nombre o RUT..."
 							className="bg-background ml-auto w-fit lg:w-72"
 						/>
+
+						<OrderByButton
+							className="w-full md:w-fit"
+							onChange={(orderBy, order) => {
+								actions.setOrderBy(orderBy)
+								actions.setOrder(order)
+							}}
+						/>
+
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
 					</div>
 				</div>
@@ -122,7 +130,7 @@ export function CompanyTable() {
 				<TablePagination
 					table={table}
 					isLoading={isLoading}
-					onPageChange={setPage}
+					onPageChange={actions.setPage}
 					total={data?.total ?? 0}
 					pageCount={data?.pages ?? 0}
 				/>

@@ -59,7 +59,7 @@ export default function EquipmentStatsContainer() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{data?.workOrdersByStatus.find((s) => s.status === "PENDING")?.count || 0}
+							{data?.workOrdersByStatus.find((s) => s.status === "IN_PROGRESS")?.count || 0}
 						</div>
 						<p className="text-muted-foreground text-xs">Órdenes de trabajo en curso</p>
 					</CardContent>

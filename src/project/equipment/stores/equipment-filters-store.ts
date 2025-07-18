@@ -1,16 +1,22 @@
 import { persist } from "zustand/middleware"
 import { create } from "zustand"
 
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
+
 interface EquipmentFiltersState {
 	parentId: string | null
 	showAll: boolean
 	search: string
 	page: number
+	orderBy: OrderBy
+	order: Order
 
 	setParentId: (parentId: string | null) => void
 	setShowAll: (showAll: boolean) => void
 	setSearch: (search: string) => void
 	setPage: (page: number) => void
+	setOrderBy: (orderBy: OrderBy) => void
+	setOrder: (order: Order) => void
 
 	resetFilters: () => void
 	resetPagination: () => void
@@ -21,6 +27,8 @@ const initialState = {
 	showAll: true,
 	search: "",
 	page: 1,
+	order: "desc" as Order,
+	orderBy: "createdAt" as OrderBy,
 }
 
 export const useEquipmentFiltersStore = create<EquipmentFiltersState>()(
@@ -42,6 +50,14 @@ export const useEquipmentFiltersStore = create<EquipmentFiltersState>()(
 
 			setPage: (page) => {
 				set({ page })
+			},
+
+			setOrderBy: (orderBy) => {
+				set({ orderBy, page: 1 })
+			},
+
+			setOrder: (order) => {
+				set({ order, page: 1 })
 			},
 
 			resetFilters: () => {

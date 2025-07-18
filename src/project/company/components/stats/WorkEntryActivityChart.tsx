@@ -5,10 +5,10 @@ import { ChartSplineIcon } from "lucide-react"
 
 import {
 	Card,
+	CardTitle,
+	CardHeader,
 	CardContent,
 	CardDescription,
-	CardHeader,
-	CardTitle,
 } from "@/shared/components/ui/card"
 import {
 	ChartConfig,
@@ -160,10 +160,8 @@ export function WorkEntryActivityChart({ data }: WorkEntryActivityChartProps) {
 				<ChartContainer config={config} className="h-[350px] w-full">
 					<AreaChart data={chartData} margin={{ top: 10, left: 15, right: 15 }}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						<XAxis dataKey="date" tickLine={false} axisLine={false} label="Fecha" />
+						<XAxis dataKey="date" label="Fecha" />
 						<YAxis
-							tickLine={false}
-							axisLine={false}
 							label={{
 								angle: -90,
 								value: "Entradas",
@@ -171,7 +169,6 @@ export function WorkEntryActivityChart({ data }: WorkEntryActivityChartProps) {
 							}}
 						/>
 						<ChartTooltip content={<ChartTooltipContent />} />
-						<ChartLegend content={<ChartLegendContent />} />
 
 						<defs>
 							<linearGradient id={"company-1"} x1="0" y1="0" x2="0" y2="1">
@@ -206,6 +203,11 @@ export function WorkEntryActivityChart({ data }: WorkEntryActivityChartProps) {
 								fill={`url(#company-${index + 1})`}
 							/>
 						))}
+
+						<ChartLegend
+							className="flex w-full flex-wrap gap-y-1.5 overflow-hidden"
+							content={<ChartLegendContent />}
+						/>
 					</AreaChart>
 				</ChartContainer>
 			</CardContent>

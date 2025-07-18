@@ -1,5 +1,6 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 import type { Attachment } from "@prisma/client"
 
 export async function fetchAllEquipments(parentId: string | null = null) {
@@ -41,12 +42,28 @@ export const fetchEquipments: QueryFunction<
 	EquipmentsResponse,
 	[
 		"equipments",
-		{ page: number; limit: number; search: string; parentId: string | null; showAll: boolean },
+		{
+			page: number
+			limit: number
+			search: string
+			parentId: string | null
+			showAll: boolean
+			order?: Order
+			orderBy?: OrderBy
+		},
 	]
 > = async ({ queryKey }) => {
-	const [, { page, limit, search, parentId, showAll }]: [
+	const [, { page, limit, search, parentId, showAll, order, orderBy }]: [
 		string,
-		{ page: number; limit: number; search: string; parentId: string | null; showAll: boolean },
+		{
+			page: number
+			limit: number
+			search: string
+			parentId: string | null
+			showAll: boolean
+			order?: Order
+			orderBy?: OrderBy
+		},
 	] = queryKey
 
 	const searchParams = new URLSearchParams()
@@ -55,6 +72,8 @@ export const fetchEquipments: QueryFunction<
 	if (search) searchParams.set("search", search)
 	if (parentId) searchParams.set("parentId", parentId)
 	if (showAll) searchParams.set("showAll", showAll.toString())
+	if (order) searchParams.set("order", order)
+	if (orderBy) searchParams.set("orderBy", orderBy)
 
 	const res = await fetch(`/api/equipments?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching equipments")
@@ -74,9 +93,13 @@ interface UseEquipmentsParams {
 	search?: string
 	showAll?: boolean
 	parentId?: string | null
+	orderBy?: OrderBy
+	order?: Order
 }
 
 export const useEquipments = ({
+	order,
+	orderBy,
 	page = 1,
 	limit = 10,
 	search = "",
@@ -84,11 +107,11 @@ export const useEquipments = ({
 	parentId = null,
 }: UseEquipmentsParams) => {
 	return useQuery<EquipmentsResponse>({
-		queryKey: ["equipments", { page, limit, search, parentId, showAll }],
+		queryKey: ["equipments", { page, limit, search, parentId, showAll, order, orderBy }],
 		queryFn: (fn) =>
 			fetchEquipments({
 				...fn,
-				queryKey: ["equipments", { page, limit, search, parentId, showAll }],
+				queryKey: ["equipments", { page, limit, search, parentId, showAll, order, orderBy }],
 			}),
 	})
 }

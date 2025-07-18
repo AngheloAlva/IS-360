@@ -74,13 +74,7 @@ export function DocumentReviewProgressChart({ data }: DocumentReviewProgressChar
 					<BarChart data={chartData} margin={{ right: 30, left: 0 }} layout="vertical">
 						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis type="number" />
-						<YAxis
-							width={100}
-							type="category"
-							dataKey="company"
-							tickLine={false}
-							axisLine={false}
-						/>
+						<YAxis width={100} type="category" dataKey="company" />
 						<ChartTooltip
 							content={
 								<ChartTooltipContent

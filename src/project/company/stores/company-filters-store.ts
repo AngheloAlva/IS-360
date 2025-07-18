@@ -19,10 +19,10 @@ interface CompanyFiltersState {
 }
 
 const initialState = {
-	search: "",
 	page: 1,
-	orderBy: "createdAt" as OrderBy,
+	search: "",
 	order: "desc" as Order,
+	orderBy: "createdAt" as OrderBy,
 }
 
 export const useCompanyFiltersStore = create<CompanyFiltersState>()(

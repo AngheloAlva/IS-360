@@ -348,28 +348,6 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 								<Text style={styles.value}>{workPermit.mutuality}</Text>
 							</View>
 						</View>
-						{workPermit.otherMutuality && (
-							<View style={styles.column}>
-								<View style={styles.row}>
-									<Text style={styles.label}>Otra Mutualidad:</Text>
-									<Text style={styles.value}>{workPermit.otherMutuality || "N/A"}</Text>
-								</View>
-							</View>
-						)}
-					</View>
-
-					<View style={styles.row}>
-						<View style={styles.column}>
-							<View style={styles.row}>
-								<Text style={styles.label}>Trabajo:</Text>
-								<Text style={styles.value}>
-									{workPermit.otNumber.workName || "No especificado"}
-								</Text>
-							</View>
-						</View>
-					</View>
-
-					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Lugar exacto:</Text>
@@ -377,6 +355,39 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							</View>
 						</View>
 					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Trabajo Requerido:</Text>
+								<Text style={styles.value}>
+									{workPermit.otNumber.workRequest || "No especificado"}
+								</Text>
+							</View>
+						</View>
+					</View>
+
+					{workPermit.otherMutuality && (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otra Mutualidad:</Text>
+									<Text style={styles.value}>{workPermit.otherMutuality || "N/A"}</Text>
+								</View>
+							</View>
+						</View>
+					)}
+
+					{workPermit.otNumber.workDescription && (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Descripción de Trabajo:</Text>
+									<Text style={styles.value}>{workPermit.otNumber.workDescription}</Text>
+								</View>
+							</View>
+						</View>
+					)}
 				</View>
 
 				{/* Detalles del trabajo */}
@@ -470,6 +481,21 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 								<Text style={styles.label}>Otras herramientas:</Text>
 								<Text style={styles.value}>{workPermit.otherTools || "N/A"}</Text>
 							</View>
+						</View>
+					</View>
+
+					{/* Add activity details: string[] */}
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Detalle de Actividades:</Text>
+							</View>
+
+							{workPermit.activityDetails.map((detail, index) => (
+								<View key={index} style={styles.row}>
+									<Text style={styles.value}>- {detail}</Text>
+								</View>
+							))}
 						</View>
 					</View>
 				</View>

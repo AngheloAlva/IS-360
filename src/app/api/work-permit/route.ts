@@ -95,7 +95,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					otNumber: {
 						select: {
 							otNumber: true,
-							workName: true,
+							workRequest: true,
+							workDescription: true,
 						},
 					},
 					user: {

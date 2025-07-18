@@ -28,6 +28,8 @@ export async function GET(
 					select: {
 						otNumber: true,
 						workName: true,
+						workRequest: true,
+						workDescription: true,
 						supervisor: {
 							select: {
 								name: true,
@@ -62,6 +64,10 @@ export async function GET(
 						internalRole: true,
 					},
 				},
+			},
+			cacheStrategy: {
+				ttl: 60,
+				swr: 10,
 			},
 		})
 

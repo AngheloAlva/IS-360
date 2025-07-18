@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
-import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 
 export async function GET(req: NextRequest) {
 	const session = await auth.api.getSession({
@@ -20,6 +22,8 @@ export async function GET(req: NextRequest) {
 		const search = searchParams.get("search") || ""
 		const parentId = searchParams.get("parentId") || null
 		const showAll = searchParams.get("showAll") === "true"
+		const orderBy = searchParams.get("orderBy") as OrderBy
+		const order = searchParams.get("order") as Order
 
 		const skip = (page - 1) * limit
 
@@ -85,7 +89,7 @@ export async function GET(req: NextRequest) {
 				skip,
 				take: limit,
 				orderBy: {
-					createdAt: "desc",
+					[orderBy]: order,
 				},
 				cacheStrategy: {
 					ttl: 10,

@@ -8,6 +8,8 @@ export interface WorkPermit {
 	otNumber: {
 		otNumber: string
 		workName: string
+		workRequest: string
+		workDescription: string
 	}
 	status: string
 	mutuality: string

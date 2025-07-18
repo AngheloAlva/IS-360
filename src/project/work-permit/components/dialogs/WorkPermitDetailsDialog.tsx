@@ -154,7 +154,9 @@ export default function WorkPermitDetailsDialog({
 									<ClipboardListIcon className="h-4 w-4" />
 									Trabajo a realizar
 								</p>
-								<p className="font-medium">{workPermit.otNumber.workName}</p>
+								<p className="font-medium">
+									{workPermit.otNumber?.workName || workPermit.otNumber.workRequest}
+								</p>
 							</div>
 
 							<div>
@@ -171,6 +173,16 @@ export default function WorkPermitDetailsDialog({
 									Tipo de trabajo
 								</p>
 								<p className="font-medium">{workPermit.workWillBeOther || workPermit.workWillBe}</p>
+							</div>
+
+							<div className="col-span-2">
+								<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+									<WrenchIcon className="h-4 w-4" />
+									Descripción del trabajo
+								</p>
+								<p className="font-medium">
+									{workPermit.otNumber.workDescription || "Sin descripción"}
+								</p>
 							</div>
 
 							<div className="col-span-2">

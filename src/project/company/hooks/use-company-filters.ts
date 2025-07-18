@@ -16,17 +16,17 @@ export const useCompanyFilters = () => {
 
 	return {
 		filters: {
-			search: store.search,
 			page: store.page,
-			orderBy: store.orderBy,
 			order: store.order,
+			search: store.search,
+			orderBy: store.orderBy,
 		},
 
 		actions: {
-			setSearch: store.setSearch,
 			setPage: store.setPage,
-			setOrderBy: store.setOrderBy,
 			setOrder: store.setOrder,
+			setSearch: store.setSearch,
+			setOrderBy: store.setOrderBy,
 			resetFilters: store.resetFilters,
 			resetPagination: store.resetPagination,
 		},

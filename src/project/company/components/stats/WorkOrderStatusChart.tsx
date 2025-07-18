@@ -52,7 +52,7 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 		inProgress: item.inProgress,
 		completed: item.completed,
 		cancelled: item.cancelled,
-		fullName: item.company, // Para mostrar en el tooltip
+		fullName: item.company,
 		total: item.planned + item.inProgress + item.cancelled + item.completed,
 	}))
 
@@ -72,17 +72,8 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 				<ChartContainer config={config} className="h-[350px] w-full">
 					<BarChart data={chartData} margin={{ top: 10, left: 15, right: 15 }} barSize={20}>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-						<XAxis
-							dataKey="company"
-							tickLine={false}
-							axisLine={false}
-							angle={-25}
-							textAnchor="end"
-							height={70}
-						/>
+						<XAxis dataKey="company" angle={-25} textAnchor="end" height={70} />
 						<YAxis
-							tickLine={false}
-							axisLine={false}
 							label={{
 								value: "Cantidad",
 								angle: -90,

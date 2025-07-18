@@ -80,6 +80,7 @@ export async function GET(req: NextRequest) {
 			}),
 			prisma.company.count({
 				where: {
+					isActive: true,
 					...(search
 						? {
 								OR: [

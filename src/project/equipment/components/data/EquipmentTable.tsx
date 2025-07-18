@@ -13,15 +13,14 @@ import {
 	getPaginationRowModel,
 } from "@tanstack/react-table"
 
+import { useEquipmentFilters } from "../../hooks/use-equipment-filters"
 import { EquipmentColumns } from "../../columns/equipment-columns"
-import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
 import { useRouter } from "next/navigation"
 import {
-	useEquipments,
 	WorkEquipment,
-	fetchAllEquipments,
 	fetchEquipments,
+	fetchAllEquipments,
 } from "@/project/equipment/hooks/use-equipments"
 
 import EditEquipmentForm from "@/project/equipment/components/forms/EditEquipmentForm"
@@ -60,20 +59,14 @@ export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) 
 	const [showAll, setShowAll] = useState<boolean>(parentId ? false : true)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [sorting, setSorting] = useState<SortingState>([])
-	const [search, setSearch] = useState<string>("")
-	const [page, setPage] = useState<number>(1)
 
-	const searchInput = useDebounce(search)
+	const {
+		actions,
+		filters,
+		equipments: { data, isLoading, isFetching, refetch },
+	} = useEquipmentFilters()
 
 	const router = useRouter()
-
-	const { data, isLoading, refetch, isFetching } = useEquipments({
-		page,
-		showAll,
-		limit: 15,
-		search: searchInput,
-		parentId: parentId ?? null,
-	})
 
 	const handleExportToExcel = async () => {
 		try {
@@ -125,7 +118,7 @@ export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) 
 			sorting,
 			columnFilters,
 			pagination: {
-				pageIndex: page - 1,
+				pageIndex: filters.page - 1,
 				pageSize: 10,
 			},
 		},
@@ -183,10 +176,10 @@ export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) 
 						<div className="ml-auto flex items-center gap-2">
 							<Input
 								type="text"
-								value={search}
+								value={filters.search}
 								onChange={(e) => {
-									setSearch(e.target.value)
-									setPage(1)
+									actions.setSearch(e.target.value)
+									actions.setPage(1)
 								}}
 								className="bg-background w-full sm:w-72"
 								placeholder="Buscar por nombre, TAG o ubicación..."
@@ -295,9 +288,9 @@ export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) 
 				<TablePagination
 					table={table}
 					isLoading={isLoading}
-					onPageChange={setPage}
 					total={data?.total ?? 0}
 					pageCount={data?.pages ?? 0}
+					onPageChange={actions.setPage}
 					className="border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white"
 				/>
 			</CardContent>

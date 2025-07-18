@@ -12,6 +12,8 @@ export const useEquipmentFilters = () => {
 		search: debouncedSearch,
 		showAll: store.showAll,
 		parentId: store.parentId,
+		orderBy: store.orderBy,
+		order: store.order,
 	})
 
 	return {
