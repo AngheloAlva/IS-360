@@ -29,7 +29,7 @@ const mapPoints: MapPoint[] = [
 		description: "Presentación de la planta OTC",
 		position: { x: 7, y: 86 },
 		variant: "default",
-		videoUrl: "https://drive.google.com/file/d/1-vMj0XfQDmiIkDXnE5dosUnGRIdU1p_H/preview",
+		videoUrl: "https://drive.google.com/file/d/1eE7JEOpzftpB9_7nj67BLw1rNBhNFso-/preview",
 	},
 	{
 		id: "point2",
@@ -53,7 +53,7 @@ const mapPoints: MapPoint[] = [
 		description: "Prohibiciones en la planta",
 		position: { x: 10, y: 62 },
 		variant: "default",
-		videoUrl: "https://drive.google.com/file/d/1dLzxoNhOWQIstZnH8YF_UI1smz6uaSfi/preview",
+		videoUrl: "https://drive.google.com/file/d/1rurbDwzhLDw2RuKwjPPnvPofp0Rg5ORt/preview",
 	},
 	{
 		id: "point5",
@@ -165,7 +165,7 @@ const mapPoints: MapPoint[] = [
 		description: "No botar Basura",
 		position: { x: 40, y: 80 },
 		variant: "default",
-		videoUrl: "https://drive.google.com/file/d/1J8FqfCOI7oJ7OOB1PnAekB-pJNIAvcGc/preview",
+		videoUrl: "https://drive.google.com/file/d/1AJ-SaV77NSF7fOCsfZSO0M8FIb8KXrQy/preview",
 	},
 	{
 		id: "point19",

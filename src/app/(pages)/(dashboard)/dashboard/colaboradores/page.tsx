@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth"
 
 import { UsersByCompanyTable } from "@/project/user/components/data/UsersByCompanyTable"
 import CreateUsersForm from "@/project/user/components/forms/CreateUsersForm"
+import VideoTutorials from "@/shared/components/VideoTutorials"
+import ModuleHeader from "@/shared/components/ModuleHeader"
 
 export default async function UsersByCompanyPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -17,16 +19,25 @@ export default async function UsersByCompanyPage(): Promise<React.ReactElement> 
 
 	return (
 		<div className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="rounded-lg bg-gradient-to-r from-orange-600 to-red-700 p-6 shadow-lg">
-				<div className="flex items-center justify-between">
-					<div className="text-white">
-						<h1 className="text-3xl font-bold tracking-tight">Colaboradores</h1>
-						<p className="opacity-90">Gestión del personal de la empresa</p>
-					</div>
+			<ModuleHeader
+				title="Colaboradores"
+				description="Crea y gestiona los colaboradores de tu empresa."
+				className="from-purple-600 to-indigo-700"
+			>
+				<>
+					<VideoTutorials
+						videos={[
+							{
+								title: "Creacion de Colaborador",
+								description: "Tutorial de como crear un colaborador correctamente.",
+								url: "https://youtube.com/embed/0hMlJI2u0p0",
+							},
+						]}
+					/>
 
 					{session.user.isSupervisor && <CreateUsersForm companyId={session.user.companyId} />}
-				</div>
-			</div>
+				</>
+			</ModuleHeader>
 
 			<UsersByCompanyTable companyId={session.user.companyId} />
 		</div>

@@ -157,15 +157,15 @@ export default function UpdateExternalUserForm({
 							name="isSupervisor"
 							control={form.control}
 							label="¿Es supervisor?"
-							className="data-[state=checked]:bg-orange-600"
+							className="data-[state=checked]:bg-blue-600"
 						/>
 
 						<div className="mt-4 flex items-center justify-end gap-2 sm:col-span-2">
 							<Button
 								type="button"
 								variant="outline"
+								className="w-1/2"
 								onClick={() => setIsOpen(false)}
-								className="w-1/2 border-2 border-orange-900 text-orange-700 transition-all hover:scale-105 hover:bg-orange-900 hover:text-white"
 							>
 								Cancelar
 							</Button>
@@ -173,7 +173,7 @@ export default function UpdateExternalUserForm({
 							<SubmitButton
 								isSubmitting={isSubmitting}
 								label="Actualizar Colaborador"
-								className="w-1/2 bg-orange-600 hover:bg-orange-700"
+								className="w-1/2 bg-blue-600 hover:bg-blue-700"
 							/>
 						</div>
 					</form>

@@ -113,21 +113,38 @@ export default function StartupFolderOverview({
 				<>
 					{!isOtcMember && (
 						<VideoTutorials
-							videos={[
-								{
-									title: "Agregar Colaborador",
-									description: "Tutorial de como agregar un colaborador correctamente.",
-									url:
-										selectedFolder?.type === "FULL"
-											? "https://youtube.com/embed/HQlXE2gNZDo"
-											: "https://youtube.com/embed/j_UqQYTPpik",
-								},
-								{
-									title: "Agregar Vehículo",
-									description: "Tutorial de como agregar un colaborador correctamente.",
-									url: "https://youtube.com/embed/ngYgt8-RQ9k",
-								},
-							]}
+							videos={
+								selectedFolder?.type === "FULL"
+									? [
+											{
+												title: "Carga de documentos",
+												description: "Tutorial de como agregar documentos en la carpeta basica.",
+												url: "https://youtube.com/embed/Ph2iFqBEmc4",
+											},
+											{
+												title: "Agregar Colaborador",
+												description: "Tutorial de como agregar un colaborador correctamente.",
+												url: "https://youtube.com/embed/HQlXE2gNZDo",
+											},
+											{
+												title: "Agregar Vehículo",
+												description: "Tutorial de como agregar un vehiculo correctamente.",
+												url: "https://youtube.com/embed/ngYgt8-RQ9k",
+											},
+										]
+									: [
+											{
+												title: "Carga de documentos Basicos",
+												description: "Tutorial de como agregar documentos en la carpeta basica.",
+												url: "https://youtube.com/embed/Z5Ha0mmPVII",
+											},
+											{
+												title: "Agregar Colaborador",
+												description: "Tutorial de como agregar un colaborador correctamente.",
+												url: "https://youtube.com/embed/j_UqQYTPpik",
+											},
+										]
+							}
 						/>
 					)}
 

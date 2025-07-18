@@ -126,7 +126,7 @@ export function UsersByCompanyTable({ companyId }: { companyId: string }) {
 					isLoading={isLoading}
 					onPageChange={setPage}
 					pageCount={data?.pages ?? 0}
-					className="border-orange-600 text-orange-600"
+					className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
 				/>
 			</CardContent>
 		</Card>

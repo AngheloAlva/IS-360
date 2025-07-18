@@ -176,7 +176,7 @@ export default function CreateUsersForm({
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>
 			<SheetTrigger
 				className={cn(
-					"flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-orange-600 transition-all hover:scale-105",
+					"flex h-10 items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-medium text-blue-600 transition-all hover:scale-105",
 					className
 				)}
 				onClick={() => setIsOpen(true)}
@@ -291,7 +291,7 @@ export default function CreateUsersForm({
 						<Button
 							type="button"
 							variant="ghost"
-							className="cursor-pointer hover:bg-transparent hover:text-orange-500"
+							className="cursor-pointer hover:bg-transparent hover:text-blue-500"
 							onClick={() => {
 								append({
 									rut: "",
@@ -322,7 +322,7 @@ export default function CreateUsersForm({
 								isSubmitting={isSubmitting}
 								label={isSupervisor ? "Crear Supervisor(es)" : "Crear Colaborador(es)"}
 								className={cn(
-									"w-1/2 bg-orange-700 hover:bg-orange-600",
+									"w-1/2 bg-blue-700 hover:bg-blue-600",
 									"bg-blue-600 hover:bg-blue-700"
 								)}
 							/>

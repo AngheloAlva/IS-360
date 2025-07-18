@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth"
 
 import { WorkBookTable } from "@/project/work-order/components/data/WorkBookTable"
 import NewWorkBookForm from "@/project/work-order/components/forms/NewWorkBookForm"
+import ModuleHeader from "@/shared/components/ModuleHeader"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function WorkBooksPage() {
 	const res = await auth.api.getSession({
@@ -16,16 +18,39 @@ export default async function WorkBooksPage() {
 
 	return (
 		<main className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
-			<div className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700 p-6 shadow-lg">
-				<div className="flex items-center justify-between">
-					<div className="text-white">
-						<h1 className="text-3xl font-bold tracking-tight">Libro de Obras</h1>
-						<p className="opacity-90">Gestión de libros de obras de tu empresa</p>
-					</div>
-
+			<ModuleHeader
+				className="from-orange-600 to-red-700"
+				title="Libro de Obras"
+				description="Gestión de libros de obras de tu empresa"
+			>
+				<>
+					<VideoTutorials
+						videos={[
+							{
+								title: "Creacion Libro de Obras",
+								description: "Tutorial de como crear un libro de obras.",
+								url: "https://youtube.com/embed/FW-NFkb4300",
+							},
+							{
+								title: "Creacion de Carta Gantt/Hitos",
+								description: "Tutorial de como agregar un correctamente hitos.",
+								url: "https://youtube.com/embed/ySMKy29aFYk",
+							},
+							{
+								title: "Agregar Actividades Diarias",
+								description: "Tutorial de como agregar un actividades diarias al libro de obras.",
+								url: "https://youtube.com/embed/i1nqut1kOas",
+							},
+							{
+								title: "Cierre de Hitos",
+								description: "Tutorial de como cerrar un hito en el libro de obras.",
+								url: "https://youtube.com/embed/snastGIP1Pw",
+							},
+						]}
+					/>
 					<NewWorkBookForm userId={res.user.id} companyId={res.user.companyId} />
-				</div>
-			</div>
+				</>
+			</ModuleHeader>
 
 			<WorkBookTable companyId={res.user.companyId} />
 		</main>

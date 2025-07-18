@@ -7,21 +7,35 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 import { navOther } from "@/shared/components/sidebar/sidebar-data"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default function MiCuentaLayout({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname()
 
 	return (
 		<>
-			<div className="mx-auto flex w-full items-center justify-start gap-2">
-				<UserIcon className="text-primary bg-primary/10 size-10 rounded-lg p-1" />
+			<div className="flex w-full items-center justify-between gap-4">
+				<div className="mx-auto flex w-full items-center justify-start gap-2">
+					<UserIcon className="text-primary bg-primary/10 size-10 rounded-lg p-1" />
 
-				<div className="flex flex-col">
-					<h1 className="text-text text-xl font-bold lg:text-2xl">Mi Cuenta</h1>
-					<p className="text-muted-foreground text-sm lg:text-base">
-						Personaliza tu cuenta y protege tu información.
-					</p>
+					<div className="flex flex-col">
+						<h1 className="text-text text-xl font-bold lg:text-2xl">Mi Cuenta</h1>
+						<p className="text-muted-foreground text-sm lg:text-base">
+							Personaliza tu cuenta y protege tu información.
+						</p>
+					</div>
 				</div>
+
+				<VideoTutorials
+					className="bg-background text-text"
+					videos={[
+						{
+							title: "Configuración Mi Cuenta",
+							description: "Tutorial de como actualizar datos personales correctamente.",
+							url: "https://youtube.com/embed/4uRmbU2eoU8",
+						},
+					]}
+				/>
 			</div>
 
 			<div className="mx-auto flex w-full flex-1 flex-row gap-4">
