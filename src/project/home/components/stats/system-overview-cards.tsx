@@ -18,6 +18,9 @@ export function SystemOverviewCards({ data, isLoading }: SystemOverviewCardsProp
 
 	return (
 		<>
+			<div className="absolute top-0 -z-10 h-full w-full bg-white">
+				<div className="absolute top-0 right-0 bottom-auto left-auto h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(173,109,244,0.5)] opacity-50 blur-[80px]"></div>
+			</div>
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				<Link href="/admin/dashboard/empresas">
 					<Card className="cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105">
