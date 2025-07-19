@@ -13,7 +13,7 @@ interface SendNewWorkRequestEmailProps {
 	requestDate: Date
 	description: string
 	requestNumber: string
-	equipmentName?: string
+	equipmentName?: string[]
 	observations?: string | null
 }
 

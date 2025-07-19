@@ -23,7 +23,7 @@ interface NewWorkRequestEmailTemplateProps {
 	requestDate: Date
 	observations?: string | null
 	userName: string
-	equipmentName?: string
+	equipmentName?: string[]
 	baseUrl: string
 }
 
@@ -89,13 +89,17 @@ export const NewWorkRequestEmail = ({
 								</Column>
 							</Row>
 
-							{equipmentName && (
+							{equipmentName && equipmentName.length > 0 && (
 								<Row>
 									<Column>
 										<Text className="mb-[8px] text-[14px] font-semibold text-gray-700">
-											Equipo:
+											Equipo(s):
 										</Text>
-										<Text className="mb-[16px] text-[14px] text-gray-600">{equipmentName}</Text>
+										{equipmentName.map((equipment, index) => (
+											<Text key={index} className="mb-[8px] text-[14px] text-gray-600">
+												{equipment}
+											</Text>
+										))}
 									</Column>
 								</Row>
 							)}

@@ -73,6 +73,9 @@ export const createWorkRequest = async ({
 						}
 					: {}),
 			},
+			include: {
+				equipments: true,
+			},
 		})
 
 		sendNewWorkRequestEmail({
@@ -80,9 +83,9 @@ export const createWorkRequest = async ({
 			userName: session.user.name,
 			requestDate: values.requestDate,
 			description: values.description,
-			equipmentName: values.equipments,
 			observations: values.observations,
 			isUrgent: values.isUrgent || false,
+			equipmentName: newWorkRequest.equipments.map((equipment) => equipment.name),
 			baseUrl: process.env.NEXT_PUBLIC_BASE_URL + "/admin/dashboard/solicitudes-de-trabajo",
 		})
 
