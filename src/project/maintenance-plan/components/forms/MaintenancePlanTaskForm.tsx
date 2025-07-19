@@ -76,7 +76,12 @@ export default function MaintenancePlanTaskForm({
 		},
 	})
 
-	const { data: equipmentsData } = useEquipments({ limit: 1000, parentId: equipmentId })
+	const { data: equipmentsData } = useEquipments({
+		limit: 1000,
+		parentId: equipmentId,
+		order: "asc",
+		orderBy: "name",
+	})
 
 	const onSubmit = async (values: MaintenancePlanTaskSchema) => {
 		setIsSubmitting(true)

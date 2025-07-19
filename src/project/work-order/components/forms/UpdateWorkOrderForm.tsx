@@ -73,7 +73,7 @@ export default function UpdateWorkOrderForm({
 	const [open, setOpen] = useState(false)
 
 	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
-	const { data: equipmentsData } = useEquipments({ limit: 100 })
+	const { data: equipmentsData } = useEquipments({ limit: 100, order: "asc", orderBy: "name" })
 	const { data: usersData } = useUsers({ limit: 100 })
 
 	const form = useForm<UpdateWorkOrderSchema>({

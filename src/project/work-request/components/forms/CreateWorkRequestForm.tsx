@@ -53,6 +53,8 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 	const { data: equipmentsData } = useEquipments({
 		limit: 10000,
 		showAll: true,
+		order: "asc",
+		orderBy: "name",
 	})
 
 	async function onSubmit(values: WorkRequestSchema) {

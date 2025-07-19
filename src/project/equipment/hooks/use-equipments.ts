@@ -93,8 +93,8 @@ interface UseEquipmentsParams {
 	search?: string
 	showAll?: boolean
 	parentId?: string | null
-	orderBy?: OrderBy
-	order?: Order
+	orderBy: OrderBy
+	order: Order
 }
 
 export const useEquipments = ({
