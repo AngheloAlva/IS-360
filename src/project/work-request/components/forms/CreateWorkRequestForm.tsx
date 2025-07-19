@@ -8,7 +8,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { createWorkRequest } from "@/project/work-request/actions/create-work-request"
-import { uploadFilesToCloud } from "@/lib/upload-files"
+import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 import {
 	workRequestSchema,
 	type WorkRequestSchema,
@@ -62,36 +62,23 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 
 		try {
 			const attachmentsFiles = form.getValues("attachments")
-			const attachments = []
+			let uploadResults: UploadResult[] = []
 
-			// Si hay archivos adjuntos, subir cada uno a la nube
 			if (attachmentsFiles && attachmentsFiles.length > 0) {
-				for (const attachment of attachmentsFiles) {
-					if (attachment && attachment.file) {
-						const fileExtension = attachment.file.name.split(".").pop()
-						const uniqueFilename = `${Date.now()}-${Math.random()
-							.toString(36)
-							.substring(2, 9)}-request.${fileExtension}`
-
-						// Crear un objeto File con el archivo del formulario
-						const uploadResult = await uploadFilesToCloud({
-							randomString: uniqueFilename,
-							containerType: "files",
-							files: [attachment],
-						})
-
-						if (uploadResult) {
-							attachments.push(uploadResult)
-						}
-					}
-				}
+				uploadResults = await uploadFilesToCloud({
+					files: attachmentsFiles,
+					containerType: "files",
+					randomString: values.requestDate.toISOString(),
+				})
 			}
 
-			// Crear la solicitud de trabajo
 			const result = await createWorkRequest({
-				values,
+				values: {
+					...values,
+					attachments: [],
+				},
 				userId,
-				attachments: attachments.length > 0 ? attachments.flat() : undefined,
+				attachments: uploadResults.length > 0 ? uploadResults : undefined,
 			})
 
 			if (result.error) {
@@ -103,7 +90,6 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 					description: "Solicitud de trabajo creada exitosamente",
 				})
 
-				// Cerrar el formulario y recargar la página
 				setOpen(false)
 				form.reset()
 				router.refresh()
