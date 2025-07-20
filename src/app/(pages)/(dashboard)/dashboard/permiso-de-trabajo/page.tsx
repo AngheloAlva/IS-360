@@ -42,6 +42,16 @@ export default async function WorkPermitPage() {
 								description: "Consideraciones a tener en cuenta al crear un permiso de trabajo.",
 								url: "https://youtube.com/embed/GSSVKmZHGoI",
 							},
+							{
+								title: "Visualización Permiso de Trabajo",
+								description: "Consideraciones a tener en cuenta al crear un permiso de trabajo.",
+								url: "https://youtube.com/embed/CsnFK1NOUzs",
+							},
+							{
+								title: "Edición Permiso de Trabajo",
+								description: "Consideraciones a tener en cuenta al crear un permiso de trabajo.",
+								url: "https://youtube.com/embed/TGmy-UK-PKU",
+							},
 						]}
 					/>
 

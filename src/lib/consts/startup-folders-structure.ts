@@ -37,11 +37,6 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 			description: "Listado del personal asignado con contactos de emergencia y exámenes médicos.",
 		},
 		{
-			type: SafetyAndHealthDocumentType.GANTT_CHART,
-			name: "Carta Gantt",
-			description: "Cronograma del proyecto y planificación de actividades.",
-		},
-		{
 			type: SafetyAndHealthDocumentType.MUTUAL,
 			name: "Certificado de adhesión a mutualidad",
 			description: "Documento que acredita la afiliación a la mutual correspondiente.",

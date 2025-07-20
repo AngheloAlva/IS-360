@@ -10,8 +10,13 @@ import VideoTutorials from "@/shared/components/VideoTutorials"
 const vehicleVideos = [
 	{
 		title: "Agregar Vehiculos",
-		description: "Gestión y monitoreo de vehículos y equipos",
+		description: "Gestión y Monitoreo de Vehículos / Equipos",
 		url: "https://youtube.com/embed/PThFgVXV8_M",
+	},
+	{
+		title: "Editar y Eliminar Vehiculos / Equipos",
+		description: "Gestión y monitoreo de vehículos y equipos",
+		url: "https://youtube.com/embed/aG8R429NdKU",
 	},
 ]
 

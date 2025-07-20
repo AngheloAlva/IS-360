@@ -32,6 +32,11 @@ export default async function UsersByCompanyPage(): Promise<React.ReactElement> 
 								description: "Tutorial de como crear un colaborador correctamente.",
 								url: "https://youtube.com/embed/0hMlJI2u0p0",
 							},
+							{
+								title: "Editar y Eliminar Colaboradores",
+								description: "Tutorial de como crear un colaborador correctamente.",
+								url: "https://youtube.com/embed/1UNEvx1Rko8",
+							},
 						]}
 					/>
 
