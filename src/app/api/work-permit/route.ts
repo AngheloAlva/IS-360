@@ -34,16 +34,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const filter = {
 			...(search
 				? {
-						OR: [
-							{
-								otNumber: {
+						otNumber: {
+							OR: [
+								{
+									workRequest: {
+										contains: search,
+										mode: "insensitive" as const,
+									},
+								},
+								{
 									otNumber: {
 										contains: search,
 										mode: "insensitive" as const,
 									},
 								},
-							},
-						],
+							],
+						},
 					}
 				: {}),
 			...(statusFilter

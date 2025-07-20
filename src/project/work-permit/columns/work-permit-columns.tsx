@@ -142,7 +142,7 @@ export const getWorkPermitColumns = (
 		accessorKey: "workName",
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
-			const workOrder = row.original.otNumber.workName
+			const workOrder = row.original.otNumber.workRequest
 			return <div className="max-w-56 min-w-56 text-wrap">{workOrder}</div>
 		},
 	},

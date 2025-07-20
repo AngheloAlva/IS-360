@@ -19,9 +19,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const searchParams = req.nextUrl.searchParams
 		const otStatus = searchParams.get("otStatus")
 		const search = searchParams.get("search") || ""
-		const withOtActive = searchParams.get("withOtActive") === "true"
 		const order = searchParams.get("order") as Order
 		const orderBy = searchParams.get("orderBy") as OrderBy
+		const withOtActive = searchParams.get("withOtActive") === "true"
+		const onlyWithReviewRequest = searchParams.get("onlyWithReviewRequest") === "true"
 
 		const companiesWithStartupFolders = await prisma.company.findMany({
 			where: {
@@ -59,6 +60,65 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							workOrders: {
 								some: {
 									status: otStatus as WORK_ORDER_STATUS,
+								},
+							},
+						}
+					: {}),
+				...(onlyWithReviewRequest
+					? {
+							StartupFolders: {
+								some: {
+									OR: [
+										{
+											safetyAndHealthFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+										{
+											environmentalFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+										{
+											environmentFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+										{
+											techSpecsFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+										{
+											basicFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+										{
+											workersFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+										{
+											vehiclesFolders: {
+												some: {
+													status: "SUBMITTED",
+												},
+											},
+										},
+									],
 								},
 							},
 						}

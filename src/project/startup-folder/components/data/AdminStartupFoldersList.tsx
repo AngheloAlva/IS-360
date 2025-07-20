@@ -3,6 +3,7 @@
 import { Files, InfoIcon } from "lucide-react"
 import Link from "next/link"
 
+import { useStartupFolderFilters } from "../../hooks/use-startup-folder-filters"
 import { WorkOrderStatusSimpleOptions } from "@/lib/consts/work-order-status"
 import { StartupFolderStatus, type WORK_ORDER_STATUS } from "@prisma/client"
 import { generateSlug } from "@/lib/generateSlug"
@@ -32,7 +33,6 @@ import {
 	SelectContent,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
-import { useStartupFolderFilters } from "../../hooks/use-startup-folder-filters"
 
 interface AdminStartupFoldersListProps {
 	id: string
@@ -48,7 +48,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 
 	return (
 		<>
-			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-5" id={id}>
+			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-6" id={id}>
 				<SearchInput
 					setPage={() => {}}
 					value={filters.search}
@@ -57,6 +57,29 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 					className="col-span-2 sm:col-span-1 lg:col-span-2"
 					placeholder="Buscar por nombre o RUT de empresa..."
 				/>
+
+				<Select
+					onValueChange={(value: "true" | "false") => {
+						if (value === "true") {
+							actions.setonlyWithReviewRequest(true)
+						} else {
+							actions.setonlyWithReviewRequest(false)
+						}
+					}}
+					value={filters.onlyWithReviewRequest ? "true" : "false"}
+				>
+					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
+						<SelectValue placeholder="Estado" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectGroup>
+							<SelectLabel>¿Carpetas en Revisión?</SelectLabel>
+							<SelectSeparator />
+							<SelectItem value={"false"}>Todas las carpetas</SelectItem>
+							<SelectItem value={"true"}>Solo carpetas en Revisión</SelectItem>
+						</SelectGroup>
+					</SelectContent>
+				</Select>
 
 				<Select
 					onValueChange={(value: "all" | WORK_ORDER_STATUS) => {

@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { format } from "date-fns"
 
 export const dynamic = "force-dynamic"
 
@@ -108,7 +109,7 @@ export async function GET(): Promise<NextResponse> {
 		// Process activity data by day
 		const activityByDay: Record<string, { date: string; count: number }> = {}
 		workPermitActivity.forEach((activity) => {
-			const date = activity.createdAt.toISOString().split("T")[0]
+			const date = format(activity.createdAt, "dd-MM")
 			if (!activityByDay[date]) {
 				activityByDay[date] = { date, count: 0 }
 			}

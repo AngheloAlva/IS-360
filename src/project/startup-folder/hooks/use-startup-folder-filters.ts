@@ -12,6 +12,7 @@ export const useStartupFolderFilters = () => {
 		search: debouncedSearch,
 		otStatus: store.otStatus,
 		withOtActive: store.withOtActive,
+		onlyWithReviewRequest: store.onlyWithReviewRequest,
 	})
 
 	return {
@@ -21,6 +22,7 @@ export const useStartupFolderFilters = () => {
 			otStatus: store.otStatus,
 			orderBy: store.orderBy,
 			order: store.order,
+			onlyWithReviewRequest: store.onlyWithReviewRequest,
 		},
 
 		actions: {
@@ -30,6 +32,7 @@ export const useStartupFolderFilters = () => {
 			setOrderBy: store.setOrderBy,
 			setOrder: store.setOrder,
 			resetFilters: store.resetFilters,
+			setonlyWithReviewRequest: store.setOnlyWithReviewRequest,
 		},
 
 		// Query

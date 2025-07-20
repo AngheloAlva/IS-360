@@ -10,12 +10,14 @@ interface StartupFolderFiltersState {
 	otStatus: WORK_ORDER_STATUS | undefined
 	orderBy: OrderBy
 	order: Order
+	onlyWithReviewRequest?: boolean
 
 	setSearch: (search: string) => void
 	setWithOtActive: (withOtActive: boolean) => void
 	setOtStatus: (otStatus: WORK_ORDER_STATUS | undefined) => void
 	setOrderBy: (orderBy: OrderBy) => void
 	setOrder: (order: Order) => void
+	setOnlyWithReviewRequest: (onlyWithReviewRequest: boolean) => void
 
 	resetFilters: () => void
 }
@@ -26,6 +28,7 @@ const initialState = {
 	withOtActive: false,
 	order: "asc" as Order,
 	orderBy: "name" as OrderBy,
+	onlyWithReviewRequest: false,
 }
 
 export const useStartupFolderFiltersStore = create<StartupFolderFiltersState>()(
@@ -53,6 +56,10 @@ export const useStartupFolderFiltersStore = create<StartupFolderFiltersState>()(
 				set({ order })
 			},
 
+			setOnlyWithReviewRequest: (onlyWithReviewRequest) => {
+				set({ onlyWithReviewRequest })
+			},
+
 			resetFilters: () => {
 				set({
 					search: "",
@@ -60,6 +67,7 @@ export const useStartupFolderFiltersStore = create<StartupFolderFiltersState>()(
 					otStatus: undefined,
 					orderBy: "name" as OrderBy,
 					order: "asc" as Order,
+					onlyWithReviewRequest: false,
 				})
 			},
 		}),
@@ -71,6 +79,7 @@ export const useStartupFolderFiltersStore = create<StartupFolderFiltersState>()(
 				otStatus: state.otStatus,
 				orderBy: state.orderBy,
 				order: state.order,
+				onlyWithReviewRequest: state.onlyWithReviewRequest,
 			}),
 		}
 	)

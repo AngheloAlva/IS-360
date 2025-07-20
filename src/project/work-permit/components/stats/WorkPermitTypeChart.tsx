@@ -33,10 +33,10 @@ export default function WorkPermitTypeChart({ data }: WorkPermitTypeChartProps) 
 			</CardHeader>
 			<CardContent className="p-0">
 				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
-					<BarChart data={data} margin={{ right: 15, top: 15 }}>
+					<BarChart data={data} margin={{ right: 15, top: 15, bottom: 10 }}>
 						<ChartTooltip content={<ChartTooltipContent />} />
 
-						<XAxis dataKey="type" />
+						<XAxis dataKey="type" angle={-20} tickMargin={10} />
 						<YAxis />
 
 						<Bar dataKey="count" fill="var(--color-rose-600)" radius={[4, 4, 4, 4]} maxBarSize={40}>

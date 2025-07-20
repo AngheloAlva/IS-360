@@ -152,6 +152,7 @@ interface UseStartupFoldersListParams {
 	otStatus?: WORK_ORDER_STATUS
 	order?: Order
 	orderBy?: OrderBy
+	onlyWithReviewRequest?: boolean
 }
 
 export const fetchStartupFoldersList: QueryFunction<
@@ -164,10 +165,11 @@ export const fetchStartupFoldersList: QueryFunction<
 			otStatus?: WORK_ORDER_STATUS
 			order?: Order
 			orderBy?: OrderBy
+			onlyWithReviewRequest?: boolean
 		},
 	]
 > = async ({ queryKey }) => {
-	const [, { search, withOtActive, otStatus, order, orderBy }] = queryKey
+	const [, { search, withOtActive, otStatus, order, orderBy, onlyWithReviewRequest }] = queryKey
 
 	const searchParams = new URLSearchParams()
 	if (search) searchParams.set("search", search)
@@ -175,6 +177,8 @@ export const fetchStartupFoldersList: QueryFunction<
 	if (otStatus) searchParams.set("otStatus", otStatus)
 	if (order) searchParams.set("order", order)
 	if (orderBy) searchParams.set("orderBy", orderBy)
+	if (onlyWithReviewRequest)
+		searchParams.set("onlyWithReviewRequest", onlyWithReviewRequest.toString())
 
 	const res = await fetch(`/api/startup-folders/list?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching general startup folders")
@@ -188,8 +192,12 @@ export const useStartupFoldersList = ({
 	orderBy,
 	otStatus,
 	withOtActive,
+	onlyWithReviewRequest = false,
 }: UseStartupFoldersListParams) => {
-	const queryKey = ["startupFolders", { search, withOtActive, otStatus, order, orderBy }] as const
+	const queryKey = [
+		"startupFolders",
+		{ search, withOtActive, otStatus, order, orderBy, onlyWithReviewRequest },
+	] as const
 
 	return useQuery({
 		queryKey,

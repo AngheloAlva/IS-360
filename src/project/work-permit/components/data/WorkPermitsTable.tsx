@@ -3,21 +3,20 @@
 import { useState } from "react"
 import {
 	flexRender,
+	SortingState,
 	useReactTable,
 	getCoreRowModel,
-	getSortedRowModel,
-	type SortingState,
+	ColumnFiltersState,
 	getFilteredRowModel,
-	getPaginationRowModel,
 } from "@tanstack/react-table"
 
-import { useWorkPermits } from "@/project/work-permit/hooks/use-work-permit"
+import { useWorkPermitFilters } from "../../hooks/use-work-permit-filters"
 import { getWorkPermitColumns } from "../../columns/work-permit-columns"
-import { useDebounce } from "@/shared/hooks/useDebounce"
+import { useOperators } from "@/shared/hooks/use-operators"
 
-import OrderByButton, { type Order, type OrderBy } from "@/shared/components/OrderByButton"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
+import OrderByButton from "@/shared/components/OrderByButton"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
@@ -40,7 +39,6 @@ import {
 	SelectTrigger,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
-import { useOperators } from "@/shared/hooks/use-operators"
 
 interface WorkPermitsTableProps {
 	hasPermission: boolean
@@ -49,27 +47,14 @@ interface WorkPermitsTableProps {
 }
 
 export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPermitsTableProps) {
-	const [approvedBy, setApprovedBy] = useState<string | null>(null)
-	const [companyId, setCompanyId] = useState<string | null>(null)
-	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
-	const [order, setOrder] = useState<Order>("desc")
-	const [search, setSearch] = useState<string>("")
-	const [page, setPage] = useState<number>(1)
 
-	const debouncedSearch = useDebounce(search)
-
-	const { data, isLoading, refetch, isFetching } = useWorkPermits({
-		page,
-		order,
-		orderBy,
-		limit: 15,
-		companyId,
-		approvedBy,
-		dateRange: null,
-		statusFilter: null,
-		search: debouncedSearch,
-	})
+	const {
+		filters,
+		actions,
+		workPermits: { data, isLoading, isFetching, refetch },
+	} = useWorkPermitFilters()
 
 	const { data: companies } = useCompanies({
 		limit: 1000,
@@ -81,18 +66,23 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 	})
 
 	const table = useReactTable({
-		data: data?.workPermits ?? [],
 		onSortingChange: setSorting,
-		getCoreRowModel: getCoreRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
+		data: data?.workPermits ?? [],
 		columns: getWorkPermitColumns(hasPermission, userId),
-		getPaginationRowModel: getPaginationRowModel(),
+		getCoreRowModel: getCoreRowModel(),
+		onColumnFiltersChange: setColumnFilters,
+		getFilteredRowModel: getFilteredRowModel(),
+
 		state: {
 			sorting,
+			columnFilters,
+			pagination: {
+				pageIndex: filters.page - 1,
+				pageSize: 10,
+			},
 		},
 		manualPagination: true,
-		pageCount: data?.pages ?? 1,
+		pageCount: data?.pages ?? 0,
 	})
 
 	return (
@@ -101,22 +91,22 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
 					<div className="flex w-full flex-col items-end gap-4 lg:flex-row">
 						<SearchInput
-							value={search}
-							setPage={setPage}
-							onChange={setSearch}
-							placeholder="Buscar permisos..."
-							className="w-full lg:w-[250px]"
+							value={filters.search}
+							setPage={actions.setPage}
+							onChange={actions.setSearch}
+							placeholder="Buscar permisos por OT o trabajo solicitado..."
+							className="w-full lg:w-[350px]"
 						/>
 
 						<Select
 							onValueChange={(value) => {
 								if (value === "all") {
-									setCompanyId(null)
+									actions.setCompanyId(null)
 								} else {
-									setCompanyId(value)
+									actions.setCompanyId(value)
 								}
 							}}
-							value={companyId ?? "all"}
+							value={filters.companyId ?? "all"}
 						>
 							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
 								<SelectValue placeholder="Empresa" />
@@ -138,12 +128,12 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 						<Select
 							onValueChange={(value) => {
 								if (value === "all") {
-									setApprovedBy(null)
+									actions.setApprovedBy(null)
 								} else {
-									setApprovedBy(value)
+									actions.setApprovedBy(value)
 								}
 							}}
-							value={approvedBy ?? "all"}
+							value={filters.approvedBy ?? "all"}
 						>
 							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
 								<SelectValue placeholder="Seleccione operador" />
@@ -165,8 +155,8 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 						<div className="ml-auto flex items-center justify-end gap-2">
 							<OrderByButton
 								onChange={(orderBy, order) => {
-									setOrderBy(orderBy)
-									setOrder(order)
+									actions.setOrderBy(orderBy)
+									actions.setOrder(order)
 								}}
 							/>
 
@@ -225,16 +215,14 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 					</TableBody>
 				</Table>
 
-				{data && (
-					<TablePagination
-						table={table}
-						total={data.total}
-						isLoading={isLoading}
-						pageCount={data.pages}
-						onPageChange={setPage}
-						className="border-rose-600 text-rose-600 hover:bg-rose-600"
-					/>
-				)}
+				<TablePagination
+					table={table}
+					isLoading={isLoading}
+					total={data?.total ?? 0}
+					pageCount={data?.pages ?? 0}
+					onPageChange={actions.setPage}
+					className="border-rose-600 text-rose-600 hover:bg-rose-600"
+				/>
 			</CardContent>
 		</Card>
 	)

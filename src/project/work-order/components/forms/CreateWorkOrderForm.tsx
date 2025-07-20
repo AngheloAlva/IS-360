@@ -391,24 +391,6 @@ export default function CreateWorkOrderForm({
 							className="mb-6 w-full sm:col-span-2"
 						/>
 
-						{/* Botón de debug temporal */}
-						<Button
-							size="lg"
-							type="button"
-							variant="secondary"
-							onClick={() => {
-								const values = form.getValues()
-								const errors = form.formState.errors
-								console.log("=== DEBUG FORMULARIO ===")
-								console.log("Valores actuales:", values)
-								console.log("Errores:", errors)
-								console.log("Es válido:", form.formState.isValid)
-								console.log("========================")
-							}}
-						>
-							🐛 Debug Form
-						</Button>
-
 						<Button
 							size="lg"
 							type="button"
