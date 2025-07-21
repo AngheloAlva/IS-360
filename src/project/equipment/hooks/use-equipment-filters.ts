@@ -2,33 +2,33 @@ import { useEquipmentFiltersStore } from "@/project/equipment/stores/equipment-f
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { useDebounce } from "@/shared/hooks/useDebounce"
 
-export const useEquipmentFilters = () => {
+export const useEquipmentFilters = (parentId: string | null) => {
 	const store = useEquipmentFiltersStore()
 	const debouncedSearch = useDebounce(store.search, 300)
 
 	const equipmentsQuery = useEquipments({
+		parentId,
 		limit: 10,
 		page: store.page,
-		search: debouncedSearch,
-		showAll: store.showAll,
-		parentId: store.parentId,
-		orderBy: store.orderBy,
 		order: store.order,
+		orderBy: store.orderBy,
+		search: debouncedSearch,
+		showAll: parentId ? false : store.showAll,
 	})
 
 	return {
 		filters: {
-			parentId: store.parentId,
-			showAll: store.showAll,
-			search: store.search,
+			parentId,
 			page: store.page,
+			search: store.search,
+			showAll: parentId ? false : store.showAll,
 		},
 
 		actions: {
-			setParentId: store.setParentId,
-			setShowAll: store.setShowAll,
-			setSearch: store.setSearch,
 			setPage: store.setPage,
+			setSearch: store.setSearch,
+			setShowAll: store.setShowAll,
+			setParentId: store.setParentId,
 			resetFilters: store.resetFilters,
 			resetPagination: store.resetPagination,
 		},

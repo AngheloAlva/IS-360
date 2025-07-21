@@ -56,7 +56,6 @@ interface EquipmentTableProps {
 
 export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-	const [showAll, setShowAll] = useState<boolean>(parentId ? false : true)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [sorting, setSorting] = useState<SortingState>([])
 
@@ -64,7 +63,7 @@ export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) 
 		actions,
 		filters,
 		equipments: { data, isLoading, isFetching, refetch },
-	} = useEquipmentFilters()
+	} = useEquipmentFilters(parentId)
 
 	const router = useRouter()
 
@@ -185,26 +184,28 @@ export function EquipmentTable({ parentId, lastPath, id }: EquipmentTableProps) 
 								placeholder="Buscar por nombre, TAG o ubicación..."
 							/>
 
-							<Select
-								onValueChange={(value) => {
-									if (value === "true") {
-										setShowAll(true)
-									} else {
-										setShowAll(false)
-									}
-								}}
-								value={showAll ? "true" : "false"}
-							>
-								<SelectTrigger className="border-input bg-background w-full border md:w-fit">
-									<SelectValue placeholder="Mostrar todos los equipos" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectGroup>
-										<SelectItem value="true">Todos los equipos</SelectItem>
-										<SelectItem value="false">Equipos padres</SelectItem>
-									</SelectGroup>
-								</SelectContent>
-							</Select>
+							{!parentId && (
+								<Select
+									onValueChange={(value) => {
+										if (value === "true") {
+											actions.setShowAll(true)
+										} else {
+											actions.setShowAll(false)
+										}
+									}}
+									value={filters.showAll ? "true" : "false"}
+								>
+									<SelectTrigger className="border-input bg-background w-full border md:w-fit">
+										<SelectValue placeholder="Mostrar todos los equipos" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											<SelectItem value="true">Todos los equipos</SelectItem>
+											<SelectItem value="false">Equipos padres</SelectItem>
+										</SelectGroup>
+									</SelectContent>
+								</Select>
+							)}
 
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
 						</div>

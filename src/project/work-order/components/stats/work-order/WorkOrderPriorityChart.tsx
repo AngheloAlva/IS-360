@@ -36,7 +36,7 @@ export function WorkOrderPriorityChart({ data }: WorkOrderPriorityChartProps) {
 		color: PRIORITY_COLORS[item.name] || "var(--color-gray-500)",
 	}))
 
-	const handleBarClick = (data: { originalName: string; name: string }) => {
+	const handleBarClick = (data: { originalName: string }) => {
 		const clickedPriority = data.originalName
 
 		if (priorityFilter === clickedPriority) {

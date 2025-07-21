@@ -1,6 +1,6 @@
 "use client"
 
-import { FileSpreadsheetIcon, FilterXIcon } from "lucide-react"
+import { FileSpreadsheetIcon, FilterXIcon, InfoIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -353,27 +353,38 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					</TableHeader>
 
 					<TableBody>
-						{isLoading || isFetching
-							? Array.from({ length: 10 }).map((_, index) => (
-									<TableRow key={index}>
-										<TableCell className="" colSpan={17}>
-											<Skeleton className="h-16 min-w-full" />
+						{isLoading || isFetching ? (
+							Array.from({ length: 10 }).map((_, index) => (
+								<TableRow key={index}>
+									<TableCell className="" colSpan={17}>
+										<Skeleton className="h-16 min-w-full" />
+									</TableCell>
+								</TableRow>
+							))
+						) : table.getRowModel().rows.length === 0 ? (
+							<TableRow>
+								<TableCell colSpan={17} className="h-20 text-center">
+									<div className="flex items-center justify-center gap-2">
+										<InfoIcon className="size-4" />
+										No se encontraron resultados.
+									</div>
+								</TableCell>
+							</TableRow>
+						) : (
+							table.getRowModel().rows.map((row) => (
+								<TableRow
+									key={row.id}
+									data-state={row.getIsSelected() && "selected"}
+									onMouseEnter={() => prefetchWorkBookById(row.original.id)}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id} className="font-medium">
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
 										</TableCell>
-									</TableRow>
-								))
-							: table.getRowModel().rows.map((row) => (
-									<TableRow
-										key={row.id}
-										data-state={row.getIsSelected() && "selected"}
-										onMouseEnter={() => prefetchWorkBookById(row.original.id)}
-									>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell key={cell.id} className="font-medium">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</TableCell>
-										))}
-									</TableRow>
-								))}
+									))}
+								</TableRow>
+							))
+						)}
 					</TableBody>
 				</Table>
 

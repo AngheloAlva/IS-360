@@ -7,9 +7,10 @@ import { format } from "date-fns"
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/shared/components/ui/button"
-import { Calendar } from "@/shared/components/ui/calendar"
+
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover"
+import { Calendar } from "@/shared/components/ui/calendar"
+import { Button } from "@/shared/components/ui/button"
 
 interface CalendarDateRangePickerProps {
 	value?: DateRange | null
@@ -17,14 +18,6 @@ interface CalendarDateRangePickerProps {
 }
 
 export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePickerProps) {
-	const [date, setDate] = React.useState<DateRange | null>(value ?? null)
-
-	React.useEffect(() => {
-		if (value) {
-			setDate(value)
-		}
-	}, [value])
-
 	return (
 		<div className={cn("grid gap-2")}>
 			<Popover>
@@ -34,18 +27,18 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 						variant={"outline"}
 						className={cn(
 							"border-input bg-background w-fit justify-start text-left font-normal",
-							!date && "text-muted-foreground"
+							!value && "text-muted-foreground"
 						)}
 					>
 						<CalendarIcon className="mr-2 h-4 w-4" />
-						{date?.from ? (
-							date.to ? (
+						{value?.from ? (
+							value.to ? (
 								<>
-									{format(date.from, "LLL dd, y", { locale: es })} -{" "}
-									{format(date.to, "LLL dd, y", { locale: es })}
+									{format(value.from, "LLL dd, y", { locale: es })} -{" "}
+									{format(value.to, "LLL dd, y", { locale: es })}
 								</>
 							) : (
-								format(date.from, "LLL dd, y", { locale: es })
+								format(value.from, "LLL dd, y", { locale: es })
 							)
 						) : (
 							<span>Seleccionar rango de fechas</span>
@@ -57,11 +50,10 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 					<Calendar
 						mode="range"
 						captionLayout={"dropdown"}
-						defaultMonth={date?.from}
-						selected={date ?? undefined}
+						defaultMonth={value?.from}
+						selected={value ?? undefined}
 						fromYear={2024}
 						onSelect={(newDate) => {
-							setDate(newDate ?? null)
 							onChange?.(newDate ?? null)
 						}}
 						numberOfMonths={2}

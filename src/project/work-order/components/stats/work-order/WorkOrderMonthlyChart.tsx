@@ -82,16 +82,6 @@ export function WorkOrderMonthlyChart({ data }: WorkOrderMonthlyChartProps) {
 							to: lastDay,
 						}
 						actions.setDateRange(dateRange)
-
-						setTimeout(() => {
-							const tableElement = document.getElementById("work-order-table")
-							if (tableElement) {
-								tableElement.scrollIntoView({
-									behavior: "smooth",
-									block: "start",
-								})
-							}
-						}, 100)
 					}
 				}
 			}

@@ -26,32 +26,22 @@ interface WorkOrderStatusChartProps {
 	data: WorkOrderStatsResponse
 }
 
-const COLORS = [
-	"var(--color-orange-500)",
-	"var(--color-yellow-500)",
-	"var(--color-amber-500)",
-	"var(--color-red-500)",
-]
-
 export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 	const statusData = data.charts.type
-	const { setTypeFilter, statusFilter } = useWorkOrderFiltersStore()
+	const { setTypeFilter, typeFilter } = useWorkOrderFiltersStore()
 
 	const handleChartClick = (data: { name: string }) => {
 		const clickedStatus = data.name
 
-		if (statusFilter === clickedStatus) {
+		console.log({
+			typeFilter,
+			clickedStatus,
+		})
+		if (typeFilter === clickedStatus) {
 			setTypeFilter(null)
 		} else {
 			setTypeFilter(clickedStatus)
 		}
-
-		// setTimeout(() => {
-		// 	document.getElementById("work-order-table")?.scrollIntoView({
-		// 		behavior: "smooth",
-		// 		block: "start",
-		// 	})
-		// }, 100)
 	}
 
 	return (
@@ -98,9 +88,8 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 							{statusData.map((entry, index) => (
 								<Cell
 									key={`cell-${index}`}
-									fill={COLORS[index % COLORS.length]}
-									strokeWidth={statusFilter === entry.name ? 2 : 0}
-									stroke={statusFilter === entry.name ? "var(--text)" : "none"}
+									strokeWidth={typeFilter === entry.name ? 2 : 0}
+									stroke={typeFilter === entry.name ? "var(--text)" : "none"}
 									className="cursor-pointer hover:brightness-75"
 								/>
 							))}

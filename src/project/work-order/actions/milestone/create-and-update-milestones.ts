@@ -89,6 +89,7 @@ export async function createAndUpdateMilestones(
 					endDate: milestone.endDate,
 					startDate: milestone.startDate,
 					weight: Number(milestone.weight),
+					status: isResponsible ? MILESTONE_STATUS.PENDING : MILESTONE_STATUS.IN_APPROVAL,
 					description: milestone.description || "",
 					workOrder: {
 						connect: { id: values.workOrderId },
