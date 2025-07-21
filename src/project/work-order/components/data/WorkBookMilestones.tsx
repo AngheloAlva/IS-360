@@ -83,11 +83,9 @@ export default function WorkBookMilestones({
 				<div className="flex items-center gap-2">
 					{!isMilestonesApproved && <MilestoneApproval workOrderId={workOrderId} />}
 
-					<MilestonesForm
-						workOrderId={workOrderId}
-						workOrderStartDate={workOrderStartDate}
-						initialData={data?.milestones}
-					/>
+					{!(data?.milestones?.length ?? 0 > 1) && (
+						<MilestonesForm workOrderId={workOrderId} workOrderStartDate={workOrderStartDate} />
+					)}
 
 					{canRequestClosure ||
 						(canRequestClosure && hassWorkBookPermission && (
