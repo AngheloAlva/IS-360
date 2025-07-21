@@ -19,6 +19,7 @@ import {
 	LockKeyholeIcon,
 	ShieldPlusIcon,
 	BellIcon,
+	BookOpenIcon,
 } from "lucide-react"
 
 export const data = {
@@ -57,6 +58,11 @@ export const data = {
 			name: "Libro de Obras",
 			url: "/dashboard/libro-de-obras",
 			icon: BookCopyIcon,
+		},
+		{
+			name: "Tutoriales",
+			url: "/dashboard/tutoriales",
+			icon: BookOpenIcon,
 		},
 	],
 	navAdmin: [
@@ -109,6 +115,11 @@ export const data = {
 			name: "Notificaciones",
 			url: "/admin/dashboard/notificaciones",
 			icon: BellIcon,
+		},
+		{
+			name: "Tutoriales",
+			url: "/admin/dashboard/tutoriales",
+			icon: BookOpenIcon,
 		},
 	],
 	navSecondary: [
