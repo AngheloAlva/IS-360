@@ -1,13 +1,12 @@
 "use client"
 
-import { ChevronDown, FileSpreadsheetIcon, FilterXIcon } from "lucide-react"
+import { FileSpreadsheetIcon, FilterXIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
 	flexRender,
 	SortingState,
 	useReactTable,
-	VisibilityState,
 	getCoreRowModel,
 	ColumnFiltersState,
 	getFilteredRowModel,
@@ -50,12 +49,6 @@ import {
 	SelectContent,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-	DropdownMenuCheckboxItem,
-} from "@/shared/components/ui/dropdown-menu"
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 
@@ -64,7 +57,6 @@ interface WorkOrderTableProps {
 }
 
 export function WorkOrderTable({ id }: WorkOrderTableProps) {
-	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [sorting, setSorting] = useState<SortingState>([])
@@ -84,7 +76,6 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
-		onColumnVisibilityChange: setColumnVisibility,
 		onRowSelectionChange: setRowSelection,
 
 		state: {
@@ -95,7 +86,6 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 				pageSize: 10,
 			},
 			rowSelection,
-			columnVisibility,
 		},
 		manualPagination: true,
 		pageCount: data?.pages ?? 0,
@@ -313,6 +303,29 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						</SelectContent>
 					</Select>
 
+					<Select
+						onValueChange={(value) => {
+							if (value === "true") {
+								actions.setOnlyWithRequestClousure(true)
+							} else {
+								actions.setOnlyWithRequestClousure(false)
+							}
+						}}
+						value={filters.onlyWithRequestClousure ? "true" : "false"}
+					>
+						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+							Hito(s) en Revisión
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Urgente</SelectLabel>
+								<SelectSeparator />
+								<SelectItem value="false">Todas las OT</SelectItem>
+								<SelectItem value="true">Solo en Revisión</SelectItem>
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+
 					<OrderByButton
 						className="ml-auto"
 						onChange={(orderBy, order) => {
@@ -320,31 +333,6 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 							actions.setOrder(order)
 						}}
 					/>
-
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button className="text-text border-input hover:bg-input bg-background border">
-								Columnas <ChevronDown />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{table
-								.getAllColumns()
-								.filter((column) => column.getCanHide())
-								.map((column) => {
-									return (
-										<DropdownMenuCheckboxItem
-											key={column.id}
-											className="capitalize"
-											checked={column.getIsVisible()}
-											onCheckedChange={(value) => column.toggleVisibility(!!value)}
-										>
-											{(column.columnDef.header as string) || column.id}
-										</DropdownMenuCheckboxItem>
-									)
-								})}
-						</DropdownMenuContent>
-					</DropdownMenu>
 				</div>
 
 				<Table>

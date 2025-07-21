@@ -3,7 +3,7 @@
 import { headers } from "next/headers"
 
 import { sendMilestoneApprovalEmail } from "./milestone/sendMilestoneApprovalEmail"
-import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
+import { ACTIVITY_TYPE, MILESTONE_STATUS, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
@@ -68,6 +68,15 @@ export async function approveMilestones({
 			where: { id: workOrder.id },
 			data: {
 				isMilestonesApproved: approved,
+			},
+		})
+
+		await prisma.milestone.updateMany({
+			where: {
+				workOrderId: updatedWorkOrder.id,
+			},
+			data: {
+				status: approved ? MILESTONE_STATUS.PENDING : MILESTONE_STATUS.REJECTED_APPROVAL,
 			},
 		})
 

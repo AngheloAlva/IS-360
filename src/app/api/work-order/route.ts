@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { subDays } from "date-fns"
 
-import { type WORK_ORDER_PRIORITY, WORK_ORDER_STATUS, type WORK_ORDER_TYPE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import {
+	MILESTONE_STATUS,
+	WORK_ORDER_STATUS,
+	type WORK_ORDER_TYPE,
+	type WORK_ORDER_PRIORITY,
+} from "@prisma/client"
 
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 
@@ -32,6 +37,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const order = searchParams.get("order") as Order
 		const orderBy = searchParams.get("orderBy") as OrderBy
 		const isOtcMember = searchParams.get("isOtcMember") === "true"
+		const onlyWithRequestClousure = searchParams.get("onlyWithRequestClousure") === "true"
 
 		let orderByField: string
 
@@ -88,6 +94,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						solicitationDate: {
 							...(startDate ? { gte: new Date(startDate) } : {}),
 							...(endDate ? { lte: new Date(endDate) } : {}),
+						},
+					}
+				: {}),
+			...(onlyWithRequestClousure
+				? {
+						milestones: {
+							some: {
+								status: MILESTONE_STATUS.REQUESTED_CLOSURE,
+							},
 						},
 					}
 				: {}),

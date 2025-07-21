@@ -122,7 +122,6 @@ export default function CreateWorkOrderForm({
 	}, [form.formState.errors])
 
 	async function onSubmit(values: WorkOrderSchema) {
-		console.log("Formulario enviado con valores:", values)
 		const initReportFile = form.getValues("file")?.[0]
 
 		setIsSubmitting(true)

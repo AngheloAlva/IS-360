@@ -4,6 +4,7 @@ import { Resend } from "resend"
 
 import OtcInspectionNotificationEmail from "@/project/work-order/components/emails/OtcInspectionNotificationEmail"
 import prisma from "@/lib/prisma"
+import { systemUrl } from "@/lib/consts/systemUrl"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -39,7 +40,6 @@ export const sendOtcInspectionNotification = async ({
 								id: true,
 								name: true,
 								email: true,
-								internal: true,
 							},
 						},
 						supervisor: {
@@ -47,7 +47,6 @@ export const sendOtcInspectionNotification = async ({
 								id: true,
 								name: true,
 								email: true,
-								internal: true,
 							},
 						},
 						company: {
@@ -80,18 +79,17 @@ export const sendOtcInspectionNotification = async ({
 		}
 
 		const workOrderData = {
+			id: inspection.workOrder.id,
 			otNumber: inspection.workOrder.otNumber,
 			workName: inspection.workOrder.workName || undefined,
 			workLocation: inspection.workOrder.workLocation || undefined,
 			responsible: {
 				name: inspection.workOrder.responsible.name,
 				email: inspection.workOrder.responsible.email,
-				internal: inspection.workOrder.responsible.internal,
 			},
 			supervisor: {
 				name: inspection.workOrder.supervisor.name,
 				email: inspection.workOrder.supervisor.email,
-				internal: inspection.workOrder.supervisor.internal,
 			},
 			company: inspection.workOrder.company
 				? {
@@ -109,14 +107,14 @@ export const sendOtcInspectionNotification = async ({
 			{
 				email: workOrderData.responsible.email,
 				name: workOrderData.responsible.name,
-				isInternal: workOrderData.responsible.internal,
 				role: "responsible" as const,
+				isInternal: true,
 			},
 			{
 				email: workOrderData.supervisor.email,
 				name: workOrderData.supervisor.name,
-				isInternal: workOrderData.supervisor.internal,
 				role: "supervisor" as const,
+				isInternal: false,
 			},
 		]
 
@@ -148,6 +146,10 @@ export const sendOtcInspectionNotification = async ({
 				? `🚨 URGENTE: Inspección OTC con No Conformidades - ${workOrderData.otNumber}`
 				: `📋 Nueva Inspección OTC Realizada - OT ${workOrderData.otNumber}`
 
+			const url = recipient.isInternal
+				? `${systemUrl}/admin/dashboard/ordenes-de-trabajo/${workOrderData.id}`
+				: `${systemUrl}/dashboard/libro-de-obras/${workOrderData.id}`
+
 			return resend.emails.send({
 				from: "anghelo.alva@ingenieriasimple.cl",
 				to: recipient.email,
@@ -157,6 +159,7 @@ export const sendOtcInspectionNotification = async ({
 					inspection: inspectionData,
 					workOrder: workOrderData,
 					recipient,
+					url,
 				}),
 				tags: [
 					{
@@ -184,8 +187,6 @@ export const sendOtcInspectionNotification = async ({
 		// Log results
 		const successful = results.filter((r) => r.status === "fulfilled").length
 		const failed = results.filter((r) => r.status === "rejected").length
-
-		console.log(`[OTC_INSPECTION_NOTIFICATION] Sent ${successful} emails, ${failed} failed`)
 
 		// Log any failures
 		results.forEach((result, index) => {

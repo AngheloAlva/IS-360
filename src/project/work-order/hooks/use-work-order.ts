@@ -1,13 +1,13 @@
 import { QueryFunction, useQuery } from "@tanstack/react-query"
 import { DateRange } from "react-day-picker"
 
+import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 import type {
 	WORK_ORDER_TYPE,
 	WORK_ORDER_CAPEX,
 	WORK_ORDER_STATUS,
 	WORK_ORDER_PRIORITY,
 } from "@prisma/client"
-import { Order, OrderBy } from "@/shared/components/OrderByButton"
 
 interface WorkOrderStats {
 	activeCount: number
@@ -78,6 +78,7 @@ interface WorkOrdersParams {
 	statusFilter: string | null
 	dateRange: DateRange | null
 	priorityFilter: string | null
+	onlyWithRequestClousure: boolean
 }
 
 interface WorkOrdersResponse {
@@ -104,6 +105,7 @@ export const fetchWorkOrders: QueryFunction<
 			statusFilter: string | null
 			dateRange: DateRange | null
 			priorityFilter: string | null
+			onlyWithRequestClousure: boolean
 		},
 	]
 > = async ({ queryKey }) => {
@@ -122,6 +124,7 @@ export const fetchWorkOrders: QueryFunction<
 			statusFilter,
 			permitFilter,
 			priorityFilter,
+			onlyWithRequestClousure,
 		},
 	] = queryKey
 
@@ -139,6 +142,8 @@ export const fetchWorkOrders: QueryFunction<
 	if (order) searchParams.set("order", order)
 	if (isOtcMember) searchParams.set("isOtcMember", isOtcMember.toString())
 	if (priorityFilter) searchParams.set("priorityFilter", priorityFilter)
+	if (onlyWithRequestClousure)
+		searchParams.set("onlyWithRequestClousure", onlyWithRequestClousure.toString())
 
 	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching work orders")
@@ -155,10 +160,11 @@ export const useWorkOrders = ({
 	companyId = null,
 	dateRange = null,
 	typeFilter = null,
+	isOtcMember = false,
 	statusFilter = null,
 	permitFilter = false,
 	orderBy = "createdAt",
-	isOtcMember = false,
+	onlyWithRequestClousure,
 }: WorkOrdersParams) => {
 	const queryKey = [
 		"workOrders",
@@ -175,6 +181,7 @@ export const useWorkOrders = ({
 			statusFilter,
 			permitFilter,
 			priorityFilter,
+			onlyWithRequestClousure,
 		},
 	] as const
 

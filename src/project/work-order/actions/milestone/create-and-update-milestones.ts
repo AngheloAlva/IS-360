@@ -3,8 +3,8 @@
 import { headers } from "next/headers"
 
 import { sendNotification } from "@/shared/actions/notifications/send-notification"
+import { ACTIVITY_TYPE, MILESTONE_STATUS, MODULES } from "@prisma/client"
 import { sendMilestoneUpdateEmail } from "./sendMilestoneUpdateEmail"
-import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { USER_ROLE } from "@/lib/permissions"
 import { auth } from "@/lib/auth"
@@ -17,8 +17,9 @@ interface SaveMilestonesResponse {
 	message: string
 }
 
-export async function createMilestones(
-	values: WorkBookMilestonesSchema
+export async function createAndUpdateMilestones(
+	values: WorkBookMilestonesSchema,
+	isResponsible: boolean
 ): Promise<SaveMilestonesResponse> {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -72,6 +73,7 @@ export async function createMilestones(
 						startDate: milestone.startDate,
 						weight: Number(milestone.weight),
 						description: milestone.description || "",
+						status: isResponsible ? MILESTONE_STATUS.PENDING : MILESTONE_STATUS.IN_APPROVAL,
 					},
 				})
 
@@ -113,7 +115,6 @@ export async function createMilestones(
 			message: `Se han actualizado los hitos del libro de obras ${workOrder.workName}`,
 		})
 
-		// Send email to the responsible person
 		if (workOrder.responsible.email) {
 			await sendMilestoneUpdateEmail({
 				workOrderId: workOrder.id,

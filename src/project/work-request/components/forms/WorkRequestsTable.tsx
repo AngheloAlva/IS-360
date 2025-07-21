@@ -240,10 +240,12 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 
 							<Select
 								onValueChange={(value) => {
-									if (value === "all") {
-										setIsUrgent(null)
+									if (value === "true") {
+										setIsUrgent(true)
+									} else if (value === "false") {
+										setIsUrgent(false)
 									} else {
-										setIsUrgent(value === "true")
+										setIsUrgent(null)
 									}
 								}}
 								value={isUrgent === null ? "all" : isUrgent ? "true" : "false"}

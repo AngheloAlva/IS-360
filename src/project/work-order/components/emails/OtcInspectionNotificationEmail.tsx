@@ -15,7 +15,6 @@ import {
 } from "@react-email/components"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { systemUrl } from "@/lib/consts/systemUrl"
 
 interface OtcInspectionNotificationEmailProps {
 	inspection: {
@@ -33,17 +32,16 @@ interface OtcInspectionNotificationEmailProps {
 		attachmentCount?: number
 	}
 	workOrder: {
+		id: string
 		otNumber: string
 		workName?: string
 		workLocation?: string
 		responsible: {
 			name: string
-			internal: boolean
 		}
 		supervisor: {
 			name: string
 			email: string
-			internal: boolean
 		}
 		company?: {
 			name: string
@@ -54,12 +52,14 @@ interface OtcInspectionNotificationEmailProps {
 		isInternal: boolean
 		role: "responsible" | "supervisor" | "safety"
 	}
+	url: string
 }
 
 const OtcInspectionNotificationEmail = ({
-	inspection,
+	url,
 	workOrder,
 	recipient,
+	inspection,
 }: OtcInspectionNotificationEmailProps) => {
 	const getRoleContext = () => {
 		switch (recipient.role) {
@@ -337,7 +337,7 @@ const OtcInspectionNotificationEmail = ({
 							{/* Action Button */}
 							<Section className="mb-[32px] text-center">
 								<Button
-									href={`${systemUrl}/work-orders/${workOrder.otNumber}`}
+									href={url}
 									className="box-border rounded-[8px] bg-orange-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-orange-600"
 								>
 									Ver Inspección en OTC 360

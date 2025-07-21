@@ -394,18 +394,20 @@ model WorkOrder {
 }
 
 enum MILESTONE_STATUS {
+  IN_APPROVAL
   PENDING
   IN_PROGRESS
   COMPLETED
   CANCELLED
   REQUESTED_CLOSURE
+  REJECTED_APPROVAL
 }
 
 model Milestone {
   id             String           @id @default(cuid())
   name           String
   description    String?
-  status         MILESTONE_STATUS @default(PENDING)
+  status         MILESTONE_STATUS @default(IN_APPROVAL)
   order          Int              @default(0)
   isCompleted    Boolean          @default(false)
   weight         Float

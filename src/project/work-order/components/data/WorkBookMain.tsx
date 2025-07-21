@@ -176,7 +176,7 @@ export default function WorkBookMain({
 									{canAddActivities && (
 										<>
 											{!canRequestClosure &&
-												(workBook._count.milestones > 0 ? (
+												(workBook._count.milestones > 0 && workBook.isMilestonesApproved ? (
 													<ActivityForm
 														userId={userId}
 														startDate={new Date()}
@@ -188,7 +188,9 @@ export default function WorkBookMain({
 														<Alert>
 															<InfoIcon className="h-4 w-4" />
 															<AlertTitle>
-																Debe crear su(s) hito(s) para agregar actividades diarias
+																{workBook.isMilestonesApproved
+																	? "Debe crear su(s) hito(s) para agregar actividades diarias"
+																	: "Debe tener su(s) hito(s) aprobados para poder agregar actividades diarias"}
 															</AlertTitle>
 														</Alert>
 													)

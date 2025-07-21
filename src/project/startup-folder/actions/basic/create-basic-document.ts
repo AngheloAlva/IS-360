@@ -64,8 +64,6 @@ export async function createBasicDocument(input: CreateBasicDocumentInput) {
 			},
 		})
 
-		console.log(document)
-
 		if (!document) {
 			return {
 				ok: false,

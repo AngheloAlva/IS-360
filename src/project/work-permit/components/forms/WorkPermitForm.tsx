@@ -163,6 +163,7 @@ export default function WorkPermitForm({
 		permitFilter: true,
 		orderBy: "createdAt",
 		priorityFilter: null,
+		onlyWithRequestClousure: false,
 	})
 
 	const { data: usersData } = useUsersByCompany({

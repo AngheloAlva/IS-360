@@ -12,6 +12,7 @@ interface WorkOrderFiltersState {
 	page: number
 	orderBy: "createdAt" | "name"
 	order: "asc" | "desc"
+	onlyWithRequestClousure: boolean
 
 	setStatusFilter: (status: string | null) => void
 	setPriorityFilter: (priority: string | null) => void
@@ -22,6 +23,7 @@ interface WorkOrderFiltersState {
 	setPage: (page: number) => void
 	setOrderBy: (orderBy: "createdAt" | "name") => void
 	setOrder: (order: "asc" | "desc") => void
+	setOnlyWithRequestClousure: (onlyWithRequestClousure: boolean) => void
 
 	resetFilters: () => void
 	resetPagination: () => void
@@ -37,6 +39,7 @@ const initialState = {
 	page: 1,
 	orderBy: "createdAt" as const,
 	order: "desc" as const,
+	onlyWithRequestClousure: false,
 }
 
 export const useWorkOrderFiltersStore = create<WorkOrderFiltersState>()(
@@ -78,6 +81,10 @@ export const useWorkOrderFiltersStore = create<WorkOrderFiltersState>()(
 
 			setOrder: (order) => {
 				set({ order, page: 1 })
+			},
+
+			setOnlyWithRequestClousure: (onlyWithRequestClousure) => {
+				set({ onlyWithRequestClousure, page: 1 })
 			},
 
 			resetFilters: () => {

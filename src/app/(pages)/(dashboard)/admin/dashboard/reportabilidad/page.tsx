@@ -69,9 +69,6 @@ export default function PowerBIDashboardPage() {
 	useEffect(() => {
 		const authorizedEmails = process.env.NEXT_PUBLIC_GERENCY_EMAILS!.split(",")
 
-		console.log(authorizedEmails)
-		console.log("session.data?.user.email", session.data?.user.email)
-
 		if (authorizedEmails.includes(session.data?.user.email || "")) {
 			setDashboards((prev) => ({
 				...prev,

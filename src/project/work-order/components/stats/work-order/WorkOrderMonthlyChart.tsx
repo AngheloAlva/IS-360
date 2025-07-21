@@ -76,14 +76,12 @@ export function WorkOrderMonthlyChart({ data }: WorkOrderMonthlyChartProps) {
 
 					if (isMonthAlreadyFiltered) {
 						actions.setDateRange(null)
-						console.log("Filtro de mes eliminado")
 					} else {
 						const dateRange = {
 							from: firstDay,
 							to: lastDay,
 						}
 						actions.setDateRange(dateRange)
-						console.log("Filtro aplicado:", dateRange)
 
 						setTimeout(() => {
 							const tableElement = document.getElementById("work-order-table")

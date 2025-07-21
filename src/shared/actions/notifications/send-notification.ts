@@ -37,7 +37,7 @@ export const sendNotification = async ({
 				},
 			})
 
-			const res = await pusherServer.trigger(`${targetRole}-channel`, "notification", {
+			await pusherServer.trigger(`${targetRole}-channel`, "notification", {
 				isRead: false,
 				id: notification.id,
 				type: notification.type,
@@ -46,7 +46,6 @@ export const sendNotification = async ({
 				message: notification.message,
 				createdAt: notification.createdAt,
 			})
-			console.log(res)
 		}
 
 		return {

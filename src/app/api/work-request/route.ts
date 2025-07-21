@@ -21,7 +21,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
 		const status = searchParams.get("status") || "all"
-		const isUrgent = searchParams.get("isUrgent") || "all"
+		const isUrgent = searchParams.get("isUrgent") as "true" | "false" | "all"
 
 		const skip = (page - 1) * limit
 
@@ -35,7 +35,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					}
 				: {}),
 			...(status !== "all" ? { status: status as WORK_REQUEST_STATUS } : {}),
-			...(isUrgent !== "all" ? { isUrgent: isUrgent === "true" } : {}),
+			...(isUrgent === "true" ? { isUrgent: true } : {}),
+			...(isUrgent === "false" ? { isUrgent: false } : {}),
 		}
 
 		const [workRequests, total] = await Promise.all([

@@ -53,8 +53,6 @@ export function DocumentReviewProgressChart({ data }: DocumentReviewProgressChar
 		fullName: item.company,
 	}))
 
-	console.log(data)
-
 	return (
 		<Card className="border-none">
 			<CardHeader>

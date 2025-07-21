@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { createMilestones } from "@/project/work-order/actions/milestone/create-milestones"
+import { createAndUpdateMilestones } from "../../actions/milestone/create-and-update-milestones"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 import {
@@ -34,6 +34,7 @@ import type { Milestone } from "../../hooks/use-work-book-milestones"
 
 interface MilestonesFormProps {
 	workOrderId: string
+	isResponsible: boolean
 	workOrderStartDate: Date
 	initialData?: Milestone[]
 }
@@ -41,6 +42,7 @@ interface MilestonesFormProps {
 export default function MilestonesForm({
 	initialData,
 	workOrderId,
+	isResponsible,
 	workOrderStartDate,
 }: MilestonesFormProps) {
 	const [loading, setLoading] = useState<boolean>(false)
@@ -53,11 +55,12 @@ export default function MilestonesForm({
 			workOrderId,
 			milestones: initialData
 				? initialData.map((milestone) => ({
+						id: milestone.id,
 						name: milestone.name,
 						weight: milestone.weight.toString(),
-						endDate: milestone.endDate || new Date(),
 						description: milestone.description || "",
-						startDate: milestone.startDate || new Date(),
+						endDate: new Date(milestone.endDate || new Date()),
+						startDate: new Date(milestone.startDate || new Date()),
 					}))
 				: [
 						{
@@ -84,7 +87,7 @@ export default function MilestonesForm({
 		try {
 			setLoading(true)
 
-			const result = await createMilestones(values)
+			const result = await createAndUpdateMilestones(values, isResponsible)
 
 			if (result.ok) {
 				toast.success("Hitos guardados correctamente", {

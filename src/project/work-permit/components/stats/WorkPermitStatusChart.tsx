@@ -28,7 +28,6 @@ interface WorkPermitStatusChartProps {
 }
 
 export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusChartProps) {
-	console.log(data)
 	return (
 		<Card>
 			<CardHeader>

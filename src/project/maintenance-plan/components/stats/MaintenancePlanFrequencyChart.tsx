@@ -40,7 +40,6 @@ export default function MaintenancePlanFrequencyChart({
 	data,
 	total,
 }: MaintenancePlanFrequencyChartProps) {
-	console.log(data)
 	return (
 		<Card className="border">
 			<CardHeader>

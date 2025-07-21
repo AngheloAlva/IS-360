@@ -21,10 +21,10 @@ import CloseMilestoneDialog from "../forms/CloseMilestoneDialog"
 import { Badge } from "@/shared/components/ui/badge"
 import {
 	Card,
+	CardTitle,
+	CardHeader,
 	CardContent,
 	CardDescription,
-	CardHeader,
-	CardTitle,
 } from "@/shared/components/ui/card"
 
 import type { Milestone } from "@/project/work-order/hooks/use-work-book-milestones"
@@ -76,11 +76,8 @@ export default function MilestoneCards({
 					<Card key={milestone.id} className="shadow-xl">
 						<CardHeader>
 							<div className="flex items-center justify-between">
-								<div className="flex items-center gap-1">
+								<div className="flex items-center gap-2">
 									<CardTitle className="text-lg font-bold">{milestone.name}</CardTitle>
-									{milestone.isCompleted && (
-										<CheckCircleIcon className="ml-1 h-4 w-4 text-green-500" />
-									)}
 								</div>
 								<Badge
 									variant="outline"
