@@ -2,7 +2,7 @@
 
 import { Area, XAxis, YAxis, AreaChart, CartesianGrid } from "recharts"
 import { ChartSplineIcon } from "lucide-react"
-import { format, addMonths } from "date-fns"
+import { format } from "date-fns"
 
 import { WorkRequestStatsResponse } from "@/project/work-request/hooks/use-work-request-stats"
 
@@ -31,9 +31,9 @@ export default function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
 			<CardHeader className="pb-2">
 				<div className="flex items-start justify-between">
 					<div>
-						<CardTitle className="text-base font-medium">Tendencia Mensual</CardTitle>
+						<CardTitle className="text-base font-medium">Tendencia Diaria</CardTitle>
 						<CardDescription>
-							Solicitudes de trabajo creadas y atendidas por mes los últimos 12 meses
+							Solicitudes de trabajo creadas y atendidas en los últimos 30 días
 						</CardDescription>
 					</div>
 					<ChartSplineIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
@@ -57,7 +57,7 @@ export default function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
 							<CartesianGrid strokeDasharray="3 3" />
 							<XAxis
 								dataKey="month"
-								tickFormatter={(date) => format(addMonths(new Date(date), 1), "MMM-yyyy")}
+								tickFormatter={(date) => format(new Date(date), "dd/MM")}
 								tick={{ fontSize: 12 }}
 							/>
 							<YAxis allowDecimals={false} tick={{ fontSize: 12 }} />

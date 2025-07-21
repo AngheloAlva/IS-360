@@ -1,5 +1,6 @@
 "use client"
 
+import { FileSpreadsheetIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -14,13 +15,16 @@ import {
 import { updateWorkRequestStatus } from "@/project/work-request/actions/update-work-request-status"
 import { useWorkRequests, WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import { getWorkRequestColumns } from "../../columns/work-request-columns"
+import { queryClient } from "@/lib/queryClient"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import WorkRequestDetailsDialog from "../dialogs/WorkRequestDetailsDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
+import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
+import Spinner from "@/shared/components/Spinner"
 import CommentDialog from "./CommentDialog"
 import {
 	Table,
@@ -42,7 +46,6 @@ import {
 } from "@/shared/components/ui/select"
 
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
-import { queryClient } from "@/lib/queryClient"
 
 interface WorkRequestsTableProps {
 	id: string
@@ -60,6 +63,7 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 	const [isCommentOpen, setIsCommentOpen] = useState(false)
 	const [isStatusLoading, setIsStatusLoading] = useState(false)
+	const [exportLoading, setExportLoading] = useState<boolean>(false)
 
 	const { data, refetch, isLoading, isFetching } = useWorkRequests({
 		page,
@@ -136,6 +140,47 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 		pageCount: data?.pages ?? 0,
 	})
 
+	const handleExportToExcel = async () => {
+		try {
+			setExportLoading(true)
+
+			const res: { workRequests: WorkRequest[] } = await fetch(
+				`/api/work-request?page=1&limit=10000`
+			).then((res) => res.json())
+			if (!res?.workRequests?.length) {
+				toast.error("No hay solicitudes de trabajo para exportar")
+				return
+			}
+
+			const XLSX = await import("xlsx")
+
+			const workbook = XLSX.utils.book_new()
+			const worksheet = XLSX.utils.json_to_sheet(
+				res?.workRequests.map((workRequest: WorkRequest) => ({
+					requestNumber: workRequest.requestNumber,
+					description: workRequest.description,
+					status: workRequest.status,
+					isUrgent: workRequest.isUrgent ? "Sí" : "No",
+					createdAt: workRequest.createdAt,
+					updatedAt: workRequest.updatedAt,
+					usuario: workRequest.user.name,
+					equipos: workRequest.equipments.map((eq) => eq.name).join(", "),
+					comentarios: workRequest.comments.map((com) => com.content).join(", "),
+					adjuntos: workRequest.attachments.map((att) => att.name).join(", "),
+				}))
+			)
+
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Solicitudes de Trabajo")
+			XLSX.writeFile(workbook, "solicitudes-de-trabajo.xlsx")
+			toast.success("Solicitudes de trabajo exportadas exitosamente")
+		} catch (error) {
+			console.error("[EXPORT_EXCEL]", error)
+			toast.error("Error al exportar solicitudes de trabajo")
+		} finally {
+			setExportLoading(false)
+		}
+	}
+
 	return (
 		<>
 			<Card id={id}>
@@ -149,6 +194,15 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 						</div>
 
 						<div className="ml-auto flex items-center gap-2">
+							<Button
+								onClick={handleExportToExcel}
+								disabled={isLoading || exportLoading || !data?.workRequests?.length}
+								className="hidden cursor-pointer gap-1 bg-cyan-500 text-white transition-all hover:scale-105 hover:bg-cyan-600 hover:text-white md:flex"
+							>
+								{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+								Exportar
+							</Button>
+
 							<Input
 								onChange={(e) => {
 									setSearch(e.target.value)

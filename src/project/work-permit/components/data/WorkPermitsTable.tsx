@@ -11,7 +11,9 @@ import {
 } from "@tanstack/react-table"
 
 import { useWorkPermitFilters } from "../../hooks/use-work-permit-filters"
+import { WorkPermitStatusOptions } from "@/lib/consts/work-permit-status"
 import { getWorkPermitColumns } from "../../columns/work-permit-columns"
+import { useCompanies } from "@/project/company/hooks/use-companies"
 import { useOperators } from "@/shared/hooks/use-operators"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
@@ -28,11 +30,9 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
-import { useCompanies } from "@/project/company/hooks/use-companies"
 import {
 	Select,
 	SelectItem,
-	SelectValue,
 	SelectGroup,
 	SelectLabel,
 	SelectContent,
@@ -109,7 +109,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							value={filters.companyId ?? "all"}
 						>
 							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-								<SelectValue placeholder="Empresa" />
+								Empresa
 							</SelectTrigger>
 							<SelectContent>
 								<SelectGroup>
@@ -136,7 +136,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							value={filters.approvedBy ?? "all"}
 						>
 							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-								<SelectValue placeholder="Seleccione operador" />
+								Aprobado por
 							</SelectTrigger>
 							<SelectContent>
 								<SelectGroup>
@@ -146,6 +146,33 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 									{operators?.operators?.map((operator) => (
 										<SelectItem key={operator.id} value={operator.id}>
 											{operator.name}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+
+						<Select
+							onValueChange={(value) => {
+								if (value === "all") {
+									actions.setStatusFilter(null)
+								} else {
+									actions.setStatusFilter(value)
+								}
+							}}
+							value={filters.statusFilter ?? "all"}
+						>
+							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+								Estado
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Estado</SelectLabel>
+									<SelectSeparator />
+									<SelectItem value="all">Todos los Permisos</SelectItem>
+									{WorkPermitStatusOptions.map((option) => (
+										<SelectItem key={option.value} value={option.value}>
+											{option.label}
 										</SelectItem>
 									))}
 								</SelectGroup>

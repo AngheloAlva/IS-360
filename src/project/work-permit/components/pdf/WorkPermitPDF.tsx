@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		marginBottom: 25,
+		alignItems: "center",
 		borderBottomWidth: 2,
 		borderBottomStyle: "solid",
 		borderBottomColor: "#3B82F6", // Azul moderno
@@ -254,8 +255,16 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						src="https://otc360.ingsimple.cl/logo.png"
 						source="https://otc360.ingsimple.cl/logo.png"
 					/>
+
+					<View
+						style={{ flex: 1, alignItems: "flex-start", marginLeft: 8, justifyContent: "center" }}
+					>
+						<Text style={{ fontSize: 20, fontWeight: "bold", color: "#1E3A8A" }}>
+							PERMISO DE TRABAJO
+						</Text>
+					</View>
+
 					<View>
-						<Text>PERMISO DE TRABAJO</Text>
 						<Text>Fecha de emisión: {format(new Date(), "dd/MM/yyyy", { locale: es })}</Text>
 						<Text>
 							Fecha de vencimiento:{" "}
@@ -263,9 +272,6 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						</Text>
 					</View>
 				</View>
-
-				{/* Título */}
-				<Text style={styles.title}>PERMISO DE TRABAJO</Text>
 
 				{/* Información del permiso */}
 				<View style={styles.section}>
@@ -325,7 +331,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Fecha inicio:</Text>
+								<Text style={styles.label}>Fecha inicio OT:</Text>
 								<Text style={styles.value}>
 									{format(new Date(workPermit.startDate), "dd/MM/yyyy", { locale: es })}
 								</Text>
@@ -333,7 +339,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						</View>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Fecha término:</Text>
+								<Text style={styles.label}>Fecha término OT:</Text>
 								<Text style={styles.value}>
 									{format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es })}
 								</Text>

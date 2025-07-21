@@ -174,7 +174,10 @@ export default function WorkOrderDetailsDialog({
 
 							<div className="flex flex-wrap gap-2">
 								{workOrder.equipment.map((item) => (
-									<Badge key={item.id} className="bg-orange-600 text-white">
+									<Badge
+										key={item.id}
+										className="rounded-lg bg-orange-600 whitespace-normal text-white"
+									>
 										{item.name}
 									</Badge>
 								))}

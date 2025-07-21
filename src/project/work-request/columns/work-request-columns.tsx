@@ -1,5 +1,6 @@
 "use client"
 
+import { AlertCircleIcon, CheckCircleIcon, MessageCircleIcon, XCircleIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -11,13 +12,6 @@ import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWor
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Badge } from "@/shared/components/ui/badge"
-import {
-	AlertCircleIcon,
-	CheckCircleIcon,
-	EyeIcon,
-	MessageCircleIcon,
-	XCircleIcon,
-} from "lucide-react"
 
 const statusBadgeVariant = (status: WORK_REQUEST_STATUS) => {
 	switch (status) {
@@ -70,10 +64,6 @@ export const getWorkRequestColumns = ({
 			return (
 				<ActionDataMenu>
 					<>
-						<DropdownMenuItem onClick={() => handleOpenDetails(row.original)}>
-							<EyeIcon className="h-4 w-4" /> Ver detalles
-						</DropdownMenuItem>
-
 						<DropdownMenuItem onClick={() => handleOpenComment(row.original)}>
 							<MessageCircleIcon className="h-4 w-4" /> Comentar
 						</DropdownMenuItem>
@@ -119,10 +109,25 @@ export const getWorkRequestColumns = ({
 	{
 		accessorKey: "requestNumber",
 		header: "N° Solicitud",
+		cell: ({ row }) => {
+			const requestNumber = row.original.requestNumber
+			return (
+				<div
+					onClick={() => handleOpenDetails(row.original)}
+					className="cursor-pointer text-cyan-500 hover:underline"
+				>
+					<span>{requestNumber}</span>
+				</div>
+			)
+		},
 	},
 	{
 		accessorKey: "description",
 		header: "Descripción",
+		cell: ({ row }) => {
+			const description = row.original.description
+			return <p className="w-72 max-w-72 text-wrap">{description}</p>
+		},
 	},
 	{
 		accessorKey: "userId",
@@ -131,15 +136,6 @@ export const getWorkRequestColumns = ({
 			const user = row.original.user
 
 			return user?.name || "Usuario desconocido"
-		},
-	},
-	{
-		accessorKey: "companyId",
-		header: "Empresa",
-		cell: ({ row }) => {
-			const company = row.original.user?.company
-
-			return company?.name || "N/A"
 		},
 	},
 	{
@@ -165,14 +161,12 @@ export const getWorkRequestColumns = ({
 		},
 	},
 	{
-		accessorKey: "location",
-		header: "Ubicación",
+		accessorKey: "equipment",
+		header: "Equipo / Ubicación",
 		cell: ({ row }) => {
-			const location = row.original.location
+			const equipment = row.original.equipments[0]
 
-			return location === "OTHER" && row.original.customLocation
-				? row.original.customLocation
-				: row.original.location
+			return <span className="w-72 max-w-72 text-wrap">{equipment?.name}</span>
 		},
 	},
 	{

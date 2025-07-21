@@ -92,7 +92,7 @@ export default function WorkRequestStatsContainer() {
 							{
 								status: "Canceladas",
 								count: data?.totalCancelled || 0,
-								fill: "var(--color-blue-600)",
+								fill: "var(--color-rose-600)",
 							},
 							{
 								status: "Reportadas",

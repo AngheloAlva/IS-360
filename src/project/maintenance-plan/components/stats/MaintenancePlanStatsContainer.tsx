@@ -30,16 +30,19 @@ export default function MaintenancePlanStatsContainer() {
 									{
 										name: "Alta",
 										value: 0,
+										fill: "var(--color-red-500)",
 										priority: "HIGH",
 									},
 									{
 										name: "Media",
 										value: 0,
+										fill: "var(--color-yellow-500)",
 										priority: "MEDIUM",
 									},
 									{
 										name: "Baja",
 										value: 0,
+										fill: "var(--color-green-500)",
 										priority: "LOW",
 									},
 								]

@@ -145,7 +145,7 @@ export const sendOtcInspectionNotification = async ({
 		// Send emails to all recipients
 		const emailPromises = recipients.map(async (recipient, i) => {
 			const subject = hasSafetyIssues
-				? `🚨 URGENTE: Inspección OTC con No Conformidades - OT ${workOrderData.otNumber}`
+				? `🚨 URGENTE: Inspección OTC con No Conformidades - ${workOrderData.otNumber}`
 				: `📋 Nueva Inspección OTC Realizada - OT ${workOrderData.otNumber}`
 
 			return resend.emails.send({

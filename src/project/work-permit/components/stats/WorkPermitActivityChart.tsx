@@ -26,7 +26,7 @@ export default function WorkPermitActivityChart({ data }: WorkPermitActivityChar
 				<div className="flex items-start justify-between">
 					<div>
 						<CardTitle className="text-base font-medium">Actividad de Permisos (30 días)</CardTitle>
-						<CardDescription>Equipos con más ocurrencias agrupados por tipo</CardDescription>
+						<CardDescription>Permisos de trabajo creados en los últimos 30 días.</CardDescription>
 					</div>
 					<ChartSplineIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>

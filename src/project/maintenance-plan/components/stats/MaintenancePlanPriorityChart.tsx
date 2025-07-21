@@ -1,46 +1,63 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts"
-import { BarChartItem } from "@/project/maintenance-plan/hooks/use-maintenance-plan-stats"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, LabelList } from "recharts"
+import { ChartColumnIcon } from "lucide-react"
+
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/components/ui/chart"
+import {
+	Card,
+	CardTitle,
+	CardHeader,
+	CardContent,
+	CardDescription,
+} from "@/shared/components/ui/card"
+
+import type { BarChartItem } from "@/project/maintenance-plan/hooks/use-maintenance-plan-stats"
 
 interface MaintenancePlanPriorityChartProps {
 	data: BarChartItem[]
 }
 
-const PRIORITY_COLORS = {
-	HIGH: "var(--color-red-500)",
-	MEDIUM: "var(--color-amber-500)",
-	LOW: "var(--color-emerald-500)",
-}
-
 export default function MaintenancePlanPriorityChart({ data }: MaintenancePlanPriorityChartProps) {
-	const colorFill = (priority: string) => {
-		return PRIORITY_COLORS[priority as keyof typeof PRIORITY_COLORS] || "var(--color-blue-500)"
-	}
-
 	return (
 		<Card className="border">
-			<CardHeader className="pb-2">
-				<CardTitle className="text-lg">Órdenes por Prioridad</CardTitle>
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<div>
+						<CardTitle>Tareas por Prioridad</CardTitle>
+						<CardDescription>Distribución de las tareas según su prioridad</CardDescription>
+					</div>
+					<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
+				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
-					<BarChart data={data}>
-						<CartesianGrid strokeDasharray="3 3" />
-						<XAxis dataKey="name" />
-						<YAxis />
+				<ChartContainer
+					config={{
+						HIGH: {
+							label: "Alta",
+						},
+						MEDIUM: {
+							label: "Media",
+						},
+						LOW: {
+							label: "Baja",
+						},
+					}}
+					className="h-[250px] w-full max-w-[90dvw]"
+				>
+					<BarChart data={data} margin={{ top: 15 }}>
+						<ChartTooltip content={<ChartTooltipContent nameKey="priority" />} />
 
-						<ChartTooltip
-							content={<ChartTooltipContent />}
-							formatter={(value) => [`${value} órdenes`, "Cantidad"]}
-							labelFormatter={(label) => `Prioridad: ${label}`}
-						/>
+						<CartesianGrid strokeDasharray="3 3" />
+						<XAxis dataKey="priority" />
+						<YAxis dataKey="value" />
+
 						<Bar dataKey="value" name="Órdenes" radius={[4, 4, 0, 0]} maxBarSize={60}>
-							{data.map((entry, index) => (
-								<Cell key={`cell-${index}`} fill={colorFill(entry.priority)} />
+							{data.map((item, index) => (
+								<Cell key={index} fill={item.fill} />
 							))}
+
+							<LabelList dataKey="value" position="top" />
 						</Bar>
 					</BarChart>
 				</ChartContainer>

@@ -33,20 +33,8 @@ export const WorkPermitStatusOptions = [
 		label: "Activo",
 	},
 	{
-		value: WORK_PERMIT_STATUS_VALUES.IN_PROGRESS,
-		label: "En Proceso",
-	},
-	{
 		value: WORK_PERMIT_STATUS_VALUES.COMPLETED,
 		label: "Completado",
-	},
-	{
-		value: WORK_PERMIT_STATUS_VALUES.CANCELLED,
-		label: "Cancelado",
-	},
-	{
-		value: WORK_PERMIT_STATUS_VALUES.EXPIRED,
-		label: "Expirado",
 	},
 	{
 		value: WORK_PERMIT_STATUS_VALUES.REVIEW_PENDING,

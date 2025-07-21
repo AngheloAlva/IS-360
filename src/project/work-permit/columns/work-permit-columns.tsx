@@ -112,7 +112,7 @@ export const getWorkPermitColumns = (
 			return (
 				<Link
 					href={`/admin/dashboard/empresas/${company.id}`}
-					className="flex items-center gap-1.5 truncate hover:text-rose-500 hover:underline"
+					className="flex w-72 items-center gap-1.5 truncate text-wrap hover:text-rose-500 hover:underline"
 				>
 					<Building2Icon className="text-muted-foreground size-4" />
 					{company.name}

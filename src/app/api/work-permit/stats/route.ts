@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
-
-import prisma from "@/lib/prisma"
-import { auth } from "@/lib/auth"
 import { format } from "date-fns"
+
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export const dynamic = "force-dynamic"
 
@@ -161,15 +161,9 @@ function getStatusColor(status: string): string {
 	switch (status) {
 		case "ACTIVE":
 			return "var(--color-pink-500)"
-		case "IN_PROGRESS":
-			return "var(--color-rose-500)"
 		case "COMPLETED":
-			return "var(--color-red-500)"
-		case "CANCELLED":
-			return "var(--color-violet-500)"
-		case "EXPIRED":
-			return "var(--color-fuchsia-500)"
-		default:
 			return "var(--color-purple-500)"
+		default:
+			return "var(--color-red-500)"
 	}
 }

@@ -116,8 +116,8 @@ const OtcInspectionNotificationEmail = ({
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Estimado/a ${recipient.name}, se ha realizado una nueva inspección OTC en el
-								sistema. Le notificamos {getRoleContext()}.
+								Estimado/a {recipient.name}, se ha realizado una nueva inspección OTC en el sistema.
+								Le notificamos {getRoleContext()}.
 							</Text>
 
 							{/* Severity Alert */}
@@ -150,7 +150,7 @@ const OtcInspectionNotificationEmail = ({
 									</Column>
 									<Column className="w-[50%]">
 										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
-											Responsable:
+											Administrador Contrato:
 										</Text>
 										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 											{workOrder.responsible.name}

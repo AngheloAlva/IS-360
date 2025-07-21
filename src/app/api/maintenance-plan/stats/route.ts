@@ -17,10 +17,6 @@ export async function GET() {
 	}
 
 	try {
-		// Extraer parámetros de consulta si es necesario
-		// const searchParams = request.nextUrl.searchParams
-
-		// 1. Estadísticas básicas
 		const [totalPlans, totalTasks, tasksWithUpcomingDate, tasksWithOverdueDate] = await Promise.all(
 			[
 				prisma.maintenancePlan.count(),
@@ -72,10 +68,17 @@ export async function GET() {
 			},
 		})
 
+		const PRIORITY_COLORS = {
+			HIGH: "var(--color-red-500)",
+			MEDIUM: "var(--color-amber-500)",
+			LOW: "var(--color-emerald-500)",
+		}
+
 		const barChartData = workOrdersByPriority.map(
 			(item: { priority: WORK_ORDER_PRIORITY; _count: { id: number } }) => ({
 				value: item._count.id,
 				priority: item.priority,
+				fill: PRIORITY_COLORS[item.priority],
 			})
 		)
 

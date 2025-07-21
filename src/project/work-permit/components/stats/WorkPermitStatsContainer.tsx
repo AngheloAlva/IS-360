@@ -9,6 +9,7 @@ import ChartSkeleton from "@/shared/components/stats/ChartSkeleton"
 import WorkPermitActivityChart from "./WorkPermitActivityChart"
 import WorkPermitStatusChart from "./WorkPermitStatusChart"
 import WorkPermitTypeChart from "./WorkPermitTypeChart"
+import { WORK_PERMIT_STATUS } from "@prisma/client"
 
 export default function WorkPermitStatsContainer() {
 	const { data, isLoading } = useWorkPermitStats()
@@ -42,7 +43,8 @@ export default function WorkPermitStatsContainer() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{data?.workPermitsByStatus.find((s) => s.status === "ACTIVE")?.count || 0}
+							{data?.workPermitsByStatus.find((s) => s.status === WORK_PERMIT_STATUS.ACTIVE)
+								?.count || 0}
 						</div>
 						<p className="text-muted-foreground text-xs">Permisos en estado activo</p>
 					</CardContent>
@@ -51,16 +53,17 @@ export default function WorkPermitStatsContainer() {
 				<Card className="overflow-hidden border-none pt-0">
 					<div className="bg-gradient-to-br from-rose-500 to-rose-600 p-1.5" />
 					<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
-						<CardTitle className="text-sm font-medium sm:text-base">Permisos En Progreso</CardTitle>
+						<CardTitle className="text-sm font-medium sm:text-base">Permisos Pendientes</CardTitle>
 						<div className="rounded-lg bg-rose-500/20 p-1.5 text-rose-500">
 							<FileWarningIcon className="h-5 w-5 text-rose-500" />
 						</div>
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{data?.workPermitsByStatus.find((s) => s.status === "IN_PROGRESS")?.count || 0}
+							{data?.workPermitsByStatus.find((s) => s.status === WORK_PERMIT_STATUS.REVIEW_PENDING)
+								?.count || 0}
 						</div>
-						<p className="text-muted-foreground text-xs">Permisos en ejecución</p>
+						<p className="text-muted-foreground text-xs">Permisos pendientes de revisión</p>
 					</CardContent>
 				</Card>
 

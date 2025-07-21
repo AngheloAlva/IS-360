@@ -18,6 +18,7 @@ export interface PieChartItem {
 export interface BarChartItem {
 	name: string
 	value: number
+	fill: string
 	priority: WORK_ORDER_PRIORITY
 }
 

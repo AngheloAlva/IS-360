@@ -28,6 +28,7 @@ interface WorkPermitStatusChartProps {
 }
 
 export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusChartProps) {
+	console.log(data)
 	return (
 		<Card>
 			<CardHeader>
@@ -45,17 +46,11 @@ export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusC
 						ACTIVE: {
 							label: "Activo",
 						},
-						IN_PROGRESS: {
-							label: "En Progreso",
-						},
 						COMPLETED: {
 							label: "Completado",
 						},
-						CANCELLED: {
-							label: "Cancelado",
-						},
-						EXPIRED: {
-							label: "Expirado",
+						REVIEW_PENDING: {
+							label: "Pendiente de Revisión",
 						},
 					}}
 					className="h-[250px] w-full max-w-[90dvw]"

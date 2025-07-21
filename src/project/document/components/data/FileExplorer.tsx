@@ -151,7 +151,13 @@ export function FileExplorer({
 								parentFolderId={actualFolderId}
 							/>
 
-							<NewFolderFormSheet area={area} userId={userId} order={order} orderBy={orderBy} />
+							<NewFolderFormSheet
+								area={area}
+								userId={userId}
+								order={order}
+								orderBy={orderBy}
+								parentFolderId={actualFolderId}
+							/>
 						</>
 					)}
 				</div>

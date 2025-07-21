@@ -1,10 +1,17 @@
 "use client"
 
 import { PieChart, Pie, Cell, Label } from "recharts"
+import { PieChartIcon } from "lucide-react"
 
 import { PieChartItem } from "@/project/maintenance-plan/hooks/use-maintenance-plan-stats"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import {
+	Card,
+	CardTitle,
+	CardHeader,
+	CardContent,
+	CardDescription,
+} from "@/shared/components/ui/card"
 import {
 	ChartLegend,
 	ChartTooltip,
@@ -33,10 +40,17 @@ export default function MaintenancePlanFrequencyChart({
 	data,
 	total,
 }: MaintenancePlanFrequencyChartProps) {
+	console.log(data)
 	return (
 		<Card className="border">
-			<CardHeader className="pb-2">
-				<CardTitle className="text-lg">Distribución por Frecuencia</CardTitle>
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<div>
+						<CardTitle>Tareas por Frecuencia</CardTitle>
+						<CardDescription>Distribución de las tareas por frecuencia</CardDescription>
+					</div>
+					<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
+				</div>
 			</CardHeader>
 			<CardContent className="p-0">
 				<ChartContainer
@@ -53,18 +67,24 @@ export default function MaintenancePlanFrequencyChart({
 						Anual: {
 							label: "Anual",
 						},
+						Trimestral: {
+							label: "Trimestral",
+						},
+						Semestral: {
+							label: "Semestral",
+						},
 					}}
 					className="h-[250px] w-full max-w-[90dvw]"
 				>
 					<PieChart>
 						<Pie
-							data={data}
+							label
 							cx="50%"
 							cy="50%"
-							innerRadius={45}
-							label={(props) => `${props.percent.toFixed(1)}%`}
+							data={data}
 							dataKey="value"
 							nameKey="name"
+							innerRadius={45}
 							paddingAngle={5}
 						>
 							<Label

@@ -1,11 +1,18 @@
 "use client"
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts"
+import { ChartSplineIcon } from "lucide-react"
 
 import { AreaChartItem } from "@/project/maintenance-plan/hooks/use-maintenance-plan-stats"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/components/ui/chart"
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import {
+	Card,
+	CardTitle,
+	CardHeader,
+	CardContent,
+	CardDescription,
+} from "@/shared/components/ui/card"
 
 interface MaintenancePlanChartProps {
 	data: AreaChartItem[]
@@ -15,7 +22,13 @@ export default function MaintenancePlanChart({ data }: MaintenancePlanChartProps
 	return (
 		<Card className="border">
 			<CardHeader className="pb-2">
-				<CardTitle className="text-lg">Tareas Creadas por Mes</CardTitle>
+				<div className="flex items-center justify-between">
+					<div>
+						<CardTitle>Tareas creadas por mes</CardTitle>
+						<CardDescription>Cantidad de tareas creadas en los últimos meses</CardDescription>
+					</div>
+					<ChartSplineIcon className="text-muted-foreground h-5 min-w-5" />
+				</div>
 			</CardHeader>
 			<CardContent>
 				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
@@ -28,7 +41,7 @@ export default function MaintenancePlanChart({ data }: MaintenancePlanChartProps
 							bottom: 0,
 						}}
 					>
-						<CartesianGrid strokeDasharray="3 3" vertical={false} />
+						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis dataKey="date" />
 						<YAxis allowDecimals={false} />
 						<ChartTooltip

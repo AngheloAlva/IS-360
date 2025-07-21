@@ -73,58 +73,57 @@ export async function GET(): Promise<NextResponse> {
 			}),
 		])
 
-		const lastYear = new Date()
-		lastYear.setMonth(lastYear.getMonth() - 11)
-		lastYear.setDate(1)
-		lastYear.setHours(0, 0, 0, 0)
+		// Modificar para obtener datos de los últimos 30 días en lugar de 12 meses
+		const last30Days = new Date()
+		last30Days.setDate(last30Days.getDate() - 30)
+		last30Days.setHours(0, 0, 0, 0)
 
-		const monthlyStats = await prisma.$queryRaw<
-			Array<{ year: number; month: number; status: string; count: bigint }>
+		const dailyStats = await prisma.$queryRaw<
+			Array<{ date: Date; status: string; count: bigint }>
 		>`
 			SELECT
-				EXTRACT(YEAR FROM "requestDate") as year,
-				EXTRACT(MONTH FROM "requestDate") as month,
+				DATE("requestDate") as date,
 				status,
 				COUNT(*) as count
 			FROM "work_request"
 			WHERE
-				"requestDate" >= ${lastYear}
+				"requestDate" >= ${last30Days}
 				AND status IN ('REPORTED', 'ATTENDED')
 			GROUP BY
-				EXTRACT(YEAR FROM "requestDate"),
-				EXTRACT(MONTH FROM "requestDate"),
+				DATE("requestDate"),
 				status
 			ORDER BY
-				year ASC,
-				month ASC
+				date ASC
 		`
 
-		const months: { month: string; created: number; attended: number }[] = []
+		const days: { month: string; created: number; attended: number }[] = []
 		const currentDate = new Date()
 		const startDate = new Date(currentDate)
-		startDate.setMonth(currentDate.getMonth() - 11) // Últimos 12 meses incluyendo el actual
+		startDate.setDate(currentDate.getDate() - 29) // Últimos 30 días incluyendo el actual
 
-		for (let i = 0; i < 12; i++) {
+		// Crear un array con los últimos 30 días
+		for (let i = 0; i < 30; i++) {
 			const date = new Date(startDate)
-			date.setMonth(startDate.getMonth() + i)
-			months.push({
-				month: date.toISOString().substring(0, 7), // Formato YYYY-MM
+			date.setDate(startDate.getDate() + i)
+			days.push({
+				month: date.toISOString().split('T')[0], // Formato YYYY-MM-DD
 				created: 0,
 				attended: 0,
 			})
 		}
 
-		monthlyStats.forEach((stat) => {
-			const statDate = new Date(stat.year, stat.month - 1) // PostgreSQL months son 1-12
-			const monthDiff =
-				(statDate.getFullYear() - startDate.getFullYear()) * 12 +
-				(statDate.getMonth() - startDate.getMonth())
+		// Asignar los valores de las estadísticas a los días correspondientes
+		dailyStats.forEach((stat) => {
+			const statDate = new Date(stat.date)
+			const dayDiff = Math.floor(
+				(statDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+			)
 
-			if (monthDiff >= 0 && monthDiff < 12) {
+			if (dayDiff >= 0 && dayDiff < 30) {
 				if (stat.status === "REPORTED") {
-					months[monthDiff].created = Number(stat.count)
+					days[dayDiff].created = Number(stat.count)
 				} else if (stat.status === "ATTENDED") {
-					months[monthDiff].attended = Number(stat.count)
+					days[dayDiff].attended = Number(stat.count)
 				}
 			}
 		})
@@ -145,7 +144,7 @@ export async function GET(): Promise<NextResponse> {
 					pending: nonUrgentPending,
 				},
 			},
-			monthlyTrend: months,
+			monthlyTrend: days, // Ahora contiene datos diarios de los últimos 30 días
 		})
 	} catch (error) {
 		console.error("Error fetching work request stats:", error)
