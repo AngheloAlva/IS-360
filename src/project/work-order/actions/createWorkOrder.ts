@@ -136,7 +136,7 @@ export const createWorkOrder = async ({
 							},
 						}
 					: {}),
-				...(maintenancePlanTaskData
+				...(maintenancePlanTaskData.length > 0
 					? {
 							MaintenancePlanTask: {
 								connect: {
