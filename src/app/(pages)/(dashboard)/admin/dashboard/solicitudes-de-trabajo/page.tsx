@@ -40,7 +40,7 @@ export default async function WorkRequestsPage() {
 							className="text-sky-600 hover:bg-white hover:text-sky-600"
 						/>
 
-						{hasPermission.success && <CreateWorkRequestButton userId={session.user.id} />}
+						<CreateWorkRequestButton userId={session.user.id} />
 					</div>
 				</div>
 			</div>
