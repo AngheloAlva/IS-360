@@ -46,14 +46,14 @@ import {
 import type { Company } from "@/project/company/hooks/use-companies"
 
 interface CreateWorkOrderFormProps {
-	equipmentId?: string
 	workRequestId?: string
-	equipmentName?: string
-	maintenancePlanTaskId?: string
+	equipmentId?: string[]
+	equipmentName?: string[]
+	maintenancePlanTaskId?: string[]
 	initialData?: {
 		programDate: Date
-		workRequest: string
-		description: string
+		workRequest?: string
+		description?: string
 		responsibleId: string
 	}
 }
@@ -70,9 +70,9 @@ export default function CreateWorkOrderForm({
 
 	const [open, setOpen] = useState(false)
 
+	const { data: equipmentsData } = useEquipments({ limit: 1000, order: "asc", orderBy: "name" })
 	const { data: companiesData } = useCompanies({ limit: 1000, orderBy: "name", order: "desc" })
 	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
-	const { data: equipmentsData } = useEquipments({ limit: 1000, order: "asc", orderBy: "name" })
 
 	const form = useForm<WorkOrderSchema>({
 		resolver: zodResolver(workOrderSchema),
@@ -86,12 +86,12 @@ export default function CreateWorkOrderForm({
 			priority: undefined,
 			estimatedEndDate: new Date(),
 			solicitationDate: new Date(),
-			equipment: equipmentId ? [equipmentId] : [],
+			equipment: equipmentId ? equipmentId : [],
 			workRequest: initialData?.workRequest ?? "",
 			responsibleId: initialData?.responsibleId ?? "",
 			workDescription: initialData?.description ?? "",
-			programDate: initialData?.programDate ?? new Date(),
 			solicitationTime: new Date().toTimeString().split(" ")[0],
+			programDate: new Date(initialData?.programDate || new Date()),
 		},
 	})
 

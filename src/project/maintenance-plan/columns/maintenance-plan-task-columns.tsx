@@ -56,9 +56,9 @@ export const MaintenancePlanTaskColumns = ({
 
 					<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 						<CreateWorkOrderForm
-							equipmentId={row.original.equipment.id}
-							maintenancePlanTaskId={row.original.id}
-							equipmentName={row.original.equipment.name}
+							equipmentId={[row.original.equipment.id]}
+							maintenancePlanTaskId={[row.original.id]}
+							equipmentName={[row.original.equipment.name]}
 							initialData={{
 								workRequest: row.original.name,
 								programDate: row.original.nextDate,

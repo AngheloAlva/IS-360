@@ -15,10 +15,10 @@ import type { WorkOrderSchema } from "@/project/work-order/schemas/workOrder.sch
 import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
 
 interface CreateWorkOrderProps {
-	equipmentId?: string
+	equipmentId?: string[]
 	workRequestId?: string
 	values: WorkOrderSchema
-	maintenancePlanTaskId?: string
+	maintenancePlanTaskId?: string[]
 	initReportFile?: FileUploadResult
 }
 
@@ -41,49 +41,55 @@ export const createWorkOrder = async ({
 	}
 
 	try {
-		let maintenancePlanTaskData: {
-			id: string
-			equipment: {
-				id: string
-			}
-			nextDate: Date
-			frequency: PLAN_FREQUENCY
-			attachments: {
-				id: string
-			}[]
-		} | null = null
+		const maintenancePlanTaskData:
+			| {
+					id: string
+					equipment: {
+						id: string
+					}
+					nextDate: Date
+					frequency: PLAN_FREQUENCY
+					attachments: {
+						id: string
+					}[]
+			  }[]
+			| null = []
 
 		if (maintenancePlanTaskId) {
-			maintenancePlanTaskData = await prisma.maintenancePlanTask.findUnique({
-				where: {
-					id: maintenancePlanTaskId,
-				},
-				select: {
-					id: true,
-					equipment: {
-						select: {
-							id: true,
-							name: true,
+			for (const taskId of maintenancePlanTaskId) {
+				const taskData = await prisma.maintenancePlanTask.findUnique({
+					where: {
+						id: taskId,
+					},
+					select: {
+						id: true,
+						equipment: {
+							select: {
+								id: true,
+								name: true,
+							},
+						},
+						nextDate: true,
+						frequency: true,
+						attachments: {
+							select: {
+								id: true,
+								name: true,
+								type: true,
+								url: true,
+							},
 						},
 					},
-					nextDate: true,
-					frequency: true,
-					attachments: {
-						select: {
-							id: true,
-							name: true,
-							type: true,
-							url: true,
-						},
-					},
-				},
-			})
+				})
 
-			if (!maintenancePlanTaskData) {
-				return {
-					ok: false,
-					message: "Tarea de mantenimiento no encontrada",
+				if (!taskData) {
+					return {
+						ok: false,
+						message: "Tarea de mantenimiento no encontrada",
+					}
 				}
+
+				maintenancePlanTaskData.push(taskData)
 			}
 		}
 
@@ -134,11 +140,11 @@ export const createWorkOrder = async ({
 					? {
 							MaintenancePlanTask: {
 								connect: {
-									id: maintenancePlanTaskData.id,
+									id: maintenancePlanTaskData[0].id,
 								},
 							},
 							manualDocuments: {
-								connect: maintenancePlanTaskData.attachments.map((attachment) => ({
+								connect: maintenancePlanTaskData[0].attachments.map((attachment) => ({
 									id: attachment.id,
 								})),
 							},
@@ -155,7 +161,9 @@ export const createWorkOrder = async ({
 				requiresBreak: false,
 				breakDays: 0,
 				equipment: {
-					connect: equipmentId ? { id: equipmentId } : equipment.map((id) => ({ id })),
+					connect: equipmentId
+						? equipmentId.map((id) => ({ id }))
+						: equipment.map((id) => ({ id })),
 				},
 			},
 			select: {
@@ -220,50 +228,52 @@ export const createWorkOrder = async ({
 		})
 
 		if (maintenancePlanTaskData) {
-			let nextDate: Date
+			for (const task of maintenancePlanTaskData) {
+				let nextDate: Date
 
-			switch (maintenancePlanTaskData.frequency) {
-				case PLAN_FREQUENCY.DAILY:
-					nextDate = addDays(maintenancePlanTaskData.nextDate, 1)
-					break
-				case PLAN_FREQUENCY.WEEKLY:
-					nextDate = addWeeks(maintenancePlanTaskData.nextDate, 1)
-					break
-				case PLAN_FREQUENCY.MONTHLY:
-					nextDate = addMonths(maintenancePlanTaskData.nextDate, 1)
-					break
-				case PLAN_FREQUENCY.BIMONTHLY:
-					nextDate = addMonths(maintenancePlanTaskData.nextDate, 2)
-					break
-				case PLAN_FREQUENCY.QUARTERLY:
-					nextDate = addMonths(maintenancePlanTaskData.nextDate, 3)
-					break
-				case PLAN_FREQUENCY.FOURMONTHLY:
-					nextDate = addMonths(maintenancePlanTaskData.nextDate, 4)
-					break
-				case PLAN_FREQUENCY.BIANNUAL:
-					nextDate = addMonths(maintenancePlanTaskData.nextDate, 6)
-					break
-				case PLAN_FREQUENCY.YEARLY:
-					nextDate = addMonths(maintenancePlanTaskData.nextDate, 12)
-					break
-				default:
-					nextDate = maintenancePlanTaskData.nextDate
-			}
+				switch (task.frequency) {
+					case PLAN_FREQUENCY.DAILY:
+						nextDate = addDays(task.nextDate, 1)
+						break
+					case PLAN_FREQUENCY.WEEKLY:
+						nextDate = addWeeks(task.nextDate, 1)
+						break
+					case PLAN_FREQUENCY.MONTHLY:
+						nextDate = addMonths(task.nextDate, 1)
+						break
+					case PLAN_FREQUENCY.BIMONTHLY:
+						nextDate = addMonths(task.nextDate, 2)
+						break
+					case PLAN_FREQUENCY.QUARTERLY:
+						nextDate = addMonths(task.nextDate, 3)
+						break
+					case PLAN_FREQUENCY.FOURMONTHLY:
+						nextDate = addMonths(task.nextDate, 4)
+						break
+					case PLAN_FREQUENCY.BIANNUAL:
+						nextDate = addMonths(task.nextDate, 6)
+						break
+					case PLAN_FREQUENCY.YEARLY:
+						nextDate = addMonths(task.nextDate, 12)
+						break
+					default:
+						nextDate = task.nextDate
+				}
 
-			await prisma.maintenancePlanTask.update({
-				where: {
-					id: maintenancePlanTaskData.id,
-				},
-				data: {
-					nextDate,
-					workOrders: {
-						connect: {
-							id: newWorkOrder.id,
+				await prisma.maintenancePlanTask.update({
+					where: {
+						id: task.id,
+					},
+					data: {
+						nextDate,
+						workOrders: {
+							connect: {
+								id: newWorkOrder.id,
+							},
 						},
 					},
-				},
-			})
+				})
+			}
 		}
 
 		if (workRequestId) {

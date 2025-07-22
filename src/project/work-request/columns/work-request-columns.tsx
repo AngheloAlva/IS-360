@@ -71,7 +71,7 @@ export const getWorkRequestColumns = ({
 						<DropdownMenuItem asChild>
 							<CreateWorkOrderForm
 								workRequestId={row.original.id}
-								equipmentId={row.original.equipments[0].id}
+								equipmentId={[row.original.equipments[0].id]}
 							/>
 						</DropdownMenuItem>
 

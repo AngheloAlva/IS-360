@@ -11,12 +11,14 @@ import type {
 	VehicleDocument,
 	StartupFolderType,
 	WORK_ORDER_STATUS,
+	EnvironmentFolder,
+	EnvironmentDocument,
 	EnvironmentalFolder,
+	StartupFolderStatus,
 	EnvironmentalDocument,
 	SafetyAndHealthFolder,
 	SafetyAndHealthDocument,
 	StartupFolder as StartupFolderModel,
-	StartupFolderStatus,
 } from "@prisma/client"
 
 export interface StartupFolder extends StartupFolderModel {
@@ -142,6 +144,7 @@ interface CompanyWithStartupFolders extends Company {
 		vehiclesFolders: VehicleFolder[] & { documents: VehicleDocument[] }
 		safetyAndHealthFolders: SafetyAndHealthFolder[] & { documents: SafetyAndHealthDocument[] }
 		environmentalFolders: EnvironmentalFolder[] & { documents: EnvironmentalDocument[] }
+		environmentFolders: EnvironmentFolder[] & { documents: EnvironmentDocument[] }
 		basicFolders: BasicFolder[] & { documents: BasicDocument[] }
 	}[]
 }

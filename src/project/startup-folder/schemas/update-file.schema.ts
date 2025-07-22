@@ -2,10 +2,13 @@ import { z } from "zod"
 
 import { fileSchema } from "@/shared/schemas/file.schema"
 import {
+	EnvironmentDocType,
 	WorkerDocumentType,
 	VehicleDocumentType,
-	EnvironmentalDocType,
 	SafetyAndHealthDocumentType,
+	EnvironmentalDocType,
+	TechSpecsDocumentType,
+	BasicDocumentType,
 } from "@prisma/client"
 
 export const updateStartupFolderDocumentSchema = z.object({
@@ -15,9 +18,12 @@ export const updateStartupFolderDocumentSchema = z.object({
 	documentName: z.string().optional(),
 	documentType: z
 		.nativeEnum({
+			...BasicDocumentType,
+			...EnvironmentDocType,
 			...WorkerDocumentType,
 			...VehicleDocumentType,
 			...EnvironmentalDocType,
+			...TechSpecsDocumentType,
 			...SafetyAndHealthDocumentType,
 		})
 		.optional(),

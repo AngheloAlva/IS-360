@@ -52,6 +52,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 					createdAt: true,
 					createdBy: {
 						select: {
+							id: true,
 							name: true,
 						},
 					},
@@ -61,6 +62,19 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 							tag: true,
 							name: true,
 							location: true,
+						},
+					},
+					task: {
+						select: {
+							id: true,
+							name: true,
+							nextDate: true,
+							equipment: {
+								select: {
+									id: true,
+									name: true,
+								},
+							},
 						},
 					},
 				},

@@ -2,7 +2,7 @@
 
 import { z } from "zod"
 
-import { MODULES, ACTIVITY_TYPE } from "@prisma/client"
+import { MODULES, ACTIVITY_TYPE, EnvironmentDocType, TechSpecsDocumentType } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import {
 	DocumentCategory,
@@ -26,11 +26,13 @@ const updateDocumentSchema = z.object({
 	expirationDate: z.date(),
 	category: z.nativeEnum(DocumentCategory),
 	documentType: z.nativeEnum({
+		...BasicDocumentType,
 		...WorkerDocumentType,
+		...EnvironmentDocType,
 		...VehicleDocumentType,
 		...EnvironmentalDocType,
+		...TechSpecsDocumentType,
 		...SafetyAndHealthDocumentType,
-		...BasicDocumentType,
 	}),
 	documentName: z.string(),
 })

@@ -9,6 +9,7 @@ import type { MaintenancePlan } from "@/project/maintenance-plan/hooks/use-maint
 import MaintenancePlanForm from "../components/forms/MaintenancePlanForm"
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
 import ActionDataMenu from "@/shared/components/ActionDataMenu"
+import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 
 export const MaintenancePlanColumns = ({
 	userId,
@@ -19,6 +20,13 @@ export const MaintenancePlanColumns = ({
 		id: "actions",
 		header: "",
 		cell: ({ row }) => {
+			const tasks = row.original.task
+
+			const uniqueEquipmentIds = [...new Set(tasks.map((task) => task.equipment.id))]
+			const uniqueEquipmentNames = [...new Set(tasks.map((task) => task.equipment.name))]
+			const taskNames = tasks.map((task) => task.name)
+			const taskIds = tasks.map((task) => task.id)
+
 			return (
 				<ActionDataMenu>
 					<>
@@ -33,6 +41,22 @@ export const MaintenancePlanColumns = ({
 								className="text-muted-foreground hover:bg-accent w-full justify-start bg-transparent hover:scale-100 hover:text-white"
 							/>
 						</DropdownMenuItem>
+
+						{tasks && tasks.length > 0 && (
+							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+								<CreateWorkOrderForm
+									equipmentId={uniqueEquipmentIds}
+									equipmentName={uniqueEquipmentNames}
+									maintenancePlanTaskId={taskIds}
+									initialData={{
+										workRequest: row.original.name,
+										description: taskNames.join(", "),
+										responsibleId: row.original.createdBy.id,
+										programDate: row.original.task[0].nextDate,
+									}}
+								/>
+							</DropdownMenuItem>
+						)}
 					</>
 				</ActionDataMenu>
 			)

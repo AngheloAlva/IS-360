@@ -14,10 +14,20 @@ export interface MaintenancePlan {
 	}
 	createdAt: Date
 	createdBy: {
+		id: string
 		name: string
 	}
 	nextWeekTasksCount: number
 	expiredTasksCount: number
+	task: {
+		id: string
+		name: string
+		nextDate: Date
+		equipment: {
+			id: string
+			name: string
+		}
+	}[]
 }
 
 interface UseMaintenancePlansParams {
