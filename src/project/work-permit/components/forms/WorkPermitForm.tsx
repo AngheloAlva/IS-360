@@ -152,15 +152,15 @@ export default function WorkPermitForm({
 
 	const { data: workOrdersData } = useWorkOrders({
 		page: 1,
-		companyId: "",
+		companyId,
 		search: "",
 		limit: 1000,
-		// isOtcMember,
+		isOtcMember,
 		order: "desc",
 		dateRange: null,
 		typeFilter: null,
 		statusFilter: null,
-		// permitFilter: true,
+		permitFilter: true,
 		orderBy: "createdAt",
 		priorityFilter: null,
 		onlyWithRequestClousure: false,
