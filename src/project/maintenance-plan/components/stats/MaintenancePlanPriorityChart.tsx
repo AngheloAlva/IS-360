@@ -19,13 +19,14 @@ interface MaintenancePlanPriorityChartProps {
 }
 
 export default function MaintenancePlanPriorityChart({ data }: MaintenancePlanPriorityChartProps) {
+	console.log(data)
 	return (
 		<Card className="border">
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
-						<CardTitle>Tareas por Prioridad</CardTitle>
-						<CardDescription>Distribución de las tareas según su prioridad</CardDescription>
+						<CardTitle>OT de Tareas por Prioridad</CardTitle>
+						<CardDescription>Distribución de las OT de tareas según su prioridad</CardDescription>
 					</div>
 					<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
 				</div>

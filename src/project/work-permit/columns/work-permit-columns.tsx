@@ -112,11 +112,25 @@ export const getWorkPermitColumns = (
 			return (
 				<Link
 					href={`/admin/dashboard/empresas/${company.id}`}
-					className="flex w-72 items-center gap-1.5 truncate text-wrap hover:text-rose-500 hover:underline"
+					className="flex w-56 items-center gap-1.5 truncate hover:text-rose-500 hover:underline"
 				>
 					<Building2Icon className="text-muted-foreground size-4" />
-					{company.name}
+					<span className="truncate text-nowrap">{company.name}</span>
 				</Link>
+			)
+		},
+	},
+	{
+		accessorKey: "approvalBy",
+		header: "Aprobado por",
+		cell: ({ row }) => {
+			const approvalBy = row.original.approvalBy
+
+			return (
+				<div className="flex w-52 items-center gap-1 truncate">
+					<UserIcon className="text-muted-foreground size-4" />
+					<span className="truncate text-nowrap">{approvalBy?.name}</span>
+				</div>
 			)
 		},
 	},
@@ -143,7 +157,7 @@ export const getWorkPermitColumns = (
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber.workRequest
-			return <div className="max-w-56 min-w-56 text-wrap">{workOrder}</div>
+			return <div className="line-clamp-1 w-56 truncate text-wrap">{workOrder}</div>
 		},
 	},
 	{
@@ -152,9 +166,9 @@ export const getWorkPermitColumns = (
 		cell: ({ row }) => {
 			const exactPlace = row.original.exactPlace
 			return (
-				<div className="flex max-w-56 min-w-56 items-center gap-1.5 text-wrap">
+				<div className="line-clamp-1 flex w-56 items-center gap-1.5 truncate text-wrap">
 					<MapPinnedIcon className="text-muted-foreground size-4" />
-					{exactPlace}
+					<span className="w-full truncate text-nowrap">{exactPlace}</span>
 				</div>
 			)
 		},

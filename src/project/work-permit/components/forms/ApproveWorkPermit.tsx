@@ -36,6 +36,7 @@ import {
 	FormMessage,
 	FormControl,
 } from "@/shared/components/ui/form"
+import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 
 export default function ApproveWorkPermit({
 	workPermitId,
@@ -47,8 +48,9 @@ export default function ApproveWorkPermit({
 	const form = useForm<ApproveWorkPermitSchema>({
 		resolver: zodResolver(approveWorkPermitSchema),
 		defaultValues: {
-			action: "approve",
 			approvedBy: "",
+			action: "approve",
+			approvalNotes: "",
 		},
 	})
 
@@ -150,6 +152,13 @@ export default function ApproveWorkPermit({
 										label: operator.name,
 									})) ?? []
 								}
+							/>
+
+							<TextAreaFormField<ApproveWorkPermitSchema>
+								optional
+								name="approvalNotes"
+								control={form.control}
+								label="Notas de Aprobación"
 							/>
 						</div>
 

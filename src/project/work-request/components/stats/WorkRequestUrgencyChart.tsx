@@ -84,7 +84,7 @@ export default function WorkRequestUrgencyChart({ data }: WorkRequestUrgencyChar
 								dataKey="pendientes"
 								name="Pendientes"
 								radius={[4, 4, 0, 0]}
-								fill="var(--color-blue-500)"
+								fill="var(--color-rose-500)"
 							>
 								<LabelList dataKey="pendientes" position="top" />
 							</Bar>

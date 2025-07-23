@@ -80,7 +80,7 @@ export const createWorkPermit = async ({ values, userId, companyId }: CreateWork
 			type: "WORK_PERMIT_SUBMITTED",
 			title: `Nuevo permiso de trabajo`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.operator],
-			message: `La empresa ${workPermit.company.name} ha creado un nuevo permiso de trabajo para la ${workPermit.otNumber.otNumber}`,
+			message: `La empresa ${workPermit.company.name} ha creado un nuevo permiso de trabajo ${workPermit.otNumber ? `para la ${workPermit.otNumber.otNumber}` : ""}`,
 		})
 
 		logActivity({

@@ -101,7 +101,7 @@ export default function MaintenancePlanFrequencyChart({
 													y={viewBox.cy}
 													className="fill-foreground text-3xl font-bold"
 												>
-													{total.toLocaleString()}
+													{total}
 												</tspan>
 												<tspan
 													x={viewBox.cx}

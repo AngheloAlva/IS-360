@@ -17,12 +17,19 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		flexDirection: "row",
+		alignItems: "center",
 		justifyContent: "space-between",
 		marginBottom: 25,
 		borderBottomWidth: 2,
 		borderBottomStyle: "solid",
 		borderBottomColor: "#3B82F6", // Azul moderno
 		paddingBottom: 12,
+	},
+	headerTitle: {
+		fontSize: 18,
+		fontWeight: "bold",
+		color: "#1E3A8A", // Azul oscuro
+		marginLeft: 15,
 	},
 	title: {
 		fontSize: 20,
@@ -249,23 +256,21 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 			<Page size="A4" style={styles.page}>
 				{/* Encabezado */}
 				<View style={styles.header}>
-					<Image
-						style={styles.logo}
-						src="https://otc360.ingsimple.cl/logo.png"
-						source="https://otc360.ingsimple.cl/logo.png"
-					/>
+					<View style={{ flexDirection: "row", alignItems: "center" }}>
+						<Image style={styles.logo} src="https://otc360.ingsimple.cl/logo.png" />
+						<Text style={styles.headerTitle}>PERMISO DE TRABAJO</Text>
+					</View>
 					<View>
-						<Text>PERMISO DE TRABAJO</Text>
-						<Text>Fecha de emisión: {format(new Date(), "dd/MM/yyyy", { locale: es })}</Text>
+						<Text>
+							Fecha de emisión:{" "}
+							{format(new Date(workPermit.createdAt), "dd/MM/yyyy", { locale: es })}
+						</Text>
 						<Text>
 							Fecha de vencimiento:{" "}
 							{format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es })}
 						</Text>
 					</View>
 				</View>
-
-				{/* Título */}
-				<Text style={styles.title}>PERMISO DE TRABAJO</Text>
 
 				{/* Información del permiso */}
 				<View style={styles.section}>
@@ -325,7 +330,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.row}>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Fecha inicio:</Text>
+								<Text style={styles.label}>Fecha inicio OT:</Text>
 								<Text style={styles.value}>
 									{format(new Date(workPermit.startDate), "dd/MM/yyyy", { locale: es })}
 								</Text>
@@ -333,7 +338,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						</View>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Fecha término:</Text>
+								<Text style={styles.label}>Fecha término OT:</Text>
 								<Text style={styles.value}>
 									{format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es })}
 								</Text>

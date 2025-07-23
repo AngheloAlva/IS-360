@@ -6,7 +6,8 @@ import { ACTIVITY_TYPE, MODULES, WORK_PERMIT_STATUS } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { ApproveWorkPermitSchema } from "../../schemas/approve-work-permit.schema"
+
+import type { ApproveWorkPermitSchema } from "../../schemas/approve-work-permit.schema"
 
 interface ApproveWorkPermitProps {
 	workPermitId: string
@@ -28,7 +29,7 @@ export const approveOrRejectWorkPermit = async ({
 		}
 	}
 
-	const { action, approvedBy } = values
+	const { action, approvedBy, approvalNotes } = values
 
 	try {
 		const workPermit = await prisma.workPermit.update({
@@ -38,6 +39,7 @@ export const approveOrRejectWorkPermit = async ({
 			data: {
 				status: action === "approve" ? WORK_PERMIT_STATUS.ACTIVE : WORK_PERMIT_STATUS.REJECTED,
 				approvalDate: new Date(),
+				approvalNotes,
 				approvalBy: {
 					connect: {
 						id: approvedBy,

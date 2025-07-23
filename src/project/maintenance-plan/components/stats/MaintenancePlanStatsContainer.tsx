@@ -20,7 +20,7 @@ export default function MaintenancePlanStatsContainer() {
 			<div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
 				<MaintenancePlanFrequencyChart
 					data={data.pieChartData}
-					total={data.basicStats.totalPlans}
+					total={data.basicStats.totalTasks}
 				/>
 				<MaintenancePlanPriorityChart
 					data={
