@@ -5,12 +5,13 @@ import type { DateRange } from "react-day-picker"
 
 export interface WorkPermit {
 	id: string
-	otNumber: {
+	otNumber?: {
 		otNumber: string
 		workName: string
 		workRequest: string
 		workDescription: string
 	}
+	isUrgent: boolean
 	status: string
 	mutuality: string
 	otherMutuality: string

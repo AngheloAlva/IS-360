@@ -29,7 +29,7 @@ export const approveOrRejectWorkPermit = async ({
 		}
 	}
 
-	const { action, approvedBy, approvalNotes } = values
+	const { action, approvedBy, approvalNotes, extraParticipants } = values
 
 	try {
 		const workPermit = await prisma.workPermit.update({
@@ -45,6 +45,15 @@ export const approveOrRejectWorkPermit = async ({
 						id: approvedBy,
 					},
 				},
+				...(extraParticipants && extraParticipants.length > 0
+					? {
+							participants: {
+								connect: extraParticipants.map((participant) => ({
+									id: participant,
+								})),
+							},
+						}
+					: {}),
 			},
 			select: {
 				id: true,

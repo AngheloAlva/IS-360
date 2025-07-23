@@ -134,8 +134,9 @@ export const getWorkRequestColumns = ({
 		header: "Solicitante",
 		cell: ({ row }) => {
 			const user = row.original.user
+			const operator = row.original.operator
 
-			return user?.name || "Usuario desconocido"
+			return operator?.name || user?.name || "Usuario desconocido"
 		},
 	},
 	{

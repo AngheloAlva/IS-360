@@ -79,12 +79,13 @@ export const getWorkPermitColumns = (
 		accessorKey: "otNumber",
 		header: "OT",
 		cell: ({ row }) => {
-			const otNumber = row.original.otNumber.otNumber
+			const otNumber = row.original.otNumber?.otNumber
+			const isUrgent = row.original.isUrgent
 
 			return (
 				<WorkPermitDetailsDialog workPermit={row.original}>
 					<div className="cursor-pointer font-semibold text-rose-500 hover:underline">
-						{otNumber}
+						{isUrgent ? <span className="text-rose-500">URGENTE</span> : otNumber}
 					</div>
 				</WorkPermitDetailsDialog>
 			)
@@ -156,8 +157,14 @@ export const getWorkPermitColumns = (
 		accessorKey: "workName",
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
-			const workOrder = row.original.otNumber.workRequest
-			return <div className="line-clamp-1 w-56 truncate text-wrap">{workOrder}</div>
+			const workOrder = row.original.otNumber?.workRequest
+			const isUrgent = row.original.isUrgent
+
+			return (
+				<div className="line-clamp-1 w-56 truncate text-wrap">
+					{isUrgent ? <span className="text-rose-500">Permiso Urgente</span> : workOrder}
+				</div>
+			)
 		},
 	},
 	{

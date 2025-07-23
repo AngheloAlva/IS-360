@@ -1,7 +1,7 @@
 import type { WorkPermit } from "@prisma/client"
 
 export interface WorkPermitData extends WorkPermit {
-	otNumber: {
+	otNumber?: {
 		otNumber: string
 		workName?: string
 		workRequest: string

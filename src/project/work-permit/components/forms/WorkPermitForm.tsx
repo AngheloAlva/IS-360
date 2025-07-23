@@ -18,7 +18,7 @@ import { updateWorkPermit } from "../../actions/updateWorkPermit"
 import { WORK_ORDER_PRIORITY } from "@prisma/client"
 import { cn } from "@/lib/utils"
 import {
-	workPermitSchema,
+	createWorkPermitSchema,
 	type WorkPermitSchema,
 } from "@/project/work-permit/schemas/work-permit.schema"
 import {
@@ -68,10 +68,11 @@ export default function WorkPermitForm({
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const form = useForm<WorkPermitSchema>({
-		resolver: zodResolver(workPermitSchema),
+		resolver: zodResolver(createWorkPermitSchema(isOtcMember)),
 		defaultValues: {
 			tools: initialValues?.tools || [],
 			acceptTerms: isOtcMember ? true : false,
+			isUrgent: initialValues?.isUrgent || false,
 			preChecks: initialValues?.preChecks || [],
 			otherRisk: initialValues?.otherRisk || "",
 			wasteType: initialValues?.wasteType || "",
@@ -175,6 +176,16 @@ export default function WorkPermitForm({
 
 	useEffect(() => {
 		const otNumber = form.watch("otNumber")
+		const isUrgent = form.watch("isUrgent")
+
+		if (isOtcMember && isUrgent) {
+			form.setValue("endDate", new Date())
+			form.setValue("startDate", new Date())
+			setExpirationMessage(
+				"Este permiso está configurado como urgente por lo que su duración es de solo un día"
+			)
+			return
+		}
 
 		if (workOrdersData?.workOrders && otNumber && !initialValues) {
 			const workOrder = workOrdersData.workOrders.find(
@@ -204,7 +215,7 @@ export default function WorkPermitForm({
 			setExpirationMessage(expirationMessage)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [form.watch("otNumber")])
+	}, [form.watch("otNumber"), form.watch("isUrgent")])
 
 	async function onSubmit(values: WorkPermitSchema) {
 		try {
@@ -244,7 +255,11 @@ export default function WorkPermitForm({
 				],
 			})
 
-			router.push("/dashboard/permiso-de-trabajo")
+			if (isOtcMember) {
+				router.push("/admin/dashboard/permisos-de-trabajo")
+			} else {
+				router.push("/dashboard/permiso-de-trabajo")
+			}
 		} catch (error) {
 			setIsSubmitting(false)
 
@@ -263,6 +278,7 @@ export default function WorkPermitForm({
 	const toolsAreOther = form.watch("tools").includes("Otros")
 	const generateWaste = form.watch("generateWaste")
 	const acceptTerms = form.watch("acceptTerms")
+	const isUrgent = form.watch("isUrgent")
 
 	const {
 		fields: participantsFields,
@@ -292,6 +308,14 @@ export default function WorkPermitForm({
 					>
 						<div className="flex w-full flex-col gap-x-2 gap-y-5 md:col-span-2 lg:flex-row">
 							<div className="flex w-1/2 flex-col justify-start gap-5">
+								{isOtcMember && (
+									<SwitchFormField<WorkPermitSchema>
+										name="isUrgent"
+										label="¿Es urgente?"
+										control={form.control}
+									/>
+								)}
+
 								{initialValues ? (
 									<InputFormField<WorkPermitSchema>
 										readOnly
@@ -300,17 +324,32 @@ export default function WorkPermitForm({
 										control={form.control}
 									/>
 								) : (
-									<SelectWithSearchFormField<WorkPermitSchema>
-										name="otNumber"
-										label="Número de OT"
-										control={form.control}
-										options={
-											workOrdersData?.workOrders?.map((workOrder) => ({
-												value: workOrder.otNumber,
-												label: workOrder.otNumber + " - " + workOrder.workRequest,
-											})) ?? []
-										}
-									/>
+									<>
+										{(!isOtcMember || !isUrgent) && (
+											<SelectWithSearchFormField<WorkPermitSchema>
+												name="otNumber"
+												label="Número de OT"
+												control={form.control}
+												options={
+													workOrdersData?.workOrders?.map((workOrder) => ({
+														value: workOrder.otNumber,
+														label: workOrder.otNumber + " - " + workOrder.workRequest,
+													})) ?? []
+												}
+											/>
+										)}
+
+										{isOtcMember && isUrgent && (
+											<Alert>
+												<InfoIcon />
+												<AlertTitle>Permiso Urgente</AlertTitle>
+												<AlertDescription>
+													Este permiso se está creando como urgente, por lo que no requiere una
+													Orden de Trabajo asociada.
+												</AlertDescription>
+											</Alert>
+										)}
+									</>
 								)}
 
 								<InputFormField<WorkPermitSchema>

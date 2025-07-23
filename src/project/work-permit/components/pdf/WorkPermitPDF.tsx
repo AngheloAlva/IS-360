@@ -277,15 +277,24 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<Text style={styles.subtitle}>1. INFORMACIÓN GENERAL</Text>
 
 					<View style={styles.row}>
-						<View style={styles.column}>
-							<View style={styles.row}>
-								<Text style={styles.label}>
-									{" "}
-									N°
-									{workPermit.otNumber.otNumber}
-								</Text>
+						{workPermit.isUrgent ? (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Permiso URGENTE</Text>
+								</View>
 							</View>
-						</View>
+						) : (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>
+										{" "}
+										N°
+										{workPermit.otNumber?.otNumber}
+									</Text>
+								</View>
+							</View>
+						)}
+
 						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Empresa:</Text>
@@ -306,7 +315,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							<View style={styles.row}>
 								<Text style={styles.label}>Adm. contrato OTC:</Text>
 								<View style={styles.value}>
-									<Text style={styles.value}>{workPermit.otNumber.responsible.name}</Text>
+									<Text style={styles.value}>{workPermit.otNumber?.responsible.name}</Text>
 								</View>
 							</View>
 						</View>
@@ -366,7 +375,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							<View style={styles.row}>
 								<Text style={styles.label}>Trabajo Requerido:</Text>
 								<Text style={styles.value}>
-									{workPermit.otNumber.workRequest || "No especificado"}
+									{workPermit.otNumber?.workRequest || "No especificado"}
 								</Text>
 							</View>
 						</View>
@@ -383,7 +392,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 						</View>
 					)}
 
-					{workPermit.otNumber.workDescription && (
+					{workPermit.otNumber?.workDescription && (
 						<View style={styles.row}>
 							<View style={styles.column}>
 								<View style={styles.row}>

@@ -55,6 +55,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							},
 						},
 					},
+					operator: {
+						select: {
+							name: true,
+							email: true,
+							image: true,
+						},
+					},
 					attachments: true,
 					comments: {
 						include: {

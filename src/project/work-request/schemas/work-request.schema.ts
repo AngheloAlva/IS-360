@@ -11,6 +11,7 @@ export const workRequestSchema = z.object({
 	equipments: z.string().nonempty({ message: "El equipo no puede estar vacío" }).min(1, {
 		message: "Debe seleccionar al menos un equipo",
 	}),
+	operatorId: z.string().optional(),
 })
 
 export type WorkRequestSchema = z.infer<typeof workRequestSchema>

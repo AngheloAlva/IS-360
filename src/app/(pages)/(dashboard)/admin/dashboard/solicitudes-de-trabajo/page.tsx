@@ -36,6 +36,7 @@ export default async function WorkRequestsPage() {
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
 						<VideoTutorials
+							className="text-sky-600"
 							videos={[
 								{
 									title: "Creacion de Solicitud de Trabajo",

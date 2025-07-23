@@ -23,6 +23,11 @@ export interface WorkRequest extends WorkRequestModel {
 			name: string | null
 		} | null
 	}
+	operator: {
+		name: string
+		email: string
+		image: string | null
+	} | null
 	attachments: Attachment[]
 	comments: Array<
 		WorkRequestComment & {

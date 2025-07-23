@@ -3,6 +3,7 @@
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Image from "next/image"
+import Link from "next/link"
 import {
 	UserIcon,
 	ZoomInIcon,
@@ -25,7 +26,6 @@ import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
-import Link from "next/link"
 
 interface WorkRequestDetailsDialogProps {
 	open: boolean
@@ -54,9 +54,9 @@ export default function WorkRequestDetailsDialog({
 	const statusBadgeVariant = (status: WORK_REQUEST_STATUS) => {
 		switch (status) {
 			case "REPORTED":
-				return "outline" // Cambiado de warning a outline
+				return "outline"
 			case "ATTENDED":
-				return "default" // Cambiado de success a default
+				return "default"
 			case "CANCELLED":
 				return "destructive"
 			default:
@@ -108,7 +108,7 @@ export default function WorkRequestDetailsDialog({
 								<DialogLabel
 									icon={<UserIcon className="size-4" />}
 									label="Solicitante"
-									value={workRequest.user?.name || "Usuario desconocido"}
+									value={workRequest.operator ? workRequest.operator.name : workRequest.user?.name}
 								/>
 								<DialogLabel
 									icon={<BuildingIcon className="size-4" />}
@@ -116,8 +116,9 @@ export default function WorkRequestDetailsDialog({
 									value={workRequest.user?.company?.name || "N/A"}
 								/>
 								<DialogLabel
-									icon={<SettingsIcon className="size-4" />}
 									label="Equipo / Ubicación"
+									icon={<SettingsIcon className="size-4" />}
+									className="col-span-2"
 									value={
 										workRequest.equipments[0].name + " - " + workRequest.equipments[0].location
 									}

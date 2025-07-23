@@ -60,7 +60,7 @@ export default function WorkPermitDetailsDialog({
 						Detalles del Permiso de Trabajo
 					</DialogTitle>
 					<DialogDescription>
-						Información general del permiso de trabajo de la {workPermit.otNumber.otNumber}
+						Información general del permiso de trabajo de la {workPermit.otNumber?.otNumber}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -116,7 +116,7 @@ export default function WorkPermitDetailsDialog({
 										<FileIcon className="h-4 w-4" />
 										OT
 									</p>
-									<p className="font-medium">{workPermit.otNumber.otNumber}</p>
+									<p className="font-medium">{workPermit.otNumber?.otNumber}</p>
 								</div>
 								<div>
 									<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
@@ -155,7 +155,7 @@ export default function WorkPermitDetailsDialog({
 									Trabajo a realizar
 								</p>
 								<p className="font-medium">
-									{workPermit.otNumber?.workName || workPermit.otNumber.workRequest}
+									{workPermit.otNumber?.workName || workPermit.otNumber?.workRequest}
 								</p>
 							</div>
 
@@ -181,7 +181,7 @@ export default function WorkPermitDetailsDialog({
 									Descripción del trabajo
 								</p>
 								<p className="font-medium">
-									{workPermit.otNumber.workDescription || "Sin descripción"}
+									{workPermit.otNumber?.workDescription || "Sin descripción"}
 								</p>
 							</div>
 

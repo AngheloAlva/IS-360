@@ -3,6 +3,7 @@
 import { headers } from "next/headers"
 
 import { sendNotification } from "@/shared/actions/notifications/send-notification"
+import { sendUrgentWorkPermitEmail } from "./sendUrgentWorkPermitEmail"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { USER_ROLE } from "@/lib/permissions"
@@ -30,17 +31,21 @@ export const createWorkPermit = async ({ values, userId, companyId }: CreateWork
 	}
 
 	try {
-		const { participants, activityDetails, ...rest } = values
+		const { participants, activityDetails, otNumber, ...rest } = values
 
 		const workPermit = await prisma.workPermit.create({
 			data: {
 				...rest,
 				activityDetails: activityDetails.map((activityDetail) => activityDetail.activity),
-				otNumber: {
-					connect: {
-						otNumber: values.otNumber,
-					},
-				},
+				...(otNumber
+					? {
+							otNumber: {
+								connect: {
+									otNumber: otNumber,
+								},
+							},
+						}
+					: {}),
 				user: {
 					connect: {
 						id: userId,
@@ -57,8 +62,7 @@ export const createWorkPermit = async ({ values, userId, companyId }: CreateWork
 					})),
 				},
 			},
-			select: {
-				id: true,
+			include: {
 				otNumber: {
 					select: {
 						otNumber: true,
@@ -69,18 +73,50 @@ export const createWorkPermit = async ({ values, userId, companyId }: CreateWork
 						name: true,
 					},
 				},
+				user: {
+					select: {
+						name: true,
+					},
+				},
+				participants: {
+					select: {
+						name: true,
+					},
+				},
 			},
 		})
+
+		// Si el permiso es urgente, enviar email a gerencia
+		if (values.isUrgent) {
+			try {
+				await sendUrgentWorkPermitEmail({
+					applicantName: workPermit.user.name,
+					companyName: workPermit.company.name,
+					exactPlace: values.exactPlace,
+					workWillBe: values.workWillBe,
+					activityDetails: values.activityDetails.map((detail) => detail.activity),
+					startDate: values.startDate,
+					endDate: values.endDate,
+					participants: workPermit.participants.map((p) => p.name),
+					otNumber: workPermit.otNumber?.otNumber,
+					additionalObservations: values.additionalObservations,
+				})
+				console.log("[CREATE_WORK_PERMIT] Urgent email sent successfully")
+			} catch (emailError) {
+				console.error("[CREATE_WORK_PERMIT] Failed to send urgent email:", emailError)
+				// No fallar la creación del permiso si el email falla
+			}
+		}
 
 		const folderLink = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/permisos-de-trabajo`
 
 		sendNotification({
 			link: folderLink,
 			creatorId: userId,
-			type: "WORK_PERMIT_SUBMITTED",
-			title: `Nuevo permiso de trabajo`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.operator],
-			message: `La empresa ${workPermit.company.name} ha creado un nuevo permiso de trabajo ${workPermit.otNumber ? `para la ${workPermit.otNumber.otNumber}` : ""}`,
+			type: values.isUrgent ? "URGENT_WORK_PERMIT_SUBMITTED" : "WORK_PERMIT_SUBMITTED",
+			title: `${values.isUrgent ? "🚨 Permiso urgente" : "Nuevo permiso"} de trabajo`,
+			message: `La empresa ${workPermit.company.name} ha creado un ${values.isUrgent ? "permiso urgente" : "nuevo permiso"} de trabajo ${workPermit.otNumber ? `para la ${workPermit.otNumber.otNumber}` : ""}`,
 		})
 
 		logActivity({

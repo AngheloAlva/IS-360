@@ -62,7 +62,7 @@ export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPer
 		accessorKey: "otNumber",
 		header: "OT",
 		cell: ({ row }) => {
-			const otNumber = row.original.otNumber.otNumber
+			const otNumber = row.original.otNumber?.otNumber
 
 			return (
 				<WorkPermitDetailsDialog workPermit={row.original} className="bg-indigo-500">
@@ -121,7 +121,7 @@ export const getWorkPermitByCompanyColumns = (userId: string): ColumnDef<WorkPer
 		accessorKey: "workName",
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
-			const workOrder = row.original.otNumber.workName
+			const workOrder = row.original.otNumber?.workName
 			return <div className="max-w-56 min-w-36 text-wrap">{workOrder}</div>
 		},
 	},

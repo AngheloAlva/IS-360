@@ -134,6 +134,7 @@ model User {
   techSpecsDocumentReviewer       TechSpecsDocument[]       @relation("TechSpecsDocumentReviewer")
   workRequestApproves             WorkRequest[]             @relation("WorkRequestApprovalBy")
   workRequestComments             WorkRequestComment[]
+  workRequestOperator             WorkRequest[]             @relation("WorkRequestOperator")
   workPermitAttachments           WorkPermitAttachment[]
   activityLogs                    ActivityLog[]
   WorkRequest                     WorkRequest[]
@@ -606,6 +607,7 @@ enum WORK_PERMIT_STATUS {
 model WorkPermit {
   id                             String                 @id @default(cuid())
   status                         WORK_PERMIT_STATUS     @default(REVIEW_PENDING)
+  isUrgent                       Boolean                @default(false)
   aplicantPt                     String
   mutuality                      String
   otherMutuality                 String?
@@ -645,7 +647,7 @@ model WorkPermit {
   closingById                    String?
   preventionOfficerUser          User?                  @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
   preventionOfficerId            String?
-  otNumber                       WorkOrder?              @relation(fields: [otNumberId], references: [id])
+  otNumber                       WorkOrder?             @relation(fields: [otNumberId], references: [id])
   otNumberId                     String?
   user                           User                   @relation("WorkPermitUser", fields: [userId], references: [id])
   userId                         String
@@ -1409,6 +1411,8 @@ model WorkRequest {
   customLocation String?
   location       MAINTENANCE_PLAN_LOCATION?
   status         WORK_REQUEST_STATUS        @default(REPORTED)
+  operatorId     String?
+  operator       User?                      @relation("WorkRequestOperator", fields: [operatorId], references: [id])
 
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt

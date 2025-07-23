@@ -37,6 +37,7 @@ import {
 	FormControl,
 } from "@/shared/components/ui/form"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
+import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
 
 export default function ApproveWorkPermit({
 	workPermitId,
@@ -51,6 +52,7 @@ export default function ApproveWorkPermit({
 			approvedBy: "",
 			action: "approve",
 			approvalNotes: "",
+			extraParticipants: [],
 		},
 	})
 
@@ -159,6 +161,19 @@ export default function ApproveWorkPermit({
 								name="approvalNotes"
 								control={form.control}
 								label="Notas de Aprobación"
+							/>
+
+							<MultiSelectFormField<ApproveWorkPermitSchema>
+								name="extraParticipants"
+								label="Participantes Extra"
+								description="Puede seleccionar más de un participante extra, estos se agregaran como participantes del Permiso de Trabajo"
+								control={form.control}
+								options={
+									operators?.operators.map((operator) => ({
+										value: operator.id,
+										label: operator.name,
+									})) ?? []
+								}
 							/>
 						</div>
 

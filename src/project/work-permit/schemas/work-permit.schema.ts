@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-export const workPermitSchema = z.object({
-	otNumber: z.string().nonempty({ message: "Debe seleccionar un número de OT" }),
+const baseWorkPermitSchema = {
 	aplicantPt: z
 		.string()
 		.min(3, { message: "El nombre del postulante debe tener al menos 3 caracteres" }),
+	isUrgent: z.boolean().optional(),
 	mutuality: z.string().nonempty({ message: "Debe seleccionar una mutualidad" }),
 	otherMutuality: z.string().optional(),
 	exactPlace: z.string().nonempty({ message: "Debe ingresar un lugar exacto" }),
@@ -32,7 +32,6 @@ export const workPermitSchema = z.object({
 		.array(z.object({ activity: z.string() }))
 		.min(1, { message: "Debe especificar al menos una actividad" }),
 	operatorWorker: z.string().optional(),
-
 	participants: z.array(
 		z.object({
 			userId: z.string().nonempty({ message: "Debe seleccionar un usuario" }),
@@ -41,6 +40,34 @@ export const workPermitSchema = z.object({
 	acceptTerms: z
 		.boolean()
 		.refine((value) => value, { message: "Debe aceptar los términos y condiciones" }),
-})
+}
 
-export type WorkPermitSchema = z.infer<typeof workPermitSchema>
+// Función para crear el esquema dinámico
+export const createWorkPermitSchema = (isOtcMember: boolean = false) => {
+	return z
+		.object({
+			...baseWorkPermitSchema,
+			otNumber: isOtcMember
+				? z.string().optional().or(z.literal(""))
+				: z.string().nonempty({ message: "Debe seleccionar un número de OT" }),
+		})
+		.refine(
+			(data) => {
+				if (isOtcMember && !data.isUrgent && (!data.otNumber || data.otNumber === "")) {
+					return false
+				}
+				if (!isOtcMember && (!data.otNumber || data.otNumber === "")) {
+					return false
+				}
+				return true
+			},
+			{
+				message: "Debe seleccionar un número de OT",
+				path: ["otNumber"],
+			}
+		)
+}
+
+export const workPermitSchema = createWorkPermitSchema(false)
+
+export type WorkPermitSchema = z.infer<ReturnType<typeof createWorkPermitSchema>>

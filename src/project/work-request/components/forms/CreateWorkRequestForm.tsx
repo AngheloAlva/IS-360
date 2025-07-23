@@ -8,12 +8,14 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { createWorkRequest } from "@/project/work-request/actions/create-work-request"
+import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
 import {
 	workRequestSchema,
 	type WorkRequestSchema,
 } from "@/project/work-request/schemas/work-request.schema"
 
+import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
@@ -30,8 +32,8 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
-import { useEquipments } from "@/project/equipment/hooks/use-equipments"
-import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
+import { SelectFormField } from "@/shared/components/forms/SelectFormField"
+import { useOperators } from "@/shared/hooks/use-operators"
 
 export default function CreateWorkRequestForm({ userId }: { userId: string }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -41,12 +43,13 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 	const form = useForm<WorkRequestSchema>({
 		resolver: zodResolver(workRequestSchema),
 		defaultValues: {
-			description: "",
-			isUrgent: false,
-			requestDate: new Date(),
-			observations: "",
-			attachments: [],
 			equipments: "",
+			isUrgent: false,
+			description: "",
+			attachments: [],
+			observations: "",
+			operatorId: undefined,
+			requestDate: new Date(),
 		},
 	})
 
@@ -55,6 +58,11 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 		showAll: true,
 		order: "asc",
 		orderBy: "name",
+	})
+
+	const { data: operatorsData } = useOperators({
+		limit: 100,
+		page: 1,
 	})
 
 	async function onSubmit(values: WorkRequestSchema) {
@@ -167,11 +175,27 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 							placeholder="Agrega observaciones adicionales"
 						/>
 
+						{userId !== process.env.NEXT_PUBLIC_OPERATOR_ACCOUNT && (
+							<SelectFormField<WorkRequestSchema>
+								name="operatorId"
+								control={form.control}
+								label="Operador que Solicita"
+								itemClassName="sm:col-span-2"
+								placeholder="Selecciona el operador"
+								options={
+									operatorsData?.operators.map((operator) => ({
+										value: operator.id,
+										label: operator.name,
+									})) || []
+								}
+							/>
+						)}
+
 						<SwitchFormField<WorkRequestSchema>
 							name="isUrgent"
 							control={form.control}
 							label="Marcar como urgente"
-							itemClassName="flex-row items-center sm:col-span-2 mt-4 flex"
+							itemClassName="flex-row items-center sm:col-span-2 flex"
 							className="data-[state=checked]:bg-cyan-500"
 						/>
 

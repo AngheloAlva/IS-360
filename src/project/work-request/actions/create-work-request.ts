@@ -21,8 +21,8 @@ interface CreateWorkRequestProps {
 
 export const createWorkRequest = async ({
 	values,
-	attachments,
 	userId,
+	attachments,
 }: CreateWorkRequestProps) => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -36,31 +36,31 @@ export const createWorkRequest = async ({
 	}
 
 	try {
-		// Obtener el siguiente número de solicitud
 		const counter = await prisma.workRequestCounter.upsert({
 			where: { id: "work-request-counter" },
 			update: { value: { increment: 1 } },
 			create: { id: "work-request-counter", value: 1 },
 		})
 
-		// Generar el número de solicitud con formato REQ-YYYY-XXXX
 		const year = new Date().getFullYear()
 		const requestNumber = `REQ-${year}-${counter.value.toString().padStart(4, "0")}`
 
-		// Crear la solicitud de trabajo
+		const { description, equipments, requestDate, isUrgent, observations, operatorId } = values
+
 		const newWorkRequest = await prisma.workRequest.create({
 			data: {
-				requestNumber,
-				description: values.description,
-				isUrgent: values.isUrgent,
-				requestDate: values.requestDate,
-				observations: values.observations || null,
 				userId,
+				description,
+				requestDate,
+				observations,
+				requestNumber,
+				isUrgent: isUrgent || false,
 				equipments: {
 					connect: {
-						id: values.equipments,
+						id: equipments,
 					},
 				},
+				operatorId: operatorId || null,
 				...(attachments && attachments.length > 0
 					? {
 							attachments: {
@@ -79,12 +79,12 @@ export const createWorkRequest = async ({
 		})
 
 		sendNewWorkRequestEmail({
+			requestDate,
+			description,
+			observations,
 			requestNumber,
 			userName: session.user.name,
-			requestDate: values.requestDate,
-			description: values.description,
-			observations: values.observations,
-			isUrgent: values.isUrgent || false,
+			isUrgent: isUrgent || false,
 			equipmentName: newWorkRequest.equipments.map((equipment) => equipment.name),
 			baseUrl: process.env.NEXT_PUBLIC_BASE_URL + "/admin/dashboard/solicitudes-de-trabajo",
 		})
@@ -93,9 +93,9 @@ export const createWorkRequest = async ({
 			creatorId: userId,
 			type: "WORK_REQUEST_CREATED",
 			targetRoles: [USER_ROLE.admin, USER_ROLE.workRequestOperator],
-			title: `Nueva Solicitud de Trabajo ${values.isUrgent ? "URGENTE 🚨" : ""}`,
+			title: `Nueva Solicitud de Trabajo ${isUrgent ? "URGENTE 🚨" : ""}`,
 			link: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/solicitudes-de-trabajo`,
-			message: `Se ha creado una nueva solicitud de trabajo ${values.isUrgent ? "URGENTE 🚨" : ""} #${requestNumber} - ${values.description}`,
+			message: `Se ha creado una nueva solicitud de trabajo ${isUrgent ? "URGENTE 🚨" : ""} #${requestNumber} - ${description}`,
 		})
 
 		logActivity({
