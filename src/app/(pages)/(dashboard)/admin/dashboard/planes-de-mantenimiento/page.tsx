@@ -6,6 +6,7 @@ import MaintenancePlanStatsContainer from "@/project/maintenance-plan/components
 import { MaintenancePlanTable } from "@/project/maintenance-plan/components/data/MaintenancePlanTable"
 import MaintenancePlanForm from "@/project/maintenance-plan/components/forms/MaintenancePlanForm"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function MaintenancePlansPage() {
 	const session = await auth.api.getSession({
@@ -35,6 +36,21 @@ export default async function MaintenancePlansPage() {
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Creacion de Plan de Mantenimiento",
+									description: "Tutorial de como crear un plan de mantenimiento.",
+									url: "https://youtube.com/embed/UjotpO6DcIQ",
+								},
+								{
+									title: "Creacion de Tareas para un Plan",
+									description: "Tutorial de como crear tareas para un plan de mantenimiento.",
+									url: "https://youtube.com/embed/uvrnlMjWJqU",
+								},
+							]}
+						/>
+
 						<ScrollToTableButton
 							label="Lista Planes"
 							id="maintenance-plans-list"

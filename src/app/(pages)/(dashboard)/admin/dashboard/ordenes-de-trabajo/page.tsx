@@ -6,8 +6,9 @@ import { auth } from "@/lib/auth"
 import { WorkOrderStatsContainer } from "@/project/work-order/components/stats/work-order/WorkOrderStatsContainer"
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
 import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
-import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import NewWorkBookForm from "@/project/work-order/components/forms/NewWorkBookForm"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -47,12 +48,34 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 					</div>
 
 					<div className="flex w-full flex-wrap items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Creacion Orden de Trabajo",
+									description: "Tutorial de como crear una orden de trabajo.",
+									url: "https://youtube.com/embed/Yg_ZiODHu1U",
+								},
+								{
+									title: "Creacion Libro de Obras",
+									description: "Tutorial de como crear un libro de obras.",
+									url: "https://youtube.com/embed/K_LHCpommos",
+								},
+								{
+									title: "Cierre de Hitos",
+									description: "Tutorial de como cerrar hitos de una orden de trabajo.",
+									url: "https://youtube.com/embed/cTT1T9zIl7Q",
+								},
+							]}
+						/>
+
 						<ScrollToTableButton
 							id="work-order-table"
 							label="Lista Órdenes"
 							className="text-red-600 hover:bg-white hover:text-red-600"
 						/>
+
 						{hasPermission.success && <CreateWorkOrderForm />}
+
 						{hassWorkBookPermission.success && (
 							<NewWorkBookForm
 								userId={session.user.id}

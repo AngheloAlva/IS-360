@@ -7,6 +7,7 @@ import WorkRequestStatsContainer from "@/project/work-request/components/stats/W
 import CreateWorkRequestButton from "@/project/work-request/components/forms/CreateWorkRequestForm"
 import WorkRequestsTable from "@/project/work-request/components/forms/WorkRequestsTable"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function WorkRequestsPage() {
 	const session = await auth.api.getSession({
@@ -34,6 +35,16 @@ export default async function WorkRequestsPage() {
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Creacion de Solicitud de Trabajo",
+									description: "Tutorial de como crear una solicitud de trabajo.",
+									url: "https://youtube.com/embed/rUHO23Z7lSs",
+								},
+							]}
+						/>
+
 						<ScrollToTableButton
 							id="work-requests-list"
 							label="Lista Solicitud"

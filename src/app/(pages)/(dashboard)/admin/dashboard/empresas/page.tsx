@@ -7,6 +7,7 @@ import CompanyStatsContainer from "@/project/company/components/stats/CompanySta
 import { CompanyTable } from "@/project/company/components/data/CompanyTable"
 import CompanyForm from "@/project/company/components/forms/CompanyForm"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function AdminCompaniesPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -34,6 +35,16 @@ export default async function AdminCompaniesPage(): Promise<React.ReactElement> 
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Creacion de Empresas",
+									description: "Tutorial de como crear una empresa.",
+									url: "https://youtube.com/embed/zA0xehVOB0s",
+								},
+							]}
+						/>
+
 						<ScrollToTableButton
 							label="Lista Empresas"
 							id="company-table"

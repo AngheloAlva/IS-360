@@ -1,15 +1,16 @@
+import { PlusCircleIcon } from "lucide-react"
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
 import { Metadata } from "next"
+import Link from "next/link"
 
 import { auth } from "@/lib/auth"
 
-import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import WorkPermitStatsContainer from "@/project/work-permit/components/stats/WorkPermitStatsContainer"
 import WorkPermitsTable from "@/project/work-permit/components/data/WorkPermitsTable"
-import Link from "next/link"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 import { Button } from "@/shared/components/ui/button"
-import { PlusCircleIcon } from "lucide-react"
 
 export const metadata: Metadata = {
 	title: "Permisos de Trabajo | OTC",
@@ -44,6 +45,16 @@ export default async function WorkPermitsAdminPage() {
 					</div>
 
 					<div className="ml-auto flex items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Creacion de Permiso de Trabajo",
+									description: "Tutorial de como crear un permiso de trabajo.",
+									url: "https://youtube.com/embed/0RcHtcDqRKk",
+								},
+							]}
+						/>
+
 						<ScrollToTableButton
 							id="work-permit-table"
 							label="Lista Permisos"

@@ -111,10 +111,24 @@ export default function StartupFolderOverview({
 				}
 			>
 				<>
-					{!isOtcMember && (
-						<VideoTutorials
-							videos={
-								selectedFolder?.type === "FULL"
+					<VideoTutorials
+						videos={
+							isOtcMember
+								? [
+										{
+											title: "Carpeta de Arranque Basica",
+											description:
+												"Tutorial de como revisar la documentación basica de la empresa contratista.",
+											url: "https://youtube.com/embed/GrsgcxZuqUc",
+										},
+										{
+											title: "Carpeta de Arranque Full",
+											description:
+												"Tutorial de como revisar la documentación completa de la empresa contratista.",
+											url: "https://youtube.com/embed/qUXU_MNd2Q0",
+										},
+									]
+								: selectedFolder?.type === "FULL"
 									? [
 											{
 												title: "Carga de documentos",
@@ -144,9 +158,8 @@ export default function StartupFolderOverview({
 												url: "https://youtube.com/embed/j_UqQYTPpik",
 											},
 										]
-							}
-						/>
-					)}
+						}
+					/>
 
 					{isOtcMember && hasPermission && <CreateStartupFolder companyId={companyId} />}
 

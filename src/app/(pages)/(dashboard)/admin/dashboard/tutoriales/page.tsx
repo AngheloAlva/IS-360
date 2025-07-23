@@ -62,6 +62,71 @@ const adminTutorialModules: ModuleVideos[] = [
 		],
 	},
 	{
+		moduleName: "Ordenes de Trabajo",
+		videos: [
+			{
+				title: "Creacion Orden de Trabajo",
+				description: "Tutorial de como crear una orden de trabajo.",
+				url: "https://youtube.com/embed/Yg_ZiODHu1U",
+			},
+			{
+				title: "Creacion Libro de Obras",
+				description: "Tutorial de como crear un libro de obras.",
+				url: "https://youtube.com/embed/K_LHCpommos",
+			},
+			{
+				title: "Cierre de Hitos",
+				description: "Tutorial de como cerrar hitos de una orden de trabajo.",
+				url: "https://youtube.com/embed/cTT1T9zIl7Q",
+			},
+		],
+	},
+	{
+		moduleName: "Planes de Mantenimiento",
+		videos: [
+			{
+				title: "Creacion de Plan de Mantenimiento",
+				description: "Tutorial de como crear un plan de mantenimiento.",
+				url: "https://youtube.com/embed/UjotpO6DcIQ",
+			},
+			{
+				title: "Creacion de Tareas para un Plan",
+				description: "Tutorial de como crear tareas para un plan de mantenimiento.",
+				url: "https://youtube.com/embed/uvrnlMjWJqU",
+			},
+		],
+	},
+	{
+		moduleName: "Permisos de Trabajo",
+		videos: [
+			{
+				title: "Creacion de Permiso de Trabajo",
+				description: "Tutorial de como crear un permiso de trabajo.",
+				url: "https://youtube.com/embed/0RcHtcDqRKk",
+			},
+		],
+	},
+	{
+		moduleName: "Solicitudes de Trabajo",
+		videos: [
+			{
+				title: "Creacion de Solicitud de Trabajo",
+				description: "Tutorial de como crear una solicitud de trabajo.",
+				url: "https://youtube.com/embed/rUHO23Z7lSs",
+			},
+		],
+	},
+	{
+		moduleName: "Empresas",
+		videos: [
+			{
+				title: "Creacion de Empresas",
+				description: "Tutorial de como crear una empresa.",
+				url: "https://youtube.com/embed/zA0xehVOB0s",
+			},
+		],
+	},
+	{
 		moduleName: "Mi Cuenta",
 		videos: [
 			{
