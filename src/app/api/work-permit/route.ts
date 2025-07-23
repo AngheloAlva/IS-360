@@ -23,11 +23,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const search = searchParams.get("search") || ""
 		const statusFilter = searchParams.get("statusFilter") || null
 		const companyId = searchParams.get("companyId") || null
-		const startDate = searchParams.get("startDate") || null
-		const endDate = searchParams.get("endDate") || null
+		const typeFilter = searchParams.get("typeFilter") || null
 		const orderBy = searchParams.get("orderBy") as OrderBy
 		const order = searchParams.get("order") as Order
 		const approvedBy = searchParams.get("approvedBy") || null
+		const date = searchParams.get("date") || null
 
 		const skip = (page - 1) * limit
 
@@ -36,48 +36,24 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				? {
 						otNumber: {
 							OR: [
-								{
-									workRequest: {
-										contains: search,
-										mode: "insensitive" as const,
-									},
-								},
-								{
-									otNumber: {
-										contains: search,
-										mode: "insensitive" as const,
-									},
-								},
+								{ workRequest: { contains: search, mode: "insensitive" as const } },
+								{ otNumber: { contains: search, mode: "insensitive" as const } },
 							],
 						},
 					}
 				: {}),
-			...(statusFilter
+			...(statusFilter ? { status: statusFilter as WORK_PERMIT_STATUS } : {}),
+			...(companyId ? { companyId: companyId } : {}),
+			...(date
 				? {
-						status: statusFilter as WORK_PERMIT_STATUS,
-					}
-				: {}),
-
-			...(companyId
-				? {
-						companyId: companyId,
-					}
-				: {}),
-			...(startDate || endDate
-				? {
-						solicitationDate: {
-							...(startDate ? { gte: new Date(startDate) } : {}),
-							...(endDate ? { lte: new Date(endDate) } : {}),
+						createdAt: {
+							gte: new Date(new Date(decodeURIComponent(date)).setHours(0, 0, 0, 0)),
+							lt: new Date(new Date(decodeURIComponent(date)).setHours(23, 59, 59, 999)),
 						},
 					}
 				: {}),
-			...(approvedBy
-				? {
-						approvalBy: {
-							id: approvedBy,
-						},
-					}
-				: {}),
+			...(approvedBy ? { approvalBy: { id: approvedBy } } : {}),
+			...(typeFilter ? { workWillBe: typeFilter } : {}),
 		}
 
 		const [workPermits, total] = await Promise.all([

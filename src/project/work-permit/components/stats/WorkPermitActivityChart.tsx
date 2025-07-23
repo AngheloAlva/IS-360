@@ -1,7 +1,11 @@
 "use client"
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { ChartSplineIcon } from "lucide-react"
+import { ActivityIcon } from "lucide-react"
+import { useCallback } from "react"
+import { format } from "date-fns"
+
+import { useWorkPermitFilters } from "../../hooks/use-work-permit-filters"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/components/ui/chart"
 import {
@@ -20,39 +24,68 @@ interface WorkPermitActivityChartProps {
 }
 
 export default function WorkPermitActivityChart({ data }: WorkPermitActivityChartProps) {
+	const formatData = data.map((item) => ({
+		count: item.count,
+		originalDate: item.date,
+		date: format(item.date, "dd-MM"),
+	}))
+
+	const { filters, actions } = useWorkPermitFilters()
+
+	const handleChartClick = useCallback(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		(data: any) => {
+			if (!data.activePayload) return
+
+			const selectedDate = new Date(data.activePayload[0].payload.originalDate)
+
+			if (selectedDate === filters.date) {
+				actions.setDate(null)
+			} else {
+				actions.setDate(selectedDate)
+			}
+		},
+		[filters, actions]
+	)
+
 	return (
-		<Card>
+		<Card className="border-none transition-shadow hover:shadow-md">
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>
-						<CardTitle className="text-base font-medium">Actividad de Permisos (30 días)</CardTitle>
-						<CardDescription>Permisos de trabajo creados en los últimos 30 días.</CardDescription>
+						<CardTitle className="text-lg font-semibold">Actividad de Permisos</CardTitle>
+						<CardDescription>Permisos creados en los últimos 30 días</CardDescription>
 					</div>
-					<ChartSplineIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
+					<ActivityIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
-				<ChartContainer config={{}} className="h-[250px] w-full max-w-[90dvw]">
-					<AreaChart data={data} margin={{ right: 15 }}>
+				<ChartContainer
+					config={{
+						count: {
+							label: "Permisos",
+							color: "var(--color-rose-500)",
+						},
+					}}
+					className="h-[250px] w-full max-w-[90dvw]"
+				>
+					<AreaChart
+						data={formatData}
+						onClick={handleChartClick}
+						margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+					>
 						<CartesianGrid strokeDasharray="3 3" vertical={false} />
-
 						<XAxis dataKey="date" />
 						<YAxis />
-
-						<ChartTooltip content={<ChartTooltipContent />} />
-
-						<defs>
-							<linearGradient id={"company-1"} x1="0" y1="0" x2="0" y2="1">
-								<stop offset="5%" stopColor={"var(--color-fuchsia-500)"} stopOpacity={0.8} />
-								<stop offset="95%" stopColor={"var(--color-fuchsia-500)"} stopOpacity={0.1} />
-							</linearGradient>
-						</defs>
-
+						<ChartTooltip content={<ChartTooltipContent nameKey="date" />} />
 						<Area
-							type="monotone"
 							dataKey="count"
-							stroke="var(--color-fuchsia-500)"
-							fill="url(#company-1)"
+							type="monotone"
+							fill="var(--color-rose-500)"
+							fillOpacity={0.4}
+							stroke="var(--color-rose-500)"
+							strokeWidth={2}
+							className="cursor-pointer transition-opacity hover:opacity-80"
 						/>
 					</AreaChart>
 				</ChartContainer>

@@ -1,7 +1,9 @@
 "use client"
 
-import { PieChart, Pie, Label } from "recharts"
+import { PieChart, Pie, Label, Cell } from "recharts"
 import { PieChartIcon } from "lucide-react"
+
+import { useWorkPermitFilters } from "../../hooks/use-work-permit-filters"
 
 import {
 	Card,
@@ -28,18 +30,30 @@ interface WorkPermitStatusChartProps {
 }
 
 export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusChartProps) {
+	const { filters, actions } = useWorkPermitFilters()
+
+	const handleChartClick = (data: { status: string }) => {
+		const clickedStatus = data.status
+
+		if (filters.statusFilter === clickedStatus) {
+			actions.setStatusFilter(null)
+		} else {
+			actions.setStatusFilter(clickedStatus)
+		}
+	}
+
 	return (
-		<Card>
+		<Card className="border-none transition-shadow hover:shadow-md">
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>
-						<CardTitle className="text-base font-medium">Estado de Permisos de Trabajo</CardTitle>
+						<CardTitle className="text-lg font-semibold">Estado de Permisos de Trabajo</CardTitle>
 						<CardDescription>Estado de permisos de trabajo agrupados por estado</CardDescription>
 					</div>
 					<PieChartIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>
 			</CardHeader>
-			<CardContent className="p-0">
+			<CardContent className="px-0">
 				<ChartContainer
 					config={{
 						ACTIVE: {
@@ -51,10 +65,13 @@ export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusC
 						REVIEW_PENDING: {
 							label: "Pendiente de Revisión",
 						},
+						REJECTED: {
+							label: "Rechazado",
+						},
 					}}
 					className="h-[250px] w-full max-w-[90dvw]"
 				>
-					<PieChart>
+					<PieChart margin={{ top: 10 }}>
 						<ChartTooltip content={<ChartTooltipContent nameKey="status" />} />
 
 						<Pie
@@ -63,9 +80,20 @@ export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusC
 							cy="50%"
 							data={data}
 							dataKey="count"
+							nameKey="status"
 							innerRadius={45}
 							paddingAngle={5}
+							onClick={handleChartClick}
 						>
+							{data.map((entry, index) => (
+								<Cell
+									key={`cell-${index}`}
+									fill={entry.fill}
+									strokeWidth={filters.statusFilter === entry.status ? 2 : 0}
+									stroke={filters.statusFilter === entry.status ? "var(--text)" : "none"}
+									className="cursor-pointer hover:brightness-75"
+								/>
+							))}
 							<Label
 								content={({ viewBox }) => {
 									if (viewBox && "cx" in viewBox && "cy" in viewBox) {

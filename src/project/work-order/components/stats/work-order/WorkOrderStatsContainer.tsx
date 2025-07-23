@@ -1,7 +1,7 @@
 "use client"
 
-import { useWorkOrderStats } from "@/project/work-order/hooks/use-work-order-stats"
 import { useWorkOrderFiltersStore } from "@/project/work-order/stores/work-order-filters-store"
+import { useWorkOrderStats } from "@/project/work-order/hooks/use-work-order-stats"
 
 import ChartSkeleton from "@/shared/components/stats/ChartSkeleton"
 import { WorkOrderPriorityChart } from "./WorkOrderPriorityChart"
@@ -10,10 +10,8 @@ import { WorkOrderStatusChart } from "./WorkOrderStatusChart"
 import { WorkOrderStatCards } from "./WorkOrderStatsCards"
 
 export function WorkOrderStatsContainer() {
-	// Usar los filtros del store
 	const filters = useWorkOrderFiltersStore()
 
-	// Pasar los filtros al hook de estadísticas
 	const { data, isLoading } = useWorkOrderStats({
 		search: filters.search,
 		companyId: filters.companyId,

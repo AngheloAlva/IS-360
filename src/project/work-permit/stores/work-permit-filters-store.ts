@@ -1,4 +1,3 @@
-import { DateRange } from "react-day-picker"
 import { persist } from "zustand/middleware"
 import { create } from "zustand"
 
@@ -8,7 +7,8 @@ interface WorkPermitFiltersState {
 	statusFilter: string | null
 	companyId: string | null
 	approvedBy: string | null
-	dateRange: DateRange | null
+	typeFilter: string | null
+	date: Date | null
 	search: string
 	page: number
 	orderBy: OrderBy
@@ -17,7 +17,8 @@ interface WorkPermitFiltersState {
 	setStatusFilter: (status: string | null) => void
 	setCompanyId: (companyId: string | null) => void
 	setApprovedBy: (approvedBy: string | null) => void
-	setDateRange: (range: DateRange | null) => void
+	setTypeFilter: (type: string | null) => void
+	setDate: (range: Date | null) => void
 	setSearch: (search: string) => void
 	setPage: (page: number) => void
 	setOrderBy: (orderBy: OrderBy) => void
@@ -31,7 +32,8 @@ const initialState = {
 	statusFilter: null,
 	companyId: null,
 	approvedBy: null,
-	dateRange: null,
+	typeFilter: null,
+	date: null,
 	search: "",
 	page: 1,
 	orderBy: "createdAt" as OrderBy,
@@ -55,8 +57,12 @@ export const useWorkPermitFiltersStore = create<WorkPermitFiltersState>()(
 				set({ approvedBy, page: 1 })
 			},
 
-			setDateRange: (dateRange) => {
-				set({ dateRange, page: 1 })
+			setTypeFilter: (typeFilter) => {
+				set({ typeFilter, page: 1 })
+			},
+
+			setDate: (date) => {
+				set({ date, page: 1 })
 			},
 
 			setSearch: (search) => {
@@ -80,11 +86,10 @@ export const useWorkPermitFiltersStore = create<WorkPermitFiltersState>()(
 					statusFilter: null,
 					companyId: null,
 					approvedBy: null,
-					dateRange: null,
+					typeFilter: null,
+					date: null,
 					search: "",
 					page: 1,
-					orderBy: "createdAt",
-					order: "desc",
 				})
 			},
 
@@ -98,7 +103,8 @@ export const useWorkPermitFiltersStore = create<WorkPermitFiltersState>()(
 				statusFilter: state.statusFilter,
 				companyId: state.companyId,
 				approvedBy: state.approvedBy,
-				dateRange: state.dateRange,
+				typeFilter: state.typeFilter,
+				date: state.date,
 				search: state.search,
 				orderBy: state.orderBy,
 				order: state.order,

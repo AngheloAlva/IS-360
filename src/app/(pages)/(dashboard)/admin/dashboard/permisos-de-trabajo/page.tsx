@@ -47,6 +47,7 @@ export default async function WorkPermitsAdminPage() {
 
 					<div className="ml-auto flex items-center justify-end gap-2">
 						<VideoTutorials
+							className="text-red-500"
 							videos={[
 								{
 									title: "Creacion de Permiso de Trabajo",

@@ -17,6 +17,8 @@ import { useCompanies } from "@/project/company/hooks/use-companies"
 import { useOperators } from "@/shared/hooks/use-operators"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
+import { CalendarDatePicker } from "@/shared/components/ui/date-picker"
+import { WorkWillBeOptions } from "@/lib/consts/work-permit-options"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import OrderByButton from "@/shared/components/OrderByButton"
 import RefreshButton from "@/shared/components/RefreshButton"
@@ -39,6 +41,8 @@ import {
 	SelectTrigger,
 	SelectSeparator,
 } from "@/shared/components/ui/select"
+import { Button } from "@/shared/components/ui/button"
+import { FilterXIcon } from "lucide-react"
 
 interface WorkPermitsTableProps {
 	hasPermission: boolean
@@ -89,13 +93,13 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-col flex-wrap items-start gap-4 md:flex-row md:items-center md:justify-between">
-					<div className="flex w-full flex-col items-end gap-4 lg:flex-row">
+					<div className="flex w-full flex-col items-end gap-2 lg:flex-row">
 						<SearchInput
 							value={filters.search}
 							setPage={actions.setPage}
 							onChange={actions.setSearch}
-							placeholder="Buscar permisos por OT o trabajo solicitado..."
-							className="w-full lg:w-[350px]"
+							placeholder="Buscar por OT o trabajo solicitado..."
+							className="w-full lg:w-[290px]"
 						/>
 
 						<Select
@@ -179,6 +183,39 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							</SelectContent>
 						</Select>
 
+						<CalendarDatePicker
+							value={filters.date}
+							onChange={actions.setDate}
+							placeholder="Seleccionar fecha"
+						/>
+
+						<Select
+							onValueChange={(value) => {
+								if (value === "all") {
+									actions.setTypeFilter(null)
+								} else {
+									actions.setTypeFilter(value)
+								}
+							}}
+							value={filters.typeFilter ?? "all"}
+						>
+							<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
+								Tipo de Trabajo
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Tipo de Trabajo</SelectLabel>
+									<SelectSeparator />
+									<SelectItem value="all">Todos los Tipos</SelectItem>
+									{WorkWillBeOptions.map((type) => (
+										<SelectItem key={type.value} value={type.value}>
+											{type.label}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+
 						<div className="ml-auto flex items-center justify-end gap-2">
 							<OrderByButton
 								onChange={(orderBy, order) => {
@@ -188,6 +225,15 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							/>
 
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+							<Button
+								size={"icon"}
+								variant="outline"
+								onClick={actions.resetFilters}
+								className="border-pink-600 text-pink-600 hover:bg-pink-600 hover:text-white"
+							>
+								<FilterXIcon />
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -210,7 +256,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 						{isLoading || isFetching ? (
 							Array.from({ length: 15 }).map((_, index) => (
 								<TableRow key={index}>
-									<TableCell colSpan={10}>
+									<TableCell colSpan={11}>
 										<Skeleton className="h-6.5 min-w-full" />
 									</TableCell>
 								</TableRow>

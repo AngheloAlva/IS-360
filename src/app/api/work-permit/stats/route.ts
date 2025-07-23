@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { format } from "date-fns"
 
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { WORK_PERMIT_STATUS } from "@prisma/client"
 
 export const dynamic = "force-dynamic"
 
-export async function GET(): Promise<NextResponse> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -17,17 +18,50 @@ export async function GET(): Promise<NextResponse> {
 	}
 
 	try {
-		// 1. Total count of work permits
+		const searchParams = req.nextUrl.searchParams
+		const search = searchParams.get("search") || ""
+		const statusFilter = searchParams.get("statusFilter") || null
+		const companyId = searchParams.get("companyId") || null
+		const typeFilter = searchParams.get("typeFilter") || null
+		const approvedBy = searchParams.get("approvedBy") || null
+		const date = searchParams.get("date") || null
+
+		const filter = {
+			...(search
+				? {
+						otNumber: {
+							OR: [
+								{ workRequest: { contains: search, mode: "insensitive" as const } },
+								{ otNumber: { contains: search, mode: "insensitive" as const } },
+							],
+						},
+					}
+				: {}),
+			...(statusFilter ? { status: statusFilter as WORK_PERMIT_STATUS } : {}),
+			...(companyId ? { companyId: companyId } : {}),
+			...(date
+				? {
+						createdAt: {
+							gte: new Date(new Date(decodeURIComponent(date)).setHours(0, 0, 0, 0)),
+							lt: new Date(new Date(decodeURIComponent(date)).setHours(23, 59, 59, 999)),
+						},
+					}
+				: {}),
+			...(approvedBy ? { approvalBy: { id: approvedBy } } : {}),
+			...(typeFilter ? { workWillBe: typeFilter } : {}),
+		}
+
 		const totalWorkPermits = await prisma.workPermit.count({
+			where: filter,
 			cacheStrategy: {
 				ttl: 120,
 				swr: 10,
 			},
 		})
 
-		// 2. Work permits by status
 		const workPermitsByStatus = await prisma.workPermit.groupBy({
 			by: ["status"],
+			where: filter,
 			_count: {
 				id: true,
 			},
@@ -37,9 +71,9 @@ export async function GET(): Promise<NextResponse> {
 			},
 		})
 
-		// 3. Work permits by type of work
 		const workPermitsByType = await prisma.workPermit.groupBy({
 			by: ["workWillBe"],
+			where: filter,
 			_count: {
 				id: true,
 			},
@@ -48,17 +82,17 @@ export async function GET(): Promise<NextResponse> {
 					id: "desc",
 				},
 			},
-			take: 5, // Top 5 types
+			take: 5,
 			cacheStrategy: {
 				ttl: 120,
 				swr: 10,
 			},
 		})
 
-		// 4. Active work permits by company
 		const activeWorkPermitsByCompany = await prisma.workPermit.groupBy({
 			by: ["companyId"],
 			where: {
+				...filter,
 				status: "ACTIVE",
 			},
 			_count: {
@@ -76,16 +110,18 @@ export async function GET(): Promise<NextResponse> {
 			},
 		})
 
-		// 5. Work permits activity over time (last 30 days)
 		const thirtyDaysAgo = new Date()
 		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-		const workPermitActivity = await prisma.workPermit.findMany({
-			where: {
-				createdAt: {
-					gte: thirtyDaysAgo,
-				},
+		const activityFilter = {
+			...filter,
+			createdAt: {
+				gte: thirtyDaysAgo,
 			},
+		}
+
+		const workPermitActivity = await prisma.workPermit.findMany({
+			where: activityFilter,
 			select: {
 				id: true,
 				status: true,
@@ -106,17 +142,15 @@ export async function GET(): Promise<NextResponse> {
 			},
 		})
 
-		// Process activity data by day
-		const activityByDay: Record<string, { date: string; count: number }> = {}
+		const activityByDay: Record<string, { date: Date; count: number }> = {}
 		workPermitActivity.forEach((activity) => {
 			const date = format(activity.createdAt, "dd-MM")
 			if (!activityByDay[date]) {
-				activityByDay[date] = { date, count: 0 }
+				activityByDay[date] = { date: activity.createdAt, count: 0 }
 			}
 			activityByDay[date].count++
 		})
 
-		// Get company details for active permits
 		const companyDetails = await prisma.company.findMany({
 			where: {
 				id: {

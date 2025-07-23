@@ -130,7 +130,7 @@ export const getWorkPermitColumns = (
 			return (
 				<div className="flex w-52 items-center gap-1 truncate">
 					<UserIcon className="text-muted-foreground size-4" />
-					<span className="truncate text-nowrap">{approvalBy?.name}</span>
+					<span className="truncate text-nowrap">{approvalBy?.name || "-"}</span>
 				</div>
 			)
 		},

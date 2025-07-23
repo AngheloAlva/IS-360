@@ -5,6 +5,7 @@ export const WORK_PERMIT_STATUS_VALUES = {
 	CANCELLED: "CANCELLED",
 	EXPIRED: "EXPIRED",
 	REVIEW_PENDING: "REVIEW_PENDING",
+	REJECTED: "REJECTED",
 } as const
 
 export const WORK_PERMIT_STATUS_VALUES_ARRAY = [
@@ -14,6 +15,7 @@ export const WORK_PERMIT_STATUS_VALUES_ARRAY = [
 	WORK_PERMIT_STATUS_VALUES.CANCELLED,
 	WORK_PERMIT_STATUS_VALUES.EXPIRED,
 	WORK_PERMIT_STATUS_VALUES.REVIEW_PENDING,
+	WORK_PERMIT_STATUS_VALUES.REJECTED,
 ] as const
 
 export type WorkPermitStatus = keyof typeof WORK_PERMIT_STATUS_VALUES
@@ -25,6 +27,7 @@ export const WorkPermitStatusLabels = {
 	[WORK_PERMIT_STATUS_VALUES.CANCELLED]: "Cancelado",
 	[WORK_PERMIT_STATUS_VALUES.EXPIRED]: "Expirado",
 	[WORK_PERMIT_STATUS_VALUES.REVIEW_PENDING]: "Pendiente de Aprobación",
+	[WORK_PERMIT_STATUS_VALUES.REJECTED]: "Rechazado",
 }
 
 export const WorkPermitStatusOptions = [
@@ -39,5 +42,9 @@ export const WorkPermitStatusOptions = [
 	{
 		value: WORK_PERMIT_STATUS_VALUES.REVIEW_PENDING,
 		label: "Pendiente de Aprobación",
+	},
+	{
+		value: WORK_PERMIT_STATUS_VALUES.REJECTED,
+		label: "Rechazado",
 	},
 ]

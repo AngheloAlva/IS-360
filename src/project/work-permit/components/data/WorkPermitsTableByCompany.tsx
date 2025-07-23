@@ -69,9 +69,10 @@ export function WorkPermitsTableByCompany({
 		orderBy,
 		limit: 15,
 		companyId,
+		date: null,
 		statusFilter,
-		dateRange: null,
 		approvedBy: null,
+		typeFilter: null,
 	})
 
 	const table = useReactTable({
