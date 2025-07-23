@@ -4,6 +4,7 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 import {
+	DotIcon,
 	FileIcon,
 	UserIcon,
 	UsersIcon,
@@ -12,12 +13,11 @@ import {
 	MapPinIcon,
 	BuildingIcon,
 	CalendarIcon,
-	ClipboardListIcon,
-	CloudUploadIcon,
 	PaperclipIcon,
-	CheckCircle2Icon,
-	DotIcon,
 	ShieldUserIcon,
+	CloudUploadIcon,
+	CheckCircle2Icon,
+	ClipboardListIcon,
 } from "lucide-react"
 
 import { WorkPermitStatus, WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"

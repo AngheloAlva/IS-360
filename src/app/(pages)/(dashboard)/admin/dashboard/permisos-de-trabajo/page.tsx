@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth"
 
 import WorkPermitStatsContainer from "@/project/work-permit/components/stats/WorkPermitStatsContainer"
 import WorkPermitsTable from "@/project/work-permit/components/data/WorkPermitsTable"
+import PdfBlankButton from "@/project/work-permit/components/pdf/PdfBlankButton"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import VideoTutorials from "@/shared/components/VideoTutorials"
 import { Button } from "@/shared/components/ui/button"
@@ -60,6 +61,8 @@ export default async function WorkPermitsAdminPage() {
 							label="Lista Permisos"
 							className="text-rose-600 hover:bg-white hover:text-rose-600"
 						/>
+
+						<PdfBlankButton />
 
 						{hasPermission.success && (
 							<Link href="/admin/dashboard/permisos-de-trabajo/agregar">

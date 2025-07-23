@@ -1,11 +1,13 @@
 "use client"
 
+import { PDFViewer } from "@react-pdf/renderer"
 import { useState, useEffect } from "react"
 import { Loader2 } from "lucide-react"
-import { PDFViewer } from "@react-pdf/renderer"
-import WorkPermitPDF from "./WorkPermitPDF"
-import type { WorkPermitData } from "@/app/api/work-permit/pdf/[id]/types"
+
 import { Button } from "@/shared/components/ui/button"
+import WorkPermitPDF from "./WorkPermitPDF"
+
+import type { WorkPermitData } from "@/app/api/work-permit/pdf/[id]/types"
 
 interface WorkPermitPDFViewerProps {
 	workPermitId: string

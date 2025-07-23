@@ -64,6 +64,7 @@ export interface WorkPermit {
 			name: string
 		}
 	}>
+	approvalNotes?: string
 	approvalDate: Date | null
 	approvalBy: {
 		id: string
