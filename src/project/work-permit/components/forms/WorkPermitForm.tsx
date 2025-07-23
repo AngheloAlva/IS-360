@@ -152,15 +152,15 @@ export default function WorkPermitForm({
 
 	const { data: workOrdersData } = useWorkOrders({
 		page: 1,
-		companyId,
-		limit: 100,
+		companyId: "",
 		search: "",
-		isOtcMember,
+		limit: 1000,
+		// isOtcMember,
 		order: "desc",
 		dateRange: null,
 		typeFilter: null,
 		statusFilter: null,
-		permitFilter: true,
+		// permitFilter: true,
 		orderBy: "createdAt",
 		priorityFilter: null,
 		onlyWithRequestClousure: false,
@@ -181,7 +181,7 @@ export default function WorkPermitForm({
 				(workOrder) => workOrder.otNumber === otNumber
 			)
 
-			if (!workOrder || !workOrder.programDate) {
+			if (!workOrder) {
 				toast.error("La orden de trabajo seleccionada no tiene una fecha de programación válida")
 				return
 			}
@@ -193,7 +193,7 @@ export default function WorkPermitForm({
 				return
 			}
 
-			const startDate = new Date(workOrder.programDate)
+			const startDate = new Date()
 			const otEndDate = workOrder.estimatedEndDate ? new Date(workOrder.estimatedEndDate) : null
 			const endDate = getPermitExpirationDate(startDate, otEndDate)
 			const expirationMessage = getPermitExpirationMessage(startDate, endDate)
