@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import { Files, InfoIcon } from "lucide-react"
+import { memo, useMemo, useCallback } from "react"
+import { InfoIcon, FilesIcon } from "lucide-react"
 import Link from "next/link"
 
 import { useStartupFolderFilters } from "../../hooks/use-startup-folder-filters"
@@ -38,34 +40,53 @@ interface AdminStartupFoldersListProps {
 	id: string
 }
 
-export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
+const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 	const {
 		filters,
 		actions,
 		isLoading,
+		isFetching,
 		startupFolders: companiesWithFolders,
 	} = useStartupFolderFilters()
+
+	const memoizedFilters = useMemo(
+		() => ({
+			search: filters.search,
+			otStatus: filters.otStatus,
+			withOtActive: filters.withOtActive,
+			onlyWithReviewRequest: filters.onlyWithReviewRequest,
+		}),
+		[filters.search, filters.onlyWithReviewRequest, filters.otStatus, filters.withOtActive]
+	)
+
+	const handleReviewRequestChange = useCallback(
+		(value: "true" | "false") => {
+			actions.setonlyWithReviewRequest(value === "true")
+		},
+		[actions.setonlyWithReviewRequest]
+	)
+
+	const handleOtStatusChange = useCallback(
+		(value: "all" | WORK_ORDER_STATUS) => {
+			actions.setOtStatus(value === "all" ? undefined : (value as WORK_ORDER_STATUS))
+		},
+		[actions.setOtStatus]
+	)
 
 	return (
 		<>
 			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-6" id={id}>
 				<SearchInput
 					setPage={() => {}}
-					value={filters.search}
 					onChange={actions.setSearch}
 					inputClassName="bg-background"
+					value={memoizedFilters.search}
 					className="col-span-2 sm:col-span-1 lg:col-span-2"
 					placeholder="Buscar por nombre o RUT de empresa..."
 				/>
 
 				<Select
-					onValueChange={(value: "true" | "false") => {
-						if (value === "true") {
-							actions.setonlyWithReviewRequest(true)
-						} else {
-							actions.setonlyWithReviewRequest(false)
-						}
-					}}
+					onValueChange={handleReviewRequestChange}
 					value={filters.onlyWithReviewRequest ? "true" : "false"}
 				>
 					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
@@ -81,16 +102,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 					</SelectContent>
 				</Select>
 
-				<Select
-					onValueChange={(value: "all" | WORK_ORDER_STATUS) => {
-						if (value === "all") {
-							actions.setOtStatus(undefined)
-						} else {
-							actions.setOtStatus(value as WORK_ORDER_STATUS)
-						}
-					}}
-					value={filters.otStatus ?? "all"}
-				>
+				<Select value={memoizedFilters.otStatus ?? "all"} onValueChange={handleOtStatusChange}>
 					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
 						<SelectValue placeholder="Estado" />
 					</SelectTrigger>
@@ -117,7 +129,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 							actions.setWithOtActive(false)
 						}
 					}}
-					value={filters.withOtActive ? "true" : "false"}
+					value={memoizedFilters.withOtActive ? "true" : "false"}
 				>
 					<SelectTrigger className="border-input bg-background w-full border">
 						<SelectValue placeholder="Mostrar todas las empresas" />
@@ -141,7 +153,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 
 			{companiesWithFolders?.length === 0 && (
 				<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
-					<Files className="text-muted-foreground h-8 w-8" />
+					<FilesIcon className="text-muted-foreground h-8 w-8" />
 					<div>
 						<p className="text-lg font-medium">
 							No hay carpetas de arranque para órdenes de trabajo
@@ -154,7 +166,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 				</div>
 			)}
 
-			{isLoading ? (
+			{isLoading || isFetching ? (
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{[1, 2, 3, 4, 5, 6].map((item) => (
 						<Card key={item} className="overflow-hidden">
@@ -260,4 +272,7 @@ export function AdminStartupFoldersList({ id }: AdminStartupFoldersListProps) {
 			)}
 		</>
 	)
-}
+})
+
+AdminStartupFoldersList.displayName = "AdminStartupFoldersList"
+export { AdminStartupFoldersList }

@@ -31,13 +31,13 @@ interface VehicleFolderProps {
 	startupFolderId: string
 }
 
-export const VehicleFolder: React.FC<VehicleFolderProps> = ({
+export default function VehicleFolder({
 	onBack,
 	userId,
 	companyId,
 	isOtcMember,
 	startupFolderId,
-}) => {
+}: VehicleFolderProps) {
 	const [selectedEntity, setSelectedEntity] = useState<{
 		id: string
 		name: string

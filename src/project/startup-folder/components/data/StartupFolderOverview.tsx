@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense, lazy } from "react"
 import Link from "next/link"
 import {
 	CarIcon,
@@ -21,6 +21,13 @@ import {
 	useStartupFolder,
 	type StartupFolder,
 } from "@/project/startup-folder/hooks/use-startup-folder"
+import {
+	SAFETY_AND_HEALTH_STRUCTURE,
+	ENVIRONMENTAL_STRUCTURE,
+	ENVIRONMENT_STRUCTURE,
+	EXTENDED_ENVIRONMENT_STRUCTURE,
+	TECH_SPEC_STRUCTURE,
+} from "@/lib/consts/startup-folders-structure"
 
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
@@ -28,16 +35,17 @@ import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/aler
 import { CreateStartupFolder } from "../forms/CreateStartupFolder"
 import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import CompleteFolderDialog from "../dialogs/CompleteFolderDialog"
-import { StartupFolderDocuments } from "./StartupFolderDocuments"
 import VideoTutorials from "@/shared/components/VideoTutorials"
 import RefreshButton from "@/shared/components/RefreshButton"
 import ModuleHeader from "@/shared/components/ModuleHeader"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { StartupFolderTable } from "./StartupFolderTable"
 import { Button } from "@/shared/components/ui/button"
-import { VehicleFolder } from "./VehicleFolder"
-import { WorkerFolder } from "./WorkerFolder"
-import { BasicFolder } from "./BasicFolder"
+
+const StartupFolderDocuments = lazy(() => import("./StartupFolderDocuments"))
+const StartupFolderTable = lazy(() => import("./StartupFolderTable"))
+const VehicleFolder = lazy(() => import("./VehicleFolder"))
+const WorkerFolder = lazy(() => import("./WorkerFolder"))
+const BasicFolder = lazy(() => import("./BasicFolder"))
 
 interface StartupFolderOverviewProps {
 	userId: string
@@ -103,7 +111,7 @@ export default function StartupFolderOverview({
 			<ModuleHeader
 				className="from-teal-600 to-cyan-700"
 				title={companyName || "Carpeta de arranque"}
-				backHref="/admin/dashboard/carpetas-de-arranques"
+				backHref={isOtcMember ? "/admin/dashboard/carpetas-de-arranques" : undefined}
 				description={
 					isOtcMember
 						? "Revisión de documentación de empresa contratista"
@@ -181,111 +189,114 @@ export default function StartupFolderOverview({
 
 			{startupFolders && startupFolders.length > 0 ? (
 				<>
-					<Tabs defaultValue={startupFolders?.[0].id}>
-						<div className="flex w-full items-center justify-end gap-2">
-							{startupFolders && startupFolders.length > 1 && (
-								<TabsList className="w-full" onClick={() => setSelectedCategory(null)}>
+					<Suspense fallback={<Skeleton className="h-96 w-full" />}>
+						<Tabs defaultValue={startupFolders?.[0].id}>
+							<div className="flex w-full items-center justify-end gap-2">
+								{startupFolders && startupFolders.length > 1 && (
+									<TabsList className="w-full" onClick={() => setSelectedCategory(null)}>
+										{startupFolders.map((folder) => (
+											<TabsTrigger value={folder.id} key={folder.id} className="p-0">
+												<div
+													onClick={() => {
+														setSelectedFolder(folder)
+													}}
+													className="flex h-full w-full items-center justify-center"
+												>
+													{folder.name}
+												</div>
+											</TabsTrigger>
+										))}
+									</TabsList>
+								)}
+
+								<RefreshButton refetch={refetch} isFetching={isFetching} size="lg" />
+							</div>
+
+							{startupFolders && startupFolders.length > 0 ? (
+								<TabsContents>
 									{startupFolders.map((folder) => (
-										<TabsTrigger value={folder.id} key={folder.id} className="p-0">
-											<div
-												onClick={() => {
-													setSelectedFolder(folder)
-												}}
-												className="flex h-full w-full items-center justify-center"
-											>
-												{folder.name}
+										<TabsContent key={folder.id} value={folder.id} className="space-y-2">
+											<div className="bg-background flex items-center justify-between rounded-lg px-4 py-1">
+												<h2 className="flex items-center gap-2 text-lg font-bold">
+													<FolderKanbanIcon className="size-5" />
+													{folder.name}
+												</h2>
+
+												{isOtcMember && hasPermission && (
+													<UpdateStartupFolder
+														type={folder.type}
+														name={folder.name}
+														companyId={companyId}
+														startupFolderId={folder.id}
+													/>
+												)}
 											</div>
-										</TabsTrigger>
-									))}
-								</TabsList>
-							)}
 
-							<RefreshButton refetch={refetch} isFetching={isFetching} size="lg" />
-						</div>
-
-						{startupFolders && startupFolders.length > 0 ? (
-							<TabsContents>
-								{startupFolders.map((folder) => (
-									<TabsContent key={folder.id} value={folder.id} className="space-y-2">
-										<div className="bg-background flex items-center justify-between rounded-lg px-4 py-1">
-											<h2 className="flex items-center gap-2 text-lg font-bold">
-												<FolderKanbanIcon className="size-5" />
-												{folder.name}
-											</h2>
-
-											{isOtcMember && hasPermission && (
-												<UpdateStartupFolder
-													type={folder.type}
-													name={folder.name}
-													companyId={companyId}
-													startupFolderId={folder.id}
-												/>
-											)}
-										</div>
-
-										<div className="bg-background space-y-6 rounded-lg p-4">
-											{selectedCategory ? (
-												selectedCategory === DocumentCategory.PERSONNEL ? (
-													<WorkerFolder
-														userId={userId}
-														companyId={companyId}
-														isOtcMember={isOtcMember}
-														startupFolderId={folder.id}
-														onBack={() => setSelectedCategory(null)}
-													/>
-												) : selectedCategory === DocumentCategory.VEHICLES ? (
-													<VehicleFolder
-														userId={userId}
-														companyId={companyId}
-														isOtcMember={isOtcMember}
-														startupFolderId={folder.id}
-														onBack={() => setSelectedCategory(null)}
-													/>
-												) : (
-													<StartupFolderDocuments
-														userId={userId}
-														companyId={companyId}
-														isOtcMember={isOtcMember}
-														category={selectedCategory}
-														startupFolderId={folder.id}
-														onBack={() => setSelectedCategory(null)}
-														moreMonthDuration={folder.moreMonthDuration}
-													/>
-												)
-											) : (
-												<>
-													{folder.type === "BASIC" ? (
-														<BasicFolder
+											<div className="bg-background space-y-6 rounded-lg p-4">
+												{selectedCategory ? (
+													selectedCategory === DocumentCategory.PERSONNEL ? (
+														<WorkerFolder
 															userId={userId}
 															companyId={companyId}
 															isOtcMember={isOtcMember}
 															startupFolderId={folder.id}
+															onBack={() => setSelectedCategory(null)}
+														/>
+													) : selectedCategory === DocumentCategory.VEHICLES ? (
+														<VehicleFolder
+															userId={userId}
+															companyId={companyId}
+															isOtcMember={isOtcMember}
+															startupFolderId={folder.id}
+															onBack={() => setSelectedCategory(null)}
 														/>
 													) : (
-														<StartupFolderTable
-															subFolders={folder}
-															startupFolderType={folder.type}
-															onCategorySelect={setSelectedCategory}
+														<StartupFolderDocuments
+															userId={userId}
+															companyId={companyId}
+															isOtcMember={isOtcMember}
+															category={selectedCategory}
+															startupFolderId={folder.id}
+															onBack={() => setSelectedCategory(null)}
+															moreMonthDuration={folder.moreMonthDuration}
 														/>
-													)}
-												</>
-											)}
-										</div>
-									</TabsContent>
-								))}
-							</TabsContents>
-						) : (
-							<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
-								<FilesIcon className="text-muted-foreground h-8 w-4" />
-								<div>
-									<p className="text-lg font-medium">No hay carpeta de arranque</p>
-									<p className="text-muted-foreground text-sm">
-										Su empresa aún no tiene una carpeta de arranque. Por favor contacte con soporte.
-									</p>
+													)
+												) : (
+													<>
+														{folder.type === "BASIC" ? (
+															<BasicFolder
+																userId={userId}
+																companyId={companyId}
+																isOtcMember={isOtcMember}
+																startupFolderId={folder.id}
+															/>
+														) : (
+															<StartupFolderTable
+																subFolders={folder}
+																startupFolderType={folder.type}
+																onCategorySelect={setSelectedCategory}
+															/>
+														)}
+													</>
+												)}
+											</div>
+										</TabsContent>
+									))}
+								</TabsContents>
+							) : (
+								<div className="col-span-full flex flex-col items-center justify-center space-y-3 rounded-lg border border-dashed p-8 text-center">
+									<FilesIcon className="text-muted-foreground h-8 w-4" />
+									<div>
+										<p className="text-lg font-medium">No hay carpeta de arranque</p>
+										<p className="text-muted-foreground text-sm">
+											Su empresa aún no tiene una carpeta de arranque. Por favor contacte con
+											soporte.
+										</p>
+									</div>
 								</div>
-							</div>
-						)}
-					</Tabs>
+							)}
+						</Tabs>
+					</Suspense>
 
 					<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 						<Card>
@@ -302,10 +313,13 @@ export default function StartupFolderOverview({
 												</div>
 												Documentación básica:{" "}
 											</div>
-											{selectedFolder.basicFolder.reduce(
-												(acc, wf) => acc + (wf.isCompleted ? 1 : 0),
-												0
-											)}{" "}
+											{selectedFolder.basicFolder.length > 0
+												? selectedFolder.basicFolder.reduce((acc, wf) => {
+														const approvedDocs = wf.isCompleted
+
+														return acc + (approvedDocs ? 1 : 0)
+													}, 0)
+												: "0"}
 											/ {selectedFolder.basicFolder.length} completados
 										</li>
 									)}
@@ -320,8 +334,8 @@ export default function StartupFolderOverview({
 													Seguridad y Salud Ocupacional:{" "}
 												</div>
 												{(
-													((selectedFolder?.safetyAndHealthFolders[0].approvedDocuments || 0) /
-														(selectedFolder?.safetyAndHealthFolders[0].totalDocuments || 0)) *
+													(selectedFolder?.safetyAndHealthFolders[0].documentCounts?.approved /
+														SAFETY_AND_HEALTH_STRUCTURE.documents.length) *
 													100
 												).toFixed(0)}
 												% completado
@@ -336,8 +350,8 @@ export default function StartupFolderOverview({
 														Medio Ambiente:{" "}
 													</div>
 													{(
-														((selectedFolder?.environmentalFolders[0].approvedDocuments || 0) /
-															(selectedFolder?.environmentalFolders[0].totalDocuments || 0)) *
+														(selectedFolder?.environmentalFolders[0].documentCounts?.approved /
+															ENVIRONMENTAL_STRUCTURE.documents.length) *
 														100
 													).toFixed(0)}
 													% completado
@@ -351,8 +365,14 @@ export default function StartupFolderOverview({
 														Medio Ambiente:{" "}
 													</div>
 													{(
-														((selectedFolder?.environmentFolders[0].approvedDocuments || 0) /
-															(selectedFolder?.environmentFolders[0].totalDocuments || 0)) *
+														(Number(
+															selectedFolder?.environmentFolders[0].documentCounts?.approved ||
+																selectedFolder?.environmentFolders[0].approvedDocuments ||
+																0
+														) /
+															(selectedFolder?.moreMonthDuration
+																? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
+																: ENVIRONMENT_STRUCTURE.documents.length)) *
 														100
 													).toFixed(0)}
 													% completado
@@ -368,8 +388,12 @@ export default function StartupFolderOverview({
 														Especificaciones Técnicas:{" "}
 													</div>
 													{(
-														((selectedFolder?.techSpecsFolders[0].approvedDocuments || 0) /
-															(selectedFolder?.techSpecsFolders[0].totalDocuments || 0)) *
+														(Number(
+															selectedFolder?.techSpecsFolders[0].documentCounts?.approved ||
+																selectedFolder?.techSpecsFolders[0].approvedDocuments ||
+																0
+														) /
+															TECH_SPEC_STRUCTURE.documents.length) *
 														100
 													).toFixed(0)}
 													% completado
@@ -383,10 +407,13 @@ export default function StartupFolderOverview({
 													</div>
 													Trabajadores:{" "}
 												</div>
-												{selectedFolder.workersFolders.reduce(
-													(acc, wf) => acc + (wf.isCompleted ? 1 : 0),
-													0
-												)}{" "}
+												{selectedFolder.workersFolders.length > 0
+													? selectedFolder.workersFolders.reduce((acc, wf) => {
+															const approvedDocs = wf.isCompleted
+
+															return acc + (approvedDocs ? 1 : 0)
+														}, 0)
+													: "0"}
 												/ {selectedFolder.workersFolders.length} completados
 											</li>
 
@@ -397,10 +424,13 @@ export default function StartupFolderOverview({
 													</div>
 													Vehículos:{" "}
 												</div>
-												{selectedFolder.vehiclesFolders.reduce(
-													(acc, vf) => acc + (vf.isCompleted ? 1 : 0),
-													0
-												)}{" "}
+												{selectedFolder.vehiclesFolders.length > 0
+													? selectedFolder.vehiclesFolders.reduce((acc, wf) => {
+															const approvedDocs = wf.isCompleted
+
+															return acc + (approvedDocs ? 1 : 0)
+														}, 0)
+													: "0"}
 												/ {selectedFolder.vehiclesFolders.length} completados
 											</li>
 										</>

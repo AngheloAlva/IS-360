@@ -14,12 +14,10 @@ interface FolderDocuments {
 }
 
 export interface StartupFolderStats {
-	// Estadísticas básicas
 	totalFolders: number
 	totalFoldersActive: number
 	totalFoldersToReview: number
 	totalCompaniesApproved: number
-	// Datos para gráficas
 	charts: {
 		documentsByStatus: DocumentStatusCount[]
 		documentsByFolder: FolderDocuments[]
@@ -38,5 +36,11 @@ export function useStartupFolderStats() {
 
 			return response.json()
 		},
+		staleTime: 3 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+		retry: 2,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+		refetchOnWindowFocus: false,
+		refetchInterval: 5 * 60 * 1000,
 	})
 }

@@ -1,120 +1,67 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
+import type { StartupFolderType, WORK_ORDER_STATUS, StartupFolderStatus } from "@prisma/client"
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
-import type {
-	Company,
-	BasicFolder,
-	WorkerFolder,
-	VehicleFolder,
-	BasicDocument,
-	WorkerDocument,
-	VehicleDocument,
-	StartupFolderType,
-	WORK_ORDER_STATUS,
-	EnvironmentFolder,
-	EnvironmentDocument,
-	EnvironmentalFolder,
-	StartupFolderStatus,
-	EnvironmentalDocument,
-	SafetyAndHealthFolder,
-	SafetyAndHealthDocument,
-	StartupFolder as StartupFolderModel,
-} from "@prisma/client"
 
-export interface StartupFolder extends StartupFolderModel {
-	company: {
-		name: string
-		rut: string
-		image?: string
-		id: string
+interface DocumentCounts {
+	total: number
+	approved: number
+	rejected: number
+	submitted: number
+	draft: number
+}
+
+interface ProcessedFolder {
+	id: string
+	status: StartupFolderStatus
+	documentCounts: DocumentCounts
+	isCompleted: boolean
+	_count: {
+		documents: number
 	}
+	[key: string]: unknown
+}
+
+interface ProcessedWorkerFolder extends ProcessedFolder {
+	isDriver: boolean
+}
+
+export interface StartupFolder {
+	id: string
+	name: string
+	status: StartupFolderStatus
+	createdAt: Date
+	updatedAt: Date
 	type: StartupFolderType
-	reviewComments?: string | null
-	submittedBy?: {
+	moreMonthDuration: boolean
+	company: {
+		id: string
+		rut: string
 		name: string
-	} | null
-	basicFolder: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	safetyAndHealthFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	environmentalFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	environmentFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	techSpecsFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	workersFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	vehiclesFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
-	basicFolders: {
-		totalDocuments: number
-		approvedDocuments: number
-		rejectedDocuments: number
-		submittedDocuments: number
-		draftDocuments: number
-		isCompleted: boolean
-	}[]
+		image?: string
+	}
+	basicFolder: ProcessedFolder[]
+	safetyAndHealthFolders: ProcessedFolder[]
+	environmentalFolders: ProcessedFolder[]
+	environmentFolders: ProcessedFolder[]
+	techSpecsFolders: ProcessedFolder[]
+	workersFolders: ProcessedWorkerFolder[]
+	vehiclesFolders: ProcessedFolder[]
 }
 
 interface UseStartupFolderParams {
 	companyId?: string
-	folderId?: string
 }
 
 export const fetchStartupFolder: QueryFunction<
 	StartupFolder[],
-	readonly ["startupFolder", { companyId?: string; folderId?: string }]
+	readonly ["startupFolder", { companyId?: string }]
 > = async ({ queryKey }) => {
-	const [, { companyId, folderId }] = queryKey
+	const [, { companyId }] = queryKey
 
 	const searchParams = new URLSearchParams()
 	if (companyId) {
 		searchParams.set("companyId", companyId)
-	} else if (folderId) {
-		searchParams.set("folderId", folderId)
 	}
 
 	const res = await fetch(`/api/startup-folders?${searchParams.toString()}`)
@@ -123,29 +70,63 @@ export const fetchStartupFolder: QueryFunction<
 	return res.json()
 }
 
-export const useStartupFolder = ({ companyId, folderId }: UseStartupFolderParams) => {
-	const queryKey = ["startupFolder", { companyId, folderId }] as const
+export const useStartupFolder = ({ companyId }: UseStartupFolderParams) => {
+	const queryKey = ["startupFolder", { companyId }] as const
 
 	return useQuery({
 		queryKey,
 		queryFn: fetchStartupFolder,
-		enabled: !!companyId || !!folderId,
+		enabled: !!companyId,
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+		retry: 2,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
 	})
 }
 
-interface CompanyWithStartupFolders extends Company {
+interface ListFolder {
+	id: string
+	status: string
+	totalDocuments: number
+	approvedDocuments: number
+	rejectedDocuments: number
+	submittedDocuments: number
+	draftDocuments: number
+	isCompleted: boolean
+	[key: string]: unknown
+}
+
+interface ListWorkerFolder extends ListFolder {
+	isDriver: boolean
+	worker?: {
+		id: string
+		name: string
+		email: string
+		rut: string
+	}
+}
+
+interface CompanyWithStartupFolders {
+	id: string
+	name: string
+	rut: string
+	image?: string
+	isActive: boolean
+	createdAt: Date
+	updatedAt: Date
 	StartupFolders: {
 		id: string
 		name: string
 		createdAt: Date
 		type: StartupFolderType
 		status: StartupFolderStatus
-		workersFolders: WorkerFolder[] & { documents: WorkerDocument[] }
-		vehiclesFolders: VehicleFolder[] & { documents: VehicleDocument[] }
-		safetyAndHealthFolders: SafetyAndHealthFolder[] & { documents: SafetyAndHealthDocument[] }
-		environmentalFolders: EnvironmentalFolder[] & { documents: EnvironmentalDocument[] }
-		environmentFolders: EnvironmentFolder[] & { documents: EnvironmentDocument[] }
-		basicFolders: BasicFolder[] & { documents: BasicDocument[] }
+		workersFolders: ListWorkerFolder[]
+		vehiclesFolders: ListFolder[]
+		safetyAndHealthFolders: ListFolder[]
+		environmentalFolders: ListFolder[]
+		environmentFolders: ListFolder[]
+		basicFolders: ListFolder[]
+		techSpecsFolders: ListFolder[]
 	}[]
 }
 
@@ -205,5 +186,12 @@ export const useStartupFoldersList = ({
 	return useQuery({
 		queryKey,
 		queryFn: fetchStartupFoldersList,
+
+		staleTime: 2 * 60 * 1000,
+		gcTime: 5 * 60 * 1000,
+		retry: 2,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+
+		placeholderData: (previousData) => previousData,
 	})
 }

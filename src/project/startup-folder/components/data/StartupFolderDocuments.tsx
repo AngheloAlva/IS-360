@@ -64,7 +64,7 @@ interface StartupFolderDocumentsProps {
 	moreMonthDuration: boolean
 }
 
-export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
+export default function StartupFolderDocuments({
 	onBack,
 	userId,
 	category,
@@ -72,7 +72,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 	isOtcMember,
 	startupFolderId,
 	moreMonthDuration,
-}) => {
+}: StartupFolderDocumentsProps): React.ReactElement {
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
 		type:
 			| EnvironmentDocType
@@ -123,7 +123,7 @@ export const StartupFolderDocuments: React.FC<StartupFolderDocumentsProps> = ({
 				/>
 				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
-				{!isOtcMember && data?.folderStatus === "DRAFT" && documentsData.length > 0 && (
+				{!isOtcMember && data?.folderStatus === "DRAFT" && (
 					<Button
 						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
 						onClick={() => setShowSubmitDialog(true)}

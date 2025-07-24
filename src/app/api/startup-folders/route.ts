@@ -1,21 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
-import { BASIC_FOLDER_STRUCTURE } from "@/lib/consts/basic-startup-folders-structure"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import {
-	TECH_SPEC_STRUCTURE,
-	ENVIRONMENT_STRUCTURE,
-	ENVIRONMENTAL_STRUCTURE,
-	SAFETY_AND_HEALTH_STRUCTURE,
-	EXTENDED_ENVIRONMENT_STRUCTURE,
-} from "@/lib/consts/startup-folders-structure"
-import {
-	BASE_WORKER_STRUCTURE,
-	DRIVER_WORKER_STRUCTURE,
-} from "@/lib/consts/worker-folder-structure"
-import { VEHICLE_STRUCTURE } from "@/lib/consts/vehicle-folder-structure"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth.api.getSession({
@@ -29,69 +16,92 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	try {
 		const searchParams = req.nextUrl.searchParams
 		const companyId = searchParams.get("companyId")
-		const folderId = searchParams.get("folderId")
 
-		if (!companyId && !folderId) {
+		if (!companyId) {
 			return new NextResponse("Either company ID or folder ID is required", { status: 400 })
 		}
 
-		const where: {
-			companyId?: string
-			id?: string
-		} = {}
-		if (companyId) where.companyId = companyId
-		if (folderId) where.id = folderId
-
 		const startupFolders = await prisma.startupFolder.findMany({
-			where,
-			include: {
+			where: {
+				companyId,
+			},
+			select: {
+				id: true,
+				name: true,
+				type: true,
+				status: true,
+				createdAt: true,
+				updatedAt: true,
+				moreMonthDuration: true,
 				company: {
 					select: {
-						name: true,
+						id: true,
 						rut: true,
+						name: true,
+						image: true,
 					},
 				},
 				basicFolders: {
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						createdAt: true,
+						updatedAt: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
 				},
 				safetyAndHealthFolders: {
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						createdAt: true,
+						updatedAt: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
 				},
 				environmentalFolders: {
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						createdAt: true,
+						updatedAt: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
 				},
 				environmentFolders: {
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						createdAt: true,
+						updatedAt: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
 				},
 				techSpecsFolders: {
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						createdAt: true,
+						updatedAt: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
@@ -102,10 +112,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							isActive: true,
 						},
 					},
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						isDriver: true,
+						createdAt: true,
+						updatedAt: true,
+						workerId: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
@@ -116,10 +132,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							isActive: true,
 						},
 					},
-					include: {
-						documents: {
+					select: {
+						id: true,
+						status: true,
+						createdAt: true,
+						updatedAt: true,
+						vehicleId: true,
+						_count: {
 							select: {
-								status: true,
+								documents: true,
 							},
 						},
 					},
@@ -130,103 +151,233 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			},
 		})
 
-		if (!startupFolders) {
+		if (!startupFolders || startupFolders.length === 0) {
 			return new NextResponse("General startup folder not found", { status: 404 })
 		}
-		const processedFolders = startupFolders.map((folder) => ({
-			...folder,
-			basicFolder: folder.basicFolders.map((basic) => ({
-				...basic,
-				totalDocuments: BASIC_FOLDER_STRUCTURE.documents.length,
-				approvedDocuments: basic.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: basic.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: basic.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: basic.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					basic.documents.length === BASIC_FOLDER_STRUCTURE.documents.length &&
-					basic.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-			safetyAndHealthFolders: folder.safetyAndHealthFolders.map((shf) => ({
-				...shf,
-				totalDocuments: SAFETY_AND_HEALTH_STRUCTURE.documents.length,
-				approvedDocuments: shf.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: shf.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: shf.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: shf.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					shf.documents.length === SAFETY_AND_HEALTH_STRUCTURE.documents.length &&
-					shf.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-			environmentalFolders: folder.environmentalFolders.map((ef) => ({
-				...ef,
-				totalDocuments: ENVIRONMENTAL_STRUCTURE.documents.length,
-				approvedDocuments: ef.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: ef.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: ef.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: ef.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					ef.documents.length === ENVIRONMENTAL_STRUCTURE.documents.length &&
-					ef.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-			environmentFolders: folder.environmentFolders.map((ef) => ({
-				...ef,
-				totalDocuments: folder.moreMonthDuration
-					? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
-					: ENVIRONMENT_STRUCTURE.documents.length,
-				approvedDocuments: ef.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: ef.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: ef.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: ef.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					ef.documents.length === ENVIRONMENTAL_STRUCTURE.documents.length &&
-					ef.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-			techSpecsFolders: folder.techSpecsFolders.map((tsf) => ({
-				...tsf,
-				totalDocuments: TECH_SPEC_STRUCTURE.documents.length,
-				approvedDocuments: tsf.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: tsf.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: tsf.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: tsf.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					tsf.documents.length === TECH_SPEC_STRUCTURE.documents.length &&
-					tsf.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-			workersFolders: folder.workersFolders.map((wf) => ({
-				...wf,
-				totalDocuments: wf.isDriver
-					? DRIVER_WORKER_STRUCTURE.documents.length
-					: BASE_WORKER_STRUCTURE.documents.length,
-				approvedDocuments: wf.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: wf.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: wf.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: wf.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					wf.documents.length >=
-						(wf.isDriver
-							? DRIVER_WORKER_STRUCTURE.documents.length
-							: BASE_WORKER_STRUCTURE.documents.length) &&
-					wf.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-			vehiclesFolders: folder.vehiclesFolders.map((vf) => ({
-				...vf,
-				totalDocuments: VEHICLE_STRUCTURE.documents.length,
-				approvedDocuments: vf.documents.filter((doc) => doc.status === "APPROVED").length,
-				rejectedDocuments: vf.documents.filter((doc) => doc.status === "REJECTED").length,
-				submittedDocuments: vf.documents.filter((doc) => doc.status === "SUBMITTED").length,
-				draftDocuments: vf.documents.filter((doc) => doc.status === "DRAFT").length,
-				documents: undefined,
-				isCompleted:
-					vf.documents.length >= VEHICLE_STRUCTURE.documents.length &&
-					vf.documents?.every((doc) => doc.status === "APPROVED"),
-			})),
-		}))
+
+		// Función para obtener estadísticas de documentos por carpeta específica
+		const getDocumentStatsByFolder = async (folderId: string, documentType: string) => {
+			let stats: { status: string; _count: { id: number } }[] = []
+
+			switch (documentType) {
+				case "basic":
+					stats = await prisma.basicDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+				case "safety":
+					stats = await prisma.safetyAndHealthDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+				case "environmental":
+					stats = await prisma.environmentalDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+				case "environment":
+					stats = await prisma.environmentDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+				case "techSpecs":
+					stats = await prisma.techSpecsDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+				case "worker":
+					stats = await prisma.workerDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+				case "vehicle":
+					stats = await prisma.vehicleDocument.groupBy({
+						by: ["status"],
+						where: {
+							folderId: folderId,
+						},
+						_count: { id: true },
+					})
+					break
+			}
+
+			return stats
+		}
+
+		const getStatusCount = (
+			stats: { status: string; _count: { id: number } }[],
+			status: string
+		) => {
+			return stats.find((s) => s.status === status)?._count?.id || 0
+		}
+
+		const isFolderCompleted = (
+			folderStatus: string,
+			documentCount: number,
+			expectedCount: number
+		) => {
+			if (folderStatus === "APPROVED") return true
+			if (folderStatus === "DRAFT" || folderStatus === "SUBMITTED" || folderStatus === "REJECTED")
+				return false
+
+			return documentCount >= expectedCount
+		}
+
+		const processedFolders = await Promise.all(
+			startupFolders.map(async (folder) => {
+				const processFolderWithStats = async (
+					folders: {
+						id: string
+						_count: { documents: number }
+						status: string
+						[key: string]: unknown
+					}[],
+					documentType: string
+				) => {
+					return await Promise.all(
+						folders.map(async (subFolder) => {
+							const totalDocuments = subFolder._count.documents
+							const docStats = await getDocumentStatsByFolder(subFolder.id, documentType)
+
+							const approvedDocuments = getStatusCount(docStats, "APPROVED")
+							const rejectedDocuments = getStatusCount(docStats, "REJECTED")
+							const submittedDocuments = getStatusCount(docStats, "SUBMITTED")
+							const draftDocuments = getStatusCount(docStats, "DRAFT")
+
+							const isCompleted = isFolderCompleted(
+								subFolder.status,
+								approvedDocuments,
+								totalDocuments
+							)
+
+							return {
+								...subFolder,
+								documentCounts: {
+									total: totalDocuments,
+									approved: approvedDocuments,
+									rejected: rejectedDocuments,
+									submitted: submittedDocuments,
+									draft: draftDocuments,
+								},
+								isCompleted,
+							}
+						})
+					)
+				}
+
+				const processedBasicFolders = await processFolderWithStats(folder.basicFolders, "basic")
+				const processedSafetyAndHealthFolders = await processFolderWithStats(
+					folder.safetyAndHealthFolders,
+					"safety"
+				)
+				const processedEnvironmentalFolders = await processFolderWithStats(
+					folder.environmentalFolders,
+					"environmental"
+				)
+				const processedEnvironmentFolders = await processFolderWithStats(
+					folder.environmentFolders,
+					"environment"
+				)
+				const processedTechSpecsFolders = await processFolderWithStats(
+					folder.techSpecsFolders,
+					"techSpecs"
+				)
+
+				const processedWorkersFolders = await Promise.all(
+					folder.workersFolders.map(async (workerFolder) => {
+						const totalDocuments = workerFolder._count.documents
+						const workerDocStats = await getDocumentStatsByFolder(workerFolder.id, "worker")
+
+						const approvedDocuments = getStatusCount(workerDocStats, "APPROVED")
+						const rejectedDocuments = getStatusCount(workerDocStats, "REJECTED")
+						const submittedDocuments = getStatusCount(workerDocStats, "SUBMITTED")
+						const draftDocuments = getStatusCount(workerDocStats, "DRAFT")
+						const isCompleted = isFolderCompleted(
+							workerFolder.status,
+							approvedDocuments,
+							totalDocuments
+						)
+
+						return {
+							...workerFolder,
+							isDriver: workerFolder.isDriver,
+							documentCounts: {
+								total: totalDocuments,
+								approved: approvedDocuments,
+								rejected: rejectedDocuments,
+								submitted: submittedDocuments,
+								draft: draftDocuments,
+							},
+							isCompleted,
+						}
+					})
+				)
+
+				const processedVehiclesFolders = await Promise.all(
+					folder.vehiclesFolders.map(async (vehicleFolder) => {
+						const totalDocuments = vehicleFolder._count.documents
+						const vehicleDocStats = await getDocumentStatsByFolder(vehicleFolder.id, "vehicle")
+
+						const approvedDocuments = getStatusCount(vehicleDocStats, "APPROVED")
+						const rejectedDocuments = getStatusCount(vehicleDocStats, "REJECTED")
+						const submittedDocuments = getStatusCount(vehicleDocStats, "SUBMITTED")
+						const draftDocuments = getStatusCount(vehicleDocStats, "DRAFT")
+						const isCompleted = isFolderCompleted(
+							vehicleFolder.status,
+							approvedDocuments,
+							totalDocuments
+						)
+
+						return {
+							...vehicleFolder,
+							documentCounts: {
+								total: totalDocuments,
+								approved: approvedDocuments,
+								rejected: rejectedDocuments,
+								submitted: submittedDocuments,
+								draft: draftDocuments,
+							},
+							isCompleted,
+						}
+					})
+				)
+
+				return {
+					...folder,
+					basicFolder: processedBasicFolders,
+					safetyAndHealthFolders: processedSafetyAndHealthFolders,
+					environmentalFolders: processedEnvironmentalFolders,
+					environmentFolders: processedEnvironmentFolders,
+					techSpecsFolders: processedTechSpecsFolders,
+					workersFolders: processedWorkersFolders,
+					vehiclesFolders: processedVehiclesFolders,
+				}
+			})
+		)
 
 		return NextResponse.json(processedFolders)
 	} catch (error) {

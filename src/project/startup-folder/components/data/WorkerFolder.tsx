@@ -31,13 +31,13 @@ interface WorkerFolderProps {
 	startupFolderId: string
 }
 
-export const WorkerFolder: React.FC<WorkerFolderProps> = ({
+export default function WorkerFolder({
 	onBack,
 	userId,
 	companyId,
 	isOtcMember,
 	startupFolderId,
-}) => {
+}: WorkerFolderProps) {
 	const [selectedEntity, setSelectedEntity] = useState<{
 		id: string
 		name: string

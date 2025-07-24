@@ -34,5 +34,12 @@ export const useStartupFolderDocuments = ({
 		queryKey,
 		queryFn: fetchStartupFolderDocuments,
 		enabled: !!category && (!!startupFolderId || !!workerId || !!vehicleId),
+
+		staleTime: 2 * 60 * 1000,
+		gcTime: 5 * 60 * 1000,
+		retry: 2,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+
+		placeholderData: (previousData) => previousData,
 	})
 }

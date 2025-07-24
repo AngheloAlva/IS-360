@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 
-import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export async function GET(): Promise<NextResponse> {
 	const session = await auth.api.getSession({
@@ -16,21 +16,22 @@ export async function GET(): Promise<NextResponse> {
 	try {
 		const [totalFolders, totalFoldersToReview, totalFoldersActive, totalCompaniesApproved] =
 			await Promise.all([
-				prisma.startupFolder.count(),
+				prisma.startupFolder.count({
+					cacheStrategy: { ttl: 60 },
+				}),
 				prisma.startupFolder.count({
 					where: {
 						OR: [
-							{ basicFolders: { some: { documents: { some: { status: "SUBMITTED" } } } } },
-							{ workersFolders: { some: { documents: { some: { status: "SUBMITTED" } } } } },
-							{ vehiclesFolders: { some: { documents: { some: { status: "SUBMITTED" } } } } },
-							{ environmentalFolders: { some: { documents: { some: { status: "SUBMITTED" } } } } },
-							{ environmentFolders: { some: { documents: { some: { status: "SUBMITTED" } } } } },
-							{ techSpecsFolders: { some: { documents: { some: { status: "SUBMITTED" } } } } },
-							{
-								safetyAndHealthFolders: { some: { documents: { some: { status: "SUBMITTED" } } } },
-							},
+							{ basicFolders: { some: { status: "SUBMITTED" } } },
+							{ workersFolders: { some: { status: "SUBMITTED" } } },
+							{ vehiclesFolders: { some: { status: "SUBMITTED" } } },
+							{ environmentalFolders: { some: { status: "SUBMITTED" } } },
+							{ environmentFolders: { some: { status: "SUBMITTED" } } },
+							{ techSpecsFolders: { some: { status: "SUBMITTED" } } },
+							{ safetyAndHealthFolders: { some: { status: "SUBMITTED" } } },
 						],
 					},
+					cacheStrategy: { ttl: 60 },
 				}),
 				prisma.startupFolder.count({
 					where: {
@@ -42,6 +43,7 @@ export async function GET(): Promise<NextResponse> {
 							},
 						},
 					},
+					cacheStrategy: { ttl: 60 },
 				}),
 				prisma.company.count({
 					where: {
@@ -59,6 +61,7 @@ export async function GET(): Promise<NextResponse> {
 							},
 						},
 					},
+					cacheStrategy: { ttl: 300 },
 				}),
 			])
 
@@ -74,30 +77,37 @@ export async function GET(): Promise<NextResponse> {
 			prisma.safetyAndHealthDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 			prisma.environmentalDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 			prisma.workerDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 			prisma.vehicleDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 			prisma.environmentDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 			prisma.techSpecsDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 			prisma.basicDocument.groupBy({
 				by: ["status"],
 				_count: { id: true },
+				cacheStrategy: { ttl: 180 },
 			}),
 		])
 
@@ -123,7 +133,6 @@ export async function GET(): Promise<NextResponse> {
 			}
 		})
 
-		// Datos para el gráfico de barras apiladas
 		const documentsByFolder = [
 			{
 				name: "Seguridad y Salud",
@@ -177,12 +186,11 @@ export async function GET(): Promise<NextResponse> {
 		]
 
 		return NextResponse.json({
-			// Estadísticas básicas
 			totalFolders,
 			totalFoldersActive,
 			totalFoldersToReview,
 			totalCompaniesApproved,
-			// Datos para gráficas
+
 			charts: {
 				documentsByStatus,
 				documentsByFolder,
