@@ -54,6 +54,16 @@ export default async function WorkPermitsAdminPage() {
 									description: "Tutorial de como crear un permiso de trabajo.",
 									url: "https://youtube.com/embed/0RcHtcDqRKk",
 								},
+								{
+									title: "Revisión Permiso de Trabajo",
+									description: "Muestra de un permiso de trabajo con todas sus funcionalidades.",
+									url: "https://youtube.com/embed/cXXmaIlkKxk",
+								},
+								{
+									title: "Funcionalidades Permiso de Trabajo",
+									description: "Muestra todas las funcionalidades de los permisos de trabajo.",
+									url: "https://youtube.com/embed/bIflB6OZ-70",
+								},
 							]}
 						/>
 

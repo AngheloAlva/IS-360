@@ -65,6 +65,21 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 									description: "Tutorial de como cerrar hitos de una orden de trabajo.",
 									url: "https://youtube.com/embed/cTT1T9zIl7Q",
 								},
+								{
+									title: "Funcionalidades OT",
+									description: "Muestra todas las funcionalidades de las ordenes de trabajo.",
+									url: "https://youtube.com/embed/guIR3J8qyT8",
+								},
+								{
+									title: "Funcionalidades Libro de Obras",
+									description: "Muestra todas las funcionalidades de los libros de obras.",
+									url: "https://youtube.com/embed/vJTegLRfjDY",
+								},
+								{
+									title: "Edicion OT",
+									description: "Tutorial de como editar una orden de trabajo.",
+									url: "https://youtube.com/embed/7tkrv7JHOKs",
+								},
 							]}
 						/>
 

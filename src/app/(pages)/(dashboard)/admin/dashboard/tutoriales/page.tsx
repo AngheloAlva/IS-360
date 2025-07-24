@@ -62,6 +62,27 @@ const adminTutorialModules: ModuleVideos[] = [
 		],
 	},
 	{
+		moduleName: "Carpetas de Arranque",
+		videos: [
+			{
+				title: "Carpeta de Arranque Basica",
+				description: "Tutorial de como revisar la documentación basica de la empresa contratista.",
+				url: "https://youtube.com/embed/GrsgcxZuqUc",
+			},
+			{
+				title: "Carpeta de Arranque Full",
+				description:
+					"Tutorial de como revisar la documentación completa de la empresa contratista.",
+				url: "https://youtube.com/embed/qUXU_MNd2Q0",
+			},
+			{
+				title: "Funcionalidad Carpetas de Arranque",
+				description: "Tutorial de las funcionalidades de las carpetas de arranque.",
+				url: "https://youtube.com/embed/bSlof1Rs5vI",
+			},
+		],
+	},
+	{
 		moduleName: "Ordenes de Trabajo",
 		videos: [
 			{
@@ -79,6 +100,21 @@ const adminTutorialModules: ModuleVideos[] = [
 				description: "Tutorial de como cerrar hitos de una orden de trabajo.",
 				url: "https://youtube.com/embed/cTT1T9zIl7Q",
 			},
+			{
+				title: "Funcionalidades OT",
+				description: "Muestra todas las funcionalidades de las ordenes de trabajo.",
+				url: "https://youtube.com/embed/guIR3J8qyT8",
+			},
+			{
+				title: "Funcionalidades Libro de Obras",
+				description: "Muestra todas las funcionalidades de los libros de obras.",
+				url: "https://youtube.com/embed/vJTegLRfjDY",
+			},
+			{
+				title: "Edicion OT",
+				description: "Tutorial de como editar una orden de trabajo.",
+				url: "https://youtube.com/embed/7tkrv7JHOKs",
+			},
 		],
 	},
 	{
@@ -94,6 +130,11 @@ const adminTutorialModules: ModuleVideos[] = [
 				description: "Tutorial de como crear tareas para un plan de mantenimiento.",
 				url: "https://youtube.com/embed/uvrnlMjWJqU",
 			},
+			{
+				title: "Edicion de Tareas",
+				description: "Tutorial de como editar tareas de un plan de mantenimiento.",
+				url: "https://youtube.com/embed/DRbyHJyOgdk",
+			},
 		],
 	},
 	{
@@ -103,6 +144,16 @@ const adminTutorialModules: ModuleVideos[] = [
 				title: "Creacion de Permiso de Trabajo",
 				description: "Tutorial de como crear un permiso de trabajo.",
 				url: "https://youtube.com/embed/0RcHtcDqRKk",
+			},
+			{
+				title: "Revisión Permiso de Trabajo",
+				description: "Muestra de un permiso de trabajo con todas sus funcionalidades.",
+				url: "https://youtube.com/embed/cXXmaIlkKxk",
+			},
+			{
+				title: "Funcionalidades Permiso de Trabajo",
+				description: "Muestra todas las funcionalidades de los permisos de trabajo.",
+				url: "https://youtube.com/embed/bIflB6OZ-70",
 			},
 		],
 	},
@@ -122,7 +173,12 @@ const adminTutorialModules: ModuleVideos[] = [
 			{
 				title: "Creacion de Empresas",
 				description: "Tutorial de como crear una empresa.",
-				url: "https://youtube.com/embed/zA0xehVOB0s",
+				url: "https://youtube.com/embed/QJvsj75LouU",
+			},
+			{
+				title: "Funcionalidad Empresas",
+				description: "Tutorial de como utilizar todas las funcionalidades de las empresas.",
+				url: "https://youtube.com/embed/QJvsj75LouU",
 			},
 		],
 	},

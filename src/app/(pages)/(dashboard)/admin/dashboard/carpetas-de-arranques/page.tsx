@@ -1,6 +1,7 @@
 import { StartupFolderStatsContainer } from "@/project/startup-folder/components/stats/StartupFolderStatsContainer"
 import { AdminStartupFoldersList } from "@/project/startup-folder/components/data/AdminStartupFoldersList"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default function AdminStartupFoldersPage() {
 	return (
@@ -15,6 +16,16 @@ export default function AdminStartupFoldersPage() {
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Funcionalidad Carpetas de Arranque",
+									description: "Tutorial de las funcionalidades de las carpetas de arranque.",
+									url: "https://youtube.com/embed/bSlof1Rs5vI",
+								},
+							]}
+						/>
+
 						<ScrollToTableButton
 							label="Lista Carpetas"
 							id="startup-folders-list"

@@ -42,6 +42,12 @@ export default async function AdminCompaniesPage(): Promise<React.ReactElement> 
 									description: "Tutorial de como crear una empresa.",
 									url: "https://youtube.com/embed/zA0xehVOB0s",
 								},
+								{
+									title: "Funcionalidad Empresas",
+									description:
+										"Tutorial de como utilizar todas las funcionalidades de las empresas.",
+									url: "https://youtube.com/embed/QJvsj75LouU",
+								},
 							]}
 						/>
 

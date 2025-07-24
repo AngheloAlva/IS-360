@@ -48,6 +48,11 @@ export default async function MaintenancePlansPage() {
 									description: "Tutorial de como crear tareas para un plan de mantenimiento.",
 									url: "https://youtube.com/embed/uvrnlMjWJqU",
 								},
+								{
+									title: "Edicion de Tareas",
+									description: "Tutorial de como editar tareas de un plan de mantenimiento.",
+									url: "https://youtube.com/embed/DRbyHJyOgdk",
+								},
 							]}
 						/>
 
