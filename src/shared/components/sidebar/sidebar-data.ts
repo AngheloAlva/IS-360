@@ -1,10 +1,13 @@
 import {
 	CarIcon,
 	HomeIcon,
+	BellIcon,
+	BoxIcon,
 	UsersIcon,
 	WrenchIcon,
 	FoldersIcon,
 	UserPenIcon,
+	BookOpenIcon,
 	FileTextIcon,
 	LifeBuoyIcon,
 	SettingsIcon,
@@ -18,8 +21,6 @@ import {
 	ChartColumnIcon,
 	LockKeyholeIcon,
 	ShieldPlusIcon,
-	BellIcon,
-	BookOpenIcon,
 } from "lucide-react"
 
 export const data = {
@@ -105,6 +106,11 @@ export const data = {
 			name: "Solicitudes de Trabajo",
 			url: "/admin/dashboard/solicitudes-de-trabajo",
 			icon: FilePlus2Icon,
+		},
+		{
+			name: "Herramientas (test)",
+			url: "/admin/dashboard/herramientas",
+			icon: BoxIcon,
 		},
 		{
 			name: "Reportabilidad",
