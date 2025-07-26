@@ -34,7 +34,24 @@ export const createOtcInspections = async ({
 	}
 
 	try {
-		const { workOrderId, milestoneId, inspectionName, ...rest } = values
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { workOrderId, milestoneId, inspectionName, inspections, files, ...rest } = values
+
+		const inspectionData: {
+			nonConformities?: string
+			safetyObservations?: string
+			supervisionComments?: string
+		} = {}
+
+		inspections.forEach((inspection) => {
+			if (inspection.type === "NO_CONFORMITY") {
+				inspectionData.nonConformities = inspection.inspection
+			} else if (inspection.type === "SAFETY_OBSERVATION") {
+				inspectionData.safetyObservations = inspection.inspection
+			} else if (inspection.type === "SUPERVISED_COMMENT") {
+				inspectionData.supervisionComments = inspection.inspection
+			}
+		})
 
 		return await prisma.$transaction(async (tx) => {
 			const newWorkEntry = await tx.workEntry.create({
@@ -50,6 +67,9 @@ export const createOtcInspections = async ({
 							})),
 						},
 					}),
+					nonConformities: inspectionData.nonConformities,
+					safetyObservations: inspectionData.safetyObservations,
+					supervisionComments: inspectionData.supervisionComments,
 					createdById: userId,
 					activityName: inspectionName,
 					workOrderId: workOrderId,

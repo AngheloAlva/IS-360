@@ -114,7 +114,7 @@ export default function WorkBookMain({
 				</div>
 
 				<div className="flex w-full flex-col items-end gap-2 md:w-64">
-					<Badge className="border-white bg-white/10 text-white">
+					<Badge className="bg-white font-semibold text-orange-500">
 						{WorkOrderStatusLabels[workBook.status as keyof typeof WorkOrderStatusLabels]}
 					</Badge>
 
@@ -163,7 +163,7 @@ export default function WorkBookMain({
 					</TabsContent>
 
 					<TabsContent value="activities">
-						<Card>
+						<Card className="gap-4">
 							<CardHeader className="flex w-full flex-row items-center justify-between gap-2">
 								<h2 className="text-text flex items-center gap-2 text-2xl font-bold">
 									<div className="size-10 rounded-md bg-red-500/10 p-1.5">
@@ -220,7 +220,12 @@ export default function WorkBookMain({
 							</CardHeader>
 
 							<CardContent>
-								<WorkBookEntriesTable workOrderId={workBook.id} />
+								<WorkBookEntriesTable
+									userId={userId}
+									workOrderId={workBook.id}
+									hasPermission={hasPermission}
+									workOrderNumber={workBook.otNumber}
+								/>
 							</CardContent>
 						</Card>
 					</TabsContent>

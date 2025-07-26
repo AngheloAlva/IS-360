@@ -60,14 +60,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					createdAt: true,
 					entryType: true,
 					attachments: true,
-					// OTC Inspection fields
 					supervisionComments: true,
 					safetyObservations: true,
 					nonConformities: true,
 					inspectorName: true,
 					recommendations: true,
 					others: true,
-					// Status fields
+					inspectionStatus: true,
 					noteStatus: true,
 					approvalDate: true,
 					createdBy: {

@@ -4,8 +4,12 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
+import UpdateInspectionStatusDialog from "@/project/work-order/components/forms/UpdateInspectionStatusDialog"
 import { WorkEntry } from "@/project/work-order/hooks/use-work-entries"
+import { useQueryClient } from "@tanstack/react-query"
+import { Badge } from "@/shared/components/ui/badge"
 import { ExternalLink, X } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { Skeleton } from "@/shared/components/ui/skeleton"
@@ -19,12 +23,26 @@ import {
 } from "@/shared/components/ui/drawer"
 
 interface WorkBookEntryDetailsProps {
-	entry: WorkEntry | null
 	isLoading: boolean
 	onClose: () => void
+	hasPermission: boolean
+	entry: WorkEntry | null
+	userId?: string
 }
 
-export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntryDetailsProps) {
+export function WorkBookEntryDetails({
+	entry,
+	userId,
+	onClose,
+	isLoading,
+	hasPermission,
+}: WorkBookEntryDetailsProps) {
+	const queryClient = useQueryClient()
+
+	const handleStatusUpdate = () => {
+		// Invalidar las queries para refrescar los datos
+		queryClient.invalidateQueries({ queryKey: ["work-entries"] })
+	}
 	if (!entry && !isLoading) return null
 
 	return (
@@ -36,7 +54,7 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 			<DrawerContent>
 				<DrawerHeader className="border-border/50 border-b px-4 py-2">
 					<div className="flex items-center justify-between">
-						<DrawerTitle>{isLoading ? "Cargando..." : "Detalles de la Entrada"}</DrawerTitle>
+						<DrawerTitle>{isLoading ? "Cargando..." : "Detalles del Registro"}</DrawerTitle>
 						<DrawerClose asChild>
 							<Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
 								<X className="h-4 w-4" />
@@ -56,7 +74,7 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 							<Skeleton className="h-20 w-full" />
 						</div>
 					) : entry ? (
-						<div className="space-y-6">
+						<div className="space-y-5">
 							<div>
 								<h3 className="text-2xl font-semibold">{entry.activityName}</h3>
 								<p className="text-muted-foreground text-sm">
@@ -65,9 +83,33 @@ export function WorkBookEntryDetails({ entry, isLoading, onClose }: WorkBookEntr
 								</p>
 							</div>
 
+							{entry.entryType === "OTC_INSPECTION" && (
+								<div className="flex items-center justify-between">
+									<Badge
+										className={cn(
+											"text-sm",
+											entry.inspectionStatus === "RESOLVED"
+												? "border-green-500 bg-green-500/20 text-green-500"
+												: "border-orange-500 bg-orange-500/20 text-orange-500"
+										)}
+										variant="outline"
+									>
+										{entry.inspectionStatus === "RESOLVED" ? "Resuelta" : "Reportada"}
+									</Badge>
+									{userId && entry.inspectionStatus && hasPermission && (
+										<UpdateInspectionStatusDialog
+											userId={userId}
+											workEntryId={entry.id}
+											currentStatus={entry.inspectionStatus}
+											onStatusUpdate={handleStatusUpdate}
+										/>
+									)}
+								</div>
+							)}
+
 							<div className="space-y-2">
 								<h4 className="font-semibold">Detalles de la Actividad</h4>
-								<div className="grid grid-cols-2 gap-4">
+								<div className="grid grid-cols-2 gap-2">
 									<div>
 										<p className="text-muted-foreground text-sm">Fecha de ejecución</p>
 										<p>{format(entry.executionDate, "dd MMM yyyy", { locale: es })}</p>

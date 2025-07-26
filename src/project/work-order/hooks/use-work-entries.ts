@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 
-import type { ENTRY_TYPE } from "@prisma/client"
+import type { ENTRY_TYPE, INSPECTION_STATUS } from "@prisma/client"
 
 export interface WorkEntry {
 	id: string
@@ -16,6 +16,7 @@ export interface WorkEntry {
 	recommendations: string
 	executionDate: Date
 	entryType: ENTRY_TYPE
+	inspectionStatus?: INSPECTION_STATUS
 	others: string
 	createdBy: {
 		name: string

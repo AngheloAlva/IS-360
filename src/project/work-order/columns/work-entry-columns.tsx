@@ -1,3 +1,4 @@
+import { CalendarIcon, KanbanSquareIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -8,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkEntry } from "@/project/work-order/hooks/use-work-entries"
-import type { ENTRY_TYPE } from "@prisma/client"
+import type { ENTRY_TYPE, INSPECTION_STATUS } from "@prisma/client"
 
 export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 	{
@@ -35,7 +36,12 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		cell: ({ row }) => {
 			const milestone = row.original.milestone?.name
 
-			return <span>{milestone}</span>
+			return (
+				<span className="flex items-center gap-1.5">
+					<KanbanSquareIcon className="text-muted-foreground size-3.5" />
+					{milestone}
+				</span>
+			)
 		},
 	},
 	{
@@ -73,20 +79,52 @@ export const WorkEntryColumns: ColumnDef<WorkEntry>[] = [
 		header: "Fecha de ejecución",
 		cell: ({ row }) => {
 			const date = row.getValue("executionDate") as Date
-			return format(date, "PP", { locale: es })
+			return (
+				<span className="flex items-center gap-1.5">
+					<CalendarIcon className="text-muted-foreground size-3.5" />
+					{format(date, "PP", { locale: es })}
+				</span>
+			)
 		},
-	},
-	{
-		accessorKey: "activityStartTime",
-		header: "Hora de inicio",
-	},
-	{
-		accessorKey: "activityEndTime",
-		header: "Hora de fin",
 	},
 	{
 		id: "createdBy",
 		header: "Creado por",
-		accessorFn: (row) => row.createdBy.name,
+		cell: ({ row }) => {
+			const name = row.original.createdBy.name
+
+			return (
+				<span className="flex items-center gap-1.5">
+					<UserIcon className="text-muted-foreground size-3.5" />
+					{name}
+				</span>
+			)
+		},
+	},
+	{
+		accessorKey: "inspectionStatus",
+		header: "Estado de Inspección",
+		cell: ({ row }) => {
+			const entryType = row.getValue("entryType") as ENTRY_TYPE
+			const inspectionStatus = row.original.inspectionStatus as INSPECTION_STATUS
+
+			if (entryType !== "OTC_INSPECTION") {
+				return <span className="text-gray-400">-</span>
+			}
+
+			return (
+				<Badge
+					className={cn(
+						"text-xs",
+						inspectionStatus === "RESOLVED"
+							? "border-green-500 bg-green-500/10 text-green-500"
+							: "border-orange-500 bg-orange-500/10 text-orange-500"
+					)}
+					variant="outline"
+				>
+					{inspectionStatus === "RESOLVED" ? "Resuelta" : "Reportada"}
+				</Badge>
+			)
+		},
 	},
 ]

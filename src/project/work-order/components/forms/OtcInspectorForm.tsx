@@ -1,12 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { PlusIcon } from "lucide-react"
+import { useFieldArray, useForm } from "react-hook-form"
+import { MinusCircleIcon, PlusCircleIcon, PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { createOtcInspections } from "@/project/work-order/actions/createOtcInspections"
+import { InspectionTypeOptions, InspectionType } from "../../const/inspection-type"
 import { useWorkBookMilestones } from "../../hooks/use-work-book-milestones"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
@@ -24,6 +25,7 @@ import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
 import FileTable from "@/shared/components/forms/FileTable"
 import { Skeleton } from "@/shared/components/ui/skeleton"
+import { Button } from "@/shared/components/ui/button"
 import { Form } from "@/shared/components/ui/form"
 import {
 	Sheet,
@@ -33,6 +35,8 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
+
+type InspectionTypeValue = (typeof InspectionType)[number]
 
 export default function OtcInspectorForm({
 	userId,
@@ -49,7 +53,6 @@ export default function OtcInspectorForm({
 		defaultValues: {
 			workOrderId,
 			inspectionName: "",
-			nonConformities: "",
 			activityEndTime: new Date().toLocaleTimeString("en-US", {
 				hour12: false,
 				hour: "2-digit",
@@ -60,16 +63,25 @@ export default function OtcInspectorForm({
 				hour: "2-digit",
 				minute: "2-digit",
 			}),
-			safetyObservations: "",
 			milestoneId: undefined,
-			supervisionComments: "",
 			executionDate: new Date(),
+			inspections: [
+				{
+					inspection: "",
+					type: "NO_CONFORMITY",
+				},
+			],
 		},
 	})
 
 	const { data: milestones, isLoading: isLoadingMilestones } = useWorkBookMilestones({
 		workOrderId,
 		showAll: false,
+	})
+
+	const { fields, append, remove } = useFieldArray({
+		control: form.control,
+		name: "inspections",
 	})
 
 	async function onSubmit(values: OtcInspectionSchema) {
@@ -139,7 +151,7 @@ export default function OtcInspectorForm({
 				<span className="hidden sm:inline">Inspección OTC</span>
 			</SheetTrigger>
 
-			<SheetContent className="gap-0 sm:max-w-xl">
+			<SheetContent className="gap-0 sm:max-w-fit">
 				<SheetHeader className="shadow">
 					<SheetTitle>Inspección OTC</SheetTitle>
 					<SheetDescription>
@@ -165,7 +177,7 @@ export default function OtcInspectorForm({
 							label="Fecha de Ejecución"
 						/>
 
-						<div className="grid gap-3 md:grid-cols-2">
+						<div className="grid gap-3 overflow-hidden md:grid-cols-2">
 							<TimePickerFormField<OtcInspectionSchema>
 								name="activityStartTime"
 								control={form.control}
@@ -173,9 +185,9 @@ export default function OtcInspectorForm({
 							/>
 
 							<TimePickerFormField<OtcInspectionSchema>
+								label="Hora de Fin"
 								name="activityEndTime"
 								control={form.control}
-								label="Hora de Fin"
 							/>
 						</div>
 
@@ -199,26 +211,72 @@ export default function OtcInspectorForm({
 							/>
 						)}
 
-						<TextAreaFormField<OtcInspectionSchema>
-							name="nonConformities"
-							control={form.control}
-							label="No Conformidades"
-							itemClassName="sm:col-span-2"
-						/>
+						<Separator className="sm:col-span-2" />
 
-						<TextAreaFormField<OtcInspectionSchema>
-							control={form.control}
-							name="supervisionComments"
-							itemClassName="sm:col-span-2"
-							label="Comentarios de Supervisión"
-						/>
+						<div className="flex items-center justify-between gap-4 sm:col-span-2">
+							<div>
+								<h2 className="text-lg font-bold">Inspecciones</h2>
+								<p className="text-muted-foreground text-sm">
+									Selecciona el tipo de inspección y proporciona una observación.
+								</p>
+							</div>
 
-						<TextAreaFormField<OtcInspectionSchema>
-							control={form.control}
-							name="safetyObservations"
-							itemClassName="sm:col-span-2"
-							label="Observaciones de Seguridad"
-						/>
+							{fields.length < 3 && (
+								<Button
+									type="button"
+									variant={"ghost"}
+									className="text-orange-500"
+									disabled={fields.length >= 3 || fields.length >= InspectionTypeOptions.length}
+									onClick={() => {
+										const selectedTypes = fields.map((field) => field.type)
+										const availableType =
+											InspectionTypeOptions.find(
+												(option) => !selectedTypes.includes(option.value as InspectionTypeValue)
+											)?.value || "NO_CONFORMITY"
+
+										append({ type: availableType as InspectionTypeValue, inspection: "" })
+									}}
+								>
+									<PlusCircleIcon /> Inspección
+								</Button>
+							)}
+						</div>
+
+						{fields.map((field, index) => (
+							<div className="flex flex-col gap-4 sm:col-span-2" key={field.id}>
+								<div className="flex items-center justify-between">
+									<h3 className="font-bold">Inspección {index + 1}</h3>
+									{index !== 0 && (
+										<Button
+											type="button"
+											variant={"ghost"}
+											className="text-red-500"
+											onClick={() => remove(index)}
+										>
+											<MinusCircleIcon /> Eliminar
+										</Button>
+									)}
+								</div>
+
+								<SelectFormField<OtcInspectionSchema>
+									control={form.control}
+									label="Tipo de Inspección"
+									options={InspectionTypeOptions.filter((option) => {
+										const selectedTypes = fields
+											.filter((_, fieldIndex) => fieldIndex !== index)
+											.map((field) => field.type as typeof option.value)
+										return !selectedTypes.includes(option.value)
+									})}
+									name={`inspections.${index}.type`}
+								/>
+
+								<TextAreaFormField<OtcInspectionSchema>
+									label="Observación"
+									control={form.control}
+									name={`inspections.${index}.inspection`}
+								/>
+							</div>
+						))}
 
 						<Separator className="my-4 sm:col-span-2" />
 

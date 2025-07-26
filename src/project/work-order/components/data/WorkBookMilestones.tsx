@@ -78,7 +78,7 @@ export default function WorkBookMilestones({
 	}
 
 	return (
-		<Card className="w-full">
+		<Card className="w-full gap-4">
 			<CardHeader className="flex flex-row items-center justify-between">
 				<h2 className="flex items-center gap-2 text-2xl font-bold">
 					<div className="size-10 rounded-md bg-orange-500/10 p-1.5">

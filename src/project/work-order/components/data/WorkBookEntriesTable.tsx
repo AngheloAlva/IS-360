@@ -32,11 +32,18 @@ import {
 	SelectContent,
 	SelectTrigger,
 } from "@/shared/components/ui/select"
+import WorkOrderPDFViewer from "../pdf/WorkOrderPDFViewer"
 
 export default function WorkBookEntriesTable({
+	userId,
 	workOrderId,
+	hasPermission,
+	workOrderNumber,
 }: {
+	userId: string
 	workOrderId: string
+	hasPermission: boolean
+	workOrderNumber: string
 }): React.ReactElement {
 	const [selectedEntry, setSelectedEntry] = useState<WorkEntry | null>(null)
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -106,6 +113,8 @@ export default function WorkBookEntriesTable({
 						))}
 					</SelectContent>
 				</Select>
+
+				<WorkOrderPDFViewer workOrderId={workOrderId} workOrderNumber={workOrderNumber} />
 			</div>
 
 			{isLoading ? (
@@ -173,8 +182,10 @@ export default function WorkBookEntriesTable({
 			/>
 
 			<WorkBookEntryDetails
+				userId={userId}
 				isLoading={false}
 				entry={selectedEntry}
+				hasPermission={hasPermission}
 				onClose={() => setSelectedEntry(null)}
 			/>
 		</div>

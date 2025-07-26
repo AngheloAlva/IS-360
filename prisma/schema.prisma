@@ -495,6 +495,11 @@ enum NOTE_STATUS {
   RESOLVED
 }
 
+enum INSPECTION_STATUS {
+  REPORTED
+  RESOLVED
+}
+
 model WorkEntry {
   id                  String             @id @default(cuid())
   entryType           ENTRY_TYPE
@@ -505,6 +510,7 @@ model WorkEntry {
   activityStartTime   String?
   activityEndTime     String?
   comments            String?
+  inspectionStatus    INSPECTION_STATUS? @default(REPORTED)
   supervisionComments String?
   safetyObservations  String?
   nonConformities     String?
