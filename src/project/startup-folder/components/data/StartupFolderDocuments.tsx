@@ -17,9 +17,9 @@ import {
 } from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
+import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
-import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
 import {
 	ReviewStatus,
 	DocumentCategory,
@@ -214,7 +214,7 @@ export default function StartupFolderDocuments({
 											</Button>
 										)}
 
-										{!isOtcMember &&
+										{isOtcMember &&
 											data?.folderStatus === "DRAFT" &&
 											(doc.status === "DRAFT" ||
 												doc.status === "REJECTED" ||

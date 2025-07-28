@@ -13,8 +13,9 @@ import {
 	SafetyAndHealthDocumentType,
 } from "@prisma/client"
 
-import { updateSafetyAndHealthDocument } from "./safety-and-health/update-safety-document"
 import { updateEnvironmentalDocument } from "./environmental/update-environmental-document"
+import { updateSafetyAndHealthDocument } from "./safety-and-health/update-safety-document"
+import { updateEnvironmentDocument } from "./environment/update-environment-document"
 import { updateVehicleDocument } from "./vehicle/update-vehicle-document"
 import { updateWorkerDocument } from "./worker/update-worker-document"
 import { updateBasicDocument } from "./basic/update-basic-document"
@@ -100,6 +101,19 @@ export async function updateStartupFolderDocument({
 					documentName,
 					expirationDate,
 					documentType: documentType as EnvironmentalDocType,
+					file: [],
+				},
+				uploadedFile,
+				userId,
+			})
+
+		case "ENVIRONMENT":
+			return updateEnvironmentDocument({
+				data: {
+					documentId,
+					documentName,
+					expirationDate,
+					documentType: documentType as EnvironmentDocType,
 					file: [],
 				},
 				uploadedFile,
