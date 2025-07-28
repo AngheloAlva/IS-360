@@ -1,6 +1,6 @@
 "use client"
 
-import { PieChart, Pie, Cell } from "recharts"
+import { PieChart, Pie, Cell, Label } from "recharts"
 import { PieChartIcon } from "lucide-react"
 
 import { useWorkOrderFiltersStore } from "@/project/work-order/stores/work-order-filters-store"
@@ -23,11 +23,12 @@ import {
 } from "@/shared/components/ui/chart"
 
 interface WorkOrderStatusChartProps {
+	total: number
 	data: WorkOrderStatsResponse
 }
 
-export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
-	const statusData = data.charts.type
+export function WorkOrderTypeChart({ data, total }: WorkOrderStatusChartProps) {
+	const typeData = data.charts.type
 	const { setTypeFilter, typeFilter } = useWorkOrderFiltersStore()
 
 	const handleChartClick = (data: { name: string }) => {
@@ -82,10 +83,10 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 							dataKey="value"
 							innerRadius={45}
 							paddingAngle={5}
-							data={statusData}
+							data={typeData}
 							onClick={handleChartClick}
 						>
-							{statusData.map((entry, index) => (
+							{typeData.map((entry, index) => (
 								<Cell
 									key={`cell-${index}`}
 									strokeWidth={typeFilter === entry.name ? 2 : 0}
@@ -93,6 +94,36 @@ export function WorkOrderStatusChart({ data }: WorkOrderStatusChartProps) {
 									className="cursor-pointer hover:brightness-75"
 								/>
 							))}
+
+							<Label
+								content={({ viewBox }) => {
+									if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+										return (
+											<text
+												x={viewBox.cx}
+												y={viewBox.cy}
+												textAnchor="middle"
+												dominantBaseline="middle"
+											>
+												<tspan
+													x={viewBox.cx}
+													y={viewBox.cy}
+													className="fill-foreground text-2xl font-semibold"
+												>
+													{total}
+												</tspan>
+												<tspan
+													x={viewBox.cx}
+													y={(viewBox.cy || 0) + 24}
+													className="fill-muted-foreground text-sm"
+												>
+													Total
+												</tspan>
+											</text>
+										)
+									}
+								}}
+							/>
 						</Pie>
 						<ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
 						<ChartLegend content={<ChartLegendContent />} />

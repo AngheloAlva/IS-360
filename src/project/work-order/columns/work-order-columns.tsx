@@ -4,11 +4,6 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
-import ActionDataMenu from "@/shared/components/ActionDataMenu"
-import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
-
-import WorkOrderDetailsDialog from "@/project/work-order/components/dialogs/WorkOrderDetailsDialog"
-
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
@@ -16,13 +11,21 @@ import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
 import UpdateWorkOrderForm from "@/project/work-order/components/forms/UpdateWorkOrderForm"
+import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 
-export const workOrderColumns: ColumnDef<WorkOrder>[] = [
+export const getWorkOrderColumns = ({
+	setSelectedId,
+	setDialogDetailsOpen,
+}: {
+	setSelectedId: (id: string) => void
+	setDialogDetailsOpen: (open: boolean) => void
+}): ColumnDef<WorkOrder>[] => [
 	{
 		id: "actions",
 		header: "",
@@ -31,7 +34,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 				<ActionDataMenu>
 					<>
 						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-							<UpdateWorkOrderForm workOrder={row.original} />
+							<UpdateWorkOrderForm workOrderId={row.original.id} />
 						</DropdownMenuItem>
 					</>
 				</ActionDataMenu>
@@ -41,18 +44,18 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	{
 		accessorKey: "id",
 		cell: ({ row }) => {
-			const workOrder = row.original
-
 			return (
-				<WorkOrderDetailsDialog workOrder={workOrder}>
-					<Button
-						variant={"ghost"}
-						size={"icon"}
-						className="size-9 font-semibold text-amber-600 hover:bg-amber-600 hover:text-white hover:underline"
-					>
-						<EyeIcon className="size-4" />
-					</Button>
-				</WorkOrderDetailsDialog>
+				<Button
+					size={"icon"}
+					variant={"ghost"}
+					onClick={() => {
+						setDialogDetailsOpen(true)
+						setSelectedId(row.original.id)
+					}}
+					className="size-9 font-semibold text-amber-600 hover:bg-amber-600 hover:text-white hover:underline"
+				>
+					<EyeIcon className="size-4" />
+				</Button>
 			)
 		},
 	},
@@ -189,7 +192,7 @@ export const workOrderColumns: ColumnDef<WorkOrder>[] = [
 	},
 	{
 		accessorKey: "programDate",
-		header: "Fecha programada - Fecha finalización",
+		header: "Fecha programada - finalización",
 		cell: ({ row }) => {
 			const date = row.getValue("programDate") as Date | null
 			const endDate = row.original.estimatedEndDate

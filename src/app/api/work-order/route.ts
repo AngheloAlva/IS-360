@@ -115,32 +115,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				select: {
 					id: true,
 					otNumber: true,
-					solicitationDate: true,
-					type: true,
-					status: true,
-					capex: true,
-					solicitationTime: true,
-					workRequest: true,
-					workDescription: true,
-					workProgressStatus: true,
-					priority: true,
-					createdAt: true,
-					initReport: {
-						select: {
-							url: true,
-						},
-					},
-					endReport: true,
-					programDate: true,
-					estimatedHours: true,
-					estimatedDays: true,
-					estimatedEndDate: true,
-					equipment: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
 					company: {
 						select: {
 							id: true,
@@ -156,14 +130,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							role: true,
 						},
 					},
-					responsible: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-							role: true,
-						},
-					},
+					workRequest: true,
+					workProgressStatus: true,
+					status: true,
+					solicitationDate: true,
+					estimatedEndDate: true,
+					estimatedHours: true,
+					estimatedDays: true,
+					type: true,
+					priority: true,
+					programDate: true,
 					_count: {
 						select: {
 							workEntries: {
@@ -171,6 +147,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 									entryType: { in: ["ADDITIONAL_ACTIVITY", "DAILY_ACTIVITY"] },
 								},
 							},
+						},
+					},
+					initReport: {
+						select: {
+							url: true,
+						},
+					},
+					endReport: {
+						select: {
+							url: true,
 						},
 					},
 				},

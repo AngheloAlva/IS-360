@@ -6,7 +6,7 @@ import { useWorkOrderStats } from "@/project/work-order/hooks/use-work-order-sta
 import ChartSkeleton from "@/shared/components/stats/ChartSkeleton"
 import { WorkOrderPriorityChart } from "./WorkOrderPriorityChart"
 import { WorkOrderMonthlyChart } from "./WorkOrderMonthlyChart"
-import { WorkOrderStatusChart } from "./WorkOrderStatusChart"
+import { WorkOrderTypeChart } from "./WorkOrderStatusChart"
 import { WorkOrderStatCards } from "./WorkOrderStatsCards"
 
 export function WorkOrderStatsContainer() {
@@ -31,7 +31,7 @@ export function WorkOrderStatsContainer() {
 					<WorkOrderStatCards data={data} />
 
 					<div className="grid gap-4 xl:grid-cols-3">
-						<WorkOrderStatusChart data={data} />
+						<WorkOrderTypeChart data={data} total={data.cards.total} />
 						<WorkOrderPriorityChart data={data} />
 						<WorkOrderMonthlyChart data={data.charts} />
 					</div>

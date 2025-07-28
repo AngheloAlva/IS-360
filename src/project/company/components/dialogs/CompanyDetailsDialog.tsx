@@ -80,8 +80,8 @@ export default function CompanyDetailsDialog({ children, company }: CompanyDetai
 
 						<div className="grid grid-cols-2 gap-4">
 							<DialogLabel
-								icon={<CalendarIcon className="size-4" />}
 								label="Fecha de registro"
+								icon={<CalendarIcon className="size-4" />}
 								value={format(company.createdAt, "dd/MM/yyyy HH:mm", { locale: es })}
 							/>
 

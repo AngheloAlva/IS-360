@@ -1,13 +1,9 @@
 import { QueryFunction, useQuery } from "@tanstack/react-query"
 import { DateRange } from "react-day-picker"
 
+import type { WORK_ORDER_TYPE, WORK_ORDER_STATUS, WORK_ORDER_PRIORITY } from "@prisma/client"
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
-import type {
-	WORK_ORDER_TYPE,
-	WORK_ORDER_CAPEX,
-	WORK_ORDER_STATUS,
-	WORK_ORDER_PRIORITY,
-} from "@prisma/client"
+import { useMemo } from "react"
 
 interface WorkOrderStats {
 	activeCount: number
@@ -22,13 +18,12 @@ export interface WorkOrder {
 	solicitationDate: Date
 	type: WORK_ORDER_TYPE
 	status: WORK_ORDER_STATUS
-	solicitationTime: string
 	workRequest: string
-	createdAt: Date
-	capex: WORK_ORDER_CAPEX
-	workDescription: string
+	estimatedHours: number
+	estimatedDays: number
 	priority: WORK_ORDER_PRIORITY
 	workProgressStatus: number
+	estimatedEndDate: Date | null
 	initReport: {
 		url: string
 	} | null
@@ -36,25 +31,13 @@ export interface WorkOrder {
 		url: string
 	} | null
 	programDate: Date
-	estimatedHours: number | null
-	estimatedDays: number | null
-	estimatedEndDate: Date | null
-	equipment: {
-		id: string
-		name: string
-	}[]
+
 	company?: {
 		id: string
 		name: string
 		logo: string | null
 	}
 	supervisor: {
-		id: string
-		name: string
-		email: string
-		role: string
-	}
-	responsible: {
 		id: string
 		name: string
 		email: string
@@ -82,10 +65,10 @@ interface WorkOrdersParams {
 }
 
 interface WorkOrdersResponse {
-	workOrders: WorkOrder[]
 	total: number
 	pages: number
 	stats: WorkOrderStats
+	workOrders: WorkOrder[]
 }
 
 export const fetchWorkOrders: QueryFunction<
@@ -108,7 +91,7 @@ export const fetchWorkOrders: QueryFunction<
 			onlyWithRequestClousure: boolean
 		},
 	]
-> = async ({ queryKey }) => {
+> = async ({ queryKey, signal }) => {
 	const [
 		,
 		{
@@ -131,7 +114,8 @@ export const fetchWorkOrders: QueryFunction<
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", page.toString())
 	searchParams.set("limit", limit.toString())
-	if (search) searchParams.set("search", search)
+
+	if (search) searchParams.set("search", search.trim())
 	if (typeFilter) searchParams.set("typeFilter", typeFilter)
 	if (statusFilter) searchParams.set("statusFilter", statusFilter)
 	if (companyId) searchParams.set("companyId", companyId)
@@ -142,13 +126,31 @@ export const fetchWorkOrders: QueryFunction<
 	if (order) searchParams.set("order", order)
 	if (isOtcMember) searchParams.set("isOtcMember", isOtcMember.toString())
 	if (priorityFilter) searchParams.set("priorityFilter", priorityFilter)
-	if (onlyWithRequestClousure)
+	if (onlyWithRequestClousure) {
 		searchParams.set("onlyWithRequestClousure", onlyWithRequestClousure.toString())
+	}
 
-	const res = await fetch(`/api/work-order?${searchParams.toString()}`)
-	if (!res.ok) throw new Error("Error fetching work orders")
+	try {
+		const res = await fetch(`/api/work-order?${searchParams.toString()}`, {
+			signal,
+		})
 
-	return res.json()
+		if (!res.ok) throw new Error("Error fetching work orders")
+
+		const data = await res.json()
+
+		if (!data || typeof data !== "object") {
+			throw new Error("Invalid response format")
+		}
+
+		return data
+	} catch (error) {
+		if (error instanceof Error && error.name === "AbortError") {
+			throw new Error("Request was cancelled")
+		}
+
+		throw error
+	}
 }
 
 export const useWorkOrders = ({
@@ -166,9 +168,27 @@ export const useWorkOrders = ({
 	orderBy = "createdAt",
 	onlyWithRequestClousure,
 }: WorkOrdersParams) => {
-	const queryKey = [
-		"workOrders",
-		{
+	const queryKey = useMemo(
+		() =>
+			[
+				"workOrders",
+				{
+					page,
+					limit,
+					order,
+					orderBy,
+					dateRange,
+					companyId,
+					typeFilter,
+					isOtcMember,
+					statusFilter,
+					permitFilter,
+					priorityFilter,
+					search: search.trim(),
+					onlyWithRequestClousure,
+				},
+			] as const,
+		[
 			page,
 			limit,
 			order,
@@ -182,11 +202,14 @@ export const useWorkOrders = ({
 			permitFilter,
 			priorityFilter,
 			onlyWithRequestClousure,
-		},
-	] as const
+		]
+	)
 
 	return useQuery<WorkOrdersResponse>({
 		queryKey,
 		queryFn: (fn) => fetchWorkOrders({ ...fn, queryKey }),
+		staleTime: 1000 * 60 * 2,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
 	})
 }

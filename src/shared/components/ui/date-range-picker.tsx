@@ -30,7 +30,7 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 							!value && "text-muted-foreground"
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
+						<CalendarIcon className="h-4 w-4" />
 						{value?.from ? (
 							value.to ? (
 								<>
@@ -41,7 +41,7 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 								format(value.from, "LLL dd, y", { locale: es })
 							)
 						) : (
-							<span>Seleccionar rango de fechas</span>
+							<span>Rango de fechas</span>
 						)}
 					</Button>
 				</PopoverTrigger>

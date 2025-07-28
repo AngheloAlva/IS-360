@@ -13,7 +13,6 @@ import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
 import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
-import { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { useCompanies } from "@/project/company/hooks/use-companies"
 import { useUsers } from "@/project/user/hooks/use-users"
@@ -60,18 +59,18 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { Company } from "@/project/company/hooks/use-companies"
-
-interface UpdateWorkOrderFormProps {
-	workOrder: WorkOrder
-}
+import { useWorkOrderDetails } from "../../hooks/use-work-order-details"
 
 export default function UpdateWorkOrderForm({
-	workOrder,
-}: UpdateWorkOrderFormProps): React.ReactElement {
+	workOrderId,
+}: {
+	workOrderId: string
+}): React.ReactElement {
 	const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
+	const { data: workOrder } = useWorkOrderDetails(workOrderId)
 	const { data: companiesData, isLoading: isCompaniesLoading } = useCompanies({ limit: 100 })
 	const { data: equipmentsData } = useEquipments({ limit: 100, order: "asc", orderBy: "name" })
 	const { data: usersData } = useUsers({ limit: 100 })
@@ -79,40 +78,63 @@ export default function UpdateWorkOrderForm({
 	const form = useForm<UpdateWorkOrderSchema>({
 		resolver: zodResolver(updateWorkOrderSchema),
 		defaultValues: {
-			type: workOrder.type,
-			status: workOrder.status,
-			priority: workOrder.priority,
-			companyId: workOrder.company?.id,
-			workRequest: workOrder.workRequest,
-			capex: workOrder.capex ?? undefined,
-			supervisorId: workOrder.supervisor.id,
-			responsibleId: workOrder.responsible.id,
-			estimatedDays: `${workOrder.estimatedDays}`,
-			programDate: new Date(workOrder.programDate),
-			estimatedHours: `${workOrder.estimatedHours}`,
-			workDescription: workOrder.workDescription ?? "",
-			workProgressStatus: [workOrder.workProgressStatus],
-			estimatedEndDate: workOrder.estimatedEndDate ?? undefined,
-			equipment: workOrder.equipment.map((equipment) => equipment.id),
-			solicitationDate: new Date(workOrder.solicitationDate) ?? new Date(),
-			solicitationTime: workOrder.solicitationTime ?? new Date().toTimeString().split(" ")[0],
-			endReport: workOrder.endReport
-				? [
-						{
-							url: workOrder.endReport.url,
-						},
-					]
-				: undefined,
+			type: undefined,
+			status: undefined,
+			priority: undefined,
+			companyId: "",
+			workRequest: "",
+			capex: undefined,
+			supervisorId: "",
+			responsibleId: "",
+			estimatedDays: "",
+			programDate: undefined,
+			estimatedHours: "",
+			workDescription: "",
+			workProgressStatus: [],
+			estimatedEndDate: undefined,
+			solicitationDate: undefined,
+			solicitationTime: "",
+			endReport: undefined,
 		},
 	})
 
 	useEffect(() => {
-		if (companiesData) {
+		form.reset({
+			type: workOrder?.type,
+			status: workOrder?.status,
+			priority: workOrder?.priority,
+			companyId: workOrder?.company?.id,
+			workRequest: workOrder?.workRequest,
+			capex: workOrder?.capex ?? undefined,
+			supervisorId: workOrder?.supervisor.id,
+			responsibleId: workOrder?.responsible.id,
+			estimatedDays: `${workOrder?.estimatedDays}`,
+			estimatedHours: `${workOrder?.estimatedHours}`,
+			workDescription: workOrder?.workDescription ?? "",
+			workProgressStatus: [workOrder?.workProgressStatus],
+			estimatedEndDate: workOrder?.estimatedEndDate ?? undefined,
+			programDate: new Date(workOrder?.programDate || new Date()),
+			equipment: workOrder?.equipment.map((equipment) => equipment.id),
+			solicitationDate: new Date(workOrder?.solicitationDate || new Date()) ?? new Date(),
+			solicitationTime: workOrder?.solicitationTime ?? new Date().toTimeString().split(" ")[0],
+			endReport: workOrder?.endReport
+				? [
+						{
+							url: workOrder?.endReport.url,
+						},
+					]
+				: undefined,
+		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [workOrder])
+
+	useEffect(() => {
+		if (companiesData && workOrder) {
 			setSelectedCompany(
 				companiesData.companies.find((company) => company.id === workOrder.company?.id)
 			)
 		}
-	}, [companiesData, workOrder.company])
+	}, [companiesData, workOrder])
 
 	useEffect(() => {
 		console.log(form.formState.errors)
@@ -149,12 +171,12 @@ export default function UpdateWorkOrderForm({
 					files: [file],
 					containerType: "files",
 					nameStrategy: "original",
-					randomString: workOrder.id,
+					randomString: workOrderId,
 				})
 			}
 
 			const { ok, message } = await updateWorkOrderById({
-				id: workOrder.id,
+				id: workOrderId,
 				values: {
 					endReport: undefined,
 					...values,
@@ -330,7 +352,7 @@ export default function UpdateWorkOrderForm({
 									<FormLabel>Empresa Responsable</FormLabel>
 									<Select
 										disabled={isCompaniesLoading}
-										defaultValue={workOrder.company?.id}
+										defaultValue={workOrder?.company?.id}
 										onValueChange={(value) => {
 											const company = companiesData?.companies.find((c) => c.id === value)
 											setSelectedCompany(company)

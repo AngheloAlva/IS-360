@@ -8,23 +8,29 @@ import {
 	LinkIcon,
 	UsersIcon,
 	ClockIcon,
+	SettingsIcon,
 	CalendarIcon,
 	FileTextIcon,
 	Building2Icon,
 	ClipboardIcon,
-	SettingsIcon,
 	CalendarClockIcon,
+	AlertTriangleIcon,
+	CheckCircle,
 } from "lucide-react"
 
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
+import { useWorkOrderDetails } from "../../hooks/use-work-order-details"
+import { MILESTONE_STATUS_LABELS } from "@/lib/consts/milestone-status"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 import { DialogLabel } from "@/shared/components/ui/dialog-label"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { Separator } from "@/shared/components/ui/separator"
+import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Progress } from "@/shared/components/ui/progress"
 import { Badge } from "@/shared/components/ui/badge"
 import {
@@ -32,66 +38,122 @@ import {
 	DialogTitle,
 	DialogHeader,
 	DialogContent,
-	DialogTrigger,
 	DialogDescription,
 } from "@/shared/components/ui/dialog"
 
-import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
+import type {
+	WORK_ORDER_TYPE,
+	MILESTONE_STATUS,
+	WORK_ORDER_STATUS,
+	WORK_ORDER_PRIORITY,
+} from "@prisma/client"
 
 interface WorkOrderDetailsDialogProps {
-	workOrder: WorkOrder
-	children: React.ReactNode
+	open: boolean
+	workOrderId: string
+	setOpen: (open: boolean) => void
 }
 
 export default function WorkOrderDetailsDialog({
-	workOrder,
-	children,
+	workOrderId,
+	open,
+	setOpen,
 }: WorkOrderDetailsDialogProps) {
-	return (
-		<Dialog>
-			<DialogTrigger asChild>{children}</DialogTrigger>
+	const { data, isLoading, error } = useWorkOrderDetails(workOrderId)
 
+	if (error) {
+		return (
+			<Dialog open={open} onOpenChange={setOpen}>
+				<DialogContent className="overflow-hidden p-0">
+					<div className="h-2 w-full bg-orange-600"></div>
+
+					<DialogHeader className="px-4">
+						<DialogTitle className="flex items-center gap-2">
+							<ClipboardIcon className="size-5" />
+							Detalles de la Orden de Trabajo
+						</DialogTitle>
+
+						<DialogDescription className="py-4">
+							<Alert variant={"destructive"}>
+								<AlertTriangleIcon />
+								<AlertTitle>Error</AlertTitle>
+								<AlertDescription>
+									Ocurrio un error al cargar los detalles de la orden de trabajo.
+								</AlertDescription>
+							</Alert>
+						</DialogDescription>
+					</DialogHeader>
+				</DialogContent>
+			</Dialog>
+		)
+	}
+
+	return (
+		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent className="overflow-hidden p-0">
 				<div className="h-2 w-full bg-orange-600"></div>
 
 				<DialogHeader className="px-4">
-					<DialogTitle className="flex items-center gap-2">
+					<DialogTitle className="flex items-center justify-start gap-2">
 						<ClipboardIcon className="size-5" />
 						Detalles de la Orden de Trabajo
 					</DialogTitle>
-					<DialogDescription>Información general de la {workOrder.otNumber}</DialogDescription>
+					<DialogDescription className="text-left" asChild>
+						<div>
+							Información general de la
+							{isLoading ? <Skeleton className="inline-flex h-3 w-24" /> : data?.otNumber}
+						</div>
+					</DialogDescription>
 				</DialogHeader>
 
 				<ScrollArea className="h-full max-h-[calc(90vh-8rem)] px-6 pb-6">
 					<div className="flex flex-col gap-6">
 						<div className="flex items-start gap-4">
 							<Avatar className="size-16">
-								<AvatarImage src={workOrder.company?.logo ?? ""} />
+								<AvatarImage src={data?.company?.image ?? ""} />
 								<AvatarFallback className="text-lg">
-									{workOrder.company?.name?.slice(0, 2) ?? "IN"}
+									{data?.company?.name?.slice(0, 2) ?? "NA"}
 								</AvatarFallback>
 							</Avatar>
 
 							<div className="flex flex-col gap-2">
 								<div>
-									<h3 className="text-lg font-semibold">{workOrder.otNumber}</h3>
+									<h3 className="text-lg font-semibold">
+										{isLoading ? <Skeleton className="h-7 w-36" /> : data?.otNumber}
+									</h3>
 									<div className="text-muted-foreground flex items-center gap-2 text-sm">
 										<Building2Icon className="size-4" />
-										<span>{workOrder.company?.name ?? "Interno"}</span>
+										<span>
+											{isLoading ? (
+												<Skeleton className="h-5 w-24" />
+											) : (
+												(data?.company?.name ?? "Interno")
+											)}
+										</span>
 									</div>
 								</div>
 
 								<div className="flex flex-wrap gap-2">
-									<Badge className="bg-rose-600/10 text-rose-600">
-										{WorkOrderTypeLabels[workOrder.type]}
-									</Badge>
-									<Badge className="bg-yellow-500/10 text-yellow-500" variant="secondary">
-										{WorkOrderPriorityLabels[workOrder.priority]}
-									</Badge>
-									{workOrder.capex && (
-										<Badge className="bg-orange-600/10 text-orange-600">
-											{WorkOrderCAPEXLabels[workOrder.capex]}
-										</Badge>
+									{isLoading ? (
+										<>
+											<Skeleton className="h-6 w-20" />
+											<Skeleton className="h-6 w-20" />
+											<Skeleton className="h-6 w-20" />
+										</>
+									) : (
+										<>
+											<Badge className="bg-rose-600/10 text-rose-600">
+												{WorkOrderTypeLabels[data?.type as WORK_ORDER_TYPE]}
+											</Badge>
+											<Badge className="bg-yellow-500/10 text-yellow-500" variant="secondary">
+												{WorkOrderPriorityLabels[data?.priority as WORK_ORDER_PRIORITY]}
+											</Badge>
+											{data?.capex && (
+												<Badge className="bg-orange-600/10 text-orange-600">
+													{WorkOrderCAPEXLabels[data?.capex]}
+												</Badge>
+											)}
+										</>
 									)}
 								</div>
 							</div>
@@ -102,14 +164,18 @@ export default function WorkOrderDetailsDialog({
 						<div className="space-y-4">
 							<div className="flex items-center justify-between">
 								<Badge className="bg-yellow-500/10 text-yellow-500" variant="secondary">
-									{WorkOrderStatusLabels[workOrder.status]}
+									{isLoading ? (
+										<Skeleton className="h-6 w-24" />
+									) : (
+										WorkOrderStatusLabels[data?.status as WORK_ORDER_STATUS]
+									)}
 								</Badge>
 								<span className="text-muted-foreground text-sm">
-									{workOrder.workProgressStatus || 0}% completado
+									{data?.workProgressStatus || 0}% completado
 								</span>
 							</div>
 							<Progress
-								value={workOrder.workProgressStatus || 0}
+								value={data?.workProgressStatus || 0}
 								className="h-2 bg-orange-600/10"
 								indicatorClassName="bg-orange-600"
 							/>
@@ -124,12 +190,20 @@ export default function WorkOrderDetailsDialog({
 							</h2>
 
 							<div className="grid gap-4">
-								<DialogLabel label="Trabajo Solicitado" value={workOrder.workRequest} />
-								<DialogLabel label="Descripción del Trabajo" value={workOrder.workDescription} />
+								<DialogLabel
+									isLoading={isLoading}
+									label="Trabajo Solicitado"
+									value={data?.workRequest}
+								/>
+								<DialogLabel
+									isLoading={isLoading}
+									label="Descripción del Trabajo"
+									value={data?.workDescription}
+								/>
 							</div>
 						</div>
 
-						{(workOrder.initReport || workOrder.endReport) && (
+						{(data?.initReport || data?.endReport) && (
 							<div className="flex flex-col gap-4">
 								<h2 className="flex items-center gap-2 text-lg font-semibold">
 									<FileTextIcon className="size-5" />
@@ -137,11 +211,11 @@ export default function WorkOrderDetailsDialog({
 								</h2>
 
 								<div className="grid gap-2">
-									{workOrder.initReport && (
+									{data?.initReport && (
 										<Link
 											target="_blank"
 											rel="noopener noreferrer"
-											href={workOrder.initReport.url}
+											href={data?.initReport.url}
 											className="flex w-fit items-center gap-2 rounded-lg bg-orange-600/10 px-2 py-1 font-medium text-orange-600 hover:bg-orange-600 hover:text-white"
 										>
 											<LinkIcon className="h-4 w-4" />
@@ -149,11 +223,11 @@ export default function WorkOrderDetailsDialog({
 										</Link>
 									)}
 
-									{workOrder.endReport && (
+									{data?.endReport && (
 										<Link
 											target="_blank"
 											rel="noopener noreferrer"
-											href={workOrder.endReport.url}
+											href={data?.endReport.url}
 											className="flex w-fit items-center gap-2 rounded-lg bg-orange-600/10 px-2 py-1 font-medium text-orange-600 hover:bg-orange-600 hover:text-white"
 										>
 											<LinkIcon className="h-4 w-4" />
@@ -173,14 +247,18 @@ export default function WorkOrderDetailsDialog({
 							</h2>
 
 							<div className="flex flex-wrap gap-2">
-								{workOrder.equipment.map((item) => (
-									<Badge
-										key={item.id}
-										className="rounded-lg bg-orange-600 whitespace-normal text-white"
-									>
-										{item.name}
-									</Badge>
-								))}
+								{isLoading ? (
+									<Skeleton className="h-12 w-full" />
+								) : (
+									data?.equipment.map((item) => (
+										<Badge
+											key={item.id}
+											className="rounded-lg bg-orange-600 whitespace-normal text-white"
+										>
+											{item.name}
+										</Badge>
+									))
+								)}
 							</div>
 						</div>
 
@@ -194,14 +272,16 @@ export default function WorkOrderDetailsDialog({
 
 							<div className="grid grid-cols-2 gap-4">
 								<DialogLabel
-									icon={<UserIcon className="size-4" />}
 									label="Supervisor"
-									value={workOrder.supervisor.name}
+									isLoading={isLoading}
+									value={data?.supervisor.name}
+									icon={<UserIcon className="size-4" />}
 								/>
 								<DialogLabel
-									icon={<UserIcon className="size-4" />}
+									isLoading={isLoading}
 									label="Responsable OTC"
-									value={workOrder.responsible.name}
+									value={data?.responsible.name}
+									icon={<UserIcon className="size-4" />}
 								/>
 							</div>
 						</div>
@@ -217,14 +297,17 @@ export default function WorkOrderDetailsDialog({
 							<div className="grid grid-cols-2 gap-4">
 								<div className="col-span-2">
 									<DialogLabel
-										icon={<CalendarIcon className="size-4" />}
+										isLoading={isLoading}
 										label="Fecha y Hora de Solicitud"
+										icon={<CalendarIcon className="size-4" />}
 										value={
 											<div className="flex items-center gap-4">
-												<span>{format(workOrder.solicitationDate, "PPP", { locale: es })}</span>
+												<span>
+													{format(data?.solicitationDate || new Date(), "PPP", { locale: es })}
+												</span>
 												<div className="flex items-center gap-2">
 													<ClockIcon className="text-muted-foreground size-4" />
-													<span>{workOrder.solicitationTime}</span>
+													<span>{data?.solicitationTime}</span>
 												</div>
 											</div>
 										}
@@ -232,44 +315,87 @@ export default function WorkOrderDetailsDialog({
 								</div>
 
 								<DialogLabel
-									icon={<CalendarClockIcon className="size-4" />}
+									isLoading={isLoading}
 									label="Fecha Programada de Inicio"
-									value={format(workOrder.programDate, "PPP", { locale: es })}
+									icon={<CalendarClockIcon className="size-4" />}
+									value={format(data?.programDate || new Date(), "PPP", { locale: es })}
 								/>
 
-								{workOrder.estimatedEndDate && (
+								{data?.estimatedEndDate && (
 									<DialogLabel
-										icon={<CalendarClockIcon className="size-4" />}
+										isLoading={isLoading}
 										label="Fecha Estimada de Fin."
-										value={format(workOrder.estimatedEndDate, "PPP", { locale: es })}
+										icon={<CalendarClockIcon className="size-4" />}
+										value={format(data?.estimatedEndDate || new Date(), "PPP", { locale: es })}
 									/>
 								)}
 							</div>
 
 							<div className="grid grid-cols-2 gap-4">
-								{workOrder.estimatedHours && (
+								{data?.estimatedHours && (
 									<DialogLabel
-										icon={<ClockIcon className="size-4" />}
+										isLoading={isLoading}
 										label="Horas Estimadas"
-										value={`${workOrder.estimatedHours} horas`}
+										icon={<ClockIcon className="size-4" />}
+										value={`${data?.estimatedHours} horas`}
 									/>
 								)}
 
-								{workOrder.estimatedDays && (
+								{data?.estimatedDays && (
 									<DialogLabel
-										icon={<CalendarIcon className="size-4" />}
+										isLoading={isLoading}
 										label="Días Estimados"
-										value={`${workOrder.estimatedDays} días`}
+										value={`${data?.estimatedDays} días`}
+										icon={<CalendarIcon className="size-4" />}
 									/>
 								)}
 
 								<DialogLabel
-									icon={<ClipboardIcon className="size-4" />}
+									isLoading={isLoading}
 									label="Actividades Realizadas"
-									value={workOrder._count.workEntries}
+									value={data?._count.workEntries}
+									icon={<ClipboardIcon className="size-4" />}
 								/>
 							</div>
 						</div>
+
+						{data?.milestones && data?.milestones?.length > 0 && (
+							<>
+								<Separator />
+								<div className="space-y-4">
+									<h3 className="flex items-center gap-2 text-lg font-semibold">
+										<CheckCircle className="h-5 w-5" />
+										Hitos ({data?.milestones.length})
+									</h3>
+
+									<div className="space-y-3">
+										{isLoading ? (
+											<>
+												<Skeleton className="h-24 w-full" />
+												<Skeleton className="h-24 w-full" />
+											</>
+										) : (
+											data?.milestones.map((milestone) => (
+												<div
+													key={milestone.id}
+													className="flex items-center justify-between rounded-lg border p-3"
+												>
+													<div className="flex items-center gap-3">
+														<div>
+															<p className="font-medium">{milestone.name}</p>
+															<p className="text-sm text-gray-600">Peso: {milestone.weight}%</p>
+														</div>
+													</div>
+													<Badge className="bg-secondary-background">
+														{MILESTONE_STATUS_LABELS[milestone.status as MILESTONE_STATUS]}
+													</Badge>
+												</div>
+											))
+										)}
+									</div>
+								</div>
+							</>
+						)}
 					</div>
 				</ScrollArea>
 			</DialogContent>

@@ -389,7 +389,7 @@ export default function WorkPermitForm({
 									Información de la OT:
 								</h2>
 
-								<div>
+								<div className="sm:col-span-2">
 									<h3 className="text-sm font-semibold">Trabajo solicitado:</h3>
 									<p className="text-muted-foreground">{workOrderSelected?.workRequest || "N/A"}</p>
 								</div>
@@ -428,12 +428,6 @@ export default function WorkPermitForm({
 										{workOrderSelected?.programDate
 											? format(workOrderSelected.programDate, "PPP", { locale: es })
 											: "N/A"}
-									</p>
-								</div>
-								<div>
-									<h3 className="text-sm font-semibold">Descripción del trabajo:</h3>
-									<p className="text-muted-foreground">
-										{workOrderSelected?.workDescription || "N/A"}
 									</p>
 								</div>
 								<div>

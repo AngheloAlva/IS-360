@@ -1,30 +1,26 @@
 "use client"
 
-import { FileSpreadsheetIcon, FilterXIcon, InfoIcon } from "lucide-react"
-import { useState } from "react"
+import { FileSpreadsheetIcon, FilterIcon, FilterXIcon, InfoIcon } from "lucide-react"
+import { useCallback, useMemo, useState } from "react"
 import { toast } from "sonner"
 import {
 	flexRender,
-	SortingState,
 	useReactTable,
 	getCoreRowModel,
-	ColumnFiltersState,
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
-import { WorkOrderPriorityLabels, WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-book-milestones"
 import { useWorkOrderFilters } from "@/project/work-order/hooks/use-work-order-filters"
 import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
-import { WorkOrderStatusOptions } from "@/lib/consts/work-order-status"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { useCompanies } from "@/project/company/hooks/use-companies"
-import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
-import { WorkOrderCAPEXLabels } from "@/lib/consts/work-order-capex"
 import { queryClient } from "@/lib/queryClient"
 
 import { CalendarDateRangePicker } from "@/shared/components/ui/date-range-picker"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
-import { workOrderColumns } from "../../columns/work-order-columns"
+import { getWorkOrderColumns } from "../../columns/work-order-columns"
+import WorkOrderDetailsDialog from "../dialogs/WorkOrderDetailsDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import OrderByButton from "@/shared/components/OrderByButton"
 import RefreshButton from "@/shared/components/RefreshButton"
@@ -41,14 +37,21 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 import {
-	Select,
-	SelectItem,
-	SelectLabel,
-	SelectGroup,
-	SelectTrigger,
-	SelectContent,
-	SelectSeparator,
-} from "@/shared/components/ui/select"
+	DropdownMenu,
+	DropdownMenuItem,
+	DropdownMenuGroup,
+	DropdownMenuLabel,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+	DropdownMenuSeparator,
+} from "@/shared/components/ui/dropdown-menu"
+import {
+	WorkOrderTypeFilter,
+	WorkOrderStatusFilter,
+	WorkOrderCompanyFilter,
+	WorkOrderPriorityFilter,
+	WorkOrderHasRequestClousureFilter,
+} from "./WorkOrderFilters"
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 
@@ -57,30 +60,27 @@ interface WorkOrderTableProps {
 }
 
 export function WorkOrderTable({ id }: WorkOrderTableProps) {
-	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [dialogDetailsOpen, setDialogDetailsOpen] = useState<boolean>(false)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
-	const [sorting, setSorting] = useState<SortingState>([])
+	const [selectedId, setSelectedId] = useState<string | null>(null)
 	const [rowSelection, setRowSelection] = useState({})
 
 	const { data: companies } = useCompanies({
 		limit: 1000,
+		orderBy: "name",
 	})
 
 	const { filters, actions, workOrders } = useWorkOrderFilters()
 	const { data, isLoading, refetch, isFetching } = workOrders
 
 	const table = useReactTable<WorkOrder>({
-		columns: workOrderColumns,
-		onSortingChange: setSorting,
 		data: data?.workOrders ?? [],
 		getCoreRowModel: getCoreRowModel(),
-		onColumnFiltersChange: setColumnFilters,
-		getFilteredRowModel: getFilteredRowModel(),
 		onRowSelectionChange: setRowSelection,
+		getFilteredRowModel: getFilteredRowModel(),
+		columns: getWorkOrderColumns({ setSelectedId, setDialogDetailsOpen }),
 
 		state: {
-			sorting,
-			columnFilters,
 			pagination: {
 				pageIndex: filters.page - 1,
 				pageSize: 10,
@@ -113,13 +113,14 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		})
 	}
 
-	const handleExportToExcel = async () => {
+	const handleExportToExcel = useCallback(async () => {
 		try {
 			setExportLoading(true)
 
 			const res: { workOrders: WorkOrder[] } = await fetch(
 				`/api/work-order?page=1&order=desc&orderBy=createdAt&limit=10000`
 			).then((res) => res.json())
+
 			if (!res?.workOrders?.length) {
 				toast.error("No hay órdenes de trabajo para exportar")
 				return
@@ -134,24 +135,13 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					solicitationDate: workOrder.solicitationDate,
 					type: workOrder.type,
 					status: workOrder.status,
-					solicitationTime: workOrder.solicitationTime,
 					workRequest: workOrder.workRequest,
-					createdAt: workOrder.createdAt,
-					capex: WorkOrderCAPEXLabels[workOrder.capex],
-					workDescription: workOrder.workDescription,
 					priority: WorkOrderPriorityLabels[workOrder.priority],
 					workProgressStatus: workOrder.workProgressStatus,
 					programDate: workOrder.programDate,
-					estimatedHours: workOrder.estimatedHours,
-					estimatedDays: workOrder.estimatedDays,
 					estimatedEndDate: workOrder.estimatedEndDate,
-					equipment: workOrder.equipment.map((equipment) => ({
-						id: equipment.id,
-						name: equipment.name,
-					})),
 					company: workOrder.company?.name,
 					supervisor: workOrder.supervisor?.name + " " + workOrder.supervisor?.email,
-					responsible: workOrder.responsible?.name + " " + workOrder.responsible?.email,
 					_count: workOrder._count.workEntries,
 				}))
 			)
@@ -165,7 +155,17 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		} finally {
 			setExportLoading(false)
 		}
-	}
+	}, [])
+
+	const filterHandlers = useMemo(
+		() => ({
+			onTypeChange: actions.setTypeFilter,
+			onCompanyChange: actions.setCompanyId,
+			onStatusChange: actions.setStatusFilter,
+			onPriorityChange: actions.setPriorityFilter,
+		}),
+		[actions]
+	)
 
 	return (
 		<Card id={id}>
@@ -186,153 +186,84 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						placeholder="Buscar por número de OT, trabajo..."
 					/>
 
+					<CalendarDateRangePicker value={filters.dateRange} onChange={actions.setDateRange} />
+
 					<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" size={"icon"} className="size-10">
+								<FilterIcon />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent className="w-fit min-w-56" align="start">
+							<DropdownMenuLabel>Filtrar</DropdownMenuLabel>
+
+							<DropdownMenuGroup className="flex flex-col gap-1.5">
+								<DropdownMenuItem asChild>
+									<WorkOrderTypeFilter
+										onChange={filterHandlers.onTypeChange}
+										value={filters.typeFilter}
+									/>
+								</DropdownMenuItem>
+
+								<DropdownMenuItem asChild>
+									<WorkOrderCompanyFilter
+										value={filters.companyId}
+										companies={companies?.companies}
+										onChange={filterHandlers.onCompanyChange}
+									/>
+								</DropdownMenuItem>
+
+								<DropdownMenuItem asChild>
+									<WorkOrderStatusFilter
+										onChange={filterHandlers.onStatusChange}
+										value={filters.statusFilter}
+									/>
+								</DropdownMenuItem>
+
+								<DropdownMenuItem asChild>
+									<WorkOrderPriorityFilter
+										value={filters.priorityFilter}
+										onChange={filterHandlers.onPriorityChange}
+									/>
+								</DropdownMenuItem>
+
+								<DropdownMenuItem asChild>
+									<WorkOrderHasRequestClousureFilter
+										value={filters.onlyWithRequestClousure}
+										onChange={actions.setOnlyWithRequestClousure}
+									/>
+								</DropdownMenuItem>
+
+								<DropdownMenuItem asChild>
+									<OrderByButton
+										className="w-full"
+										onChange={(orderBy, order) => {
+											actions.setOrderBy(orderBy)
+											actions.setOrder(order)
+										}}
+									/>
+								</DropdownMenuItem>
+							</DropdownMenuGroup>
+
+							<DropdownMenuSeparator />
+
+							<DropdownMenuItem onClick={handleExportToExcel}>
+								{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+								Exportar
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 
 					<Button
 						size={"icon"}
 						variant="outline"
 						onClick={actions.resetFilters}
-						className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+						className="size-10 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
 					>
 						<FilterXIcon />
 					</Button>
-				</div>
-
-				<div className="flex w-full flex-wrap items-center justify-start gap-2 md:w-full md:flex-row">
-					<Button
-						onClick={handleExportToExcel}
-						disabled={isLoading || exportLoading || !data?.workOrders?.length}
-						className="hidden cursor-pointer gap-1 bg-orange-500 text-white transition-all hover:scale-105 hover:bg-orange-600 hover:text-white md:flex"
-					>
-						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
-						Exportar
-					</Button>
-
-					<Select
-						onValueChange={(value) => {
-							actions.setTypeFilter(value === "all" ? null : value)
-						}}
-						value={filters.typeFilter ?? "all"}
-					>
-						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							Tipo OT
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Tipo de obra</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="all">Todos</SelectItem>
-								{WorkOrderTypeOptions.map((type) => (
-									<SelectItem key={type.value} value={type.value}>
-										{type.label}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-
-					<Select
-						onValueChange={(value) => {
-							actions.setCompanyId(value === "all" ? null : value)
-						}}
-						value={filters.companyId ?? "all"}
-					>
-						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							Empresa
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Empresa</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="all">Todas</SelectItem>
-								{companies?.companies?.map((company) => (
-									<SelectItem key={company.id} value={company.id}>
-										{company.name}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-
-					<CalendarDateRangePicker value={filters.dateRange} onChange={actions.setDateRange} />
-
-					<Select
-						onValueChange={(value) => {
-							actions.setStatusFilter(value === "all" ? null : value)
-						}}
-						value={filters.statusFilter ?? "all"}
-					>
-						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							Estado OT
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Estado</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="all">Todos</SelectItem>
-								{WorkOrderStatusOptions.map((status) => (
-									<SelectItem key={status.value} value={status.value}>
-										{status.label}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-
-					<Select
-						onValueChange={(value) => {
-							actions.setPriorityFilter(value === "all" ? null : value)
-						}}
-						value={filters.priorityFilter ?? "all"}
-					>
-						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							Prioridad OT
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Prioridad</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="all">Todas</SelectItem>
-
-								{WorkOrderPriorityOptions.map((priority) => (
-									<SelectItem key={priority.value} value={priority.value}>
-										{priority.label}
-									</SelectItem>
-								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-
-					<Select
-						onValueChange={(value) => {
-							if (value === "true") {
-								actions.setOnlyWithRequestClousure(true)
-							} else {
-								actions.setOnlyWithRequestClousure(false)
-							}
-						}}
-						value={filters.onlyWithRequestClousure ? "true" : "false"}
-					>
-						<SelectTrigger className="border-input bg-background hover:bg-input w-full border transition-colors sm:w-fit">
-							Hito(s) en Revisión
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Urgente</SelectLabel>
-								<SelectSeparator />
-								<SelectItem value="false">Todas las OT</SelectItem>
-								<SelectItem value="true">Solo en Revisión</SelectItem>
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-
-					<OrderByButton
-						className="ml-auto"
-						onChange={(orderBy, order) => {
-							actions.setOrderBy(orderBy)
-							actions.setOrder(order)
-						}}
-					/>
 				</div>
 
 				<Table>
@@ -397,6 +328,14 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					className="border-orange-600 text-orange-600 hover:bg-orange-600"
 				/>
 			</CardContent>
+
+			{selectedId && (
+				<WorkOrderDetailsDialog
+					workOrderId={selectedId}
+					open={dialogDetailsOpen}
+					setOpen={setDialogDetailsOpen}
+				/>
+			)}
 		</Card>
 	)
 }

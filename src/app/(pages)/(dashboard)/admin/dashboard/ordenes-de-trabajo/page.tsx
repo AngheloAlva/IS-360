@@ -9,6 +9,7 @@ import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTa
 import NewWorkBookForm from "@/project/work-order/components/forms/NewWorkBookForm"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import VideoTutorials from "@/shared/components/VideoTutorials"
+import ModuleHeader from "@/shared/components/ModuleHeader"
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -38,69 +39,65 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 
 	return (
 		<div className={"flex h-full w-full flex-1 flex-col gap-8 transition-all"}>
-			<div className="rounded-lg bg-gradient-to-r from-orange-600 to-red-600 p-6 shadow-lg">
-				<div className="flex flex-col items-center justify-between gap-3 lg:flex-row">
-					<div className="w-full text-white">
-						<h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Órdenes de Trabajo</h1>
-						<p className="text-sm opacity-90 sm:text-base">
-							Gestión y seguimiento de órdenes de trabajo
-						</p>
-					</div>
+			<ModuleHeader
+				title="Órdenes de Trabajo"
+				className="from-orange-600 to-red-600"
+				description="Gestión y seguimiento de órdenes de trabajo"
+			>
+				<>
+					<VideoTutorials
+						className="text-red-500"
+						videos={[
+							{
+								title: "Creacion Orden de Trabajo",
+								description: "Tutorial de como crear una orden de trabajo.",
+								url: "https://youtube.com/embed/Yg_ZiODHu1U",
+							},
+							{
+								title: "Creacion Libro de Obras",
+								description: "Tutorial de como crear un libro de obras.",
+								url: "https://youtube.com/embed/K_LHCpommos",
+							},
+							{
+								title: "Cierre de Hitos",
+								description: "Tutorial de como cerrar hitos de una orden de trabajo.",
+								url: "https://youtube.com/embed/cTT1T9zIl7Q",
+							},
+							{
+								title: "Funcionalidades OT",
+								description: "Muestra todas las funcionalidades de las ordenes de trabajo.",
+								url: "https://youtube.com/embed/guIR3J8qyT8",
+							},
+							{
+								title: "Funcionalidades Libro de Obras",
+								description: "Muestra todas las funcionalidades de los libros de obras.",
+								url: "https://youtube.com/embed/vJTegLRfjDY",
+							},
+							{
+								title: "Edicion OT",
+								description: "Tutorial de como editar una orden de trabajo.",
+								url: "https://youtube.com/embed/7tkrv7JHOKs",
+							},
+						]}
+					/>
 
-					<div className="flex w-full flex-wrap items-center justify-end gap-2">
-						<VideoTutorials
-							videos={[
-								{
-									title: "Creacion Orden de Trabajo",
-									description: "Tutorial de como crear una orden de trabajo.",
-									url: "https://youtube.com/embed/Yg_ZiODHu1U",
-								},
-								{
-									title: "Creacion Libro de Obras",
-									description: "Tutorial de como crear un libro de obras.",
-									url: "https://youtube.com/embed/K_LHCpommos",
-								},
-								{
-									title: "Cierre de Hitos",
-									description: "Tutorial de como cerrar hitos de una orden de trabajo.",
-									url: "https://youtube.com/embed/cTT1T9zIl7Q",
-								},
-								{
-									title: "Funcionalidades OT",
-									description: "Muestra todas las funcionalidades de las ordenes de trabajo.",
-									url: "https://youtube.com/embed/guIR3J8qyT8",
-								},
-								{
-									title: "Funcionalidades Libro de Obras",
-									description: "Muestra todas las funcionalidades de los libros de obras.",
-									url: "https://youtube.com/embed/vJTegLRfjDY",
-								},
-								{
-									title: "Edicion OT",
-									description: "Tutorial de como editar una orden de trabajo.",
-									url: "https://youtube.com/embed/7tkrv7JHOKs",
-								},
-							]}
+					<ScrollToTableButton
+						id="work-order-table"
+						label="Lista Órdenes"
+						className="text-red-600 hover:bg-white hover:text-red-600"
+					/>
+
+					{hasPermission.success && <CreateWorkOrderForm />}
+
+					{hassWorkBookPermission.success && (
+						<NewWorkBookForm
+							userId={session.user.id}
+							companyId={process.env.NEXT_PUBLIC_OTC_COMPANY_ID!}
+							className="text-amber-600 hover:bg-white hover:text-amber-600"
 						/>
-
-						<ScrollToTableButton
-							id="work-order-table"
-							label="Lista Órdenes"
-							className="text-red-600 hover:bg-white hover:text-red-600"
-						/>
-
-						{hasPermission.success && <CreateWorkOrderForm />}
-
-						{hassWorkBookPermission.success && (
-							<NewWorkBookForm
-								userId={session.user.id}
-								companyId={process.env.NEXT_PUBLIC_OTC_COMPANY_ID!}
-								className="text-amber-600 hover:bg-white hover:text-amber-600"
-							/>
-						)}
-					</div>
-				</div>
-			</div>
+					)}
+				</>
+			</ModuleHeader>
 
 			<div className="space-y-4">
 				<WorkOrderStatsContainer />

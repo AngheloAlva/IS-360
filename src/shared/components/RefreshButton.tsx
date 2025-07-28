@@ -21,14 +21,14 @@ export default function RefreshButton({
 			title="Recargar datos"
 			onClick={() => refetch()}
 			className={cn(
-				"group relative inline-flex size-9 cursor-pointer items-center justify-center overflow-hidden rounded-lg transition-all duration-300 hover:w-28",
+				"group relative inline-flex size-9 cursor-pointer items-center justify-center overflow-hidden rounded-lg transition-all duration-300 md:hover:w-28",
 				{
 					"size-10": size === "lg",
 					"size-8": size === "sm",
 				}
 			)}
 		>
-			<div className="inline-flex whitespace-nowrap opacity-0 transition-all duration-200 group-hover:-translate-x-3 group-hover:opacity-100">
+			<div className="inline-flex whitespace-nowrap opacity-0 transition-all duration-200 md:group-hover:-translate-x-3 md:group-hover:opacity-100">
 				Recargar
 			</div>
 
