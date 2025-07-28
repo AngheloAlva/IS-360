@@ -108,8 +108,9 @@ export const data = {
 			icon: FilePlus2Icon,
 		},
 		{
-			name: "Herramientas (test)",
+			name: "Herramientas",
 			url: "/admin/dashboard/herramientas",
+			test: true,
 			icon: BoxIcon,
 		},
 		{
@@ -120,6 +121,7 @@ export const data = {
 		{
 			name: "Notificaciones",
 			url: "/admin/dashboard/notificaciones",
+			test: true,
 			icon: BellIcon,
 		},
 		{

@@ -22,6 +22,7 @@ export function NavMain({
 		name: string
 		url: string
 		icon: LucideIcon
+		test?: boolean
 	}[]
 }) {
 	const pathName = usePathname()
@@ -42,6 +43,11 @@ export function NavMain({
 							<Link href={item.url}>
 								<item.icon />
 								<span>{item.name}</span>
+								{item.test && (
+									<div className="mt-0.5 rounded-full bg-amber-500/80 px-1.5 text-xs font-medium text-white">
+										Test
+									</div>
+								)}
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

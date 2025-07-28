@@ -17,6 +17,7 @@ export default function AdminStartupFoldersPage() {
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
 						<VideoTutorials
+							className="text-teal-600"
 							videos={[
 								{
 									title: "Funcionalidad Carpetas de Arranque",

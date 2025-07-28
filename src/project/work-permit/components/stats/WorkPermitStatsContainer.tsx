@@ -11,6 +11,7 @@ import WorkPermitActivityChart from "./WorkPermitActivityChart"
 import WorkPermitStatusChart from "./WorkPermitStatusChart"
 import WorkPermitTypeChart from "./WorkPermitTypeChart"
 import { WORK_PERMIT_STATUS } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
 export default function WorkPermitStatsContainer() {
 	const filters = useWorkPermitFiltersStore()
@@ -32,14 +33,15 @@ export default function WorkPermitStatsContainer() {
 				<>
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 						<Card
-							className="cursor-pointer overflow-hidden border-none pt-0 hover:brightness-90"
+							className="group relative cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105"
 							onClick={() => filters.resetFilters()}
 						>
 							<div className="bg-gradient-to-br from-pink-600 to-pink-700 p-1.5" />
+							<div className="absolute top-0 left-0 h-16 w-16 -translate-x-4 -translate-y-4 rounded-full bg-pink-600/30 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
+							<div className="absolute right-0 bottom-0 h-16 w-16 translate-x-4 translate-y-4 rounded-full bg-pink-700/30 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
+
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
-								<CardTitle className="text-sm font-medium sm:text-base">
-									Total de Permisos
-								</CardTitle>
+								<CardTitle>Total de Permisos</CardTitle>
 								<div className="rounded-lg bg-pink-600/20 p-1.5 text-pink-600">
 									<ClipboardListIcon className="text-pink-6s00 h-5 w-5" />
 								</div>
@@ -51,12 +53,29 @@ export default function WorkPermitStatsContainer() {
 						</Card>
 
 						<Card
-							className="cursor-pointer overflow-hidden border-none pt-0 hover:brightness-90"
+							className="group relative cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105"
 							onClick={() => filters.setStatusFilter(WORK_PERMIT_STATUS.ACTIVE)}
 						>
 							<div className="bg-gradient-to-br from-pink-700 to-rose-500 p-1.5" />
+							<div
+								className={cn(
+									"absolute top-0 left-0 h-16 w-16 -translate-x-4 -translate-y-4 rounded-full bg-pink-700/30 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100",
+									{
+										"opacity-100": filters.statusFilter === WORK_PERMIT_STATUS.ACTIVE,
+									}
+								)}
+							/>
+							<div
+								className={cn(
+									"absolute right-0 bottom-0 h-16 w-16 translate-x-4 translate-y-4 rounded-full bg-rose-500/30 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100",
+									{
+										"opacity-100": filters.statusFilter === WORK_PERMIT_STATUS.ACTIVE,
+									}
+								)}
+							/>
+
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
-								<CardTitle className="text-sm font-medium sm:text-base">Permisos Activos</CardTitle>
+								<CardTitle>Permisos Activos</CardTitle>
 								<div className="rounded-lg bg-pink-700/20 p-1.5 text-pink-700">
 									<FileCheckIcon className="h-5 w-5 text-pink-700" />
 								</div>
@@ -71,14 +90,29 @@ export default function WorkPermitStatsContainer() {
 						</Card>
 
 						<Card
-							className="cursor-pointer overflow-hidden border-none pt-0 hover:brightness-90"
+							className="group relative cursor-pointer overflow-hidden border-none pt-0 transition-all hover:scale-105"
 							onClick={() => filters.setStatusFilter(WORK_PERMIT_STATUS.REVIEW_PENDING)}
 						>
 							<div className="bg-gradient-to-br from-rose-500 to-rose-600 p-1.5" />
+							<div
+								className={cn(
+									"absolute top-0 left-0 h-16 w-16 -translate-x-4 -translate-y-4 rounded-full bg-rose-500/30 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100",
+									{
+										"opacity-100": filters.statusFilter === WORK_PERMIT_STATUS.REVIEW_PENDING,
+									}
+								)}
+							/>
+							<div
+								className={cn(
+									"absolute right-0 bottom-0 h-16 w-16 translate-x-4 translate-y-4 rounded-full bg-rose-600/30 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100",
+									{
+										"opacity-100": filters.statusFilter === WORK_PERMIT_STATUS.REVIEW_PENDING,
+									}
+								)}
+							/>
+
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
-								<CardTitle className="text-sm font-medium sm:text-base">
-									Permisos Pendientes
-								</CardTitle>
+								<CardTitle>Permisos Pendientes</CardTitle>
 								<div className="rounded-lg bg-rose-500/20 p-1.5 text-rose-500">
 									<FileWarningIcon className="h-5 w-5 text-rose-500" />
 								</div>
@@ -96,9 +130,7 @@ export default function WorkPermitStatsContainer() {
 						<Card className="overflow-hidden border-none pt-0">
 							<div className="bg-gradient-to-br from-rose-600 to-rose-700 p-1.5" />
 							<CardHeader className="flex flex-row items-center justify-between space-y-0 sm:pb-2">
-								<CardTitle className="text-sm font-medium sm:text-base">
-									Empresas con Permisos
-								</CardTitle>
+								<CardTitle>Empresas con Permisos</CardTitle>
 								<div className="rounded-lg bg-rose-600/20 p-1.5 text-rose-600">
 									<UsersIcon className="h-5 w-5 text-rose-600" />
 								</div>
