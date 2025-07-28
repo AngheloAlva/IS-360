@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation"
+import { headers } from "next/headers"
 import Image from "next/image"
 
-import Login from "@/project/auth/components/forms/Login"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
 import { USER_ROLE } from "@prisma/client"
+import { auth } from "@/lib/auth"
+
+import Login from "@/project/auth/components/forms/Login"
 
 export default async function LoginPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
