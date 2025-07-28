@@ -1,8 +1,15 @@
-import { Building2Icon, EyeIcon, LinkIcon, UserIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
+import {
+	UserIcon,
+	EyeIcon,
+	MailIcon,
+	PhoneIcon,
+	Building2Icon,
+	ChevronRightIcon,
+} from "lucide-react"
 
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
@@ -10,7 +17,9 @@ import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { cn } from "@/lib/utils"
 
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/shared/components/ui/hover-card"
 import UpdateWorkOrderForm from "@/project/work-order/components/forms/UpdateWorkOrderForm"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
 import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Progress } from "@/shared/components/ui/progress"
@@ -52,7 +61,7 @@ export const getWorkOrderColumns = ({
 						setDialogDetailsOpen(true)
 						setSelectedId(row.original.id)
 					}}
-					className="size-9 font-semibold text-amber-600 hover:bg-amber-600 hover:text-white hover:underline"
+					className="size-8 font-semibold text-amber-600 hover:bg-amber-600 hover:text-white hover:underline"
 				>
 					<EyeIcon className="size-4" />
 				</Button>
@@ -82,13 +91,37 @@ export const getWorkOrderColumns = ({
 		accessorKey: "company",
 		header: "Nombre de la empresa",
 		cell: ({ row }) => {
-			const company = row.getValue("company") as { name: string } | null
+			const company = row.original.company
 
 			return (
-				<div className="flex w-64 max-w-56 items-center gap-2 text-wrap">
-					<Building2Icon className="text-muted-foreground h-4 w-4" />
-					{company?.name ? company.name : "Interno"}
-				</div>
+				<HoverCard openDelay={200}>
+					<HoverCardTrigger className="text-text flex cursor-pointer items-center gap-1.5 select-none hover:underline">
+						<Building2Icon className="text-muted-foreground min-h-3.5 max-w-3.5 min-w-3.5" />
+						<span className="line-clamp-1 w-52 truncate">{company?.name || "Interno"}</span>
+					</HoverCardTrigger>
+
+					<HoverCardContent className="flex gap-2" side="top">
+						<Avatar>
+							<AvatarImage src={company?.image || undefined} />
+							<AvatarFallback>{company?.name?.slice(0, 2) || ""}</AvatarFallback>
+						</Avatar>
+
+						<div className="flex flex-col gap-2">
+							<div className="text-text">
+								<p className="font-bold">{company?.name || ""}</p>
+								<p className="text-muted-foreground text-sm">{company?.rut || ""}</p>
+							</div>
+
+							<Link
+								href={`/admin/dashboard/empresas/${company?.id}`}
+								className="flex items-center text-sm text-orange-500 hover:underline"
+							>
+								Ver detalles
+								<ChevronRightIcon className="size-4" />
+							</Link>
+						</div>
+					</HoverCardContent>
+				</HoverCard>
 			)
 		},
 	},
@@ -96,13 +129,39 @@ export const getWorkOrderColumns = ({
 		accessorKey: "supervisor",
 		header: "Supervisor",
 		cell: ({ row }) => {
-			const supervisor = row.getValue("supervisor") as { name: string } | null
+			const supervisor = row.original.supervisor
 
 			return (
-				<div className="flex w-64 max-w-56 items-center gap-2 text-wrap">
-					<UserIcon className="text-muted-foreground h-4 w-4" />
-					{supervisor?.name}
-				</div>
+				<HoverCard openDelay={200}>
+					<HoverCardTrigger className="text-text flex cursor-pointer items-center gap-1.5 select-none hover:underline">
+						<UserIcon className="text-muted-foreground min-h-3.5 max-w-3.5 min-w-3.5" />
+						<span className="line-clamp-1 w-52 truncate">{supervisor?.name || "Interno"}</span>
+					</HoverCardTrigger>
+
+					<HoverCardContent className="flex w-fit gap-2" side="top">
+						<Avatar>
+							<AvatarImage src={supervisor?.image || undefined} />
+							<AvatarFallback>{supervisor?.name?.slice(0, 2) || ""}</AvatarFallback>
+						</Avatar>
+
+						<div className="flex flex-col gap-2">
+							<div className="text-text">
+								<p className="font-bold">{supervisor?.name || ""}</p>
+								<p className="text-muted-foreground text-sm">{supervisor?.rut || ""}</p>
+								<p className="mt-2 flex items-center gap-1 text-sm font-semibold">
+									<MailIcon className="mt-0.5 size-3" />
+									{supervisor?.email || ""}
+								</p>
+								{supervisor.phone && (
+									<p className="mt-1 flex items-center gap-1 text-sm font-semibold">
+										<PhoneIcon className="size-3" />
+										{supervisor.phone}
+									</p>
+								)}
+							</div>
+						</div>
+					</HoverCardContent>
+				</HoverCard>
 			)
 		},
 	},
@@ -111,7 +170,7 @@ export const getWorkOrderColumns = ({
 		header: "Trabajo Solicitado",
 		cell: ({ row }) => {
 			const request = row.getValue("workRequest") as string
-			return <div className="w-72 max-w-72 text-wrap">{request}</div>
+			return <div className="line-clamp-1 w-72 max-w-72 truncate">{request}</div>
 		},
 	},
 	{
@@ -213,56 +272,6 @@ export const getWorkOrderColumns = ({
 			const count = row.getValue("_count") as { workEntries: number }
 
 			return <div className="font-medium">{count.workEntries}</div>
-		},
-	},
-	{
-		accessorKey: "initReport",
-		header: "Reporte Inicial",
-		cell: ({ row }) => {
-			const report = row.original.initReport as { url: string } | null
-
-			return (
-				<Button
-					size="icon"
-					variant="outline"
-					disabled={!report}
-					className="hover:bg-orange-amber/50 border-amber-500 bg-amber-500/10 text-amber-500 hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
-				>
-					<Link
-						target="_blank"
-						className="font-medium"
-						rel="noopener noreferrer"
-						href={report ? report.url : "#"}
-					>
-						<LinkIcon className="h-4 w-4" />
-					</Link>
-				</Button>
-			)
-		},
-	},
-	{
-		accessorKey: "endReport",
-		header: "Reporte Final",
-		cell: ({ row }) => {
-			const report = row.original.endReport as { url: string } | null
-
-			return (
-				<Button
-					size="icon"
-					variant="outline"
-					disabled={!report}
-					className="hover:bg-orange-amber/50 border-amber-500 bg-amber-500/10 text-amber-500 hover:text-white disabled:cursor-not-allowed disabled:border-none disabled:bg-neutral-500/20 disabled:text-neutral-500"
-				>
-					<Link
-						target="_blank"
-						className="font-medium"
-						rel="noopener noreferrer"
-						href={report ? report.url : "#"}
-					>
-						<LinkIcon className="h-4 w-4" />
-					</Link>
-				</Button>
-			)
 		},
 	},
 ]

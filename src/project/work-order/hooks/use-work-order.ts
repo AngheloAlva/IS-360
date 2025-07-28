@@ -24,24 +24,21 @@ export interface WorkOrder {
 	priority: WORK_ORDER_PRIORITY
 	workProgressStatus: number
 	estimatedEndDate: Date | null
-	initReport: {
-		url: string
-	} | null
-	endReport: {
-		url: string
-	} | null
 	programDate: Date
 
 	company?: {
 		id: string
+		rut: string
 		name: string
-		logo: string | null
+		image: string | null
 	}
 	supervisor: {
 		id: string
+		rut: string
 		name: string
 		email: string
-		role: string
+		phone: string | null
+		image: string | null
 	}
 	_count: {
 		workEntries: number

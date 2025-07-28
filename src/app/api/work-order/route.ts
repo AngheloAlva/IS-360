@@ -118,6 +118,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					company: {
 						select: {
 							id: true,
+							image: true,
 							name: true,
 							rut: true,
 						},
@@ -125,9 +126,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					supervisor: {
 						select: {
 							id: true,
+							rut: true,
 							name: true,
 							email: true,
-							role: true,
+							image: true,
+							phone: true,
 						},
 					},
 					workRequest: true,
@@ -147,16 +150,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 									entryType: { in: ["ADDITIONAL_ACTIVITY", "DAILY_ACTIVITY"] },
 								},
 							},
-						},
-					},
-					initReport: {
-						select: {
-							url: true,
-						},
-					},
-					endReport: {
-						select: {
-							url: true,
 						},
 					},
 				},
