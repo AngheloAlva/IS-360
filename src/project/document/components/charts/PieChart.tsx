@@ -1,6 +1,6 @@
 "use client"
 
-import { Cell, Pie, PieChart as RechartsPieChart } from "recharts"
+import { Cell, Label, Pie, PieChart as RechartsPieChart } from "recharts"
 
 import {
 	ChartLegend,
@@ -16,7 +16,7 @@ interface PieChartProps {
 
 export function PieChart({ data, colors }: PieChartProps) {
 	const filteredData = data.filter((item) => item.value > 0)
-	// const total = filteredData.reduce((acc, item) => acc + item.value, 0)
+	const total = filteredData.reduce((acc, item) => acc + item.value, 0)
 
 	return (
 		<ChartContainer className="h-[300px] w-full" config={{}}>
@@ -44,6 +44,30 @@ export function PieChart({ data, colors }: PieChartProps) {
 							}
 						/>
 					))}
+					<Label
+						content={({ viewBox }) => {
+							if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+								return (
+									<text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+										<tspan
+											x={viewBox.cx}
+											y={viewBox.cy}
+											className="fill-foreground text-2xl font-semibold"
+										>
+											{total}
+										</tspan>
+										<tspan
+											x={viewBox.cx}
+											y={(viewBox.cy || 0) + 24}
+											className="fill-muted-foreground text-sm"
+										>
+											Total
+										</tspan>
+									</text>
+								)
+							}
+						}}
+					/>
 				</Pie>
 
 				<ChartLegend />

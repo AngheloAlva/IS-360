@@ -1,137 +1,145 @@
 "use client"
 
-import {
-	UsersIcon,
-	FileXIcon,
-	ReplaceIcon,
-	PieChartIcon,
-	FileTypeIcon,
-	ChartColumnIcon,
-	ChartSplineIcon,
-} from "lucide-react"
+import { ChartBarDecreasingIcon, ChartSplineIcon, PieChartIcon } from "lucide-react"
 
-import { useDocumentsCharts } from "@/project/document/hooks/use-documents-charts"
+import { useDocumentsCharts } from "../../hooks/use-documents-charts"
 
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/shared/components/ui/card"
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { DocumentExpirationChart } from "./DocumentExpirationChart"
 import { DocumentActivityChart } from "./DocumentActivityChart"
-import { RecentChangesTable } from "./RecentChangesTable"
+import { TopContributorsChart } from "./TopContributorsChart"
+import { MonthlyTrendsChart } from "./MonthlyTrendsChart"
 import { ChangesPerDayChart } from "./ChangesPerDayChart"
+import { RecentChangesTable } from "./RecentChangesTable"
 import { ResponsiblesChart } from "./ResponsiblesChart"
-import { Metadata } from "./Metadata"
+import { FileTypesChart } from "./FileTypesChart"
+import { MetricsGrid } from "./MetricsGrid"
 import { PieChart } from "./PieChart"
+import {
+	Card,
+	CardTitle,
+	CardHeader,
+	CardContent,
+	CardDescription,
+} from "@/shared/components/ui/card"
 
 export default function DocumentCharts() {
 	const { data, isLoading } = useDocumentsCharts()
 
 	return (
-		<div className="w-full flex-1 space-y-4">
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				<Metadata
-					isLoading={isLoading}
-					className="bg-blue-500"
-					title="Total Documentos"
-					description="Documentos registrados"
-					value={data?.areaData.reduce((acc, item) => acc + item.value, 0) || 0}
-					icon={
-						<div className="rounded-lg bg-blue-500/20 p-1.5 text-blue-500">
-							<FileTypeIcon />
-						</div>
-					}
-				/>
-				<Metadata
-					isLoading={isLoading}
-					className="bg-red-500"
-					title="Documentos Vencidos"
-					description="Requieren atención inmediata"
-					value={data?.expirationData.find((item) => item.name === "Vencidos")?.value || 0}
-					icon={
-						<div className="rounded-lg bg-red-500/20 p-1.5 text-red-500">
-							<FileXIcon />
-						</div>
-					}
-				/>
-				<Metadata
-					title="Responsables"
-					isLoading={isLoading}
-					className="bg-green-500"
-					description="Personas a cargo"
-					value={data?.responsibleData.length || 0}
-					icon={
-						<div className="rounded-lg bg-green-500/20 p-1.5 text-green-500">
-							<UsersIcon />
-						</div>
-					}
-				/>
-				<Metadata
-					isLoading={isLoading}
-					title="Cambios Recientes"
-					className="bg-yellow-500"
-					description="En los últimos 7 días"
-					value={data?.recentChanges.length || 0}
-					icon={
-						<div className="rounded-lg bg-yellow-500/20 p-1.5 text-yellow-500">
-							<ReplaceIcon />
-						</div>
-					}
-				/>
-			</div>
+		<div className="space-y-6">
+			<MetricsGrid
+				totalDocuments={data?.areaData.reduce((acc, item) => acc + item.value, 0) || 0}
+				totalFolders={data?.metrics?.totalFolders || 0}
+				expiredDocuments={data?.expirationData.find((item) => item.name === "Vencidos")?.value || 0}
+				recentChanges={data?.recentChanges.length || 0}
+				isLoading={isLoading}
+			/>
 
-			<Tabs defaultValue="areas" className="mt-10 space-y-4">
-				<TabsList className="h-11 w-full">
-					<TabsTrigger className="py-2" value="areas">
-						Por Áreas
-					</TabsTrigger>
-					<TabsTrigger className="py-2" value="vencimientos">
-						Vencimientos
-					</TabsTrigger>
-					<TabsTrigger className="py-2" value="responsables">
-						Responsables
-					</TabsTrigger>
-					<TabsTrigger className="py-2" value="actividad">
-						Actividad
-					</TabsTrigger>
+			<Tabs defaultValue="overview" className="w-full">
+				<TabsList className="grid w-full grid-cols-5">
+					<TabsTrigger value="overview">Resumen</TabsTrigger>
+					<TabsTrigger value="areas">Por Áreas</TabsTrigger>
+					<TabsTrigger value="vencimientos">Vencimientos</TabsTrigger>
+					<TabsTrigger value="responsables">Responsables</TabsTrigger>
+					<TabsTrigger value="actividad">Actividad</TabsTrigger>
 				</TabsList>
 
 				<TabsContents>
-					<TabsContent value="areas" className="space-y-4">
-						<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-							<Card className="col-span-2">
+					<TabsContent value="overview" className="space-y-4">
+						<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+							<Card className="cursor-pointer border-none transition-shadow hover:shadow-md">
 								<CardHeader>
-									<div className="flex items-center justify-between">
+									<div className="flex items-start justify-between">
 										<div>
-											<CardTitle>Actividad de Documentación</CardTitle>
-											<CardDescription>
-												Creación de carpetas y archivos en los últimos 15 días
-											</CardDescription>
+											<CardTitle className="text-lg font-semibold">Tendencias Mensuales</CardTitle>
+											<CardDescription>Archivos subidos por mes en el año actual</CardDescription>
 										</div>
-
-										<ChartSplineIcon className="text-muted-foreground h-5 min-w-5" />
+										<ChartSplineIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 									</div>
 								</CardHeader>
+								<CardContent className="p-0 pr-4">
+									<MonthlyTrendsChart data={data?.monthlyUploads || []} />
+								</CardContent>
+							</Card>
 
-								<CardContent className="pl-2">
+							<Card className="cursor-pointer border-none transition-shadow hover:shadow-md">
+								<CardHeader>
+									<div className="flex items-start justify-between">
+										<div>
+											<CardTitle className="text-lg font-semibold">Tipos de Archivos</CardTitle>
+											<CardDescription>
+												Distribución de los tipos de archivos subidos
+											</CardDescription>
+										</div>
+										<PieChartIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
+									</div>
+								</CardHeader>
+								<CardContent className="p-2">
+									<FileTypesChart data={data?.fileTypes || []} />
+								</CardContent>
+							</Card>
+
+							<Card className="cursor-pointer border-none transition-shadow hover:shadow-md">
+								<CardHeader>
+									<div className="flex items-start justify-between">
+										<div>
+											<CardTitle className="text-lg font-semibold">
+												Principales Contribuidores
+											</CardTitle>
+											<CardDescription>
+												Top 5 contribuyentes más activos en el año actual
+											</CardDescription>
+										</div>
+										<ChartBarDecreasingIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
+									</div>
+								</CardHeader>
+								<CardContent className="px-4">
+									<TopContributorsChart data={data?.topContributors || []} />
+								</CardContent>
+							</Card>
+
+							<Card className="cursor-pointer border-none transition-shadow hover:shadow-md">
+								<CardHeader>
+									<div className="flex items-start justify-between">
+										<div>
+											<CardTitle className="text-lg font-semibold">Distibución por Áreas</CardTitle>
+											<CardDescription>
+												Distribución de los archivos subidos por área
+											</CardDescription>
+										</div>
+										<PieChartIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
+									</div>
+								</CardHeader>
+								<CardContent className="p-0">
+									<PieChart data={data?.areaData || []} />
+								</CardContent>
+							</Card>
+						</div>
+					</TabsContent>
+
+					<TabsContent value="areas" className="space-y-4">
+						<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+							<Card className="cursor-pointer border-none transition-shadow hover:shadow-md">
+								<CardHeader>
+									<div className="flex items-start justify-between">
+										<div>
+											<CardTitle className="text-lg font-semibold">
+												Actividad de Documentos
+											</CardTitle>
+											<CardDescription>Actividad diaria de documentos y carpetas</CardDescription>
+										</div>
+										<ChartSplineIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
+									</div>
+								</CardHeader>
+								<CardContent className="p-0 pr-4">
 									<DocumentActivityChart data={data?.activityByDay || []} />
 								</CardContent>
 							</Card>
 
-							<Card className="col-span-2 lg:col-span-1">
+							<Card>
 								<CardHeader>
-									<div className="flex items-center justify-between">
-										<div>
-											<CardTitle>Proporción por Áreas</CardTitle>
-											<CardDescription>Distribución porcentual</CardDescription>
-										</div>
-
-										<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
-									</div>
+									<CardTitle>Proporción por Áreas</CardTitle>
 								</CardHeader>
 								<CardContent>
 									<PieChart data={data?.areaData || []} />
@@ -141,49 +149,42 @@ export default function DocumentCharts() {
 					</TabsContent>
 
 					<TabsContent value="vencimientos" className="space-y-4">
-						<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-							<Card className="col-span-2">
+						<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+							<Card>
 								<CardHeader>
-									<div className="flex items-center justify-between">
-										<div>
-											<CardTitle>Estado de Vencimientos</CardTitle>
-											<CardDescription>Documentos por período de vencimiento</CardDescription>
-										</div>
-
-										<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
-									</div>
+									<CardTitle>Estado de Vencimientos</CardTitle>
 								</CardHeader>
-								<CardContent className="pl-2">
+								<CardContent>
 									<DocumentExpirationChart
 										data={data?.expirationData || []}
 										colors={[
-											"var(--color-red-500)",
-											"var(--color-orange-500)",
-											"var(--color-yellow-500)",
-											"var(--color-green-500)",
-											"var(--color-blue-500)",
-											"var(--color-indigo-500)",
-											"var(--color-purple-500)",
+											"#ef4444", // red-500
+											"#f97316", // orange-500
+											"#eab308", // yellow-500
+											"#22c55e", // green-500
+											"#3b82f6", // blue-500
+											"#8b5cf6", // violet-500
+											"#06b6d4", // cyan-500
 										]}
 									/>
 								</CardContent>
 							</Card>
+
 							<Card>
 								<CardHeader>
 									<CardTitle>Distribución de Vencimientos</CardTitle>
-									<CardDescription>Proporción por período</CardDescription>
 								</CardHeader>
 								<CardContent>
 									<PieChart
 										data={data?.expirationData || []}
 										colors={[
-											"var(--color-red-500)",
-											"var(--color-orange-500)",
-											"var(--color-yellow-500)",
-											"var(--color-green-500)",
-											"var(--color-blue-500)",
-											"var(--color-indigo-500)",
-											"var(--color-purple-500)",
+											"#ef4444", // red-500
+											"#f97316", // orange-500
+											"#eab308", // yellow-500
+											"#22c55e", // green-500
+											"#3b82f6", // blue-500
+											"#8b5cf6", // violet-500
+											"#06b6d4", // cyan-500
 										]}
 									/>
 								</CardContent>
@@ -192,54 +193,32 @@ export default function DocumentCharts() {
 					</TabsContent>
 
 					<TabsContent value="responsables" className="space-y-4">
-						<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-							<Card className="col-span-2">
-								<CardHeader>
-									<div className="flex items-center justify-between">
-										<div>
-											<CardTitle>Documentos por Responsable</CardTitle>
-											<CardDescription>Cantidad asignada a cada persona</CardDescription>
-										</div>
-
-										<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
-									</div>
-								</CardHeader>
-
-								<CardContent className="pl-2">
-									<ResponsiblesChart
-										data={data?.responsibleData || []}
-										colors={[
-											"var(--color-blue-500)",
-											"var(--color-green-500)",
-											"var(--color-yellow-500)",
-											"var(--color-red-500)",
-											"var(--color-indigo-500)",
-											"var(--color-purple-500)",
-										]}
-									/>
-								</CardContent>
-							</Card>
+						<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 							<Card>
 								<CardHeader>
-									<div className="flex items-center justify-between">
-										<div>
-											<CardTitle>Distribución por Responsable</CardTitle>
-											<CardDescription>Proporción de carga de trabajo</CardDescription>
-										</div>
+									<CardTitle>Documentos por Responsable</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<ResponsiblesChart data={data?.responsibleData || []} />
+								</CardContent>
+							</Card>
 
-										<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
-									</div>
+							<Card>
+								<CardHeader>
+									<CardTitle>Distribución por Responsable</CardTitle>
 								</CardHeader>
 								<CardContent>
 									<PieChart
 										data={data?.responsibleData || []}
 										colors={[
-											"var(--color-blue-500)",
-											"var(--color-green-500)",
-											"var(--color-yellow-500)",
-											"var(--color-red-500)",
-											"var(--color-indigo-500)",
-											"var(--color-purple-500)",
+											"#3b82f6", // blue-500
+											"#10b981", // emerald-500
+											"#f59e0b", // amber-500
+											"#ef4444", // red-500
+											"#8b5cf6", // violet-500
+											"#06b6d4", // cyan-500
+											"#84cc16", // lime-500
+											"#f97316", // orange-500
 										]}
 									/>
 								</CardContent>
@@ -248,23 +227,19 @@ export default function DocumentCharts() {
 					</TabsContent>
 
 					<TabsContent value="actividad" className="space-y-4">
-						<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-							<Card className="col-span-full lg:col-span-2">
+						<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+							<Card>
 								<CardHeader>
 									<CardTitle>Cambios por Día</CardTitle>
-									<CardDescription>
-										Modificaciones realizadas en los últimos 15 días
-									</CardDescription>
 								</CardHeader>
-								<CardContent className="pl-2">
+								<CardContent>
 									<ChangesPerDayChart data={data?.changesPerDay || []} />
 								</CardContent>
 							</Card>
 
-							<Card className="col-span-full lg:col-span-1">
+							<Card>
 								<CardHeader>
-									<CardTitle>Últimas modificaciones</CardTitle>
-									<CardDescription>Últimas modificaciones realizadas a documentos</CardDescription>
+									<CardTitle>Modificaciones Recientes</CardTitle>
 								</CardHeader>
 								<CardContent>
 									<RecentChangesTable data={data?.recentChanges || []} />

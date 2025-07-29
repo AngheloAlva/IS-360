@@ -11,6 +11,95 @@ import prisma from "@/lib/prisma"
 
 import type { AREAS } from "@prisma/client"
 
+function formatFileType(mimeType: string): string {
+	const typeMap: Record<string, string> = {
+		// Documentos de Office
+		"application/msword": "Word (.doc)",
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word (.docx)",
+		"application/vnd.ms-excel": "Excel (.xls)",
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Excel (.xlsx)",
+		"application/vnd.ms-powerpoint": "PowerPoint (.ppt)",
+		"application/vnd.openxmlformats-officedocument.presentationml.presentation":
+			"PowerPoint (.pptx)",
+
+		// PDFs
+		"application/pdf": "PDF",
+
+		// Imágenes
+		"image/jpeg": "JPEG",
+		"image/jpg": "JPG",
+		"image/png": "PNG",
+		"image/gif": "GIF",
+		"image/bmp": "BMP",
+		"image/webp": "WebP",
+		"image/svg+xml": "SVG",
+
+		// Archivos comprimidos
+		"application/zip": "ZIP",
+		"application/x-zip-compressed": "ZIP",
+		"application/x-rar-compressed": "RAR",
+		"application/x-7z-compressed": "7Z",
+		"application/gzip": "GZIP",
+
+		// Texto
+		"text/plain": "Texto (.txt)",
+		"text/csv": "CSV",
+		"text/html": "HTML",
+		"text/css": "CSS",
+		"text/javascript": "JavaScript",
+
+		// Videos
+		"video/mp4": "MP4",
+		"video/avi": "AVI",
+		"video/quicktime": "MOV",
+		"video/x-msvideo": "AVI",
+
+		// Audio
+		"audio/mpeg": "MP3",
+		"audio/wav": "WAV",
+		"audio/ogg": "OGG",
+
+		// Otros
+		"application/json": "JSON",
+		"application/xml": "XML",
+		"application/octet-stream": "Archivo binario",
+	}
+
+	// Si el tipo está vacío o es null
+	if (!mimeType || mimeType.trim() === "") {
+		return "Sin tipo"
+	}
+
+	// Si existe en el mapa, devolver el nombre formateado
+	if (typeMap[mimeType]) {
+		return typeMap[mimeType]
+	}
+
+	// Si no existe, intentar extraer la extensión del tipo MIME
+	if (mimeType.includes("/")) {
+		const [category, subtype] = mimeType.split("/")
+
+		// Formatear categorías conocidas
+		switch (category) {
+			case "image":
+				return `Imagen (${subtype.toUpperCase()})`
+			case "video":
+				return `Video (${subtype.toUpperCase()})`
+			case "audio":
+				return `Audio (${subtype.toUpperCase()})`
+			case "text":
+				return `Texto (${subtype.toUpperCase()})`
+			case "application":
+				return `Aplicación (${subtype.toUpperCase()})`
+			default:
+				return `${category.charAt(0).toUpperCase() + category.slice(1)} (${subtype.toUpperCase()})`
+		}
+	}
+
+	// Si no se puede formatear, devolver el tipo original
+	return mimeType
+}
+
 export async function GET() {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -50,6 +139,71 @@ export async function GET() {
 			}
 		})
 	)
+
+	// Get additional metrics
+	const totalFolders = await // Total folders
+	prisma.folder.count({
+		where: { isActive: true, isExternal: false },
+		cacheStrategy: { ttl: 120 },
+	})
+
+	// Get file type distribution
+	const fileTypes = await prisma.file.groupBy({
+		by: ["type"],
+		where: { isActive: true },
+		_count: { type: true },
+		cacheStrategy: { ttl: 120 },
+	})
+
+	// Get monthly upload trends (last 6 months)
+	const sixMonthsAgo = subDays(new Date(), 180)
+	const monthlyUploads = await Promise.all(
+		Array.from({ length: 6 }, (_, i) => {
+			const startDate = addDays(sixMonthsAgo, i * 30)
+			const endDate = addDays(startDate, 30)
+			return prisma.file
+				.count({
+					where: {
+						isActive: true,
+						createdAt: {
+							gte: startDate,
+							lt: endDate,
+						},
+					},
+					cacheStrategy: { ttl: 120 },
+				})
+				.then((count) => ({
+					month: format(startDate, "MMM"),
+					count,
+				}))
+		})
+	)
+
+	// Get top contributors (users with most uploads)
+	const topContributors = await prisma.user.findMany({
+		select: {
+			name: true,
+			_count: {
+				select: {
+					files: {
+						where: { isActive: true },
+					},
+				},
+			},
+		},
+		where: {
+			files: {
+				some: { isActive: true },
+			},
+		},
+		orderBy: {
+			files: {
+				_count: "desc",
+			},
+		},
+		take: 5,
+		cacheStrategy: { ttl: 120 },
+	})
 
 	// Get documents by expiration
 	const now = new Date()
@@ -351,6 +505,19 @@ export async function GET() {
 		changesPerDay: changesPerDay.map((day) => ({
 			date: format(new Date(day.date), "dd/MM"),
 			cambios: day.changes,
+		})),
+		// New metrics
+		metrics: {
+			totalFolders,
+		},
+		fileTypes: fileTypes.map((type) => ({
+			name: formatFileType(type.type),
+			value: type._count.type,
+		})),
+		monthlyUploads,
+		topContributors: topContributors.map((user) => ({
+			name: user.name,
+			value: user._count.files,
 		})),
 	})
 }

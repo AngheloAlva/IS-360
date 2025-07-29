@@ -39,6 +39,25 @@ export interface ChangesPerDay {
 	cambios: number
 }
 
+export interface FileType {
+	name: string
+	value: number
+}
+
+export interface MonthlyUpload {
+	month: string
+	count: number
+}
+
+export interface TopContributor {
+	name: string
+	value: number
+}
+
+export interface Metrics {
+	totalFolders: number
+}
+
 interface DocumentsChartsResponse {
 	areaData: AreaDaum[]
 	expirationData: ExpirationDaum[]
@@ -46,6 +65,10 @@ interface DocumentsChartsResponse {
 	recentChanges: RecentChange[]
 	activityByDay: ActivityByDay[]
 	changesPerDay: ChangesPerDay[]
+	metrics: Metrics
+	fileTypes: FileType[]
+	monthlyUploads: MonthlyUpload[]
+	topContributors: TopContributor[]
 }
 
 export const useDocumentsCharts = () => {
