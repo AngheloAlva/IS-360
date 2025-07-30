@@ -15,6 +15,7 @@ import { WorkEntryColumns } from "../../columns/work-entry-columns"
 import { WorkBookEntryDetails } from "./WorkBookEntryDetails"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
+import WorkOrderPDFViewer from "../pdf/WorkOrderPDFViewer"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Input } from "@/shared/components/ui/input"
 import {
@@ -32,16 +33,16 @@ import {
 	SelectContent,
 	SelectTrigger,
 } from "@/shared/components/ui/select"
-import WorkOrderPDFViewer from "../pdf/WorkOrderPDFViewer"
 
 export default function WorkBookEntriesTable({
 	userId,
+	isOtcMember,
 	workOrderId,
-	hasPermission,
 	workOrderNumber,
 }: {
 	userId: string
 	workOrderId: string
+	isOtcMember: boolean
 	hasPermission: boolean
 	workOrderNumber: string
 }): React.ReactElement {
@@ -181,13 +182,15 @@ export default function WorkBookEntriesTable({
 				className="border-orange-600 text-orange-600 hover:bg-orange-600"
 			/>
 
-			<WorkBookEntryDetails
-				userId={userId}
-				isLoading={false}
-				entry={selectedEntry}
-				hasPermission={hasPermission}
-				onClose={() => setSelectedEntry(null)}
-			/>
+			{selectedEntry && (
+				<WorkBookEntryDetails
+					userId={userId}
+					isLoading={false}
+					entry={selectedEntry}
+					isOtcMember={isOtcMember}
+					onClose={() => setSelectedEntry(null)}
+				/>
+			)}
 		</div>
 	)
 }

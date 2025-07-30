@@ -22,7 +22,7 @@ export default function SubmitButton({
 			type="submit"
 			disabled={isSubmitting || disabled}
 			className={cn(
-				"hover:bg-secondary-background w-full cursor-pointer font-bold tracking-wide transition-all hover:scale-105",
+				"hover:bg-secondary-background w-full cursor-pointer font-bold tracking-wide transition-all hover:scale-[1.02]",
 				className
 			)}
 		>

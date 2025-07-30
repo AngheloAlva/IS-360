@@ -140,6 +140,7 @@ model User {
   WorkRequest                     WorkRequest[]
   basicFolderReviewer             BasicFolder[]             @relation("BasicFolderReviewer")
   equipment                       Equipment[]               @relation("EquipmentCreatedBy")
+  inspectionComments              InspectionComment[]       @relation("InspectionCommentAuthor")
 
   @@unique([email])
   @@unique([rut])
@@ -501,45 +502,46 @@ enum INSPECTION_STATUS {
 }
 
 model WorkEntry {
-  id                  String             @id @default(cuid())
+  id                  String              @id @default(cuid())
   entryType           ENTRY_TYPE
-  isFavorite          Boolean            @default(false)
-  hasAttachments      Boolean            @default(false)
-  executionDate       DateTime           @default(now())
+  isFavorite          Boolean             @default(false)
+  hasAttachments      Boolean             @default(false)
+  executionDate       DateTime            @default(now())
   activityName        String?
   activityStartTime   String?
   activityEndTime     String?
   comments            String?
-  inspectionStatus    INSPECTION_STATUS? @default(REPORTED)
+  inspectionStatus    INSPECTION_STATUS?  @default(REPORTED)
   supervisionComments String?
   safetyObservations  String?
   nonConformities     String?
   inspectorName       String?
   recommendations     String?
   others              String?
-  noteStatus          NOTE_STATUS?       @default(PENDING)
-  notificationSent    Boolean            @default(false)
+  noteStatus          NOTE_STATUS?        @default(PENDING)
+  notificationSent    Boolean             @default(false)
   acknowledgedAt      DateTime?
   resolvedAt          DateTime?
   approvalDate        DateTime?
-  approvalBy          User?              @relation("WorkEntryApproval", fields: [approvalById], references: [id])
+  approvalBy          User?               @relation("WorkEntryApproval", fields: [approvalById], references: [id])
   approvalById        String?
-  createdAt           DateTime           @default(now())
-  createdBy           User               @relation("WorkEntryCreator", fields: [createdById], references: [id])
+  createdAt           DateTime            @default(now())
+  createdBy           User                @relation("WorkEntryCreator", fields: [createdById], references: [id])
   createdById         String
   signedAt            DateTime?
-  signedBy            User?              @relation("WorkEntrySigner", fields: [signedById], references: [id])
+  signedBy            User?               @relation("WorkEntrySigner", fields: [signedById], references: [id])
   signedById          String?
-  workOrder           WorkOrder          @relation(fields: [workOrderId], references: [id])
+  workOrder           WorkOrder           @relation(fields: [workOrderId], references: [id])
   workOrderId         String
-  milestone           Milestone?         @relation(fields: [milestoneId], references: [id])
+  milestone           Milestone?          @relation(fields: [milestoneId], references: [id])
   milestoneId         String?
-  assignedUsers       User[]             @relation(name: "AssignedUsers")
-  referencedEntry     WorkEntry?         @relation("EntryReferences", fields: [referencedEntryId], references: [id])
+  assignedUsers       User[]              @relation(name: "AssignedUsers")
+  referencedEntry     WorkEntry?          @relation("EntryReferences", fields: [referencedEntryId], references: [id])
   referencedEntryId   String?
-  referencedBy        WorkEntry[]        @relation("EntryReferences")
+  referencedBy        WorkEntry[]         @relation("EntryReferences")
   equipmentHistory    EquipmentHistory[]
   attachments         Attachment[]
+  inspectionComments  InspectionComment[]
 
   @@unique([id])
   @@index([milestoneId])
@@ -596,6 +598,8 @@ model Attachment {
   equipmentId           String?
   workRequest           WorkRequest?         @relation(fields: [workRequestId], references: [id])
   workRequestId         String?
+  inspectionComment     InspectionComment?   @relation(fields: [inspectionCommentId], references: [id])
+  inspectionCommentId   String?
 
   @@map("attachment")
 }
@@ -1489,4 +1493,29 @@ model ActivityLog {
   @@index([entityType, entityId])
   @@index([timestamp])
   @@map("activity_log")
+}
+
+enum INSPECTION_COMMENT_TYPE {
+  SUPERVISOR_RESPONSE
+  RESPONSIBLE_APPROVAL
+  RESPONSIBLE_REJECTION
+}
+
+model InspectionComment {
+  id          String                  @id @default(cuid())
+  content     String
+  type        INSPECTION_COMMENT_TYPE
+  isResolved  Boolean                 @default(false)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  author      User                    @relation("InspectionCommentAuthor", fields: [authorId], references: [id])
+  authorId    String
+  workEntry   WorkEntry               @relation(fields: [workEntryId], references: [id])
+  workEntryId String
+  attachments Attachment[]
+
+  @@index([workEntryId])
+  @@index([authorId])
+  @@index([type])
+  @@map("inspection_comment")
 }

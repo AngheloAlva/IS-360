@@ -192,8 +192,9 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="outline" size={"icon"} className="size-10">
+							<Button variant="outline" className="h-10">
 								<FilterIcon />
+								Filtros
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-fit min-w-56" align="start">
@@ -257,12 +258,12 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					</DropdownMenu>
 
 					<Button
-						size={"icon"}
 						variant="outline"
 						onClick={actions.resetFilters}
-						className="size-10 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+						className="h-10 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
 					>
 						<FilterXIcon />
+						Limpiar Filtros
 					</Button>
 				</div>
 

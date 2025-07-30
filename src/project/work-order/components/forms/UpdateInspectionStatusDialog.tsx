@@ -23,11 +23,13 @@ export default function UpdateInspectionStatusDialog({
 	workEntryId,
 	currentStatus,
 	onStatusUpdate,
+	onOpen,
 }: {
 	userId: string
 	workEntryId: string
 	currentStatus: INSPECTION_STATUS
 	onStatusUpdate?: () => void
+	onOpen?: () => void
 }) {
 	const [isLoading, setIsLoading] = useState(false)
 	const [open, setOpen] = useState(false)
@@ -62,7 +64,13 @@ export default function UpdateInspectionStatusDialog({
 	}
 
 	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
+		<AlertDialog
+			open={open}
+			onOpenChange={() => {
+				setOpen(!open)
+				onOpen?.()
+			}}
+		>
 			<AlertDialogTrigger asChild>
 				<Button
 					size="sm"

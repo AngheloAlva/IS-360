@@ -39,6 +39,7 @@ export default async function AdminWorkBooksPage({ params }: { params: Promise<{
 			userId={session.user.id}
 			userRole={session.user.role!}
 			hasPermission={hasPermission.success}
+			isOtcMember={session.user.accessRole === "ADMIN"}
 			hassWorkBookPermission={hassWorkBookPermission.success}
 		/>
 	)

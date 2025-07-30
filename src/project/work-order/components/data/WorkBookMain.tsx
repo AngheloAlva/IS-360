@@ -16,8 +16,8 @@ import OtcInspectorForm from "@/project/work-order/components/forms/OtcInspector
 import ActivityForm from "@/project/work-order/components/forms/WorkBookActivityForm"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { Alert, AlertTitle } from "@/shared/components/ui/alert"
-import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Progress } from "@/shared/components/ui/progress"
+import { Skeleton } from "@/shared/components/ui/skeleton"
 import BackButton from "@/shared/components/BackButton"
 import { Badge } from "@/shared/components/ui/badge"
 
@@ -25,6 +25,7 @@ interface WorkBookMainProps {
 	userId: string
 	userRole: string
 	workBookId: string
+	isOtcMember?: boolean
 	hasPermission: boolean
 	hassWorkBookPermission: boolean
 }
@@ -34,6 +35,7 @@ export default function WorkBookMain({
 	userRole,
 	workBookId,
 	hasPermission,
+	isOtcMember = false,
 	hassWorkBookPermission,
 }: WorkBookMainProps): React.ReactElement {
 	const { data, isLoading, isError, isFetching } = useWorkBookById({ workOrderId: workBookId })
@@ -222,6 +224,7 @@ export default function WorkBookMain({
 							<CardContent>
 								<WorkBookEntriesTable
 									userId={userId}
+									isOtcMember={isOtcMember}
 									workOrderId={workBook.id}
 									hasPermission={hasPermission}
 									workOrderNumber={workBook.otNumber}

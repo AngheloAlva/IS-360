@@ -1,33 +1,55 @@
 "use client"
-
+import { ExternalLink, FileText, User, MessageSquareTextIcon } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { useState } from "react"
+import { toast } from "sonner"
 import Link from "next/link"
 
-import UpdateInspectionStatusDialog from "@/project/work-order/components/forms/UpdateInspectionStatusDialog"
+import { createInspectionComment } from "@/project/work-order/actions/createInspectionComment"
+import { useInspectionComments } from "@/project/work-order/hooks/use-inspection-comments"
 import { WorkEntry } from "@/project/work-order/hooks/use-work-entries"
+import { INSPECTION_COMMENT_TYPE } from "@prisma/client"
+import { uploadFilesToCloud } from "@/lib/upload-files"
 import { useQueryClient } from "@tanstack/react-query"
-import { Badge } from "@/shared/components/ui/badge"
-import { ExternalLink, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+	inspectionCommentSchema,
+	type InspectionCommentSchema,
+} from "@/project/work-order/schemas/inspection-comment.schema"
 
+import { Sheet, SheetTitle, SheetHeader, SheetContent } from "@/shared/components/ui/sheet"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
+import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
+import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
+import { Separator } from "@/shared/components/ui/separator"
+import FileTable from "@/shared/components/forms/FileTable"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Button } from "@/shared/components/ui/button"
-import {
-	Drawer,
-	DrawerTitle,
-	DrawerClose,
-	DrawerHeader,
-	DrawerContent,
-} from "@/shared/components/ui/drawer"
+import { Badge } from "@/shared/components/ui/badge"
+import { Form } from "@/shared/components/ui/form"
 
 interface WorkBookEntryDetailsProps {
 	isLoading: boolean
 	onClose: () => void
-	hasPermission: boolean
-	entry: WorkEntry | null
+	entry: WorkEntry
 	userId?: string
+	isOtcMember: boolean
+}
+
+const commentTypeLabels = {
+	SUPERVISOR_RESPONSE: "Respuesta",
+	RESPONSIBLE_APPROVAL: "Aprobación",
+	RESPONSIBLE_REJECTION: "Rechazo",
+}
+
+const commentTypeColors = {
+	SUPERVISOR_RESPONSE: "bg-blue-500/10 text-blue-500 border-blue-500",
+	RESPONSIBLE_APPROVAL: "bg-green-500/10 text-green-500 border-green-500",
+	RESPONSIBLE_REJECTION: "bg-red-500/10 text-red-500 border-red-500",
 }
 
 export function WorkBookEntryDetails({
@@ -35,34 +57,133 @@ export function WorkBookEntryDetails({
 	userId,
 	onClose,
 	isLoading,
-	hasPermission,
+	isOtcMember,
 }: WorkBookEntryDetailsProps) {
 	const queryClient = useQueryClient()
+	const [commentType, setCommentType] = useState<INSPECTION_COMMENT_TYPE | null>(
+		!isOtcMember ? "SUPERVISOR_RESPONSE" : null
+	)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 
-	const handleStatusUpdate = () => {
-		// Invalidar las queries para refrescar los datos
-		queryClient.invalidateQueries({ queryKey: ["work-entries"] })
+	const { data: comments, isLoading: commentsLoading } = useInspectionComments({
+		workEntryId: entry?.id || "",
+		enabled: entry?.entryType === "OTC_INSPECTION" && !!entry?.id,
+	})
+
+	const form = useForm<InspectionCommentSchema>({
+		resolver: zodResolver(inspectionCommentSchema),
+		defaultValues: {
+			content: "",
+			workEntryId: entry.id,
+			type: !isOtcMember ? "SUPERVISOR_RESPONSE" : undefined,
+		},
+	})
+
+	const canAddComment = () => {
+		if (!entry || entry.inspectionStatus === "RESOLVED" || !userId) return false
+
+		if (!isOtcMember) {
+			const hasPendingResponse = comments?.some(
+				(c) =>
+					c.type === "SUPERVISOR_RESPONSE" &&
+					!comments.some(
+						(approval) =>
+							approval.createdAt > c.createdAt &&
+							(approval.type === "RESPONSIBLE_APPROVAL" ||
+								approval.type === "RESPONSIBLE_REJECTION")
+					)
+			)
+			return !hasPendingResponse
+		}
+
+		if (isOtcMember) {
+			const hasPendingResponse = comments?.some(
+				(c) =>
+					c.type === "SUPERVISOR_RESPONSE" &&
+					!comments.some(
+						(approval) =>
+							approval.createdAt > c.createdAt &&
+							(approval.type === "RESPONSIBLE_APPROVAL" ||
+								approval.type === "RESPONSIBLE_REJECTION")
+					)
+			)
+			return hasPendingResponse
+		}
+
+		return false
 	}
+
+	const getAvailableCommentTypes = (): INSPECTION_COMMENT_TYPE[] => {
+		if (!userId) return []
+		if (!isOtcMember) {
+			return ["SUPERVISOR_RESPONSE"]
+		}
+		if (isOtcMember) {
+			return ["RESPONSIBLE_APPROVAL", "RESPONSIBLE_REJECTION"]
+		}
+		return []
+	}
+
+	const onSubmit = async (values: InspectionCommentSchema) => {
+		if (!commentType || !entry || !userId) return
+
+		setIsSubmitting(true)
+
+		try {
+			const files = form.getValues("files")
+			let attachment
+
+			if (files && files.length > 0) {
+				attachment = await uploadFilesToCloud({
+					files,
+					containerType: "files",
+					secondaryName: "InspectionComment-",
+					randomString: entry.id.slice(0, 4),
+				})
+			}
+
+			const result = await createInspectionComment({
+				userId,
+				workEntryId: entry.id,
+				content: values.content,
+				type: commentType,
+				attachment,
+			})
+
+			if (result.ok) {
+				toast.success(result.message)
+				form.reset()
+				setCommentType(!isOtcMember ? "SUPERVISOR_RESPONSE" : null)
+
+				queryClient.invalidateQueries({
+					queryKey: ["inspection-comments", { workEntryId: entry.id }],
+				})
+				queryClient.invalidateQueries({
+					queryKey: ["work-entries"],
+				})
+			} else {
+				toast.error(result.message)
+			}
+		} catch (error) {
+			console.error(error)
+			toast.error("Error al enviar el comentario")
+		} finally {
+			setIsSubmitting(false)
+		}
+	}
+
 	if (!entry && !isLoading) return null
 
 	return (
-		<Drawer
-			open={entry !== null || isLoading}
-			onOpenChange={(open) => !open && onClose()}
-			direction="right"
-		>
-			<DrawerContent>
-				<DrawerHeader className="border-border/50 border-b px-4 py-2">
+		<Sheet open={entry !== null || isLoading} onOpenChange={(open) => !open && onClose()}>
+			<SheetContent dir="right" className="pb-10 sm:w-fit sm:max-w-lg">
+				<SheetHeader className="border-border/50 border-b px-4 py-3">
 					<div className="flex items-center justify-between">
-						<DrawerTitle>{isLoading ? "Cargando..." : "Detalles del Registro"}</DrawerTitle>
-						<DrawerClose asChild>
-							<Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
-								<X className="h-4 w-4" />
-							</Button>
-						</DrawerClose>
+						<SheetTitle>{isLoading ? "Cargando..." : "Detalles del Registro"}</SheetTitle>
 					</div>
-				</DrawerHeader>
-				<ScrollArea className="p-4">
+				</SheetHeader>
+
+				<ScrollArea className="px-4">
 					{isLoading ? (
 						<div className="space-y-4">
 							<Skeleton className="h-8 w-3/4" />
@@ -96,14 +217,6 @@ export function WorkBookEntryDetails({
 									>
 										{entry.inspectionStatus === "RESOLVED" ? "Resuelta" : "Reportada"}
 									</Badge>
-									{userId && entry.inspectionStatus && hasPermission && (
-										<UpdateInspectionStatusDialog
-											userId={userId}
-											workEntryId={entry.id}
-											currentStatus={entry.inspectionStatus}
-											onStatusUpdate={handleStatusUpdate}
-										/>
-									)}
 								</div>
 							)}
 
@@ -193,10 +306,218 @@ export function WorkBookEntryDetails({
 									))}
 								</div>
 							)}
+
+							{entry && entry.entryType === "OTC_INSPECTION" && (
+								<div className="space-y-3">
+									<Separator />
+
+									<div className="space-y-4">
+										<div className="flex items-center gap-2">
+											<MessageSquareTextIcon className="h-5 w-5 text-amber-500" />
+											<h4 className="text-lg font-semibold">Comentarios de Inspección</h4>
+											{comments && comments.length > 0 && (
+												<Badge variant="secondary" className="ml-1">
+													{comments.length}
+												</Badge>
+											)}
+										</div>
+
+										{commentsLoading ? (
+											<div className="space-y-4">
+												{[...Array(2)].map((_, i) => (
+													<div key={i} className="flex w-full max-w-96 gap-3">
+														<Skeleton className="h-10 w-10 rounded-full" />
+														<div className="flex-1 space-y-2">
+															<Skeleton className="h-4 w-32" />
+															<Skeleton className="h-16 w-full" />
+														</div>
+													</div>
+												))}
+											</div>
+										) : comments && comments.length > 0 ? (
+											<div className="max-h-96 space-y-4 overflow-y-auto">
+												{comments.map((comment) => (
+													<div
+														key={comment.id}
+														className="bg-muted/30 flex w-full max-w-96 gap-3 rounded-lg p-3"
+													>
+														<Avatar className="h-10 w-10">
+															<AvatarImage src={comment.author.image} />
+															<AvatarFallback>
+																<User className="h-4 w-4" />
+															</AvatarFallback>
+														</Avatar>
+
+														<div className="flex w-full flex-1 flex-col gap-2">
+															<div className="flex flex-col gap-2">
+																<span className="font-semibold">{comment.author.name}</span>
+																<Badge
+																	variant="outline"
+																	className={cn("text-xs", commentTypeColors[comment.type])}
+																>
+																	{commentTypeLabels[comment.type]}
+																</Badge>
+															</div>
+
+															<div className="bg-background rounded-lg p-3">
+																<p className="text-sm">{comment.content}</p>
+
+																{comment.attachments.length > 0 && (
+																	<div className="mt-3 space-y-1">
+																		<p className="text-muted-foreground text-xs font-medium">
+																			Archivos adjuntos:
+																		</p>
+																		{comment.attachments.map((attachment) => (
+																			<a
+																				key={attachment.id}
+																				href={attachment.url}
+																				target="_blank"
+																				rel="noopener noreferrer"
+																				className="flex items-center gap-1 text-xs text-orange-600 hover:underline"
+																			>
+																				<FileText className="h-3 w-3" />
+																				{attachment.name}
+																				<ExternalLink className="h-3 w-3" />
+																			</a>
+																		))}
+																	</div>
+																)}
+															</div>
+
+															<span className="text-muted-foreground ml-auto text-sm">
+																{format(new Date(comment.createdAt), "dd MMM yyyy HH:mm", {
+																	locale: es,
+																})}
+															</span>
+														</div>
+													</div>
+												))}
+											</div>
+										) : (
+											<div className="text-muted-foreground py-8 text-center">
+												<MessageSquareTextIcon className="mx-auto mb-2 h-12 w-12 opacity-50" />
+												<p>No hay comentarios aún</p>
+											</div>
+										)}
+
+										{canAddComment() && (
+											<>
+												<Separator />
+
+												<div className="space-y-4">
+													{!commentType ? (
+														<div className="space-y-2">
+															<p className="text-sm font-medium">
+																Selecciona el tipo de comentario:
+															</p>
+															<div className="flex gap-1">
+																{userId &&
+																	isOtcMember &&
+																	getAvailableCommentTypes().map((type) => (
+																		<Button
+																			key={type}
+																			variant="outline"
+																			onClick={() => {
+																				setCommentType(type)
+																				form.setValue("type", type)
+																			}}
+																			className={cn(
+																				"flex-1 font-medium transition-colors",
+																				type === "RESPONSIBLE_APPROVAL" &&
+																					"bg-green-500 text-white hover:bg-green-600",
+																				type === "RESPONSIBLE_REJECTION" &&
+																					"bg-red-500 text-white hover:bg-red-600",
+																				type === "SUPERVISOR_RESPONSE" &&
+																					"bg-blue-500 text-white hover:bg-blue-600"
+																			)}
+																		>
+																			{commentTypeLabels[type]}
+																		</Button>
+																	))}
+															</div>
+														</div>
+													) : (
+														<Form {...form}>
+															<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+																<div className="flex items-center justify-between">
+																	{userId && isOtcMember && (
+																		<>
+																			<Badge
+																				className={cn("text-sm", commentTypeColors[commentType])}
+																			>
+																				{commentTypeLabels[commentType]}
+																			</Badge>
+																			<Button
+																				type="button"
+																				variant="ghost"
+																				size="sm"
+																				onClick={() => {
+																					setCommentType(null)
+																				}}
+																			>
+																				Cambiar tipo
+																			</Button>
+																		</>
+																	)}
+																</div>
+
+																<TextAreaFormField<InspectionCommentSchema>
+																	name="content"
+																	control={form.control}
+																	label="Comentario"
+																	placeholder="Escribe tu comentario aquí..."
+																	className="max-w-96"
+																/>
+
+																<FileTable<InspectionCommentSchema>
+																	name="files"
+																	isMultiple={true}
+																	maxFileSize={500}
+																	control={form.control}
+																	className="w-full"
+																/>
+
+																<div className="flex justify-end gap-2">
+																	<Button
+																		type="button"
+																		variant="outline"
+																		className="flex-1"
+																		onClick={() => {
+																			form.reset()
+																			setCommentType(!isOtcMember ? "SUPERVISOR_RESPONSE" : null)
+																		}}
+																		disabled={isSubmitting}
+																	>
+																		Cancelar
+																	</Button>
+
+																	<SubmitButton
+																		label="Enviar comentario"
+																		isSubmitting={isSubmitting}
+																		className={cn(
+																			"flex-1",
+																			commentType === "RESPONSIBLE_APPROVAL" &&
+																				"bg-green-600 hover:bg-green-700",
+																			commentType === "RESPONSIBLE_REJECTION" &&
+																				"bg-red-600 hover:bg-red-700",
+																			commentType === "SUPERVISOR_RESPONSE" &&
+																				"bg-blue-600 hover:bg-blue-700"
+																		)}
+																	/>
+																</div>
+															</form>
+														</Form>
+													)}
+												</div>
+											</>
+										)}
+									</div>
+								</div>
+							)}
 						</div>
 					) : null}
 				</ScrollArea>
-			</DrawerContent>
-		</Drawer>
+			</SheetContent>
+		</Sheet>
 	)
 }
