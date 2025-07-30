@@ -214,7 +214,7 @@ export default function StartupFolderDocuments({
 											</Button>
 										)}
 
-										{isOtcMember &&
+										{!isOtcMember &&
 											data?.folderStatus === "DRAFT" &&
 											(doc.status === "DRAFT" ||
 												doc.status === "REJECTED" ||
