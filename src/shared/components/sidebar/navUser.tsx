@@ -47,7 +47,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 							className="data-[state=open]:bg-primary/70 hover:bg-primary/70 data-[state=open]:text-white"
 						>
 							<Avatar className="h-8 w-8 rounded-lg">
-								<AvatarImage src={session?.user.image || ""} />
+								<AvatarImage src={session?.user.image || ""} width={32} height={32} />
 								<AvatarFallback className="text-primary rounded-md">
 									<Building />
 								</AvatarFallback>

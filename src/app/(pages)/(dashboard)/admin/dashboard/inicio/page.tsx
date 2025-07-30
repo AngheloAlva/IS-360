@@ -15,7 +15,7 @@ export default function DashboardHomePage() {
 					fill
 					priority
 					alt="Dashboard Hero"
-					src="/images/home/hero.jpeg"
+					src="/images/home/hero.png"
 					className="object-cover object-bottom"
 				/>
 				<div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent sm:bg-gradient-to-tl" />
