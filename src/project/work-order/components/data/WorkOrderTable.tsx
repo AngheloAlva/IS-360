@@ -1,7 +1,7 @@
 "use client"
 
 import { FileSpreadsheetIcon, FilterIcon, FilterXIcon, InfoIcon } from "lucide-react"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useState, useRef, lazy, Suspense } from "react"
 import { toast } from "sonner"
 import {
 	flexRender,
@@ -14,7 +14,6 @@ import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-boo
 import { useWorkOrderFilters } from "@/project/work-order/hooks/use-work-order-filters"
 import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
-import { useCompanies } from "@/project/company/hooks/use-companies"
 import { queryClient } from "@/lib/queryClient"
 
 import { CalendarDateRangePicker } from "@/shared/components/ui/date-range-picker"
@@ -48,12 +47,14 @@ import {
 import {
 	WorkOrderTypeFilter,
 	WorkOrderStatusFilter,
-	WorkOrderCompanyFilter,
 	WorkOrderPriorityFilter,
 	WorkOrderHasRequestClousureFilter,
 } from "./WorkOrderFilters"
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
+import { CompanyFilterLoadingSkeleton } from "./WorkOrderCompanyFilterWithData"
+
+const WorkOrderCompanyFilterWithData = lazy(() => import("./WorkOrderCompanyFilterWithData"))
 
 interface WorkOrderTableProps {
 	id?: string
@@ -64,11 +65,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [selectedId, setSelectedId] = useState<string | null>(null)
 	const [rowSelection, setRowSelection] = useState({})
-
-	const { data: companies } = useCompanies({
-		limit: 1000,
-		orderBy: "name",
-	})
+	const prefetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
 	const { filters, actions, workOrders } = useWorkOrderFilters()
 	const { data, isLoading, refetch, isFetching } = workOrders
@@ -91,27 +88,33 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		pageCount: data?.pages ?? 0,
 	})
 
-	const prefetchWorkBookById = (workOrderId: string) => {
-		queryClient.prefetchQuery({
-			queryKey: ["workBooks", { workOrderId }],
-			queryFn: (fn) =>
-				fetchWorkBookById({
-					...fn,
-					queryKey: ["workBooks", { workOrderId }],
-				}),
-			staleTime: 5 * 60 * 1000,
-		})
+	const debouncedPrefetchWorkBookById = useCallback((workOrderId: string) => {
+		if (prefetchTimeoutRef.current) {
+			clearTimeout(prefetchTimeoutRef.current)
+		}
 
-		queryClient.prefetchQuery({
-			queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
-			queryFn: (fn) =>
-				fetchWorkBookMilestones({
-					...fn,
-					queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
-				}),
-			staleTime: 5 * 60 * 1000,
-		})
-	}
+		prefetchTimeoutRef.current = setTimeout(() => {
+			queryClient.prefetchQuery({
+				queryKey: ["workBooks", { workOrderId }],
+				queryFn: (fn) =>
+					fetchWorkBookById({
+						...fn,
+						queryKey: ["workBooks", { workOrderId }],
+					}),
+				staleTime: 5 * 60 * 1000,
+			})
+
+			queryClient.prefetchQuery({
+				queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+				queryFn: (fn) =>
+					fetchWorkBookMilestones({
+						...fn,
+						queryKey: ["workBookMilestones", { workOrderId, showAll: true }],
+					}),
+				staleTime: 5 * 60 * 1000,
+			})
+		}, 300)
+	}, [])
 
 	const handleExportToExcel = useCallback(async () => {
 		try {
@@ -209,11 +212,12 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 								</DropdownMenuItem>
 
 								<DropdownMenuItem asChild>
-									<WorkOrderCompanyFilter
-										value={filters.companyId}
-										companies={companies?.companies}
-										onChange={filterHandlers.onCompanyChange}
-									/>
+									<Suspense fallback={<CompanyFilterLoadingSkeleton />}>
+										<WorkOrderCompanyFilterWithData
+											value={filters.companyId ?? null}
+											onChange={filterHandlers.onCompanyChange}
+										/>
+									</Suspense>
 								</DropdownMenuItem>
 
 								<DropdownMenuItem asChild>
@@ -248,7 +252,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 								</DropdownMenuItem>
 							</DropdownMenuGroup>
 
-							<DropdownMenuSeparator />
+							<DropdownMenuSeparator className="mt-2" />
 
 							<DropdownMenuItem onClick={handleExportToExcel}>
 								{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
@@ -307,7 +311,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 								<TableRow
 									key={row.id}
 									data-state={row.getIsSelected() && "selected"}
-									onMouseEnter={() => prefetchWorkBookById(row.original.id)}
+									onMouseEnter={() => debouncedPrefetchWorkBookById(row.original.id)}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id} className="font-medium">

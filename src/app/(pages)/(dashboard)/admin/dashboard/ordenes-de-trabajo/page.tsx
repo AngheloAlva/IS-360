@@ -4,10 +4,10 @@ import dynamic from "next/dynamic"
 
 import { auth } from "@/lib/auth"
 
-import { WorkOrderStatsContainer } from "@/project/work-order/components/stats/work-order/WorkOrderStatsContainer"
+import { LazyWorkOrderStatsContainer } from "@/project/work-order/components/stats/work-order/LazyWorkOrderStatsContainer"
 import LazyCreateWorkOrderForm from "@/project/work-order/components/forms/LazyCreateWorkOrderForm"
-import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
 import LazyNewWorkBookForm from "@/project/work-order/components/forms/LazyNewWorkBookForm"
+import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import ModuleHeader from "@/shared/components/ModuleHeader"
 
@@ -102,7 +102,7 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 			</ModuleHeader>
 
 			<div className="space-y-4">
-				<WorkOrderStatsContainer />
+				<LazyWorkOrderStatsContainer />
 			</div>
 
 			<WorkOrderTable id="work-order-table" />

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 
 import BackButton from "./BackButton"
+import { memo } from "react"
 
 interface ModuleHeaderProps {
 	title: string
@@ -10,7 +11,7 @@ interface ModuleHeaderProps {
 	children?: React.ReactElement
 }
 
-export default function ModuleHeader({
+const MemoizedModuleHeader = memo(function ModuleHeader({
 	title,
 	backHref,
 	children,
@@ -43,4 +44,6 @@ export default function ModuleHeader({
 			</div>
 		</div>
 	)
-}
+})
+
+export default MemoizedModuleHeader
