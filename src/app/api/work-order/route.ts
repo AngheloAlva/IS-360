@@ -54,9 +54,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				? {
 						OR: [
 							{ workName: { contains: search, mode: "insensitive" as const } },
+							{ workRequest: { contains: search, mode: "insensitive" as const } },
 							{ workLocation: { contains: search, mode: "insensitive" as const } },
 							{ otNumber: { contains: search, mode: "insensitive" as const } },
 							{ supervisor: { name: { contains: search, mode: "insensitive" as const } } },
+							{ company: { name: { contains: search, mode: "insensitive" as const } } },
 						],
 					}
 				: {}),

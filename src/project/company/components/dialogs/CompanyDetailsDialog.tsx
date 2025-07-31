@@ -1,6 +1,7 @@
 "use client"
 
 import { BuildingIcon, CalendarIcon, UserIcon, UsersIcon } from "lucide-react"
+import { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
@@ -26,6 +27,13 @@ interface CompanyDetailsDialogProps {
 }
 
 export default function CompanyDetailsDialog({ children, company }: CompanyDetailsDialogProps) {
+	const { props } = getImageProps({
+		width: 64,
+		height: 64,
+		alt: company.name,
+		src: company.image || "",
+	})
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>{children}</DialogTrigger>
@@ -46,7 +54,7 @@ export default function CompanyDetailsDialog({ children, company }: CompanyDetai
 						<div className="flex flex-col gap-4">
 							<div className="flex items-center gap-4">
 								<Avatar className="size-16 text-lg">
-									<AvatarImage src={company.image || ""} alt={company.name} />
+									<AvatarImage {...props} />
 									<AvatarFallback>{company.name.slice(0, 2)}</AvatarFallback>
 								</Avatar>
 

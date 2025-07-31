@@ -2,7 +2,7 @@
 
 import { BuildingIcon, LogOutIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
+import { getImageProps } from "next/image"
 
 import { authClient } from "@/lib/auth-client"
 
@@ -14,6 +14,13 @@ import type { Session } from "@/lib/auth"
 
 export function NavUser({ session }: { session: Session }): React.ReactElement {
 	const router = useRouter()
+
+	const { props } = getImageProps({
+		width: 40,
+		height: 40,
+		alt: session.user.name,
+		src: session.user.image || "",
+	})
 
 	const handleLogOut = async () => {
 		await authClient.signOut({
@@ -30,14 +37,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 			<SidebarMenuItem className="bg-accent flex items-center gap-2 rounded-xl p-2">
 				<div className="flex items-start gap-2">
 					<Avatar className="h-8 w-8 rounded-lg">
-						<AvatarImage src={session?.user.image || ""} width={32} height={32} asChild>
-							<Image
-								width={32}
-								height={32}
-								alt={session?.user.name}
-								src={session?.user.image || ""}
-							/>
-						</AvatarImage>
+						<AvatarImage {...props} />
 						<AvatarFallback className="text-primary rounded-md">
 							<BuildingIcon />
 						</AvatarFallback>

@@ -12,6 +12,7 @@ import { Button } from "@/shared/components/ui/button"
 
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
 import { FileSchema } from "@/shared/schemas/file.schema"
+import { getImageProps } from "next/image"
 
 interface AvatarUploadFieldProps<T extends FieldValues> {
 	name: FieldPath<T>
@@ -33,10 +34,9 @@ export function AvatarUploadField<T extends FieldValues>({
 
 		const file = files[0]
 
-		// Validate file type
-		if (!file.type.match(/^image\/(jpeg|png|gif|webp|avif|jpg)$/)) {
+		if (!file.type.match(/^image\/(jpeg|png|webp|jpg)$/)) {
 			toast.error("Formato no soportado", {
-				description: "Solo se permiten imágenes JPG, PNG, GIF, WebP y AVIF",
+				description: "Solo se permiten imágenes JPG, PNG, y WebP",
 			})
 			return
 		}
@@ -70,11 +70,18 @@ export function AvatarUploadField<T extends FieldValues>({
 
 	const image = form.watch(name) as FileSchema | undefined
 
+	const { props } = getImageProps({
+		width: 32,
+		height: 32,
+		alt: image?.title || "",
+		src: image?.preview || currentImage || "",
+	})
+
 	return (
 		<div className={cn("relative", className)}>
 			<div className="group relative">
 				<Avatar className="h-24 w-24 transition-all duration-300 group-hover:scale-105">
-					<AvatarImage src={image?.preview || currentImage || undefined} alt="Avatar preview" />
+					<AvatarImage {...props} />
 
 					<AvatarFallback className="text-lg">
 						<Building className="h-8 w-8" />

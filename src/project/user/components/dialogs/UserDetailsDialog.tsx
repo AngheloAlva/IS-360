@@ -32,6 +32,7 @@ import {
 } from "@/shared/components/ui/dialog"
 
 import type { ApiUser } from "@/project/user/types/api-user"
+import { getImageProps } from "next/image"
 
 interface UserDetailsDialogProps {
 	user: ApiUser
@@ -39,6 +40,13 @@ interface UserDetailsDialogProps {
 }
 
 export default function UserDetailsDialog({ children, user }: UserDetailsDialogProps) {
+	const { props } = getImageProps({
+		width: 64,
+		height: 64,
+		alt: user.name,
+		src: user.image || "",
+	})
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>{children}</DialogTrigger>
@@ -59,7 +67,7 @@ export default function UserDetailsDialog({ children, user }: UserDetailsDialogP
 						<div className="flex flex-col gap-4">
 							<div className="flex items-center gap-4">
 								<Avatar className="size-16 text-lg">
-									<AvatarImage src={user.image || ""} alt={user.name} />
+									<AvatarImage {...props} />
 									<AvatarFallback>{user.name.slice(0, 2)}</AvatarFallback>
 								</Avatar>
 

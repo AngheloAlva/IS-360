@@ -2,6 +2,7 @@
 
 import { ArrowRightIcon, EyeIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
+import { getImageProps } from "next/image"
 import Link from "next/link"
 
 import { StartupFolderStatus } from "@prisma/client"
@@ -48,9 +49,16 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 			const image = row.getValue("image") as string
 			const name = row.getValue("name") as string
 
+			const { props } = getImageProps({
+				alt: name,
+				width: 40,
+				height: 40,
+				src: image || "",
+			})
+
 			return (
 				<Avatar className="size-10 text-sm">
-					<AvatarImage src={image} alt={name} />
+					<AvatarImage {...props} />
 					<AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
 				</Avatar>
 			)

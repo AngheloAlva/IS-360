@@ -1,15 +1,17 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
+import dynamic from "next/dynamic"
 
 import { auth } from "@/lib/auth"
 
 import { WorkOrderStatsContainer } from "@/project/work-order/components/stats/work-order/WorkOrderStatsContainer"
-import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
+import LazyCreateWorkOrderForm from "@/project/work-order/components/forms/LazyCreateWorkOrderForm"
 import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
-import NewWorkBookForm from "@/project/work-order/components/forms/NewWorkBookForm"
+import LazyNewWorkBookForm from "@/project/work-order/components/forms/LazyNewWorkBookForm"
 import ScrollToTableButton from "@/shared/components/ScrollToTable"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 import ModuleHeader from "@/shared/components/ModuleHeader"
+
+const VideoTutorials = dynamic(() => import("@/shared/components/VideoTutorials"))
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -87,10 +89,10 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 						className="text-red-600 hover:bg-white hover:text-red-600"
 					/>
 
-					{hasPermission.success && <CreateWorkOrderForm />}
+					{hasPermission.success && <LazyCreateWorkOrderForm />}
 
 					{hassWorkBookPermission.success && (
-						<NewWorkBookForm
+						<LazyNewWorkBookForm
 							userId={session.user.id}
 							companyId={process.env.NEXT_PUBLIC_OTC_COMPANY_ID!}
 							className="text-amber-600 hover:bg-white hover:text-amber-600"

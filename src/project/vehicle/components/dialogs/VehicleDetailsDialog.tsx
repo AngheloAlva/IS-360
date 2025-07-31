@@ -13,7 +13,7 @@ import {
 
 import { VehicleTypeOptions } from "@/lib/consts/vehicle-types"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar"
 import { DialogLabel } from "@/shared/components/ui/dialog-label"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { Separator } from "@/shared/components/ui/separator"
@@ -59,7 +59,6 @@ export default function VehicleDetailsDialog({ vehicle, children }: VehicleDetai
 						<div className="flex flex-col gap-4">
 							<div className="flex items-center gap-4">
 								<Avatar className="size-16 text-lg">
-									<AvatarImage src={""} alt={vehicle.plate || ""} />
 									<AvatarFallback>{vehicle.plate?.slice(0, 2)}</AvatarFallback>
 								</Avatar>
 

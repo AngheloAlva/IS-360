@@ -1,6 +1,7 @@
 "use client"
 import { ExternalLink, FileText, User, MessageSquareTextIcon } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { getImageProps } from "next/image"
 import { useForm } from "react-hook-form"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -336,62 +337,71 @@ export function WorkBookEntryDetails({
 											</div>
 										) : comments && comments.length > 0 ? (
 											<div className="max-h-96 space-y-4 overflow-y-auto">
-												{comments.map((comment) => (
-													<div
-														key={comment.id}
-														className="bg-muted/30 flex w-full max-w-96 gap-3 rounded-lg p-3"
-													>
-														<Avatar className="h-10 w-10">
-															<AvatarImage src={comment.author.image} />
-															<AvatarFallback>
-																<User className="h-4 w-4" />
-															</AvatarFallback>
-														</Avatar>
+												{comments.map((comment) => {
+													const { props } = getImageProps({
+														width: 40,
+														height: 40,
+														alt: comment.author.name || "",
+														src: comment.author.image || "",
+													})
 
-														<div className="flex w-full flex-1 flex-col gap-2">
-															<div className="flex flex-col gap-2">
-																<span className="font-semibold">{comment.author.name}</span>
-																<Badge
-																	variant="outline"
-																	className={cn("text-xs", commentTypeColors[comment.type])}
-																>
-																	{commentTypeLabels[comment.type]}
-																</Badge>
+													return (
+														<div
+															key={comment.id}
+															className="bg-muted/30 flex w-full max-w-96 gap-3 rounded-lg p-3"
+														>
+															<Avatar className="h-10 w-10">
+																<AvatarImage {...props} />
+																<AvatarFallback>
+																	<User className="h-4 w-4" />
+																</AvatarFallback>
+															</Avatar>
+
+															<div className="flex w-full flex-1 flex-col gap-2">
+																<div className="flex flex-col gap-2">
+																	<span className="font-semibold">{comment.author.name}</span>
+																	<Badge
+																		variant="outline"
+																		className={cn("text-xs", commentTypeColors[comment.type])}
+																	>
+																		{commentTypeLabels[comment.type]}
+																	</Badge>
+																</div>
+
+																<div className="bg-background rounded-lg p-3">
+																	<p className="text-sm">{comment.content}</p>
+
+																	{comment.attachments.length > 0 && (
+																		<div className="mt-3 space-y-1">
+																			<p className="text-muted-foreground text-xs font-medium">
+																				Archivos adjuntos:
+																			</p>
+																			{comment.attachments.map((attachment) => (
+																				<a
+																					key={attachment.id}
+																					href={attachment.url}
+																					target="_blank"
+																					rel="noopener noreferrer"
+																					className="flex items-center gap-1 text-xs text-orange-600 hover:underline"
+																				>
+																					<FileText className="h-3 w-3" />
+																					{attachment.name}
+																					<ExternalLink className="h-3 w-3" />
+																				</a>
+																			))}
+																		</div>
+																	)}
+																</div>
+
+																<span className="text-muted-foreground ml-auto text-sm">
+																	{format(new Date(comment.createdAt), "dd MMM yyyy HH:mm", {
+																		locale: es,
+																	})}
+																</span>
 															</div>
-
-															<div className="bg-background rounded-lg p-3">
-																<p className="text-sm">{comment.content}</p>
-
-																{comment.attachments.length > 0 && (
-																	<div className="mt-3 space-y-1">
-																		<p className="text-muted-foreground text-xs font-medium">
-																			Archivos adjuntos:
-																		</p>
-																		{comment.attachments.map((attachment) => (
-																			<a
-																				key={attachment.id}
-																				href={attachment.url}
-																				target="_blank"
-																				rel="noopener noreferrer"
-																				className="flex items-center gap-1 text-xs text-orange-600 hover:underline"
-																			>
-																				<FileText className="h-3 w-3" />
-																				{attachment.name}
-																				<ExternalLink className="h-3 w-3" />
-																			</a>
-																		))}
-																	</div>
-																)}
-															</div>
-
-															<span className="text-muted-foreground ml-auto text-sm">
-																{format(new Date(comment.createdAt), "dd MMM yyyy HH:mm", {
-																	locale: es,
-																})}
-															</span>
 														</div>
-													</div>
-												))}
+													)
+												})}
 											</div>
 										) : (
 											<div className="text-muted-foreground py-8 text-center">

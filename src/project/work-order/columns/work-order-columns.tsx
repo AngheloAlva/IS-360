@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table"
+import { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -93,6 +94,13 @@ export const getWorkOrderColumns = ({
 		cell: ({ row }) => {
 			const company = row.original.company
 
+			const { props } = getImageProps({
+				width: 32,
+				height: 32,
+				alt: company?.name || "",
+				src: company?.image || "",
+			})
+
 			return (
 				<HoverCard openDelay={200}>
 					<HoverCardTrigger className="text-text flex cursor-pointer items-center gap-1.5 select-none hover:underline">
@@ -102,7 +110,7 @@ export const getWorkOrderColumns = ({
 
 					<HoverCardContent className="flex gap-2" side="top">
 						<Avatar>
-							<AvatarImage src={company?.image || undefined} />
+							<AvatarImage {...props} />
 							<AvatarFallback>{company?.name?.slice(0, 2) || ""}</AvatarFallback>
 						</Avatar>
 
@@ -131,6 +139,13 @@ export const getWorkOrderColumns = ({
 		cell: ({ row }) => {
 			const supervisor = row.original.supervisor
 
+			const { props } = getImageProps({
+				width: 32,
+				height: 32,
+				alt: supervisor.name || "",
+				src: supervisor.image || "",
+			})
+
 			return (
 				<HoverCard openDelay={200}>
 					<HoverCardTrigger className="text-text flex cursor-pointer items-center gap-1.5 select-none hover:underline">
@@ -140,7 +155,7 @@ export const getWorkOrderColumns = ({
 
 					<HoverCardContent className="flex w-fit gap-2" side="top">
 						<Avatar>
-							<AvatarImage src={supervisor?.image || undefined} />
+							<AvatarImage {...props} />
 							<AvatarFallback>{supervisor?.name?.slice(0, 2) || ""}</AvatarFallback>
 						</Avatar>
 

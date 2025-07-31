@@ -1,6 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { getImageProps } from "next/image"
 
 import { AreasLabels } from "@/lib/consts/areas"
 
@@ -17,9 +18,11 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			const image = row.getValue("image") as string
 			const name = row.getValue("name") as string
 
+			const { props } = getImageProps({ src: image, width: 40, height: 40, alt: name })
+
 			return (
 				<Avatar className="size-8 text-sm">
-					<AvatarImage src={image} alt={name} />
+					<AvatarImage {...props} />
 					<AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
 				</Avatar>
 			)

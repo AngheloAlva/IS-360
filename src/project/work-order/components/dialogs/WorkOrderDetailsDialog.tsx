@@ -1,5 +1,6 @@
 "use client"
 
+import { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -8,6 +9,7 @@ import {
 	LinkIcon,
 	UsersIcon,
 	ClockIcon,
+	CheckCircle,
 	SettingsIcon,
 	CalendarIcon,
 	FileTextIcon,
@@ -15,7 +17,6 @@ import {
 	ClipboardIcon,
 	CalendarClockIcon,
 	AlertTriangleIcon,
-	CheckCircle,
 } from "lucide-react"
 
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
@@ -60,6 +61,13 @@ export default function WorkOrderDetailsDialog({
 	setOpen,
 }: WorkOrderDetailsDialogProps) {
 	const { data, isLoading, error } = useWorkOrderDetails(workOrderId)
+
+	const { props } = getImageProps({
+		width: 64,
+		height: 64,
+		alt: data?.company?.name || "",
+		src: data?.company?.image || "",
+	})
 
 	if (error) {
 		return (
@@ -110,7 +118,7 @@ export default function WorkOrderDetailsDialog({
 					<div className="flex flex-col gap-6">
 						<div className="flex items-start gap-4">
 							<Avatar className="size-16">
-								<AvatarImage src={data?.company?.image ?? ""} />
+								<AvatarImage {...props} />
 								<AvatarFallback className="text-lg">
 									{data?.company?.name?.slice(0, 2) ?? "NA"}
 								</AvatarFallback>

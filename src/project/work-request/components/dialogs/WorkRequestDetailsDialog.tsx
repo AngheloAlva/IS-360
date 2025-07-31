@@ -1,8 +1,8 @@
 "use client"
 
+import Image, { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import Image from "next/image"
 import Link from "next/link"
 import {
 	UserIcon,
@@ -179,9 +179,9 @@ export default function WorkRequestDetailsDialog({
 																<FileTextIcon className="size-12" />
 															) : (
 																<Image
+																	fill
 																	src={attachment.url}
 																	alt={attachment.name}
-																	fill
 																	className="object-cover"
 																/>
 															)}
@@ -198,29 +198,38 @@ export default function WorkRequestDetailsDialog({
 											<p className="text-muted-foreground py-8 text-center">No hay comentarios</p>
 										) : (
 											<div className="space-y-4">
-												{workRequest.comments.map((comment) => (
-													<div key={comment.id} className="flex gap-3">
-														<Avatar className="h-8 w-8">
-															<AvatarImage src={comment.user?.image || undefined} />
-															<AvatarFallback>
-																{comment.user?.name?.slice(0, 2) || "U"}
-															</AvatarFallback>
-														</Avatar>
-														<div className="flex-1 space-y-1">
-															<div className="flex items-center justify-between">
-																<p className="text-sm font-medium">
-																	{comment.user?.name || "Usuario"}
-																</p>
-																<p className="text-muted-foreground text-xs">
-																	{format(new Date(comment.createdAt), "dd/MM/yyyy HH:mm", {
-																		locale: es,
-																	})}
-																</p>
+												{workRequest.comments.map((comment) => {
+													const { props } = getImageProps({
+														width: 32,
+														height: 32,
+														alt: comment.user.name || "",
+														src: comment.user.image || "",
+													})
+
+													return (
+														<div key={comment.id} className="flex gap-3">
+															<Avatar className="h-8 w-8">
+																<AvatarImage {...props} />
+																<AvatarFallback>
+																	{comment.user?.name?.slice(0, 2) || "U"}
+																</AvatarFallback>
+															</Avatar>
+															<div className="flex-1 space-y-1">
+																<div className="flex items-center justify-between">
+																	<p className="text-sm font-medium">
+																		{comment.user?.name || "Usuario"}
+																	</p>
+																	<p className="text-muted-foreground text-xs">
+																		{format(new Date(comment.createdAt), "dd/MM/yyyy HH:mm", {
+																			locale: es,
+																		})}
+																	</p>
+																</div>
+																<p className="text-sm">{comment.content}</p>
 															</div>
-															<p className="text-sm">{comment.content}</p>
 														</div>
-													</div>
-												))}
+													)
+												})}
 											</div>
 										)}
 									</TabsContent>

@@ -3,6 +3,7 @@
 
 import { memo, useMemo, useCallback } from "react"
 import { InfoIcon, FilesIcon } from "lucide-react"
+import { getImageProps } from "next/image"
 import Link from "next/link"
 
 import { useStartupFolderFilters } from "../../hooks/use-startup-folder-filters"
@@ -189,85 +190,96 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 				</div>
 			) : (
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{companiesWithFolders?.map((company) => (
-						<Card key={company.id} className="group relative transition-all hover:shadow-md">
-							<CardHeader className="sm:pb-2">
-								<div className="flex items-center gap-4">
-									<Avatar className="size-14 text-lg">
-										<AvatarImage src={company.image || ""} />
-										<AvatarFallback>{company.name.slice(0, 2)}</AvatarFallback>
-									</Avatar>
+					{companiesWithFolders?.map((company) => {
+						const { props } = getImageProps({
+							width: 56,
+							height: 56,
+							alt: company.name,
+							src: company.image || "",
+						})
 
+						return (
+							<Card key={company.id} className="group relative transition-all hover:shadow-md">
+								<CardHeader className="sm:pb-2">
+									<div className="flex items-center gap-4">
+										<Avatar className="size-14 text-lg">
+											<AvatarImage {...props} />
+											<AvatarFallback>{company.name.slice(0, 2)}</AvatarFallback>
+										</Avatar>
+
+										<div>
+											<CardTitle className="line-clamp-1 text-lg font-semibold">
+												{company.name}
+											</CardTitle>
+											<CardDescription className="text-xs">{company.rut}</CardDescription>
+										</div>
+									</div>
+								</CardHeader>
+
+								<CardContent>
 									<div>
-										<CardTitle className="line-clamp-1 text-lg font-semibold">
-											{company.name}
-										</CardTitle>
-										<CardDescription className="text-xs">{company.rut}</CardDescription>
-									</div>
-								</div>
-							</CardHeader>
+										<h2 className="text-muted-foreground text-sm font-medium">
+											Carpetas de arranque:
+										</h2>
 
-							<CardContent>
-								<div>
-									<h2 className="text-muted-foreground text-sm font-medium">
-										Carpetas de arranque:
-									</h2>
-
-									<div className="mt-1.5 flex flex-wrap gap-1.5 text-sm">
-										{company.StartupFolders?.length > 0 ? (
-											company.StartupFolders.map((folder) => (
-												<Badge
-													key={folder.id}
-													className={cn(
-														"bg-accent text-text flex items-center text-xs text-wrap whitespace-normal sm:text-sm",
-														{
-															"border border-cyan-500 bg-cyan-500/10 text-cyan-600":
-																folder.status === StartupFolderStatus.COMPLETED,
-														}
-													)}
-												>
-													{folder.name}
+										<div className="mt-1.5 flex flex-wrap gap-1.5 text-sm">
+											{company.StartupFolders?.length > 0 ? (
+												company.StartupFolders.map((folder) => (
+													<Badge
+														key={folder.id}
+														className={cn(
+															"bg-accent text-text flex items-center text-xs text-wrap whitespace-normal sm:text-sm",
+															{
+																"border border-cyan-500 bg-cyan-500/10 text-cyan-600":
+																	folder.status === StartupFolderStatus.COMPLETED,
+															}
+														)}
+													>
+														{folder.name}
+													</Badge>
+												))
+											) : (
+												<Badge className="bg-accent text-text flex items-center text-wrap whitespace-normal">
+													No hay carpetas de arranque
 												</Badge>
-											))
-										) : (
-											<Badge className="bg-accent text-text flex items-center text-wrap whitespace-normal">
-												No hay carpetas de arranque
-											</Badge>
-										)}
+											)}
+										</div>
 									</div>
-								</div>
-							</CardContent>
+								</CardContent>
 
-							<CardFooter className="mt-auto flex flex-col gap-2">
-								{company.StartupFolders.some(
-									(folder) =>
-										folder.environmentalFolders.some((folder) => folder.status === "SUBMITTED") ||
-										folder.safetyAndHealthFolders.some((folder) => folder.status === "SUBMITTED") ||
-										folder.workersFolders.some((folder) => folder.status === "SUBMITTED") ||
-										folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED") ||
-										folder.basicFolders.some((folder) => folder.status === "SUBMITTED")
-								) && (
-									<div className="w-full rounded-md bg-teal-500/10 px-3 py-2 text-xs md:text-sm">
-										<span className="flex items-center font-medium text-teal-500">
-											<InfoIcon className="mr-1.5 size-3.5" />
-											Hay carpetas pendientes de revisión
-										</span>
-									</div>
-								)}
+								<CardFooter className="mt-auto flex flex-col gap-2">
+									{company.StartupFolders.some(
+										(folder) =>
+											folder.environmentalFolders.some((folder) => folder.status === "SUBMITTED") ||
+											folder.safetyAndHealthFolders.some(
+												(folder) => folder.status === "SUBMITTED"
+											) ||
+											folder.workersFolders.some((folder) => folder.status === "SUBMITTED") ||
+											folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED") ||
+											folder.basicFolders.some((folder) => folder.status === "SUBMITTED")
+									) && (
+										<div className="w-full rounded-md bg-teal-500/10 px-3 py-2 text-xs md:text-sm">
+											<span className="flex items-center font-medium text-teal-500">
+												<InfoIcon className="mr-1.5 size-3.5" />
+												Hay carpetas pendientes de revisión
+											</span>
+										</div>
+									)}
 
-								<Button
-									asChild
-									className="w-full bg-teal-600 text-white transition-colors hover:bg-teal-700 hover:text-white"
-								>
-									<Link
-										href={`/admin/dashboard/carpetas-de-arranques/${generateSlug(company.name)}_${company.id}`}
+									<Button
+										asChild
+										className="w-full bg-teal-600 text-white transition-colors hover:bg-teal-700 hover:text-white"
 									>
-										Ver carpeta
-									</Link>
-								</Button>
-							</CardFooter>
-						</Card>
-					))}
+										<Link
+											href={`/admin/dashboard/carpetas-de-arranques/${generateSlug(company.name)}_${company.id}`}
+										>
+											Ver carpeta
+										</Link>
+									</Button>
+								</CardFooter>
+							</Card>
+						)
+					})}
 				</div>
 			)}
 		</>

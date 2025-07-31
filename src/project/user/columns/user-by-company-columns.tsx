@@ -1,5 +1,7 @@
 "use client"
 
+import { getImageProps } from "next/image"
+
 import UpdateExternalUserForm from "@/project/user/components/forms/UpdateExternalUserForm"
 import DeleteExternalUserDialog from "@/project/user/components/forms/DeleteExternalUser"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
@@ -37,9 +39,16 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 			const image = row.getValue("image") as string
 			const name = row.getValue("name") as string
 
+			const { props } = getImageProps({
+				alt: name,
+				width: 32,
+				height: 32,
+				src: image || "",
+			})
+
 			return (
 				<Avatar className="size-8 text-sm">
-					<AvatarImage src={image} alt={name} />
+					<AvatarImage {...props} />
 					<AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
 				</Avatar>
 			)
