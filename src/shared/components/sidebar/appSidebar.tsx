@@ -1,11 +1,4 @@
-"use client"
-
 import Image from "next/image"
-
-import { data, navInternal, navOtherAdmin, navOther } from "./sidebar-data"
-
-import { NavInternal } from "./navInternal"
-import { NavOther } from "./navOther"
 import { NavMain } from "./navMain"
 import { NavUser } from "./navUser"
 import {
@@ -21,17 +14,10 @@ import type { Session } from "@/lib/auth"
 
 interface AppSidebarProps extends ComponentProps<typeof Sidebar> {
 	session: Session
+	canAccessAdminRoutes: boolean
 }
 
-export function AppSidebar({ session, ...props }: AppSidebarProps) {
-	const canAccessAdminRoutes = session.user.accessRole === "ADMIN"
-	const canAccessUserRoutes = session.user.accessRole === "USER"
-
-	const navItems = [
-		...(!canAccessAdminRoutes && !canAccessUserRoutes ? data.navMain : []),
-		...(canAccessAdminRoutes ? [...data.navAdmin] : []),
-	]
-
+export function AppSidebar({ session, canAccessAdminRoutes, ...props }: AppSidebarProps) {
 	return (
 		<Sidebar collapsible="icon" variant="sidebar" {...props}>
 			<SidebarHeader>
@@ -47,11 +33,7 @@ export function AppSidebar({ session, ...props }: AppSidebarProps) {
 			</SidebarHeader>
 
 			<SidebarContent>
-				<NavMain navItems={navItems} />
-				{canAccessAdminRoutes && <NavInternal navItems={navInternal} />}
-				<NavOther navItems={canAccessAdminRoutes ? navOtherAdmin : navOther} />
-
-				{/* <NavSecondary items={[myAccountItem, ...data.navSecondary]} className="mt-auto" /> */}
+				<NavMain canAccessAdminRoutes={canAccessAdminRoutes} />
 			</SidebarContent>
 
 			<SidebarFooter>

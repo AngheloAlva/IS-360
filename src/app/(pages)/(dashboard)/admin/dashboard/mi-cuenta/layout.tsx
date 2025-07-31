@@ -4,9 +4,9 @@ import { usePathname } from "next/navigation"
 import { UserIcon } from "lucide-react"
 import Link from "next/link"
 
+import { internalPersonalInfo } from "@/shared/components/sidebar/sidebar-data"
 import { cn } from "@/lib/utils"
 
-import { navOtherAdmin } from "@/shared/components/sidebar/sidebar-data"
 import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default function MiCuentaLayout({ children }: { children: React.ReactNode }) {
@@ -40,7 +40,7 @@ export default function MiCuentaLayout({ children }: { children: React.ReactNode
 
 			<div className="mx-auto flex w-full flex-1 flex-row gap-4">
 				<div className="flex h-fit flex-col justify-start gap-1">
-					{navOtherAdmin.map((item) => {
+					{internalPersonalInfo.map((item) => {
 						const isActive = pathname === item.url
 						const Icon = item.icon
 

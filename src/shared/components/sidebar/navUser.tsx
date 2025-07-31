@@ -1,30 +1,18 @@
 "use client"
 
-import { Building, ChevronsUpDown, LogOut } from "lucide-react"
+import { BuildingIcon, LogOutIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 import { authClient } from "@/lib/auth-client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
-import {
-	DropdownMenu,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-	DropdownMenuContent,
-	DropdownMenuSeparator,
-} from "@/shared/components/ui/dropdown-menu"
-import {
-	useSidebar,
-	SidebarMenu,
-	SidebarMenuItem,
-	SidebarMenuButton,
-} from "@/shared/components/ui/sidebar"
+import { SidebarMenu, SidebarMenuItem } from "@/shared/components/ui/sidebar"
+import { Button } from "../ui/button"
 
 import type { Session } from "@/lib/auth"
 
 export function NavUser({ session }: { session: Session }): React.ReactElement {
-	const { isMobile } = useSidebar()
 	const router = useRouter()
 
 	const handleLogOut = async () => {
@@ -39,55 +27,36 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 
 	return (
 		<SidebarMenu>
-			<SidebarMenuItem>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<SidebarMenuButton
-							size="lg"
-							className="data-[state=open]:bg-primary/70 hover:bg-primary/70 data-[state=open]:text-white"
-						>
-							<Avatar className="h-8 w-8 rounded-lg">
-								<AvatarImage src={session?.user.image || ""} width={32} height={32} />
-								<AvatarFallback className="text-primary rounded-md">
-									<Building />
-								</AvatarFallback>
-							</Avatar>
-							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-semibold">{session?.user.name}</span>
-								<span className="truncate text-xs">{session?.user.email}</span>
-							</div>
-							<ChevronsUpDown className="ml-auto size-4" />
-						</SidebarMenuButton>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-						side={isMobile ? "bottom" : "right"}
-						align="end"
-						sideOffset={4}
-					>
-						<DropdownMenuLabel className="p-0 font-normal">
-							<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-								<Avatar className="h-8 w-8 rounded-lg">
-									<AvatarImage src={session?.user.image || ""} />
-									<AvatarFallback className="rounded-lg">
-										<Building />
-									</AvatarFallback>
-								</Avatar>
-								<div className="grid flex-1 text-left text-sm leading-tight">
-									<span className="truncate font-semibold">{session?.user.name}</span>
-									<span className="truncate text-xs">{session?.user.email}</span>
-								</div>
-							</div>
-						</DropdownMenuLabel>
+			<SidebarMenuItem className="bg-accent flex items-center gap-2 rounded-xl p-2">
+				<div className="flex items-start gap-2">
+					<Avatar className="h-8 w-8 rounded-lg">
+						<AvatarImage src={session?.user.image || ""} width={32} height={32} asChild>
+							<Image
+								width={32}
+								height={32}
+								alt={session?.user.name}
+								src={session?.user.image || ""}
+							/>
+						</AvatarImage>
+						<AvatarFallback className="text-primary rounded-md">
+							<BuildingIcon />
+						</AvatarFallback>
+					</Avatar>
 
-						<DropdownMenuSeparator />
+					<div className="grid flex-1 text-left text-sm leading-tight">
+						<span className="truncate font-semibold">{session?.user.name}</span>
+						<span className="truncate text-xs">{session?.user.email}</span>
+					</div>
+				</div>
 
-						<DropdownMenuItem onClick={() => handleLogOut()}>
-							<LogOut />
-							Cerrar Sesión
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+				<Button
+					size={"icon"}
+					variant={"ghost"}
+					className="hover:bg-blue-500"
+					onClick={() => handleLogOut()}
+				>
+					<LogOutIcon />
+				</Button>
 			</SidebarMenuItem>
 		</SidebarMenu>
 	)

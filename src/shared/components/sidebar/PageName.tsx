@@ -12,7 +12,7 @@ import {
 
 export default function PageName({ externalPath }: { externalPath: boolean }): React.ReactElement {
 	const pathname = usePathname()
-	const path = pathname.split("/").slice(externalPath ? 1 : 2)
+	const path = pathname.split("/").slice(externalPath ? 2 : 3)
 
 	return (
 		<Breadcrumb className="hidden md:block">

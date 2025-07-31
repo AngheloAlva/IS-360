@@ -9,7 +9,6 @@ import {
 	UserPenIcon,
 	BookOpenIcon,
 	FileTextIcon,
-	LifeBuoyIcon,
 	SettingsIcon,
 	BookCopyIcon,
 	BuildingIcon,
@@ -17,147 +16,31 @@ import {
 	Building2Icon,
 	FileSearchIcon,
 	LayoutListIcon,
+	ShieldPlusIcon,
+	UserCircleIcon,
 	MonitorPlayIcon,
 	ChartColumnIcon,
 	LockKeyholeIcon,
-	ShieldPlusIcon,
+	type LucideIcon,
 } from "lucide-react"
 
-export const data = {
-	navMain: [
-		{
-			name: "Inicio",
-			url: "/dashboard/inicio",
-			icon: HomeIcon,
-		},
-		{
-			name: "Colaboradores",
-			url: "/dashboard/colaboradores",
-			icon: UsersIcon,
-		},
-		{
-			name: "Vehículos y Equipos",
-			url: "/dashboard/vehiculos",
-			icon: CarIcon,
-		},
-		{
-			name: "Carpetas de Arranque",
-			url: "/dashboard/carpetas-de-arranque",
-			icon: FoldersIcon,
-		},
-		{
-			name: "Seguridad",
-			url: "/dashboard/charlas-de-seguridad",
-			icon: MonitorPlayIcon,
-		},
-		{
-			name: "Permiso de Trabajo",
-			url: "/dashboard/permiso-de-trabajo",
-			icon: FileTextIcon,
-		},
-		{
-			name: "Libro de Obras",
-			url: "/dashboard/libro-de-obras",
-			icon: BookCopyIcon,
-		},
-		{
-			name: "Tutoriales",
-			url: "/dashboard/tutoriales",
-			icon: BookOpenIcon,
-		},
-	],
-	navAdmin: [
-		{
-			name: "Inicio",
-			url: "/admin/dashboard/inicio",
-			icon: HomeIcon,
-		},
-		{
-			name: "Documentación",
-			url: "/admin/dashboard/documentacion",
-			icon: FileSearchIcon,
-		},
-		{
-			name: "Carpetas de Arranques",
-			url: "/admin/dashboard/carpetas-de-arranques",
-			icon: FoldersIcon,
-		},
-		{
-			name: "Charlas de Seguridad",
-			url: "/admin/dashboard/charlas-de-seguridad",
-			icon: MonitorPlayIcon,
-		},
-		{
-			name: "Permisos de Trabajo",
-			url: "/admin/dashboard/permisos-de-trabajo",
-			icon: FileTextIcon,
-		},
-		{
-			name: "OT / Libros de Obras",
-			url: "/admin/dashboard/ordenes-de-trabajo",
-			icon: LayoutListIcon,
-		},
-		{
-			name: "Planes de Mantenimiento",
-			url: "/admin/dashboard/planes-de-mantenimiento",
-			icon: WrenchIcon,
-		},
-		{
-			name: "Solicitudes de Trabajo",
-			url: "/admin/dashboard/solicitudes-de-trabajo",
-			icon: FilePlus2Icon,
-		},
-		{
-			name: "Herramientas",
-			url: "/admin/dashboard/herramientas",
-			test: true,
-			icon: BoxIcon,
-		},
-		{
-			name: "Reportabilidad",
-			url: "/admin/dashboard/reportabilidad",
-			icon: ChartColumnIcon,
-		},
-		{
-			name: "Notificaciones",
-			url: "/admin/dashboard/notificaciones",
-			test: true,
-			icon: BellIcon,
-		},
-		{
-			name: "Tutoriales",
-			url: "/admin/dashboard/tutoriales",
-			icon: BookOpenIcon,
-		},
-	],
-	navSecondary: [
-		{
-			title: "Soporte | Contacto",
-			url: "/dashboard/soporte",
-			icon: LifeBuoyIcon,
-		},
-	],
+export interface NavBarItem {
+	title: string
+	type: "normal" | "collapsed"
+	icon?: LucideIcon
+	items: {
+		url: string
+		name: string
+		test?: boolean
+		icon: LucideIcon
+	}[]
 }
 
-export const navInternal = [
-	{
-		name: "Usuarios Internos",
-		url: "/admin/dashboard/usuarios",
-		icon: UsersIcon,
-	},
-	{
-		name: "Empresas Contratistas",
-		url: "/admin/dashboard/empresas",
-		icon: Building2Icon,
-	},
-	{
-		name: "Equipos / Ubicaciones",
-		url: "/admin/dashboard/equipos",
-		icon: SettingsIcon,
-	},
-]
+interface NavBarData {
+	[name: string]: NavBarItem[]
+}
 
-export const navOtherAdmin = [
+export const internalPersonalInfo = [
 	{
 		name: "Datos Personales",
 		url: "/admin/dashboard/mi-cuenta/datos-personales",
@@ -175,7 +58,7 @@ export const navOtherAdmin = [
 	},
 ]
 
-export const navOther = [
+export const externalPersonalInfo = [
 	{
 		name: "Datos Personales",
 		url: "/dashboard/mi-cuenta/datos-personales",
@@ -197,3 +80,157 @@ export const navOther = [
 		icon: ShieldPlusIcon,
 	},
 ]
+
+export const data: NavBarData = {
+	internal: [
+		{
+			title: "Menú Interno",
+			type: "normal",
+			items: [
+				{
+					name: "Inicio",
+					url: "/admin/dashboard/inicio",
+					icon: HomeIcon,
+					test: false,
+				},
+				{
+					name: "Documentación",
+					url: "/admin/dashboard/documentacion",
+					icon: FileSearchIcon,
+				},
+				{
+					name: "Carpetas de Arranques",
+					url: "/admin/dashboard/carpetas-de-arranques",
+					icon: FoldersIcon,
+				},
+				{
+					name: "Charlas de Seguridad",
+					url: "/admin/dashboard/charlas-de-seguridad",
+					icon: MonitorPlayIcon,
+				},
+				{
+					name: "Permisos de Trabajo",
+					url: "/admin/dashboard/permisos-de-trabajo",
+					icon: FileTextIcon,
+				},
+				{
+					name: "OT / Libros de Obras",
+					url: "/admin/dashboard/ordenes-de-trabajo",
+					icon: LayoutListIcon,
+				},
+				{
+					name: "Planes de Mantenimiento",
+					url: "/admin/dashboard/planes-de-mantenimiento",
+					icon: WrenchIcon,
+				},
+				{
+					name: "Solicitudes de Trabajo",
+					url: "/admin/dashboard/solicitudes-de-trabajo",
+					icon: FilePlus2Icon,
+				},
+				{
+					name: "Herramientas",
+					url: "/admin/dashboard/herramientas",
+					test: true,
+					icon: BoxIcon,
+				},
+				{
+					name: "Reportabilidad",
+					url: "/admin/dashboard/reportabilidad",
+					icon: ChartColumnIcon,
+				},
+				{
+					name: "Notificaciones",
+					url: "/admin/dashboard/notificaciones",
+					test: true,
+					icon: BellIcon,
+				},
+				{
+					name: "Tutoriales",
+					url: "/admin/dashboard/tutoriales",
+					icon: BookOpenIcon,
+				},
+			],
+		},
+		{
+			title: "Menú Interno",
+			type: "normal",
+			items: [
+				{
+					name: "Usuarios Internos",
+					url: "/admin/dashboard/usuarios",
+					icon: UsersIcon,
+				},
+				{
+					name: "Empresas Contratistas",
+					url: "/admin/dashboard/empresas",
+					icon: Building2Icon,
+				},
+				{
+					name: "Equipos / Ubicaciones",
+					url: "/admin/dashboard/equipos",
+					icon: SettingsIcon,
+				},
+			],
+		},
+		{
+			title: "Información Personal",
+			type: "collapsed",
+			icon: UserCircleIcon,
+			items: internalPersonalInfo,
+		},
+	],
+	external: [
+		{
+			title: "Menú Principal",
+			type: "normal",
+			items: [
+				{
+					name: "Inicio",
+					url: "/dashboard/inicio",
+					icon: HomeIcon,
+				},
+				{
+					name: "Colaboradores",
+					url: "/dashboard/colaboradores",
+					icon: UsersIcon,
+				},
+				{
+					name: "Vehículos y Equipos",
+					url: "/dashboard/vehiculos",
+					icon: CarIcon,
+				},
+				{
+					name: "Carpetas de Arranque",
+					url: "/dashboard/carpetas-de-arranque",
+					icon: FoldersIcon,
+				},
+				{
+					name: "Seguridad",
+					url: "/dashboard/charlas-de-seguridad",
+					icon: MonitorPlayIcon,
+				},
+				{
+					name: "Permiso de Trabajo",
+					url: "/dashboard/permiso-de-trabajo",
+					icon: FileTextIcon,
+				},
+				{
+					name: "Libro de Obras",
+					url: "/dashboard/libro-de-obras",
+					icon: BookCopyIcon,
+				},
+				{
+					name: "Tutoriales",
+					url: "/dashboard/tutoriales",
+					icon: BookOpenIcon,
+				},
+			],
+		},
+		{
+			title: "Información Personal",
+			type: "collapsed",
+			items: externalPersonalInfo,
+		},
+	],
+}

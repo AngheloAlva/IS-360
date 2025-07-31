@@ -25,7 +25,7 @@ export default async function AdminDashboardLayout({
 	return (
 		<QueryProvider>
 			<SidebarProvider>
-				<AppSidebar session={session} />
+				<AppSidebar session={session} canAccessAdminRoutes={session.user.accessRole === "ADMIN"} />
 
 				<SidebarInset className="overflow-x-hidden">
 					<Header session={session} />
