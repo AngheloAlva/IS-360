@@ -35,8 +35,6 @@ export default function WorkBookMilestones({
 }: WorkBookMilestonesProps) {
 	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
 
-	const canCreateOrEditMilestones = userId === responsibleId || (data?.milestones?.length ?? 0 > 1)
-
 	if (isLoading) {
 		return (
 			<Card className="w-full">
@@ -80,13 +78,11 @@ export default function WorkBookMilestones({
 				</h2>
 
 				<div className="flex items-center gap-2">
-					{canCreateOrEditMilestones && (
-						<MilestonesForm
-							workOrderId={workOrderId}
-							initialData={data?.milestones}
-							workOrderStartDate={workOrderStartDate}
-						/>
-					)}
+					<MilestonesForm
+						workOrderId={workOrderId}
+						initialData={data?.milestones}
+						workOrderStartDate={workOrderStartDate}
+					/>
 
 					{canRequestClosure ||
 						(canRequestClosure && hassWorkBookPermission && (
