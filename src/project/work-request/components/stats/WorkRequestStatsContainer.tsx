@@ -6,8 +6,8 @@ import { useWorkRequestStats } from "../../hooks/use-work-request-stats"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import ChartSkeleton from "@/shared/components/stats/ChartSkeleton"
+import WorkRequestOperatorChart from "./WorkRequestOperatorChart"
 import WorkRequestUrgencyChart from "./WorkRequestUrgencyChart"
-import WorkRequestStatusChart from "./WorkRequestStatusChart"
 import MonthlyTrendChart from "./MonthlyTrendChart"
 
 export default function WorkRequestStatsContainer() {
@@ -81,27 +81,7 @@ export default function WorkRequestStatsContainer() {
 			</div>
 
 			<div className="grid gap-4 xl:grid-cols-3">
-				{
-					<WorkRequestStatusChart
-						data={[
-							{
-								status: "Atendidas",
-								count: data?.totalAttended || 0,
-								fill: "var(--color-teal-500)",
-							},
-							{
-								status: "Canceladas",
-								count: data?.totalCancelled || 0,
-								fill: "var(--color-rose-600)",
-							},
-							{
-								status: "Reportadas",
-								count: data?.totalWorkRequests || 0,
-								fill: "var(--color-cyan-500)",
-							},
-						]}
-					/>
-				}
+				{data?.operatorStats && <WorkRequestOperatorChart data={data.operatorStats} />}
 				{data?.urgencyStats && <WorkRequestUrgencyChart data={data?.urgencyStats} />}
 				{data?.monthlyTrend && <MonthlyTrendChart data={data?.monthlyTrend} />}
 			</div>

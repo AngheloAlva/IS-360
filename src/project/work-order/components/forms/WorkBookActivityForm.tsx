@@ -220,7 +220,6 @@ export default function ActivityForm({
 							control={form.control}
 							label="Fecha de Ejecución"
 							itemClassName="sm:col-span-1"
-							disabledCondition={(date) => date < startDate}
 						/>
 
 						<TimePickerFormField<DailyActivitySchema>

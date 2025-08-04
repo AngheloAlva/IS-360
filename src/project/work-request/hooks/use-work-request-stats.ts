@@ -21,6 +21,11 @@ export interface WorkRequestStatsResponse {
 		created: number
 		attended: number
 	}[]
+	operatorStats: {
+		operatorId: string
+		operatorName: string
+		count: number
+	}[]
 }
 
 async function getWorkRequestStats(): Promise<WorkRequestStatsResponse> {

@@ -42,6 +42,46 @@ export async function GET(): Promise<NextResponse> {
 				}),
 			])
 
+		const operatorCompanyId = "cmbbc0dqr00062z0vcpigjy9l"
+		const operatorStats = await prisma.workRequest.groupBy({
+			by: ["operatorId"],
+			where: {
+				operator: {
+					companyId: operatorCompanyId,
+				},
+			},
+			_count: {
+				id: true,
+			},
+			...cacheConfig,
+		})
+
+		// Obtener información de los operadores
+		const operatorIds = operatorStats.map((stat) => stat.operatorId).filter(Boolean) as string[]
+		const operators = await prisma.user.findMany({
+			where: {
+				id: { in: operatorIds },
+				companyId: operatorCompanyId,
+			},
+			select: {
+				id: true,
+				name: true,
+			},
+			...cacheConfig,
+		})
+
+		// Combinar datos de operadores con estadísticas
+		const operatorStatsWithNames = operatorStats
+			.map((stat) => {
+				const operator = operators.find((op) => op.id === stat.operatorId)
+				return {
+					operatorId: stat.operatorId,
+					operatorName: operator?.name || "Operador desconocido",
+					count: stat._count.id,
+				}
+			})
+			.filter((stat) => stat.operatorId) // Filtrar operadores nulos
+
 		const [urgentAttended, urgentPending, nonUrgentAttended, nonUrgentPending] = await Promise.all([
 			prisma.workRequest.count({
 				where: {
@@ -78,9 +118,7 @@ export async function GET(): Promise<NextResponse> {
 		last30Days.setDate(last30Days.getDate() - 30)
 		last30Days.setHours(0, 0, 0, 0)
 
-		const dailyStats = await prisma.$queryRaw<
-			Array<{ date: Date; status: string; count: bigint }>
-		>`
+		const dailyStats = await prisma.$queryRaw<Array<{ date: Date; status: string; count: bigint }>>`
 			SELECT
 				DATE("requestDate") as date,
 				status,
@@ -106,7 +144,7 @@ export async function GET(): Promise<NextResponse> {
 			const date = new Date(startDate)
 			date.setDate(startDate.getDate() + i)
 			days.push({
-				month: date.toISOString().split('T')[0], // Formato YYYY-MM-DD
+				month: date.toISOString().split("T")[0], // Formato YYYY-MM-DD
 				created: 0,
 				attended: 0,
 			})
@@ -115,9 +153,7 @@ export async function GET(): Promise<NextResponse> {
 		// Asignar los valores de las estadísticas a los días correspondientes
 		dailyStats.forEach((stat) => {
 			const statDate = new Date(stat.date)
-			const dayDiff = Math.floor(
-				(statDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-			)
+			const dayDiff = Math.floor((statDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
 
 			if (dayDiff >= 0 && dayDiff < 30) {
 				if (stat.status === "REPORTED") {
@@ -145,6 +181,7 @@ export async function GET(): Promise<NextResponse> {
 				},
 			},
 			monthlyTrend: days, // Ahora contiene datos diarios de los últimos 30 días
+			operatorStats: operatorStatsWithNames, // Estadísticas por operador
 		})
 	} catch (error) {
 		console.error("Error fetching work request stats:", error)
