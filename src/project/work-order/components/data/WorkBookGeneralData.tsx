@@ -105,12 +105,10 @@ export default function WorkBookGeneralData({
 										<Calendar className="h-5 w-5" />
 									</div>
 									<div>
-										<p className="text-muted-foreground text-sm font-medium">Fecha de Inicio</p>
-										<p className="font-medium">
-											{data.workStartDate
-												? format(data.workStartDate, "dd/MM/yyyy")
-												: "No iniciada"}
+										<p className="text-muted-foreground text-sm font-medium">
+											Fecha Programada de Inicio
 										</p>
+										<p className="font-medium">{format(data.programDate, "dd/MM/yyyy")}</p>
 									</div>
 								</div>
 
@@ -119,7 +117,9 @@ export default function WorkBookGeneralData({
 										<Clock className="h-5 w-5" />
 									</div>
 									<div>
-										<p className="text-muted-foreground text-sm font-medium">Fecha de Término</p>
+										<p className="text-muted-foreground text-sm font-medium">
+											Fecha Programada de Término
+										</p>
 										<p className="font-medium">
 											{data.estimatedEndDate
 												? format(data.estimatedEndDate, "dd/MM/yyyy")
