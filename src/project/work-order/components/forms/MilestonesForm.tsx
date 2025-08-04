@@ -38,11 +38,7 @@ interface MilestonesFormProps {
 	initialData?: Milestone[]
 }
 
-export default function MilestonesForm({
-	initialData,
-	workOrderId,
-	workOrderStartDate,
-}: MilestonesFormProps) {
+export default function MilestonesForm({ initialData, workOrderId }: MilestonesFormProps) {
 	const [loading, setLoading] = useState<boolean>(false)
 	const [activeTab, setActiveTab] = useState("0")
 	const [open, setOpen] = useState(false)
@@ -256,11 +252,7 @@ export default function MilestonesForm({
 								<TabsContents>
 									{milestoneFields.map((field, index) => (
 										<TabsContent key={field.id} value={index.toString()} className="m-0 pt-4">
-											<MilestoneForm
-												form={form}
-												index={index}
-												workOrderStartDate={workOrderStartDate}
-											/>
+											<MilestoneForm form={form} index={index} />
 										</TabsContent>
 									))}
 								</TabsContents>
@@ -283,10 +275,9 @@ interface MilestoneFormProps {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	form: any
 	index: number
-	workOrderStartDate: Date
 }
 
-function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) {
+function MilestoneForm({ form, index }: MilestoneFormProps) {
 	return (
 		<div className="w-full space-y-4 px-4">
 			<div className="space-y-5">
@@ -318,7 +309,6 @@ function MilestoneForm({ form, index, workOrderStartDate }: MilestoneFormProps) 
 						control={form.control}
 						label="Fecha de inicio"
 						name={`milestones.${index}.startDate`}
-						disabledCondition={(date) => date < workOrderStartDate}
 					/>
 
 					<DatePickerFormField<WorkBookMilestonesSchema>

@@ -42,7 +42,6 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
-	DropdownMenuSeparator,
 } from "@/shared/components/ui/dropdown-menu"
 import {
 	WorkOrderTypeFilter,
@@ -185,8 +184,8 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 						value={filters.search}
 						setPage={actions.setPage}
 						onChange={actions.setSearch}
-						className="ml-auto w-full md:w-72"
-						placeholder="Buscar por número de OT, trabajo..."
+						className="ml-auto w-full md:w-60"
+						placeholder="Buscar por nº de OT, trabajo..."
 					/>
 
 					<CalendarDateRangePicker value={filters.dateRange} onChange={actions.setDateRange} />
@@ -251,13 +250,6 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 									/>
 								</DropdownMenuItem>
 							</DropdownMenuGroup>
-
-							<DropdownMenuSeparator className="mt-2" />
-
-							<DropdownMenuItem onClick={handleExportToExcel}>
-								{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
-								Exportar
-							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 
@@ -268,6 +260,15 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					>
 						<FilterXIcon />
 						Limpiar Filtros
+					</Button>
+
+					<Button
+						size={"lg"}
+						onClick={handleExportToExcel}
+						className="bg-orange-600 hover:bg-orange-700"
+					>
+						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+						Exportar
 					</Button>
 				</div>
 

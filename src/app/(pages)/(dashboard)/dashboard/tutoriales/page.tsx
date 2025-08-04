@@ -109,6 +109,11 @@ const tutorialModules: ModuleVideos[] = [
 				description: "Tutorial de como cerrar un hito en el libro de obras.",
 				url: "https://youtube.com/embed/snastGIP1Pw",
 			},
+			{
+				title: "Respuesta a Inspección de OTC",
+				description: "Tutorial de como cerrar un hito en el libro de obras.",
+				url: "https://youtube.com/embed/WCUYcNFr7OI",
+			},
 		],
 	},
 	{

@@ -125,7 +125,7 @@ export async function createAndUpdateMilestones(
 		logActivity({
 			userId: session.user.id,
 			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.CREATE,
+			action: ACTIVITY_TYPE.UPDATE,
 			entityId: values.workOrderId,
 			entityType: "Milestone",
 			metadata: {
