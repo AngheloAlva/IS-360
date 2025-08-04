@@ -35,8 +35,7 @@ export default function WorkBookMilestones({
 }: WorkBookMilestonesProps) {
 	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
 
-	const canCreateOrEditMilestones =
-		userId === responsibleId ? true : !(data?.milestones?.length ?? 0 > 1)
+	const canCreateOrEditMilestones = userId === responsibleId || (data?.milestones?.length ?? 0 > 1)
 
 	if (isLoading) {
 		return (
