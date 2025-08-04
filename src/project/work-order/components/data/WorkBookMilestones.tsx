@@ -9,7 +9,6 @@ import MilestoneCards from "@/project/work-order/components/data/MilestoneCards"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { RequestWorkBookClosure } from "../forms/RequestWorkBookClosure"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { MILESTONE_STATUS } from "@prisma/client"
 
 interface WorkBookMilestonesProps {
 	userId: string
@@ -37,10 +36,7 @@ export default function WorkBookMilestones({
 	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
 
 	const canCreateOrEditMilestones =
-		userId === responsibleId
-			? true
-			: !(data?.milestones?.length ?? 0 > 1) ||
-				data?.milestones.every((m) => m.status === MILESTONE_STATUS.REJECTED_APPROVAL)
+		userId === responsibleId ? true : !(data?.milestones?.length ?? 0 > 1)
 
 	if (isLoading) {
 		return (
