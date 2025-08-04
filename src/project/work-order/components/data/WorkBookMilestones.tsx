@@ -8,7 +8,6 @@ import MilestonesForm from "@/project/work-order/components/forms/MilestonesForm
 import MilestoneCards from "@/project/work-order/components/data/MilestoneCards"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { RequestWorkBookClosure } from "../forms/RequestWorkBookClosure"
-import { MilestoneApproval } from "../forms/MilestoneApproval"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { MILESTONE_STATUS } from "@prisma/client"
 
@@ -21,7 +20,6 @@ interface WorkBookMilestonesProps {
 	hasPermission: boolean
 	workOrderStartDate: Date
 	canRequestClosure: boolean
-	isMilestonesApproved: boolean
 	hassWorkBookPermission: boolean
 }
 
@@ -34,7 +32,6 @@ export default function WorkBookMilestones({
 	hasPermission,
 	canRequestClosure,
 	workOrderStartDate,
-	isMilestonesApproved,
 	hassWorkBookPermission,
 }: WorkBookMilestonesProps) {
 	const { data, isLoading, isError } = useWorkBookMilestones({ workOrderId, showAll: true })
@@ -88,18 +85,11 @@ export default function WorkBookMilestones({
 				</h2>
 
 				<div className="flex items-center gap-2">
-					{!isMilestonesApproved &&
-						userId === responsibleId &&
-						data?.milestones.every((m) => m.status !== MILESTONE_STATUS.REJECTED_APPROVAL) && (
-							<MilestoneApproval workOrderId={workOrderId} />
-						)}
-
 					{canCreateOrEditMilestones && (
 						<MilestonesForm
 							workOrderId={workOrderId}
 							initialData={data?.milestones}
 							workOrderStartDate={workOrderStartDate}
-							isResponsible={userId === responsibleId}
 						/>
 					)}
 

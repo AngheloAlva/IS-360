@@ -9,7 +9,6 @@ export interface WorkBookById extends WorkOrder {
 		name: string
 		type: string
 		location: string
-		isMilestonesApproved: boolean
 		attachments: {
 			id: string
 			url: string

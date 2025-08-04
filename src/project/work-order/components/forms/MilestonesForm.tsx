@@ -34,7 +34,6 @@ import type { Milestone } from "../../hooks/use-work-book-milestones"
 
 interface MilestonesFormProps {
 	workOrderId: string
-	isResponsible: boolean
 	workOrderStartDate: Date
 	initialData?: Milestone[]
 }
@@ -42,7 +41,6 @@ interface MilestonesFormProps {
 export default function MilestonesForm({
 	initialData,
 	workOrderId,
-	isResponsible,
 	workOrderStartDate,
 }: MilestonesFormProps) {
 	const [loading, setLoading] = useState<boolean>(false)
@@ -87,7 +85,7 @@ export default function MilestonesForm({
 		try {
 			setLoading(true)
 
-			const result = await createAndUpdateMilestones(values, isResponsible)
+			const result = await createAndUpdateMilestones(values)
 
 			if (result.ok) {
 				toast.success("Hitos guardados correctamente", {

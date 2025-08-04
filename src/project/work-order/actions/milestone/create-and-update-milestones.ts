@@ -18,8 +18,7 @@ interface SaveMilestonesResponse {
 }
 
 export async function createAndUpdateMilestones(
-	values: WorkBookMilestonesSchema,
-	isResponsible: boolean
+	values: WorkBookMilestonesSchema
 ): Promise<SaveMilestonesResponse> {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -72,8 +71,8 @@ export async function createAndUpdateMilestones(
 						endDate: milestone.endDate,
 						startDate: milestone.startDate,
 						weight: Number(milestone.weight),
+						status: MILESTONE_STATUS.PENDING,
 						description: milestone.description || "",
-						status: isResponsible ? MILESTONE_STATUS.PENDING : MILESTONE_STATUS.IN_APPROVAL,
 					},
 				})
 
@@ -89,7 +88,7 @@ export async function createAndUpdateMilestones(
 					endDate: milestone.endDate,
 					startDate: milestone.startDate,
 					weight: Number(milestone.weight),
-					status: isResponsible ? MILESTONE_STATUS.PENDING : MILESTONE_STATUS.IN_APPROVAL,
+					status: MILESTONE_STATUS.PENDING,
 					description: milestone.description || "",
 					workOrder: {
 						connect: { id: values.workOrderId },
@@ -98,14 +97,6 @@ export async function createAndUpdateMilestones(
 			})
 			createdAndUpdatedMilestones.push(createdMilestone)
 		}
-
-		await prisma.workOrder.update({
-			where: { id: values.workOrderId },
-			data: {
-				updatedAt: new Date(),
-				isMilestonesApproved: false,
-			},
-		})
 
 		sendNotification({
 			type: "milestone",

@@ -159,7 +159,6 @@ export default function WorkBookMain({
 							canRequestClosure={canRequestClosure}
 							responsibleId={workBook.responsibleId}
 							hassWorkBookPermission={hassWorkBookPermission}
-							isMilestonesApproved={workBook.isMilestonesApproved}
 							workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
 						/>
 					</TabsContent>
@@ -178,7 +177,7 @@ export default function WorkBookMain({
 									{canAddActivities && (
 										<>
 											{!canRequestClosure &&
-												(workBook._count.milestones > 0 && workBook.isMilestonesApproved ? (
+												(workBook._count.milestones > 0 ? (
 													<ActivityForm
 														userId={userId}
 														startDate={new Date()}
@@ -190,9 +189,7 @@ export default function WorkBookMain({
 														<Alert>
 															<InfoIcon className="h-4 w-4" />
 															<AlertTitle>
-																{workBook.isMilestonesApproved
-																	? "Debe crear su(s) hito(s) para agregar actividades diarias"
-																	: "Debe tener su(s) hito(s) aprobados para poder agregar actividades diarias"}
+																Debe crear su(s) hito(s) para agregar actividades diarias
 															</AlertTitle>
 														</Alert>
 													)

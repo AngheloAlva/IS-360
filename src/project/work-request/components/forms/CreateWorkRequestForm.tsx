@@ -175,7 +175,7 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 							placeholder="Agrega observaciones adicionales"
 						/>
 
-						{userId !== process.env.NEXT_PUBLIC_OPERATOR_ACCOUNT && (
+						{userId === process.env.NEXT_PUBLIC_OPERATOR_ACCOUNT && (
 							<SelectFormField<WorkRequestSchema>
 								name="operatorId"
 								control={form.control}

@@ -409,7 +409,7 @@ model Milestone {
   id             String           @id @default(cuid())
   name           String
   description    String?
-  status         MILESTONE_STATUS @default(IN_APPROVAL)
+  status         MILESTONE_STATUS @default(PENDING)
   order          Int              @default(0)
   isCompleted    Boolean          @default(false)
   weight         Float

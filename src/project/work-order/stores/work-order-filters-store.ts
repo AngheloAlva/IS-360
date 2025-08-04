@@ -89,13 +89,14 @@ export const useWorkOrderFiltersStore = create<WorkOrderFiltersState>()(
 
 			resetFilters: () => {
 				set({
-					statusFilter: null,
-					priorityFilter: null,
-					typeFilter: null,
+					page: 1,
+					search: "",
 					companyId: null,
 					dateRange: null,
-					search: "",
-					page: 1,
+					typeFilter: null,
+					statusFilter: null,
+					priorityFilter: null,
+					onlyWithRequestClousure: false,
 				})
 			},
 
