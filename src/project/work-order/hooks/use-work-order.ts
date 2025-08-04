@@ -25,7 +25,9 @@ export interface WorkOrder {
 	workProgressStatus: number
 	estimatedEndDate: Date | null
 	programDate: Date
-
+	equipments?: {
+		name: string
+	}[]
 	company?: {
 		id: string
 		rut: string

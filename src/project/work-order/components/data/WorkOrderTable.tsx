@@ -120,7 +120,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 			setExportLoading(true)
 
 			const res: { workOrders: WorkOrder[] } = await fetch(
-				`/api/work-order?page=1&order=desc&orderBy=createdAt&limit=10000`
+				`/api/work-order?page=1&order=desc&orderBy=createdAt&limit=10000&includeEquipments=true`
 			).then((res) => res.json())
 
 			if (!res?.workOrders?.length) {
@@ -144,6 +144,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					estimatedEndDate: workOrder.estimatedEndDate,
 					company: workOrder.company?.name,
 					supervisor: workOrder.supervisor?.name + " " + workOrder.supervisor?.email,
+					equipments: workOrder.equipments?.map((equipment) => equipment.name).join(", "),
 					_count: workOrder._count.workEntries,
 				}))
 			)

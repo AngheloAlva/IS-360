@@ -7,6 +7,8 @@ export async function fetchAllEquipments(parentId: string | null = null) {
 	const searchParams = new URLSearchParams()
 	searchParams.set("page", "1")
 	searchParams.set("limit", "1000")
+	searchParams.set("order", "desc")
+	searchParams.set("orderBy", "name")
 	if (parentId) searchParams.set("parentId", parentId)
 
 	const res = await fetch(`/api/equipments?${searchParams.toString()}`)

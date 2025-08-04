@@ -38,6 +38,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const orderBy = searchParams.get("orderBy") as OrderBy
 		const isOtcMember = searchParams.get("isOtcMember") === "true"
 		const onlyWithRequestClousure = searchParams.get("onlyWithRequestClousure") === "true"
+		const includeEquipments = searchParams.get("includeEquipments") === "true"
 
 		let orderByField: string
 
@@ -145,6 +146,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					type: true,
 					priority: true,
 					programDate: true,
+					...(includeEquipments
+						? {
+								equipment: {
+									select: {
+										name: true,
+									},
+								},
+							}
+						: {}),
 					_count: {
 						select: {
 							workEntries: {
