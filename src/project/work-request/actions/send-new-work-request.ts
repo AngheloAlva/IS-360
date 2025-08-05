@@ -44,8 +44,9 @@ export async function sendNewWorkRequestEmail({
 				"gsereno@oleotrasandino.cl",
 				"katherine.burgos@oleotrasandino.cl",
 				"jaime.chavez@oleotrasandino.cl",
-				"jculloa@oleotrasandino.cl",
+				"gonzalo.orellana@oleotrasandino.cl",
 				"soporte@ingenieriasimple.cl",
+				"jculloa@oleotrasandino.cl",
 			],
 			subject,
 			react: NewWorkRequestEmail({
