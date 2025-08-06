@@ -10,6 +10,7 @@ interface GetCompanyEntitiesParams {
 
 interface SelectedEntity {
 	id: string
+	rut: string
 	name: string
 	status: ReviewStatus
 }
@@ -42,6 +43,7 @@ export async function getBasicEntities({
 						worker: {
 							select: {
 								id: true,
+								rut: true,
 								name: true,
 							},
 						},
@@ -63,6 +65,7 @@ export async function getBasicEntities({
 			},
 			select: {
 				id: true,
+				rut: true,
 				name: true,
 			},
 			orderBy: {
@@ -73,13 +76,15 @@ export async function getBasicEntities({
 		return {
 			allEntities: allBasicFolders.map((user) => ({
 				id: user.id,
+				rut: user.rut,
 				name: user.name,
 				status: ReviewStatus.DRAFT,
 			})),
 			vinculatedEntities:
 				vinculatedBasicUsers?.basicFolders?.map((basicFolder) => ({
-					id: basicFolder.worker?.id,
 					status: basicFolder.status,
+					id: basicFolder.worker?.id,
+					rut: basicFolder.worker.rut,
 					name: basicFolder.worker?.name,
 				})) ?? [],
 		}

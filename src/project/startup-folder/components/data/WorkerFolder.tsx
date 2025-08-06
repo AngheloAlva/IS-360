@@ -42,12 +42,13 @@ export default function WorkerFolder({
 		id: string
 		name: string
 		status: ReviewStatus
+		rut: string
 	} | null>(null)
 	const [allEntities, setAllEntities] = useState<
-		Array<{ id: string; name: string; status: ReviewStatus }>
+		Array<{ id: string; name: string; status: ReviewStatus; rut: string }>
 	>([])
 	const [entities, setEntities] = useState<
-		Array<{ id: string; name: string; status: ReviewStatus }>
+		Array<{ id: string; name: string; status: ReviewStatus; rut: string }>
 	>([])
 	const [showLinkDialog, setShowLinkDialog] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
@@ -111,6 +112,7 @@ export default function WorkerFolder({
 				<TableHeader>
 					<TableRow>
 						<TableHead>Nombre</TableHead>
+						<TableHead>RUT</TableHead>
 						<TableHead>Estado</TableHead>
 						<TableHead>Subido por</TableHead>
 						<TableHead>Subido el</TableHead>
@@ -148,6 +150,7 @@ export default function WorkerFolder({
 										{entity.name}
 									</div>
 								</TableCell>
+								<TableCell>{entity.rut}</TableCell>
 								<TableCell>
 									<StartupFolderStatusBadge status={entity.status} />
 								</TableCell>
