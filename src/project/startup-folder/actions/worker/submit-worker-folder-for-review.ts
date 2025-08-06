@@ -108,7 +108,9 @@ export const submitWorkerFolderForReview = async ({
 					const newStatus =
 						document.status === ReviewStatus.APPROVED
 							? ReviewStatus.APPROVED
-							: ReviewStatus.SUBMITTED
+							: document.status === ReviewStatus.TO_UPDATE
+								? ReviewStatus.TO_UPDATE
+								: ReviewStatus.SUBMITTED
 
 					await prisma.workerDocument.update({
 						where: {

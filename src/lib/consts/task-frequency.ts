@@ -62,8 +62,8 @@ export const TaskFrequencyLabels = {
 	[PLAN_FREQUENCY.WEEKLY]: "Semanal",
 	[PLAN_FREQUENCY.MONTHLY]: "Mensual",
 	[PLAN_FREQUENCY.BIMONTHLY]: "Bimestral",
-	[PLAN_FREQUENCY.QUARTERLY]: "Cuatrimestral",
-	[PLAN_FREQUENCY.FOURMONTHLY]: "Trimestral",
+	[PLAN_FREQUENCY.QUARTERLY]: "Trimestral",
+	[PLAN_FREQUENCY.FOURMONTHLY]: "Cuatrimestral",
 	[PLAN_FREQUENCY.BIANNUAL]: "Semestral",
 	[PLAN_FREQUENCY.YEARLY]: "Anual",
 }

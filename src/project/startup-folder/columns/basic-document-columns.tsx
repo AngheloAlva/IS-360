@@ -14,24 +14,18 @@ import { Button } from "@/shared/components/ui/button"
 
 import type { QueryObserverResult, RefetchOptions } from "@tanstack/react-query"
 import type { ColumnDef, Row, Table } from "@tanstack/react-table"
-import type { StartupFolderDocument } from "../types"
-import type {
-	EnvironmentDocType,
-	EnvironmentalDocType,
-	TechSpecsDocumentType,
-	SafetyAndHealthDocumentType,
-} from "@prisma/client"
+import type { BasicStartupFolderDocument } from "../types"
+import type { BasicDocumentType } from "@prisma/client"
 
-interface GetDocumentColumnsProps {
+interface GetBasicDocumentColumnsProps {
 	userId: string
 	refetch: (options?: RefetchOptions) => Promise<
 		QueryObserverResult<
 			{
-				documents: StartupFolderDocument[]
-				folderStatus: ReviewStatus
 				totalDocuments: number
 				approvedDocuments: number
-				isDriver: boolean
+				folderStatus: ReviewStatus
+				documents: BasicStartupFolderDocument[]
 			},
 			Error
 		>
@@ -41,19 +35,15 @@ interface GetDocumentColumnsProps {
 	folderStatus: ReviewStatus | undefined
 	setSelectedDocumentType: Dispatch<
 		SetStateAction<{
-			type:
-				| EnvironmentDocType
-				| EnvironmentalDocType
-				| TechSpecsDocumentType
-				| SafetyAndHealthDocumentType
+			type: BasicDocumentType
 			name: string
 		} | null>
 	>
-	setSelectedDocument: (document: StartupFolderDocument) => void
+	setSelectedDocument: (document: BasicStartupFolderDocument) => void
 	setShowUploadDialog: (show: boolean) => void
 }
 
-export const getDocumentColumns = ({
+export const getBasicDocumentColumns = ({
 	userId,
 	refetch,
 	isOtcMember,
@@ -62,12 +52,12 @@ export const getDocumentColumns = ({
 	setSelectedDocumentType,
 	setShowUploadDialog,
 	setSelectedDocument,
-}: GetDocumentColumnsProps): ColumnDef<StartupFolderDocument>[] => [
+}: GetBasicDocumentColumnsProps): ColumnDef<BasicStartupFolderDocument>[] => [
 	...(isOtcMember
 		? [
 				{
 					id: "select",
-					header: ({ table }: { table: Table<StartupFolderDocument> }) => (
+					header: ({ table }: { table: Table<BasicStartupFolderDocument> }) => (
 						<Checkbox
 							checked={
 								table.getIsAllPageRowsSelected() ||
@@ -78,7 +68,7 @@ export const getDocumentColumns = ({
 							className="mr-1 data-[state=checked]:bg-teal-500"
 						/>
 					),
-					cell: ({ row }: { row: Row<StartupFolderDocument> }) => (
+					cell: ({ row }: { row: Row<BasicStartupFolderDocument> }) => (
 						<Checkbox
 							checked={row.getIsSelected()}
 							onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -218,13 +208,15 @@ export const getDocumentColumns = ({
 								variant="ghost"
 								className="text-cyan-600"
 								onClick={() => {
-									const baseDoc: StartupFolderDocument = {
+									const baseDoc: BasicStartupFolderDocument = {
 										id: doc.id,
 										url: doc.url,
 										name: doc.name,
+										type: doc.type,
 										status: doc.status,
 										reviewer: doc.reviewer,
 										folderId: doc.folderId,
+										category: doc.category,
 										reviewerId: doc.reviewerId,
 										reviewedAt: doc.reviewedAt,
 										uploadedAt: doc.uploadedAt,
@@ -233,8 +225,6 @@ export const getDocumentColumns = ({
 										submittedAt: doc.submittedAt,
 										uploadedById: doc.uploadedById,
 										expirationDate: doc.expirationDate,
-										type: doc.type as EnvironmentalDocType,
-										category: doc.category as "ENVIRONMENTAL",
 									}
 
 									setSelectedDocumentType({ type: doc.type, name: doc.name })

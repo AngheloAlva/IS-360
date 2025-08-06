@@ -1,6 +1,6 @@
 "use client"
 
-import { RefreshCwIcon } from "lucide-react"
+import { FileSymlinkIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
@@ -85,7 +85,7 @@ export function UpdateDocumentStatusDialog({
 				})
 			} else if (category === "TECHNICAL_SPECS") {
 				const { updateTechnicalDocumentToUpdate } = await import(
-					"@/project/startup-folder/actions/technical/update-technical-document-to-update"
+					"@/project/startup-folder/actions/technical-specs/update-technical-document-to-update"
 				)
 				result = await updateTechnicalDocumentToUpdate({
 					documentIds,
@@ -124,8 +124,8 @@ export function UpdateDocumentStatusDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button size={"icon"} variant="ghost" className="size-8">
-					<RefreshCwIcon className="h-4 w-4" />
+				<Button size={"icon"} variant="outline" className="size-8">
+					<FileSymlinkIcon className="h-4 w-4" />
 				</Button>
 			</DialogTrigger>
 

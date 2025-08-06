@@ -2,19 +2,21 @@
 
 import { z } from "zod"
 
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
-import prisma from "@/lib/prisma"
 import { generateSlug } from "@/lib/generateSlug"
-import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { USER_ROLE } from "@/lib/permissions"
+import prisma from "@/lib/prisma"
 
-export const submitSafetyAndHealthFolderForReview = async ({
+export const submitBasicFolderForReview = async ({
 	emails,
 	userId,
+	workerId,
 	folderId,
 }: {
 	userId: string
+	workerId: string
 	emails: string[]
 	folderId: string
 }) => {
@@ -34,9 +36,19 @@ export const submitSafetyAndHealthFolderForReview = async ({
 	}
 
 	try {
-		const folder = await prisma.safetyAndHealthFolder.findUnique({
-			where: { startupFolderId: folderId },
+		const folder = await prisma.basicFolder.findUnique({
+			where: {
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
+			},
 			select: {
+				worker: {
+					select: {
+						name: true,
+					},
+				},
 				startupFolder: {
 					select: {
 						name: true,
@@ -64,8 +76,13 @@ export const submitSafetyAndHealthFolderForReview = async ({
 			}
 		}
 
-		await prisma.safetyAndHealthFolder.update({
-			where: { id: folder.id },
+		await prisma.basicFolder.update({
+			where: {
+				workerId_startupFolderId: {
+					workerId,
+					startupFolderId: folderId,
+				},
+			},
 			data: {
 				submittedAt: new Date(),
 				status: ReviewStatus.SUBMITTED,
@@ -73,7 +90,7 @@ export const submitSafetyAndHealthFolderForReview = async ({
 			},
 		})
 
-		const documents = await prisma.safetyAndHealthDocument.findMany({
+		const documents = await prisma.basicDocument.findMany({
 			where: {
 				folderId: folder.id,
 			},
@@ -86,9 +103,13 @@ export const submitSafetyAndHealthFolderForReview = async ({
 		await Promise.all(
 			documents.map(async (document) => {
 				const newStatus =
-					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
+					document.status === ReviewStatus.APPROVED
+						? ReviewStatus.APPROVED
+						: document.status === ReviewStatus.TO_UPDATE
+							? ReviewStatus.TO_UPDATE
+							: ReviewStatus.SUBMITTED
 
-				await prisma.safetyAndHealthDocument.update({
+				await prisma.basicDocument.update({
 					where: {
 						id: document.id,
 					},
@@ -105,10 +126,10 @@ export const submitSafetyAndHealthFolderForReview = async ({
 		sendNotification({
 			link: folderLink,
 			creatorId: userId,
-			type: "ENVIRONMENT_FOLDER_SUBMITTED",
-			title: `Carpeta de seguridad y salud ocupacional enviada a revisión`,
+			type: "BASIC_FOLDER_SUBMITTED",
+			title: `Carpeta de arranques básica enviada a revisión`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
-			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de seguridad y salud ocupacional de la carpeta ${folder.startupFolder.name} a revisión`,
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta básica de ${folder.worker.name} (${folder.startupFolder.name}) a revisión`,
 		})
 
 		sendRequestReviewEmail({
@@ -118,19 +139,19 @@ export const submitSafetyAndHealthFolderForReview = async ({
 				rut: user.rut,
 				phone: user.phone,
 			},
+			reviewUrl: folderLink,
 			solicitationDate: new Date(),
+			documentCategory: DocumentCategory.BASIC,
 			companyName: folder.startupFolder.company.name,
-			documentCategory: DocumentCategory.SAFETY_AND_HEALTH,
-			folderName: folder.startupFolder.name + " - " + "Seguridad y Salud Ocupacional",
-			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
+			folderName: folder.startupFolder.name + " - " + folder.worker.name,
 		})
 
 		return {
 			ok: true,
-			message: "La carpeta ha sido enviada a revisión correctamente.",
+			message: "Los documentos han sido enviados a revisión correctamente.",
 		}
 	} catch (error) {
-		console.error("Error al enviar la carpeta a revisión:", error)
+		console.error("Error al enviar los documentos a revisión:", error)
 		if (error instanceof z.ZodError) {
 			return {
 				ok: false,

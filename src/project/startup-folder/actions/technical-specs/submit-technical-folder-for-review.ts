@@ -9,7 +9,7 @@ import { generateSlug } from "@/lib/generateSlug"
 import { USER_ROLE } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
 
-export const submitEnvironmentFolderForReview = async ({
+export const submitTechSpecsDocumentForReview = async ({
 	emails,
 	userId,
 	folderId,
@@ -34,7 +34,7 @@ export const submitEnvironmentFolderForReview = async ({
 	}
 
 	try {
-		const folder = await prisma.environmentFolder.findUnique({
+		const folder = await prisma.techSpecsFolder.findUnique({
 			where: { startupFolderId: folderId },
 			select: {
 				startupFolder: {
@@ -64,7 +64,7 @@ export const submitEnvironmentFolderForReview = async ({
 			}
 		}
 
-		await prisma.environmentFolder.update({
+		await prisma.techSpecsFolder.update({
 			where: { id: folder.id },
 			data: {
 				submittedAt: new Date(),
@@ -73,7 +73,7 @@ export const submitEnvironmentFolderForReview = async ({
 			},
 		})
 
-		const documents = await prisma.environmentDocument.findMany({
+		const documents = await prisma.techSpecsDocument.findMany({
 			where: {
 				folderId: folder.id,
 			},
@@ -86,9 +86,13 @@ export const submitEnvironmentFolderForReview = async ({
 		await Promise.all(
 			documents.map(async (document) => {
 				const newStatus =
-					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
+					document.status === ReviewStatus.APPROVED
+						? ReviewStatus.APPROVED
+						: document.status === ReviewStatus.TO_UPDATE
+							? ReviewStatus.TO_UPDATE
+							: ReviewStatus.SUBMITTED
 
-				await prisma.environmentDocument.update({
+				await prisma.techSpecsDocument.update({
 					where: {
 						id: document.id,
 					},
@@ -105,10 +109,10 @@ export const submitEnvironmentFolderForReview = async ({
 		sendNotification({
 			link: folderLink,
 			creatorId: userId,
-			type: "ENVIRONMENT_FOLDER_SUBMITTED",
-			title: `Carpeta de medio ambiente enviada a revisión`,
+			type: "TECHNICAL_SPECS_FOLDER_SUBMITTED",
+			title: `Carpeta de especificaciones técnicas enviada a revisión`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
-			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de medio ambiente de la carpeta ${folder.startupFolder.name} a revisión`,
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de especificaciones técnicas de la carpeta ${folder.startupFolder.name} a revisión`,
 		})
 
 		sendRequestReviewEmail({
@@ -121,8 +125,8 @@ export const submitEnvironmentFolderForReview = async ({
 			reviewUrl: folderLink,
 			solicitationDate: new Date(),
 			companyName: folder.startupFolder.company.name,
-			documentCategory: DocumentCategory.ENVIRONMENT,
-			folderName: folder.startupFolder.name + " - " + "Medio Ambiente",
+			documentCategory: DocumentCategory.TECHNICAL_SPECS,
+			folderName: folder.startupFolder.name + " - " + "Especificaciones Técnicas",
 		})
 
 		return {

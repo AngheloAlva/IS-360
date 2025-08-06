@@ -124,7 +124,7 @@ export function UndoDocumentReviewDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button size={"icon"} variant="ghost" className="size-8">
+				<Button size={"icon"} variant="outline" className="size-8">
 					<Undo2Icon className="h-4 w-4" />
 				</Button>
 			</DialogTrigger>

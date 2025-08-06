@@ -120,6 +120,7 @@ export default function StartupFolderOverview({
 			>
 				<>
 					<VideoTutorials
+						className="text-teal-600"
 						videos={
 							isOtcMember
 								? [

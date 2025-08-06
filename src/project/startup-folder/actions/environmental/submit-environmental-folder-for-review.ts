@@ -6,10 +6,10 @@ import { sendNotification } from "@/shared/actions/notifications/send-notificati
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
 import { generateSlug } from "@/lib/generateSlug"
-import { USER_ROLE } from "@/lib/permissions"
 import prisma from "@/lib/prisma"
+import { USER_ROLE } from "@/lib/permissions"
 
-export const submitTechSpecsDocumentForReview = async ({
+export const submitEnvironmentalFolderForReview = async ({
 	emails,
 	userId,
 	folderId,
@@ -34,7 +34,7 @@ export const submitTechSpecsDocumentForReview = async ({
 	}
 
 	try {
-		const folder = await prisma.techSpecsFolder.findUnique({
+		const folder = await prisma.environmentalFolder.findUnique({
 			where: { startupFolderId: folderId },
 			select: {
 				startupFolder: {
@@ -64,7 +64,7 @@ export const submitTechSpecsDocumentForReview = async ({
 			}
 		}
 
-		await prisma.techSpecsFolder.update({
+		await prisma.environmentalFolder.update({
 			where: { id: folder.id },
 			data: {
 				submittedAt: new Date(),
@@ -73,7 +73,7 @@ export const submitTechSpecsDocumentForReview = async ({
 			},
 		})
 
-		const documents = await prisma.techSpecsDocument.findMany({
+		const documents = await prisma.environmentalDocument.findMany({
 			where: {
 				folderId: folder.id,
 			},
@@ -86,9 +86,13 @@ export const submitTechSpecsDocumentForReview = async ({
 		await Promise.all(
 			documents.map(async (document) => {
 				const newStatus =
-					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
+					document.status === ReviewStatus.APPROVED
+						? ReviewStatus.APPROVED
+						: document.status === ReviewStatus.TO_UPDATE
+							? ReviewStatus.TO_UPDATE
+							: ReviewStatus.SUBMITTED
 
-				await prisma.techSpecsDocument.update({
+				await prisma.environmentalDocument.update({
 					where: {
 						id: document.id,
 					},
@@ -105,10 +109,10 @@ export const submitTechSpecsDocumentForReview = async ({
 		sendNotification({
 			link: folderLink,
 			creatorId: userId,
-			type: "TECHNICAL_SPECS_FOLDER_SUBMITTED",
-			title: `Carpeta de especificaciones técnicas enviada a revisión`,
+			type: "ENVIRONMENTAL_FOLDER_SUBMITTED",
+			title: `Carpeta de medio ambiente enviada a revisión`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
-			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de especificaciones técnicas de la carpeta ${folder.startupFolder.name} a revisión`,
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de medio ambiente de la carpeta ${folder.startupFolder.name} a revisión`,
 		})
 
 		sendRequestReviewEmail({
@@ -118,11 +122,11 @@ export const submitTechSpecsDocumentForReview = async ({
 				rut: user.rut,
 				phone: user.phone,
 			},
-			reviewUrl: folderLink,
 			solicitationDate: new Date(),
 			companyName: folder.startupFolder.company.name,
-			documentCategory: DocumentCategory.TECHNICAL_SPECS,
-			folderName: folder.startupFolder.name + " - " + "Especificaciones Técnicas",
+			documentCategory: DocumentCategory.ENVIRONMENTAL,
+			folderName: folder.startupFolder.name + " - " + "Medio Ambiente",
+			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
 		})
 
 		return {

@@ -117,7 +117,7 @@ export default function BasicFolder({
 								Cargando colaboradores...
 							</TableCell>
 						</TableRow>
-					) : (
+					) : entities?.length > 0 ? (
 						entities?.map((entity) => (
 							<TableRow key={entity.id} className="group">
 								<TableCell
@@ -171,6 +171,12 @@ export default function BasicFolder({
 								</TableCell>
 							</TableRow>
 						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={8} className="h-24 text-center">
+								No hay colaboradores vinculados
+							</TableCell>
+						</TableRow>
 					)}
 				</TableBody>
 			</Table>

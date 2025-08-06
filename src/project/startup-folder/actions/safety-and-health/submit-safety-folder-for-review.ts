@@ -2,14 +2,14 @@
 
 import { z } from "zod"
 
-import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { DocumentCategory, ReviewStatus } from "@prisma/client"
-import { generateSlug } from "@/lib/generateSlug"
 import prisma from "@/lib/prisma"
+import { generateSlug } from "@/lib/generateSlug"
+import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { USER_ROLE } from "@/lib/permissions"
 
-export const submitEnvironmentalFolderForReview = async ({
+export const submitSafetyAndHealthFolderForReview = async ({
 	emails,
 	userId,
 	folderId,
@@ -34,7 +34,7 @@ export const submitEnvironmentalFolderForReview = async ({
 	}
 
 	try {
-		const folder = await prisma.environmentalFolder.findUnique({
+		const folder = await prisma.safetyAndHealthFolder.findUnique({
 			where: { startupFolderId: folderId },
 			select: {
 				startupFolder: {
@@ -64,7 +64,7 @@ export const submitEnvironmentalFolderForReview = async ({
 			}
 		}
 
-		await prisma.environmentalFolder.update({
+		await prisma.safetyAndHealthFolder.update({
 			where: { id: folder.id },
 			data: {
 				submittedAt: new Date(),
@@ -73,7 +73,7 @@ export const submitEnvironmentalFolderForReview = async ({
 			},
 		})
 
-		const documents = await prisma.environmentalDocument.findMany({
+		const documents = await prisma.safetyAndHealthDocument.findMany({
 			where: {
 				folderId: folder.id,
 			},
@@ -86,9 +86,13 @@ export const submitEnvironmentalFolderForReview = async ({
 		await Promise.all(
 			documents.map(async (document) => {
 				const newStatus =
-					document.status === ReviewStatus.APPROVED ? ReviewStatus.APPROVED : ReviewStatus.SUBMITTED
+					document.status === ReviewStatus.APPROVED
+						? ReviewStatus.APPROVED
+						: document.status === ReviewStatus.TO_UPDATE
+							? ReviewStatus.TO_UPDATE
+							: ReviewStatus.SUBMITTED
 
-				await prisma.environmentalDocument.update({
+				await prisma.safetyAndHealthDocument.update({
 					where: {
 						id: document.id,
 					},
@@ -105,10 +109,10 @@ export const submitEnvironmentalFolderForReview = async ({
 		sendNotification({
 			link: folderLink,
 			creatorId: userId,
-			type: "ENVIRONMENTAL_FOLDER_SUBMITTED",
-			title: `Carpeta de medio ambiente enviada a revisión`,
+			type: "ENVIRONMENT_FOLDER_SUBMITTED",
+			title: `Carpeta de seguridad y salud ocupacional enviada a revisión`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.startupFolderOperator],
-			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de medio ambiente de la carpeta ${folder.startupFolder.name} a revisión`,
+			message: `La empresa ${folder.startupFolder.company.name} ha enviado la subcarpeta de seguridad y salud ocupacional de la carpeta ${folder.startupFolder.name} a revisión`,
 		})
 
 		sendRequestReviewEmail({
@@ -120,8 +124,8 @@ export const submitEnvironmentalFolderForReview = async ({
 			},
 			solicitationDate: new Date(),
 			companyName: folder.startupFolder.company.name,
-			documentCategory: DocumentCategory.ENVIRONMENTAL,
-			folderName: folder.startupFolder.name + " - " + "Medio Ambiente",
+			documentCategory: DocumentCategory.SAFETY_AND_HEALTH,
+			folderName: folder.startupFolder.name + " - " + "Seguridad y Salud Ocupacional",
 			reviewUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranques/${user.companyId}`,
 		})
 
