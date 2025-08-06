@@ -36,6 +36,10 @@ export function StartupFolderStatusBadge({ status, className }: StartupFolderSta
 			label: "Vencido",
 			className: "bg-amber-600/20 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500",
 		},
+		TO_UPDATE: {
+			label: "A actualizar",
+			className: "bg-blue-600/20 text-blue-600 dark:bg-blue-500/20 dark:text-blue-500",
+		},
 	}
 
 	const statusInfo = statusMap[status]

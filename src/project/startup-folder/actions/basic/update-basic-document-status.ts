@@ -6,71 +6,80 @@ import prisma from "@/lib/prisma"
 
 interface UndoDocumentReviewParams {
 	userId: string
-	documentId: string
+	documentIds: string[]
 }
 
-export async function undoDocumentReview({ userId, documentId }: UndoDocumentReviewParams) {
+export async function undoDocumentReview({ userId, documentIds }: UndoDocumentReviewParams) {
 	try {
-		const document = await prisma.basicDocument.update({
+		const documents = await prisma.basicDocument.updateMany({
 			where: {
-				id: documentId,
+				id: { in: documentIds },
 			},
 			data: {
 				status: "SUBMITTED",
 			},
 		})
 
-		if (!document) {
+		if (documents.count === 0) {
 			return {
 				ok: false,
-				message: "Documento no encontrado",
+				message: "No se encontraron documentos",
 			}
 		}
 
-		const folder = await prisma.basicFolder.update({
+		// Get the updated documents to access their folder IDs
+		const updatedDocuments = await prisma.basicDocument.findMany({
 			where: {
-				id: document.folderId,
+				id: { in: documentIds },
+			},
+			select: {
+				id: true,
+				folderId: true,
+			},
+		})
+
+		// Update folders status
+		const folderIds = [...new Set(updatedDocuments.map((doc) => doc.folderId))]
+		await prisma.basicFolder.updateMany({
+			where: {
+				id: { in: folderIds },
 			},
 			data: {
 				status: "SUBMITTED",
 			},
 		})
 
-		if (!folder) {
-			return {
-				ok: false,
-				message: "Carpeta no encontrada",
-			}
+		// Log activity for each document
+		for (const document of updatedDocuments) {
+			logActivity({
+				userId,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: document.id,
+				entityType: "BasicDocument",
+				metadata: {
+					documentId: document.id,
+					startupFolderId: document.folderId,
+					category: DocumentCategory.BASIC,
+				},
+			})
 		}
-
-		logActivity({
-			userId,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.UPDATE,
-			entityId: document.id,
-			entityType: "BasicDocument",
-			metadata: {
-				documentId: document.id,
-				startupFolderId: document.folderId,
-				category: DocumentCategory.BASIC,
-			},
-		})
 
 		return {
 			ok: true,
-			message: "Documento actualizado correctamente",
+			message: `${documents.count} documento(s) actualizado(s) correctamente`,
 		}
 	} catch (error) {
 		console.error("Error updating document status:", error)
 		if (error instanceof Error && error.message.includes("Unique constraint")) {
 			return {
 				ok: false,
-				message: "No se pudo actualizar el estado del documento",
+				message: "No se pudo actualizar el estado de los documentos",
 			}
 		}
 		return {
-			ok: true,
-			message: "Documento actualizado correctamente",
+			ok: false,
+			message: "Error al actualizar los documentos",
 		}
 	}
 }

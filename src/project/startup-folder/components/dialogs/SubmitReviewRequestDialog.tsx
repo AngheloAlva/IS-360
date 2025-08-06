@@ -16,18 +16,18 @@ import {
 	DialogFooter,
 	DialogContent,
 	DialogDescription,
+	DialogTrigger,
 } from "@/shared/components/ui/dialog"
 
 import type { DocumentCategory } from "@prisma/client"
+import { SendIcon } from "lucide-react"
 
 interface SubmitReviewRequestDialogProps {
 	userId: string
-	isOpen: boolean
 	folderId: string
 	workerId?: string
-	vehicleId?: string
 	companyId: string
-	onClose: () => void
+	vehicleId?: string
 	onSuccess: () => void
 	category: DocumentCategory
 }
@@ -41,8 +41,6 @@ type SubmitReviewRequestSchema = z.infer<typeof submitReviewRequestSchema>
 
 export function SubmitReviewRequestDialog({
 	userId,
-	isOpen,
-	onClose,
 	category,
 	folderId,
 	workerId,
@@ -50,8 +48,9 @@ export function SubmitReviewRequestDialog({
 	companyId,
 	onSuccess,
 }: SubmitReviewRequestDialogProps) {
-	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [emailError, setEmailError] = useState<string | null>(null)
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+	const [open, setOpen] = useState<boolean>(false)
 
 	const form = useForm<SubmitReviewRequestSchema>({
 		resolver: zodResolver(submitReviewRequestSchema),
@@ -207,7 +206,14 @@ export function SubmitReviewRequestDialog({
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white">
+					<SendIcon className="h-4 w-4" />
+					Enviar a revisión
+				</Button>
+			</DialogTrigger>
+
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Enviar documentos a revisión</DialogTitle>
@@ -237,7 +243,12 @@ export function SubmitReviewRequestDialog({
 						/>
 
 						<DialogFooter>
-							<Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+							<Button
+								type="button"
+								variant="outline"
+								disabled={isSubmitting}
+								onClick={() => setOpen(false)}
+							>
 								Cancelar
 							</Button>
 							<Button

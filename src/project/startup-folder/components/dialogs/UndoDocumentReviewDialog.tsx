@@ -11,34 +11,37 @@ import {
 	DialogFooter,
 	DialogContent,
 	DialogDescription,
+	DialogTrigger,
 } from "@/shared/components/ui/dialog"
 
 import type { DocumentCategory } from "@prisma/client"
+import { Undo2Icon } from "lucide-react"
 
 interface UndoDocumentReviewDialogProps {
 	userId: string
-	isOpen: boolean
-	documentId: string
-	onClose: () => void
+	documents: Array<{
+		id: string
+		name: string
+	}>
 	onSuccess: () => void
 	category: DocumentCategory
 }
 
 export function UndoDocumentReviewDialog({
 	userId,
-	isOpen,
-	onClose,
 	category,
-	documentId,
+	documents,
 	onSuccess,
 }: UndoDocumentReviewDialogProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [open, setOpen] = useState(false)
 
 	const handleSubmit = async () => {
 		setIsSubmitting(true)
 
 		try {
 			let result: { ok: boolean; message?: string }
+			const documentIds = documents.map((doc) => doc.id)
 
 			if (category === "SAFETY_AND_HEALTH") {
 				const { undoSafetyDocumentReview } = await import(
@@ -46,7 +49,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoSafetyDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else if (category === "VEHICLES") {
 				const { undoVehicleDocumentReview } = await import(
@@ -54,7 +57,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoVehicleDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else if (category === "PERSONNEL") {
 				const { undoWorkerDocumentReview } = await import(
@@ -62,7 +65,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoWorkerDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else if (category === "ENVIRONMENTAL") {
 				const { undoEnvironmentalDocumentReview } = await import(
@@ -70,7 +73,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoEnvironmentalDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else if (category === "ENVIRONMENT") {
 				const { undoEnvironmentDocumentReview } = await import(
@@ -78,7 +81,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoEnvironmentDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else if (category === "TECHNICAL_SPECS") {
 				const { undoTechnicalDocumentReview } = await import(
@@ -86,7 +89,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoTechnicalDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else if (category === "BASIC") {
 				const { undoDocumentReview } = await import(
@@ -94,7 +97,7 @@ export function UndoDocumentReviewDialog({
 				)
 				result = await undoDocumentReview({
 					userId,
-					documentId,
+					documentIds,
 				})
 			} else {
 				result = {
@@ -106,6 +109,7 @@ export function UndoDocumentReviewDialog({
 			if (result.ok) {
 				toast.success("Revisión revertida correctamente")
 				onSuccess()
+				setOpen(false)
 			} else {
 				toast.error(result.message || "Error al revertir la revisión")
 			}
@@ -118,18 +122,39 @@ export function UndoDocumentReviewDialog({
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				<Button size={"icon"} variant="ghost" className="size-8">
+					<Undo2Icon className="h-4 w-4" />
+				</Button>
+			</DialogTrigger>
+
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Revertir revisión de documento</DialogTitle>
-					<DialogDescription>
-						¿Estás seguro de que deseas revertir la revisión de este documento? El documento volverá
-						al estado de <span className="font-semibold">&quot;Enviado para revisión&quot;</span>.
+					<DialogTitle>Revertir Revisión de Documentos</DialogTitle>
+					<DialogDescription asChild>
+						<div>
+							¿Estás seguro(a) de que deseas revertir la revisión de estos documentos? Los
+							documentos volverán al estado de{" "}
+							<span className="font-semibold">&quot;Enviado para revisión&quot;</span>.
+							<ul className="mt-4 flex flex-col items-start justify-start">
+								<span className="font-semibold">Documentos:</span>
+
+								{documents.map((doc) => (
+									<li key={doc.id}>- {doc.name}</li>
+								))}
+							</ul>
+						</div>
 					</DialogDescription>
 				</DialogHeader>
 
-				<DialogFooter>
-					<Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+				<DialogFooter className="mt-2">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() => setOpen(false)}
+						disabled={isSubmitting}
+					>
 						Cancelar
 					</Button>
 					<Button
@@ -137,7 +162,7 @@ export function UndoDocumentReviewDialog({
 						onClick={handleSubmit}
 						disabled={isSubmitting}
 					>
-						{isSubmitting ? "Revirtiendo..." : "Revertir revisión"}
+						{isSubmitting ? "Revirtiendo..." : "Revertir revisiones"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

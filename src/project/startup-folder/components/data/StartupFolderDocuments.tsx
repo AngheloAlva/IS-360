@@ -1,27 +1,15 @@
 "use client"
 
-import { format } from "date-fns"
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
+import { InfoIcon, UploadIcon, ChevronLeft, FileTextIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
-import {
-	EyeIcon,
-	PenIcon,
-	SendIcon,
-	InfoIcon,
-	UserIcon,
-	Undo2Icon,
-	UploadIcon,
-	ChevronLeft,
-	FileTextIcon,
-	CalendarX2Icon,
-} from "lucide-react"
 
 import { useStartupFolderDocuments } from "../../hooks/use-startup-folder-documents"
 import { getDocumentsByCategory } from "@/lib/consts/startup-folders-structure"
+import { getDocumentColumns } from "../../columns/document-columns"
 import { queryClient } from "@/lib/queryClient"
-import { cn } from "@/lib/utils"
 import {
-	ReviewStatus,
 	DocumentCategory,
 	type EnvironmentDocType,
 	type EnvironmentalDocType,
@@ -32,9 +20,7 @@ import {
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
-import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
-import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -46,13 +32,9 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
-import type {
-	StartupFolderDocument,
-	TechSpecsStartupFolderDocument,
-	EnvironmentStartupFolderDocument,
-	EnvironmentalStartupFolderDocument,
-	SafetyAndHealthStartupFolderDocument,
-} from "../../types"
+import type { StartupFolderDocument } from "../../types"
+import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
+import { UpdateDocumentStatusDialog } from "../dialogs/UpdateDocumentStatusDialog"
 
 interface StartupFolderDocumentsProps {
 	userId: string
@@ -73,6 +55,7 @@ export default function StartupFolderDocuments({
 	startupFolderId,
 	moreMonthDuration,
 }: StartupFolderDocumentsProps): React.ReactElement {
+	const [rowSelection, setRowSelection] = useState({})
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
 		type:
 			| EnvironmentDocType
@@ -83,14 +66,28 @@ export default function StartupFolderDocuments({
 	} | null>(null)
 	const [selectedDocument, setSelectedDocument] = useState<StartupFolderDocument | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
-	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
-	const [showUndoReviewDialog, setShowUndoReviewDialog] = useState(false)
-	const [documentToUndoReview, setDocumentToUndoReview] = useState<StartupFolderDocument | null>(
-		null
-	)
 
 	const { data, isLoading, refetch } = useStartupFolderDocuments({ startupFolderId, category })
 	const documentsData = data?.documents ?? []
+
+	const table = useReactTable({
+		columns: getDocumentColumns({
+			userId,
+			refetch,
+			isOtcMember,
+			startupFolderId,
+			setShowUploadDialog,
+			setSelectedDocument,
+			setSelectedDocumentType,
+			folderStatus: data?.folderStatus,
+		}),
+		data: data?.documents || [],
+		getCoreRowModel: getCoreRowModel(),
+		onRowSelectionChange: setRowSelection,
+		state: {
+			rowSelection,
+		},
+	})
 
 	const { title, documents } = getDocumentsByCategory(category, moreMonthDuration)
 
@@ -116,36 +113,90 @@ export default function StartupFolderDocuments({
 					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 
-				<Progress
-					value={progress}
-					className="mr-2 ml-auto max-w-24"
-					indicatorClassName="bg-emerald-600"
-				/>
-				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
+				<div className="flex items-center gap-2">
+					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+						<>
+							<UndoDocumentReviewDialog
+								userId={userId}
+								category={category}
+								documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
+									id: row.original.id,
+									name: row.original.name,
+								}))}
+								onSuccess={async () => {
+									queryClient.invalidateQueries({
+										queryKey: [
+											"startupFolderDocuments",
+											{ startupFolderId, category, workerId: null, vehicleId: null },
+										],
+									})
+									await refetch()
+								}}
+							/>
 
-				{!isOtcMember && data?.folderStatus === "DRAFT" && (
-					<Button
-						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
-						onClick={() => setShowSubmitDialog(true)}
-					>
-						<SendIcon className="h-4 w-4" />
-						Enviar a revisión
-					</Button>
-				)}
+							<UpdateDocumentStatusDialog
+								startupFolderId={startupFolderId}
+								category={category}
+								documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
+									id: row.original.id,
+									name: row.original.name,
+								}))}
+								onSuccess={async () => {
+									queryClient.invalidateQueries({
+										queryKey: [
+											"startupFolderDocuments",
+											{ startupFolderId, category, workerId: null, vehicleId: null },
+										],
+									})
+									await refetch()
+								}}
+							/>
+						</>
+					)}
+
+					<Progress
+						value={progress}
+						className="mr-2 ml-auto w-24 max-w-24"
+						indicatorClassName="bg-emerald-600"
+					/>
+					<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
+
+					{!isOtcMember && data?.folderStatus === "DRAFT" && (
+						<SubmitReviewRequestDialog
+							userId={userId}
+							category={category}
+							companyId={companyId}
+							folderId={startupFolderId}
+							onSuccess={async () => {
+								queryClient.invalidateQueries({
+									queryKey: [
+										"startupFolderDocuments",
+										{ startupFolderId, category, workerId: null, vehicleId: null },
+									],
+								})
+								await refetch()
+								toast.success("Documentos enviados a revisión exitosamente")
+							}}
+						/>
+					)}
+				</div>
 			</div>
 
 			<Table>
 				<TableHeader>
-					<TableRow>
-						<TableHead>Nombre</TableHead>
-						<TableHead>Estado</TableHead>
-						<TableHead>Subido por</TableHead>
-						<TableHead>Subido el</TableHead>
-						<TableHead>Vencimiento</TableHead>
-						<TableHead>Revisado por</TableHead>
-						<TableHead>Revisado el</TableHead>
-						<TableHead className="w-[100px]"></TableHead>
-					</TableRow>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow key={headerGroup.id}>
+							{headerGroup.headers.map((header) => {
+								return (
+									<TableHead key={header.id}>
+										{header.isPlaceholder
+											? null
+											: flexRender(header.column.columnDef.header, header.getContext())}
+									</TableHead>
+								)
+							})}
+						</TableRow>
+					))}
 				</TableHeader>
 
 				<TableBody>
@@ -156,169 +207,13 @@ export default function StartupFolderDocuments({
 							</TableCell>
 						</TableRow>
 					) : (
-						documentsData.map((doc: StartupFolderDocument) => (
-							<TableRow key={doc.id}>
-								<TableCell className="font-medium">
-									<div className="flex flex-col items-start justify-center">
-										<div className="flex items-center gap-2">
-											<FileTextIcon className="h-4 w-4 text-teal-500" />
-											{doc.name}
-										</div>
-
-										{doc.reviewNotes && (
-											<span
-												className={cn("max-w-96 text-wrap text-rose-500", {
-													"text-emerald-500": doc.status === ReviewStatus.APPROVED,
-												})}
-											>
-												{doc.status === ReviewStatus.APPROVED ? "Aprobado" : "Rechazado"}:{" "}
-												{doc.reviewNotes}
-											</span>
-										)}
-									</div>
-								</TableCell>
-								<TableCell>
-									<StartupFolderStatusBadge status={doc.status} />
-								</TableCell>
-								<TableCell>
-									<div className="flex items-center gap-1">
-										<UserIcon className="text-muted-foreground size-3.5" />
-										{doc.uploadedBy?.name ?? "Usuario desconocido"}
-									</div>
-								</TableCell>
-								<TableCell>
-									{doc.uploadedAt ? format(new Date(doc.uploadedAt), "dd/MM/yyyy HH:mm") : "N/A"}
-								</TableCell>
-								<TableCell>
-									<div className="flex items-center gap-1">
-										<CalendarX2Icon className="text-muted-foreground size-3.5" />
-										{doc.expirationDate
-											? format(new Date(doc.expirationDate), "dd/MM/yyyy")
-											: "N/A"}
-									</div>
-								</TableCell>
-								<TableCell>{doc.reviewer?.name ?? ""}</TableCell>
-								<TableCell>
-									{doc.reviewedAt ? format(new Date(doc.reviewedAt), "dd/MM/yyyy") : ""}
-								</TableCell>
-								<TableCell>
-									<div className="flex items-center gap-1">
-										{doc.url && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-teal-600"
-												onClick={() => window.open(doc.url!, "_blank")}
-											>
-												<EyeIcon className="h-4 w-4" />
-											</Button>
-										)}
-
-										{!isOtcMember &&
-											data?.folderStatus === "DRAFT" &&
-											(doc.status === "DRAFT" ||
-												doc.status === "REJECTED" ||
-												doc.status === "EXPIRED") && (
-												<Button
-													size={"icon"}
-													variant="ghost"
-													className="text-cyan-600"
-													onClick={() => {
-														const baseDoc = {
-															id: doc.id,
-															name: doc.name,
-															url: doc.url,
-															status: doc.status,
-															uploadedBy: doc.uploadedBy,
-															uploadedById: doc.uploadedById,
-															uploadedAt: doc.uploadedAt,
-															reviewedAt: doc.reviewedAt,
-															reviewNotes: doc.reviewNotes,
-															submittedAt: doc.submittedAt,
-															expirationDate: doc.expirationDate,
-															reviewerId: doc.reviewerId,
-															folderId: doc.folderId,
-														}
-
-														let selectedDoc: StartupFolderDocument
-														switch (category) {
-															case DocumentCategory.SAFETY_AND_HEALTH: {
-																const safetyDoc: SafetyAndHealthStartupFolderDocument = {
-																	...baseDoc,
-																	category: DocumentCategory.SAFETY_AND_HEALTH,
-																	type: doc.type as SafetyAndHealthDocumentType,
-																	reviewer: doc.reviewer,
-																}
-																selectedDoc = safetyDoc
-																break
-															}
-															case DocumentCategory.ENVIRONMENTAL: {
-																const envDoc: EnvironmentalStartupFolderDocument = {
-																	...baseDoc,
-																	category: DocumentCategory.ENVIRONMENTAL,
-																	type: doc.type as EnvironmentalDocType,
-																	reviewer: doc.reviewer,
-																}
-																selectedDoc = envDoc
-																break
-															}
-															case DocumentCategory.ENVIRONMENT: {
-																const envDoc: EnvironmentStartupFolderDocument = {
-																	...baseDoc,
-																	category: DocumentCategory.ENVIRONMENT,
-																	type: doc.type as EnvironmentDocType,
-																	reviewer: doc.reviewer,
-																}
-																selectedDoc = envDoc
-																break
-															}
-															case DocumentCategory.TECHNICAL_SPECS: {
-																const envDoc: TechSpecsStartupFolderDocument = {
-																	...baseDoc,
-																	category: DocumentCategory.TECHNICAL_SPECS,
-																	type: doc.type as TechSpecsDocumentType,
-																	reviewer: doc.reviewer,
-																}
-																selectedDoc = envDoc
-																break
-															}
-															default:
-																throw new Error(`Invalid category: ${category}`)
-														}
-														setSelectedDocumentType({ type: doc.type, name: doc.name })
-														setSelectedDocument(selectedDoc)
-														setShowUploadDialog(true)
-													}}
-												>
-													<PenIcon className="h-4 w-4" />
-												</Button>
-											)}
-
-										{isOtcMember && doc.status === "SUBMITTED" && (
-											<DocumentReviewForm
-												document={doc}
-												userId={userId}
-												refetch={refetch}
-												category={category}
-												startupFolderId={startupFolderId}
-											/>
-										)}
-
-										{isOtcMember && (doc.status === "APPROVED" || doc.status === "REJECTED") && (
-											<Button
-												size={"icon"}
-												variant="ghost"
-												className="text-amber-500"
-												onClick={() => {
-													setDocumentToUndoReview(doc)
-													setShowUndoReviewDialog(true)
-												}}
-											>
-												<Undo2Icon className="h-4 w-4" />
-											</Button>
-										)}
-									</div>
-								</TableCell>
+						table.getRowModel().rows.map((row) => (
+							<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+								{row.getVisibleCells().map((cell) => (
+									<TableCell key={cell.id}>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</TableCell>
+								))}
 							</TableRow>
 						))
 					)}
@@ -326,6 +221,7 @@ export default function StartupFolderDocuments({
 					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
+								<TableCell></TableCell>
 								<TableCell className="font-medium">
 									<div className="flex flex-col items-start justify-center">
 										<div className="flex items-center gap-2">
@@ -390,52 +286,6 @@ export default function StartupFolderDocuments({
 					onUploadComplete={() => {
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
-					}}
-				/>
-			)}
-
-			{showSubmitDialog && (
-				<SubmitReviewRequestDialog
-					userId={userId}
-					category={category}
-					companyId={companyId}
-					isOpen={showSubmitDialog}
-					folderId={startupFolderId}
-					onClose={() => setShowSubmitDialog(false)}
-					onSuccess={async () => {
-						queryClient.invalidateQueries({
-							queryKey: [
-								"startupFolderDocuments",
-								{ startupFolderId, category, workerId: null, vehicleId: null },
-							],
-						})
-						setShowSubmitDialog(false)
-						await refetch()
-						toast.success("Documentos enviados a revisión exitosamente")
-					}}
-				/>
-			)}
-
-			{showUndoReviewDialog && documentToUndoReview && (
-				<UndoDocumentReviewDialog
-					userId={userId}
-					category={documentToUndoReview.category}
-					isOpen={showUndoReviewDialog}
-					documentId={documentToUndoReview.id}
-					onClose={() => {
-						setShowUndoReviewDialog(false)
-						setDocumentToUndoReview(null)
-					}}
-					onSuccess={async () => {
-						queryClient.invalidateQueries({
-							queryKey: [
-								"startupFolderDocuments",
-								{ startupFolderId, category, workerId: null, vehicleId: null },
-							],
-						})
-						setShowUndoReviewDialog(false)
-						setDocumentToUndoReview(null)
-						await refetch()
 					}}
 				/>
 			)}

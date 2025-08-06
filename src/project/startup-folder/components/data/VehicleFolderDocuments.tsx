@@ -4,16 +4,7 @@ import { format } from "date-fns"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import {
-	EyeIcon,
-	InfoIcon,
-	SendIcon,
-	Undo2Icon,
-	PencilIcon,
-	UploadIcon,
-	ChevronLeft,
-	FileTextIcon,
-} from "lucide-react"
+import { EyeIcon, InfoIcon, PencilIcon, UploadIcon, ChevronLeft, FileTextIcon } from "lucide-react"
 
 import { ReviewStatus, DocumentCategory, type VehicleDocumentType } from "@prisma/client"
 import { useVehicleFolderDocuments } from "../../hooks/use-vehicle-folder-documents"
@@ -22,7 +13,6 @@ import { queryClient } from "@/lib/queryClient"
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
-import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { DocumentReviewForm } from "../dialogs/DocumentReviewForm"
 import { Progress } from "@/shared/components/ui/progress"
@@ -69,9 +59,6 @@ export function VehicleFolderDocuments({
 		name: string
 	} | null>(null)
 	const [showUploadDialog, setShowUploadDialog] = useState(false)
-	const [showSubmitDialog, setShowSubmitDialog] = useState(false)
-	const [showUndoDialog, setShowUndoDialog] = useState(false)
-	const [documentToUndo, setDocumentToUndo] = useState<VehicleStartupFolderDocument | null>(null)
 
 	const { data, isLoading, refetch } = useVehicleFolderDocuments({
 		startupFolderId,
@@ -107,13 +94,20 @@ export function VehicleFolderDocuments({
 				<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
 				{!isOtcMember && data?.folderStatus === "DRAFT" && (
-					<Button
-						className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
-						onClick={() => setShowSubmitDialog(true)}
-					>
-						<SendIcon className="h-4 w-4" />
-						Enviar a revisión
-					</Button>
+					<SubmitReviewRequestDialog
+						userId={userId}
+						vehicleId={vehicleId}
+						companyId={companyId}
+						folderId={startupFolderId}
+						category={DocumentCategory.VEHICLES}
+						onSuccess={async () => {
+							queryClient.invalidateQueries({
+								queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
+							})
+							await refetch()
+							toast.success("Documentos enviados a revisión exitosamente")
+						}}
+					/>
 				)}
 			</div>
 
@@ -213,7 +207,7 @@ export function VehicleFolderDocuments({
 											/>
 										)}
 
-										{isOtcMember && (doc.status === "APPROVED" || doc.status === "REJECTED") && (
+										{/* {isOtcMember && (doc.status === "APPROVED" || doc.status === "REJECTED") && (
 											<Button
 												size={"icon"}
 												variant="ghost"
@@ -225,7 +219,7 @@ export function VehicleFolderDocuments({
 											>
 												<Undo2Icon className="h-4 w-4" />
 											</Button>
-										)}
+										)} */}
 									</div>
 								</TableCell>
 							</TableRow>
@@ -304,48 +298,6 @@ export function VehicleFolderDocuments({
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
 						await refetch()
-					}}
-				/>
-			)}
-
-			{showSubmitDialog && (
-				<SubmitReviewRequestDialog
-					userId={userId}
-					vehicleId={vehicleId}
-					companyId={companyId}
-					isOpen={showSubmitDialog}
-					folderId={startupFolderId}
-					category={DocumentCategory.VEHICLES}
-					onClose={() => setShowSubmitDialog(false)}
-					onSuccess={async () => {
-						queryClient.invalidateQueries({
-							queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
-						})
-						setShowSubmitDialog(false)
-						await refetch()
-						toast.success("Documentos enviados a revisión exitosamente")
-					}}
-				/>
-			)}
-
-			{showUndoDialog && documentToUndo && (
-				<UndoDocumentReviewDialog
-					userId={userId}
-					isOpen={showUndoDialog}
-					documentId={documentToUndo.id}
-					category={DocumentCategory.VEHICLES}
-					onClose={() => {
-						setShowUndoDialog(false)
-						setDocumentToUndo(null)
-					}}
-					onSuccess={async () => {
-						queryClient.invalidateQueries({
-							queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
-						})
-						setShowUndoDialog(false)
-						setDocumentToUndo(null)
-						await refetch()
-						toast.success("Revisión de documento revertida exitosamente")
 					}}
 				/>
 			)}

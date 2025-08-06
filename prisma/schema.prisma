@@ -954,6 +954,7 @@ enum ReviewStatus {
   APPROVED // Aprobado
   REJECTED // Rechazado
   EXPIRED // Expirado
+  TO_UPDATE // A actualizar
 }
 
 enum SafetyAndHealthDocumentType {
