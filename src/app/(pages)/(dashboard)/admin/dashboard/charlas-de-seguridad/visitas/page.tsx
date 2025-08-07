@@ -1,4 +1,4 @@
-import { ScrollTextIcon } from "lucide-react"
+import { ScrollTextIcon, Share2Icon } from "lucide-react"
 
 import { VisitorTalkMap } from "@/project/safety-talk/components/visitor/VisitorTalkMap"
 import BackButton from "@/shared/components/BackButton"
@@ -11,6 +11,7 @@ import {
 } from "@/shared/components/ui/card"
 
 import type { Metadata } from "next"
+import ExternalCompanyForm from "@/project/safety-talk/components/forms/ExternalCompanyForm"
 
 export const metadata: Metadata = {
 	title: "Charla de Visitas - OTC 360",
@@ -72,6 +73,49 @@ export default function VisitorTalk() {
 									</ul>
 								</div>
 							</div>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardHeader className="flex flex-row items-center justify-between">
+					<div>
+						<CardTitle className="flex items-center gap-2">
+							Compartir con Empresa Externa
+							<div className="mt-0.5 rounded-full bg-amber-500/80 px-1.5 text-xs font-medium text-white">
+								Funcionalidad de Prueba
+							</div>
+						</CardTitle>
+						<CardDescription>
+							Genera un enlace único para que empresas externas accedan a la charla de seguridad
+						</CardDescription>
+					</div>
+
+					<div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600">
+						<Share2Icon className="size-6" />
+					</div>
+				</CardHeader>
+
+				<CardContent>
+					<div className="space-y-4">
+						<div className="rounded-md bg-emerald-500/10 p-4 text-emerald-600">
+							<div className="ml-1">
+								<h3 className="text-sm font-semibold">Funcionalidad de Compartir:</h3>
+								<div className="mt-2 text-sm">
+									<ul className="list-disc space-y-1 pl-5">
+										<li>
+											Ingresa los datos de la empresa externa y los correos de los participantes.
+										</li>
+										<li>Se generará un enlace único que podrás compartir con la empresa.</li>
+										<li>Cada participante completará sus datos y podrá acceder a la charla.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div className="flex justify-center">
+							<ExternalCompanyForm videoUrl="https://drive.google.com/file/d/1E24BINYpeRsSRStcTimTJxvj2pxHFd6I/view?usp=sharing" />
 						</div>
 					</div>
 				</CardContent>

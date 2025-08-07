@@ -1520,3 +1520,78 @@ model InspectionComment {
   @@index([type])
   @@map("inspection_comment")
 }
+
+model ExternalCompany {
+  id           String            @id @default(cuid())
+  name         String
+  rut          String            @unique
+  emails       String[]
+  createdAt    DateTime          @default(now())
+  visitors     ExternalVisitor[]
+  visitorTalks VisitorTalk[]
+
+  @@index([rut])
+  @@map("external_company")
+}
+
+model ExternalVisitor {
+  id              String                  @id @default(cuid())
+  name            String                  // Will be filled when visitor accesses the link
+  rut             String                  // Will be filled when visitor accesses the link
+  email           String                  // Email from the authorized list
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  company         ExternalCompany         @relation(fields: [companyId], references: [id])
+  companyId       String
+  visitorTalks    VisitorTalk[]
+  talkCompletions VisitorTalkCompletion[]
+
+  @@unique([email, companyId]) // One visitor per email per company
+  @@index([companyId])
+  @@index([email])
+  @@map("external_visitor")
+}
+
+model VisitorTalk {
+  id          String                  @id @default(cuid())
+  uniqueToken String                  @unique
+  videoUrl    String
+  expiresAt   DateTime?
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  company     ExternalCompany         @relation(fields: [companyId], references: [id])
+  companyId   String
+  visitors    ExternalVisitor[]
+  completions VisitorTalkCompletion[]
+
+  @@index([uniqueToken])
+  @@index([companyId])
+  @@map("visitor_talk")
+}
+
+enum VISITOR_TALK_STATUS {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model VisitorTalkCompletion {
+  id            String              @id @default(cuid())
+  status        VISITOR_TALK_STATUS @default(NOT_STARTED)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  visitor       ExternalVisitor     @relation(fields: [visitorId], references: [id])
+  visitorId     String
+  visitorTalk   VisitorTalk         @relation(fields: [visitorTalkId], references: [id])
+  visitorTalkId String
+
+  @@unique([visitorId, visitorTalkId])
+  @@index([visitorTalkId])
+  @@index([status])
+  @@map("visitor_talk_completion")
+}

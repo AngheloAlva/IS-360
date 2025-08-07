@@ -216,7 +216,7 @@ export const UrgentWorkPermitEmail = ({
 					{/* Footer */}
 					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360 - Sistema de Gestión
+							© {new Date().getFullYear()} OTC 360
 						</Text>
 						<Text className="m-0 text-center text-[12px] text-gray-500">
 							Este es un correo automático, por favor no responder directamente.

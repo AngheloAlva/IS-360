@@ -37,6 +37,7 @@ import FileComments from "./FileComments"
 import type { Areas } from "@/lib/consts/areas"
 import type { AREAS } from "@prisma/client"
 import { useState } from "react"
+import { openDocumentSecurely } from "@/lib/view-document"
 
 interface FileExplorerTableProps {
 	userId: string
@@ -262,14 +263,19 @@ export function FileExplorer({
 									<div className="flex items-center gap-2">
 										{getFileIcon(item.type)}
 
-										<Link
-											href={item.url}
-											target="_blank"
+										<button
 											rel="noreferrer noopener"
 											className="pr-12 font-medium hover:underline"
+											onClick={() => {
+												const filename = item.url.split("/").pop()?.split("?")[0]
+
+												if (filename) {
+													openDocumentSecurely(filename, "documents")
+												}
+											}}
 										>
 											{item?.code ? item.code.charAt(0) + "-" + item.name : item.name}
-										</Link>
+										</button>
 									</div>
 
 									{item.description && (
