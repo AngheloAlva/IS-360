@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 
 import prisma from "@/lib/prisma"
 
-type Params = {
+type Params = Promise<{
 	token: string
-}
+}>
 
 export async function GET(request: NextRequest, { params }: { params: Params }) {
 	try {
-		const { token } = params
+		const { token } = await params
 
 		if (!token) {
 			return NextResponse.json(

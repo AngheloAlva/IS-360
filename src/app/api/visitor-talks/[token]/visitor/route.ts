@@ -3,13 +3,13 @@ import { type NextRequest, NextResponse } from "next/server"
 import { visitorDataSchema } from "@/project/safety-talk/schemas/external-company.schema"
 import { updateVisitorData } from "@/project/safety-talk/actions/updateVisitorData"
 
-type Params = {
+type Params = Promise<{
 	token: string
-}
+}>
 
 export async function POST(request: NextRequest, { params }: { params: Params }) {
 	try {
-		const { token } = params
+		const { token } = await params
 		const body = await request.json()
 
 		if (!token) {
