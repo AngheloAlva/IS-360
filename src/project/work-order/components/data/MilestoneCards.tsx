@@ -47,7 +47,6 @@ export default function MilestoneCards({
 	workOrderId,
 	supervisorId,
 	responsibleId,
-	hasPermission,
 	hassWorkBookPermission,
 }: MilestoneCardsProps) {
 	if (milestones.length === 0) {
@@ -234,8 +233,7 @@ export default function MilestoneCards({
 									/>
 								)}
 
-							{hasPermission &&
-								milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
+							{milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
 								userId === responsibleId && (
 									<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
 								)}
