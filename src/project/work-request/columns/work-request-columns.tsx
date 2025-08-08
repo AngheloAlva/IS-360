@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
-import { WORK_REQUEST_STATUS } from "@prisma/client"
+import { WORK_REQUEST_STATUS, WORK_TYPE } from "@prisma/client"
 
 import { DropdownMenuItem, DropdownMenuSeparator } from "@/shared/components/ui/dropdown-menu"
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
@@ -40,6 +40,17 @@ const statusText = (status: WORK_REQUEST_STATUS) => {
 			return "Cancelada"
 		default:
 			return status
+	}
+}
+
+const workTypeText = (workType: WORK_TYPE) => {
+	switch (workType) {
+		case "ELECTRIC":
+			return "Eléctrico"
+		case "MECHANIC":
+			return "Mecánico"
+		default:
+			return workType
 	}
 }
 
@@ -161,13 +172,14 @@ export const getWorkRequestColumns = ({
 			)
 		},
 	},
+
 	{
 		accessorKey: "equipment",
 		header: "Equipo / Ubicación",
 		cell: ({ row }) => {
 			const equipment = row.original.equipments[0]
 
-			return <span className="w-72 max-w-72 text-wrap">{equipment?.name}</span>
+			return <span className="line-clamp-1 w-72 max-w-72 min-w-72 truncate">{equipment?.name}</span>
 		},
 	},
 	{
@@ -177,6 +189,15 @@ export const getWorkRequestColumns = ({
 			const status = row.original.status
 
 			return <Badge variant={statusBadgeVariant(status)}>{statusText(status)}</Badge>
+		},
+	},
+	{
+		accessorKey: "workType",
+		header: "Tipo de trabajo",
+		cell: ({ row }) => {
+			const workType = row.getValue("workType") as WORK_TYPE
+
+			return workTypeText(workType)
 		},
 	},
 ]

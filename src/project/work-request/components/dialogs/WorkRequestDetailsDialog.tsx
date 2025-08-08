@@ -14,6 +14,7 @@ import {
 	PaperclipIcon,
 	AlertCircleIcon,
 	MessageSquareIcon,
+	ListOrderedIcon,
 } from "lucide-react"
 
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
@@ -25,7 +26,7 @@ import { Separator } from "@/shared/components/ui/separator"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
-import type { WORK_REQUEST_STATUS } from "@prisma/client"
+import type { WORK_REQUEST_STATUS, WORK_TYPE } from "@prisma/client"
 
 interface WorkRequestDetailsDialogProps {
 	open: boolean
@@ -61,6 +62,17 @@ export default function WorkRequestDetailsDialog({
 				return "destructive"
 			default:
 				return "secondary"
+		}
+	}
+
+	const workTypeText = (workType: WORK_TYPE) => {
+		switch (workType) {
+			case "ELECTRIC":
+				return "Eléctrico"
+			case "MECHANIC":
+				return "Mecánico"
+			default:
+				return workType
 		}
 	}
 
@@ -114,6 +126,11 @@ export default function WorkRequestDetailsDialog({
 									icon={<BuildingIcon className="size-4" />}
 									label="Empresa"
 									value={workRequest.user?.company?.name || "N/A"}
+								/>
+								<DialogLabel
+									label="Tipo de Trabajo"
+									value={workTypeText(workRequest.workType as WORK_TYPE)}
+									icon={<ListOrderedIcon className="size-4" />}
 								/>
 								<DialogLabel
 									label="Equipo / Ubicación"

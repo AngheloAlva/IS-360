@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { createWorkRequest } from "@/project/work-request/actions/create-work-request"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
 import { uploadFilesToCloud, UploadResult } from "@/lib/upload-files"
+import { useOperators } from "@/shared/hooks/use-operators"
 import {
 	workRequestSchema,
 	type WorkRequestSchema,
@@ -19,6 +20,7 @@ import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithS
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
+import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
 import FileTable from "@/shared/components/forms/FileTable"
@@ -32,8 +34,6 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
-import { SelectFormField } from "@/shared/components/forms/SelectFormField"
-import { useOperators } from "@/shared/hooks/use-operators"
 
 export default function CreateWorkRequestForm({ userId }: { userId: string }): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -48,6 +48,7 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 			description: "",
 			attachments: [],
 			observations: "",
+			workType: undefined,
 			operatorId: undefined,
 			requestDate: new Date(),
 		},
@@ -165,6 +166,18 @@ export default function CreateWorkRequestForm({ userId }: { userId: string }): R
 									label: equipment.name + " *(" + equipment.location + ")",
 								})) || []
 							}
+						/>
+
+						<SelectFormField<WorkRequestSchema>
+							optional
+							name="workType"
+							control={form.control}
+							label="Tipo de trabajo"
+							itemClassName="sm:col-span-2"
+							options={[
+								{ value: "ELECTRIC", label: "Eléctrico" },
+								{ value: "MECHANIC", label: "Mecánico" },
+							]}
 						/>
 
 						<TextAreaFormField<WorkRequestSchema>

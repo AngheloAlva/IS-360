@@ -45,11 +45,13 @@ export const createWorkRequest = async ({
 		const year = new Date().getFullYear()
 		const requestNumber = `REQ-${year}-${counter.value.toString().padStart(4, "0")}`
 
-		const { description, equipments, requestDate, isUrgent, observations, operatorId } = values
+		const { workType, description, equipments, requestDate, isUrgent, observations, operatorId } =
+			values
 
 		const newWorkRequest = await prisma.workRequest.create({
 			data: {
 				userId,
+				workType,
 				description,
 				requestDate,
 				observations,
@@ -112,6 +114,7 @@ export const createWorkRequest = async ({
 				observations: newWorkRequest.observations,
 				location: newWorkRequest.location,
 				customLocation: newWorkRequest.customLocation,
+				workType: newWorkRequest.workType,
 				userId,
 			},
 		})

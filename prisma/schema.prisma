@@ -1412,6 +1412,11 @@ enum WORK_REQUEST_STATUS {
   CANCELLED // Solicitud Cancelada
 }
 
+enum WORK_TYPE {
+  MECHANIC
+  ELECTRIC
+}
+
 model WorkRequest {
   id             String                     @id @default(cuid())
   requestNumber  String                     @unique
@@ -1424,6 +1429,7 @@ model WorkRequest {
   status         WORK_REQUEST_STATUS        @default(REPORTED)
   operatorId     String?
   operator       User?                      @relation("WorkRequestOperator", fields: [operatorId], references: [id])
+  workType       WORK_TYPE?
 
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
@@ -1536,9 +1542,9 @@ model ExternalCompany {
 
 model ExternalVisitor {
   id              String                  @id @default(cuid())
-  name            String                  // Will be filled when visitor accesses the link
-  rut             String                  // Will be filled when visitor accesses the link
-  email           String                  // Email from the authorized list
+  name            String // Will be filled when visitor accesses the link
+  rut             String // Will be filled when visitor accesses the link
+  email           String // Email from the authorized list
   createdAt       DateTime                @default(now())
   updatedAt       DateTime                @updatedAt
   company         ExternalCompany         @relation(fields: [companyId], references: [id])
