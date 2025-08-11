@@ -17,6 +17,7 @@ import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { MaintenancePlanTask } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
+import DeletePlanTaskDialog from "../components/dialogs/DeletePlanTaskDialog"
 
 interface MaintenancePlanTaskColumnsProps {
 	userId: string
@@ -65,6 +66,13 @@ export const MaintenancePlanTaskColumns = ({
 								responsibleId: row.original.createdBy.id,
 								description: row.original.description ?? "",
 							}}
+						/>
+					</DropdownMenuItem>
+
+					<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+						<DeletePlanTaskDialog
+							taskId={row.original.id}
+							maintenancePlanSlug={maintenancePlanSlug}
 						/>
 					</DropdownMenuItem>
 				</>
