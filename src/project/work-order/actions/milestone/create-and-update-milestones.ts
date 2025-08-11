@@ -30,6 +30,7 @@ export async function createAndUpdateMilestones(
 			message: "No autorizado",
 		}
 	}
+
 	try {
 		const workOrder = await prisma.workOrder.findUnique({
 			where: { id: values.workOrderId },
@@ -37,9 +38,38 @@ export async function createAndUpdateMilestones(
 				id: true,
 				otNumber: true,
 				workName: true,
-				milestones: true,
-				responsible: true,
-				supervisor: true,
+				milestones: {
+					select: {
+						id: true,
+						name: true,
+						status: true,
+						weight: true,
+						endDate: true,
+						startDate: true,
+						description: true,
+						_count: {
+							select: {
+								activities: true,
+							},
+						},
+					},
+				},
+				responsible: {
+					select: {
+						id: true,
+						rut: true,
+						name: true,
+						email: true,
+					},
+				},
+				supervisor: {
+					select: {
+						id: true,
+						rut: true,
+						name: true,
+						email: true,
+					},
+				},
 				company: {
 					select: {
 						id: true,
@@ -57,8 +87,10 @@ export async function createAndUpdateMilestones(
 			}
 		}
 
+		const newMilestones = values.milestones.entries()
 		const createdAndUpdatedMilestones = []
-		for (const [index, milestone] of values.milestones.entries()) {
+
+		for (const [index, milestone] of newMilestones) {
 			const existingMilestone = workOrder.milestones.find((m) => m.id === milestone.id)
 
 			if (existingMilestone) {
@@ -98,6 +130,24 @@ export async function createAndUpdateMilestones(
 			createdAndUpdatedMilestones.push(createdMilestone)
 		}
 
+		const deletedMilestones = workOrder.milestones.filter(
+			(milestone) => !values.milestones.some((m) => m.id === milestone.id)
+		)
+
+		if (deletedMilestones.length > 0) {
+			deletedMilestones.map(async (milestone) => {
+				if (milestone._count.activities > 0) {
+					return
+				}
+
+				await prisma.milestone.delete({
+					where: {
+						id: milestone.id,
+					},
+				})
+			})
+		}
+
 		sendNotification({
 			type: "milestone",
 			creatorId: session.user.id,
@@ -114,6 +164,7 @@ export async function createAndUpdateMilestones(
 				workOrderNumber: workOrder.otNumber,
 				supervisorName: workOrder.supervisor.name + workOrder.supervisor.rut,
 				workOrderName: workOrder.workName || `Libro de Obras ${workOrder.otNumber}`,
+
 				companyName: workOrder.company
 					? workOrder.company.name + " - " + workOrder.company.rut
 					: "Interno",
@@ -137,7 +188,6 @@ export async function createAndUpdateMilestones(
 					weight: m.weight,
 					startDate: m.startDate,
 					endDate: m.endDate,
-					order: m.order,
 				})),
 			},
 		})

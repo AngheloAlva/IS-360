@@ -4,6 +4,7 @@ export const milestoneSchema = z
 	.object({
 		id: z.string().optional(),
 		name: z.string().nonempty({ message: "El nombre del hito no puede estar vacío" }),
+		activityCount: z.number(),
 		description: z.string().optional(),
 		weight: z.string().refine(
 			(value) => {

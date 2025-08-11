@@ -53,6 +53,7 @@ export default function MilestonesForm({ initialData, workOrderId }: MilestonesF
 						name: milestone.name,
 						weight: milestone.weight.toString(),
 						description: milestone.description || "",
+						activityCount: milestone.activities.length || 0,
 						endDate: new Date(milestone.endDate || new Date()),
 						startDate: new Date(milestone.startDate || new Date()),
 					}))
@@ -61,6 +62,7 @@ export default function MilestonesForm({ initialData, workOrderId }: MilestonesF
 							name: "",
 							weight: "",
 							description: "",
+							activityCount: 0,
 							endDate: undefined,
 							startDate: undefined,
 						},
@@ -202,7 +204,7 @@ export default function MilestonesForm({ initialData, workOrderId }: MilestonesF
 													{form.watch(`milestones.${index}.name`) || `Hito ${index + 1}`}
 												</span>
 
-												{milestoneFields.length > 1 && (
+												{milestoneFields.length > 1 && field.activityCount === 0 && (
 													<div
 														className="hover:bg-accent hover:text-text size-5 cursor-pointer rounded-full p-0.5 transition-colors"
 														onClick={(e) => {
@@ -236,6 +238,7 @@ export default function MilestonesForm({ initialData, workOrderId }: MilestonesF
 												name: "",
 												weight: "",
 												description: "",
+												activityCount: 0,
 												endDate: new Date(),
 												startDate: new Date(),
 											})
