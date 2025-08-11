@@ -254,6 +254,7 @@ export default function MaintenancePlanTaskForm({
 							name="nextDate"
 							label="Próxima fecha"
 							control={form.control}
+							toYear={new Date().getFullYear() + 5}
 						/>
 
 						<TextAreaFormField<MaintenancePlanTaskSchema>
