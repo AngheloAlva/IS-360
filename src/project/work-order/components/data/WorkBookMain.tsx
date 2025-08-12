@@ -153,6 +153,7 @@ export default function WorkBookMain({
 						<WorkBookMilestones
 							userId={userId}
 							userRole={userRole}
+							isOtcMember={isOtcMember}
 							workOrderId={workBook.id}
 							hasPermission={hasPermission}
 							supervisorId={workBook.supervisorId}

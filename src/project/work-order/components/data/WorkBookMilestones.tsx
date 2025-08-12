@@ -15,6 +15,7 @@ interface WorkBookMilestonesProps {
 	userRole: string
 	workOrderId: string
 	supervisorId: string
+	isOtcMember?: boolean
 	responsibleId: string
 	hasPermission: boolean
 	workOrderStartDate: Date
@@ -26,6 +27,7 @@ export default function WorkBookMilestones({
 	userId,
 	userRole,
 	workOrderId,
+	isOtcMember,
 	supervisorId,
 	responsibleId,
 	hasPermission,
@@ -96,6 +98,7 @@ export default function WorkBookMilestones({
 					userId={userId}
 					userRole={userRole}
 					workOrderId={workOrderId}
+					isOtcMember={isOtcMember}
 					supervisorId={supervisorId}
 					responsibleId={responsibleId}
 					hasPermission={hasPermission}
