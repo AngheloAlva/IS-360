@@ -224,14 +224,14 @@ export default function MilestoneCards({
 								</div>
 							)}
 
-							{milestone.status === MILESTONE_STATUS.IN_PROGRESS ||
-								(hassWorkBookPermission && (
+							{milestone.status === MILESTONE_STATUS.IN_PROGRESS &&
+								(hassWorkBookPermission || userRole === USER_ROLE.user) && (
 									<RequestCloseMilestoneDialog
 										userId={userId}
 										workOrderId={workOrderId}
 										milestoneId={milestone.id}
 									/>
-								))}
+								)}
 
 							{hasPermission &&
 								milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&

@@ -103,7 +103,10 @@ export async function createAndUpdateMilestones(
 						endDate: milestone.endDate,
 						startDate: milestone.startDate,
 						weight: Number(milestone.weight),
-						status: MILESTONE_STATUS.PENDING,
+						status:
+							existingMilestone._count.activities > 0
+								? MILESTONE_STATUS.IN_PROGRESS
+								: MILESTONE_STATUS.PENDING,
 						description: milestone.description || "",
 					},
 				})
@@ -120,7 +123,8 @@ export async function createAndUpdateMilestones(
 					endDate: milestone.endDate,
 					startDate: milestone.startDate,
 					weight: Number(milestone.weight),
-					status: MILESTONE_STATUS.PENDING,
+					status:
+						milestone.activityCount > 0 ? MILESTONE_STATUS.IN_PROGRESS : MILESTONE_STATUS.PENDING,
 					description: milestone.description || "",
 					workOrder: {
 						connect: { id: values.workOrderId },
