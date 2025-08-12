@@ -46,6 +46,8 @@ import {
 } from "@/shared/components/ui/select"
 
 import type { WORK_REQUEST_STATUS } from "@prisma/client"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface WorkRequestsTableProps {
 	id: string
@@ -154,19 +156,35 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 
 			const XLSX = await import("xlsx")
 
+			const statusText = (status: WORK_REQUEST_STATUS) => {
+				switch (status) {
+					case "REPORTED":
+						return "Reportada"
+					case "APPROVED":
+						return "Aprobada"
+					case "ATTENDED":
+						return "Atendida"
+					case "CANCELLED":
+						return "Cancelada"
+					default:
+						return status
+				}
+			}
+
 			const workbook = XLSX.utils.book_new()
 			const worksheet = XLSX.utils.json_to_sheet(
 				res?.workRequests.map((workRequest: WorkRequest) => ({
-					requestNumber: workRequest.requestNumber,
-					description: workRequest.description,
-					status: workRequest.status,
-					isUrgent: workRequest.isUrgent ? "Sí" : "No",
-					createdAt: workRequest.createdAt,
-					updatedAt: workRequest.updatedAt,
-					usuario: workRequest.user.name,
-					equipos: workRequest.equipments.map((eq) => eq.name).join(", "),
-					comentarios: workRequest.comments.map((com) => com.content).join(", "),
-					adjuntos: workRequest.attachments.map((att) => att.name).join(", "),
+					"N° Solicitud": workRequest.requestNumber,
+					"Solicitante": workRequest.operator?.name || workRequest.user.name,
+					"Descripción": workRequest.description,
+					"Estado": statusText(workRequest.status),
+					"Fecha de solicitud": format(new Date(workRequest.requestDate), "dd/MM/yyyy HH:mm", {
+						locale: es,
+					}),
+					"Urgente": workRequest.isUrgent ? "Sí" : "No",
+					"Equipos": workRequest.equipments.map((eq) => eq.name).join(", "),
+					"Comentarios": workRequest.comments.map((com) => com.content).join(", "),
+					"Adjuntos": workRequest.attachments.map((att) => att.url).join(" | "),
 				}))
 			)
 
