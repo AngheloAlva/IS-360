@@ -294,12 +294,20 @@ export default function CreateWorkOrderFormContent({
 						name="supervisorId"
 						control={form.control}
 						options={
-							selectedCompany?.users
-								.filter((user) => user.isSupervisor)
-								.map((user) => ({
-									value: user.id,
-									label: user.name,
-								})) ?? []
+							selectedCompany?.rut === "96.655.490-8"
+								? [
+										...selectedCompany.users.map((user) => ({
+											value: user.id,
+											label: user.name,
+										})),
+										{ value: "w1pvjvijUfBTqWFaCaPsHUmTLrRCs583", label: "Cristian Pavez" },
+									]
+								: (selectedCompany?.users
+										.filter((user) => user.isSupervisor)
+										.map((user) => ({
+											value: user.id,
+											label: user.name,
+										})) ?? [])
 						}
 						label="Supervisor"
 					/>
