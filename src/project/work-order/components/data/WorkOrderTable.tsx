@@ -52,6 +52,10 @@ import {
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
 import { CompanyFilterLoadingSkeleton } from "./WorkOrderCompanyFilterWithData"
+import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
+import { WorkOrderTypeLabels } from "../../../../lib/consts/work-order-types"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 const WorkOrderCompanyFilterWithData = lazy(() => import("./WorkOrderCompanyFilterWithData"))
 
@@ -133,19 +137,21 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 			const workbook = XLSX.utils.book_new()
 			const worksheet = XLSX.utils.json_to_sheet(
 				res?.workOrders.map((workOrder: WorkOrder) => ({
-					otNumber: workOrder.otNumber,
-					solicitationDate: workOrder.solicitationDate,
-					type: workOrder.type,
-					status: workOrder.status,
-					workRequest: workOrder.workRequest,
-					priority: WorkOrderPriorityLabels[workOrder.priority],
-					workProgressStatus: workOrder.workProgressStatus,
-					programDate: workOrder.programDate,
-					estimatedEndDate: workOrder.estimatedEndDate,
-					company: workOrder.company?.name,
-					supervisor: workOrder.supervisor?.name + " " + workOrder.supervisor?.email,
-					equipments: workOrder.equipments?.map((equipment) => equipment.name).join(", "),
-					_count: workOrder._count.workEntries,
+					"No. OT": workOrder.otNumber,
+					"Fecha de solicitud": workOrder.solicitationDate,
+					"Tipo": WorkOrderTypeLabels[workOrder.type],
+					"Estado": WorkOrderStatusLabels[workOrder.status],
+					"Trabajo": workOrder.workRequest,
+					"Prioridad": WorkOrderPriorityLabels[workOrder.priority],
+					"Porcentaje de avance": workOrder.workProgressStatus,
+					"Fecha programada": format(workOrder.programDate, "dd/MM/yyyy", { locale: es }),
+					"Fecha estimada de finalización": workOrder.estimatedEndDate
+						? format(workOrder.estimatedEndDate, "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"Empresa": workOrder.company?.name,
+					"Supervisor": workOrder.supervisor?.name + " " + workOrder.supervisor?.email,
+					"Equipos": workOrder.equipments?.map((equipment) => equipment.name).join(", "),
+					"Cantidad de actividades": workOrder._count.workEntries,
 				}))
 			)
 
