@@ -18,8 +18,10 @@ import {
 } from "@prisma/client"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
+import { type ChangeSubfolderStatusSchema } from "../../schemas/change-subfolder-status.schema"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import ChangeSubfolderStatusDialog from "../dialogs/ChangeSubfolderStatusDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
@@ -44,6 +46,22 @@ interface StartupFolderDocumentsProps {
 	startupFolderId: string
 	category: DocumentCategory
 	moreMonthDuration: boolean
+}
+
+// Helper function to map document category to subfolder type
+function getSubfolderType(
+	category: DocumentCategory
+): ChangeSubfolderStatusSchema["subfolderType"] {
+	const mapping: Record<DocumentCategory, ChangeSubfolderStatusSchema["subfolderType"]> = {
+		[DocumentCategory.SAFETY_AND_HEALTH]: "SAFETY_AND_HEALTH",
+		[DocumentCategory.ENVIRONMENTAL]: "ENVIRONMENTAL",
+		[DocumentCategory.ENVIRONMENT]: "ENVIRONMENT",
+		[DocumentCategory.TECHNICAL_SPECS]: "TECHNICAL_SPECS",
+		[DocumentCategory.PERSONNEL]: "WORKER",
+		[DocumentCategory.VEHICLES]: "VEHICLE",
+		[DocumentCategory.BASIC]: "BASIC",
+	}
+	return mapping[category]
 }
 
 export default function StartupFolderDocuments({
@@ -160,6 +178,24 @@ export default function StartupFolderDocuments({
 						indicatorClassName="bg-emerald-600"
 					/>
 					<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
+
+					{isOtcMember && data?.folderStatus && (
+						<ChangeSubfolderStatusDialog
+							startupFolderId={startupFolderId}
+							subfolderType={getSubfolderType(category)}
+							currentStatus={data.folderStatus}
+							onSuccess={async () => {
+								queryClient.invalidateQueries({
+									queryKey: [
+										"startupFolderDocuments",
+										{ startupFolderId, category, workerId: null, vehicleId: null },
+									],
+								})
+								await refetch()
+								toast.success("Estado actualizado exitosamente")
+							}}
+						/>
+					)}
 
 					{!isOtcMember && data?.folderStatus === "DRAFT" && (
 						<SubmitReviewRequestDialog

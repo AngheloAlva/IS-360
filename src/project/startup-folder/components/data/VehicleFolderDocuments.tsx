@@ -18,6 +18,7 @@ import { StartupFolderStatusBadge } from "@/project/startup-folder/components/da
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { UpdateDocumentStatusDialog } from "../dialogs/UpdateDocumentStatusDialog"
 import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import ChangeSubfolderStatusDialog from "../dialogs/ChangeSubfolderStatusDialog"
 import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { Progress } from "@/shared/components/ui/progress"
@@ -159,6 +160,24 @@ export function VehicleFolderDocuments({
 						indicatorClassName="bg-emerald-600"
 					/>
 					<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
+
+					{/* Botón para cambio manual de estado - solo miembros OTC */}
+					{isOtcMember && data?.folderStatus && (
+						<ChangeSubfolderStatusDialog
+							startupFolderId={startupFolderId}
+							subfolderType="VEHICLE"
+							currentStatus={data.folderStatus}
+							entityId={vehicleId}
+							entityName={`Vehículo ${vehicleId}`}
+							onSuccess={async () => {
+								queryClient.invalidateQueries({
+									queryKey: ["vehicleFolderDocuments", { startupFolderId, vehicleId }],
+								})
+								await refetch()
+								toast.success("Estado actualizado exitosamente")
+							}}
+						/>
+					)}
 
 					{!isOtcMember && data?.folderStatus === "DRAFT" && (
 						<SubmitReviewRequestDialog
