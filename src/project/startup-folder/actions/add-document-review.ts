@@ -123,7 +123,7 @@ export const addDocumentReview = async ({
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.safetyAndHealthFolder.update({
 						where: { startupFolderId },
@@ -241,7 +241,7 @@ export const addDocumentReview = async ({
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.environmentalFolder.update({
 						where: { startupFolderId },
@@ -365,12 +365,12 @@ export const addDocumentReview = async ({
 
 				totalDocuments = (allDocuments?.startupFolder as { moreMonthDuration: boolean })
 					.moreMonthDuration
-					? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length + 1
+					? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
 					: ENVIRONMENT_STRUCTURE.documents.length
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.environmentFolder.update({
 						where: { startupFolderId },
@@ -496,7 +496,7 @@ export const addDocumentReview = async ({
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.techSpecsFolder.update({
 						where: { startupFolderId },
@@ -638,7 +638,7 @@ export const addDocumentReview = async ({
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.workerFolder.update({
 						where: {
@@ -775,7 +775,7 @@ export const addDocumentReview = async ({
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.vehicleFolder.update({
 						where: {
@@ -926,7 +926,7 @@ export const addDocumentReview = async ({
 
 				if (
 					allDocuments?.documents.every((d) => d.status === ReviewStatus.APPROVED) &&
-					allDocuments.documents.length === totalDocuments
+					allDocuments.documents.length >= totalDocuments
 				) {
 					await prisma.basicFolder.update({
 						where: {

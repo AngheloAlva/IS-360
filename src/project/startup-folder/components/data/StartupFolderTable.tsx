@@ -11,6 +11,7 @@ import {
 	ENVIRONMENT_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
 	SAFETY_AND_HEALTH_STRUCTURE,
+	EXTENDED_ENVIRONMENT_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
 import {
 	BASE_WORKER_STRUCTURE,
@@ -30,13 +31,15 @@ import type { StartupFolder } from "../../hooks/use-startup-folder"
 
 interface StartupFolderTableProps {
 	subFolders: StartupFolder
+	moreMonthDuration: boolean
 	startupFolderType: StartupFolderType
 	onCategorySelect: (category: DocumentCategory) => void
 }
 
 export default function StartupFolderTable({
-	onCategorySelect,
 	subFolders,
+	onCategorySelect,
+	moreMonthDuration,
 }: StartupFolderTableProps) {
 	interface CategoryItem {
 		title: string
@@ -164,7 +167,9 @@ export default function StartupFolderTable({
 				title: "Medio Ambiente (nuevo)",
 				category: DocumentCategory.ENVIRONMENT,
 				description: "Documentación relacionada con gestión ambiental y manejo de residuos.",
-				totalDocsToUpload: ENVIRONMENT_STRUCTURE.documents.length,
+				totalDocsToUpload: moreMonthDuration
+					? EXTENDED_ENVIRONMENT_STRUCTURE.documents.length
+					: ENVIRONMENT_STRUCTURE.documents.length,
 				documentsCount:
 					subFolders.environmentFolders[0]?.documentCounts?.total ??
 					subFolders.environmentFolders[0]?.totalDocuments ??
@@ -218,7 +223,7 @@ export default function StartupFolderTable({
 		}
 
 		return baseCategories
-	}, [subFolders])
+	}, [subFolders, moreMonthDuration])
 
 	return (
 		<Table>

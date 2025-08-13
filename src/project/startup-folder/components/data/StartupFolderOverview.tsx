@@ -276,6 +276,7 @@ export default function StartupFolderOverview({
 																subFolders={folder}
 																startupFolderType={folder.type}
 																onCategorySelect={setSelectedCategory}
+																moreMonthDuration={selectedFolder?.moreMonthDuration || false}
 															/>
 														)}
 													</>
