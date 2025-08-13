@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
+import { InfoIcon, FilesIcon, CheckCircleIcon } from "lucide-react"
 import { memo, useMemo, useCallback } from "react"
-import { InfoIcon, FilesIcon } from "lucide-react"
 import { getImageProps } from "next/image"
 import Link from "next/link"
 
@@ -230,11 +230,12 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 														className={cn(
 															"bg-accent text-text flex items-center text-xs text-wrap whitespace-normal sm:text-sm",
 															{
-																"border border-cyan-500 bg-cyan-500/10 text-cyan-600":
+																"border border-cyan-500 bg-cyan-500/10 text-cyan-500":
 																	folder.status === StartupFolderStatus.COMPLETED,
 															}
 														)}
 													>
+														{folder.status === StartupFolderStatus.COMPLETED && <CheckCircleIcon />}
 														{folder.name}
 													</Badge>
 												))

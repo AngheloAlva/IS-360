@@ -70,7 +70,6 @@ export const addDocumentReview = async ({
 		let document: Document
 		let totalDocuments: number
 		let allDocuments: AllDocuments | null
-		let totalReviewedDocuments: number
 
 		const now: Date = new Date()
 
@@ -154,12 +153,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.safetyAndHealthFolder.update({
@@ -281,12 +277,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.environmentalFolder.update({
@@ -413,12 +406,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.environmentFolder.update({
@@ -542,12 +532,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.techSpecsFolder.update({
@@ -684,12 +671,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.workerFolder.update({
@@ -830,12 +814,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.vehicleFolder.update({
@@ -981,12 +962,9 @@ export const addDocumentReview = async ({
 					}
 				}
 
-				totalReviewedDocuments =
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.APPROVED).length || 0) +
-					(allDocuments?.documents.filter((d) => d.status === ReviewStatus.REJECTED).length || 0)
-
 				if (
-					totalReviewedDocuments <= totalDocuments &&
+					(allDocuments?.documents.some((d) => d.status === ReviewStatus.REJECTED) ||
+						(allDocuments?.documents.length || 0) < totalDocuments) &&
 					allDocuments?.documents.every((d) => d.status !== ReviewStatus.SUBMITTED)
 				) {
 					await prisma.basicFolder.update({
