@@ -43,10 +43,18 @@ export const MaintenancePlanTaskColumns = ({
 							initialData={{
 								id: row.original.id,
 								name: row.original.name,
-								description: row.original.description ?? undefined,
-								frequency: row.original.frequency,
 								nextDate: row.original.nextDate,
+								frequency: row.original.frequency,
+								description: row.original.description ?? undefined,
 								equipmentId: row.original.equipment?.id ?? undefined,
+								isAutomated: row.original.isAutomated,
+								automatedSupervisorId: row.original.automatedSupervisorId,
+								automatedWorkOrderType: row.original.automatedWorkOrderType,
+								automatedPriority: row.original.automatedPriority,
+								automatedCapex: row.original.automatedCapex,
+								automatedEstimatedDays: row.original.automatedEstimatedDays,
+								automatedEstimatedHours: row.original.automatedEstimatedHours,
+								automatedWorkDescription: row.original.automatedWorkDescription,
 							}}
 						/>
 					</DropdownMenuItem>

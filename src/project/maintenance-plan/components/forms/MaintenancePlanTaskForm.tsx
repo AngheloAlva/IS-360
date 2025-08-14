@@ -8,10 +8,15 @@ import { toast } from "sonner"
 
 import { createMaintenancePlanTask } from "@/project/maintenance-plan/actions/createMaintenancePlanTask"
 import { updateMaintenancePlanTask } from "@/project/maintenance-plan/actions/updateMaintenancePlanTask"
+import { WorkOrderPriorityOptions } from "@/lib/consts/work-order-priority"
 import { uploadFilesToCloud, type UploadResult } from "@/lib/upload-files"
 import { useEquipments } from "@/project/equipment/hooks/use-equipments"
+import { WorkOrderCAPEXOptions } from "@/lib/consts/work-order-capex"
+import { WorkOrderTypeOptions } from "@/lib/consts/work-order-types"
 import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
+import { useOperators } from "@/shared/hooks/use-operators"
 import { queryClient } from "@/lib/queryClient"
+import { cn } from "@/lib/utils"
 import {
 	maintenancePlanTaskSchema,
 	type MaintenancePlanTaskSchema,
@@ -20,9 +25,11 @@ import {
 import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
-import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
+import { SelectFormField } from "@/shared/components/forms/SelectFormField"
+import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
+import { Separator } from "@/shared/components/ui/separator"
 import FileTable from "@/shared/components/forms/FileTable"
 import { Button } from "@/shared/components/ui/button"
 import { Form } from "@/shared/components/ui/form"
@@ -34,7 +41,8 @@ import {
 	SheetContent,
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
-import { cn } from "@/lib/utils"
+
+import type { WORK_ORDER_CAPEX, WORK_ORDER_PRIORITY, WORK_ORDER_TYPE } from "@prisma/client"
 
 interface MaintenancePlanTaskFormProps {
 	userId: string
@@ -48,6 +56,14 @@ interface MaintenancePlanTaskFormProps {
 		frequency: string
 		nextDate: Date
 		equipmentId?: string
+		isAutomated?: boolean
+		automatedSupervisorId?: string
+		automatedWorkOrderType?: WORK_ORDER_TYPE
+		automatedPriority?: WORK_ORDER_PRIORITY
+		automatedCapex?: WORK_ORDER_CAPEX
+		automatedEstimatedDays?: number
+		automatedEstimatedHours?: number
+		automatedWorkDescription?: string
 	}
 }
 
@@ -73,6 +89,15 @@ export default function MaintenancePlanTaskForm({
 			frequency:
 				(initialData?.frequency as (typeof TaskFrequencyOptions)[number]["value"]) ?? undefined,
 			equipmentId: initialData?.equipmentId ?? undefined,
+			// Campos de automatización
+			isAutomated: initialData?.isAutomated ?? false,
+			automatedSupervisorId: initialData?.automatedSupervisorId ?? "",
+			automatedWorkOrderType: initialData?.automatedWorkOrderType ?? undefined,
+			automatedPriority: initialData?.automatedPriority ?? undefined,
+			automatedCapex: initialData?.automatedCapex ?? undefined,
+			automatedEstimatedDays: `${initialData?.automatedEstimatedDays ?? "1"}`,
+			automatedEstimatedHours: `${initialData?.automatedEstimatedHours ?? "8"}`,
+			automatedWorkDescription: initialData?.automatedWorkDescription ?? "",
 		},
 	})
 
@@ -83,6 +108,8 @@ export default function MaintenancePlanTaskForm({
 		orderBy: "name",
 		parentId: equipmentId,
 	})
+
+	const { data: operatorsData } = useOperators({ page: 1, limit: 1000 })
 
 	const onSubmit = async (values: MaintenancePlanTaskSchema) => {
 		setIsSubmitting(true)
@@ -273,6 +300,83 @@ export default function MaintenancePlanTaskForm({
 							label="Archivos adjuntos"
 							className="sm:col-span-2"
 						/>
+
+						<Separator className="my-4 sm:col-span-2" />
+
+						<div className="sm:col-span-2">
+							<h3 className="text-lg font-semibold">Automatización de Órdenes de Trabajo</h3>
+							<p className="text-sm">
+								Configurar la creación automática de OTs para esta tarea de mantenimiento
+							</p>
+						</div>
+
+						<SwitchFormField
+							name="isAutomated"
+							control={form.control}
+							label="¿Automatizar creación de OTs?"
+							itemClassName="sm:col-span-2"
+							description="Las órdenes de trabajo se crearán automáticamente según la frecuencia de la tarea para la empresa OTC"
+						/>
+
+						{form.watch("isAutomated") && (
+							<>
+								<SelectWithSearchFormField
+									name="automatedSupervisorId"
+									control={form.control}
+									options={
+										operatorsData?.operators?.map((operator) => ({
+											value: operator.id,
+											label: operator.name,
+										})) ?? []
+									}
+									label="Supervisor Automático (Operadores)"
+									placeholder="Seleccionar supervisor"
+									itemClassName="sm:col-span-2"
+									description="Supervisor que será asignado automáticamente a las OTs generadas"
+								/>
+
+								<SelectFormField
+									name="automatedWorkOrderType"
+									control={form.control}
+									label="Tipo de Trabajo"
+									options={WorkOrderTypeOptions}
+								/>
+
+								<SelectFormField
+									name="automatedPriority"
+									control={form.control}
+									label="Prioridad"
+									options={WorkOrderPriorityOptions}
+									placeholder="Seleccione una prioridad"
+								/>
+
+								<SelectFormField
+									name="automatedCapex"
+									control={form.control}
+									label="CAPEX"
+									options={WorkOrderCAPEXOptions}
+									placeholder="Seleccione un indicador"
+								/>
+
+								<InputFormField
+									type="number"
+									name="automatedEstimatedDays"
+									control={form.control}
+									label="Días Estimados"
+									placeholder="1"
+								/>
+
+								<InputFormField
+									type="number"
+									name="automatedEstimatedHours"
+									control={form.control}
+									label="Horas Estimadas"
+									placeholder="8"
+								/>
+							</>
+						)}
+
+						<Separator className="my-4 sm:col-span-2" />
 
 						<div className="flex gap-2 sm:col-span-2">
 							<Button

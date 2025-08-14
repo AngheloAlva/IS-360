@@ -37,13 +37,27 @@ export async function updateMaintenancePlanTask({
 				frequency: values.frequency,
 				nextDate: values.nextDate,
 				equipmentId: values.equipmentId,
+				// Campos de automatización
+				isAutomated: values.isAutomated || false,
+				automatedCompanyId: values.isAutomated ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID : null,
+				automatedSupervisorId: values.automatedSupervisorId || null,
+				automatedWorkOrderType: values.automatedWorkOrderType || null,
+				automatedPriority: values.automatedPriority || null,
+				automatedCapex: values.automatedCapex || null,
+				automatedEstimatedDays: values.automatedEstimatedDays
+					? +values.automatedEstimatedDays
+					: null,
+				automatedEstimatedHours: values.automatedEstimatedHours
+					? +values.automatedEstimatedHours
+					: null,
+				automatedWorkDescription: values.automatedWorkDescription || null,
 				attachments: {
 					createMany: {
 						data: attachments.map((attachment) => ({
-							name: attachment.name,
+							name: values.name,
 							url: attachment.url,
-							size: attachment.size,
 							type: attachment.type,
+							createdById: values.createdById,
 						})),
 					},
 				},

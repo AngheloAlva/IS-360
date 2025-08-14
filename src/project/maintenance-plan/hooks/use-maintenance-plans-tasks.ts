@@ -1,6 +1,12 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
-import type { MAINTENANCE_PLAN_LOCATION, PLAN_FREQUENCY } from "@prisma/client"
+import type {
+	PLAN_FREQUENCY,
+	WORK_ORDER_TYPE,
+	WORK_ORDER_CAPEX,
+	WORK_ORDER_PRIORITY,
+	MAINTENANCE_PLAN_LOCATION,
+} from "@prisma/client"
 
 export interface MaintenancePlanTask {
 	id: string
@@ -11,6 +17,14 @@ export interface MaintenancePlanTask {
 	frequency: PLAN_FREQUENCY
 	description: string
 	location: MAINTENANCE_PLAN_LOCATION
+	isAutomated: boolean
+	automatedSupervisorId: string
+	automatedWorkOrderType: WORK_ORDER_TYPE
+	automatedPriority: WORK_ORDER_PRIORITY
+	automatedCapex: WORK_ORDER_CAPEX
+	automatedEstimatedDays: number
+	automatedEstimatedHours: number
+	automatedWorkDescription: string
 	createdBy: {
 		id: string
 		name: string

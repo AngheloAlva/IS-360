@@ -99,6 +99,14 @@ export async function GET(
 							url: true,
 						},
 					},
+					isAutomated: true,
+					automatedSupervisorId: true,
+					automatedWorkOrderType: true,
+					automatedPriority: true,
+					automatedCapex: true,
+					automatedEstimatedDays: true,
+					automatedEstimatedHours: true,
+					automatedWorkDescription: true,
 					_count: {
 						select: {
 							workOrders: true,

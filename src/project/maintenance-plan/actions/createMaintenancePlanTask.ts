@@ -83,21 +83,31 @@ export const createMaintenancePlanTask = async ({
 					},
 				},
 				nextDate: values.nextDate,
-				...(values.equipmentId
+				// Campos de automatización
+				isAutomated: values.isAutomated || false,
+				automatedCompanyId: values.isAutomated ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID : null,
+				automatedSupervisorId: values.automatedSupervisorId || null,
+				automatedWorkOrderType: values.automatedWorkOrderType || null,
+				automatedPriority: values.automatedPriority || null,
+				automatedCapex: values.automatedCapex || null,
+				automatedEstimatedDays: values.automatedEstimatedDays
+					? +values.automatedEstimatedDays
+					: null,
+				automatedEstimatedHours: values.automatedEstimatedHours
+					? +values.automatedEstimatedHours
+					: null,
+				automatedWorkDescription: values.automatedWorkDescription || null,
+				equipment: values.equipmentId
 					? {
-							equipment: {
-								connect: {
-									id: values.equipmentId,
-								},
+							connect: {
+								id: values.equipmentId,
 							},
 						}
 					: {
-							equipment: {
-								connect: {
-									id: maintenancePlan.equipment.id,
-								},
+							connect: {
+								id: maintenancePlan.equipment.id,
 							},
-						}),
+						},
 				createdBy: {
 					connect: {
 						id: values.createdById,
@@ -105,9 +115,12 @@ export const createMaintenancePlanTask = async ({
 				},
 				attachments: {
 					create: attachments.map((attachment) => ({
-						name: values.name,
-						url: attachment.url,
-						type: attachment.type,
+						...attachment,
+						createdBy: {
+							connect: {
+								id: values.createdById,
+							},
+						},
 					})),
 				},
 			},
