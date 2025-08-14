@@ -6,8 +6,7 @@
     },
     {
       "path": "/api/crons/automated-work-orders/",
-      "schedule": "0 6 * * *",
-      "description": "Crear órdenes de trabajo automáticas para tareas de mantenimiento de OTC"
+      "schedule": "0 6 * * *"
     }
   ]
 }
