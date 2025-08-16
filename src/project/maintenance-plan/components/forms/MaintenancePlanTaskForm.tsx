@@ -353,7 +353,7 @@ export default function MaintenancePlanTaskForm({
 								<SelectFormField
 									name="automatedCapex"
 									control={form.control}
-									label="CAPEX"
+									label="CapEx"
 									options={WorkOrderCAPEXOptions}
 									placeholder="Seleccione un indicador"
 								/>

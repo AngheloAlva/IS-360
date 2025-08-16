@@ -228,7 +228,7 @@ export default function CreateWorkOrderFormContent({
 
 				<SelectFormField<WorkOrderSchema>
 					name="capex"
-					label="CAPEX"
+					label="CapEx"
 					control={form.control}
 					options={WorkOrderCAPEXOptions}
 					placeholder="Seleccione un indicador"

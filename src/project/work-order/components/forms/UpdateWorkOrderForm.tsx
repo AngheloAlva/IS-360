@@ -298,7 +298,7 @@ export default function UpdateWorkOrderForm({
 
 						<SelectFormField<UpdateWorkOrderSchema>
 							name="capex"
-							label="CAPEX"
+							label="CapEx"
 							control={form.control}
 							options={WorkOrderCAPEXOptions}
 							placeholder="Seleccione un indicador"
