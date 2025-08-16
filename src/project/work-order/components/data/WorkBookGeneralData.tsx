@@ -180,7 +180,7 @@ export default function WorkBookGeneralData({
 
 					<AccordionContent className="px-6">
 						<div className="grid gap-6 md:grid-cols-2">
-							{data.equipment.map((equipment) => (
+							{data.equipments.map((equipment) => (
 								<div key={equipment.id}>
 									<p className="text-muted-foreground font-semibold">{equipment.name}</p>
 									<p className="text-muted-foreground text-sm font-medium">TAG: {equipment.tag}</p>

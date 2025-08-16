@@ -9,7 +9,7 @@ export interface WorkBook {
 	progress: number | null
 	status: string
 	solicitationDate: string
-	equipment: {
+	equipments: {
 		id: string
 		name: string
 	}[]

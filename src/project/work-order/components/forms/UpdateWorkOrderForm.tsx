@@ -114,7 +114,7 @@ export default function UpdateWorkOrderForm({
 			progress: [workOrder?.progress],
 			estimatedEndDate: workOrder?.estimatedEndDate ?? undefined,
 			programDate: new Date(workOrder?.programDate || new Date()),
-			equipment: workOrder?.equipment.map((equipment) => equipment.id),
+			equipment: workOrder?.equipments.map((equipment) => equipment.id),
 			solicitationDate: new Date(workOrder?.solicitationDate || new Date()) ?? new Date(),
 			solicitationTime: workOrder?.solicitationTime ?? new Date().toTimeString().split(" ")[0],
 			endReport: workOrder?.endReport

@@ -17,7 +17,7 @@ export interface WorkBookByCompany {
 	estimatedDays: number
 	estimatedHours: number
 	workDescription: string
-	equipment: {
+	equipments: {
 		name: string
 	}[]
 	company?: {

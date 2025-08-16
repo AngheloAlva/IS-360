@@ -3,7 +3,7 @@ import { QueryFunction, useQuery } from "@tanstack/react-query"
 import type { WorkOrder } from "@prisma/client"
 
 export interface WorkBookById extends WorkOrder {
-	equipment: {
+	equipments: {
 		id: string
 		tag: string
 		name: string

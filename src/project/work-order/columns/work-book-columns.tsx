@@ -94,13 +94,13 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 		},
 	},
 	{
-		accessorKey: "equipment",
+		accessorKey: "equipments",
 		header: "Equipo(s)",
 		cell: ({ row }) => {
-			const equipment = row.original.equipment
+			const equipments = row.original.equipments
 			return (
 				<ul>
-					{equipment.map((e) => (
+					{equipments.map((e) => (
 						<li key={e.name}>{e.name}</li>
 					))}
 				</ul>

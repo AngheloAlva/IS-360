@@ -258,7 +258,7 @@ export default function WorkOrderDetailsDialog({
 								{isLoading ? (
 									<Skeleton className="h-12 w-full" />
 								) : (
-									data?.equipment.map((item) => (
+									data?.equipments.map((item) => (
 										<Badge
 											key={item.id}
 											className="rounded-lg bg-orange-600 whitespace-normal text-white"

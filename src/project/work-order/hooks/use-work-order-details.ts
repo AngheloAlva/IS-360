@@ -33,7 +33,7 @@ export interface WorkOrderDetails {
 		name: string
 		createdAt: Date
 	} | null
-	equipment: {
+	equipments: {
 		id: string
 		name: string
 	}[]
