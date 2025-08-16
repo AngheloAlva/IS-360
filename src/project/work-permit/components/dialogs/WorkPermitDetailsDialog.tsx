@@ -155,7 +155,7 @@ export default function WorkPermitDetailsDialog({
 									Trabajo a realizar
 								</p>
 								<p className="font-medium">
-									{workPermit.otNumber?.workName || workPermit.otNumber?.workRequest}
+									{workPermit.otNumber?.workBookName || workPermit.otNumber?.workRequest}
 								</p>
 							</div>
 

@@ -5,7 +5,6 @@ import type {
 	WORK_ORDER_TYPE,
 	WORK_ORDER_CAPEX,
 	WORK_ORDER_PRIORITY,
-	MAINTENANCE_PLAN_LOCATION,
 } from "@prisma/client"
 
 export interface MaintenancePlanTask {
@@ -14,17 +13,16 @@ export interface MaintenancePlanTask {
 	slug: string
 	nextDate: Date
 	createdAt: Date
-	frequency: PLAN_FREQUENCY
 	description: string
-	location: MAINTENANCE_PLAN_LOCATION
 	isAutomated: boolean
+	frequency: PLAN_FREQUENCY
 	automatedSupervisorId: string
-	automatedWorkOrderType: WORK_ORDER_TYPE
-	automatedPriority: WORK_ORDER_PRIORITY
-	automatedCapex: WORK_ORDER_CAPEX
 	automatedEstimatedDays: number
 	automatedEstimatedHours: number
+	automatedCapex: WORK_ORDER_CAPEX
 	automatedWorkDescription: string
+	automatedPriority: WORK_ORDER_PRIORITY
+	automatedWorkOrderType: WORK_ORDER_TYPE
 	createdBy: {
 		id: string
 		name: string

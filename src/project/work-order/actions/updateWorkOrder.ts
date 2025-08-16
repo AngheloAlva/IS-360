@@ -32,9 +32,9 @@ export const updateWorkOrderLikeBook = async ({ id, values }: UpdateWorkOrderLik
 			},
 			data: {
 				isWorkBookInit: true,
-				workName: values.workName,
-				workLocation: values.workLocation,
-				workStartDate: values.workStartDate,
+				workBookName: values.workBookName,
+				workBookLocation: values.workBookLocation,
+				workBookStartDate: values.workBookStartDate,
 			},
 		})
 
@@ -46,9 +46,9 @@ export const updateWorkOrderLikeBook = async ({ id, values }: UpdateWorkOrderLik
 			entityType: "WorkOrder",
 			metadata: {
 				isWorkBookInit: updatedWorkOrder.isWorkBookInit,
-				workName: updatedWorkOrder.workName,
-				workLocation: updatedWorkOrder.workLocation,
-				workStartDate: updatedWorkOrder.workStartDate,
+				workBookName: updatedWorkOrder.workBookName,
+				workBookLocation: updatedWorkOrder.workBookLocation,
+				workBookStartDate: updatedWorkOrder.workBookStartDate,
 			},
 		})
 

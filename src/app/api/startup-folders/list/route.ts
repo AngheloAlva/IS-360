@@ -270,9 +270,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			orderBy: {
 				[orderBy]: order,
 			},
-			cacheStrategy: {
-				ttl: 30,
-			},
 		})
 
 		if (!companiesWithStartupFolders || companiesWithStartupFolders.length === 0) {

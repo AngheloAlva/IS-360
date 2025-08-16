@@ -29,7 +29,6 @@ export async function GET(
 				id: true,
 				name: true,
 				description: true,
-				location: true,
 				createdAt: true,
 				updatedAt: true,
 				_count: {

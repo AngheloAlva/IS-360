@@ -3,7 +3,7 @@
 import { headers } from "next/headers"
 
 import { changeSubfolderStatusSchema } from "../schemas/change-subfolder-status.schema"
-import { MODULES, USER_ROLE } from "@prisma/client"
+import { MODULES, ACCESS_ROLE } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
@@ -15,7 +15,7 @@ export async function changeSubfolderStatus(
 		headers: await headers(),
 	})
 
-	if (session?.user?.accessRole !== USER_ROLE.ADMIN) {
+	if (session?.user?.accessRole !== ACCESS_ROLE.ADMIN) {
 		throw new Error("No tienes permisos para realizar esta acción")
 	}
 

@@ -72,10 +72,6 @@ export async function GET() {
 					},
 				},
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		const companiesData = companies.map((company) => {

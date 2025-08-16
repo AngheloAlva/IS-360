@@ -22,7 +22,7 @@ export interface WorkOrder {
 	estimatedHours: number
 	estimatedDays: number
 	priority: WORK_ORDER_PRIORITY
-	workProgressStatus: number
+	progress: number
 	estimatedEndDate: Date | null
 	programDate: Date
 	equipments?: {
@@ -43,7 +43,7 @@ export interface WorkOrder {
 		image: string | null
 	}
 	_count: {
-		workEntries: number
+		workBookEntries: number
 	}
 }
 

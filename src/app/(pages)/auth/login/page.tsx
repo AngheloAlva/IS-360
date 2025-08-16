@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import Image from "next/image"
 
-import { USER_ROLE } from "@prisma/client"
+import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 
 import Login from "@/project/auth/components/forms/Login"
@@ -13,7 +13,7 @@ export default async function LoginPage(): Promise<React.ReactElement> {
 	})
 
 	if (session?.user) {
-		if (session.user.accessRole === USER_ROLE.ADMIN) redirect("/admin/dashboard/inicio")
+		if (session.user.accessRole === ACCESS_ROLE.ADMIN) redirect("/admin/dashboard/inicio")
 		else redirect("/dashboard/inicio")
 	}
 

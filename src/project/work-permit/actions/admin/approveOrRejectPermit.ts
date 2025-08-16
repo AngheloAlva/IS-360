@@ -63,7 +63,7 @@ export const approveOrRejectWorkPermit = async ({
 				otNumber: {
 					select: {
 						otNumber: true,
-						workName: true,
+						workBookName: true,
 					},
 				},
 			},
@@ -80,7 +80,7 @@ export const approveOrRejectWorkPermit = async ({
 				approvalDate: workPermit.approvalDate,
 				approvalById: workPermit.approvalById,
 				otNumber: workPermit.otNumber?.otNumber,
-				workName: workPermit.otNumber?.workName,
+				workBookName: workPermit.otNumber?.workBookName,
 			},
 		})
 

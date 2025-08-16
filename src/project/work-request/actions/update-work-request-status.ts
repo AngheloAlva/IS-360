@@ -89,7 +89,6 @@ export async function updateWorkRequestStatus(
 				isUrgent: updatedWorkRequest.isUrgent,
 				requestDate: updatedWorkRequest.requestDate,
 				observations: updatedWorkRequest.observations,
-				location: updatedWorkRequest.location,
 				customLocation: updatedWorkRequest.customLocation,
 			},
 		})

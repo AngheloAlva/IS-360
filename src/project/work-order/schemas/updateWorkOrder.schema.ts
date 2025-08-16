@@ -36,7 +36,7 @@ export const updateWorkOrderSchema = z.object({
 		{ message: "La cantidad de días no es válida" }
 	),
 	estimatedEndDate: z.date({ message: "La fecha de fin estimada no es válida" }).optional(),
-	workProgressStatus: z.array(z.number()),
+	progress: z.array(z.number()),
 
 	companyId: z.string().optional(),
 	supervisorId: z.string().nonempty({ message: "El supervisor no puede estar vacío" }),

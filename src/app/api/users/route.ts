@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
-import { USER_ROLE } from "@prisma/client"
 
-import prisma from "@/lib/prisma"
+import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const skip = (page - 1) * limit
 
 		const where = {
-			accessRole: USER_ROLE.ADMIN,
+			accessRole: ACCESS_ROLE.ADMIN,
 			isActive: true,
 			...(showOnlyInternal ? { internal: { not: true } } : {}),
 			...(search
@@ -54,7 +54,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					phone: true,
 					image: true,
 					email: true,
-					modules: true,
 					createdAt: true,
 					internalRole: true,
 					isSupervisor: true,
@@ -70,15 +69,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				orderBy: {
 					[orderBy]: order,
 				},
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			prisma.user.count({
 				where,
-				cacheStrategy: {
-					ttl: 15,
-				},
 			}),
 		])
 

@@ -189,10 +189,10 @@ export const getWorkOrderColumns = ({
 		},
 	},
 	{
-		accessorKey: "workProgressStatus",
+		accessorKey: "progress",
 		header: "Progreso",
 		cell: ({ row }) => {
-			const progress = row.getValue("workProgressStatus") as number
+			const progress = row.getValue("progress") as number
 
 			return (
 				<div className="flex w-[100px] items-center gap-1">
@@ -284,9 +284,9 @@ export const getWorkOrderColumns = ({
 		accessorKey: "_count",
 		header: "N° Actividades",
 		cell: ({ row }) => {
-			const count = row.getValue("_count") as { workEntries: number }
+			const count = row.getValue("_count") as { workBookEntries: number }
 
-			return <div className="font-medium">{count.workEntries}</div>
+			return <div className="font-medium">{count.workBookEntries}</div>
 		},
 	},
 ]

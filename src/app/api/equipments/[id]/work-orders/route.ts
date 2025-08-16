@@ -23,7 +23,7 @@ export async function GET(
 
 		const workOrders = await prisma.workOrder.findMany({
 			where: {
-				equipment: {
+				equipments: {
 					some: {
 						id,
 					},

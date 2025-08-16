@@ -50,9 +50,6 @@ export async function GET(req: NextRequest) {
 				},
 				skip,
 				take: limit,
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			prisma.userSafetyTalk.count({
 				where: {
@@ -62,9 +59,6 @@ export async function GET(req: NextRequest) {
 							mode: "insensitive" as const,
 						},
 					},
-				},
-				cacheStrategy: {
-					ttl: 10,
 				},
 			}),
 		])

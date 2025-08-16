@@ -58,7 +58,6 @@ export async function GET(req: NextRequest) {
 					area,
 					parent: folderId ? { id: folderId } : null,
 					isActive: true,
-					isExternal: false,
 				},
 				include: {
 					user: {

@@ -27,7 +27,7 @@ export async function GET(
 				otNumber: {
 					select: {
 						otNumber: true,
-						workName: true,
+						workBookName: true,
 						workRequest: true,
 						workDescription: true,
 						supervisor: {
@@ -64,10 +64,6 @@ export async function GET(
 						internalRole: true,
 					},
 				},
-			},
-			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
 			},
 		})
 

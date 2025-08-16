@@ -8,7 +8,7 @@ interface SendNewWorkOrderEmailProps {
 		otNumber: string
 		type: string
 		priority: string
-		equipment: {
+		equipments: {
 			name: string
 		}[]
 		programDate: Date

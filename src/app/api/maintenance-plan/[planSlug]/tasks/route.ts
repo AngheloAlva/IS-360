@@ -74,7 +74,6 @@ export async function GET(
 					name: true,
 					slug: true,
 					nextDate: true,
-					location: true,
 					createdAt: true,
 					description: true,
 					frequency: true,
@@ -118,9 +117,6 @@ export async function GET(
 				orderBy: {
 					nextDate: "asc",
 				},
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			await prisma.maintenancePlanTask.count({
 				where: {
@@ -144,10 +140,6 @@ export async function GET(
 								},
 							}
 						: {}),
-				},
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
 				},
 			}),
 		])

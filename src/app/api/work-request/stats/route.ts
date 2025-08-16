@@ -13,32 +13,21 @@ export async function GET(): Promise<NextResponse> {
 		return new NextResponse("No autorizado", { status: 401 })
 	}
 
-	const cacheConfig = {
-		cacheStrategy: {
-			ttl: 120,
-			swr: 10,
-		},
-	}
-
 	try {
 		const [totalWorkRequests, totalPending, totalAttended, totalUrgent, totalCancelled] =
 			await Promise.all([
-				prisma.workRequest.count(cacheConfig),
+				prisma.workRequest.count(),
 				prisma.workRequest.count({
 					where: { status: "REPORTED" },
-					...cacheConfig,
 				}),
 				prisma.workRequest.count({
 					where: { status: "ATTENDED" },
-					...cacheConfig,
 				}),
 				prisma.workRequest.count({
 					where: { isUrgent: true },
-					...cacheConfig,
 				}),
 				prisma.workRequest.count({
 					where: { status: "CANCELLED" },
-					...cacheConfig,
 				}),
 			])
 
@@ -53,7 +42,6 @@ export async function GET(): Promise<NextResponse> {
 			_count: {
 				id: true,
 			},
-			...cacheConfig,
 		})
 
 		// Obtener información de los operadores
@@ -67,7 +55,6 @@ export async function GET(): Promise<NextResponse> {
 				id: true,
 				name: true,
 			},
-			...cacheConfig,
 		})
 
 		// Combinar datos de operadores con estadísticas
@@ -88,28 +75,24 @@ export async function GET(): Promise<NextResponse> {
 					isUrgent: true,
 					status: "ATTENDED",
 				},
-				...cacheConfig,
 			}),
 			prisma.workRequest.count({
 				where: {
 					isUrgent: true,
 					status: "REPORTED",
 				},
-				...cacheConfig,
 			}),
 			prisma.workRequest.count({
 				where: {
 					isUrgent: false,
 					status: "ATTENDED",
 				},
-				...cacheConfig,
 			}),
 			prisma.workRequest.count({
 				where: {
 					isUrgent: false,
 					status: "REPORTED",
 				},
-				...cacheConfig,
 			}),
 		])
 

@@ -102,7 +102,6 @@ export async function GET(req: NextRequest) {
 					: {}),
 				...expirationFilter,
 				isActive: true,
-				isExternal: false,
 			},
 			include: {
 				user: {
@@ -116,9 +115,6 @@ export async function GET(req: NextRequest) {
 			},
 			skip,
 			take: limit,
-			cacheStrategy: {
-				ttl: 10,
-			},
 		})
 
 		return NextResponse.json({

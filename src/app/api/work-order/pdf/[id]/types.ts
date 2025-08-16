@@ -25,7 +25,7 @@ export interface WorkOrderPDFData extends WorkOrder {
 	milestones: (Milestone & {
 		activities: WorkEntry[]
 	})[]
-	workEntries: (WorkEntry & {
+	workBookEntries: (WorkEntry & {
 		createdBy: {
 			name: string
 			rut: string

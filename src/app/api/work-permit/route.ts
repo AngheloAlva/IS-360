@@ -132,17 +132,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				orderBy: {
 					[orderBy]: order,
 				},
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
-				},
 			}),
 			prisma.workPermit.count({
 				where: filter,
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
-				},
 			}),
 		])
 

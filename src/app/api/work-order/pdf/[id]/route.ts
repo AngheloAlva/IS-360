@@ -44,7 +44,7 @@ export async function GET(
 						internalRole: true,
 					},
 				},
-				equipment: {
+				equipments: {
 					select: {
 						id: true,
 						name: true,
@@ -71,15 +71,15 @@ export async function GET(
 								},
 							},
 							orderBy: {
-								createdAt: 'asc',
+								createdAt: "asc",
 							},
 						},
 					},
 					orderBy: {
-						order: 'asc',
+						order: "asc",
 					},
 				},
-				workEntries: {
+				workBookEntries: {
 					include: {
 						createdBy: {
 							select: {
@@ -100,13 +100,9 @@ export async function GET(
 						},
 					},
 					orderBy: {
-						createdAt: 'asc',
+						createdAt: "asc",
 					},
 				},
-			},
-			cacheStrategy: {
-				ttl: 60,
-				swr: 10,
 			},
 		})
 

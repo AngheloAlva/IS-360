@@ -3,10 +3,10 @@ import { type QueryFunction, useQuery } from "@tanstack/react-query"
 export interface WorkBook {
 	id: string
 	otNumber: string
-	workName: string | null
-	workLocation: string | null
-	workStartDate: string | null
-	workProgressStatus: number | null
+	workBookName: string | null
+	workBookLocation: string | null
+	workBookStartDate: string | null
+	progress: number | null
 	status: string
 	solicitationDate: string
 	equipment: {
@@ -31,7 +31,7 @@ export interface WorkBook {
 		role: string
 	}
 	_count: {
-		workEntries: number
+		workBookEntries: number
 	}
 }
 

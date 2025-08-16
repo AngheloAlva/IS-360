@@ -27,7 +27,7 @@ interface InspectionCommentNotificationEmailProps {
 			name: string
 			email: string
 		}
-		hasAttachments: boolean
+
 		attachmentCount?: number
 	}
 	inspection: {
@@ -42,8 +42,8 @@ interface InspectionCommentNotificationEmailProps {
 	workOrder: {
 		id: string
 		otNumber: string
-		workName?: string
-		workLocation?: string
+		workBookName?: string
+		workBookLocation?: string
 		responsible: {
 			name: string
 		}
@@ -137,7 +137,7 @@ const InspectionCommentNotificationEmail = ({
 
 						<Text className="text-[14px] leading-[24px] text-black">
 							{getHeaderMessage()} en la orden de trabajo <strong>{workOrder.otNumber}</strong>
-							{workOrder.workName && ` - ${workOrder.workName}`}.
+							{workOrder.workBookName && ` - ${workOrder.workBookName}`}.
 						</Text>
 
 						<Section className="my-4 rounded-lg bg-gray-50 p-4">
@@ -163,7 +163,7 @@ const InspectionCommentNotificationEmail = ({
 							</Text>
 							<Hr className="my-3" />
 							<Text className="m-0 text-[14px] leading-[20px]">{comment.content}</Text>
-							{comment.hasAttachments && (
+							{comment.attachmentCount && (
 								<Text className="m-0 mt-2 text-[12px] text-gray-600">
 									📎 {comment.attachmentCount} archivo(s) adjunto(s)
 								</Text>
@@ -226,11 +226,11 @@ const InspectionCommentNotificationEmail = ({
 									<Text className="m-0 text-[13px]">{workOrder.supervisor.name}</Text>
 								</Column>
 							</Row>
-							{workOrder.workLocation && (
+							{workOrder.workBookLocation && (
 								<Row>
 									<Column>
 										<Text className="m-0 text-[12px] text-gray-600">Ubicación:</Text>
-										<Text className="m-0 text-[13px]">{workOrder.workLocation}</Text>
+										<Text className="m-0 text-[13px]">{workOrder.workBookLocation}</Text>
 									</Column>
 								</Row>
 							)}

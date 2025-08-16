@@ -45,8 +45,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			...(search
 				? {
 						OR: [
-							{ workName: { contains: search, mode: "insensitive" as const } },
-							{ workLocation: { contains: search, mode: "insensitive" as const } },
+							{ workBookName: { contains: search, mode: "insensitive" as const } },
+							{ workBookLocation: { contains: search, mode: "insensitive" as const } },
 							{ otNumber: { contains: search, mode: "insensitive" as const } },
 						],
 					}
@@ -123,8 +123,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					status: true,
 					priority: true,
 					createdAt: true,
-					workName: true,
-					workProgressStatus: true,
+					workBookName: true,
+					progress: true,
 					company: {
 						select: {
 							name: true,
@@ -172,11 +172,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 			prisma.workOrder.aggregate({
 				_avg: {
-					workProgressStatus: true,
+					progress: true,
 				},
 				where: {
 					...filter,
-					workProgressStatus: {
+					progress: {
 						not: null,
 					},
 				},
@@ -219,7 +219,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				month: Number(item.month),
 				count: Number(item.count),
 			})),
-			averageProgress: Math.round((avgProgress._avg.workProgressStatus || 0) * 100) / 100,
+			averageProgress: Math.round((avgProgress._avg.progress || 0) * 100) / 100,
 		}
 
 		return NextResponse.json({

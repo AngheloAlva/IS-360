@@ -50,7 +50,7 @@ export const closeWorkPermit = async ({ values, workPermitId }: CloseWorkPermitP
 				otNumber: {
 					select: {
 						otNumber: true,
-						workName: true,
+						workBookName: true,
 					},
 				},
 			},
@@ -67,7 +67,7 @@ export const closeWorkPermit = async ({ values, workPermitId }: CloseWorkPermitP
 				closingDate: workPermit.closingDate,
 				closingById: workPermit.closingById,
 				otNumber: workPermit.otNumber?.otNumber,
-				workName: workPermit.otNumber?.workName,
+				workBookName: workPermit.otNumber?.workBookName,
 			},
 		})
 

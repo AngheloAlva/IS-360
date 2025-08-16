@@ -26,7 +26,7 @@ import { Separator } from "@/shared/components/ui/separator"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
-import type { WORK_REQUEST_STATUS, WORK_TYPE } from "@prisma/client"
+import type { WORK_REQUEST_STATUS, WORK_REQUEST_TYPE } from "@prisma/client"
 
 interface WorkRequestDetailsDialogProps {
 	open: boolean
@@ -65,7 +65,7 @@ export default function WorkRequestDetailsDialog({
 		}
 	}
 
-	const workTypeText = (workType: WORK_TYPE) => {
+	const workTypeText = (workType: WORK_REQUEST_TYPE) => {
 		switch (workType) {
 			case "ELECTRIC":
 				return "Eléctrico"
@@ -129,7 +129,7 @@ export default function WorkRequestDetailsDialog({
 								/>
 								<DialogLabel
 									label="Tipo de Trabajo"
-									value={workTypeText(workRequest.workType as WORK_TYPE)}
+									value={workTypeText(workRequest.workType as WORK_REQUEST_TYPE)}
 									icon={<ListOrderedIcon className="size-4" />}
 								/>
 								<DialogLabel

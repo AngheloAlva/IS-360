@@ -30,6 +30,9 @@ export async function GET() {
 					_count: {
 						_all: true,
 					},
+					orderBy: {
+						type: "asc",
+					},
 				}),
 			]),
 
@@ -40,6 +43,9 @@ export async function GET() {
 					by: ["companyId"],
 					_count: {
 						_all: true,
+					},
+					orderBy: {
+						companyId: "asc",
 					},
 				}),
 			]),
@@ -52,6 +58,9 @@ export async function GET() {
 					by: ["frequency"],
 					_count: {
 						_all: true,
+					},
+					orderBy: {
+						frequency: "asc",
 					},
 				}),
 				prisma.maintenancePlanTask.findMany({
@@ -82,6 +91,9 @@ export async function GET() {
 					_count: {
 						_all: true,
 					},
+					orderBy: {
+						area: "asc",
+					},
 				}),
 			]),
 		])
@@ -101,14 +113,14 @@ export async function GET() {
 				inProgress: inProgressOts,
 				byType: otsByType.map((item) => ({
 					type: item.type,
-					_count: item._count._all,
+					_count: item._count,
 				})),
 			},
 			companies: {
 				total: totalCompanies,
 				usersDistribution: usersPerCompany.map((item) => ({
 					companyId: item.companyId,
-					_count: item._count._all,
+					_count: item._count,
 				})),
 			},
 			maintenance: {
@@ -116,7 +128,7 @@ export async function GET() {
 				totalTasks,
 				tasksByFrequency: tasksByFrequency.map((item) => ({
 					frequency: item.frequency,
-					_count: item._count._all,
+					_count: item._count,
 				})),
 				upcomingTasks,
 			},
@@ -124,7 +136,7 @@ export async function GET() {
 				total: totalDocuments,
 				byArea: documentsByArea.map((item) => ({
 					area: item.area,
-					_count: item._count._all,
+					_count: item._count,
 				})),
 			},
 		})

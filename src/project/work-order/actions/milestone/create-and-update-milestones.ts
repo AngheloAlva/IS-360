@@ -37,7 +37,7 @@ export async function createAndUpdateMilestones(
 			select: {
 				id: true,
 				otNumber: true,
-				workName: true,
+				workBookName: true,
 				milestones: {
 					select: {
 						id: true,
@@ -158,7 +158,7 @@ export async function createAndUpdateMilestones(
 			title: "Actualización de hitos",
 			link: `/admin/dashboard/ordenes-de-trabajo/${workOrder.id}`,
 			targetRoles: [USER_ROLE.admin, USER_ROLE.workOrderOperator],
-			message: `Se han actualizado los hitos del libro de obras ${workOrder.workName}`,
+			message: `Se han actualizado los hitos del libro de obras ${workOrder.workBookName}`,
 		})
 
 		if (workOrder.responsible.email) {
@@ -167,7 +167,7 @@ export async function createAndUpdateMilestones(
 				email: workOrder.responsible.email,
 				workOrderNumber: workOrder.otNumber,
 				supervisorName: workOrder.supervisor.name + workOrder.supervisor.rut,
-				workOrderName: workOrder.workName || `Libro de Obras ${workOrder.otNumber}`,
+				workOrderName: workOrder.workBookName || `Libro de Obras ${workOrder.otNumber}`,
 
 				companyName: workOrder.company
 					? workOrder.company.name + " - " + workOrder.company.rut

@@ -30,14 +30,13 @@ export async function GET(
 		const [workBooks, total] = await Promise.all([
 			prisma.workOrder.findMany({
 				where: {
-					isWorkBook: true,
 					companyId,
 					isWorkBookInit: onlyBooks,
 					...(search
 						? {
 								OR: [
-									{ workName: { contains: search, mode: "insensitive" as const } },
-									{ workLocation: { contains: search, mode: "insensitive" as const } },
+									{ workBookName: { contains: search, mode: "insensitive" as const } },
+									{ workBookLocation: { contains: search, mode: "insensitive" as const } },
 									{ otNumber: { contains: search, mode: "insensitive" as const } },
 								],
 							}
@@ -47,17 +46,17 @@ export async function GET(
 					id: true,
 					type: true,
 					otNumber: true,
-					workName: true,
+					workBookName: true,
 					priority: true,
 					workRequest: true,
 					programDate: true,
-					workLocation: true,
-					workStartDate: true,
+					workBookLocation: true,
+					workBookStartDate: true,
 					estimatedDays: true,
 					estimatedHours: true,
 					workDescription: true,
 					estimatedEndDate: true,
-					workProgressStatus: true,
+					progress: true,
 					status: true,
 					solicitationDate: true,
 					company: {
@@ -82,14 +81,14 @@ export async function GET(
 							role: true,
 						},
 					},
-					equipment: {
+					equipments: {
 						select: {
 							name: true,
 						},
 					},
 					_count: {
 						select: {
-							workEntries: true,
+							workBookEntries: true,
 						},
 					},
 				},
@@ -98,27 +97,20 @@ export async function GET(
 				orderBy: {
 					createdAt: "desc",
 				},
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			prisma.workOrder.count({
 				where: {
-					isWorkBook: true,
 					companyId,
 					isWorkBookInit: onlyBooks,
 					...(search
 						? {
 								OR: [
-									{ workName: { contains: search, mode: "insensitive" as const } },
-									{ workLocation: { contains: search, mode: "insensitive" as const } },
+									{ workBookName: { contains: search, mode: "insensitive" as const } },
+									{ workBookLocation: { contains: search, mode: "insensitive" as const } },
 									{ otNumber: { contains: search, mode: "insensitive" as const } },
 								],
 							}
 						: {}),
-				},
-				cacheStrategy: {
-					ttl: 10,
 				},
 			}),
 		])

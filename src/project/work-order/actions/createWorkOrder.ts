@@ -150,17 +150,14 @@ export const createWorkOrder = async ({
 							},
 						}
 					: {}),
-				isWorkBook: true,
 				estimatedDays: +rest.estimatedDays,
 				estimatedHours: +rest.estimatedHours,
 				solicitationDate: rest.solicitationDate ? new Date(rest.solicitationDate) : new Date(),
 				solicitationTime: rest.solicitationTime
 					? rest.solicitationTime
 					: new Date().toTimeString().split(" ")[0],
-				estimatedEndDate: rest.estimatedEndDate ? new Date(rest.estimatedEndDate) : undefined,
-				requiresBreak: false,
-				breakDays: 0,
-				equipment: {
+				estimatedEndDate: rest.estimatedEndDate ? new Date(rest.estimatedEndDate) : new Date(),
+				equipments: {
 					connect: equipmentId
 						? equipmentId.map((id) => ({ id }))
 						: equipment.map((id) => ({ id })),
@@ -189,7 +186,7 @@ export const createWorkOrder = async ({
 						email: true,
 					},
 				},
-				equipment: {
+				equipments: {
 					select: {
 						id: true,
 						name: true,
@@ -309,7 +306,7 @@ export const createWorkOrder = async ({
 				workDescription: newWorkOrder.workDescription,
 				responsible: newWorkOrder.responsible,
 				supervisor: newWorkOrder.supervisor,
-				equipment: newWorkOrder.equipment,
+				equipments: newWorkOrder.equipments,
 				company: newWorkOrder.company,
 				initReport: newWorkOrder.initReport,
 				maintenancePlanTask: newWorkOrder.MaintenancePlanTask,
@@ -321,7 +318,7 @@ export const createWorkOrder = async ({
 				otNumber: newWorkOrder.otNumber,
 				type: newWorkOrder.type,
 				priority: newWorkOrder.priority,
-				equipment: newWorkOrder.equipment,
+				equipments: newWorkOrder.equipments,
 				programDate: newWorkOrder.programDate,
 				estimatedDays: +newWorkOrder.estimatedDays,
 				estimatedHours: +newWorkOrder.estimatedHours,

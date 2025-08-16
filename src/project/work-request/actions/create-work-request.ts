@@ -112,7 +112,6 @@ export const createWorkRequest = async ({
 				isUrgent: newWorkRequest.isUrgent,
 				requestDate: newWorkRequest.requestDate,
 				observations: newWorkRequest.observations,
-				location: newWorkRequest.location,
 				customLocation: newWorkRequest.customLocation,
 				workType: newWorkRequest.workType,
 				userId,

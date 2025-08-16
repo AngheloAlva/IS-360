@@ -7,7 +7,7 @@ import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import {
 	WORK_ORDER_STATUS,
-	USER_ROLE,
+	ACCESS_ROLE,
 	WORK_ORDER_PRIORITY,
 	WORK_PERMIT_STATUS,
 	StartupFolderStatus,
@@ -97,7 +97,7 @@ export async function GET() {
 			// Admin users
 			prisma.user.count({
 				where: {
-					accessRole: USER_ROLE.ADMIN,
+					accessRole: ACCESS_ROLE.ADMIN,
 				},
 			}),
 			// Operational equipment

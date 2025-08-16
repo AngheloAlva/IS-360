@@ -24,7 +24,7 @@ export async function GET(
 				id: workOrderId,
 			},
 			include: {
-				workEntries: {
+				workBookEntries: {
 					include: {
 						createdBy: true,
 						assignedUsers: true,
@@ -56,7 +56,7 @@ export async function GET(
 						email: true,
 					},
 				},
-				equipment: {
+				equipments: {
 					select: {
 						id: true,
 						tag: true,
@@ -93,9 +93,6 @@ export async function GET(
 						milestones: true,
 					},
 				},
-			},
-			cacheStrategy: {
-				ttl: 10,
 			},
 		})
 

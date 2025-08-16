@@ -23,7 +23,7 @@ export interface WorkEntry {
 	}
 	workOrder?: {
 		id: string
-		workName: string
+		workBookName: string
 	}
 	assignedUsers: {
 		id: string

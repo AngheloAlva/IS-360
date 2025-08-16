@@ -60,7 +60,7 @@ export const updateWorkOrderById = async ({
 				company: true,
 				supervisor: true,
 				responsible: true,
-				equipment: true,
+				equipments: true,
 			},
 			where: {
 				id,
@@ -78,7 +78,7 @@ export const updateWorkOrderById = async ({
 				estimatedHours: parseInt(values.estimatedHours),
 				estimatedDays: parseInt(values.estimatedDays),
 				estimatedEndDate: values.estimatedEndDate,
-				workProgressStatus: +values.workProgressStatus,
+				progress: +values.progress,
 				company: {
 					connect: {
 						id: values.companyId,
@@ -94,7 +94,7 @@ export const updateWorkOrderById = async ({
 						id: values.responsibleId,
 					},
 				},
-				equipment: {
+				equipments: {
 					set: values.equipment.map((id) => ({ id })),
 				},
 				...(endReport?.length && {
@@ -128,14 +128,12 @@ export const updateWorkOrderById = async ({
 				programDate: workOrder.programDate,
 				estimatedHours: workOrder.estimatedHours,
 				estimatedDays: workOrder.estimatedDays,
-				requiresBreak: workOrder.requiresBreak,
-				breakDays: workOrder.breakDays,
 				estimatedEndDate: workOrder.estimatedEndDate,
-				workProgressStatus: workOrder.workProgressStatus,
+				progress: workOrder.progress,
 				companyId: workOrder.company?.id,
 				supervisorId: workOrder.supervisor?.id,
 				responsibleId: workOrder.responsible?.id,
-				equipmentCount: workOrder.equipment?.length || 0,
+				equipmentCount: workOrder.equipments?.length || 0,
 			},
 		})
 

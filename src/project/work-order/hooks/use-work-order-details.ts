@@ -17,7 +17,7 @@ export interface WorkOrderDetails {
 	solicitationTime: string
 	workRequest: string
 	workDescription: string
-	workProgressStatus: number
+	progress: number
 	priority: WORK_ORDER_PRIORITY
 	createdAt: Date
 	programDate: Date
@@ -51,7 +51,7 @@ export interface WorkOrderDetails {
 		name: string
 	}
 	_count: {
-		workEntries: number
+		workBookEntries: number
 	}
 	milestones: {
 		id: string

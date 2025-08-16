@@ -94,7 +94,7 @@ export default function WorkBookGeneralData({
 									</div>
 									<div>
 										<p className="text-muted-foreground text-sm font-medium">Ubicación</p>
-										<p className="font-medium">{data.workLocation || "No proporcionada"}</p>
+										<p className="font-medium">{data.workBookLocation || "No proporcionada"}</p>
 									</div>
 								</div>
 							</div>

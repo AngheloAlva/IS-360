@@ -43,7 +43,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		let orderByField: string
 
 		if (orderBy === "name") {
-			orderByField = "workName"
+			orderByField = "workBookName"
 		} else {
 			orderByField = "createdAt"
 		}
@@ -54,9 +54,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			...(search
 				? {
 						OR: [
-							{ workName: { contains: search, mode: "insensitive" as const } },
+							{ workBookName: { contains: search, mode: "insensitive" as const } },
 							{ workRequest: { contains: search, mode: "insensitive" as const } },
-							{ workLocation: { contains: search, mode: "insensitive" as const } },
+							{ workBookLocation: { contains: search, mode: "insensitive" as const } },
 							{ otNumber: { contains: search, mode: "insensitive" as const } },
 							{ supervisor: { name: { contains: search, mode: "insensitive" as const } } },
 							{ company: { name: { contains: search, mode: "insensitive" as const } } },
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						},
 					},
 					workRequest: true,
-					workProgressStatus: true,
+					progress: true,
 					status: true,
 					solicitationDate: true,
 					estimatedEndDate: true,
@@ -157,7 +157,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						: {}),
 					_count: {
 						select: {
-							workEntries: {
+							workBookEntries: {
 								where: {
 									entryType: { in: ["ADDITIONAL_ACTIVITY", "DAILY_ACTIVITY"] },
 								},
@@ -170,43 +170,24 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				orderBy: {
 					[orderByField]: order,
 				},
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			prisma.workOrder.count({
 				where: filter,
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
-				},
 			}),
 			prisma.$transaction([
 				prisma.workOrder.count({
 					where: {
 						status: { in: ["IN_PROGRESS", "PENDING"] },
 					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
 				}),
 				prisma.workOrder.count({
 					where: {
 						status: "COMPLETED",
 					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
-					},
 				}),
 				prisma.workOrder.aggregate({
 					_avg: {
-						workProgressStatus: true,
-					},
-					cacheStrategy: {
-						ttl: 120,
-						swr: 10,
+						progress: true,
 					},
 				}),
 			]),

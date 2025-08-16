@@ -45,17 +45,17 @@ export default function NewWorkBookFormContent({
 	const form = useForm<WorkBookSchema>({
 		resolver: zodResolver(workBookSchema),
 		defaultValues: {
-			workName: "",
+			workBookName: "",
 			userId: userId,
 			workOrderId: "",
-			workLocation: "",
-			workStartDate: new Date(),
+			workBookLocation: "",
+			workBookStartDate: new Date(),
 		},
 	})
 
 	useEffect(() => {
 		navigator.geolocation.getCurrentPosition((position) => {
-			form.setValue("workLocation", `${position.coords.latitude},${position.coords.longitude}`)
+			form.setValue("workBookLocation", `${position.coords.latitude},${position.coords.longitude}`)
 		})
 	}, [form])
 
@@ -159,9 +159,7 @@ export default function NewWorkBookFormContent({
 						</div>
 						<div>
 							<h3 className="text-sm font-semibold">Tipo de trabajo:</h3>
-							<p className="text-muted-foreground">
-								{WorkOrderTypeLabels[workOrderSelected.type]}
-							</p>
+							<p className="text-muted-foreground">{WorkOrderTypeLabels[workOrderSelected.type]}</p>
 						</div>
 						<div>
 							<h3 className="text-sm font-semibold">Prioridad:</h3>
@@ -186,9 +184,7 @@ export default function NewWorkBookFormContent({
 						</div>
 						<div>
 							<h3 className="text-sm font-semibold">Descripción del trabajo:</h3>
-							<p className="text-muted-foreground">
-								{workOrderSelected.workDescription || "N/A"}
-							</p>
+							<p className="text-muted-foreground">{workOrderSelected.workDescription || "N/A"}</p>
 						</div>
 						<div>
 							<h3 className="text-sm font-semibold">Fecha programada:</h3>
@@ -220,14 +216,14 @@ export default function NewWorkBookFormContent({
 				</div>
 
 				<InputFormField<WorkBookSchema>
-					name="workName"
+					name="workBookName"
 					control={form.control}
 					label="Nombre de la Obra"
 					placeholder="Nombre de la obra"
 				/>
 
 				<DatePickerFormField<WorkBookSchema>
-					name="workStartDate"
+					name="workBookStartDate"
 					control={form.control}
 					label="Fecha de Inicio"
 				/>

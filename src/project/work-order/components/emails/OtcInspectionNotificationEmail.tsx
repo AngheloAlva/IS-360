@@ -28,14 +28,13 @@ interface OtcInspectionNotificationEmailProps {
 		safetyObservations?: string
 		supervisionComments?: string
 		recommendations?: string
-		hasAttachments: boolean
 		attachmentCount?: number
 	}
 	workOrder: {
 		id: string
 		otNumber: string
-		workName?: string
-		workLocation?: string
+		workBookName?: string
+		workBookLocation?: string
 		responsible: {
 			name: string
 		}
@@ -158,27 +157,27 @@ const OtcInspectionNotificationEmail = ({
 									</Column>
 								</Row>
 
-								{workOrder.workName && (
+								{workOrder.workBookName && (
 									<Row className="mb-[12px]">
 										<Column>
 											<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
 												Nombre del Trabajo:
 											</Text>
 											<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
-												{workOrder.workName}
+												{workOrder.workBookName}
 											</Text>
 										</Column>
 									</Row>
 								)}
 
-								{workOrder.workLocation && (
+								{workOrder.workBookLocation && (
 									<Row className="mb-[12px]">
 										<Column>
 											<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
 												Ubicación:
 											</Text>
 											<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
-												{workOrder.workLocation}
+												{workOrder.workBookLocation}
 											</Text>
 										</Column>
 									</Row>
@@ -242,7 +241,7 @@ const OtcInspectionNotificationEmail = ({
 									</Column>
 								</Row>
 
-								{inspection.hasAttachments && (
+								{inspection.attachmentCount && (
 									<Row>
 										<Column>
 											<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">

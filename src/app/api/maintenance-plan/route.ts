@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { addWeeks } from "date-fns"
-import { MAINTENANCE_PLAN_LOCATION } from "@prisma/client"
 
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
@@ -21,7 +20,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 	const limit = parseInt(searchParams.get("limit") ?? "10")
 	const page = parseInt(searchParams.get("page") ?? "1")
 	const search = searchParams.get("search") ?? ""
-	const location = searchParams.get("location") ?? ""
 	const order = searchParams.get("order") as Order
 	const orderBy = searchParams.get("orderBy") as OrderBy
 
@@ -42,7 +40,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 								],
 							}
 						: {}),
-					...(location ? { location: location as MAINTENANCE_PLAN_LOCATION } : {}),
 				},
 				skip,
 				select: {
@@ -80,9 +77,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 				},
 				take: limit,
 				orderBy: { [orderBy]: order },
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			await prisma.maintenancePlan.count({
 				where: {
@@ -95,10 +89,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 								],
 							}
 						: {}),
-					...(location ? { location: location as MAINTENANCE_PLAN_LOCATION } : {}),
-				},
-				cacheStrategy: {
-					ttl: 10,
 				},
 			}),
 		])

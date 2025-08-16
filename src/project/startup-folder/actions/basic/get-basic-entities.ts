@@ -1,6 +1,6 @@
 "use server"
 
-import { ReviewStatus, USER_ROLE } from "@prisma/client"
+import { ReviewStatus, ACCESS_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 interface GetCompanyEntitiesParams {
@@ -35,7 +35,7 @@ export async function getBasicEntities({
 						worker: {
 							companyId,
 							isActive: true,
-							accessRole: USER_ROLE.PARTNER_COMPANY,
+							accessRole: ACCESS_ROLE.PARTNER_COMPANY,
 						},
 					},
 					select: {
@@ -56,7 +56,7 @@ export async function getBasicEntities({
 			where: {
 				companyId,
 				isActive: true,
-				accessRole: USER_ROLE.PARTNER_COMPANY,
+				accessRole: ACCESS_ROLE.PARTNER_COMPANY,
 				NOT: {
 					id: {
 						in: vinculatedBasicUsers?.basicFolders.map((wf) => wf.worker?.id),

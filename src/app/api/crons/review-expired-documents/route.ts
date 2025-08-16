@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { MODULES, ACTIVITY_TYPE, USER_ROLE } from "@prisma/client"
+import { MODULES, ACTIVITY_TYPE, ACCESS_ROLE } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { resend } from "@/lib/resend"
 import prisma from "@/lib/prisma"
@@ -481,7 +481,7 @@ export async function GET(): Promise<NextResponse> {
 				const companyAdmins = await prisma.user.findMany({
 					where: {
 						companyId: doc.companyId,
-						accessRole: USER_ROLE.ADMIN,
+						accessRole: ACCESS_ROLE.ADMIN,
 						isActive: true,
 					},
 					select: {
@@ -506,8 +506,7 @@ export async function GET(): Promise<NextResponse> {
 
 		const systemUser = await prisma.user.findFirst({
 			where: {
-				accessRole: USER_ROLE.ADMIN,
-				internal: true,
+				accessRole: ACCESS_ROLE.ADMIN,
 			},
 			select: {
 				id: true,

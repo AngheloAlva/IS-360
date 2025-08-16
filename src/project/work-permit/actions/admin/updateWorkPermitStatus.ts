@@ -37,7 +37,7 @@ export async function updateWorkPermitStatus(data: z.infer<typeof updateWorkPerm
 				otNumber: {
 					select: {
 						otNumber: true,
-						workName: true,
+						workBookName: true,
 					},
 				},
 			},
@@ -52,7 +52,7 @@ export async function updateWorkPermitStatus(data: z.infer<typeof updateWorkPerm
 			metadata: {
 				workCompleted: workPermit.workCompleted,
 				otNumber: workPermit.otNumber?.otNumber,
-				workName: workPermit.otNumber?.workName,
+				workBookName: workPermit.otNumber?.workBookName,
 			},
 		})
 

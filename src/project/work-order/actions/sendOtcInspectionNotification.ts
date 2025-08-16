@@ -23,7 +23,6 @@ export const sendOtcInspectionNotification = async ({
 					select: {
 						name: true,
 						email: true,
-						internal: true,
 					},
 				},
 				attachments: {
@@ -73,16 +72,14 @@ export const sendOtcInspectionNotification = async ({
 			nonConformities: inspection.nonConformities || undefined,
 			safetyObservations: inspection.safetyObservations || undefined,
 			supervisionComments: inspection.supervisionComments || undefined,
-			recommendations: inspection.recommendations || undefined,
-			hasAttachments: inspection.attachments.length > 0,
 			attachmentCount: inspection.attachments.length,
 		}
 
 		const workOrderData = {
 			id: inspection.workOrder.id,
 			otNumber: inspection.workOrder.otNumber,
-			workName: inspection.workOrder.workName || undefined,
-			workLocation: inspection.workOrder.workLocation || undefined,
+			workBookName: inspection.workOrder.workBookName || undefined,
+			workBookLocation: inspection.workOrder.workBookLocation || undefined,
 			responsible: {
 				name: inspection.workOrder.responsible.name,
 				email: inspection.workOrder.responsible.email,

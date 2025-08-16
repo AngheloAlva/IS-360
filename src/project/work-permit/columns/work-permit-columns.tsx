@@ -143,7 +143,6 @@ export const getWorkPermitColumns = (
 			return (
 				<Badge
 					className={cn("bg-purple-500/10 text-purple-500", {
-						"bg-indigo-500/10 text-indigo-500": status === WORK_PERMIT_STATUS.CANCELLED,
 						"bg-red-500/10 text-red-500": status === WORK_PERMIT_STATUS.REJECTED,
 						"bg-fuchsia-500/10 text-fuchsia-500": status === WORK_PERMIT_STATUS.ACTIVE,
 					})}
@@ -154,7 +153,7 @@ export const getWorkPermitColumns = (
 		},
 	},
 	{
-		accessorKey: "workName",
+		accessorKey: "workBookName",
 		header: "Trabajo a realizar",
 		cell: ({ row }) => {
 			const workOrder = row.original.otNumber?.workRequest

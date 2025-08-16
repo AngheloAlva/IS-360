@@ -90,7 +90,7 @@ export default function UpdateWorkOrderForm({
 			programDate: undefined,
 			estimatedHours: "",
 			workDescription: "",
-			workProgressStatus: [],
+			progress: [],
 			estimatedEndDate: undefined,
 			solicitationDate: undefined,
 			solicitationTime: "",
@@ -111,7 +111,7 @@ export default function UpdateWorkOrderForm({
 			estimatedDays: `${workOrder?.estimatedDays}`,
 			estimatedHours: `${workOrder?.estimatedHours}`,
 			workDescription: workOrder?.workDescription ?? "",
-			workProgressStatus: [workOrder?.workProgressStatus],
+			progress: [workOrder?.progress],
 			estimatedEndDate: workOrder?.estimatedEndDate ?? undefined,
 			programDate: new Date(workOrder?.programDate || new Date()),
 			equipment: workOrder?.equipment.map((equipment) => equipment.id),
@@ -331,7 +331,7 @@ export default function UpdateWorkOrderForm({
 						<SliderFormField<UpdateWorkOrderSchema>
 							label="Progreso"
 							control={form.control}
-							name="workProgressStatus"
+							name="progress"
 							itemClassName="sm:col-span-2"
 						/>
 

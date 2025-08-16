@@ -34,7 +34,7 @@ export async function closeWorkBook({ userId, workBookId, reason, progress }: Cl
 				id: true,
 				status: true,
 				otNumber: true,
-				workName: true,
+				workBookName: true,
 				supervisor: {
 					select: {
 						id: true,
@@ -60,13 +60,13 @@ export async function closeWorkBook({ userId, workBookId, reason, progress }: Cl
 			data: {
 				status: "COMPLETED",
 				closureRejectedReason: reason || null,
-				workProgressStatus: progress,
+				progress: progress,
 			},
 			select: {
 				id: true,
 				status: true,
 				otNumber: true,
-				workName: true,
+				workBookName: true,
 				closureRejectedReason: true,
 			},
 		})
@@ -96,7 +96,7 @@ export async function closeWorkBook({ userId, workBookId, reason, progress }: Cl
 			metadata: {
 				status: updatedWorkOrder.status,
 				otNumber: updatedWorkOrder.otNumber,
-				workName: updatedWorkOrder.workName,
+				workBookName: updatedWorkOrder.workBookName,
 				closureRejectedReason: updatedWorkOrder.closureRejectedReason,
 				workEntryId: workEntry.id,
 				workEntryComments: workEntry.comments,
@@ -113,7 +113,7 @@ export async function closeWorkBook({ userId, workBookId, reason, progress }: Cl
 				supervisorName: session.user.name,
 				email: workOrder.supervisor.email,
 				workOrderNumber: workOrder.otNumber,
-				workOrderName: workOrder.workName || "",
+				workOrderName: workOrder.workBookName || "",
 				companyName: workOrder?.company?.name || "Interno",
 			})
 		}

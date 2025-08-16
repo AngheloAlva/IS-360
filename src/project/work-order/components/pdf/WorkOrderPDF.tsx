@@ -275,7 +275,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Nombre del Trabajo:</Text>
-								<Text style={styles.value}>{workOrder.workName || "No especificado"}</Text>
+								<Text style={styles.value}>{workOrder.workBookName || "No especificado"}</Text>
 							</View>
 						</View>
 					</View>
@@ -326,8 +326,8 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 							<View style={styles.row}>
 								<Text style={styles.label}>Fecha de Inicio:</Text>
 								<Text style={styles.value}>
-									{workOrder.workStartDate
-										? format(new Date(workOrder.workStartDate), "dd/MM/yyyy", { locale: es })
+									{workOrder.workBookStartDate
+										? format(new Date(workOrder.workBookStartDate), "dd/MM/yyyy", { locale: es })
 										: "No especificada"}
 								</Text>
 							</View>
@@ -335,7 +335,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 						<View style={styles.column}>
 							<View style={styles.row}>
 								<Text style={styles.label}>Progreso:</Text>
-								<Text style={styles.value}>{workOrder.workProgressStatus || 0}%</Text>
+								<Text style={styles.value}>{workOrder.progress || 0}%</Text>
 							</View>
 						</View>
 					</View>
@@ -431,7 +431,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 					</View>
 				)}
 
-				{workOrder.workEntries && workOrder.workEntries.length > 0 && (
+				{workOrder.workBookEntries && workOrder.workBookEntries.length > 0 && (
 					<View style={styles.section}>
 						<Text style={styles.subtitle}>4. REGISTRO DE ACTIVIDADES</Text>
 						<View style={styles.table}>
@@ -461,7 +461,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 								</View>
 							</View>
 
-							{workOrder.workEntries.map((entry) => (
+							{workOrder.workBookEntries.map((entry) => (
 								<View style={styles.tableRow} key={entry.id}>
 									<View style={[styles.tableCol, { width: "10%" }]}>
 										<Text style={styles.tableCell}>
@@ -508,7 +508,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 				</View>
 			</Page>
 
-			{workOrder.workEntries && workOrder.workEntries.length > 0 && (
+			{workOrder.workBookEntries && workOrder.workBookEntries.length > 0 && (
 				<Page size="A4" style={styles.page}>
 					<View style={styles.header}>
 						<View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -520,7 +520,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 						</View>
 					</View>
 
-					{workOrder.workEntries.map((entry, index) => (
+					{workOrder.workBookEntries.map((entry, index) => (
 						<View style={styles.section} key={entry.id}>
 							<Text style={styles.subtitle}>
 								{index + 1}. {getEntryTypeLabel(entry.entryType)} -{" "}
@@ -573,13 +573,6 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 										</View>
 									)}
 
-									{entry.inspectorName && (
-										<View style={styles.activityRow}>
-											<Text style={styles.activityLabel}>Inspector:</Text>
-											<Text style={styles.activityValue}>{entry.inspectorName}</Text>
-										</View>
-									)}
-
 									{entry.safetyObservations && (
 										<View style={styles.activityRow}>
 											<Text style={styles.activityLabel}>Observaciones de Seguridad:</Text>
@@ -591,13 +584,6 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 										<View style={styles.activityRow}>
 											<Text style={styles.activityLabel}>No Conformidades:</Text>
 											<Text style={styles.activityValue}>{entry.nonConformities}</Text>
-										</View>
-									)}
-
-									{entry.recommendations && (
-										<View style={styles.activityRow}>
-											<Text style={styles.activityLabel}>Recomendaciones:</Text>
-											<Text style={styles.activityValue}>{entry.recommendations}</Text>
 										</View>
 									)}
 								</>

@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth"
 import WorkPermitForm from "@/project/work-permit/components/forms/WorkPermitForm"
 import { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
 import BackButton from "@/shared/components/BackButton"
-import { USER_ROLE } from "@prisma/client"
+import { ACCESS_ROLE } from "@prisma/client"
 
 export default async function UpdateWorkPermitPage({
 	params,
@@ -61,7 +61,7 @@ export default async function UpdateWorkPermitPage({
 				userName={res.user.name}
 				initialValues={workPermit}
 				companyId={workPermit.company.id}
-				isOtcMember={res.user.accessRole === USER_ROLE.ADMIN}
+				isOtcMember={res.user.accessRole === ACCESS_ROLE.ADMIN}
 			/>
 		</div>
 	)

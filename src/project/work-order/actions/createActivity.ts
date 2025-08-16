@@ -43,7 +43,6 @@ export const createActivity = async ({
 				data: {
 					...rest,
 					entryType,
-					hasAttachments: !!attachment,
 					comments: comments || "",
 					workOrder: {
 						connect: {
@@ -78,7 +77,6 @@ export const createActivity = async ({
 				select: {
 					id: true,
 					entryType: true,
-					hasAttachments: true,
 					comments: true,
 					workOrderId: true,
 					milestoneId: true,
@@ -107,9 +105,9 @@ export const createActivity = async ({
 					id: true,
 					status: true,
 					otNumber: true,
-					workName: true,
+					workBookName: true,
 					type: true,
-					equipment: {
+					equipments: {
 						select: {
 							id: true,
 							name: true,
@@ -142,7 +140,7 @@ export const createActivity = async ({
 					id: true,
 					status: true,
 					otNumber: true,
-					workName: true,
+					workBookName: true,
 				},
 			})
 
@@ -161,7 +159,7 @@ export const createActivity = async ({
 			})
 
 			const equipmentHistories = await Promise.all(
-				workOrder.equipment.map(async (equipment) => {
+				workOrder.equipments.map(async (equipment) => {
 					return await tx.equipmentHistory.create({
 						data: {
 							equipment: {
@@ -209,7 +207,6 @@ export const createActivity = async ({
 				entityType: "WorkEntry",
 				metadata: {
 					entryType: newWorkEntry.entryType,
-					hasAttachments: newWorkEntry.hasAttachments,
 					comments: newWorkEntry.comments,
 					workOrderId: newWorkEntry.workOrderId,
 					milestoneId: newWorkEntry.milestoneId,
@@ -219,7 +216,7 @@ export const createActivity = async ({
 					attachments: newWorkEntry.attachments,
 					workOrderStatus: updatedWorkOrder.status,
 					otNumber: updatedWorkOrder.otNumber,
-					workName: updatedWorkOrder.workName,
+					workBookName: updatedWorkOrder.workBookName,
 					milestoneStatus: updatedMilestone.status,
 					milestoneName: updatedMilestone.name,
 					companyId: workOrder.company?.id,

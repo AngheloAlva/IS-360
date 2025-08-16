@@ -26,17 +26,13 @@ export async function GET(): Promise<NextResponse> {
 
 		const workBooks = await prisma.workOrder.findMany({
 			where: {
-				isWorkBook: true,
 				createdAt: {
 					gte: twelveWeeksAgo,
 				},
 			},
 			select: {
-				workProgressStatus: true,
+				progress: true,
 				createdAt: true,
-			},
-			cacheStrategy: {
-				ttl: 10,
 			},
 		})
 
@@ -52,7 +48,7 @@ export async function GET(): Promise<NextResponse> {
 				}
 			}
 
-			acc[week].total += book.workProgressStatus || 0
+			acc[week].total += book.progress || 0
 			acc[week].count++
 
 			return acc

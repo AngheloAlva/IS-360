@@ -24,7 +24,7 @@ interface RequestCloseMilestoneEmailProps {
 		workOrderId: string
 		workOrder: {
 			otNumber: string
-			workName: string | null
+			workBookName: string | null
 			workDescription: string | null
 		}
 	}
@@ -91,7 +91,7 @@ export const RequestCloseMilestoneEmail: React.FC<Readonly<RequestCloseMilestone
 									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
 										Número OT:
 									</Text>
-									<Text className="mb-[12px] text-[16px] leading-none text-blue-600 font-bold">
+									<Text className="mb-[12px] text-[16px] leading-none font-bold text-blue-600">
 										{milestone.workOrder.otNumber}
 									</Text>
 								</Column>

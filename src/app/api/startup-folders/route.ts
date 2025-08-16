@@ -157,81 +157,93 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 		// Función para obtener estadísticas de documentos por carpeta específica
 		const getDocumentStatsByFolder = async (folderId: string, documentType: string) => {
-			let stats: { status: string; _count: { id: number } }[] = []
-
 			switch (documentType) {
 				case "basic":
-					stats = await prisma.basicDocument.groupBy({
+					return await prisma.basicDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
 				case "safety":
-					stats = await prisma.safetyAndHealthDocument.groupBy({
+					return await prisma.safetyAndHealthDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
 				case "environmental":
-					stats = await prisma.environmentalDocument.groupBy({
+					return await prisma.environmentalDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
 				case "environment":
-					stats = await prisma.environmentDocument.groupBy({
+					return await prisma.environmentDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
 				case "techSpecs":
-					stats = await prisma.techSpecsDocument.groupBy({
+					return await prisma.techSpecsDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
 				case "worker":
-					stats = await prisma.workerDocument.groupBy({
+					return await prisma.workerDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
 				case "vehicle":
-					stats = await prisma.vehicleDocument.groupBy({
+					return await prisma.vehicleDocument.groupBy({
 						by: ["status"],
 						where: {
 							folderId: folderId,
 						},
 						_count: { id: true },
+						orderBy: {
+							status: "asc",
+						},
 					})
-					break
+				default:
+					return []
 			}
-
-			return stats
 		}
 
 		const getStatusCount = (
 			stats: { status: string; _count: { id: number } }[],
 			status: string
-		) => {
+		): number => {
 			return stats.find((s) => s.status === status)?._count?.id || 0
 		}
 

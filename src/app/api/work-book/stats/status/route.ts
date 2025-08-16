@@ -18,14 +18,8 @@ export async function GET(): Promise<NextResponse> {
 	try {
 		const workBookStats = await prisma.workOrder.groupBy({
 			by: ["status"],
-			where: {
-				isWorkBook: true,
-			},
 			_count: {
 				_all: true,
-			},
-			cacheStrategy: {
-				ttl: 10,
 			},
 		})
 

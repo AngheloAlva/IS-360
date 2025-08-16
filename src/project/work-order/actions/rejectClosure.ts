@@ -83,7 +83,7 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 			metadata: {
 				status: updatedWorkOrder.status,
 				otNumber: workOrder.otNumber,
-				workName: workOrder.workName,
+				workBookName: workOrder.workBookName,
 				reason,
 				workEntryId: workEntry.id,
 				workEntryComments: workEntry.comments,
@@ -100,7 +100,7 @@ export async function rejectClosure({ userId, workBookId, reason }: RejectClosur
 				rejectionReason: reason,
 				supervisorName: user.name,
 				workOrderNumber: workOrder.otNumber,
-				workOrderName: workOrder.workName || "",
+				workOrderName: workOrder.workBookName || "",
 				email: workOrder.closureRequestedBy.email,
 				companyName: workOrder?.company?.name || "Interno",
 			})

@@ -17,22 +17,13 @@ export async function GET() {
 
 	try {
 		// 1. Total count of equipment
-		const totalEquipment = await prisma.equipment.count({
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
-		})
+		const totalEquipment = await prisma.equipment.count({})
 
 		// 2. Equipment by operational status
 		const equipmentByStatus = await prisma.equipment.groupBy({
 			by: ["isOperational"],
 			_count: {
 				id: true,
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 
@@ -48,10 +39,6 @@ export async function GET() {
 				},
 			},
 			take: 5, // Limit to top 5 types
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		// 4. Equipment by criticality
@@ -60,10 +47,6 @@ export async function GET() {
 			_count: {
 				id: true,
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		// 5. Work orders by status
@@ -71,10 +54,6 @@ export async function GET() {
 			by: ["status"],
 			_count: {
 				id: true,
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 
@@ -96,20 +75,12 @@ export async function GET() {
 				},
 			},
 			take: 5,
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		// 7. Equipment hierarchy distribution (count of equipment at each level)
 		const parentEquipmentCount = await prisma.equipment.count({
 			where: {
 				parentId: null,
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 
@@ -118,10 +89,6 @@ export async function GET() {
 				NOT: {
 					parentId: null,
 				},
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 
@@ -139,7 +106,7 @@ export async function GET() {
 				id: true,
 				status: true,
 				createdAt: true,
-				equipment: {
+				equipments: {
 					select: {
 						id: true,
 						name: true,
@@ -149,10 +116,6 @@ export async function GET() {
 			},
 			orderBy: {
 				createdAt: "asc",
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 

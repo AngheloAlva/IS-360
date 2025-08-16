@@ -55,17 +55,17 @@ export default function NewWorkBookForm({
 	const form = useForm<WorkBookSchema>({
 		resolver: zodResolver(workBookSchema),
 		defaultValues: {
-			workName: "",
+			workBookName: "",
 			userId: userId,
 			workOrderId: "",
-			workLocation: "",
-			workStartDate: new Date(),
+			workBookLocation: "",
+			workBookStartDate: new Date(),
 		},
 	})
 
 	useEffect(() => {
 		navigator.geolocation.getCurrentPosition((position) => {
-			form.setValue("workLocation", `${position.coords.latitude},${position.coords.longitude}`)
+			form.setValue("workBookLocation", `${position.coords.latitude},${position.coords.longitude}`)
 		})
 	}, [form])
 
@@ -249,14 +249,14 @@ export default function NewWorkBookForm({
 						</div>
 
 						<InputFormField<WorkBookSchema>
-							name="workName"
+							name="workBookName"
 							control={form.control}
 							label="Nombre de la Obra"
 							placeholder="Nombre de la obra"
 						/>
 
 						<DatePickerFormField<WorkBookSchema>
-							name="workStartDate"
+							name="workBookStartDate"
 							control={form.control}
 							label="Fecha de Inicio"
 						/>

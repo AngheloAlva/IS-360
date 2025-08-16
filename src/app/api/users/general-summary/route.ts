@@ -13,13 +13,7 @@ export async function GET(): Promise<NextResponse> {
 	}
 
 	try {
-
-		const totalUsers = await prisma.user.count({
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
-		})
+		const totalUsers = await prisma.user.count({})
 
 		return NextResponse.json({
 			totalUsers,

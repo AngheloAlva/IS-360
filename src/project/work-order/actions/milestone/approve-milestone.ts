@@ -45,7 +45,7 @@ export async function approveMilestone({
 					select: {
 						id: true,
 						otNumber: true,
-						workProgressStatus: true,
+						progress: true,
 						responsible: {
 							select: {
 								email: true,
@@ -85,7 +85,7 @@ export async function approveMilestone({
 		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: milestone.workOrder.id },
 			data: {
-				workProgressStatus: (milestone.workOrder.workProgressStatus || 0) + milestone.weight,
+				progress: (milestone.workOrder.progress || 0) + milestone.weight,
 			},
 		})
 
@@ -100,7 +100,7 @@ export async function approveMilestone({
 				weight: milestone.weight,
 				workOrderId: milestone.workOrder.id,
 				otNumber: milestone.workOrder.otNumber,
-				workProgressStatus: updatedWorkOrder.workProgressStatus,
+				progress: updatedWorkOrder.progress,
 				closureComment,
 				status: updatedMilestone.status,
 				approvedAt: updatedMilestone.approvedAt,
@@ -152,7 +152,7 @@ export async function rejectMilestone({
 					select: {
 						id: true,
 						otNumber: true,
-						workProgressStatus: true,
+						progress: true,
 						responsible: {
 							select: {
 								email: true,
@@ -192,7 +192,7 @@ export async function rejectMilestone({
 		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: milestone.workOrder.id },
 			data: {
-				workProgressStatus: milestone.workOrder.workProgressStatus! - milestone.weight,
+				progress: milestone.workOrder.progress! - milestone.weight,
 			},
 		})
 
@@ -207,7 +207,7 @@ export async function rejectMilestone({
 				weight: milestone.weight,
 				workOrderId: milestone.workOrder.id,
 				otNumber: milestone.workOrder.otNumber,
-				workProgressStatus: updatedWorkOrder.workProgressStatus,
+				progress: updatedWorkOrder.progress,
 				closureComment,
 				status: updatedMilestone.status,
 				approvedAt: updatedMilestone.approvedAt,

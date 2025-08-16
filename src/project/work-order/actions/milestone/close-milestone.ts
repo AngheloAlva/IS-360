@@ -43,9 +43,9 @@ export async function requestCloseMilestone({
 				workOrder: {
 					select: {
 						otNumber: true,
-						workName: true,
+						workBookName: true,
 						workDescription: true,
-						workProgressStatus: true,
+						progress: true,
 						responsible: {
 							select: {
 								email: true,
@@ -88,9 +88,9 @@ export async function requestCloseMilestone({
 				description: milestone.description,
 				workOrderId: milestone.workOrderId,
 				otNumber: milestone.workOrder.otNumber,
-				workName: milestone.workOrder.workName,
+				workBookName: milestone.workOrder.workBookName,
 				workDescription: milestone.workOrder.workDescription,
-				workProgressStatus: milestone.workOrder.workProgressStatus,
+				progress: milestone.workOrder.progress,
 				status: updatedMilestone.status,
 				isCompleted: updatedMilestone.isCompleted,
 			},

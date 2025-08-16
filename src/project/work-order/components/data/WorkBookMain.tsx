@@ -92,7 +92,7 @@ export default function WorkBookMain({
 	const canAddActivities =
 		workBook.status === WORK_ORDER_STATUS.IN_PROGRESS ||
 		workBook.status === WORK_ORDER_STATUS.PLANNED
-	const canRequestClosure = hassWorkBookPermission || workBook.workProgressStatus === 100
+	const canRequestClosure = hassWorkBookPermission || workBook.progress === 100
 
 	return (
 		<>
@@ -109,7 +109,7 @@ export default function WorkBookMain({
 
 					<div>
 						<h1 className="text-2xl font-bold">
-							{workBook.workName || "Libro de Obras no creado"}
+							{workBook.workBookName || "Libro de Obras no creado"}
 						</h1>
 						<p className="text-feature text-base font-bold">{workBook.otNumber}</p>
 					</div>
@@ -122,15 +122,13 @@ export default function WorkBookMain({
 
 					<div className="flex items-center justify-between gap-2">
 						<span className="text-sm font-medium">Progreso del trabajo:</span>
-						<span className="text-sm font-bold">{workBook.workProgressStatus || 0}%</span>
+						<span className="text-sm font-bold">{workBook.progress || 0}%</span>
 					</div>
 					<Progress
-						value={workBook.workProgressStatus || 0}
+						value={workBook.progress || 0}
 						className="h-2 bg-white/40"
 						indicatorClassName={`bg-white ${
-							workBook.workProgressStatus && workBook.workProgressStatus > 50
-								? "bg-green-500"
-								: "bg-yellow-500"
+							workBook.progress && workBook.progress > 50 ? "bg-green-500" : "bg-yellow-500"
 						}`}
 					/>
 				</div>
@@ -160,7 +158,7 @@ export default function WorkBookMain({
 							canRequestClosure={canRequestClosure}
 							responsibleId={workBook.responsibleId}
 							hassWorkBookPermission={hassWorkBookPermission}
-							workOrderStartDate={subDays(workBook.workStartDate || new Date(), 1)}
+							workOrderStartDate={subDays(workBook.workBookStartDate || new Date(), 1)}
 						/>
 					</TabsContent>
 

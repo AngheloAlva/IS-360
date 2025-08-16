@@ -63,12 +63,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					supervisionComments: true,
 					safetyObservations: true,
 					nonConformities: true,
-					inspectorName: true,
-					recommendations: true,
-					others: true,
 					inspectionStatus: true,
-					noteStatus: true,
-					approvalDate: true,
 					createdBy: {
 						select: {
 							id: true,
@@ -83,7 +78,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					workOrder: {
 						select: {
 							id: true,
-							workName: true,
+							workBookName: true,
 							status: true,
 						},
 					},
@@ -110,10 +105,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				orderBy: {
 					createdAt: "desc",
 				},
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
-				},
 			}),
 			prisma.workEntry.count({
 				where: {
@@ -129,10 +120,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 								],
 							}
 						: {}),
-				},
-				cacheStrategy: {
-					ttl: 10,
-					swr: 10,
 				},
 			}),
 			prisma.milestone.findMany({

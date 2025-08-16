@@ -40,14 +40,14 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 		header: "Responsable de OTC",
 	},
 	{
-		accessorKey: "workName",
+		accessorKey: "workBookName",
 		header: "Nombre de obra",
 	},
 	{
-		accessorKey: "workStartDate",
+		accessorKey: "workBookStartDate",
 		header: "Fecha de inicio",
 		cell: ({ row }) => {
-			const date = row.getValue("workStartDate") as Date | null
+			const date = row.getValue("workBookStartDate") as Date | null
 			const formattedDate = date ? format(date, "dd/MM/yyyy") : "No iniciada"
 			return <div>{formattedDate}</div>
 		},
@@ -86,10 +86,10 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 		},
 	},
 	{
-		accessorKey: "workProgressStatus",
+		accessorKey: "progress",
 		header: "Estado de avance",
 		cell: ({ row }) => {
-			const status = row.getValue("workProgressStatus") as number
+			const status = row.getValue("progress") as number
 			return <Progress value={status} />
 		},
 	},
@@ -108,7 +108,7 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 		},
 	},
 	{
-		accessorKey: "workLocation",
+		accessorKey: "workBookLocation",
 		header: "Ubicación",
 	},
 	{

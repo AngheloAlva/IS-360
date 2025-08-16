@@ -53,9 +53,6 @@ export async function GET(request: NextRequest) {
 			orderBy: {
 				name: "asc",
 			},
-			cacheStrategy: {
-				ttl: 10,
-			},
 		})
 
 		const files = await prisma.file.findMany({
@@ -72,9 +69,6 @@ export async function GET(request: NextRequest) {
 			},
 			orderBy: {
 				name: "asc",
-			},
-			cacheStrategy: {
-				ttl: 10,
 			},
 		})
 

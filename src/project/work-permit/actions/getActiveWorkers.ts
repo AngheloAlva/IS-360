@@ -24,9 +24,6 @@ export async function getActiveWorkers() {
 				otNumber: true,
 				user: true,
 			},
-			cacheStrategy: {
-				ttl: 10,
-			},
 		})
 
 		return { activeWorkers }

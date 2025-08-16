@@ -15,7 +15,7 @@ export interface WorkBookById extends WorkOrder {
 			name: string
 		}[]
 	}[]
-	workEntries: {
+	workBookEntries: {
 		include: {
 			createdBy: true
 			assignedUsers: true

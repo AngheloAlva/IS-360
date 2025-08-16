@@ -143,7 +143,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					"Estado": WorkOrderStatusLabels[workOrder.status],
 					"Trabajo": workOrder.workRequest,
 					"Prioridad": WorkOrderPriorityLabels[workOrder.priority],
-					"Porcentaje de avance": workOrder.workProgressStatus,
+					"Porcentaje de avance": workOrder.progress,
 					"Fecha programada": format(workOrder.programDate, "dd/MM/yyyy", { locale: es }),
 					"Fecha estimada de finalización": workOrder.estimatedEndDate
 						? format(workOrder.estimatedEndDate, "dd/MM/yyyy", { locale: es })
@@ -151,7 +151,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 					"Empresa": workOrder.company?.name,
 					"Supervisor": workOrder.supervisor?.name + " " + workOrder.supervisor?.email,
 					"Equipos": workOrder.equipments?.map((equipment) => equipment.name).join(", "),
-					"Cantidad de actividades": workOrder._count.workEntries,
+					"Cantidad de actividades": workOrder._count.workBookEntries,
 				}))
 			)
 

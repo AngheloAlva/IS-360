@@ -179,11 +179,11 @@ export default function WorkOrderDetailsDialog({
 									)}
 								</Badge>
 								<span className="text-muted-foreground text-sm">
-									{data?.workProgressStatus || 0}% completado
+									{data?.progress || 0}% completado
 								</span>
 							</div>
 							<Progress
-								value={data?.workProgressStatus || 0}
+								value={data?.progress || 0}
 								className="h-2 bg-orange-600/10"
 								indicatorClassName="bg-orange-600"
 							/>
@@ -361,7 +361,7 @@ export default function WorkOrderDetailsDialog({
 								<DialogLabel
 									isLoading={isLoading}
 									label="Actividades Realizadas"
-									value={data?._count.workEntries}
+									value={data?._count.workBookEntries}
 									icon={<ClipboardIcon className="size-4" />}
 								/>
 							</div>

@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 
-import { WORK_REQUEST_STATUS, WORK_TYPE } from "@prisma/client"
+import { WORK_REQUEST_STATUS, WORK_REQUEST_TYPE } from "@prisma/client"
 
 import { DropdownMenuItem, DropdownMenuSeparator } from "@/shared/components/ui/dropdown-menu"
 import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
@@ -43,7 +43,7 @@ const statusText = (status: WORK_REQUEST_STATUS) => {
 	}
 }
 
-const workTypeText = (workType: WORK_TYPE) => {
+const workTypeText = (workType: WORK_REQUEST_TYPE) => {
 	switch (workType) {
 		case "ELECTRIC":
 			return "Eléctrico"
@@ -195,7 +195,7 @@ export const getWorkRequestColumns = ({
 		accessorKey: "workType",
 		header: "Tipo de trabajo",
 		cell: ({ row }) => {
-			const workType = row.getValue("workType") as WORK_TYPE
+			const workType = row.getValue("workType") as WORK_REQUEST_TYPE
 
 			return workTypeText(workType)
 		},

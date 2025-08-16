@@ -35,18 +35,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				orderBy: {
 					name: "desc",
 				},
-				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
-				},
 			}),
 			prisma.user.count({
 				where: {
 					companyId: process.env.NEXT_PUBLIC_OTC_COMPANY_ID,
-				},
-				cacheStrategy: {
-					ttl: 60,
-					swr: 10,
 				},
 			}),
 		])

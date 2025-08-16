@@ -115,7 +115,7 @@ export async function GET() {
 	const areaData = await Promise.all(
 		areas.map(async (area) => {
 			const count = await prisma.folder.findMany({
-				where: { area, isActive: true, isExternal: false },
+				where: { area, isActive: true },
 				include: {
 					_count: {
 						select: {
@@ -124,10 +124,6 @@ export async function GET() {
 							},
 						},
 					},
-				},
-				cacheStrategy: {
-					ttl: 120,
-					swr: 10,
 				},
 			})
 
@@ -143,8 +139,7 @@ export async function GET() {
 	// Get additional metrics
 	const totalFolders = await // Total folders
 	prisma.folder.count({
-		where: { isActive: true, isExternal: false },
-		cacheStrategy: { ttl: 120 },
+		where: { isActive: true },
 	})
 
 	// Get file type distribution
@@ -152,7 +147,6 @@ export async function GET() {
 		by: ["type"],
 		where: { isActive: true },
 		_count: { type: true },
-		cacheStrategy: { ttl: 120 },
 	})
 
 	// Get monthly upload trends (last 6 months)
@@ -170,7 +164,6 @@ export async function GET() {
 							lt: endDate,
 						},
 					},
-					cacheStrategy: { ttl: 120 },
 				})
 				.then((count) => ({
 					month: format(startDate, "MMM"),
@@ -202,7 +195,6 @@ export async function GET() {
 			},
 		},
 		take: 5,
-		cacheStrategy: { ttl: 120 },
 	})
 
 	// Get documents by expiration
@@ -222,10 +214,6 @@ export async function GET() {
 					lt: now,
 				},
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		}),
 		// Expires this week
 		prisma.file.count({
@@ -235,10 +223,6 @@ export async function GET() {
 					gte: now,
 					lt: nextWeek,
 				},
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		}),
 		// Expires in 8-15 days
@@ -250,10 +234,6 @@ export async function GET() {
 					lt: next15Days,
 				},
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		}),
 		// Expires in 16-30 days
 		prisma.file.count({
@@ -263,10 +243,6 @@ export async function GET() {
 					gte: next15Days,
 					lt: next30Days,
 				},
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		}),
 		// Expires in 31-60 days
@@ -278,10 +254,6 @@ export async function GET() {
 					lt: next60Days,
 				},
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		}),
 		// Expires in 61-90 days
 		prisma.file.count({
@@ -292,10 +264,6 @@ export async function GET() {
 					lt: next90Days,
 				},
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		}),
 		// Expires after 90 days
 		prisma.file.count({
@@ -304,10 +272,6 @@ export async function GET() {
 				expirationDate: {
 					gte: next90Days,
 				},
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		}),
 	])
@@ -326,10 +290,6 @@ export async function GET() {
 			files: {
 				some: {},
 			},
-		},
-		cacheStrategy: {
-			ttl: 120,
-			swr: 10,
 		},
 	})
 
@@ -375,10 +335,6 @@ export async function GET() {
 				},
 			},
 		},
-		cacheStrategy: {
-			ttl: 120,
-			swr: 10,
-		},
 	})
 
 	// Get last 15 days for changes per day
@@ -401,7 +357,6 @@ export async function GET() {
 							},
 							isActive: true,
 						},
-						cacheStrategy: { ttl: 120 },
 					}),
 					// Folders created on this day
 					prisma.folder.count({
@@ -412,7 +367,6 @@ export async function GET() {
 							},
 							isActive: true,
 						},
-						cacheStrategy: { ttl: 120 },
 					}),
 				])
 
@@ -433,7 +387,6 @@ export async function GET() {
 							lt: addDays(new Date(date), 1),
 						},
 					},
-					cacheStrategy: { ttl: 120 },
 				})
 				return { date, changes: count }
 			})

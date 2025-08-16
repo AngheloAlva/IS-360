@@ -6,7 +6,7 @@ export interface WorkPermit {
 	id: string
 	otNumber?: {
 		otNumber: string
-		workName: string
+		workBookName: string
 		workRequest: string
 		workDescription: string
 	}

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { format } from "date-fns"
 
-import { USER_ROLE } from "@prisma/client"
+import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -17,10 +17,10 @@ export async function GET(): Promise<NextResponse> {
 
 	try {
 		// Estadísticas básicas
-		const [totalUsers, twoFactorEnabled, totalContractors, totalSupervisors] = await Promise.all([
+		const [totalUsers, twoFactorEnabled, totalContractors] = await Promise.all([
 			prisma.user.count({
 				where: {
-					accessRole: USER_ROLE.ADMIN,
+					accessRole: ACCESS_ROLE.ADMIN,
 					isActive: true,
 				},
 			}),
@@ -28,19 +28,13 @@ export async function GET(): Promise<NextResponse> {
 				where: {
 					isActive: true,
 					twoFactorEnabled: true,
-					accessRole: USER_ROLE.ADMIN,
+					accessRole: ACCESS_ROLE.ADMIN,
 				},
 			}),
 			prisma.user.count({
 				where: {
 					isActive: true,
-					accessRole: USER_ROLE.PARTNER_COMPANY,
-				},
-			}),
-			prisma.user.count({
-				where: {
-					isActive: true,
-					accessRole: USER_ROLE.SUPERVISOR,
+					accessRole: ACCESS_ROLE.PARTNER_COMPANY,
 				},
 			}),
 		])
@@ -122,7 +116,7 @@ export async function GET(): Promise<NextResponse> {
 				totalUsers,
 				twoFactorEnabled,
 				totalContractors,
-				totalSupervisors,
+				totalSupervisors: 0,
 			},
 			charts: {
 				topUsersByWorkOrders: formattedTopUsers,

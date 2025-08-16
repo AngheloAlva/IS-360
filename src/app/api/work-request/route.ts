@@ -88,15 +88,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				},
 				skip,
 				take: limit,
-				cacheStrategy: {
-					ttl: 10,
-				},
 			}),
 			prisma.workRequest.count({
 				where,
-				cacheStrategy: {
-					ttl: 15,
-				},
 			}),
 		])
 

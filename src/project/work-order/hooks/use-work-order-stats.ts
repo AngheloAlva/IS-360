@@ -25,8 +25,8 @@ interface RecentWorkOrder {
 	status: string
 	priority: string
 	createdAt: string
-	workName: string | null
-	workProgressStatus: number | null
+	workBookName: string | null
+	progress: number | null
 	company: {
 		name: string
 	} | null

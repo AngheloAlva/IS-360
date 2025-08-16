@@ -138,7 +138,6 @@ export const createMaintenancePlanTask = async ({
 				maintenancePlanId: maintenancePlan.id,
 				equipmentId: values.equipmentId || maintenancePlan.equipment.id,
 				nextDate: values.nextDate.toISOString(),
-				hasAttachments: attachments.length > 0,
 				slug: taskSlug,
 			},
 		})

@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma"
 import { resend } from "@/lib/resend"
 
 import InspectionCommentNotificationEmail from "@/project/work-order/components/emails/InspectionCommentNotificationEmail"
-import { USER_ROLE } from "@prisma/client"
+import { ACCESS_ROLE } from "@prisma/client"
 
 interface SendInspectionCommentNotificationProps {
 	commentId: string
@@ -59,8 +59,8 @@ export const sendInspectionCommentNotification = async ({
 					select: {
 						id: true,
 						otNumber: true,
-						workName: true,
-						workLocation: true,
+						workBookName: true,
+						workBookLocation: true,
 						responsible: {
 							select: {
 								name: true,
@@ -134,8 +134,8 @@ export const sendInspectionCommentNotification = async ({
 				recipients.set(author.email, {
 					name: author.name,
 					email: author.email,
-					isInternal: author.accessRole === USER_ROLE.ADMIN ? true : false,
-					role: author.accessRole === USER_ROLE.ADMIN ? "responsible" : "supervisor",
+					isInternal: author.accessRole === ACCESS_ROLE.ADMIN ? true : false,
+					role: author.accessRole === ACCESS_ROLE.ADMIN ? "responsible" : "supervisor",
 				})
 			}
 		})
@@ -151,7 +151,6 @@ export const sendInspectionCommentNotification = async ({
 				name: comment.author.name,
 				email: comment.author.email,
 			},
-			hasAttachments: comment.attachments.length > 0,
 			attachmentCount: comment.attachments.length,
 		}
 
@@ -168,8 +167,8 @@ export const sendInspectionCommentNotification = async ({
 		const workOrderData = {
 			id: workEntry.workOrder.id,
 			otNumber: workEntry.workOrder.otNumber,
-			workName: workEntry.workOrder.workName || undefined,
-			workLocation: workEntry.workOrder.workLocation || undefined,
+			workBookName: workEntry.workOrder.workBookName || undefined,
+			workBookLocation: workEntry.workOrder.workBookLocation || undefined,
 			responsible: {
 				name: workEntry.workOrder.responsible.name,
 			},

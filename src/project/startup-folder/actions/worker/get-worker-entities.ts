@@ -1,6 +1,6 @@
 "use server"
 
-import { ReviewStatus, USER_ROLE } from "@prisma/client"
+import { ReviewStatus, ACCESS_ROLE } from "@prisma/client"
 import prisma from "@/lib/prisma"
 
 interface GetCompanyEntitiesParams {
@@ -35,7 +35,7 @@ export const getWorkerEntities = async ({
 						worker: {
 							companyId,
 							isActive: true,
-							accessRole: USER_ROLE.PARTNER_COMPANY,
+							accessRole: ACCESS_ROLE.PARTNER_COMPANY,
 						},
 					},
 					select: {
@@ -61,7 +61,7 @@ export const getWorkerEntities = async ({
 			where: {
 				companyId,
 				isActive: true,
-				accessRole: USER_ROLE.PARTNER_COMPANY,
+				accessRole: ACCESS_ROLE.PARTNER_COMPANY,
 				NOT: {
 					id: {
 						in: vinculatedUsers?.workersFolders.map((wf) => wf.worker.id),

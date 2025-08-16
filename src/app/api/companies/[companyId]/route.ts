@@ -29,9 +29,6 @@ export async function GET(
 				name: true,
 				image: true,
 			},
-			cacheStrategy: {
-				ttl: 10,
-			},
 		})
 
 		return NextResponse.json({

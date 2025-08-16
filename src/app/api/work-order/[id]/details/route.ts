@@ -35,7 +35,7 @@ export async function GET(
 				solicitationTime: true,
 				workRequest: true,
 				workDescription: true,
-				workProgressStatus: true,
+				progress: true,
 				priority: true,
 				createdAt: true,
 				programDate: true,
@@ -54,7 +54,7 @@ export async function GET(
 						name: true,
 					},
 				},
-				equipment: {
+				equipments: {
 					select: {
 						id: true,
 						name: true,
@@ -81,7 +81,7 @@ export async function GET(
 				},
 				_count: {
 					select: {
-						workEntries: {
+						workBookEntries: {
 							where: {
 								entryType: { in: ["ADDITIONAL_ACTIVITY", "DAILY_ACTIVITY"] },
 							},

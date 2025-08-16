@@ -8,18 +8,18 @@
     "start": "next start",
     "lint": "next lint",
     "migrate:dev": "pnpm dotenv -e .env.local -- prisma migrate dev",
+    "prisma:reset": "pnpm dotenv -e .env.local -- prisma migrate reset",
     "db:push": "pnpm dotenv -e .env.local -- prisma db push",
     "db:seed": "pnpm dotenv -e .env.local -- ts-node ./prisma/seed/seed.ts",
-    "prisma:generate": "pnpm dotenv -e .env.local -- prisma generate --no-engine",
+    "prisma:generate": "pnpm dotenv -e .env.local -- prisma generate",
     "prisma:studio": "pnpm dotenv -e .env.local -- prisma studio",
-    "production:build": "pnpm prisma generate --no-engine && next build"
+    "production:build": "pnpm prisma generate && next build"
   },
   "dependencies": {
     "@azure/identity": "^4.10.1",
     "@azure/storage-blob": "^12.27.0",
     "@hookform/resolvers": "5.1.1",
-    "@prisma/client": "6.12.0",
-    "@prisma/extension-accelerate": "1.3.0",
+    "@prisma/client": "6.14.0",
     "@radix-ui/react-hover-card": "^1.1.14",
     "@radix-ui/react-slider": "^1.3.5",
     "@radix-ui/react-slot": "^1.2.3",
@@ -75,7 +75,7 @@
     "eslint-plugin-react-hooks": "5.2.0",
     "prettier": "3.5.3",
     "prettier-plugin-tailwindcss": "0.6.13",
-    "prisma": "6.6.0",
+    "prisma": "6.14.0",
     "tailwindcss": "4.1.11",
     "tsx": "4.20.3",
     "typescript": "5.8.3"

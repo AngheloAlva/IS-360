@@ -23,7 +23,7 @@ interface NewWorkOrderEmailProps {
 		otNumber: string
 		type: string
 		priority: string
-		equipment: {
+		equipments: {
 			name: string
 		}[]
 		programDate: Date
@@ -152,13 +152,13 @@ const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
 									</Column>
 								</Row>
 
-								{workOrder.equipment && workOrder.equipment.length > 0 && (
+								{workOrder.equipments && workOrder.equipments.length > 0 && (
 									<Row className="mb-[12px]">
 										<Column>
 											<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
 												Equipos Involucrados:
 											</Text>
-											{workOrder.equipment.map((eq, index) => (
+											{workOrder.equipments.map((eq, index) => (
 												<Text
 													key={index}
 													className="mb-[4px] text-[14px] leading-none text-gray-600"

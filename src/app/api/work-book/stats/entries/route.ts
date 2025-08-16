@@ -27,9 +27,6 @@ export async function GET(): Promise<NextResponse> {
 
 		const workEntries = await prisma.workEntry.findMany({
 			where: {
-				workOrder: {
-					isWorkBook: true,
-				},
 				createdAt: {
 					gte: sixMonthsAgo,
 				},
@@ -37,9 +34,6 @@ export async function GET(): Promise<NextResponse> {
 			select: {
 				entryType: true,
 				createdAt: true,
-			},
-			cacheStrategy: {
-				ttl: 10,
 			},
 		})
 

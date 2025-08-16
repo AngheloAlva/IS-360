@@ -32,7 +32,7 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 				id: true,
 				status: true,
 				otNumber: true,
-				workName: true,
+				workBookName: true,
 				closureRequestedBy: {
 					select: {
 						id: true,
@@ -74,7 +74,7 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 				id: true,
 				status: true,
 				otNumber: true,
-				workName: true,
+				workBookName: true,
 				closureApprovedById: true,
 				closureApprovedAt: true,
 			},
@@ -105,7 +105,7 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 			metadata: {
 				status: updatedWorkOrder.status,
 				otNumber: updatedWorkOrder.otNumber,
-				workName: updatedWorkOrder.workName,
+				workBookName: updatedWorkOrder.workBookName,
 				closureApprovedById: updatedWorkOrder.closureApprovedById,
 				closureApprovedAt: updatedWorkOrder.closureApprovedAt,
 				workEntryId: workEntry.id,
@@ -119,7 +119,7 @@ export async function approveWorkBookClosure({ userId, workBookId }: ApproveWork
 			await sendApproveClosureEmail({
 				supervisorName: session.user.name,
 				workOrderNumber: workOrder.otNumber,
-				workOrderName: workOrder.workName || "",
+				workOrderName: workOrder.workBookName || "",
 				email: workOrder.closureRequestedBy.email,
 				companyName: workOrder?.company?.name || "Interno",
 			})

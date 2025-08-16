@@ -3,16 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-enum USER_ROLE {
-  USER
+enum ACCESS_ROLE {
   ADMIN
-  OPERATOR
-  SUPERVISOR
   PARTNER_COMPANY
 }
 
@@ -52,7 +48,7 @@ enum MODULES {
 }
 
 model User {
-  id               String    @id
+  id               String      @id
   name             String
   email            String
   emailVerified    Boolean
@@ -60,9 +56,8 @@ model User {
   phone            String?
   createdAt        DateTime
   updatedAt        DateTime
-  modules          MODULES[]
-  role             String?
-  accessRole       USER_ROLE @default(PARTNER_COMPANY)
+  role             String
+  accessRole       ACCESS_ROLE @default(PARTNER_COMPANY)
   internalRole     String?
   area             AREAS?
   banned           Boolean?
@@ -70,16 +65,14 @@ model User {
   banExpires       DateTime?
   rut              String
   twoFactorEnabled Boolean?
-  internal         Boolean   @default(false)
-  documentAreas    AREAS[]   @default([])
+  documentAreas    AREAS[]     @default([])
   internalArea     String?
-  isActive         Boolean   @default(true)
+  isActive         Boolean     @default(true)
 
   sessions                        Session[]
   accounts                        Account[]
   files                           File[]
   folders                         Folder[]
-  workTrackers                    WorkTracker[]
   safetyTalks                     UserSafetyTalk[]
   safetyTalkAttempts              SafetyTalkAttempt[]
   safetyTalkApproval              UserSafetyTalk[]          @relation("UserSafetyTalkApproval")
@@ -93,8 +86,6 @@ model User {
   approvedClosures                WorkOrder[]               @relation("WorkOrderClosureApprover")
   assignedEntries                 WorkEntry[]               @relation("AssignedUsers")
   createdEntries                  WorkEntry[]               @relation("WorkEntryCreator")
-  signedEntries                   WorkEntry[]               @relation("WorkEntrySigner")
-  workEntries                     WorkEntry[]               @relation("WorkEntryApproval")
   notifications                   Notification[]
   workPermitsAsParticipant        WorkPermit[]              @relation("WorkPermitParticipants")
   workPermitsAsPreventionOfficer  WorkPermit[]              @relation("PreventionOfficer")
@@ -170,13 +161,6 @@ model Notification {
   @@map("notification")
 }
 
-model RutCounter {
-  id    String @id @default("rut_counter")
-  value Int    @default(1)
-
-  @@map("rut_counter")
-}
-
 model TwoFactor {
   id          String
   secret      String?
@@ -232,8 +216,8 @@ model Company {
   image    String?
   isActive Boolean @default(true)
 
-  createdBy      User?           @relation("CompanyCreatedBy", fields: [createdById], references: [id])
-  createdById    String?
+  createdBy      User            @relation("CompanyCreatedBy", fields: [createdById], references: [id])
+  createdById    String
   users          User[]
   workOrders     WorkOrder[]
   workPermits    WorkPermit[]
@@ -276,23 +260,13 @@ model Vehicle {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company         Company         @relation(fields: [companyId], references: [id])
-  companyId       String
-  workPermits     WorkPermit[]
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+
   vehiclesFolders VehicleFolder[]
 
+  @@index([companyId], name: "vehicle_company_id_idx")
   @@map("vehicle")
-}
-
-model Verification {
-  id         String    @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
-
-  @@map("verification")
 }
 
 enum WORK_ORDER_STATUS {
@@ -324,37 +298,27 @@ enum WORK_ORDER_PRIORITY {
 }
 
 model WorkOrder {
-  id       String @id @default(cuid())
-  otNumber String
-
-  type                  WORK_ORDER_TYPE
-  status                WORK_ORDER_STATUS          @default(PLANNED)
-  solicitationDate      DateTime
-  solicitationTime      String
-  workRequest           String
-  workDescription       String?
-  priority              WORK_ORDER_PRIORITY
-  capex                 WORK_ORDER_CAPEX?
-  equipment             Equipment[]
-  programDate           DateTime
-  estimatedHours        Float
-  estimatedDays         Float
-  requiresBreak         Boolean
-  breakDays             Int?
-  estimatedEndDate      DateTime?
-  location              MAINTENANCE_PLAN_LOCATION?
-  isWorkBook            Boolean
-  isWorkBookInit        Boolean                    @default(false)
-  isInternalResponsible Boolean                    @default(false)
-  canUpdateMilestone    Boolean                    @default(false)
-  isMilestonesApproved  Boolean                    @default(true)
-
-  // Work book data
-  workName           String?
-  workLocation       String?
-  workStartDate      DateTime?
-  workProgressStatus Float?      @default(0)
-  workEntries        WorkEntry[]
+  id                String              @id @default(cuid())
+  otNumber          String
+  type              WORK_ORDER_TYPE
+  status            WORK_ORDER_STATUS   @default(PLANNED)
+  progress          Float?              @default(0)
+  solicitationDate  DateTime
+  solicitationTime  String
+  workRequest       String
+  workDescription   String?
+  priority          WORK_ORDER_PRIORITY
+  capex             WORK_ORDER_CAPEX?
+  equipments        Equipment[]
+  programDate       DateTime
+  estimatedHours    Float
+  estimatedDays     Float
+  estimatedEndDate  DateTime
+  isWorkBookInit    Boolean             @default(false)
+  workBookName      String?
+  workBookLocation  String?
+  workBookStartDate DateTime?
+  workBookEntries   WorkEntry[]
 
   company               Company?             @relation(fields: [companyId], references: [id])
   companyId             String?
@@ -375,12 +339,10 @@ model WorkOrder {
   closureApprovedById   String?
   closureApprovedAt     DateTime?
   closureRejectedReason String?
-  workTrackers          WorkTracker[]
   equipmentHistory      EquipmentHistory[]
   MaintenancePlanTask   MaintenancePlanTask? @relation(fields: [maintenancePlanTaskId], references: [id])
   maintenancePlanTaskId String?
   milestones            Milestone[]
-  startupFolder         StartupFolder?
   workRequestId         String?
   workRequested         WorkRequest?         @relation(fields: [workRequestId], references: [id])
 
@@ -396,13 +358,10 @@ model WorkOrder {
 }
 
 enum MILESTONE_STATUS {
-  IN_APPROVAL
   PENDING
-  IN_PROGRESS
   COMPLETED
-  CANCELLED
+  IN_PROGRESS
   REQUESTED_CLOSURE
-  REJECTED_APPROVAL
 }
 
 model Milestone {
@@ -413,8 +372,8 @@ model Milestone {
   order          Int              @default(0)
   isCompleted    Boolean          @default(false)
   weight         Float
-  startDate      DateTime?
-  endDate        DateTime?
+  startDate      DateTime
+  endDate        DateTime
   approvedAt     DateTime?
   closureComment String?
 
@@ -455,17 +414,17 @@ model Equipment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  parent              Equipment?            @relation("EquipmentHierarchy", fields: [parentId], references: [id])
-  parentId            String?
-  children            Equipment[]           @relation("EquipmentHierarchy")
-  workOrders          WorkOrder[]
-  history             EquipmentHistory[]
-  MaintenancePlan     MaintenancePlan[]
-  MaintenancePlanTask MaintenancePlanTask[]
-  attachments         Attachment[]
-  createdBy           User?                 @relation("EquipmentCreatedBy", fields: [createdById], references: [id])
-  createdById         String?
-  workRequests        WorkRequest[]
+  parent               Equipment?            @relation("EquipmentHierarchy", fields: [parentId], references: [id])
+  parentId             String?
+  children             Equipment[]           @relation("EquipmentHierarchy")
+  workOrders           WorkOrder[]
+  history              EquipmentHistory[]
+  maintenancePlans     MaintenancePlan[]
+  maintenancePlanTasks MaintenancePlanTask[]
+  attachments          Attachment[]
+  createdBy            User?                 @relation("EquipmentCreatedBy", fields: [createdById], references: [id])
+  createdById          String?
+  workRequests         WorkRequest[]
 
   @@unique([id])
   @@unique([tag])
@@ -482,18 +441,10 @@ enum WORK_APPLICATION_STATUS {
 }
 
 enum ENTRY_TYPE {
+  COMMENT
+  OTC_INSPECTION
   DAILY_ACTIVITY
   ADDITIONAL_ACTIVITY
-  PREVENTION_AREA
-  OTC_INSPECTION
-  COMMENT
-  USER_NOTE
-}
-
-enum NOTE_STATUS {
-  PENDING
-  ACKNOWLEDGED
-  RESOLVED
 }
 
 enum INSPECTION_STATUS {
@@ -502,74 +453,35 @@ enum INSPECTION_STATUS {
 }
 
 model WorkEntry {
-  id                  String              @id @default(cuid())
+  id                  String             @id @default(cuid())
   entryType           ENTRY_TYPE
-  isFavorite          Boolean             @default(false)
-  hasAttachments      Boolean             @default(false)
-  executionDate       DateTime            @default(now())
+  executionDate       DateTime           @default(now())
   activityName        String?
   activityStartTime   String?
   activityEndTime     String?
   comments            String?
-  inspectionStatus    INSPECTION_STATUS?  @default(REPORTED)
+  inspectionStatus    INSPECTION_STATUS? @default(REPORTED)
   supervisionComments String?
   safetyObservations  String?
   nonConformities     String?
-  inspectorName       String?
-  recommendations     String?
-  others              String?
-  noteStatus          NOTE_STATUS?        @default(PENDING)
-  notificationSent    Boolean             @default(false)
-  acknowledgedAt      DateTime?
-  resolvedAt          DateTime?
-  approvalDate        DateTime?
-  approvalBy          User?               @relation("WorkEntryApproval", fields: [approvalById], references: [id])
-  approvalById        String?
-  createdAt           DateTime            @default(now())
-  createdBy           User                @relation("WorkEntryCreator", fields: [createdById], references: [id])
-  createdById         String
-  signedAt            DateTime?
-  signedBy            User?               @relation("WorkEntrySigner", fields: [signedById], references: [id])
-  signedById          String?
-  workOrder           WorkOrder           @relation(fields: [workOrderId], references: [id])
-  workOrderId         String
-  milestone           Milestone?          @relation(fields: [milestoneId], references: [id])
-  milestoneId         String?
-  assignedUsers       User[]              @relation(name: "AssignedUsers")
-  referencedEntry     WorkEntry?          @relation("EntryReferences", fields: [referencedEntryId], references: [id])
-  referencedEntryId   String?
-  referencedBy        WorkEntry[]         @relation("EntryReferences")
-  equipmentHistory    EquipmentHistory[]
-  attachments         Attachment[]
-  inspectionComments  InspectionComment[]
+  createdAt           DateTime           @default(now())
+
+  createdBy          User                @relation("WorkEntryCreator", fields: [createdById], references: [id])
+  createdById        String
+  workOrder          WorkOrder           @relation(fields: [workOrderId], references: [id])
+  workOrderId        String
+  milestone          Milestone?          @relation(fields: [milestoneId], references: [id])
+  milestoneId        String?
+  assignedUsers      User[]              @relation(name: "AssignedUsers")
+  equipmentHistory   EquipmentHistory[]
+  attachments        Attachment[]
+  inspectionComments InspectionComment[]
 
   @@unique([id])
   @@index([milestoneId])
   @@index([workOrderId, createdAt])
   @@index([workOrderId, entryType])
   @@map("work_book_entry")
-}
-
-model WorkTracker {
-  id String @id @default(cuid())
-
-  description     String
-  date            DateTime
-  dedicatedHours  Int
-  quantityPersons Int
-  location        String
-  status          String
-
-  user        User         @relation(fields: [userId], references: [id])
-  userId      String
-  attachments Attachment[]
-  otNumber    WorkOrder    @relation(fields: [otNumberId], references: [id])
-  otNumberId  String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("work_tracker")
 }
 
 model Attachment {
@@ -584,8 +496,6 @@ model Attachment {
 
   workEntry             WorkEntry?           @relation(fields: [workEntryId], references: [id])
   workEntryId           String?
-  workTracker           WorkTracker?         @relation(fields: [workTrackerId], references: [id])
-  workTrackerId         String?
   manualDocuments       WorkOrder[]          @relation("WorkOrderManualDocuments")
   initReport            WorkOrder?           @relation("WorkOrderInitReport")
   initReportId          String?              @unique
@@ -607,10 +517,7 @@ model Attachment {
 enum WORK_PERMIT_STATUS {
   ACTIVE
   REJECTED
-  IN_PROGRESS
   COMPLETED
-  CANCELLED
-  EXPIRED
   REVIEW_PENDING
 }
 
@@ -664,8 +571,6 @@ model WorkPermit {
   participants                   User[]                 @relation("WorkPermitParticipants")
   company                        Company                @relation(fields: [companyId], references: [id])
   companyId                      String
-  vehicles                       Vehicle[]
-  operatorWorker                 String?
   attachments                    WorkPermitAttachment[]
 
   @@map("work_permit")
@@ -691,19 +596,16 @@ model WorkPermitAttachment {
 }
 
 model Folder {
-  id   String @id @default(cuid())
-  slug String
-
+  id          String   @id @default(cuid())
+  slug        String
   name        String
   description String?
-  root        Boolean @default(false)
+  root        Boolean  @default(false)
   area        AREAS
-  type        String  @default("default")
-  isExternal  Boolean @default(false)
-  isActive    Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  type        String   @default("default")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   parent     Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
   parentId   String?
@@ -719,8 +621,7 @@ model Folder {
 }
 
 model File {
-  id String @id @default(cuid())
-
+  id               String    @id @default(cuid())
   code             String?
   name             String
   description      String?
@@ -731,11 +632,9 @@ model File {
   registrationDate DateTime
   expirationDate   DateTime?
   revisionCount    Int       @default(0)
-  isExternal       Boolean   @default(false)
   isActive         Boolean   @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   history  FileHistory[]
   folder   Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
@@ -750,8 +649,7 @@ model File {
 }
 
 model FileComment {
-  id String @id @default(cuid())
-
+  id      String  @id @default(cuid())
   title   String?
   content String
 
@@ -901,20 +799,13 @@ enum PLAN_FREQUENCY {
   YEARLY
 }
 
-enum MAINTENANCE_PLAN_LOCATION {
-  PRS
-  TRM
-  OTHER
-}
-
 model MaintenancePlan {
-  id          String                     @id @default(cuid())
-  slug        String                     @unique
+  id          String   @id @default(cuid())
+  slug        String   @unique
   name        String
   description String
-  location    MAINTENANCE_PLAN_LOCATION?
-  createdAt   DateTime                   @default(now())
-  updatedAt   DateTime                   @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   equipment   Equipment             @relation(fields: [equipmentId], references: [id])
   equipmentId String
@@ -926,16 +817,15 @@ model MaintenancePlan {
 }
 
 model MaintenancePlanTask {
-  id                       String                     @id @default(cuid())
-  slug                     String                     @unique
+  id                       String               @id @default(cuid())
+  slug                     String               @unique
   name                     String
   description              String?
   frequency                PLAN_FREQUENCY
   nextDate                 DateTime
-  createdAt                DateTime                   @default(now())
-  updatedAt                DateTime                   @updatedAt
-  location                 MAINTENANCE_PLAN_LOCATION?
-  isAutomated              Boolean                    @default(false)
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  isAutomated              Boolean              @default(false)
   automatedCompanyId       String?
   automatedSupervisorId    String?
   automatedWorkOrderType   WORK_ORDER_TYPE?
@@ -1113,10 +1003,6 @@ model StartupFolder {
   environmentalFolders   EnvironmentalFolder[]
   company                Company                 @relation(fields: [companyId], references: [id])
   companyId              String
-  workOrder              WorkOrder?              @relation(fields: [workOrderId], references: [id])
-  workOrderId            String?                 @unique
-  workerFolders          WorkerFolder[]          @relation("WorkerFolderStartupFolder")
-  vehicleFolders         VehicleFolder[]         @relation("VehicleFolderStartupFolder")
   environmentFolders     EnvironmentFolder[]
   basicFolders           BasicFolder[]
   techSpecsFolders       TechSpecsFolder[]
@@ -1263,7 +1149,6 @@ model WorkerFolder {
   startupFolderId String
   startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
   documents       WorkerDocument[]
-  startupFolders  StartupFolder[]  @relation("WorkerFolderStartupFolder")
 
   @@unique([workerId, startupFolderId])
   @@map("worker_folders")
@@ -1306,7 +1191,6 @@ model VehicleFolder {
   vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
   startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
   documents       VehicleDocument[]
-  startupFolders  StartupFolder[]   @relation("VehicleFolderStartupFolder")
 
   @@unique([vehicleId, startupFolderId])
   @@map("vehicle_folders")
@@ -1421,24 +1305,23 @@ enum WORK_REQUEST_STATUS {
   CANCELLED // Solicitud Cancelada
 }
 
-enum WORK_TYPE {
+enum WORK_REQUEST_TYPE {
   MECHANIC
   ELECTRIC
 }
 
 model WorkRequest {
-  id             String                     @id @default(cuid())
-  requestNumber  String                     @unique
+  id             String              @id @default(cuid())
+  requestNumber  String              @unique
   description    String
-  isUrgent       Boolean                    @default(false)
-  requestDate    DateTime                   @default(now())
+  isUrgent       Boolean             @default(false)
+  requestDate    DateTime            @default(now())
   observations   String?
   customLocation String?
-  location       MAINTENANCE_PLAN_LOCATION?
-  status         WORK_REQUEST_STATUS        @default(REPORTED)
+  status         WORK_REQUEST_STATUS @default(REPORTED)
   operatorId     String?
-  operator       User?                      @relation("WorkRequestOperator", fields: [operatorId], references: [id])
-  workType       WORK_TYPE?
+  operator       User?               @relation("WorkRequestOperator", fields: [operatorId], references: [id])
+  workType       WORK_REQUEST_TYPE?
 
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt

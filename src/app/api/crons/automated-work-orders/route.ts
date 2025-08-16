@@ -103,13 +103,11 @@ export async function GET(request: NextRequest) {
 						workDescription:
 							task.automatedWorkDescription || `Mantenimiento automático: ${task.name}`,
 						workRequest: task.name,
-						requiresBreak: false,
-						isWorkBook: true,
 						companyId: task.automatedCompanyId,
 						supervisorId: task.automatedSupervisorId!,
 						responsibleId: task.createdBy.id,
 						maintenancePlanTaskId: task.id,
-						equipment: {
+						equipments: {
 							connect: { id: task.equipment.id },
 						},
 					},

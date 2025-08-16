@@ -26,7 +26,7 @@ export async function GET(
 				otNumber: {
 					select: {
 						otNumber: true,
-						workName: true,
+						workBookName: true,
 					},
 				},
 				user: {
@@ -71,10 +71,6 @@ export async function GET(
 						},
 					},
 				},
-			},
-			cacheStrategy: {
-				ttl: 30,
-				swr: 30,
 			},
 		})
 

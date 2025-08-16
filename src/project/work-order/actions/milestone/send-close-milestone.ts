@@ -17,7 +17,7 @@ interface SendRequestCloseMilestoneEmailProps {
 		workOrderId: string
 		workOrder: {
 			otNumber: string
-			workName: string | null
+			workBookName: string | null
 			workDescription: string | null
 		}
 	}

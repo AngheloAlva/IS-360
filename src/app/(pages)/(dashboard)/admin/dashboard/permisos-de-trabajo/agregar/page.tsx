@@ -1,6 +1,6 @@
 import { headers } from "next/headers"
 
-import { USER_ROLE } from "@prisma/client"
+import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import { cn } from "@/lib/utils"
 
@@ -20,7 +20,7 @@ export default async function CreateWorkPermitPage() {
 		)
 	}
 
-	const isOtcMember = res.user.accessRole === USER_ROLE.ADMIN
+	const isOtcMember = res.user.accessRole === ACCESS_ROLE.ADMIN
 
 	return (
 		<div className="mx-auto flex h-full w-full max-w-screen-xl flex-1 flex-col gap-4">

@@ -53,10 +53,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 		const totalWorkPermits = await prisma.workPermit.count({
 			where: filter,
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		const workPermitsByStatus = await prisma.workPermit.groupBy({
@@ -64,10 +60,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			where: filter,
 			_count: {
 				id: true,
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 
@@ -83,10 +75,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				},
 			},
 			take: 5,
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		const activeWorkPermitsByCompany = await prisma.workPermit.groupBy({
@@ -104,10 +92,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				},
 			},
 			take: 5,
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		const thirtyDaysAgo = new Date()
@@ -136,10 +120,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			orderBy: {
 				createdAt: "asc",
 			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
-			},
 		})
 
 		const activityByDay: Record<string, { date: Date; count: number }> = {}
@@ -160,10 +140,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			select: {
 				id: true,
 				name: true,
-			},
-			cacheStrategy: {
-				ttl: 120,
-				swr: 10,
 			},
 		})
 
