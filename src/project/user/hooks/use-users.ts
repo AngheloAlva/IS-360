@@ -9,7 +9,6 @@ interface UseUsersParams {
 	limit?: number
 	search?: string
 	orderBy?: OrderBy
-	showOnlyInternal?: boolean
 }
 
 interface UsersResponse {
@@ -24,14 +23,13 @@ export const useUsers = ({
 	page = 1,
 	limit = 10,
 	search = "",
-	showOnlyInternal = true,
 }: UseUsersParams = {}) => {
 	return useQuery<UsersResponse>({
-		queryKey: ["users", { page, limit, search, showOnlyInternal, order, orderBy }],
+		queryKey: ["users", { page, limit, search, order, orderBy }],
 		queryFn: (fn) =>
 			fetchUsers({
 				...fn,
-				queryKey: ["users", { page, limit, search, showOnlyInternal, order, orderBy }],
+				queryKey: ["users", { page, limit, search, order, orderBy }],
 			}),
 		staleTime: 5 * 60 * 1000,
 	})
@@ -40,7 +38,7 @@ export const useUsers = ({
 export const fetchUsers: QueryFunction<UsersResponse, ["users", UseUsersParams]> = async ({
 	queryKey,
 }) => {
-	const [, { page, limit, search, showOnlyInternal, order, orderBy }]: [
+	const [, { page, limit, search, order, orderBy }]: [
 		string,
 		{
 			order?: Order
@@ -48,7 +46,6 @@ export const fetchUsers: QueryFunction<UsersResponse, ["users", UseUsersParams]>
 			limit?: number
 			search?: string
 			orderBy?: OrderBy
-			showOnlyInternal?: boolean
 		},
 	] = queryKey
 
@@ -56,7 +53,6 @@ export const fetchUsers: QueryFunction<UsersResponse, ["users", UseUsersParams]>
 	searchParams.set("page", page?.toString() || "1")
 	searchParams.set("limit", limit?.toString() || "10")
 	if (search) searchParams.set("search", search)
-	if (showOnlyInternal) searchParams.set("showOnlyInternal", "true")
 	searchParams.set("order", order || "asc")
 	searchParams.set("orderBy", orderBy || "createdAt")
 

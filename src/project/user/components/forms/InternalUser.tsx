@@ -136,7 +136,7 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 					setOpen(false)
 					form.reset()
 					queryClient.invalidateQueries({
-						queryKey: ["users", { showOnlyInternal: true }],
+						queryKey: ["users"],
 					})
 				} else {
 					toast.error("Error al crear el usuario", {

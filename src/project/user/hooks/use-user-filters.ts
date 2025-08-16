@@ -12,7 +12,6 @@ export const useUserFilters = () => {
 		order: store.order,
 		orderBy: store.orderBy,
 		search: debouncedSearch,
-		showOnlyInternal: store.showOnlyInternal,
 	})
 
 	return {
@@ -21,7 +20,6 @@ export const useUserFilters = () => {
 			page: store.page,
 			orderBy: store.orderBy,
 			order: store.order,
-			showOnlyInternal: store.showOnlyInternal,
 		},
 
 		actions: {
@@ -29,7 +27,6 @@ export const useUserFilters = () => {
 			setPage: store.setPage,
 			setOrderBy: store.setOrderBy,
 			setOrder: store.setOrder,
-			setShowOnlyInternal: store.setShowOnlyInternal,
 			resetFilters: store.resetFilters,
 			resetPagination: store.resetPagination,
 		},

@@ -30,7 +30,7 @@ export default function DeleteUser({ userId }: { userId: string }) {
 
 			if (res.ok) {
 				queryClient.invalidateQueries({
-					queryKey: ["users", { showOnlyInternal: true }],
+					queryKey: ["users"],
 				})
 				toast.success("Se ha eliminado el usuario correctamente")
 			} else {

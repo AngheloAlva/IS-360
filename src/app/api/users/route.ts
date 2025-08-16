@@ -21,7 +21,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
-		const showOnlyInternal = searchParams.get("showOnlyInternal") === "true"
 		const orderBy = searchParams.get("orderBy") as OrderBy
 		const order = searchParams.get("order") as Order
 
@@ -30,7 +29,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const where = {
 			accessRole: ACCESS_ROLE.ADMIN,
 			isActive: true,
-			...(showOnlyInternal ? { internal: { not: true } } : {}),
 			...(search
 				? {
 						OR: [

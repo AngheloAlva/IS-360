@@ -8,13 +8,11 @@ interface UserFiltersState {
 	page: number
 	orderBy: OrderBy
 	order: Order
-	showOnlyInternal: boolean
 
 	setSearch: (search: string) => void
 	setPage: (page: number) => void
 	setOrderBy: (orderBy: OrderBy) => void
 	setOrder: (order: Order) => void
-	setShowOnlyInternal: (showOnlyInternal: boolean) => void
 
 	resetFilters: () => void
 	resetPagination: () => void
@@ -25,7 +23,6 @@ const initialState = {
 	page: 1,
 	orderBy: "createdAt" as OrderBy,
 	order: "asc" as Order,
-	showOnlyInternal: true,
 }
 
 export const useUserFiltersStore = create<UserFiltersState>()(
@@ -49,17 +46,12 @@ export const useUserFiltersStore = create<UserFiltersState>()(
 				set({ order, page: 1 })
 			},
 
-			setShowOnlyInternal: (showOnlyInternal) => {
-				set({ showOnlyInternal, page: 1 })
-			},
-
 			resetFilters: () => {
 				set({
 					search: "",
 					page: 1,
 					orderBy: "createdAt",
 					order: "asc",
-					showOnlyInternal: true,
 				})
 			},
 
@@ -73,7 +65,6 @@ export const useUserFiltersStore = create<UserFiltersState>()(
 				search: state.search,
 				orderBy: state.orderBy,
 				order: state.order,
-				showOnlyInternal: state.showOnlyInternal,
 			}),
 		}
 	)
