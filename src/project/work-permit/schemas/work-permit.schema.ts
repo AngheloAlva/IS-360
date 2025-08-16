@@ -31,7 +31,6 @@ const baseWorkPermitSchema = {
 	activityDetails: z
 		.array(z.object({ activity: z.string() }))
 		.min(1, { message: "Debe especificar al menos una actividad" }),
-	operatorWorker: z.string().optional(),
 	participants: z.array(
 		z.object({
 			userId: z.string().nonempty({ message: "Debe seleccionar un usuario" }),

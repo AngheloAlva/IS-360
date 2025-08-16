@@ -84,7 +84,6 @@ export default function WorkPermitForm({
 			otNumber: initialValues?.otNumber?.otNumber || "",
 			otherMutuality: initialValues?.otherMutuality || "",
 			otherPreChecks: initialValues?.otherPreChecks || "",
-			operatorWorker: initialValues?.operatorWorker || "",
 			generateWaste: initialValues?.generateWaste || false,
 			workWillBeOther: initialValues?.workWillBeOther || "",
 			additionalObservations: initialValues?.observations || "",

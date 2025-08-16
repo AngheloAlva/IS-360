@@ -32,7 +32,6 @@ export interface WorkPermit {
 	startDate: Date
 	endDate: Date
 	activityDetails: string[]
-	operatorWorker?: string
 	workCompleted: boolean
 	user: {
 		id: string
