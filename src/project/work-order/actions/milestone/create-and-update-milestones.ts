@@ -4,7 +4,6 @@ import { headers } from "next/headers"
 
 import { sendNotification } from "@/shared/actions/notifications/send-notification"
 import { ACTIVITY_TYPE, MILESTONE_STATUS, MODULES } from "@prisma/client"
-import { sendMilestoneUpdateEmail } from "./sendMilestoneUpdateEmail"
 import { logActivity } from "@/lib/activity/log"
 import { USER_ROLE } from "@/lib/permissions"
 import { auth } from "@/lib/auth"
@@ -160,22 +159,6 @@ export async function createAndUpdateMilestones(
 			targetRoles: [USER_ROLE.admin, USER_ROLE.workOrderOperator],
 			message: `Se han actualizado los hitos del libro de obras ${workOrder.workBookName}`,
 		})
-
-		if (workOrder.responsible.email) {
-			await sendMilestoneUpdateEmail({
-				workOrderId: workOrder.id,
-				email: workOrder.responsible.email,
-				workOrderNumber: workOrder.otNumber,
-				supervisorName: workOrder.supervisor.name + workOrder.supervisor.rut,
-				workOrderName: workOrder.workBookName || `Libro de Obras ${workOrder.otNumber}`,
-
-				companyName: workOrder.company
-					? workOrder.company.name + " - " + workOrder.company.rut
-					: "Interno",
-				milestonesCount: values.milestones.length,
-				updateDate: new Date(),
-			})
-		}
 
 		logActivity({
 			userId: session.user.id,
