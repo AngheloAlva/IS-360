@@ -7,8 +7,8 @@ import {
 } from "@/project/work-order/actions/milestone/approve-milestone"
 
 import { Textarea } from "@/shared/components/ui/textarea"
-import Spinner from "@/shared/components/Spinner"
 import { Label } from "@/shared/components/ui/label"
+import Spinner from "@/shared/components/Spinner"
 import {
 	AlertDialog,
 	AlertDialogTitle,
@@ -20,13 +20,16 @@ import {
 	AlertDialogContent,
 	AlertDialogDescription,
 } from "@/shared/components/ui/alert-dialog"
+import { queryClient } from "@/lib/queryClient"
 
 export default function CloseMilestoneDialog({
 	userId,
 	milestoneId,
+	workOrderId,
 }: {
 	userId: string
 	milestoneId: string
+	workOrderId: string
 }) {
 	const [closureComment, setClosureComment] = useState("")
 	const [isLoading, setIsLoading] = useState(false)
@@ -44,6 +47,9 @@ export default function CloseMilestoneDialog({
 
 			if (res.ok) {
 				toast.success("Se ha aprobado el cierre del hito correctamente")
+				queryClient.invalidateQueries({
+					queryKey: ["workBooks", { workOrderId }],
+				})
 			} else {
 				toast.error(res.message)
 			}
@@ -68,6 +74,9 @@ export default function CloseMilestoneDialog({
 
 			if (res.ok) {
 				toast.success("Se ha rechazado el cierre del hito correctamente")
+				queryClient.invalidateQueries({
+					queryKey: ["workBooks", { workOrderId }],
+				})
 			} else {
 				toast.error(res.message)
 			}

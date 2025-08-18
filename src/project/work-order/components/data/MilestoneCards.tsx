@@ -238,7 +238,11 @@ export default function MilestoneCards({
 							{hasPermission &&
 								milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
 								userId === responsibleId && (
-									<CloseMilestoneDialog userId={userId} milestoneId={milestone.id} />
+									<CloseMilestoneDialog
+										userId={userId}
+										workOrderId={workOrderId}
+										milestoneId={milestone.id}
+									/>
 								)}
 						</CardContent>
 					</Card>

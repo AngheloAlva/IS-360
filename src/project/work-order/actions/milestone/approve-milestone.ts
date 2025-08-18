@@ -2,10 +2,10 @@
 
 import { headers } from "next/headers"
 
+import { sendApproveMilestoneEmail, sendRejectMilestoneEmail } from "./send-close-milestone"
 import { ACTIVITY_TYPE, MODULES } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
-import { sendApproveMilestoneEmail, sendRejectMilestoneEmail } from "./send-close-milestone"
 import prisma from "@/lib/prisma"
 
 interface RequestCloseMilestoneResponse {
