@@ -237,6 +237,7 @@ export function VehicleFolderDocuments({
 					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
+								{isOtcMember && <TableCell></TableCell>}
 								<TableCell className="font-medium">
 									<div className="flex flex-col items-start justify-center">
 										<div className="flex items-center gap-2">

@@ -101,7 +101,11 @@ export async function getStartupFolderDocuments({
 							uploadedBy: {
 								select: {
 									id: true,
+									rut: true,
 									name: true,
+									email: true,
+									phone: true,
+									image: true,
 								},
 							},
 							reviewer: {
@@ -120,7 +124,11 @@ export async function getStartupFolderDocuments({
 							uploadedBy: {
 								select: {
 									id: true,
+									rut: true,
 									name: true,
+									email: true,
+									phone: true,
+									image: true,
 								},
 							},
 							reviewer: {
@@ -139,7 +147,11 @@ export async function getStartupFolderDocuments({
 							uploadedBy: {
 								select: {
 									id: true,
+									rut: true,
 									name: true,
+									email: true,
+									phone: true,
+									image: true,
 								},
 							},
 							reviewer: {
@@ -158,7 +170,11 @@ export async function getStartupFolderDocuments({
 							uploadedBy: {
 								select: {
 									id: true,
+									rut: true,
 									name: true,
+									email: true,
+									phone: true,
+									image: true,
 								},
 							},
 							reviewer: {

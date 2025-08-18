@@ -252,6 +252,7 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 									{company.StartupFolders.some(
 										(folder) =>
 											folder.environmentalFolders.some((folder) => folder.status === "SUBMITTED") ||
+											folder.environmentFolders.some((folder) => folder.status === "SUBMITTED") ||
 											folder.safetyAndHealthFolders.some(
 												(folder) => folder.status === "SUBMITTED"
 											) ||

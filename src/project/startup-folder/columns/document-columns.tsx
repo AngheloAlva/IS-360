@@ -1,13 +1,24 @@
 "use client"
 
-import { CalendarX2Icon, EyeIcon, FileTextIcon, PenIcon, UserIcon } from "lucide-react"
 import { Dispatch, SetStateAction } from "react"
+import { getImageProps } from "next/image"
 import { format } from "date-fns"
+import {
+	EyeIcon,
+	PenIcon,
+	UserIcon,
+	MailIcon,
+	PhoneIcon,
+	FileTextIcon,
+	CalendarX2Icon,
+} from "lucide-react"
 
 import { ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/shared/components/ui/hover-card"
 import { StartupFolderStatusBadge } from "../components/data/StartupFolderStatusBadge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { DocumentReviewForm } from "../components/dialogs/DocumentReviewForm"
 import { Checkbox } from "@/shared/components/ui/checkbox"
 import { Button } from "@/shared/components/ui/button"
@@ -57,11 +68,11 @@ export const getDocumentColumns = ({
 	userId,
 	refetch,
 	isOtcMember,
-	startupFolderId,
 	folderStatus,
-	setSelectedDocumentType,
+	startupFolderId,
 	setShowUploadDialog,
 	setSelectedDocument,
+	setSelectedDocumentType,
 }: GetDocumentColumnsProps): ColumnDef<StartupFolderDocument>[] => [
 	...(isOtcMember
 		? [
@@ -135,11 +146,46 @@ export const getDocumentColumns = ({
 		cell: ({ row }) => {
 			const uploadedBy = row.original.uploadedBy
 
-			return (
-				<div className="flex items-center gap-1">
-					<UserIcon className="text-muted-foreground size-3.5" />
-					{uploadedBy?.name ?? "Usuario desconocido"}
-				</div>
+			const { props } = getImageProps({
+				width: 32,
+				height: 32,
+				alt: uploadedBy?.name || "",
+				src: uploadedBy?.image || "",
+			})
+
+			return uploadedBy ? (
+				<HoverCard openDelay={200}>
+					<HoverCardTrigger className="text-text flex w-32 cursor-pointer items-center gap-1.5 truncate select-none hover:underline">
+						<UserIcon className="text-muted-foreground min-h-3.5 max-w-3.5 min-w-3.5" />
+						<span className="line-clamp-1 w-52 truncate">{uploadedBy.name || "Interno"}</span>
+					</HoverCardTrigger>
+
+					<HoverCardContent className="flex w-fit gap-2" side="top">
+						<Avatar>
+							<AvatarImage {...props} />
+							<AvatarFallback>{uploadedBy.name?.slice(0, 2) || ""}</AvatarFallback>
+						</Avatar>
+
+						<div className="flex flex-col gap-2">
+							<div className="text-text">
+								<p className="font-bold">{uploadedBy.name || ""}</p>
+								<p className="text-muted-foreground text-sm">{uploadedBy.rut || ""}</p>
+								<p className="mt-2 flex items-center gap-1 text-sm font-semibold">
+									<MailIcon className="mt-0.5 size-3" />
+									{uploadedBy.email || ""}
+								</p>
+								{uploadedBy.phone && (
+									<p className="mt-1 flex items-center gap-1 text-sm font-semibold">
+										<PhoneIcon className="size-3" />
+										{uploadedBy.phone}
+									</p>
+								)}
+							</div>
+						</div>
+					</HoverCardContent>
+				</HoverCard>
+			) : (
+				<></>
 			)
 		},
 	},

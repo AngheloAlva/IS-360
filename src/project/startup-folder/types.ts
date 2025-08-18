@@ -22,11 +22,19 @@ export interface BaseStartupFolderDocument {
 	reviewerId: string | null
 	reviewer: {
 		id: string
+		rut: string
 		name: string
+		email: string
+		phone: string
+		image: string
 	} | null
 	uploadedBy: {
 		id: string
+		rut: string
 		name: string
+		email: string
+		phone: string
+		image: string
 	} | null
 	uploadedById: string | null
 	folderId: string

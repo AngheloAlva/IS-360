@@ -50,7 +50,11 @@ export async function getWorkerFolderDocuments({
 				uploadedBy: {
 					select: {
 						id: true,
+						rut: true,
 						name: true,
+						email: true,
+						phone: true,
+						image: true,
 					},
 				},
 				reviewer: {
