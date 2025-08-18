@@ -148,7 +148,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					programDate: true,
 					...(includeEquipments
 						? {
-								equipment: {
+								equipments: {
 									select: {
 										name: true,
 									},
