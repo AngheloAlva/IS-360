@@ -209,6 +209,17 @@ model Account {
   @@map("account")
 }
 
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
 model Company {
   id       String  @id @default(cuid())
   name     String
