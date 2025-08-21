@@ -1,13 +1,13 @@
-"use server"
-
 import { addDays, addMonths, addWeeks, addYears, format, startOfDay } from "date-fns"
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 
 import { ACTIVITY_TYPE, MODULES, PLAN_FREQUENCY } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
-import prisma from "@/lib/prisma"
-import { generateOTNumber } from "@/project/work-order/actions/generateOTNumber"
 import { resend } from "@/lib/resend"
+import db from "@/lib/prisma"
+
+import { sendAutomatedWorkOrderEmailsWithFallback } from "@/project/work-order/actions/sendAutomatedWorkOrderEmails"
+import { generateOTNumber } from "@/project/work-order/actions/generateOTNumber"
 
 const OTC_COMPANY_ID = process.env.NEXT_PUBLIC_OTC_COMPANY_ID
 
@@ -37,16 +37,15 @@ function calculateNextDate(currentDate: Date, frequency: PLAN_FREQUENCY): Date {
 export async function GET(request: NextRequest) {
 	try {
 		const authHeader = request.headers.get("authorization")
-		if (
-			authHeader !== `Bearer ${process.env.CRON_SECRET}` &&
-			process.env.NODE_ENV === "production"
-		) {
-			return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+		if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+			return new Response("Unauthorized", {
+				status: 401,
+			})
 		}
 
 		const today = startOfDay(new Date())
 
-		const automatedTasks = await prisma.maintenancePlanTask.findMany({
+		const automatedTasks = await db.maintenancePlanTask.findMany({
 			where: {
 				isAutomated: true,
 				automatedCompanyId: OTC_COMPANY_ID,
@@ -68,7 +67,7 @@ export async function GET(request: NextRequest) {
 
 		for (const task of automatedTasks) {
 			try {
-				const existingOT = await prisma.workOrder.findFirst({
+				const existingOT = await db.workOrder.findFirst({
 					where: {
 						maintenancePlanTaskId: task.id,
 						solicitationDate: {
@@ -87,7 +86,7 @@ export async function GET(request: NextRequest) {
 				const estimatedDays = task.automatedEstimatedDays || 1
 				const estimatedHours = task.automatedEstimatedHours || 8
 
-				const workOrder = await prisma.workOrder.create({
+				const workOrder = await db.workOrder.create({
 					data: {
 						otNumber,
 						type: task.automatedWorkOrderType || "PREVENTIVE",
@@ -115,25 +114,58 @@ export async function GET(request: NextRequest) {
 
 				const nextDate = calculateNextDate(task.nextDate, task.frequency)
 
-				await prisma.maintenancePlanTask.update({
+				await db.maintenancePlanTask.update({
 					where: { id: task.id },
 					data: { nextDate },
 				})
 
 				await logActivity({
+					action: ACTIVITY_TYPE.CREATE,
 					userId: task.createdBy.id,
 					module: MODULES.WORK_ORDERS,
-					action: ACTIVITY_TYPE.CREATE,
 					entityId: workOrder.id,
-					entityType: "WorkOrder",
+					entityType: "WORK_ORDER",
 					metadata: {
-						otNumber: workOrder.otNumber,
-						taskName: task.name,
-						equipmentName: task.equipment.name,
-						automated: true,
-						nextScheduledDate: nextDate.toISOString(),
+						workOrder,
+						task,
 					},
 				})
+
+				const workOrderWithRelations = await db.workOrder.findUnique({
+					where: { id: workOrder.id },
+					include: {
+						equipments: { select: { name: true } },
+						responsible: { select: { name: true, email: true } },
+						supervisor: { select: { name: true, email: true } },
+						company: { select: { name: true } },
+					},
+				})
+
+				if (workOrderWithRelations) {
+					try {
+						await sendAutomatedWorkOrderEmailsWithFallback({
+							workOrder: {
+								otNumber: workOrderWithRelations.otNumber,
+								type: workOrderWithRelations.type,
+								priority: workOrderWithRelations.priority,
+								equipments: workOrderWithRelations.equipments,
+								programDate: workOrderWithRelations.programDate,
+								estimatedDays: workOrderWithRelations.estimatedDays,
+								estimatedHours: workOrderWithRelations.estimatedHours,
+								responsible: workOrderWithRelations.responsible!,
+								workDescription: workOrderWithRelations.workDescription,
+								supervisor: workOrderWithRelations.supervisor!,
+								company: workOrderWithRelations.company!,
+							},
+							maintenanceTask: {
+								name: task.name,
+								frequency: task.frequency,
+							},
+						})
+					} catch (emailError) {
+						console.error(`Error enviando emails para OT ${workOrder.otNumber}:`, emailError)
+					}
+				}
 
 				createdWorkOrders.push({
 					otNumber: workOrder.otNumber,
