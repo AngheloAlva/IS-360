@@ -47,7 +47,6 @@ export default function MilestoneCards({
 	milestones,
 	isOtcMember,
 	workOrderId,
-	responsibleId,
 	hasPermission,
 	hassWorkBookPermission,
 }: MilestoneCardsProps) {
@@ -235,15 +234,13 @@ export default function MilestoneCards({
 									/>
 								)}
 
-							{hasPermission &&
-								milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE &&
-								userId === responsibleId && (
-									<CloseMilestoneDialog
-										userId={userId}
-										workOrderId={workOrderId}
-										milestoneId={milestone.id}
-									/>
-								)}
+							{hasPermission && milestone.status === MILESTONE_STATUS.REQUESTED_CLOSURE && (
+								<CloseMilestoneDialog
+									userId={userId}
+									workOrderId={workOrderId}
+									milestoneId={milestone.id}
+								/>
+							)}
 						</CardContent>
 					</Card>
 				))}
