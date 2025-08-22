@@ -1,5 +1,5 @@
 import { addDays, addMonths, addWeeks, addYears, format, startOfDay } from "date-fns"
-import { NextResponse, NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 
 import { ACTIVITY_TYPE, MODULES, PLAN_FREQUENCY } from "@prisma/client"
 import { logActivity } from "@/lib/activity/log"
@@ -34,15 +34,8 @@ function calculateNextDate(currentDate: Date, frequency: PLAN_FREQUENCY): Date {
 	}
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
 	try {
-		const authHeader = request.headers.get("authorization")
-		if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-			return new Response("Unauthorized", {
-				status: 401,
-			})
-		}
-
 		const today = startOfDay(new Date())
 
 		const automatedTasks = await db.maintenancePlanTask.findMany({
@@ -67,12 +60,14 @@ export async function GET(request: NextRequest) {
 
 		for (const task of automatedTasks) {
 			try {
+				const scheduledDate = startOfDay(task.nextDate)
+
 				const existingOT = await db.workOrder.findFirst({
 					where: {
 						maintenancePlanTaskId: task.id,
 						solicitationDate: {
-							gte: today,
-							lt: addDays(today, 1),
+							gte: scheduledDate,
+							lt: addDays(scheduledDate, 1),
 						},
 					},
 				})
@@ -91,12 +86,12 @@ export async function GET(request: NextRequest) {
 						otNumber,
 						type: task.automatedWorkOrderType || "PREVENTIVE",
 						status: "PLANNED",
-						solicitationDate: today,
+						solicitationDate: scheduledDate,
 						solicitationTime: "08:00:00",
-						programDate: today,
+						programDate: scheduledDate,
 						estimatedDays,
 						estimatedHours,
-						estimatedEndDate: addDays(today, estimatedDays),
+						estimatedEndDate: addDays(scheduledDate, estimatedDays),
 						priority: task.automatedPriority || "MEDIUM",
 						capex: task.automatedCapex || "CONFIDABILITY",
 						workDescription:
