@@ -39,6 +39,7 @@ export async function updateMaintenancePlanTask({
 				equipmentId: values.equipmentId,
 				// Campos de automatización
 				isAutomated: values.isAutomated || false,
+				emailsForCopy: values.emailsForCopy,
 				automatedCompanyId: values.isAutomated ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID : null,
 				automatedSupervisorId: values.automatedSupervisorId || null,
 				automatedWorkOrderType: values.automatedWorkOrderType || null,

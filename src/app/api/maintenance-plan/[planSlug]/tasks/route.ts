@@ -75,8 +75,9 @@ export async function GET(
 					slug: true,
 					nextDate: true,
 					createdAt: true,
-					description: true,
 					frequency: true,
+					description: true,
+					emailsForCopy: true,
 					equipment: {
 						select: {
 							id: true,

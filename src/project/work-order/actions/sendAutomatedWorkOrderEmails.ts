@@ -33,6 +33,7 @@ interface SendAutomatedWorkOrderEmailsProps {
 	maintenanceTask: {
 		name: string
 		frequency: string
+		emailsForCopy: string[]
 	}
 }
 
@@ -50,6 +51,7 @@ export const sendAutomatedWorkOrderEmails = async ({
 		const responsibleEmailResult = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: [workOrder.responsible.email],
+			cc: maintenanceTask.emailsForCopy,
 			subject: `🤖 OT Automática Creada - ${workOrder.otNumber} | ${maintenanceTask.name}`,
 			react: await AutomatedWorkOrderResponsibleEmail({
 				workOrder,
@@ -126,16 +128,9 @@ export const sendAutomatedWorkOrderEmailsWithFallback = async (
 	try {
 		const result = await sendAutomatedWorkOrderEmails(props)
 
-		// Log de resultados para debugging
-		console.log(`📧 Notificaciones OT ${props.workOrder.otNumber}:`)
-		console.log(`   - Responsable OTC: ${result.results?.responsibleEmail.ok ? "✅" : "❌"}`)
-		console.log(`   - Supervisor: ${result.results?.supervisorEmail.ok ? "✅" : "❌"}`)
-		console.log(`   - Sala Control: ${result.results?.controlRoomEmail.ok ? "✅" : "❌"}`)
-
 		return result
 	} catch (error) {
 		console.error("Error crítico enviando emails:", error)
-		// Aún si falla el envío de emails, no queremos que falle la creación de la OT
 		return {
 			ok: false,
 			error,

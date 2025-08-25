@@ -84,6 +84,7 @@ export const createMaintenancePlanTask = async ({
 				},
 				nextDate: values.nextDate,
 				// Campos de automatización
+				emailsForCopy: values.emailsForCopy,
 				isAutomated: values.isAutomated || false,
 				automatedCompanyId: values.isAutomated ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID : null,
 				automatedSupervisorId: values.automatedSupervisorId || null,

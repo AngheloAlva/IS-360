@@ -34,6 +34,7 @@ export const maintenancePlanTaskSchema = z.object({
 		.regex(/^[0-9]+$/)
 		.optional(),
 	automatedWorkDescription: z.string().optional(),
+	emailsForCopy: z.array(z.string()).optional(),
 })
 
 export type MaintenancePlanTaskSchema = z.infer<typeof maintenancePlanTaskSchema>

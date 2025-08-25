@@ -1,7 +1,7 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
 import { PenBoxIcon, PlusCircleIcon } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -23,11 +23,12 @@ import {
 } from "@/project/maintenance-plan/schemas/maintenance-plan-task.schema"
 
 import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
+import { EmailTagsInputFormField } from "@/shared/components/forms/EmailTagsInputFormField"
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TextAreaFormField } from "@/shared/components/forms/TextAreaFormField"
-import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
+import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
 import { Separator } from "@/shared/components/ui/separator"
 import FileTable from "@/shared/components/forms/FileTable"
@@ -64,6 +65,7 @@ interface MaintenancePlanTaskFormProps {
 		automatedEstimatedDays?: number
 		automatedEstimatedHours?: number
 		automatedWorkDescription?: string
+		emailsForCopy?: string[]
 	}
 }
 
@@ -85,7 +87,7 @@ export default function MaintenancePlanTaskForm({
 			description: initialData?.description ?? "",
 			createdById: userId,
 			maintenancePlanSlug,
-			nextDate: initialData?.nextDate,
+			nextDate: initialData?.nextDate ? new Date(initialData.nextDate) : undefined,
 			frequency:
 				(initialData?.frequency as (typeof TaskFrequencyOptions)[number]["value"]) ?? undefined,
 			equipmentId: initialData?.equipmentId ?? undefined,
@@ -98,6 +100,7 @@ export default function MaintenancePlanTaskForm({
 			automatedEstimatedDays: `${initialData?.automatedEstimatedDays ?? "1"}`,
 			automatedEstimatedHours: `${initialData?.automatedEstimatedHours ?? "8"}`,
 			automatedWorkDescription: initialData?.automatedWorkDescription ?? "",
+			emailsForCopy: initialData?.emailsForCopy ?? [],
 		},
 	})
 
@@ -372,6 +375,16 @@ export default function MaintenancePlanTaskForm({
 									control={form.control}
 									label="Horas Estimadas"
 									placeholder="8"
+								/>
+
+								<EmailTagsInputFormField<MaintenancePlanTaskSchema>
+									optional
+									name="emailsForCopy"
+									label="Emails para Copia"
+									control={form.control}
+									itemClassName="sm:col-span-2"
+									placeholder="Ingresa emails separados por comas, espacios o Enter"
+									description="Emails que recibirán una copia de la orden de trabajo creada automáticamente"
 								/>
 							</>
 						)}

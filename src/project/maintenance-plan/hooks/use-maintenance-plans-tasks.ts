@@ -15,6 +15,7 @@ export interface MaintenancePlanTask {
 	createdAt: Date
 	description: string
 	isAutomated: boolean
+	emailsForCopy: string[]
 	frequency: PLAN_FREQUENCY
 	automatedSupervisorId: string
 	automatedEstimatedDays: number

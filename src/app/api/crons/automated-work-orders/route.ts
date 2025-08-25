@@ -62,20 +62,6 @@ export async function GET() {
 			try {
 				const scheduledDate = startOfDay(task.nextDate)
 
-				const existingOT = await db.workOrder.findFirst({
-					where: {
-						maintenancePlanTaskId: task.id,
-						solicitationDate: {
-							gte: scheduledDate,
-							lt: addDays(scheduledDate, 1),
-						},
-					},
-				})
-
-				if (existingOT) {
-					continue
-				}
-
 				const otNumber = await generateOTNumber()
 
 				const estimatedDays = task.automatedEstimatedDays || 1
@@ -155,6 +141,7 @@ export async function GET() {
 							maintenanceTask: {
 								name: task.name,
 								frequency: task.frequency,
+								emailsForCopy: task.emailsForCopy,
 							},
 						})
 					} catch (emailError) {
