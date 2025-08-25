@@ -845,6 +845,7 @@ model MaintenancePlanTask {
   automatedEstimatedDays   Int?
   automatedEstimatedHours  Int?
   automatedWorkDescription String?
+  emailsForCopy            String[]
 
   equipment         Equipment       @relation(fields: [equipmentId], references: [id])
   equipmentId       String
