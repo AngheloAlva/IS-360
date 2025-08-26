@@ -8,6 +8,7 @@ interface DocumentCounts {
 	approved: number
 	rejected: number
 	submitted: number
+	expired: number
 	draft: number
 }
 

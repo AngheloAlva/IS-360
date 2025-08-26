@@ -278,6 +278,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 							const approvedDocuments = getStatusCount(docStats, "APPROVED")
 							const rejectedDocuments = getStatusCount(docStats, "REJECTED")
 							const submittedDocuments = getStatusCount(docStats, "SUBMITTED")
+							const expiredDocuments = getStatusCount(docStats, "EXPIRED")
 							const draftDocuments = getStatusCount(docStats, "DRAFT")
 
 							const isCompleted = isFolderCompleted(
@@ -293,6 +294,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 									approved: approvedDocuments,
 									rejected: rejectedDocuments,
 									submitted: submittedDocuments,
+									expired: expiredDocuments,
 									draft: draftDocuments,
 								},
 								isCompleted,
@@ -328,6 +330,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						const rejectedDocuments = getStatusCount(workerDocStats, "REJECTED")
 						const submittedDocuments = getStatusCount(workerDocStats, "SUBMITTED")
 						const draftDocuments = getStatusCount(workerDocStats, "DRAFT")
+						const expiredDocuments = getStatusCount(workerDocStats, "EXPIRED")
 						const isCompleted = isFolderCompleted(
 							workerFolder.status,
 							approvedDocuments,
@@ -343,6 +346,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 								rejected: rejectedDocuments,
 								submitted: submittedDocuments,
 								draft: draftDocuments,
+								expired: expiredDocuments,
 							},
 							isCompleted,
 						}
@@ -358,6 +362,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						const rejectedDocuments = getStatusCount(vehicleDocStats, "REJECTED")
 						const submittedDocuments = getStatusCount(vehicleDocStats, "SUBMITTED")
 						const draftDocuments = getStatusCount(vehicleDocStats, "DRAFT")
+						const expiredDocuments = getStatusCount(vehicleDocStats, "EXPIRED")
 						const isCompleted = isFolderCompleted(
 							vehicleFolder.status,
 							approvedDocuments,
@@ -372,6 +377,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 								rejected: rejectedDocuments,
 								submitted: submittedDocuments,
 								draft: draftDocuments,
+								expired: expiredDocuments,
 							},
 							isCompleted,
 						}

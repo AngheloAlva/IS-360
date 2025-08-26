@@ -1,6 +1,6 @@
 "use client"
 
-import { FolderIcon } from "lucide-react"
+import { FolderClockIcon, FolderIcon } from "lucide-react"
 import { useMemo } from "react"
 
 import { VEHICLE_STRUCTURE } from "@/lib/consts/vehicle-folder-structure"
@@ -51,6 +51,7 @@ export default function StartupFolderTable({
 		rejectedCount: number
 		pendingCount: number
 		draftCount: number
+		expiredCount: number
 	}
 
 	const categories = useMemo<CategoryItem[]>(() => {
@@ -80,6 +81,10 @@ export default function StartupFolderTable({
 					subFolders.safetyAndHealthFolders[0]?.documentCounts?.draft ??
 					subFolders.safetyAndHealthFolders[0]?.draftDocuments ??
 					0,
+				expiredCount:
+					subFolders.safetyAndHealthFolders[0]?.documentCounts?.expired ??
+					subFolders.safetyAndHealthFolders[0]?.expiredDocuments ??
+					0,
 			},
 			{
 				title: "Vehículos y Equipos",
@@ -101,6 +106,9 @@ export default function StartupFolderTable({
 					.reduce((a, b) => a + b, 0),
 				draftCount: subFolders.vehiclesFolders
 					.map((vf) => vf.documentCounts?.draft ?? vf.draftDocuments ?? 0)
+					.reduce((a, b) => a + b, 0),
+				expiredCount: subFolders.vehiclesFolders
+					.map((vf) => vf.documentCounts?.expired ?? vf.expiredDocuments ?? 0)
 					.reduce((a, b) => a + b, 0),
 			},
 			{
@@ -130,6 +138,9 @@ export default function StartupFolderTable({
 				draftCount: subFolders.workersFolders
 					.map((wf) => wf.documentCounts?.draft ?? wf.draftDocuments ?? 0)
 					.reduce((a, b) => a + b, 0),
+				expiredCount: subFolders.workersFolders
+					.map((wf) => wf.documentCounts?.expired ?? wf.expiredDocuments ?? 0)
+					.reduce((a, b) => a + b, 0),
 			},
 		]
 
@@ -158,6 +169,10 @@ export default function StartupFolderTable({
 				draftCount:
 					subFolders.environmentalFolders[0]?.documentCounts?.draft ??
 					subFolders.environmentalFolders[0]?.draftDocuments ??
+					0,
+				expiredCount:
+					subFolders.environmentalFolders[0]?.documentCounts?.expired ??
+					subFolders.environmentalFolders[0]?.expiredDocuments ??
 					0,
 			})
 		}
@@ -190,6 +205,10 @@ export default function StartupFolderTable({
 					subFolders.environmentFolders[0]?.documentCounts?.draft ??
 					subFolders.environmentFolders[0]?.draftDocuments ??
 					0,
+				expiredCount:
+					subFolders.environmentFolders[0]?.documentCounts?.expired ??
+					subFolders.environmentFolders[0]?.expiredDocuments ??
+					0,
 			})
 		}
 
@@ -219,6 +238,10 @@ export default function StartupFolderTable({
 					subFolders.techSpecsFolders[0]?.documentCounts?.draft ??
 					subFolders.techSpecsFolders[0]?.draftDocuments ??
 					0,
+				expiredCount:
+					subFolders.techSpecsFolders[0]?.documentCounts?.expired ??
+					subFolders.techSpecsFolders[0]?.expiredDocuments ??
+					0,
 			})
 		}
 
@@ -235,6 +258,7 @@ export default function StartupFolderTable({
 					<TableHead>Completados</TableHead>
 					<TableHead>Rechazados</TableHead>
 					<TableHead>En revisión</TableHead>
+					<TableHead>Expirados</TableHead>
 					<TableHead>Total docs.</TableHead>
 				</TableRow>
 			</TableHeader>
@@ -249,13 +273,18 @@ export default function StartupFolderTable({
 							<div
 								className={cn("flex items-center gap-2", {
 									"text-yellow-500": category.pendingCount > 0,
+									"text-purple-500": category.expiredCount > 0,
 								})}
 							>
-								<FolderIcon
-									className={cn("h-4 w-4 text-teal-500", {
-										"text-yellow-500": category.pendingCount > 0,
-									})}
-								/>
+								{category.expiredCount > 0 ? (
+									<FolderClockIcon className="h-4 w-4 text-purple-500" />
+								) : (
+									<FolderIcon
+										className={cn("h-4 w-4 text-teal-500", {
+											"text-yellow-500": category.pendingCount > 0,
+										})}
+									/>
+								)}
 								{category.title}
 							</div>
 						</TableCell>
@@ -282,6 +311,11 @@ export default function StartupFolderTable({
 						<TableCell>
 							<span className="rounded-lg bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-500">
 								{category.pendingCount} Docs.
+							</span>
+						</TableCell>
+						<TableCell>
+							<span className="rounded-lg bg-purple-500/10 px-2 py-1 text-xs font-medium text-purple-500">
+								{category.expiredCount} Docs.
 							</span>
 						</TableCell>
 						<TableCell>

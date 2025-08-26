@@ -34,7 +34,7 @@ export function StartupFolderStatusBadge({ status, className }: StartupFolderSta
 		},
 		EXPIRED: {
 			label: "Vencido",
-			className: "bg-amber-600/20 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500",
+			className: "bg-purple-600/20 text-purple-600 dark:bg-purple-500/20 dark:text-purple-500",
 		},
 		TO_UPDATE: {
 			label: "A actualizar",

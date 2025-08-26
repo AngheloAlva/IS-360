@@ -87,10 +87,7 @@ model WorkOrder {
   estimatedDays        Float
   programDate          DateTime
   estimatedEndDate     DateTime?
-  requiresBreak        Boolean
-  breakDays            Int?
-  isWorkBook           Boolean
-  workProgressStatus   Float?              @default(0)
+  progress   Float?              @default(0)
   
   // Relaciones
   company      Company?    @relation(fields: [companyId], references: [id])

@@ -474,6 +474,109 @@ export async function GET(): Promise<NextResponse> {
 
 		await Promise.all(updatePromises)
 
+		const folderUpdatePromises = []
+
+		const foldersByCategory = {
+			BASIC: new Set<string>(),
+			SAFETY_AND_HEALTH: new Set<string>(),
+			ENVIRONMENTAL: new Set<string>(),
+			ENVIRONMENT: new Set<string>(),
+			TECHNICAL_SPECS: new Set<string>(),
+			PERSONNEL: new Set<string>(),
+			VEHICLES: new Set<string>(),
+		}
+
+		for (const doc of allExpiredDocuments) {
+			foldersByCategory[doc.category as keyof typeof foldersByCategory].add(doc.folderId)
+		}
+
+		if (foldersByCategory.BASIC.size > 0) {
+			folderUpdatePromises.push(
+				prisma.basicFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.BASIC) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		if (foldersByCategory.SAFETY_AND_HEALTH.size > 0) {
+			folderUpdatePromises.push(
+				prisma.safetyAndHealthFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.SAFETY_AND_HEALTH) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		if (foldersByCategory.ENVIRONMENTAL.size > 0) {
+			folderUpdatePromises.push(
+				prisma.environmentalFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.ENVIRONMENTAL) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		if (foldersByCategory.ENVIRONMENT.size > 0) {
+			folderUpdatePromises.push(
+				prisma.environmentFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.ENVIRONMENT) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		if (foldersByCategory.TECHNICAL_SPECS.size > 0) {
+			folderUpdatePromises.push(
+				prisma.techSpecsFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.TECHNICAL_SPECS) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		if (foldersByCategory.PERSONNEL.size > 0) {
+			folderUpdatePromises.push(
+				prisma.workerFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.PERSONNEL) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		if (foldersByCategory.VEHICLES.size > 0) {
+			folderUpdatePromises.push(
+				prisma.vehicleFolder.updateMany({
+					where: {
+						id: { in: Array.from(foldersByCategory.VEHICLES) },
+						status: { not: "EXPIRED" },
+					},
+					data: { status: "EXPIRED" },
+				})
+			)
+		}
+
+		// Execute all folder updates
+		await Promise.all(folderUpdatePromises)
+
 		const companiesMap = new Map<string, ExpiredDocumentsSummary>()
 
 		for (const doc of allExpiredDocuments) {

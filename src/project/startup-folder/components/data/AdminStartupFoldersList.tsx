@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import { InfoIcon, FilesIcon, CheckCircleIcon } from "lucide-react"
+import { InfoIcon, FilesIcon, CheckCircleIcon, AlertCircleIcon } from "lucide-react"
 import { memo, useMemo, useCallback } from "react"
 import { getImageProps } from "next/image"
 import Link from "next/link"
@@ -251,11 +251,9 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 								<CardFooter className="mt-auto flex flex-col gap-2">
 									{company.StartupFolders.some(
 										(folder) =>
-											folder.environmentalFolders.some((folder) => folder.status === "SUBMITTED") ||
-											folder.environmentFolders.some((folder) => folder.status === "SUBMITTED") ||
-											folder.safetyAndHealthFolders.some(
-												(folder) => folder.status === "SUBMITTED"
-											) ||
+											folder.environmentalFolders?.[0]?.status === "SUBMITTED" ||
+											folder.environmentFolders?.[0]?.status === "SUBMITTED" ||
+											folder.safetyAndHealthFolders?.[0]?.status === "SUBMITTED" ||
 											folder.workersFolders.some((folder) => folder.status === "SUBMITTED") ||
 											folder.vehiclesFolders.some((folder) => folder.status === "SUBMITTED") ||
 											folder.basicFolders.some((folder) => folder.status === "SUBMITTED")
@@ -264,6 +262,23 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 											<span className="flex items-center font-medium text-teal-500">
 												<InfoIcon className="mr-1.5 size-3.5" />
 												Hay carpetas pendientes de revisión
+											</span>
+										</div>
+									)}
+
+									{company.StartupFolders.some(
+										(folder) =>
+											folder.environmentalFolders?.[0]?.status === "EXPIRED" ||
+											folder.environmentFolders?.[0]?.status === "EXPIRED" ||
+											folder.safetyAndHealthFolders?.[0]?.status === "EXPIRED" ||
+											folder.workersFolders.some((folder) => folder.status === "EXPIRED") ||
+											folder.vehiclesFolders.some((folder) => folder.status === "EXPIRED") ||
+											folder.basicFolders.some((folder) => folder.status === "EXPIRED")
+									) && (
+										<div className="w-full rounded-md bg-purple-500/10 px-3 py-2 text-xs md:text-sm">
+											<span className="flex items-center font-medium text-purple-500">
+												<AlertCircleIcon className="mr-1.5 size-3.5" />
+												Hay carpetas expiradas
 											</span>
 										</div>
 									)}
