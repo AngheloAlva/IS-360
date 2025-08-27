@@ -137,10 +137,6 @@ export default function UpdateWorkOrderForm({
 	}, [companiesData, workOrder])
 
 	useEffect(() => {
-		console.log(form.formState.errors)
-	}, [form.formState.errors])
-
-	useEffect(() => {
 		const estimatedDays = Number(form.watch("estimatedDays"))
 		const estimatedHours = estimatedDays * 8
 		const estimatedEndDate = addDays(new Date(form.watch("programDate")), estimatedDays)
