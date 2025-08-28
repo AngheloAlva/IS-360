@@ -13,6 +13,7 @@ import {
 	type UpdatePartnerUsersSchema,
 } from "@/project/user/schemas/update-user.schema"
 
+import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import { RutFormField } from "@/shared/components/forms/RutFormField"
@@ -129,8 +130,9 @@ export default function UpdateExternalUserForm({
 							control={form.control}
 						/>
 
-						<InputFormField<UpdatePartnerUsersSchema>
-							optional
+						<InputWithPrefixFormField<UpdatePartnerUsersSchema>
+							type="tel"
+							prefix="+56"
 							name="phone"
 							label="Teléfono"
 							placeholder="Teléfono"
