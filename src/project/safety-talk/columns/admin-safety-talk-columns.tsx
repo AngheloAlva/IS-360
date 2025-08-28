@@ -24,11 +24,13 @@ const STATUS_LABELS = {
 
 const CATEGORY_COLORS = {
 	ENVIRONMENTAL: "bg-emerald-500/10 text-emerald-500",
+	VISITOR: "bg-teal-500/10 text-teal-500",
 	IRL: "bg-blue-500/10 text-blue-500",
 }
 
 const CATEGORY_LABELS = {
 	ENVIRONMENTAL: "Medio Ambiente",
+	VISITOR: "Visitas",
 	IRL: "IRL",
 }
 
