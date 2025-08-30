@@ -1,7 +1,7 @@
 "use client"
 
-import { PieChart, Pie, Cell, Label } from "recharts"
-import { PieChartIcon } from "lucide-react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, LabelList } from "recharts"
+import { ChartColumnIcon } from "lucide-react"
 
 import { PieChartItem } from "@/project/maintenance-plan/hooks/use-maintenance-plan-stats"
 
@@ -12,17 +12,10 @@ import {
 	CardContent,
 	CardDescription,
 } from "@/shared/components/ui/card"
-import {
-	ChartLegend,
-	ChartTooltip,
-	ChartContainer,
-	ChartLegendContent,
-	ChartTooltipContent,
-} from "@/shared/components/ui/chart"
+import { ChartTooltip, ChartContainer, ChartTooltipContent } from "@/shared/components/ui/chart"
 
 interface MaintenancePlanFrequencyChartProps {
 	data: PieChartItem[]
-	total: number
 }
 
 const COLORS = [
@@ -38,7 +31,6 @@ const COLORS = [
 
 export default function MaintenancePlanFrequencyChart({
 	data,
-	total,
 }: MaintenancePlanFrequencyChartProps) {
 	return (
 		<Card className="border">
@@ -48,9 +40,10 @@ export default function MaintenancePlanFrequencyChart({
 						<CardTitle>Tareas por Frecuencia</CardTitle>
 						<CardDescription>Distribución de las tareas por frecuencia</CardDescription>
 					</div>
-					<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
+					<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
 				</div>
 			</CardHeader>
+
 			<CardContent className="p-0">
 				<ChartContainer
 					config={{
@@ -75,54 +68,21 @@ export default function MaintenancePlanFrequencyChart({
 					}}
 					className="h-[250px] w-full max-w-[90dvw]"
 				>
-					<PieChart>
-						<Pie
-							label
-							cx="50%"
-							cy="50%"
-							data={data}
-							dataKey="value"
-							nameKey="name"
-							innerRadius={45}
-							paddingAngle={5}
-						>
-							<Label
-								content={({ viewBox }) => {
-									if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-										return (
-											<text
-												x={viewBox.cx}
-												y={viewBox.cy}
-												textAnchor="middle"
-												dominantBaseline="middle"
-											>
-												<tspan
-													x={viewBox.cx}
-													y={viewBox.cy}
-													className="fill-foreground text-3xl font-bold"
-												>
-													{total}
-												</tspan>
-												<tspan
-													x={viewBox.cx}
-													y={(viewBox.cy || 0) + 24}
-													className="fill-muted-foreground"
-												>
-													Planes
-												</tspan>
-											</text>
-										)
-									}
-								}}
-							/>
+					<BarChart data={data} margin={{ top: 15, right: 20 }}>
+						<ChartTooltip content={<ChartTooltipContent nameKey="frequency" />} />
 
+						<CartesianGrid strokeDasharray="3 3" />
+						<XAxis dataKey="name" />
+						<YAxis dataKey="value" />
+
+						<Bar dataKey="value" name="Tareas" radius={[4, 4, 0, 0]} maxBarSize={60}>
 							{data.map((_, index) => (
 								<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
 							))}
-						</Pie>
-						<ChartTooltip content={<ChartTooltipContent />} />
-						<ChartLegend content={<ChartLegendContent />} />
-					</PieChart>
+
+							<LabelList dataKey="value" position="top" />
+						</Bar>
+					</BarChart>
 				</ChartContainer>
 			</CardContent>
 		</Card>

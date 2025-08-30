@@ -52,7 +52,12 @@ export default function WorkRequestOperatorChart({ data }: WorkRequestOperatorCh
 					<BarChart data={chartData} margin={{ right: 30 }} layout="vertical">
 						<CartesianGrid strokeDasharray="3 3" />
 						<XAxis type="number" allowDecimals={false} />
-						<YAxis dataKey="operator" width={100} type="category" />
+						<YAxis
+							width={100}
+							type="category"
+							dataKey="operator"
+							tickFormatter={(value: string) => value.slice(0, 10) + "..."}
+						/>
 
 						<ChartTooltip
 							content={<ChartTooltipContent />}

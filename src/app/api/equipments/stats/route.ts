@@ -19,13 +19,35 @@ export async function GET() {
 		// 1. Total count of equipment
 		const totalEquipment = await prisma.equipment.count({})
 
-		// 2. Equipment by operational status
-		const equipmentByStatus = await prisma.equipment.groupBy({
-			by: ["isOperational"],
-			_count: {
-				id: true,
+		// 2. Equipment by work order association
+		const equipmentWithWorkOrders = await prisma.equipment.count({
+			where: {
+				workOrders: {
+					some: {},
+				},
 			},
 		})
+
+		const equipmentWithoutWorkOrders = await prisma.equipment.count({
+			where: {
+				workOrders: {
+					none: {},
+				},
+			},
+		})
+
+		const equipmentByWorkOrderStatus = [
+			{
+				status: "Con OT",
+				count: equipmentWithWorkOrders,
+				fill: "var(--color-emerald-500)",
+			},
+			{
+				status: "Sin OT",
+				count: equipmentWithoutWorkOrders,
+				fill: "var(--color-rose-500)",
+			},
+		]
 
 		// 3. Equipment by type
 		const equipmentByType = await prisma.equipment.groupBy({
@@ -134,11 +156,7 @@ export async function GET() {
 
 		return NextResponse.json({
 			totalEquipment,
-			equipmentByStatus: equipmentByStatus.map((item) => ({
-				status: item.isOperational ? "Operational" : "Non-operational",
-				count: item._count.id,
-				fill: item.isOperational ? "var(--color-emerald-500)" : "var(--color-rose-500)",
-			})),
+			equipmentByStatus: equipmentByWorkOrderStatus,
 			equipmentByType: equipmentByType.map((item) => ({
 				type: item.type || "Unspecified",
 				count: item._count.id,

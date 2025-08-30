@@ -5,16 +5,16 @@ import { PieChartIcon } from "lucide-react"
 
 import {
 	Card,
+	CardTitle,
+	CardHeader,
 	CardContent,
 	CardDescription,
-	CardHeader,
-	CardTitle,
 } from "@/shared/components/ui/card"
 import {
-	ChartContainer,
 	ChartLegend,
-	ChartLegendContent,
 	ChartTooltip,
+	ChartContainer,
+	ChartLegendContent,
 	ChartTooltipContent,
 } from "@/shared/components/ui/chart"
 
@@ -26,10 +26,12 @@ interface DocumentStatusChartProps {
 }
 
 const COLORS = {
-	DRAFT: "var(--color-cyan-800)",
-	SUBMITTED: "var(--color-cyan-500)",
-	APPROVED: "var(--color-emerald-500)",
-	REJECTED: "var(--color-rose-500)",
+	DRAFT: "var(--color-neutral-600)",
+	SUBMITTED: "var(--color-yellow-600)",
+	APPROVED: "var(--color-emerald-600)",
+	REJECTED: "var(--color-rose-600)",
+	EXPIRED: "var(--color-purple-600)",
+	TO_UPDATE: "var(--color-blue-600)",
 }
 
 export function DocumentStatusChart({ data }: DocumentStatusChartProps) {
@@ -61,6 +63,12 @@ export function DocumentStatusChart({ data }: DocumentStatusChartProps) {
 						REJECTED: {
 							label: "Rechazado",
 						},
+						EXPIRED: {
+							label: "Vencido",
+						},
+						TO_UPDATE: {
+							label: "A actualizar",
+						},
 					}}
 				>
 					<PieChart>
@@ -71,7 +79,7 @@ export function DocumentStatusChart({ data }: DocumentStatusChartProps) {
 							dataKey="count"
 							nameKey="status"
 							innerRadius={45}
-							paddingAngle={5}
+							paddingAngle={3}
 							label={({ percent }) => `${(percent * 100).toFixed(2)}%`}
 						>
 							{data.map((entry) => (

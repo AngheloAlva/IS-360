@@ -12,6 +12,7 @@ export interface ApiSafetyTalk {
 		id: string
 		name: string
 		email: string
+		rut: string
 		company: {
 			id: string
 			name: string

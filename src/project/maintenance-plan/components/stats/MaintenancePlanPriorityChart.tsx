@@ -1,9 +1,15 @@
 "use client"
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, LabelList } from "recharts"
-import { ChartColumnIcon } from "lucide-react"
+import { PieChart, Pie, Cell, Label } from "recharts"
+import { PieChartIcon } from "lucide-react"
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/shared/components/ui/chart"
+import {
+	ChartLegend,
+	ChartTooltip,
+	ChartContainer,
+	ChartLegendContent,
+	ChartTooltipContent,
+} from "@/shared/components/ui/chart"
 import {
 	Card,
 	CardTitle,
@@ -16,19 +22,22 @@ import type { BarChartItem } from "@/project/maintenance-plan/hooks/use-maintena
 
 interface MaintenancePlanPriorityChartProps {
 	data: BarChartItem[]
+	total: number
 }
 
-export default function MaintenancePlanPriorityChart({ data }: MaintenancePlanPriorityChartProps) {
-	console.log(data)
+export default function MaintenancePlanPriorityChart({
+	data,
+	total,
+}: MaintenancePlanPriorityChartProps) {
 	return (
 		<Card className="border">
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
-						<CardTitle>OT de Tareas por Prioridad</CardTitle>
-						<CardDescription>Distribución de las OT de tareas según su prioridad</CardDescription>
+						<CardTitle>Tareas por Prioridad</CardTitle>
+						<CardDescription>Distribución de las tareas según su prioridad</CardDescription>
 					</div>
-					<ChartColumnIcon className="text-muted-foreground h-5 min-w-5" />
+					<PieChartIcon className="text-muted-foreground h-5 min-w-5" />
 				</div>
 			</CardHeader>
 			<CardContent className="p-0">
@@ -46,21 +55,53 @@ export default function MaintenancePlanPriorityChart({ data }: MaintenancePlanPr
 					}}
 					className="h-[250px] w-full max-w-[90dvw]"
 				>
-					<BarChart data={data} margin={{ top: 15 }}>
-						<ChartTooltip content={<ChartTooltipContent nameKey="priority" />} />
-
-						<CartesianGrid strokeDasharray="3 3" />
-						<XAxis dataKey="priority" />
-						<YAxis dataKey="value" />
-
-						<Bar dataKey="value" name="Órdenes" radius={[4, 4, 0, 0]} maxBarSize={60}>
+					<PieChart>
+						<Pie
+							label
+							cx="50%"
+							cy="50%"
+							data={data}
+							dataKey="value"
+							nameKey="priority"
+							innerRadius={45}
+							paddingAngle={3}
+						>
 							{data.map((item, index) => (
-								<Cell key={index} fill={item.fill} />
+								<Cell key={`cell-${index}`} fill={item.fill} />
 							))}
-
-							<LabelList dataKey="value" position="top" />
-						</Bar>
-					</BarChart>
+							<Label
+								content={({ viewBox }) => {
+									if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+										return (
+											<text
+												x={viewBox.cx}
+												y={viewBox.cy}
+												textAnchor="middle"
+												dominantBaseline="middle"
+											>
+												<tspan
+													x={viewBox.cx}
+													y={viewBox.cy}
+													className="fill-foreground text-2xl font-bold"
+												>
+													{total.toLocaleString()}
+												</tspan>
+												<tspan
+													x={viewBox.cx}
+													y={(viewBox.cy || 0) + 24}
+													className="fill-muted-foreground text-sm"
+												>
+													Total
+												</tspan>
+											</text>
+										)
+									}
+								}}
+							/>
+						</Pie>
+						<ChartTooltip content={<ChartTooltipContent />} />
+						<ChartLegend content={<ChartLegendContent />} />
+					</PieChart>
 				</ChartContainer>
 			</CardContent>
 		</Card>

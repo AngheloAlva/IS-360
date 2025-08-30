@@ -1,7 +1,4 @@
 import { useQuery } from "@tanstack/react-query"
-import { WORK_ORDER_STATUS } from "@prisma/client"
-
-type WorkOrderStatus = keyof typeof WORK_ORDER_STATUS
 
 interface UserStatsResponse {
 	basicStats: {
@@ -9,19 +6,6 @@ interface UserStatsResponse {
 		twoFactorEnabled: number
 		totalContractors: number
 		totalSupervisors: number
-	}
-	charts: {
-		topUsersByWorkOrders: Array<{
-			name: string
-			workOrders: Record<WorkOrderStatus, number>
-		}>
-		documentActivity: Array<{
-			name: string
-			activity: Array<{
-				date: string
-				documents: number
-			}>
-		}>
 	}
 }
 

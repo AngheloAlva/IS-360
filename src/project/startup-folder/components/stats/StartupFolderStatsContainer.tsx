@@ -82,7 +82,7 @@ export function StartupFolderStatsContainer() {
 
 			<div className="grid gap-4 xl:grid-cols-3">
 				<DocumentStatusChart data={stats.charts.documentsByStatus} />
-				<DocumentsByFolderChart data={stats.charts.documentsByFolder} />
+				<DocumentsByFolderChart data={stats.charts.subfoldersByType} />
 			</div>
 		</div>
 	)

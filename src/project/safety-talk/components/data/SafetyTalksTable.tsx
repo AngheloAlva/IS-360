@@ -10,7 +10,11 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
-import { useState } from "react"
+import { FileSpreadsheetIcon } from "lucide-react"
+import { useCallback, useState } from "react"
+import { toast } from "sonner"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 import {
 	Table,
@@ -22,6 +26,8 @@ import {
 } from "@/shared/components/ui/table"
 import { Card, CardContent, CardDescription } from "@/shared/components/ui/card"
 import { Input } from "@/shared/components/ui/input"
+import { Button } from "@/shared/components/ui/button"
+import Spinner from "@/shared/components/Spinner"
 
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { useSafetyTalksTable } from "../../hooks/use-safety-talks-table"
@@ -30,17 +36,82 @@ import RefreshButton from "@/shared/components/RefreshButton"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { ApiSafetyTalk } from "../../types/api-safety-talk"
 
+// Labels para el export
+const STATUS_LABELS = {
+	PENDING: "Pendiente",
+	PASSED: "Aprobado",
+	FAILED: "Reprobado",
+	MANUALLY_APPROVED: "Aprobado Manual",
+	EXPIRED: "Expirado",
+}
+
+const CATEGORY_LABELS = {
+	ENVIRONMENTAL: "Medio Ambiente",
+	VISITOR: "Visitas",
+	IRL: "IRL",
+}
+
 export function SafetyTalksTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
+	const [exportLoading, setExportLoading] = useState(false)
 
 	const { data, isLoading, isFetching, refetch } = useSafetyTalksTable({
 		page,
 		search,
 		limit: 15,
 	})
+
+	const handleExportToExcel = useCallback(async () => {
+		try {
+			setExportLoading(true)
+
+			const res: { data: ApiSafetyTalk[] } = await fetch(
+				`/api/safety-talks/table?page=1&limit=10000`
+			).then((res) => res.json())
+
+			if (!res?.data?.length) {
+				toast.error("No hay charlas de seguridad para exportar")
+				return
+			}
+
+			const XLSX = await import("xlsx")
+
+			const workbook = XLSX.utils.book_new()
+			const worksheet = XLSX.utils.json_to_sheet(
+				res.data.map((safetyTalk: ApiSafetyTalk) => ({
+					"Nombre": safetyTalk.user?.name || "N/A",
+					"RUT": safetyTalk.user?.rut || "N/A",
+					"Empresa": safetyTalk.user?.company?.name || "Sin empresa",
+					"Fecha": safetyTalk.completedAt
+						? format(new Date(safetyTalk.completedAt), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"Vencimiento": safetyTalk.expiresAt
+						? format(new Date(safetyTalk.expiresAt), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"Estado":
+						STATUS_LABELS[safetyTalk.status as keyof typeof STATUS_LABELS] ||
+						safetyTalk.status ||
+						"N/A",
+					"Tipo de Inducción":
+						CATEGORY_LABELS[safetyTalk.category as keyof typeof CATEGORY_LABELS] ||
+						safetyTalk.category ||
+						"N/A",
+				}))
+			)
+
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Charlas de Seguridad")
+			XLSX.writeFile(workbook, "charlas-de-seguridad.xlsx")
+			toast.success("Charlas de seguridad exportadas exitosamente")
+		} catch (error) {
+			console.error("[EXPORT_SAFETY_TALKS]", error)
+			toast.error("Error al exportar charlas de seguridad")
+		} finally {
+			setExportLoading(false)
+		}
+	}, [])
 
 	const table = useReactTable<ApiSafetyTalk>({
 		data: data?.data ?? [],
@@ -82,6 +153,15 @@ export function SafetyTalksTable() {
 						/>
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+						<Button
+							size="lg"
+							onClick={handleExportToExcel}
+							className="bg-orange-600 hover:bg-orange-700"
+						>
+							{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+							Exportar
+						</Button>
 					</div>
 				</div>
 

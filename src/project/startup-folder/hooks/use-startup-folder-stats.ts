@@ -4,13 +4,17 @@ import type { ReviewStatus } from "@prisma/client"
 
 interface DocumentStatusCount {
 	status: ReviewStatus
-	label: string
 	count: number
 }
 
-interface FolderDocuments {
+interface SubfolderByType {
 	name: string
-	data: DocumentStatusCount[]
+	DRAFT: number
+	SUBMITTED: number
+	APPROVED: number
+	REJECTED: number
+	EXPIRED: number
+	TO_UPDATE: number
 }
 
 export interface StartupFolderStats {
@@ -20,7 +24,7 @@ export interface StartupFolderStats {
 	totalCompaniesApproved: number
 	charts: {
 		documentsByStatus: DocumentStatusCount[]
-		documentsByFolder: FolderDocuments[]
+		subfoldersByType: SubfolderByType[]
 	}
 }
 

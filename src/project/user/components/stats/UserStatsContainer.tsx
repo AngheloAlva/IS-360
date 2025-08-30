@@ -5,14 +5,28 @@ import { UsersIcon, ShieldCheckIcon } from "lucide-react"
 import { useUserStats } from "@/project/user/hooks/use-user-stats"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
-import { UserDocumentActivityChart } from "./UserDocumentActivityChart"
-import ChartSkeleton from "@/shared/components/stats/ChartSkeleton"
-import { UserWorkOrdersChart } from "./UserWorkOrdersChart"
+import { Skeleton } from "@/shared/components/ui/skeleton"
 
 export function UserStatsContainer() {
 	const { data: userData, isLoading } = useUserStats()
 
-	if (isLoading) return <ChartSkeleton />
+	if (isLoading)
+		return (
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+				{Array.from({ length: 4 }).map((_, i) => (
+					<Card key={i} className="col-span-1">
+						<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+							<CardTitle className="text-base font-medium">
+								<Skeleton className="h-4 w-[150px]" />
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<Skeleton className="h-[85px] w-full" />
+						</CardContent>
+					</Card>
+				))}
+			</div>
+		)
 
 	return (
 		<div className="space-y-4">
@@ -73,11 +87,6 @@ export function UserStatsContainer() {
 						<p className="text-muted-foreground text-xs">Supervisores activos</p>
 					</CardContent>
 				</Card>
-			</div>
-
-			<div className="grid gap-4 xl:grid-cols-2">
-				<UserWorkOrdersChart data={userData?.charts.topUsersByWorkOrders || []} />
-				<UserDocumentActivityChart data={userData?.charts.documentActivity || []} />
 			</div>
 		</div>
 	)

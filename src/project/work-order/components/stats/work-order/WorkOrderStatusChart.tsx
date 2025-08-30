@@ -5,14 +5,12 @@ import { PieChartIcon } from "lucide-react"
 
 import { useWorkOrderFiltersStore } from "@/project/work-order/stores/work-order-filters-store"
 
-import type { WorkOrderStatsResponse } from "@/project/work-order/hooks/use-work-order-stats"
-
 import {
 	Card,
+	CardTitle,
+	CardHeader,
 	CardContent,
 	CardDescription,
-	CardHeader,
-	CardTitle,
 } from "@/shared/components/ui/card"
 import {
 	ChartLegend,
@@ -21,6 +19,8 @@ import {
 	ChartLegendContent,
 	ChartTooltipContent,
 } from "@/shared/components/ui/chart"
+
+import type { WorkOrderStatsResponse } from "@/project/work-order/hooks/use-work-order-stats"
 
 interface WorkOrderStatusChartProps {
 	total: number
@@ -34,10 +34,6 @@ export function WorkOrderTypeChart({ data, total }: WorkOrderStatusChartProps) {
 	const handleChartClick = (data: { name: string }) => {
 		const clickedStatus = data.name
 
-		console.log({
-			typeFilter,
-			clickedStatus,
-		})
 		if (typeFilter === clickedStatus) {
 			setTypeFilter(null)
 		} else {
@@ -126,7 +122,7 @@ export function WorkOrderTypeChart({ data, total }: WorkOrderStatusChartProps) {
 							/>
 						</Pie>
 						<ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-						<ChartLegend content={<ChartLegendContent />} />
+						<ChartLegend content={<ChartLegendContent nameKey="status" />} />
 					</PieChart>
 				</ChartContainer>
 			</CardContent>

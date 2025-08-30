@@ -6,7 +6,6 @@ import MaintenancePlanFrequencyChart from "./MaintenancePlanFrequencyChart"
 import MaintenancePlanPriorityChart from "./MaintenancePlanPriorityChart"
 import ChartSkeleton from "@/shared/components/stats/ChartSkeleton"
 import MaintenancePlanStatsCards from "./MaintenancePlanStatsCards"
-import MaintenancePlanChart from "./MaintenancePlanChart"
 
 export default function MaintenancePlanStatsContainer() {
 	const { data, isLoading } = useMaintenancePlanStats()
@@ -18,11 +17,12 @@ export default function MaintenancePlanStatsContainer() {
 			<MaintenancePlanStatsCards stats={data.basicStats} />
 
 			<div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-				<MaintenancePlanFrequencyChart
-					data={data.pieChartData}
-					total={data.basicStats.totalTasks}
-				/>
+				<div className="xl:col-span-2">
+					<MaintenancePlanFrequencyChart data={data.pieChartData} />
+				</div>
+
 				<MaintenancePlanPriorityChart
+					total={data.basicStats.totalTasks}
 					data={
 						data.barChartData.length > 0
 							? data.barChartData
@@ -48,7 +48,6 @@ export default function MaintenancePlanStatsContainer() {
 								]
 					}
 				/>
-				<MaintenancePlanChart data={data.areaChartData} />
 			</div>
 		</div>
 	)

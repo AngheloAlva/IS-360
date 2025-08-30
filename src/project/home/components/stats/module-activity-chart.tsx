@@ -72,8 +72,8 @@ export function ModuleActivityChart({ data, isLoading }: ModuleActivityChartProp
 							<Bar dataKey="percentage" name="% Activo" radius={[0, 4, 4, 0]}>
 								{data.map((entry, index) => {
 									let color = "var(--color-red-500)"
-									if (entry.percentage >= 80) color = "var(--color-green-500)"
-									else if (entry.percentage >= 60) color = "var(--color-yellow-500)"
+									if (entry.percentage >= 50) color = "var(--color-green-500)"
+									else if (entry.percentage >= 30) color = "var(--color-yellow-500)"
 									return <Cell key={`cell-${index}`} fill={color} />
 								})}
 							</Bar>

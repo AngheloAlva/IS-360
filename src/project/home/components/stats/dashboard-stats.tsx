@@ -1,9 +1,9 @@
 import { HomepageStatsResponse } from "@/project/home/hooks/use-homepage-stats"
 
+import { WorkRequestsAreaChart } from "./work-request-area-chart"
 import { SystemOverviewCards } from "./system-overview-cards"
 import { ModuleActivityChart } from "./module-activity-chart"
-import { WeeklyActivityChart } from "./weekly-activity-chart"
-import { RecentActivity } from "./recent-activity"
+import { WorkOrdersPieChart } from "./work-orders-pie-chart"
 
 interface DashboardStatsProps {
 	data?: HomepageStatsResponse
@@ -53,110 +53,11 @@ export function DashboardStats({ data, isLoading }: DashboardStatsProps) {
 					}
 					isLoading={isLoading}
 				/>
-				<WeeklyActivityChart
-					data={
-						data?.weeklyActivityChart || [
-							{
-								day: "Lunes",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-							{
-								day: "Martes",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-							{
-								day: "Miércoles",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-							{
-								day: "Jueves",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-							{
-								day: "Viernes",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-							{
-								day: "Sábado",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-							{
-								day: "Domingo",
-								workOrders: 0,
-								permits: 0,
-								maintenance: 0,
-								equipment: 0,
-								users: 0,
-								companies: 0,
-								workRequests: 0,
-								documentation: 0,
-								vehicles: 0,
-								startupFolders: 0,
-							},
-						]
-					}
-					isLoading={isLoading}
-				/>
+
+				<WorkOrdersPieChart data={data?.workOrdersPieChart || []} isLoading={isLoading} />
 			</div>
 
-			{/* Recent Activity */}
-			<div className="grid gap-4 md:grid-cols-1">
-				<RecentActivity activities={data?.recentActivity || []} isLoading={isLoading} />
-			</div>
+			<WorkRequestsAreaChart data={data?.workRequestsAreaChart || []} isLoading={isLoading} />
 		</div>
 	)
 }

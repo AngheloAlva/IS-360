@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
 
-// Interface for system overview data (estructura plana como lo devuelve la API)
 export interface SystemOverview {
 	companies: number
 	equipment: number
@@ -23,19 +22,16 @@ export interface SystemOverview {
 	companiesWithPendingDocs: number
 }
 
-// Interface for system health data (ShapeChart)
 export interface ShapeChartItem {
 	label: string
 	value: string
 }
 
-// Interface for module activity data
 export interface ModuleActivityItem {
 	name: string
 	percentage: number
 }
 
-// Interface for weekly activity data
 export interface WeeklyActivityItem {
 	day: string
 	workOrders: number
@@ -50,25 +46,27 @@ export interface WeeklyActivityItem {
 	startupFolders: number
 }
 
-// Interface for recent activity data
-export interface RecentActivityItem {
-	id: string
-	description: string
-	module: string
-	time: string
-	user: string
+export interface WorkOrderPieChartItem {
+	name: string
+	value: number
+	status: string
 }
 
-// Interface for the complete homepage stats response
+export interface WorkRequestsAreaChartItem {
+	month: string
+	urgente: number
+	noUrgente: number
+}
+
 export interface HomepageStatsResponse {
 	systemOverview: SystemOverview
 	shapeChart: ShapeChartItem[]
 	moduleActivityChart: ModuleActivityItem[]
 	weeklyActivityChart: WeeklyActivityItem[]
-	recentActivity: RecentActivityItem[]
+	workOrdersPieChart: WorkOrderPieChartItem[]
+	workRequestsAreaChart: WorkRequestsAreaChartItem[]
 }
 
-// Function to fetch homepage stats from the API
 async function getHomepageStats(): Promise<HomepageStatsResponse> {
 	const response = await fetch("/api/dashboard/homepage-stats")
 
@@ -76,11 +74,9 @@ async function getHomepageStats(): Promise<HomepageStatsResponse> {
 		throw new Error("Error al obtener las estadísticas del dashboard")
 	}
 
-	// La respuesta ya está en formato compatible con HomepageStatsResponse
 	return response.json()
 }
 
-// Custom hook for fetching homepage stats
 export function useHomepageStats() {
 	return useQuery({
 		queryKey: ["dashboard", "homepage-stats"],

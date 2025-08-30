@@ -30,8 +30,8 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>
-						<CardTitle>Estado Operativo de Equipos</CardTitle>
-						<CardDescription>Equipos dividos por estado operativo</CardDescription>
+						<CardTitle>Equipos con Órdenes de Trabajo</CardTitle>
+						<CardDescription>Equipos que tienen órdenes de trabajo relacionadas</CardDescription>
 					</div>
 					<PieChartIcon className="text-muted-foreground mt-0.5 h-5 min-w-5" />
 				</div>
@@ -40,11 +40,11 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
 				<div className="h-[250px] w-full max-w-[90dvw] px-2">
 					<ChartContainer
 						config={{
-							"Operational": {
-								label: "Operativo",
+							"Con OT": {
+								label: "Con Órdenes de Trabajo",
 							},
-							"Non-operational": {
-								label: "No Operativo",
+							"Sin OT": {
+								label: "Sin Órdenes de Trabajo",
 							},
 						}}
 						className="h-full w-full"
@@ -58,6 +58,7 @@ export default function EquipmentStatusChart({ data }: EquipmentStatusChartProps
 								fill="#8884d8"
 								dataKey="count"
 								innerRadius={45}
+								paddingAngle={3}
 								nameKey="status"
 								label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
 							>
