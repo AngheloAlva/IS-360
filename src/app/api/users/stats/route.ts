@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
-import { format } from "date-fns"
 
 import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
@@ -17,7 +16,7 @@ export async function GET(): Promise<NextResponse> {
 
 	try {
 		// Estadísticas básicas
-		const [totalUsers, twoFactorEnabled, totalContractors] = await Promise.all([
+		const [totalUsers, twoFactorEnabled, totalContractors, totalSupervisors] = await Promise.all([
 			prisma.user.count({
 				where: {
 					accessRole: ACCESS_ROLE.ADMIN,
@@ -37,90 +36,21 @@ export async function GET(): Promise<NextResponse> {
 					accessRole: ACCESS_ROLE.PARTNER_COMPANY,
 				},
 			}),
+			prisma.user.count({
+				where: {
+					isActive: true,
+					isSupervisor: true,
+					accessRole: ACCESS_ROLE.PARTNER_COMPANY,
+				},
+			}),
 		])
-
-		// Top 5 usuarios por órdenes de trabajo
-		const topUsersByWorkOrders = await prisma.user.findMany({
-			take: 5,
-			select: {
-				name: true,
-				workOrders: {
-					select: {
-						status: true,
-					},
-				},
-			},
-			orderBy: {
-				workOrders: {
-					_count: "desc",
-				},
-			},
-		})
-
-		const formattedTopUsers = topUsersByWorkOrders.map((user) => ({
-			name: user.name,
-			workOrders: {
-				PENDING: user.workOrders.filter((wo) => wo.status === "PENDING").length,
-				PLANNED: user.workOrders.filter((wo) => wo.status === "PLANNED").length,
-				IN_PROGRESS: user.workOrders.filter((wo) => wo.status === "IN_PROGRESS").length,
-				COMPLETED: user.workOrders.filter((wo) => wo.status === "COMPLETED").length,
-				CANCELLED: user.workOrders.filter((wo) => wo.status === "CANCELLED").length,
-				CLOSURE_REQUESTED: user.workOrders.filter((wo) => wo.status === "CLOSURE_REQUESTED").length,
-			},
-		}))
-
-		// Actividad de documentos por día (últimos 30 días)
-		const thirtyDaysAgo = new Date()
-		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
-		const userDocumentActivity = await prisma.user.findMany({
-			select: {
-				name: true,
-				folders: {
-					where: {
-						createdAt: {
-							gte: thirtyDaysAgo,
-						},
-					},
-					select: {
-						createdAt: true,
-						files: true,
-					},
-				},
-			},
-		})
-
-		// Procesar datos de actividad por día
-		const documentActivity = userDocumentActivity.map((user) => {
-			const dailyActivity: Record<string, number> = {}
-
-			// Contar documentos por día
-			user.folders.forEach((folder) => {
-				folder.files.forEach((file) => {
-					const date = format(file.createdAt, "MM-dd")
-					dailyActivity[date] = (dailyActivity[date] || 0) + 1
-				})
-			})
-
-			return {
-				name: user.name,
-				activity: Object.entries(dailyActivity).map(([date, documents]) => ({
-					date,
-					documents,
-				})),
-			}
-		})
 
 		return NextResponse.json({
 			basicStats: {
 				totalUsers,
 				twoFactorEnabled,
 				totalContractors,
-				totalSupervisors: 0,
-			},
-			charts: {
-				topUsersByWorkOrders: formattedTopUsers,
-				documentActivity,
+				totalSupervisors,
 			},
 		})
 	} catch (error) {

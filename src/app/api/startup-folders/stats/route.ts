@@ -60,6 +60,7 @@ export async function GET(): Promise<NextResponse> {
 				}),
 			])
 
+		// Obtener datos de documentos para el gráfico de estado general
 		const [
 			safetyDocs,
 			environmentalDocs,
@@ -99,7 +100,14 @@ export async function GET(): Promise<NextResponse> {
 			}),
 		])
 
-		const documentsByStatus = ["DRAFT", "SUBMITTED", "APPROVED", "REJECTED"].map((status) => {
+		const documentsByStatus = [
+			"DRAFT",
+			"SUBMITTED",
+			"APPROVED",
+			"REJECTED",
+			"EXPIRED",
+			"TO_UPDATE",
+		].map((status) => {
 			const safetyCount = safetyDocs.find((d) => d.status === status)?._count.id ?? 0
 			const environmentalCount = environmentalDocs.find((d) => d.status === status)?._count.id ?? 0
 			const workerCount = workerDocs.find((d) => d.status === status)?._count.id ?? 0
@@ -121,55 +129,113 @@ export async function GET(): Promise<NextResponse> {
 			}
 		})
 
-		const documentsByFolder = [
+		// Obtener datos de subcarpetas para el gráfico de barras
+		const [
+			safetyFolders,
+			environmentalFolders,
+			workerFolders,
+			vehicleFolders,
+			environmentFolders,
+			techSpecsFolders,
+			basicFolders,
+		] = await Promise.all([
+			prisma.safetyAndHealthFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+			prisma.environmentalFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+			prisma.workerFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+			prisma.vehicleFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+			prisma.environmentFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+			prisma.techSpecsFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+			prisma.basicFolder.groupBy({
+				by: ["status"],
+				_count: { id: true },
+			}),
+		])
+
+		// Combinar Environmental y Environment en "Medio Ambiente"
+		const combinedEnvironmentStatus = ["DRAFT", "SUBMITTED", "APPROVED", "REJECTED", "EXPIRED"]
+			.map((status) => {
+				const environmentalCount =
+					environmentalFolders.find((f) => f.status === status)?._count.id ?? 0
+				const environmentCount = environmentFolders.find((f) => f.status === status)?._count.id ?? 0
+				return {
+					status,
+					count: environmentalCount + environmentCount,
+				}
+			})
+			.filter((item) => item.count > 0)
+
+		const subfoldersByType = [
 			{
 				name: "Seguridad y Salud",
-				data: safetyDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
+				DRAFT: safetyFolders.find((f) => f.status === "DRAFT")?._count.id ?? 0,
+				SUBMITTED: safetyFolders.find((f) => f.status === "SUBMITTED")?._count.id ?? 0,
+				APPROVED: safetyFolders.find((f) => f.status === "APPROVED")?._count.id ?? 0,
+				REJECTED: safetyFolders.find((f) => f.status === "REJECTED")?._count.id ?? 0,
+				EXPIRED: safetyFolders.find((f) => f.status === "EXPIRED")?._count.id ?? 0,
+				TO_UPDATE: safetyFolders.find((f) => f.status === "TO_UPDATE")?._count.id ?? 0,
 			},
 			{
 				name: "Medio Ambiente",
-				data: environmentalDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
-			},
-			{
-				name: "Trabajadores",
-				data: workerDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
-			},
-			{
-				name: "Vehículos",
-				data: vehicleDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
-			},
-			{
-				name: "Medio Ambiente (nuevo)",
-				data: environmentDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
+				DRAFT: combinedEnvironmentStatus.find((f) => f.status === "DRAFT")?.count ?? 0,
+				SUBMITTED: combinedEnvironmentStatus.find((f) => f.status === "SUBMITTED")?.count ?? 0,
+				APPROVED: combinedEnvironmentStatus.find((f) => f.status === "APPROVED")?.count ?? 0,
+				REJECTED: combinedEnvironmentStatus.find((f) => f.status === "REJECTED")?.count ?? 0,
+				EXPIRED: combinedEnvironmentStatus.find((f) => f.status === "EXPIRED")?.count ?? 0,
+				TO_UPDATE: combinedEnvironmentStatus.find((f) => f.status === "TO_UPDATE")?.count ?? 0,
 			},
 			{
 				name: "Especificaciones Técnicas",
-				data: techSpecsDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
+				DRAFT: techSpecsFolders.find((f) => f.status === "DRAFT")?._count.id ?? 0,
+				SUBMITTED: techSpecsFolders.find((f) => f.status === "SUBMITTED")?._count.id ?? 0,
+				APPROVED: techSpecsFolders.find((f) => f.status === "APPROVED")?._count.id ?? 0,
+				REJECTED: techSpecsFolders.find((f) => f.status === "REJECTED")?._count.id ?? 0,
+				EXPIRED: techSpecsFolders.find((f) => f.status === "EXPIRED")?._count.id ?? 0,
+				TO_UPDATE: techSpecsFolders.find((f) => f.status === "TO_UPDATE")?._count.id ?? 0,
+			},
+			{
+				name: "Trabajadores",
+				DRAFT: workerFolders.find((f) => f.status === "DRAFT")?._count.id ?? 0,
+				SUBMITTED: workerFolders.find((f) => f.status === "SUBMITTED")?._count.id ?? 0,
+				APPROVED: workerFolders.find((f) => f.status === "APPROVED")?._count.id ?? 0,
+				REJECTED: workerFolders.find((f) => f.status === "REJECTED")?._count.id ?? 0,
+				EXPIRED: workerFolders.find((f) => f.status === "EXPIRED")?._count.id ?? 0,
+				TO_UPDATE: workerFolders.find((f) => f.status === "TO_UPDATE")?._count.id ?? 0,
+			},
+			{
+				name: "Vehículos",
+				DRAFT: vehicleFolders.find((f) => f.status === "DRAFT")?._count.id ?? 0,
+				SUBMITTED: vehicleFolders.find((f) => f.status === "SUBMITTED")?._count.id ?? 0,
+				APPROVED: vehicleFolders.find((f) => f.status === "APPROVED")?._count.id ?? 0,
+				REJECTED: vehicleFolders.find((f) => f.status === "REJECTED")?._count.id ?? 0,
+				EXPIRED: vehicleFolders.find((f) => f.status === "EXPIRED")?._count.id ?? 0,
+				TO_UPDATE: vehicleFolders.find((f) => f.status === "TO_UPDATE")?._count.id ?? 0,
 			},
 			{
 				name: "Básicos",
-				data: basicDocs.map((doc) => ({
-					status: doc.status,
-					count: doc._count.id,
-				})),
+				DRAFT: basicFolders.find((f) => f.status === "DRAFT")?._count.id ?? 0,
+				SUBMITTED: basicFolders.find((f) => f.status === "SUBMITTED")?._count.id ?? 0,
+				APPROVED: basicFolders.find((f) => f.status === "APPROVED")?._count.id ?? 0,
+				REJECTED: basicFolders.find((f) => f.status === "REJECTED")?._count.id ?? 0,
+				EXPIRED: basicFolders.find((f) => f.status === "EXPIRED")?._count.id ?? 0,
+				TO_UPDATE: basicFolders.find((f) => f.status === "TO_UPDATE")?._count.id ?? 0,
 			},
 		]
 
@@ -181,7 +247,7 @@ export async function GET(): Promise<NextResponse> {
 
 			charts: {
 				documentsByStatus,
-				documentsByFolder,
+				subfoldersByType,
 			},
 		})
 	} catch (error) {

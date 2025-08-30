@@ -42,6 +42,11 @@ export async function GET(): Promise<NextResponse> {
 			_count: {
 				id: true,
 			},
+			orderBy: {
+				_count: {
+					id: "desc",
+				},
+			},
 		})
 
 		// Obtener información de los operadores
