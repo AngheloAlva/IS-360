@@ -1,5 +1,6 @@
 import { persist } from "zustand/middleware"
 import { create } from "zustand"
+import type { DateRange } from "react-day-picker"
 
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 
@@ -8,7 +9,7 @@ interface WorkPermitFiltersState {
 	companyId: string | null
 	approvedBy: string | null
 	typeFilter: string | null
-	date: Date | null
+	dateRange: DateRange | null
 	search: string
 	page: number
 	orderBy: OrderBy
@@ -18,7 +19,7 @@ interface WorkPermitFiltersState {
 	setCompanyId: (companyId: string | null) => void
 	setApprovedBy: (approvedBy: string | null) => void
 	setTypeFilter: (type: string | null) => void
-	setDate: (range: Date | null) => void
+	setDateRange: (range: DateRange | null) => void
 	setSearch: (search: string) => void
 	setPage: (page: number) => void
 	setOrderBy: (orderBy: OrderBy) => void
@@ -33,7 +34,7 @@ const initialState = {
 	companyId: null,
 	approvedBy: null,
 	typeFilter: null,
-	date: null,
+	dateRange: null,
 	search: "",
 	page: 1,
 	orderBy: "createdAt" as OrderBy,
@@ -61,8 +62,8 @@ export const useWorkPermitFiltersStore = create<WorkPermitFiltersState>()(
 				set({ typeFilter, page: 1 })
 			},
 
-			setDate: (date) => {
-				set({ date, page: 1 })
+			setDateRange: (dateRange) => {
+				set({ dateRange, page: 1 })
 			},
 
 			setSearch: (search) => {
@@ -87,7 +88,7 @@ export const useWorkPermitFiltersStore = create<WorkPermitFiltersState>()(
 					companyId: null,
 					approvedBy: null,
 					typeFilter: null,
-					date: null,
+					dateRange: null,
 					search: "",
 					page: 1,
 				})
@@ -104,7 +105,7 @@ export const useWorkPermitFiltersStore = create<WorkPermitFiltersState>()(
 				companyId: state.companyId,
 				approvedBy: state.approvedBy,
 				typeFilter: state.typeFilter,
-				date: state.date,
+				dateRange: state.dateRange,
 				search: state.search,
 				orderBy: state.orderBy,
 				order: state.order,

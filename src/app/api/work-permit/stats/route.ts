@@ -24,7 +24,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const companyId = searchParams.get("companyId") || null
 		const typeFilter = searchParams.get("typeFilter") || null
 		const approvedBy = searchParams.get("approvedBy") || null
-		const date = searchParams.get("date") || null
+		const dateFrom = searchParams.get("dateFrom") || null
+		const dateTo = searchParams.get("dateTo") || null
 
 		const filter = {
 			...(search
@@ -39,11 +40,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				: {}),
 			...(statusFilter ? { status: statusFilter as WORK_PERMIT_STATUS } : {}),
 			...(companyId ? { companyId: companyId } : {}),
-			...(date
+			...(dateFrom || dateTo
 				? {
 						createdAt: {
-							gte: new Date(new Date(decodeURIComponent(date)).setHours(0, 0, 0, 0)),
-							lt: new Date(new Date(decodeURIComponent(date)).setHours(23, 59, 59, 999)),
+							...(dateFrom ? { gte: new Date(new Date(decodeURIComponent(dateFrom)).setHours(0, 0, 0, 0)) } : {}),
+							...(dateTo ? { lte: new Date(new Date(decodeURIComponent(dateTo)).setHours(23, 59, 59, 999)) } : {}),
 						},
 					}
 				: {}),

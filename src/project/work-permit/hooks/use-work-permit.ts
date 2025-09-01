@@ -1,4 +1,5 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
+import type { DateRange } from "react-day-picker"
 
 import type { Order, OrderBy } from "@/shared/components/OrderByButton"
 
@@ -84,7 +85,7 @@ interface WorkPermitsParams {
 	limit: number
 	search: string
 	orderBy: OrderBy
-	date: Date | null
+	dateRange: DateRange | null
 	companyId: string | null
 	approvedBy: string | null
 	typeFilter: string | null
@@ -107,7 +108,7 @@ export const fetchWorkPermits: QueryFunction<
 			limit: number
 			search: string
 			orderBy: OrderBy
-			date: Date | null
+			dateRange: DateRange | null
 			companyId: string | null
 			approvedBy: string | null
 			typeFilter: string | null
@@ -117,7 +118,7 @@ export const fetchWorkPermits: QueryFunction<
 > = async ({ queryKey }) => {
 	const [
 		,
-		{ page, limit, search, statusFilter, companyId, approvedBy, date, orderBy, order, typeFilter },
+		{ page, limit, search, statusFilter, companyId, approvedBy, dateRange, orderBy, order, typeFilter },
 	] = queryKey
 
 	const searchParams = new URLSearchParams()
@@ -128,7 +129,8 @@ export const fetchWorkPermits: QueryFunction<
 	if (approvedBy) searchParams.set("approvedBy", approvedBy)
 	if (typeFilter) searchParams.set("typeFilter", typeFilter)
 	if (statusFilter) searchParams.set("statusFilter", statusFilter)
-	if (date) searchParams.set("date", date.toISOString())
+	if (dateRange?.from) searchParams.set("dateFrom", dateRange.from.toISOString())
+	if (dateRange?.to) searchParams.set("dateTo", dateRange.to.toISOString())
 	if (orderBy) searchParams.set("orderBy", orderBy)
 	if (order) searchParams.set("order", order)
 
@@ -142,7 +144,7 @@ export const useWorkPermits = ({
 	page = 1,
 	limit = 10,
 	search = "",
-	date = null,
+	dateRange = null,
 	order = "desc",
 	companyId = null,
 	approvedBy = null,
@@ -159,7 +161,7 @@ export const useWorkPermits = ({
 			search,
 			orderBy,
 			companyId,
-			date,
+			dateRange,
 			approvedBy,
 			typeFilter,
 			statusFilter,

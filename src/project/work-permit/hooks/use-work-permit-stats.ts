@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import type { DateRange } from "react-day-picker"
 
 interface WorkPermitStats {
 	totalWorkPermits: number
@@ -24,7 +25,7 @@ interface WorkPermitStats {
 
 interface WorkPermitStatsParams {
 	search?: string
-	date?: Date | null
+	dateRange?: DateRange | null
 	companyId?: string | null
 	approvedBy?: string | null
 	typeFilter?: string | null
@@ -32,12 +33,13 @@ interface WorkPermitStatsParams {
 }
 
 export function useWorkPermitStats(params: WorkPermitStatsParams = {}) {
-	const { search = "", statusFilter, companyId, approvedBy, typeFilter, date } = params
+	const { search = "", statusFilter, companyId, approvedBy, typeFilter, dateRange } = params
 
 	const searchParams = new URLSearchParams()
 	if (search) searchParams.set("search", search)
 	if (companyId) searchParams.set("companyId", companyId)
-	if (date) searchParams.set("date", date?.toISOString())
+	if (dateRange?.from) searchParams.set("dateFrom", dateRange.from.toISOString())
+	if (dateRange?.to) searchParams.set("dateTo", dateRange.to.toISOString())
 	if (approvedBy) searchParams.set("approvedBy", approvedBy)
 	if (typeFilter) searchParams.set("typeFilter", typeFilter)
 	if (statusFilter) searchParams.set("statusFilter", statusFilter)
@@ -45,7 +47,7 @@ export function useWorkPermitStats(params: WorkPermitStatsParams = {}) {
 	return useQuery<WorkPermitStats>({
 		queryKey: [
 			"work-permit-stats",
-			{ search, statusFilter, companyId, approvedBy, typeFilter, date },
+			{ search, statusFilter, companyId, approvedBy, typeFilter, dateRange },
 		],
 		queryFn: async () => {
 			const url = `/api/work-permit/stats${searchParams.toString() ? `?${searchParams.toString()}` : ""}`

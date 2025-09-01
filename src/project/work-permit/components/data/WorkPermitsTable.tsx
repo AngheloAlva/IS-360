@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import {
 	flexRender,
 	SortingState,
@@ -9,21 +9,26 @@ import {
 	ColumnFiltersState,
 	getFilteredRowModel,
 } from "@tanstack/react-table"
+import { toast } from "sonner"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 import { useWorkPermitFilters } from "../../hooks/use-work-permit-filters"
 import { WorkPermitStatusOptions } from "@/lib/consts/work-permit-status"
 import { getWorkPermitColumns } from "../../columns/work-permit-columns"
 import { useCompanies } from "@/project/company/hooks/use-companies"
 import { useOperators } from "@/shared/hooks/use-operators"
+import type { WorkPermit } from "../../hooks/use-work-permit"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
-import { CalendarDatePicker } from "@/shared/components/ui/date-picker"
+import { CalendarDateRangePicker } from "@/shared/components/ui/date-range-picker"
 import { WorkWillBeOptions } from "@/lib/consts/work-permit-options"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import OrderByButton from "@/shared/components/OrderByButton"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
+import Spinner from "@/shared/components/Spinner"
 import {
 	Table,
 	TableRow,
@@ -42,7 +47,7 @@ import {
 	SelectSeparator,
 } from "@/shared/components/ui/select"
 import { Button } from "@/shared/components/ui/button"
-import { FilterXIcon } from "lucide-react"
+import { FilterXIcon, FileSpreadsheetIcon } from "lucide-react"
 
 interface WorkPermitsTableProps {
 	hasPermission: boolean
@@ -53,6 +58,7 @@ interface WorkPermitsTableProps {
 export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPermitsTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
+	const [exportLoading, setExportLoading] = useState<boolean>(false)
 
 	const {
 		filters,
@@ -68,6 +74,60 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 		limit: 100,
 		page: 1,
 	})
+
+	const handleExportToExcel = useCallback(async () => {
+		try {
+			setExportLoading(true)
+
+			const res: { workPermits: WorkPermit[] } = await fetch(
+				`/api/work-permit?page=1&order=desc&orderBy=createdAt&limit=10000`
+			).then((res) => res.json())
+
+			if (!res?.workPermits?.length) {
+				toast.error("No hay permisos de trabajo para exportar")
+				return
+			}
+
+			const XLSX = await import("xlsx")
+
+			const workbook = XLSX.utils.book_new()
+			const worksheet = XLSX.utils.json_to_sheet(
+				res?.workPermits.map((workPermit: WorkPermit) => ({
+					"N° OT": workPermit.otNumber?.otNumber || "URGENTE",
+					"Empresa": workPermit.company?.name,
+					"Solicitante": workPermit.user?.name,
+					"RUT Solicitante": workPermit.user?.rut,
+					"Estado": workPermit.status,
+					"Trabajo Requerido": workPermit.otNumber?.workRequest || "N/A",
+					"Tipo de Trabajo": workPermit.workWillBe,
+					"Lugar Exacto": workPermit.exactPlace,
+					"Mutualidad": workPermit.mutuality,
+					"Fecha de Inicio": format(new Date(workPermit.startDate), "dd/MM/yyyy", { locale: es }),
+					"Fecha de Término": format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es }),
+					"Herramientas": Array.isArray(workPermit.tools)
+						? workPermit.tools.join(", ")
+						: workPermit.tools,
+					"Genera Residuos": workPermit.generateWaste ? "Sí" : "No",
+					"Tipo de Residuos": workPermit.wasteType || "N/A",
+					"Participantes": workPermit._count?.participants || 0,
+					"Adjuntos": workPermit._count?.attachments || 0,
+					"Fecha de Aprobación": workPermit.approvalDate
+						? format(new Date(workPermit.approvalDate), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"Aprobado por": workPermit.approvalBy?.name || "N/A",
+				}))
+			)
+
+			XLSX.utils.book_append_sheet(workbook, worksheet, "Permisos de Trabajo")
+			XLSX.writeFile(workbook, "permisos-de-trabajo.xlsx")
+			toast.success("Permisos de trabajo exportados exitosamente")
+		} catch (error) {
+			console.error("[EXPORT_EXCEL]", error)
+			toast.error("Error al exportar permisos de trabajo")
+		} finally {
+			setExportLoading(false)
+		}
+	}, [])
 
 	const table = useReactTable({
 		onSortingChange: setSorting,
@@ -183,11 +243,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							</SelectContent>
 						</Select>
 
-						<CalendarDatePicker
-							value={filters.date}
-							onChange={actions.setDate}
-							placeholder="Seleccionar fecha"
-						/>
+						<CalendarDateRangePicker value={filters.dateRange} onChange={actions.setDateRange} />
 
 						<Select
 							onValueChange={(value) => {
@@ -225,6 +281,15 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 							/>
 
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+							<Button
+								size={"icon"}
+								variant="outline"
+								onClick={handleExportToExcel}
+								className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+							>
+								{exportLoading ? <Spinner /> : <FileSpreadsheetIcon />}
+							</Button>
 
 							<Button
 								size={"icon"}

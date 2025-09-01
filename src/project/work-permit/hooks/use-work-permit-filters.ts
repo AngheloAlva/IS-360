@@ -16,7 +16,7 @@ export const useWorkPermitFilters = () => {
 		approvedBy: store.approvedBy,
 		typeFilter: store.typeFilter,
 		statusFilter: store.statusFilter,
-		date: store.date ? new Date(store.date) : null,
+		dateRange: store.dateRange,
 	})
 
 	return {
@@ -25,7 +25,7 @@ export const useWorkPermitFilters = () => {
 			companyId: store.companyId,
 			approvedBy: store.approvedBy,
 			typeFilter: store.typeFilter,
-			date: store.date,
+			dateRange: store.dateRange,
 			search: store.search,
 			page: store.page,
 			orderBy: store.orderBy,
@@ -36,7 +36,7 @@ export const useWorkPermitFilters = () => {
 			setCompanyId: store.setCompanyId,
 			setApprovedBy: store.setApprovedBy,
 			setTypeFilter: store.setTypeFilter,
-			setDate: store.setDate,
+			setDateRange: store.setDateRange,
 			setSearch: store.setSearch,
 			setPage: store.setPage,
 			setOrderBy: store.setOrderBy,

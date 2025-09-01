@@ -22,7 +22,7 @@ export default function WorkPermitStatsContainer() {
 		approvedBy: filters.approvedBy,
 		typeFilter: filters.typeFilter,
 		statusFilter: filters.statusFilter,
-		date: filters.date ? new Date(filters.date) : null,
+		dateRange: filters.dateRange,
 	})
 
 	if (isLoading) return <ChartSkeleton />
