@@ -39,10 +39,10 @@ export default function WorkPermitActivityChart({ data }: WorkPermitActivityChar
 
 			const selectedDate = new Date(data.activePayload[0].payload.originalDate)
 
-			if (selectedDate === filters.date) {
-				actions.setDate(null)
+			if (selectedDate === filters.dateRange?.from) {
+				actions.setDateRange(null)
 			} else {
-				actions.setDate(selectedDate)
+				actions.setDateRange({ from: selectedDate, to: selectedDate })
 			}
 		},
 		[filters, actions]

@@ -115,6 +115,7 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 						? format(new Date(workPermit.approvalDate), "dd/MM/yyyy", { locale: es })
 						: "N/A",
 					"Aprobado por": workPermit.approvalBy?.name || "N/A",
+					"Observaciones": workPermit.observations || "N/A",
 				}))
 			)
 
