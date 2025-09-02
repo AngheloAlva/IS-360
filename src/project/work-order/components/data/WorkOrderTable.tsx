@@ -1,7 +1,9 @@
 "use client"
 
-import { FileSpreadsheetIcon, FilterIcon, FilterXIcon, InfoIcon } from "lucide-react"
+import { FileSpreadsheetIcon, FilterIcon, FilterXIcon, InfoIcon, X } from "lucide-react"
 import { useCallback, useMemo, useState, useRef, lazy, Suspense } from "react"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
 import { toast } from "sonner"
 import {
 	flexRender,
@@ -13,12 +15,17 @@ import {
 import { fetchWorkBookMilestones } from "@/project/work-order/hooks/use-work-book-milestones"
 import { useWorkOrderFilters } from "@/project/work-order/hooks/use-work-order-filters"
 import { fetchWorkBookById } from "@/project/work-order/hooks/use-work-book-by-id"
+import { useWorkOrderSelectionStore } from "../../stores/work-order-selection-store"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
+import { getWorkOrderColumns } from "../../columns/work-order-columns"
+import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
 import { queryClient } from "@/lib/queryClient"
 
 import { CalendarDateRangePicker } from "@/shared/components/ui/date-range-picker"
+import { CompanyFilterLoadingSkeleton } from "./WorkOrderCompanyFilterWithData"
+import BulkCloseWorkOrdersDialog from "../dialogs/BulkCloseWorkOrdersDialog"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
-import { getWorkOrderColumns } from "../../columns/work-order-columns"
+import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import WorkOrderDetailsDialog from "../dialogs/WorkOrderDetailsDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import OrderByButton from "@/shared/components/OrderByButton"
@@ -51,25 +58,22 @@ import {
 } from "./WorkOrderFilters"
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
-import { CompanyFilterLoadingSkeleton } from "./WorkOrderCompanyFilterWithData"
-import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
-import { WorkOrderTypeLabels } from "../../../../lib/consts/work-order-types"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
 
 const WorkOrderCompanyFilterWithData = lazy(() => import("./WorkOrderCompanyFilterWithData"))
 
 interface WorkOrderTableProps {
 	id?: string
+	isOtcMember?: boolean
 }
 
-export function WorkOrderTable({ id }: WorkOrderTableProps) {
+export function WorkOrderTable({ id, isOtcMember = false }: WorkOrderTableProps) {
 	const [dialogDetailsOpen, setDialogDetailsOpen] = useState<boolean>(false)
 	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [selectedId, setSelectedId] = useState<string | null>(null)
 	const [rowSelection, setRowSelection] = useState({})
 	const prefetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+	const { selectedIds, getSelectedCount, clearSelection } = useWorkOrderSelectionStore()
 	const { filters, actions, workOrders } = useWorkOrderFilters()
 	const { data, isLoading, refetch, isFetching } = workOrders
 
@@ -78,7 +82,7 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		getCoreRowModel: getCoreRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
-		columns: getWorkOrderColumns({ setSelectedId, setDialogDetailsOpen }),
+		columns: getWorkOrderColumns({ setSelectedId, setDialogDetailsOpen, isOtcMember }),
 
 		state: {
 			pagination: {
@@ -176,6 +180,8 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 		[actions]
 	)
 
+	const selectedCount = getSelectedCount()
+
 	return (
 		<Card id={id}>
 			<CardContent className="flex w-full flex-col items-start gap-4">
@@ -186,6 +192,24 @@ export function WorkOrderTable({ id }: WorkOrderTableProps) {
 							Gestión y seguimiento de todas las órdenes
 						</p>
 					</div>
+
+					{selectedCount > 0 && (
+						<>
+							<Button size={"sm"} variant="outline" onClick={clearSelection} className="ml-auto">
+								<X className="h-4 w-4" />
+								Limpiar ({selectedCount})
+							</Button>
+
+							<BulkCloseWorkOrdersDialog
+								workOrders={selectedIds}
+								onSuccess={() => {
+									refetch()
+									clearSelection()
+									toast.success("Órdenes de trabajo cerradas exitosamente")
+								}}
+							/>
+						</>
+					)}
 
 					<SearchInput
 						value={filters.search}

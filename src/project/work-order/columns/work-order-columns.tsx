@@ -1,4 +1,3 @@
-import { ColumnDef } from "@tanstack/react-table"
 import { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
@@ -13,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { WORK_ORDER_STATUS, WORK_ORDER_TYPE, WORK_ORDER_PRIORITY } from "@prisma/client"
+import { useWorkOrderSelectionStore } from "../stores/work-order-selection-store"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { WorkOrderStatusLabels } from "@/lib/consts/work-order-status"
 import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
@@ -24,18 +24,44 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avat
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
 import ActionDataMenu from "@/shared/components/ActionDataMenu"
 import { Progress } from "@/shared/components/ui/progress"
+import { Checkbox } from "@/shared/components/ui/checkbox"
 import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 
 import type { WorkOrder } from "@/project/work-order/hooks/use-work-order"
+import type { ColumnDef, Row } from "@tanstack/react-table"
+
+interface GetWorkOrderColumnsProps {
+	setSelectedId: (id: string) => void
+	setDialogDetailsOpen: (open: boolean) => void
+	isOtcMember?: boolean
+}
 
 export const getWorkOrderColumns = ({
 	setSelectedId,
 	setDialogDetailsOpen,
-}: {
-	setSelectedId: (id: string) => void
-	setDialogDetailsOpen: (open: boolean) => void
-}): ColumnDef<WorkOrder>[] => [
+}: GetWorkOrderColumnsProps): ColumnDef<WorkOrder>[] => [
+	{
+		id: "select",
+		header: "",
+		cell: ({ row }: { row: Row<WorkOrder> }) => {
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			const { isSelected, toggleSelection } = useWorkOrderSelectionStore()
+
+			return (
+				<Checkbox
+					aria-label="Select row"
+					checked={isSelected(row.original.id)}
+					className="data-[state=checked]:border-orange-700 data-[state=checked]:bg-orange-500"
+					onCheckedChange={() =>
+						toggleSelection(row.original.id, row.original.otNumber, row.original.workRequest)
+					}
+				/>
+			)
+		},
+		enableSorting: false,
+		enableHiding: false,
+	},
 	{
 		id: "actions",
 		header: "",
