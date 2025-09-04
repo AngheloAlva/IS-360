@@ -58,9 +58,10 @@ export async function closeWorkBook({ userId, workBookId, reason, progress }: Cl
 		const updatedWorkOrder = await prisma.workOrder.update({
 			where: { id: workBookId },
 			data: {
-				status: "COMPLETED",
-				closureRejectedReason: reason || null,
 				progress: progress,
+				status: "COMPLETED",
+				endDate: new Date(),
+				closureRejectedReason: reason || null,
 			},
 			select: {
 				id: true,

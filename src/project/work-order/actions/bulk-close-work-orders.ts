@@ -53,6 +53,7 @@ export async function bulkCloseWorkOrders({ workOrderIds, reason }: BulkCloseWor
 			},
 			data: {
 				progress: 100,
+				endDate: new Date(),
 				status: WORK_ORDER_STATUS.COMPLETED,
 				closureRejectedReason: reason || null,
 			},

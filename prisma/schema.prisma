@@ -325,6 +325,7 @@ model WorkOrder {
   estimatedHours    Float
   estimatedDays     Float
   estimatedEndDate  DateTime
+  endDate           DateTime?
   isWorkBookInit    Boolean             @default(false)
   workBookName      String?
   workBookLocation  String?

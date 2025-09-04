@@ -79,6 +79,7 @@ export const updateWorkOrderById = async ({
 				estimatedDays: parseInt(values.estimatedDays),
 				estimatedHours: parseInt(values.estimatedHours),
 				status: +values.progress === 100 ? "COMPLETED" : values.status,
+				endDate: values.status === "COMPLETED" || +values.progress === 100 ? new Date() : null,
 				company: {
 					connect: {
 						id: values.companyId,

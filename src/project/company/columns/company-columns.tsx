@@ -3,6 +3,8 @@
 import { ArrowRightIcon, EyeIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { getImageProps } from "next/image"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
 import Link from "next/link"
 
 import { StartupFolderStatus } from "@prisma/client"
@@ -133,6 +135,14 @@ export const CompanyColumns: ColumnDef<Company>[] = [
 					</Link>
 				</div>
 			)
+		},
+	},
+	{
+		accessorKey: "createdAt",
+		header: "Fecha de creación",
+		cell: ({ row }) => {
+			const createdAt = row.getValue("createdAt") as Date
+			return format(createdAt, "dd/MM/yyyy", { locale: es })
 		},
 	},
 ]
