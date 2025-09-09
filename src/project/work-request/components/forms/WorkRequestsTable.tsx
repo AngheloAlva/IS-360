@@ -13,12 +13,13 @@ import {
 } from "@tanstack/react-table"
 
 import { updateWorkRequestStatus } from "@/project/work-request/actions/update-work-request-status"
+import { updateWorkRequestUrgency } from "@/project/work-request/actions/update-work-request-urgency"
 import { useWorkRequests, WorkRequest } from "@/project/work-request/hooks/use-work-request"
 import { getWorkRequestColumns } from "../../columns/work-request-columns"
 import { queryClient } from "@/lib/queryClient"
 
-import { TablePagination } from "@/shared/components/ui/table-pagination"
 import WorkRequestDetailsDialog from "../dialogs/WorkRequestDetailsDialog"
+import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
@@ -107,6 +108,38 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 		}
 	}
 
+	const handleUrgencyUpdate = async (id: string, isUrgent: boolean) => {
+		setIsStatusLoading(true)
+
+		try {
+			const result = await updateWorkRequestUrgency({
+				id,
+				isUrgent,
+			})
+
+			if (result.error) {
+				toast.error("Error", {
+					description: result.error,
+				})
+			} else if (result.success) {
+				toast.success("Éxito", {
+					description: result.success,
+				})
+
+				queryClient.invalidateQueries({
+					queryKey: ["workRequests"],
+				})
+			}
+		} catch (err: unknown) {
+			console.error("Error al actualizar la urgencia de la solicitud:", err)
+			toast.error("Error", {
+				description: "Error al actualizar la urgencia de la solicitud",
+			})
+		} finally {
+			setIsStatusLoading(false)
+		}
+	}
+
 	const handleOpenDetails = (request: WorkRequest) => {
 		setSelectedRequest(request)
 		setIsDetailsOpen(true)
@@ -127,6 +160,7 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 			hasPermission,
 			isStatusLoading,
 			handleStatusUpdate,
+			handleUrgencyUpdate,
 			handleOpenDetails,
 			handleOpenComment,
 		}),

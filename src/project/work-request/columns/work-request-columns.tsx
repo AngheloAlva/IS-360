@@ -1,9 +1,15 @@
 "use client"
 
-import { AlertCircleIcon, CheckCircleIcon, MessageCircleIcon, XCircleIcon } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import {
+	XCircleIcon,
+	AlertCircleIcon,
+	CheckCircleIcon,
+	MessageCircleIcon,
+	AlertTriangleIcon,
+} from "lucide-react"
 
 import { WORK_REQUEST_STATUS, WORK_REQUEST_TYPE } from "@prisma/client"
 
@@ -60,13 +66,16 @@ interface WorkRequestColumnsProps {
 	handleOpenDetails: (request: WorkRequest) => void
 	handleOpenComment: (request: WorkRequest) => void
 	handleStatusUpdate: (id: string, status: WORK_REQUEST_STATUS) => void
+	handleUrgencyUpdate: (id: string, isUrgent: boolean) => void
 }
 
 export const getWorkRequestColumns = ({
+	hasPermission,
 	isStatusLoading,
 	handleOpenDetails,
 	handleOpenComment,
 	handleStatusUpdate,
+	handleUrgencyUpdate,
 }: WorkRequestColumnsProps): ColumnDef<WorkRequest>[] => [
 	{
 		accessorKey: "workOrder",
@@ -111,6 +120,27 @@ export const getWorkRequestColumns = ({
 							>
 								<AlertCircleIcon className="h-4 w-4 text-amber-500" /> Marcar como reportada
 							</DropdownMenuItem>
+						)}
+
+						{hasPermission && (
+							<>
+								<DropdownMenuSeparator />
+								{!row.original.isUrgent ? (
+									<DropdownMenuItem
+										onClick={() => handleUrgencyUpdate(row.original.id, true)}
+										disabled={isStatusLoading}
+									>
+										<AlertTriangleIcon className="h-4 w-4 text-rose-500" /> Marcar como urgente
+									</DropdownMenuItem>
+								) : (
+									<DropdownMenuItem
+										onClick={() => handleUrgencyUpdate(row.original.id, false)}
+										disabled={isStatusLoading}
+									>
+										<AlertTriangleIcon className="h-4 w-4 text-gray-500" /> Desmarcar urgente
+									</DropdownMenuItem>
+								)}
+							</>
 						)}
 					</>
 				</ActionDataMenu>

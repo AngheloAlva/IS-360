@@ -16,7 +16,10 @@ import {
 } from "@tanstack/react-table"
 
 import { MaintenancePlanTaskColumns } from "@/project/maintenance-plan/columns/maintenance-plan-task-columns"
-
+import MaintenanceTaskOrderByButton, {
+	type MaintenanceTaskOrder,
+	type MaintenanceTaskOrderBy,
+} from "./MaintenanceTaskOrderByButton"
 import { TaskFrequencyOptions } from "@/lib/consts/task-frequency"
 import {
 	type MaintenancePlanTask,
@@ -25,12 +28,12 @@ import {
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover"
 import { TablePagination } from "@/shared/components/ui/table-pagination"
+import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Calendar } from "@/shared/components/ui/calendar"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
-import { Card, CardContent } from "@/shared/components/ui/card"
 import {
 	Select,
 	SelectItem,
@@ -63,6 +66,8 @@ export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTa
 	const [nextDateTo, setNextDateTo] = useState<Date | undefined>(undefined)
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [orderBy, setOrderBy] = useState<MaintenanceTaskOrderBy>("name")
+	const [order, setOrder] = useState<MaintenanceTaskOrder>("asc")
 
 	const { data, isLoading, refetch, isFetching } = useMaintenancePlanTasks({
 		page,
@@ -71,6 +76,8 @@ export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTa
 		frequency,
 		nextDateFrom: nextDateFrom ? format(nextDateFrom, "yyyy-MM-dd") : "",
 		nextDateTo: nextDateTo ? format(nextDateTo, "yyyy-MM-dd") : "",
+		order,
+		orderBy,
 		limit: 15,
 	})
 
@@ -210,6 +217,13 @@ export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTa
 						</div>
 
 						<div className="flex items-center gap-2">
+							<MaintenanceTaskOrderByButton
+								onChange={(orderBy: MaintenanceTaskOrderBy, order: MaintenanceTaskOrder) => {
+									setOrderBy(orderBy)
+									setOrder(order)
+								}}
+							/>
+
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
 						</div>
 					</div>

@@ -5,6 +5,11 @@ import { PLAN_FREQUENCY } from "@prisma/client"
 import prisma from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 
+import type {
+	MaintenanceTaskOrder,
+	MaintenanceTaskOrderBy,
+} from "@/project/maintenance-plan/components/data/MaintenanceTaskOrderByButton"
+
 export async function GET(
 	req: NextRequest,
 	{ params }: { params: Promise<{ planSlug: string }> }
@@ -25,6 +30,8 @@ export async function GET(
 	const frequency = searchParams.get("frequency") ?? ""
 	const nextDateFrom = searchParams.get("nextDateFrom") ?? ""
 	const nextDateTo = searchParams.get("nextDateTo") ?? ""
+	const order = searchParams.get("order") as MaintenanceTaskOrder
+	const orderBy = searchParams.get("orderBy") as MaintenanceTaskOrderBy
 
 	const skip = (page - 1) * limit
 
@@ -116,7 +123,7 @@ export async function GET(
 				skip,
 				take: limit,
 				orderBy: {
-					nextDate: "asc",
+					[orderBy || "createdAt"]: order || "asc",
 				},
 			}),
 			await prisma.maintenancePlanTask.count({

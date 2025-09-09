@@ -1,6 +1,10 @@
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
 
 import type {
+	MaintenanceTaskOrder,
+	MaintenanceTaskOrderBy,
+} from "../components/data/MaintenanceTaskOrderByButton"
+import type {
 	PLAN_FREQUENCY,
 	WORK_ORDER_TYPE,
 	WORK_ORDER_CAPEX,
@@ -52,6 +56,8 @@ interface UseMaintenancePlansTasksParams {
 	frequency?: string
 	nextDateFrom?: string
 	nextDateTo?: string
+	order?: MaintenanceTaskOrder
+	orderBy?: MaintenanceTaskOrderBy
 }
 
 interface MaintenancePlansTasksResponse {
@@ -68,18 +74,20 @@ export const useMaintenancePlanTasks = ({
 	frequency = "",
 	nextDateFrom = "",
 	nextDateTo = "",
+	order = "asc",
+	orderBy = "createdAt",
 }: UseMaintenancePlansTasksParams) => {
 	return useQuery<MaintenancePlansTasksResponse>({
 		queryKey: [
 			"maintenance-plans-tasks",
-			{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo },
+			{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo, order, orderBy },
 		],
 		queryFn: (fn) =>
 			fetchMaintenancePlanTasks({
 				...fn,
 				queryKey: [
 					"maintenance-plans-tasks",
-					{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo },
+					{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo, order, orderBy },
 				],
 			}),
 	})
@@ -97,11 +105,16 @@ export const fetchMaintenancePlanTasks: QueryFunction<
 			frequency: string
 			nextDateFrom: string
 			nextDateTo: string
+			order: MaintenanceTaskOrder
+			orderBy: MaintenanceTaskOrderBy
 		},
 	]
 > = async ({ queryKey }) => {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [_, { page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo }]: [
+	const [
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		_,
+		{ page, limit, search, planSlug, frequency, nextDateFrom, nextDateTo, order, orderBy },
+	]: [
 		string,
 		{
 			page: number
@@ -111,6 +124,8 @@ export const fetchMaintenancePlanTasks: QueryFunction<
 			frequency: string
 			nextDateFrom: string
 			nextDateTo: string
+			order: MaintenanceTaskOrder
+			orderBy: MaintenanceTaskOrderBy
 		},
 	] = queryKey
 
@@ -121,6 +136,8 @@ export const fetchMaintenancePlanTasks: QueryFunction<
 	if (frequency) searchParams.set("frequency", frequency)
 	if (nextDateFrom) searchParams.set("nextDateFrom", nextDateFrom)
 	if (nextDateTo) searchParams.set("nextDateTo", nextDateTo)
+	if (order) searchParams.set("order", order)
+	if (orderBy) searchParams.set("orderBy", orderBy)
 
 	const res = await fetch(`/api/maintenance-plan/${planSlug}/tasks?${searchParams.toString()}`)
 	if (!res.ok) throw new Error("Error fetching maintenance plans tasks")

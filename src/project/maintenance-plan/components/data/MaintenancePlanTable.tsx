@@ -12,8 +12,8 @@ import {
 } from "@tanstack/react-table"
 
 import { fetchMaintenancePlanTasks } from "@/project/maintenance-plan/hooks/use-maintenance-plans-tasks"
-import MaintenancePlanForm from "../forms/MaintenancePlanForm"
 import { MaintenancePlanColumns } from "../../columns/maintenance-plan-columns"
+import MaintenancePlanForm from "../forms/MaintenancePlanForm"
 import { useDebounce } from "@/shared/hooks/useDebounce"
 import { queryClient } from "@/lib/queryClient"
 import {
@@ -92,6 +92,8 @@ export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) 
 					planSlug: slug,
 					nextDateTo: "",
 					nextDateFrom: "",
+					order: "asc" as const,
+					orderBy: "name" as const,
 				},
 			],
 			queryFn: (fn) =>
@@ -107,6 +109,8 @@ export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) 
 							planSlug: slug,
 							nextDateTo: "",
 							nextDateFrom: "",
+							order: "asc" as const,
+							orderBy: "name" as const,
 						},
 					],
 				}),

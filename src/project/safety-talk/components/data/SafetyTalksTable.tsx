@@ -154,11 +154,7 @@ export function SafetyTalksTable() {
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
 
-						<Button
-							size="lg"
-							onClick={handleExportToExcel}
-							className="bg-orange-600 hover:bg-orange-700"
-						>
+						<Button size="lg" onClick={handleExportToExcel} className="bg-sky-600 hover:bg-sky-700">
 							{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
 							Exportar
 						</Button>
