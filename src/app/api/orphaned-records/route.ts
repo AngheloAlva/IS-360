@@ -30,16 +30,25 @@ export async function GET(request: NextRequest) {
 		const limit = parseInt(searchParams.get("limit") || "10", 10)
 		const search = searchParams.get("search") || ""
 
-		// Buscar archivos de registros huérfanos en el directorio raíz del proyecto
-		const projectRoot = process.cwd()
-		const files = fs.readdirSync(projectRoot)
+		// Buscar archivos de registros huérfanos en el directorio public/data
+		const dataDir = path.join(process.cwd(), 'public', 'data')
+		
+		// Verificar que el directorio existe
+		if (!fs.existsSync(dataDir)) {
+			return NextResponse.json(
+				{ error: "Directorio de datos no encontrado" },
+				{ status: 404 }
+			)
+		}
+		
+		const files = fs.readdirSync(dataDir)
 
 		// Buscar el archivo más reciente que contenga "orphaned-records"
 		const orphanedFiles = files
 			.filter((file) => file.includes("orphaned-records") && file.endsWith(".json"))
 			.sort((a, b) => {
-				const statA = fs.statSync(path.join(projectRoot, a))
-				const statB = fs.statSync(path.join(projectRoot, b))
+				const statA = fs.statSync(path.join(dataDir, a))
+				const statB = fs.statSync(path.join(dataDir, b))
 				return statB.mtime.getTime() - statA.mtime.getTime() // Más reciente primero
 			})
 
@@ -52,7 +61,7 @@ export async function GET(request: NextRequest) {
 
 		// Leer el archivo más reciente
 		const latestFile = orphanedFiles[0]
-		const filePath = path.join(projectRoot, latestFile)
+		const filePath = path.join(dataDir, latestFile)
 		const fileContent = fs.readFileSync(filePath, "utf8")
 		const jsonData: OrphanedRecordsData = JSON.parse(fileContent)
 
