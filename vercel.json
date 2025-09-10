@@ -1,11 +1,11 @@
 {
   "crons": [
     {
-      "path": "/api/crons/review-expired-documents/",
+      "path": "/api/crons/review-expired-documents",
       "schedule": "0 11 * * *"
     },
     {
-      "path": "/api/crons/automated-work-orders/",
+      "path": "/api/crons/automated-work-orders",
       "schedule": "0 11 * * *"
     }
   ]
