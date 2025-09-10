@@ -86,7 +86,7 @@ export const MaintenancePlanColumns = ({
 		cell: ({ row }) => {
 			const equipments = row.getValue("equipment") as MaintenancePlan["equipment"]
 			return (
-				<span className="flex items-center gap-1.5">
+				<span className="flex w-96 max-w-96 items-center gap-1.5">
 					<SettingsIcon className="text-muted-foreground size-4" />
 					{equipments.name}
 				</span>

@@ -20,18 +20,16 @@ export async function GET(
 		const companyId = (await params).companyId
 
 		const searchParams = req.nextUrl.searchParams
-		const page = parseInt(searchParams.get("page") || "1")
-		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
+		const page = parseInt(searchParams.get("page") || "1")
+		const showAll = searchParams.get("showAll") === "true"
+		const limit = parseInt(searchParams.get("limit") || "10")
 
 		const skip = (page - 1) * limit
 
-		// Get statistics
 		const [users, total] = await Promise.all([
-			// Fetch work books with pagination
 			prisma.user.findMany({
 				where: {
-					isActive: true,
 					companyId,
 					...(search
 						? {
@@ -42,6 +40,7 @@ export async function GET(
 								],
 							}
 						: {}),
+					...(showAll ? {} : { isActive: true }),
 				},
 				select: {
 					id: true,
@@ -51,6 +50,7 @@ export async function GET(
 					phone: true,
 					email: true,
 					image: true,
+					isActive: true,
 					companyId: true,
 					isSupervisor: true,
 					internalRole: true,

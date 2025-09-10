@@ -1,6 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import { FileSpreadsheetIcon } from "lucide-react"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
+import { toast } from "sonner"
 import {
 	flexRender,
 	SortingState,
@@ -27,6 +31,8 @@ import { Card, CardContent } from "@/shared/components/ui/card"
 import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import SearchInput from "@/shared/components/SearchInput"
+import { Button } from "@/shared/components/ui/button"
+import Spinner from "@/shared/components/Spinner"
 import {
 	Table,
 	TableRow,
@@ -39,11 +45,13 @@ import {
 interface MaintenancePlanTableProps {
 	id: string
 	userId: string
+	hasPermission: boolean
 }
 
-export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) {
+export function MaintenancePlanTable({ id, userId, hasPermission }: MaintenancePlanTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [planToEdit, setPlanToEdit] = useState<MaintenancePlan | null>(null)
+	const [exportLoading, setExportLoading] = useState<boolean>(false)
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [orderBy, setOrderBy] = useState<OrderBy>("name")
 	const [order, setOrder] = useState<Order>("asc")
@@ -79,6 +87,75 @@ export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) 
 		manualPagination: true,
 		pageCount: data?.pages ?? 0,
 	})
+
+	const handleExportToExcel = useCallback(async () => {
+		try {
+			setExportLoading(true)
+
+			const res: { maintenancePlans: (MaintenancePlan & { description?: string })[] } = await fetch(
+				`/api/maintenance-plan?page=1&order=desc&orderBy=createdAt&limit=10000&includeTasks=true`
+			).then((res) => res.json())
+
+			if (!res?.maintenancePlans?.length) {
+				toast.error("No hay planes de mantenimiento para exportar")
+				return
+			}
+
+			const XLSX = await import("xlsx")
+
+			const workbook = XLSX.utils.book_new()
+
+			// Hoja principal - Planes de Mantenimiento
+			const mainSheet = XLSX.utils.json_to_sheet(
+				res.maintenancePlans.map((plan) => ({
+					"Nombre": plan.name,
+					"Descripción": plan.description || "N/A",
+					"Equipo": plan.equipment?.name || "N/A",
+					"Ubicación del Equipo": plan.equipment?.location || "N/A",
+					"Cantidad de Tareas": plan.task?.length || 0,
+					"Tareas Vencidas": plan.expiredTasksCount || 0,
+					"Próximas Tareas (1 semana)": plan.nextWeekTasksCount || 0,
+					"Creado por": plan.createdBy?.name || "N/A",
+					"Fecha de Creación": plan.createdAt
+						? format(new Date(plan.createdAt), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+				}))
+			)
+
+			XLSX.utils.book_append_sheet(workbook, mainSheet, "Planes de Mantenimiento")
+
+			// Hoja de Tareas - Información detallada de todas las tareas
+			const allTasks = res.maintenancePlans.flatMap((plan) =>
+				(plan.task || []).map((task) => ({
+					"Plan de Mantenimiento": plan.name,
+					"Equipo del Plan": plan.equipment?.name || "N/A",
+					"Ubicación del Equipo": plan.equipment?.location || "N/A",
+					"Nombre de la Tarea": task.name,
+					"Equipo de la Tarea": task.equipment?.name || "N/A",
+					"Próxima Fecha Programada": task.nextDate
+						? format(new Date(task.nextDate), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"Creado por": plan.createdBy?.name || "N/A",
+					"Fecha de Creación del Plan": plan.createdAt
+						? format(new Date(plan.createdAt), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+				}))
+			)
+
+			if (allTasks.length > 0) {
+				const tasksSheet = XLSX.utils.json_to_sheet(allTasks)
+				XLSX.utils.book_append_sheet(workbook, tasksSheet, "Tareas Detalladas")
+			}
+
+			XLSX.writeFile(workbook, "planes-de-mantenimiento.xlsx")
+			toast.success("Planes de mantenimiento exportados exitosamente")
+		} catch (error) {
+			console.error("[EXPORT_EXCEL]", error)
+			toast.error("Error al exportar planes de mantenimiento")
+		} finally {
+			setExportLoading(false)
+		}
+	}, [])
 
 	const prefetchMaintenancePlan = (slug: string) => {
 		return queryClient.prefetchQuery({
@@ -153,6 +230,17 @@ export function MaintenancePlanTable({ id, userId }: MaintenancePlanTableProps) 
 						/>
 
 						<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+						{hasPermission && (
+							<Button
+								size={"lg"}
+								onClick={handleExportToExcel}
+								className="bg-purple-600 hover:bg-purple-700 hover:text-white"
+							>
+								{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+								Exportar
+							</Button>
+						)}
 					</div>
 				</div>
 

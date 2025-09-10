@@ -16,7 +16,6 @@ export default async function MaintenancePlansPage({
 	const { planSlug } = await params
 
 	const maintenancePlanSlug = planSlug.split("_")[0]
-	const equipmentId = planSlug.split("_")[1]
 
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -56,14 +55,17 @@ export default async function MaintenancePlansPage({
 					{hasPermission.success && (
 						<MaintenancePlanTaskForm
 							userId={session.user.id}
-							equipmentId={equipmentId}
 							maintenancePlanSlug={maintenancePlanSlug}
 						/>
 					)}
 				</div>
 			</div>
 
-			<MaintenancePlanTaskTable planSlug={maintenancePlanSlug} userId={session.user.id} />
+			<MaintenancePlanTaskTable
+				userId={session.user.id}
+				planSlug={maintenancePlanSlug}
+				hasPermission={hasPermission.success}
+			/>
 		</div>
 	)
 }

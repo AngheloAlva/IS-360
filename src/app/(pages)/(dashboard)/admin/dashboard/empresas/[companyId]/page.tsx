@@ -76,7 +76,11 @@ export default async function CompanyByIdAdminPage({
 
 				<TabsContents>
 					<TabsContent value="users">
-						<UsersByCompanyTable companyId={companyId} />
+						<UsersByCompanyTable
+							companyId={companyId}
+							showAll={true}
+							hasPermission={hasPermission.success}
+						/>
 					</TabsContent>
 
 					<TabsContent value="vehicles">

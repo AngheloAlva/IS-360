@@ -4,14 +4,22 @@ import { getImageProps } from "next/image"
 
 import UpdateExternalUserForm from "@/project/user/components/forms/UpdateExternalUserForm"
 import DeleteExternalUserDialog from "@/project/user/components/forms/DeleteExternalUser"
+import ReactivateExternalUserDialog from "../components/forms/ReactivateExternalUser"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { DropdownMenuItem } from "@/shared/components/ui/dropdown-menu"
 import ActionDataMenu from "@/shared/components/ActionDataMenu"
+import { Badge } from "@/shared/components/ui/badge"
 
 import type { UsersByCompany } from "@/project/user/hooks/use-users-by-company"
-import type { ColumnDef } from "@tanstack/react-table"
+import type { ColumnDef, Row } from "@tanstack/react-table"
 
-export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
+export const getUserByCompanyColumns = ({
+	showAll,
+	showReactivate,
+}: {
+	showAll?: boolean
+	showReactivate?: boolean
+}): ColumnDef<UsersByCompany>[] => [
 	{
 		id: "actions",
 		header: "",
@@ -25,9 +33,15 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 							<UpdateExternalUserForm user={user} />
 						</DropdownMenuItem>
 
-						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-							<DeleteExternalUserDialog userId={user.id} companyId={user.companyId} />
-						</DropdownMenuItem>
+						{user.isActive ? (
+							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+								<DeleteExternalUserDialog userId={user.id} companyId={user.companyId} />
+							</DropdownMenuItem>
+						) : showReactivate ? (
+							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+								<ReactivateExternalUserDialog userId={user.id} companyId={user.companyId} />
+							</DropdownMenuItem>
+						) : null}
 					</>
 				</ActionDataMenu>
 			)
@@ -70,6 +84,21 @@ export const UserByCompanyColumns: ColumnDef<UsersByCompany>[] = [
 		accessorKey: "rut",
 		header: "RUT",
 	},
+	...(showAll
+		? [
+				{
+					accessorKey: "isActive",
+					header: "Activo",
+					cell: ({ row }: { row: Row<UsersByCompany> }) => {
+						const isActive = row.getValue("isActive") as boolean
+
+						return (
+							<Badge variant={isActive ? "default" : "destructive"}>{isActive ? "Sí" : "No"}</Badge>
+						)
+					},
+				},
+			]
+		: []),
 	{
 		accessorKey: "internalRole",
 		header: "Cargo",

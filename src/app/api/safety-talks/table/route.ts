@@ -23,6 +23,17 @@ export async function GET(req: NextRequest) {
 
 		const [safetyTalks, total] = await Promise.all([
 			prisma.userSafetyTalk.findMany({
+				where: {
+					...(search
+						? {
+								OR: [
+									{ user: { name: { contains: search, mode: "insensitive" as const } } },
+									{ user: { email: { contains: search, mode: "insensitive" as const } } },
+									{ user: { rut: { contains: search, mode: "insensitive" as const } } },
+								],
+							}
+						: {}),
+				},
 				select: {
 					id: true,
 					category: true,
@@ -54,12 +65,15 @@ export async function GET(req: NextRequest) {
 			}),
 			prisma.userSafetyTalk.count({
 				where: {
-					user: {
-						name: {
-							contains: search,
-							mode: "insensitive" as const,
-						},
-					},
+					...(search
+						? {
+								OR: [
+									{ user: { name: { contains: search, mode: "insensitive" as const } } },
+									{ user: { email: { contains: search, mode: "insensitive" as const } } },
+									{ user: { rut: { contains: search, mode: "insensitive" as const } } },
+								],
+							}
+						: {}),
 				},
 			}),
 		])

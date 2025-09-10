@@ -100,7 +100,7 @@ export default function CreateUsersForm({
 								throw new Error("No tienes permiso para crear colaboradores")
 							case "USER_ALREADY_EXISTS":
 								throw new Error(
-									`El colaborador ${employee.name} ya existe. Verifique el RUT y el correo.`
+									`El RUT ${employee.rut} o correo electrónico ${employee.email} ya existe`
 								)
 							default:
 								throw new Error(`Error al crear colaborador ${employee.name}: ${error.message}`)

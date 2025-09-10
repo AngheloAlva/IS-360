@@ -53,10 +53,10 @@ const CATEGORY_LABELS = {
 
 export function SafetyTalksTable() {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [exportLoading, setExportLoading] = useState(false)
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [search, setSearch] = useState("")
 	const [page, setPage] = useState(1)
-	const [exportLoading, setExportLoading] = useState(false)
 
 	const { data, isLoading, isFetching, refetch } = useSafetyTalksTable({
 		page,

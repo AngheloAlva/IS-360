@@ -69,7 +69,11 @@ export default async function MaintenancePlansPage() {
 
 			<MaintenancePlanStatsContainer />
 
-			<MaintenancePlanTable userId={session.user.id} id="maintenance-plans-list" />
+			<MaintenancePlanTable
+				userId={session.user.id}
+				id="maintenance-plans-list"
+				hasPermission={hasPermission.success}
+			/>
 		</div>
 	)
 }

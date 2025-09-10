@@ -10,8 +10,8 @@ import {
 	getFilteredRowModel,
 } from "@tanstack/react-table"
 
+import { getUserByCompanyColumns } from "../../columns/user-by-company-columns"
 import { useUsersByCompany } from "@/project/user/hooks/use-users-by-company"
-import { UserByCompanyColumns } from "../../columns/user-by-company-columns"
 
 import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
@@ -29,7 +29,15 @@ import {
 
 import type { UsersByCompany } from "@/project/user/hooks/use-users-by-company"
 
-export function UsersByCompanyTable({ companyId }: { companyId: string }) {
+export function UsersByCompanyTable({
+	companyId,
+	showAll = false,
+	hasPermission = false,
+}: {
+	showAll?: boolean
+	companyId: string
+	hasPermission?: boolean
+}) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [search, setSearch] = useState("")
@@ -38,17 +46,18 @@ export function UsersByCompanyTable({ companyId }: { companyId: string }) {
 	const { data, isLoading, refetch, isFetching } = useUsersByCompany({
 		page,
 		search,
+		showAll,
 		limit: 15,
 		companyId,
 	})
 
 	const table = useReactTable<UsersByCompany>({
 		data: data?.users ?? [],
-		columns: UserByCompanyColumns,
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
+		columns: getUserByCompanyColumns({ showAll, showReactivate: hasPermission }),
 		state: {
 			sorting,
 			columnFilters,
@@ -104,7 +113,7 @@ export function UsersByCompanyTable({ companyId }: { companyId: string }) {
 						{isLoading || isFetching
 							? Array.from({ length: 10 }).map((_, index) => (
 									<TableRow key={index}>
-										<TableCell className="" colSpan={9}>
+										<TableCell className="" colSpan={showAll ? 10 : 9}>
 											<Skeleton className="h-9 min-w-full" />
 										</TableCell>
 									</TableRow>

@@ -1,10 +1,11 @@
 "use client"
 
-import { ArrowLeft, InfoIcon, CalendarIcon, FunnelXIcon } from "lucide-react"
+import { ArrowLeft, InfoIcon, CalendarIcon, FunnelXIcon, FileSpreadsheetIcon } from "lucide-react"
 import { useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
+import { toast } from "sonner"
 import {
 	flexRender,
 	SortingState,
@@ -34,6 +35,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Calendar } from "@/shared/components/ui/calendar"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
+import Spinner from "@/shared/components/Spinner"
 import {
 	Select,
 	SelectItem,
@@ -53,9 +55,14 @@ import {
 interface MaintenancePlanTaskTableProps {
 	planSlug: string
 	userId: string
+	hasPermission?: boolean
 }
 
-export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTaskTableProps) {
+export function MaintenancePlanTaskTable({
+	planSlug,
+	userId,
+	hasPermission = false,
+}: MaintenancePlanTaskTableProps) {
 	const searchParams = useSearchParams()
 	const parentId = searchParams.get("parentId")
 
@@ -68,6 +75,7 @@ export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTa
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [orderBy, setOrderBy] = useState<MaintenanceTaskOrderBy>("name")
 	const [order, setOrder] = useState<MaintenanceTaskOrder>("asc")
+	const [exportLoading, setExportLoading] = useState<boolean>(false)
 
 	const { data, isLoading, refetch, isFetching } = useMaintenancePlanTasks({
 		page,
@@ -80,6 +88,66 @@ export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTa
 		orderBy,
 		limit: 15,
 	})
+
+	const handleExportToExcel = useCallback(async () => {
+		try {
+			setExportLoading(true)
+
+			const res: { tasks: MaintenancePlanTask[] } = await fetch(
+				`/api/maintenance-plan/${planSlug}/tasks?page=1&limit=10000`
+			).then((res) => res.json())
+
+			if (!res?.tasks?.length) {
+				toast.error("No hay tareas para exportar")
+				return
+			}
+
+			const XLSX = await import("xlsx")
+			const { TaskFrequencyLabels } = await import("@/lib/consts/task-frequency")
+
+			const workbook = XLSX.utils.book_new()
+
+			// Hoja de Tareas de Mantenimiento
+			const tasksSheet = XLSX.utils.json_to_sheet(
+				res.tasks.map((task) => ({
+					"Nombre de la Tarea": task.name,
+					"Descripción": task.description || "N/A",
+					"Equipo": task.equipment?.name || "N/A",
+					"Ubicación del Equipo": task.equipment?.location || "N/A",
+					"Frecuencia": TaskFrequencyLabels[task.frequency] || "N/A",
+					"Próxima Ejecución": task.nextDate
+						? format(new Date(task.nextDate), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"OTs Creadas": task._count?.workOrders || 0,
+					"Es Automatizada": task.isAutomated ? "Sí" : "No",
+					"Supervisor Automatizado": task.automatedSupervisorId ? "Configurado" : "N/A",
+					"Tipo OT Automatizada": task.automatedWorkOrderType || "N/A",
+					"Prioridad Automatizada": task.automatedPriority || "N/A",
+					"CAPEX Automatizado": task.automatedCapex || "N/A",
+					"Días Estimados": task.automatedEstimatedDays || "N/A",
+					"Horas Estimadas": task.automatedEstimatedHours || "N/A",
+					"Descripción Trabajo": task.automatedWorkDescription || "N/A",
+					"Emails de Copia": task.emailsForCopy?.join(", ") || "N/A",
+					"Adjuntos": task.attachments?.map((att) => att.name).join(", ") || "Sin adjuntos",
+					"Creado por": task.createdBy?.name || "N/A",
+					"Fecha de Creación": task.createdAt
+						? format(new Date(task.createdAt), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+				}))
+			)
+
+			XLSX.utils.book_append_sheet(workbook, tasksSheet, "Tareas de Mantenimiento")
+
+			const fileName = `tareas-mantenimiento-${planSlug}.xlsx`
+			XLSX.writeFile(workbook, fileName)
+			toast.success("Tareas de mantenimiento exportadas exitosamente")
+		} catch (error) {
+			console.error("[EXPORT_TASKS_EXCEL]", error)
+			toast.error("Error al exportar tareas de mantenimiento")
+		} finally {
+			setExportLoading(false)
+		}
+	}, [planSlug])
 
 	const table = useReactTable<MaintenancePlanTask>({
 		data: data?.tasks ?? [],
@@ -225,6 +293,17 @@ export function MaintenancePlanTaskTable({ planSlug, userId }: MaintenancePlanTa
 							/>
 
 							<RefreshButton refetch={refetch} isFetching={isFetching} />
+
+							{hasPermission && (
+								<Button
+									size={"lg"}
+									onClick={handleExportToExcel}
+									className="bg-purple-600 hover:bg-purple-700 hover:text-white"
+								>
+									{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
+									Exportar
+								</Button>
+							)}
 						</div>
 					</div>
 				</div>

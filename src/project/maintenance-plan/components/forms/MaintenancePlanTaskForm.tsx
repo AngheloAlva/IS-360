@@ -48,7 +48,6 @@ import type { WORK_ORDER_CAPEX, WORK_ORDER_PRIORITY, WORK_ORDER_TYPE } from "@pr
 interface MaintenancePlanTaskFormProps {
 	userId: string
 	className?: string
-	equipmentId: string
 	maintenancePlanSlug: string
 	initialData?: {
 		id: string
@@ -72,7 +71,6 @@ interface MaintenancePlanTaskFormProps {
 export default function MaintenancePlanTaskForm({
 	userId,
 	className,
-	equipmentId,
 	initialData,
 	maintenancePlanSlug,
 }: MaintenancePlanTaskFormProps): React.ReactElement {
@@ -107,9 +105,8 @@ export default function MaintenancePlanTaskForm({
 	const { data: equipmentsData } = useEquipments({
 		limit: 1000,
 		order: "asc",
-		showAll: false,
+		showAll: true,
 		orderBy: "name",
-		parentId: equipmentId,
 	})
 
 	const { data: operatorsData } = useOperators({ page: 1, limit: 1000 })

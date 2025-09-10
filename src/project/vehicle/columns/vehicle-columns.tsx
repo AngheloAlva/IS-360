@@ -12,6 +12,27 @@ import type { ColumnDef } from "@tanstack/react-table"
 
 export const vehicleColumns: ColumnDef<Vehicle>[] = [
 	{
+		id: "actions",
+		header: "Acciones",
+		cell: ({ row }) => {
+			const vehicle = row.original
+
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<VehicleForm companyId={vehicle.companyId} vehicleId={vehicle.id} />
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+							<DeleteVehicleDialog vehicleId={vehicle.id} companyId={vehicle.companyId} />
+						</DropdownMenuItem>
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
+	{
 		accessorKey: "plate",
 		header: "Matrícula",
 		cell: ({ row }) => {
@@ -59,27 +80,6 @@ export const vehicleColumns: ColumnDef<Vehicle>[] = [
 				<Badge className="bg-teal-500 px-6 font-semibold hover:bg-teal-600">Sí</Badge>
 			) : (
 				<Badge className="bg-emerald-900 px-6 font-semibold hover:bg-emerald-900">No</Badge>
-			)
-		},
-	},
-	{
-		id: "actions",
-		header: "Acciones",
-		cell: ({ row }) => {
-			const vehicle = row.original
-
-			return (
-				<ActionDataMenu>
-					<>
-						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-							<VehicleForm companyId={vehicle.companyId} vehicleId={vehicle.id} />
-						</DropdownMenuItem>
-
-						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-							<DeleteVehicleDialog vehicleId={vehicle.id} companyId={vehicle.companyId} />
-						</DropdownMenuItem>
-					</>
-				</ActionDataMenu>
 			)
 		},
 	},
