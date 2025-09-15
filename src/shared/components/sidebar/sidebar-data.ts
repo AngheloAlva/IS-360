@@ -22,6 +22,7 @@ import {
 	ChartColumnIcon,
 	LockKeyholeIcon,
 	type LucideIcon,
+	LockKeyholeOpenIcon,
 } from "lucide-react"
 
 export interface NavBarItem {
@@ -117,6 +118,11 @@ export const data: NavBarData = {
 					name: "OT / Libros de Obras",
 					url: "/admin/dashboard/ordenes-de-trabajo",
 					icon: LayoutListIcon,
+				},
+				{
+					name: "Solicitudes de Bloqueo",
+					url: "/admin/dashboard/solicitudes-de-bloqueo",
+					icon: LockKeyholeOpenIcon,
 				},
 				{
 					name: "Planes de Mantenimiento",

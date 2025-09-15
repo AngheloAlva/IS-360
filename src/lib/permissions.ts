@@ -12,6 +12,7 @@ export const statement = {
 	equipment: ["create", "update", "delete", "list"],
 	company: ["create", "update", "delete", "list"],
 	workRequest: ["create", "update", "delete", "list"],
+	lockoutPermit: ["create", "update", "delete", "list"],
 	workBook: ["create", "update", "delete", "list"],
 } as const
 
@@ -23,6 +24,7 @@ export const admin = ac.newRole({
 	workOrder: ["create", "update", "delete", "list"],
 	startupFolder: ["create", "update", "delete", "list"],
 	workPermit: ["create", "update", "delete", "list"],
+	lockoutPermit: ["create", "update", "delete", "list"],
 	safetyTalk: ["create", "update", "delete", "list"],
 	documentation: ["create", "update", "delete", "list"],
 	equipment: ["create", "update", "delete", "list"],
@@ -42,6 +44,7 @@ export const user = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const maintenancePlanOperator = ac.newRole({
@@ -55,6 +58,7 @@ export const maintenancePlanOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const workOrderOperator = ac.newRole({
@@ -68,6 +72,7 @@ export const workOrderOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const startupFolderOperator = ac.newRole({
@@ -81,6 +86,7 @@ export const startupFolderOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const workPermitOperator = ac.newRole({
@@ -88,6 +94,21 @@ export const workPermitOperator = ac.newRole({
 	workOrder: ["list"],
 	startupFolder: ["list"],
 	workPermit: ["list", "create", "update", "delete"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+	workRequest: ["list"],
+	lockoutPermit: ["list"],
+})
+
+export const lockoutPermitOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	lockoutPermit: ["list", "create", "update", "delete"],
 	safetyTalk: ["list"],
 	documentation: ["list"],
 	equipment: ["list"],
@@ -107,6 +128,7 @@ export const workBookOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const safetyTalkOperator = ac.newRole({
@@ -120,6 +142,7 @@ export const safetyTalkOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const documentationOperator = ac.newRole({
@@ -133,6 +156,7 @@ export const documentationOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const equipmentOperator = ac.newRole({
@@ -146,6 +170,7 @@ export const equipmentOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const companyOperator = ac.newRole({
@@ -159,6 +184,7 @@ export const companyOperator = ac.newRole({
 	company: ["list", "create", "update", "delete"],
 	user: ["list", "create", "delete", "set-role"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const userOperator = ac.newRole({
@@ -172,6 +198,7 @@ export const userOperator = ac.newRole({
 	company: ["list"],
 	user: ["list", "create", "delete", "set-role"],
 	workRequest: ["list"],
+	lockoutPermit: ["list"],
 })
 
 export const partnerCompany = ac.newRole({
@@ -184,6 +211,8 @@ export const partnerCompany = ac.newRole({
 	equipment: [],
 	company: [],
 	user: ["list", "create", "delete", "set-role"],
+	workRequest: [],
+	lockoutPermit: [],
 })
 
 export const workRequestOperator = ac.newRole({
@@ -197,6 +226,7 @@ export const workRequestOperator = ac.newRole({
 	company: ["list"],
 	user: ["list"],
 	workRequest: ["list", "create", "update", "delete"],
+	lockoutPermit: [],
 })
 
 export const operator = ac.newRole({
@@ -211,6 +241,7 @@ export const operator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list", "create", "update", "delete"],
 	workBook: ["list", "create", "update", "delete"],
+	lockoutPermit: ["list", "create", "update", "delete"],
 })
 
 export const USER_ROLE = {
@@ -226,6 +257,7 @@ export const USER_ROLE = {
 	companyOperator: "companyOperator",
 	userOperator: "userOperator",
 	workRequestOperator: "workRequestOperator",
+	lockoutPermitOperator: "lockoutPermitOperator",
 	operator: "operator",
 }
 
@@ -242,6 +274,7 @@ export const USER_ROLE_LABELS = {
 	[USER_ROLE.companyOperator]: "Empresas",
 	[USER_ROLE.userOperator]: "Usuarios",
 	[USER_ROLE.workRequestOperator]: "Solicitudes de Trabajo",
+	[USER_ROLE.lockoutPermitOperator]: "Permisos de Bloqueo",
 	[USER_ROLE.operator]: "Operador",
 }
 
@@ -258,5 +291,6 @@ export const USER_ROLE_ARRAY = [
 	"companyOperator",
 	"userOperator",
 	"workRequestOperator",
+	"lockoutPermitOperator",
 	"operator",
 ] as const

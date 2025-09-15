@@ -36,6 +36,7 @@ enum MODULES {
   SAFETY_TALK // Charlas de seguridad
   WORK_ORDERS // Ordenes de Trabajo y Libros de obras
   WORK_PERMITS // Permisos de Trabajo
+  LOCKOUT_PERMITS // Permisos de Bloqueo
   DOCUMENTATION // Documentacion
   WORK_REQUESTS // Solicitudes de Trabajo
   COMPANY // Empresas
@@ -132,6 +133,14 @@ model User {
   basicFolderReviewer             BasicFolder[]             @relation("BasicFolderReviewer")
   equipment                       Equipment[]               @relation("EquipmentCreatedBy")
   inspectionComments              InspectionComment[]       @relation("InspectionCommentAuthor")
+  lockoutPermitsAsUser            LockoutPermit[]           @relation("LockoutPermitRequestedBy")
+  lockoutPermitAreaResponsible    LockoutPermit[]           @relation("LockoutPermitAreaResponsible")
+  lockoutPermitSupervisor         LockoutPermit[]           @relation("LockoutPermitSupervisor")
+  lockoutPermitOperator           LockoutPermit[]           @relation("LockoutPermitOperator")
+  lockoutPermitRemoveLockout      LockoutPermit[]           @relation("LockoutPermitRemoveLockout")
+  lockoutPermitAttachments        LockoutPermitAttachment[]
+  zeroEnergyReviews               ZeroEnergyReview[]        @relation("ZeroEnergyReviewPerformedBy")
+  zeroEnergyReviewReviewer        ZeroEnergyReview[]        @relation("ZeroEnergyReviewReviewer")
 
   @@unique([email])
   @@unique([rut])
@@ -232,6 +241,7 @@ model Company {
   users          User[]
   workOrders     WorkOrder[]
   workPermits    WorkPermit[]
+  lockoutPermits LockoutPermit[]
   vehicles       Vehicle[]
   StartupFolders StartupFolder[]
 
@@ -344,6 +354,7 @@ model WorkOrder {
   endReport             Attachment?          @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
   endReportId           String?              @unique
   workPermits           WorkPermit[]
+  lockoutPermits        LockoutPermit[]
   closureRequestedBy    User?                @relation("WorkOrderClosureRequester", fields: [closureRequestedById], references: [id])
   closureRequestedById  String?
   closureRequestedAt    DateTime?
@@ -437,6 +448,8 @@ model Equipment {
   createdBy            User?                 @relation("EquipmentCreatedBy", fields: [createdById], references: [id])
   createdById          String?
   workRequests         WorkRequest[]
+  lockoutPermits       LockoutPermit[]
+  zeroEnergyReviews    ZeroEnergyReview[]
 
   @@unique([id])
   @@unique([tag])
@@ -605,6 +618,120 @@ model WorkPermitAttachment {
   workPermit   WorkPermit @relation(fields: [workPermitId], references: [id])
 
   @@map("work_permit_attachment")
+}
+
+enum LOCKOUT_PERMIT_STATUS {
+  ACTIVE
+  REJECTED
+  COMPLETED
+  REVIEW_PENDING
+}
+
+enum LOCKOUT_TYPE {
+  PREVENTIVE
+  CORRECTIVE
+  EMERGENCY
+  OTHER
+}
+
+model LockoutPermit {
+  id                   String                @id @default(cuid())
+  status               LOCKOUT_PERMIT_STATUS @default(REVIEW_PENDING)
+  lockoutType          LOCKOUT_TYPE
+  lockoutTypeOther     String?
+  startDate            DateTime
+  endDate              DateTime
+  activitiesToExecute  String[]
+  lockoutRegistrations LockoutRegistration[]
+  removeLockoutReview  Boolean?
+  observations         String?
+  approved             Boolean?
+  approvalDate         DateTime?
+  approvalTime         String?
+  zeroEnergyReviews    ZeroEnergyReview[]
+  finalObservations    String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  approvalNotes        String?
+
+  supervisorId      String?
+  supervisor        User?                     @relation("LockoutPermitSupervisor", fields: [supervisorId], references: [id])
+  operatorId        String?
+  operator          User?                     @relation("LockoutPermitOperator", fields: [operatorId], references: [id])
+  removeLockoutId   String?
+  removeLockout     User?                     @relation("LockoutPermitRemoveLockout", fields: [removeLockoutId], references: [id])
+  areaResponsibleId String
+  areaResponsible   User                      @relation("LockoutPermitAreaResponsible", fields: [areaResponsibleId], references: [id])
+  requestedById     String
+  requestedBy       User                      @relation("LockoutPermitRequestedBy", fields: [requestedById], references: [id])
+  otNumberId        String?
+  otNumberRef       WorkOrder?                @relation(fields: [otNumberId], references: [id])
+  companyId         String
+  company           Company                   @relation(fields: [companyId], references: [id])
+  equipments        Equipment[]
+  attachments       LockoutPermitAttachment[]
+
+  @@map("lockout_permit")
+}
+
+model LockoutRegistration {
+  id          String    @id @default(cuid())
+  order       Int
+  name        String
+  rut         String
+  lockNumber  String
+  installDate DateTime?
+  installTime String?
+  removeDate  DateTime?
+  removeTime  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  lockoutPermitId String
+  lockoutPermit   LockoutPermit @relation(fields: [lockoutPermitId], references: [id], onDelete: Cascade)
+
+  @@map("lockout_registration")
+}
+
+model ZeroEnergyReview {
+  id           String   @id @default(cuid())
+  location     String?
+  action       String
+  reviewedZero Boolean?
+
+  lockoutPermit   LockoutPermit @relation(fields: [lockoutPermitId], references: [id], onDelete: Cascade)
+  lockoutPermitId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  equipmentId   String
+  equipment     Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  performedById String
+  performedBy   User      @relation("ZeroEnergyReviewPerformedBy", fields: [performedById], references: [id], onDelete: Cascade)
+  reviewerId    String?
+  reviewer      User?     @relation("ZeroEnergyReviewReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@map("zero_energy_review")
+}
+
+model LockoutPermitAttachment {
+  id   String @id @default(cuid())
+  name String
+  url  String
+  type String
+  size Int?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  uploadedAt DateTime @default(now())
+
+  uploadedBy      User          @relation(fields: [uploadedById], references: [id])
+  uploadedById    String
+  lockoutPermitId String
+  lockoutPermit   LockoutPermit @relation(fields: [lockoutPermitId], references: [id])
+
+  @@map("lockout_permit_attachment")
 }
 
 model Folder {
