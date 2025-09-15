@@ -123,6 +123,7 @@ export const data: NavBarData = {
 					name: "Solicitudes de Bloqueo",
 					url: "/admin/dashboard/solicitudes-de-bloqueo",
 					icon: LockKeyholeOpenIcon,
+					test: true,
 				},
 				{
 					name: "Planes de Mantenimiento",
