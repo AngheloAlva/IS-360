@@ -118,7 +118,18 @@ export const fetchWorkPermits: QueryFunction<
 > = async ({ queryKey }) => {
 	const [
 		,
-		{ page, limit, search, statusFilter, companyId, approvedBy, dateRange, orderBy, order, typeFilter },
+		{
+			page,
+			limit,
+			search,
+			statusFilter,
+			companyId,
+			approvedBy,
+			dateRange,
+			orderBy,
+			order,
+			typeFilter,
+		},
 	] = queryKey
 
 	const searchParams = new URLSearchParams()
@@ -129,8 +140,8 @@ export const fetchWorkPermits: QueryFunction<
 	if (approvedBy) searchParams.set("approvedBy", approvedBy)
 	if (typeFilter) searchParams.set("typeFilter", typeFilter)
 	if (statusFilter) searchParams.set("statusFilter", statusFilter)
-	if (dateRange?.from) searchParams.set("dateFrom", dateRange.from.toISOString())
-	if (dateRange?.to) searchParams.set("dateTo", dateRange.to.toISOString())
+	if (dateRange?.from) searchParams.set("dateFrom", `${dateRange.from}`)
+	if (dateRange?.to) searchParams.set("dateTo", `${dateRange.to}`)
 	if (orderBy) searchParams.set("orderBy", orderBy)
 	if (order) searchParams.set("order", order)
 

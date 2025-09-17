@@ -470,7 +470,10 @@ export default function LockoutPermitForm({
 													onChange={(value) => {
 														const [id, location] = value.split("_")
 
-														form.setValue(`zeroEnergyReviews.${index}.equipment`, id)
+														form.setValue(
+															`zeroEnergyReviews.${index}.equipment`,
+															id + "_" + location
+														)
 														form.setValue(`zeroEnergyReviews.${index}.location`, location)
 													}}
 													options={

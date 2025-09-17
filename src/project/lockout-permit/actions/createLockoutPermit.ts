@@ -80,7 +80,7 @@ export const createLockoutPermit = async ({ values, userId }: CreateLockoutPermi
 						reviewedZero: review.isZeroEnergyReview,
 						equipment: {
 							connect: {
-								id: review.equipment,
+								id: review.equipment.split("_")[0],
 							},
 						},
 						performedBy: {
