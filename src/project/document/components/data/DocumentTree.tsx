@@ -2,7 +2,9 @@
 
 import { useCallback, useMemo, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
+import { extractFilenameFromUrl, openDocumentSecurely } from "@/lib/view-document"
 import { Areas } from "@/lib/consts/areas"
 import { cn } from "@/lib/utils"
 
@@ -57,10 +59,16 @@ const TreeNodeItem = ({
 		}
 	}
 
-	const handleFileClick = () => {
-		if (node.url) {
-			window.open(node.url, "_blank", "noopener,noreferrer")
+	const handleFileClick = async () => {
+		if (!node.url) return
+
+		const filename = extractFilenameFromUrl(node.url)
+		if (!filename) {
+			toast.error("No se pudo determinar el nombre del archivo")
+			return
 		}
+
+		await openDocumentSecurely(filename, "documents")
 	}
 
 	if (node.type === "folder") {

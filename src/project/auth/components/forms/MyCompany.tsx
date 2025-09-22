@@ -71,6 +71,7 @@ export function MyCompany({ user, companyId }: MyCompanyProps) {
 					files: [values.image],
 					randomString: user.id,
 					containerType: "avatars",
+					companyId: user.companyId || undefined,
 				})
 
 				if (uploadResults.length > 0) {

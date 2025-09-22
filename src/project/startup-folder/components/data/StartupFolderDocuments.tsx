@@ -91,6 +91,7 @@ export default function StartupFolderDocuments({
 	const table = useReactTable({
 		columns: getDocumentColumns({
 			userId,
+			companyId,
 			refetch,
 			isOtcMember,
 			startupFolderId,
@@ -312,6 +313,7 @@ export default function StartupFolderDocuments({
 					userId={userId}
 					category={category}
 					isOpen={showUploadDialog}
+					userCompanyId={companyId}
 					startupFolderId={startupFolderId}
 					documentType={selectedDocumentType}
 					documentToUpdate={selectedDocument}

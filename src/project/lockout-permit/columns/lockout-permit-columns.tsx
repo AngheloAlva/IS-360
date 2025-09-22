@@ -66,7 +66,7 @@ export const getLockoutPermitColumns = (
 							</Link>
 						</DropdownMenuItem>
 
-						<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+						<DropdownMenuItem asChild>
 							<LockoutPermitAttachmentForm
 								userId={userId}
 								lockoutPermitId={row.original.id}

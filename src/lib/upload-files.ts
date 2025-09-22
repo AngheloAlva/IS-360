@@ -2,6 +2,7 @@ import { FileSchema } from "@/shared/schemas/file.schema"
 
 interface UploadFilesToCloudProps {
 	files: FileSchema[]
+	companyId?: string
 	randomString: string
 	secondaryName?: string
 	nameStrategy?: "original" | "secondary" | "both"
@@ -15,17 +16,27 @@ export interface UploadResult {
 	name: string
 }
 
+function sanitizeFilename(filename: string): string {
+	return filename
+		.replace(/[<>:"/\\|?*]/g, "_")
+		.replace(/_{2,}/g, "_")
+		.substring(0, 255)
+}
+
 export const uploadFilesToCloud = async ({
 	files,
 	randomString,
 	secondaryName,
 	containerType,
+	companyId,
 	nameStrategy = "original",
 }: UploadFilesToCloudProps): Promise<UploadResult[]> => {
-	// Obtener el SAS token y la información del contenedor
 	const sasResponse = await fetch("/api/file", {
 		method: "POST",
-		headers: { "Content-Type": "application/json" },
+		headers: {
+			"Content-Type": "application/json",
+			"X-Requested-With": "XMLHttpRequest",
+		},
 		body: JSON.stringify({
 			filenames: files.map((field) => {
 				if (!field.file) {
@@ -36,11 +47,17 @@ export const uploadFilesToCloud = async ({
 				return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${randomString.slice(0, 4)}.${fileExtension}`
 			}),
 			containerType,
+			companyId,
 		}),
 	})
 
 	if (!sasResponse.ok) {
-		throw new Error("Error al obtener URLs de subida")
+		if (sasResponse.status === 403) {
+			const errorData = await sasResponse.json()
+			throw new Error(`Acceso denegado: ${errorData.reason || "Sin permisos para subir archivos"}`)
+		}
+		const errorText = await sasResponse.text()
+		throw new Error(`Error al obtener URLs de subida: ${errorText}`)
 	}
 
 	const { urls } = await sasResponse.json()
@@ -48,14 +65,17 @@ export const uploadFilesToCloud = async ({
 		throw new Error("Error con las URLs de subida")
 	}
 
-	// Subir archivos a Azure Blob Storage
 	const uploadPromises = files.map(async (fileData, index) => {
 		if (!fileData.file) {
 			throw new Error("No se pudo obtener el archivo")
 		}
 
 		const uploadUrl = urls[index]
-		const blobUrl = uploadUrl.split("?")[0] // URL base sin SAS token
+		const blobUrl = uploadUrl.split("?")[0]
+
+		if (!uploadUrl.startsWith("https://")) {
+			throw new Error("URL de subida no segura")
+		}
 
 		const uploadResponse = await fetch(uploadUrl, {
 			method: "PUT",
@@ -63,28 +83,31 @@ export const uploadFilesToCloud = async ({
 			headers: {
 				"Content-Type": fileData.file.type,
 				"x-ms-blob-type": "BlockBlob",
+				"x-ms-blob-content-disposition": "attachment",
+				"x-ms-blob-cache-control": "no-cache",
 			},
 		})
 
 		if (!uploadResponse.ok) {
-			throw new Error(`Error al subir archivo: ${fileData.file.name}`)
+			const errorText = await uploadResponse.text()
+			throw new Error(`Error al subir archivo ${fileData.file.name}: ${errorText}`)
 		}
 
-		// Determinar el nombre del archivo según la estrategia elegida
 		let fileName
 		switch (nameStrategy) {
 			case "original":
-				fileName = fileData.file.name
+				fileName = sanitizeFilename(fileData.file.name)
 				break
 			case "secondary":
-				fileName = secondaryName || fileData.file.name
+				fileName = sanitizeFilename(secondaryName || fileData.file.name)
 				break
 			case "both":
-				fileName = secondaryName ? `${secondaryName} - ${fileData.file.name}` : fileData.file.name
+				fileName = secondaryName
+					? sanitizeFilename(`${secondaryName} - ${fileData.file.name}`)
+					: sanitizeFilename(fileData.file.name)
 				break
 			default:
-				// Comportamiento por defecto (retrocompatible)
-				fileName = secondaryName || fileData.file.name
+				fileName = sanitizeFilename(secondaryName || fileData.file.name)
 		}
 
 		return {

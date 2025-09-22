@@ -33,9 +33,25 @@ export async function GET(req: NextRequest) {
 					],
 					isActive: true,
 				},
-				include: {
+				select: {
+					id: true,
+					name: true,
+					code: true,
+					url: true,
+					size: true,
+					type: true,
+					description: true,
+					revisionCount: true,
+					expirationDate: true,
+					registrationDate: true,
+					updatedAt: true,
+					folderId: true,
+					userId: true,
+					area: true,
+					isActive: true,
 					user: {
 						select: {
+							id: true,
 							name: true,
 						},
 					},

@@ -4,7 +4,6 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import { useState } from "react"
 import {
-	EyeIcon,
 	UserIcon,
 	LockIcon,
 	ClockIcon,
@@ -21,9 +20,9 @@ import { useLockoutPermitDetails } from "../../hooks/use-lockout-permit-details"
 import { LOCKOUT_PERMIT_STATUS, LOCKOUT_TYPE } from "@prisma/client"
 import { cn } from "@/lib/utils"
 
+import LockoutPermitAttachmentButton from "@/project/lockout-permit/components/data/LockoutPermitAttachmentButton"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
-import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 import {
 	Dialog,
@@ -490,11 +489,7 @@ export default function LockoutPermitDetailsDialog({
 															<span className="text-muted-foreground text-xs">
 																{format(new Date(attachment.createdAt), "dd/MM/yyyy")}
 															</span>
-															<Button variant="outline" size="sm" asChild>
-																<a href={attachment.url} target="_blank" rel="noopener noreferrer">
-																	<EyeIcon className="h-4 w-4 min-w-4" />
-																</a>
-															</Button>
+															<LockoutPermitAttachmentButton url={attachment.url} />
 														</div>
 													</div>
 												))}

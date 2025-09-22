@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import { InfoIcon, FilesIcon, CheckCircleIcon, AlertCircleIcon } from "lucide-react"
+import { InfoIcon, FilesIcon, CheckCircleIcon, AlertCircleIcon, FilterXIcon } from "lucide-react"
 import { memo, useMemo, useCallback } from "react"
 import { getImageProps } from "next/image"
 import Link from "next/link"
@@ -76,13 +76,13 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 
 	return (
 		<>
-			<div className="mb-4 grid w-full grid-cols-2 gap-2 lg:grid-cols-6" id={id}>
+			<div className="mt-10 mb-4 flex w-full flex-wrap gap-2" id={id}>
 				<SearchInput
 					setPage={() => {}}
+					className="flex-1"
 					onChange={actions.setSearch}
 					inputClassName="bg-background"
 					value={memoizedFilters.search}
-					className="col-span-2 sm:col-span-1 lg:col-span-2"
 					placeholder="Buscar por nombre o RUT de empresa..."
 				/>
 
@@ -90,7 +90,7 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 					onValueChange={handleReviewRequestChange}
 					value={filters.onlyWithReviewRequest ? "true" : "false"}
 				>
-					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
+					<SelectTrigger className="border-input bg-background w-fit border">
 						<SelectValue placeholder="Estado" />
 					</SelectTrigger>
 					<SelectContent>
@@ -104,7 +104,7 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 				</Select>
 
 				<Select value={memoizedFilters.otStatus ?? "all"} onValueChange={handleOtStatusChange}>
-					<SelectTrigger className="border-input bg-background col-span-2 border sm:col-span-1">
+					<SelectTrigger className="border-input bg-background w-fit border">
 						<SelectValue placeholder="Estado" />
 					</SelectTrigger>
 					<SelectContent>
@@ -132,7 +132,7 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 					}}
 					value={memoizedFilters.withOtActive ? "true" : "false"}
 				>
-					<SelectTrigger className="border-input bg-background w-full border">
+					<SelectTrigger className="border-input bg-background w-fit border">
 						<SelectValue placeholder="Mostrar todas las empresas" />
 					</SelectTrigger>
 					<SelectContent>
@@ -148,8 +148,16 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 						actions.setOrderBy(orderBy)
 						actions.setOrder(order)
 					}}
-					className="w-full"
 				/>
+
+				<Button
+					size={"icon"}
+					variant="outline"
+					onClick={actions.resetFilters}
+					className="size-9 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white"
+				>
+					<FilterXIcon />
+				</Button>
 			</div>
 
 			{companiesWithFolders?.length === 0 && (

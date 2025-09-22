@@ -141,6 +141,7 @@ model User {
   lockoutPermitAttachments        LockoutPermitAttachment[]
   zeroEnergyReviews               ZeroEnergyReview[]        @relation("ZeroEnergyReviewPerformedBy")
   zeroEnergyReviewReviewer        ZeroEnergyReview[]        @relation("ZeroEnergyReviewReviewer")
+  fileAccessLogs                  FileAccessLog[]
 
   @@unique([email])
   @@unique([rut])
@@ -244,6 +245,7 @@ model Company {
   lockoutPermits LockoutPermit[]
   vehicles       Vehicle[]
   StartupFolders StartupFolder[]
+  fileAccessLogs FileAccessLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1633,4 +1635,26 @@ model VisitorTalkCompletion {
   @@index([visitorTalkId])
   @@index([status])
   @@map("visitor_talk_completion")
+}
+
+model FileAccessLog {
+  id            String      @id @default(cuid())
+  filename      String
+  containerType String
+  action        String
+  success       Boolean     @default(false)
+  accessRole    ACCESS_ROLE @default(PARTNER_COMPANY)
+  ipAddress     String?
+  userAgent     String?
+  timestamp     DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([userId])
+  @@index([companyId])
+  @@map("file_access_log")
 }

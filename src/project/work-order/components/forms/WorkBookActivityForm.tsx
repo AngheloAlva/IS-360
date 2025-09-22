@@ -43,11 +43,13 @@ import type { ENTRY_TYPE, User } from "@prisma/client"
 export default function ActivityForm({
 	userId,
 	startDate,
+	companyId,
 	entryType,
 	workOrderId,
 }: {
 	userId: string
 	startDate: Date
+	companyId?: string
 	workOrderId: string
 	entryType: ENTRY_TYPE
 }): React.ReactElement {
@@ -124,6 +126,7 @@ export default function ActivityForm({
 					files,
 					randomString: userId,
 					containerType: "files",
+					companyId, // Para logging de auditoría
 					secondaryName: values.activityName,
 				})
 

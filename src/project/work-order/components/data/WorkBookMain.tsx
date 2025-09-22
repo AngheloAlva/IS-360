@@ -182,6 +182,7 @@ export default function WorkBookMain({
 														startDate={new Date()}
 														workOrderId={workBook.id}
 														entryType="DAILY_ACTIVITY"
+														companyId={workBook.companyId || undefined}
 													/>
 												) : (
 													workBook.supervisorId === userId && (

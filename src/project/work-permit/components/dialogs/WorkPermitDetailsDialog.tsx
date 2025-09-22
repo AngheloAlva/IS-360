@@ -2,7 +2,6 @@
 
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import Link from "next/link"
 import {
 	DotIcon,
 	FileIcon,
@@ -13,7 +12,6 @@ import {
 	MapPinIcon,
 	BuildingIcon,
 	CalendarIcon,
-	PaperclipIcon,
 	ShieldUserIcon,
 	CloudUploadIcon,
 	CheckCircle2Icon,
@@ -23,6 +21,7 @@ import {
 import { WorkPermitStatus, WorkPermitStatusLabels } from "@/lib/consts/work-permit-status"
 import { cn } from "@/lib/utils"
 
+import WorkPermitAttachmentLink from "@/project/work-permit/components/data/WorkPermitAttachmentLink"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { Separator } from "@/shared/components/ui/separator"
 import {
@@ -291,15 +290,11 @@ export default function WorkPermitDetailsDialog({
 						<ul className="space-y-1">
 							{workPermit.attachments.map((attachment) => (
 								<li key={attachment.id} className="flex flex-col">
-									<Link
-										href={attachment.url}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex items-center gap-1.5 font-medium text-rose-500 hover:text-rose-600 hover:underline"
-									>
-										<PaperclipIcon className="h-4 w-4" />
-										{attachment.name}
-									</Link>
+									<WorkPermitAttachmentLink
+										url={attachment.url}
+										name={attachment.name}
+										attachmentId={attachment.id}
+									/>
 
 									<p className="text-muted-foreground text-sm">
 										Subido por {attachment.uploadedBy.name} el{" "}

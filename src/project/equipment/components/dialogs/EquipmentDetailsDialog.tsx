@@ -4,7 +4,6 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import {
 	TagIcon,
-	LinkIcon,
 	FolderIcon,
 	MapPinIcon,
 	WrenchIcon,
@@ -12,6 +11,7 @@ import {
 	CloudUploadIcon,
 } from "lucide-react"
 
+import EquipmentAttachmentLink from "@/project/equipment/components/data/EquipmentAttachmentLink"
 import { DialogLabel } from "@/shared/components/ui/dialog-label"
 import { ScrollArea } from "@/shared/components/ui/scroll-area"
 import { Separator } from "@/shared/components/ui/separator"
@@ -120,15 +120,7 @@ export default function EquipmentDetailsDialog({
 												key={attachment.id}
 												className="flex items-center gap-2 text-teal-500 hover:bg-teal-500/20"
 											>
-												<a
-													target="_blank"
-													href={attachment.url}
-													rel="noopener noreferrer"
-													className="flex items-center gap-2"
-												>
-													<LinkIcon className="size-4" />
-													{attachment.name}
-												</a>
+												<EquipmentAttachmentLink url={attachment.url} name={attachment.name} />
 											</li>
 										))}
 									</ul>

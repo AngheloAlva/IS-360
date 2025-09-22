@@ -36,7 +36,7 @@ const COLORS = {
 
 export function DocumentStatusChart({ data }: DocumentStatusChartProps) {
 	return (
-		<Card className="border-none">
+		<Card className="overflow-hidden border-none">
 			<CardHeader>
 				<div className="flex items-center justify-between">
 					<div>
@@ -89,8 +89,12 @@ export function DocumentStatusChart({ data }: DocumentStatusChartProps) {
 								/>
 							))}
 						</Pie>
+
 						<ChartTooltip content={<ChartTooltipContent />} />
-						<ChartLegend content={<ChartLegendContent />} />
+						<ChartLegend
+							className="mx-auto flex w-11/12 flex-wrap items-center justify-center gap-y-1.5 overflow-hidden"
+							content={<ChartLegendContent />}
+						/>
 					</PieChart>
 				</ChartContainer>
 			</CardContent>

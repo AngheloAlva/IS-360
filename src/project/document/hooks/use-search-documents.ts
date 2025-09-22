@@ -1,12 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-
-import { File as FileType } from "@prisma/client"
-
-export interface File extends FileType {
-	user: {
-		name: string
-	}
-}
+import type { File } from "./use-documents"
 
 interface DocumentsResponse {
 	files: File[]
@@ -19,7 +12,12 @@ interface UseDocumentsParams {
 	expiration?: string
 }
 
-export const useSearchDocuments = ({ page, limit, search, expiration = "all" }: UseDocumentsParams) => {
+export const useSearchDocuments = ({
+	page,
+	limit,
+	search,
+	expiration = "all",
+}: UseDocumentsParams) => {
 	return useQuery<DocumentsResponse>({
 		queryKey: ["documents", { search, expiration }],
 		queryFn: async () => {

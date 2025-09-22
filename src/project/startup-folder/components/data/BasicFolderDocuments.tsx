@@ -69,6 +69,7 @@ export function BasicFolderDocuments({
 		columns: getBasicDocumentColumns({
 			userId,
 			refetch,
+			companyId,
 			isOtcMember,
 			startupFolderId,
 			setShowUploadDialog,
@@ -285,6 +286,7 @@ export function BasicFolderDocuments({
 					userId={userId}
 					workerId={workerId}
 					isOpen={showUploadDialog}
+					userCompanyId={companyId}
 					category={DocumentCategory.BASIC}
 					startupFolderId={startupFolderId}
 					documentType={selectedDocumentType}

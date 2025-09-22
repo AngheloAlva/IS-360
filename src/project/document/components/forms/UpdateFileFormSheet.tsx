@@ -32,13 +32,14 @@ import {
 	SheetDescription,
 } from "@/shared/components/ui/sheet"
 
-import type { AREAS, File as PrismaFile } from "@prisma/client"
+import type { AREAS } from "@prisma/client"
+import type { File } from "../../hooks/use-documents"
 
 interface UpdateFileFormProps {
 	userId: string
 	fileId: string
 	areaValue: AREAS
-	initialData: PrismaFile
+	initialData: File
 	parentFolderId?: string
 }
 

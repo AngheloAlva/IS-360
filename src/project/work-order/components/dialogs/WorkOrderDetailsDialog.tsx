@@ -3,7 +3,8 @@
 import { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import Link from "next/link"
+import { useState } from "react"
+import { toast } from "sonner"
 import {
 	UserIcon,
 	LinkIcon,
@@ -19,6 +20,7 @@ import {
 	AlertTriangleIcon,
 } from "lucide-react"
 
+import { extractFilenameFromUrl, openDocumentSecurely } from "@/lib/view-document"
 import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
 import { useWorkOrderDetails } from "../../hooks/use-work-order-details"
 import { MILESTONE_STATUS_LABELS } from "@/lib/consts/milestone-status"
@@ -34,6 +36,8 @@ import { Separator } from "@/shared/components/ui/separator"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Progress } from "@/shared/components/ui/progress"
 import { Badge } from "@/shared/components/ui/badge"
+import { Button } from "@/shared/components/ui/button"
+import Spinner from "@/shared/components/Spinner"
 import {
 	Dialog,
 	DialogTitle,
@@ -61,6 +65,36 @@ export default function WorkOrderDetailsDialog({
 	setOpen,
 }: WorkOrderDetailsDialogProps) {
 	const { data, isLoading, error } = useWorkOrderDetails(workOrderId)
+	const [isLoadingInitReport, setIsLoadingInitReport] = useState(false)
+	const [isLoadingEndReport, setIsLoadingEndReport] = useState(false)
+
+	const handleViewInitReport = async () => {
+		if (!data?.initReport?.url) return
+
+		const filename = extractFilenameFromUrl(data.initReport.url)
+		if (!filename) {
+			toast.error("No se pudo determinar el nombre del archivo")
+			return
+		}
+
+		setIsLoadingInitReport(true)
+		await openDocumentSecurely(filename, "files")
+		setIsLoadingInitReport(false)
+	}
+
+	const handleViewEndReport = async () => {
+		if (!data?.endReport?.url) return
+
+		const filename = extractFilenameFromUrl(data.endReport.url)
+		if (!filename) {
+			toast.error("No se pudo determinar el nombre del archivo")
+			return
+		}
+
+		setIsLoadingEndReport(true)
+		await openDocumentSecurely(filename, "files")
+		setIsLoadingEndReport(false)
+	}
 
 	const { props } = getImageProps({
 		width: 64,
@@ -220,27 +254,27 @@ export default function WorkOrderDetailsDialog({
 
 								<div className="grid gap-2">
 									{data?.initReport && (
-										<Link
-											target="_blank"
-											rel="noopener noreferrer"
-											href={data?.initReport.url}
+										<Button
+											variant="ghost"
+											onClick={handleViewInitReport}
+											disabled={isLoadingInitReport}
 											className="flex w-fit items-center gap-2 rounded-lg bg-orange-600/10 px-2 py-1 font-medium text-orange-600 hover:bg-orange-600 hover:text-white"
 										>
-											<LinkIcon className="h-4 w-4" />
+											{isLoadingInitReport ? <Spinner /> : <LinkIcon className="h-4 w-4" />}
 											Reporte Inicial
-										</Link>
+										</Button>
 									)}
 
 									{data?.endReport && (
-										<Link
-											target="_blank"
-											rel="noopener noreferrer"
-											href={data?.endReport.url}
+										<Button
+											variant="ghost"
+											onClick={handleViewEndReport}
+											disabled={isLoadingEndReport}
 											className="flex w-fit items-center gap-2 rounded-lg bg-orange-600/10 px-2 py-1 font-medium text-orange-600 hover:bg-orange-600 hover:text-white"
 										>
-											<LinkIcon className="h-4 w-4" />
+											{isLoadingEndReport ? <Spinner /> : <LinkIcon className="h-4 w-4" />}
 											Reporte Final
-										</Link>
+										</Button>
 									)}
 								</div>
 							</div>

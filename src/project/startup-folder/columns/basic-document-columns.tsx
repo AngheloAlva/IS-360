@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction } from "react"
 import { getImageProps } from "next/image"
 import { format } from "date-fns"
 import {
-	EyeIcon,
 	PenIcon,
 	MailIcon,
 	UserIcon,
@@ -20,6 +19,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/shared/componen
 import { StartupFolderStatusBadge } from "../components/data/StartupFolderStatusBadge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { DocumentReviewForm } from "../components/dialogs/DocumentReviewForm"
+import DocumentViewButton from "../components/data/DocumentViewButton"
 import { Checkbox } from "@/shared/components/ui/checkbox"
 import { Button } from "@/shared/components/ui/button"
 
@@ -30,13 +30,14 @@ import type { BasicDocumentType } from "@prisma/client"
 
 interface GetBasicDocumentColumnsProps {
 	userId: string
+	companyId: string
 	refetch: (options?: RefetchOptions) => Promise<
 		QueryObserverResult<
 			{
+				documents: BasicStartupFolderDocument[]
+				folderStatus: ReviewStatus
 				totalDocuments: number
 				approvedDocuments: number
-				folderStatus: ReviewStatus
-				documents: BasicStartupFolderDocument[]
 			},
 			Error
 		>
@@ -57,12 +58,13 @@ interface GetBasicDocumentColumnsProps {
 export const getBasicDocumentColumns = ({
 	userId,
 	refetch,
+	companyId,
 	isOtcMember,
-	startupFolderId,
 	folderStatus,
-	setSelectedDocumentType,
+	startupFolderId,
 	setShowUploadDialog,
 	setSelectedDocument,
+	setSelectedDocumentType,
 }: GetBasicDocumentColumnsProps): ColumnDef<BasicStartupFolderDocument>[] => [
 	...(isOtcMember
 		? [
@@ -232,16 +234,7 @@ export const getBasicDocumentColumns = ({
 
 			return (
 				<div className="flex items-center gap-1">
-					{doc.url && (
-						<Button
-							size={"icon"}
-							variant="ghost"
-							className="text-teal-600"
-							onClick={() => window.open(doc.url!, "_blank")}
-						>
-							<EyeIcon className="h-4 w-4" />
-						</Button>
-					)}
+					{doc.url && <DocumentViewButton url={doc.url} companyId={companyId} />}
 
 					{!isOtcMember &&
 						folderStatus === "DRAFT" &&

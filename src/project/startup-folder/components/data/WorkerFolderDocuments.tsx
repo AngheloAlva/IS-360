@@ -74,6 +74,7 @@ export function WorkerFolderDocuments({
 		columns: getWorkerDocumentColumns({
 			userId,
 			refetch,
+			companyId,
 			isOtcMember,
 			startupFolderId,
 			setShowUploadDialog,
@@ -290,6 +291,7 @@ export function WorkerFolderDocuments({
 					userId={userId}
 					workerId={workerId}
 					isOpen={showUploadDialog}
+					userCompanyId={companyId}
 					startupFolderId={startupFolderId}
 					documentType={selectedDocumentType}
 					documentToUpdate={selectedDocument}

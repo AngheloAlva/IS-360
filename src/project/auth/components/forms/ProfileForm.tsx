@@ -44,6 +44,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
 					files: [values.image],
 					randomString: user.id,
 					containerType: "avatars",
+					companyId: user.companyId || undefined,
 				})
 
 				if (uploadResults.length > 0) {

@@ -1,9 +1,8 @@
 "use client"
 
-import Image, { getImageProps } from "next/image"
+import { getImageProps } from "next/image"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
-import Link from "next/link"
 import {
 	UserIcon,
 	ZoomInIcon,
@@ -18,6 +17,7 @@ import {
 } from "lucide-react"
 
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+import WorkRequestAttachmentLink from "@/project/work-request/components/data/WorkRequestAttachmentLink"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 import { DialogLabel } from "@/shared/components/ui/dialog-label"
@@ -185,26 +185,11 @@ export default function WorkRequestDetailsDialog({
 										) : (
 											<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
 												{workRequest.attachments.map((attachment) => (
-													<Link
-														target="_blank"
+													<WorkRequestAttachmentLink
 														key={attachment.id}
-														href={attachment.url}
-														className="hover:bg-text/10 overflow-hidden rounded-md border transition-colors"
-													>
-														<div className="relative flex h-32 w-full items-center justify-center">
-															{attachment.url.includes(".pdf") ? (
-																<FileTextIcon className="size-12" />
-															) : (
-																<Image
-																	fill
-																	src={attachment.url}
-																	alt={attachment.name}
-																	className="object-cover"
-																/>
-															)}
-														</div>
-														<div className="truncate p-2 text-sm">{attachment.name}</div>
-													</Link>
+														url={attachment.url}
+														name={attachment.name}
+													/>
 												))}
 											</div>
 										)}

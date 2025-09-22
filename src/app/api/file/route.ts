@@ -1,63 +1,80 @@
-import { BlobSASPermissions } from "@azure/storage-blob"
-import { NextRequest, NextResponse } from "next/server"
-import { headers } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
+
+import { validateFileAccess, logFileAccess } from "@/lib/file-security"
 import {
-	blobServiceClient,
+	generateSecureSasUrl,
 	FILES_CONTAINER_NAME,
 	DOCUMENTS_CONTAINER_NAME,
 } from "@/lib/azure-storage-client"
 
-import { auth } from "@/lib/auth"
-
 type ContainerType = "documents" | "files" | "startup" | "avatars" | "equipment"
 
 export async function POST(request: NextRequest) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return new NextResponse("No autorizado", { status: 401 })
-	}
-
 	try {
-		// Validar entrada
 		const {
 			filenames,
 			containerType = "documents",
-		}: { filenames: string[]; containerType?: ContainerType } = await request.json()
+			companyId,
+		}: {
+			filenames: string[]
+			containerType?: ContainerType
+			companyId?: string
+		} = await request.json()
 
 		if (!filenames || filenames.length === 0) {
-			console.error("No se proporcionaron nombres de archivo")
 			return NextResponse.json(
 				{ error: "No se proporcionaron nombres de archivo" },
 				{ status: 400 }
 			)
 		}
 
-		// Seleccionar el contenedor correcto basado en el tipo
+		// Validar acceso para cada archivo
+		const validationResults = await Promise.all(
+			filenames.map(async (filename) => {
+				const validation = await validateFileAccess({
+					filename,
+					containerType,
+					action: "write",
+					companyId,
+				})
+
+				// Registrar intento de acceso
+				await logFileAccess(
+					{
+						filename,
+						containerType,
+						action: "write",
+						companyId,
+					},
+					validation,
+					validation.allowed
+				)
+
+				return { filename, validation }
+			})
+		)
+
+		// Verificar si hay archivos no autorizados
+		const unauthorizedFiles = validationResults.filter((r) => !r.validation.allowed)
+		if (unauthorizedFiles.length > 0) {
+			return NextResponse.json(
+				{
+					error: "Acceso denegado a algunos archivos",
+					unauthorizedFiles: unauthorizedFiles.map((f) => ({
+						filename: f.filename,
+						reason: f.validation.reason,
+					})),
+				},
+				{ status: 403 }
+			)
+		}
+
 		const containerName =
 			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
 
-		const containerClient = blobServiceClient.getContainerClient(containerName)
-
+		// Generar URLs SAS solo para archivos autorizados
 		const urls = await Promise.all(
-			filenames.map(async (filename) => {
-				const blobClient = containerClient.getBlockBlobClient(filename)
-				const permissions = new BlobSASPermissions()
-				permissions.write = true
-				permissions.create = true
-
-				const url = await blobClient.generateSasUrl({
-					permissions,
-					expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
-					contentType: "application/octet-stream",
-					cacheControl: "no-cache",
-					contentDisposition: "attachment",
-				})
-
-				return url
-			})
+			filenames.map((filename) => generateSecureSasUrl(containerName, filename, "write", 10))
 		)
 
 		return NextResponse.json({ urls })
@@ -71,30 +88,51 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-	const filename = request.nextUrl.searchParams.get("filename") as string
-	const containerType = request.nextUrl.searchParams.get("containerType") || "documents"
-
 	try {
-		// Validar entrada
+		const filename = request.nextUrl.searchParams.get("filename") as string
+		const containerType = (request.nextUrl.searchParams.get("containerType") ||
+			"documents") as ContainerType
+		const companyId = request.nextUrl.searchParams.get("companyId") || undefined
+
 		if (!filename) {
-			console.error("No se proporcionó nombre de archivo")
 			return NextResponse.json({ error: "No se proporcionó nombre de archivo" }, { status: 400 })
 		}
 
-		// Seleccionar el contenedor correcto basado en el tipo
+		// Validar acceso al archivo
+		const validation = await validateFileAccess({
+			filename,
+			containerType,
+			action: "read",
+			companyId,
+		})
+
+		// Registrar intento de acceso
+		await logFileAccess(
+			{
+				filename,
+				containerType,
+				action: "read",
+				companyId,
+			},
+			validation,
+			validation.allowed
+		)
+
+		if (!validation.allowed) {
+			return NextResponse.json(
+				{
+					error: "Acceso denegado",
+					reason: validation.reason,
+				},
+				{ status: 403 }
+			)
+		}
+
 		const containerName =
 			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
 
-		const containerClient = blobServiceClient.getContainerClient(containerName)
-
-		const blobClient = containerClient.getBlockBlobClient(filename)
-		const permissions = new BlobSASPermissions()
-		permissions.read = true
-
-		const url = await blobClient.generateSasUrl({
-			permissions,
-			expiresOn: new Date(Date.now() + 600 * 1000), // 10 minutes
-		})
+		// Generar URL SAS para archivo autorizado
+		const url = await generateSecureSasUrl(containerName, filename, "read", 60)
 
 		return NextResponse.json({ url })
 	} catch (error: unknown) {

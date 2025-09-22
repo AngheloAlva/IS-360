@@ -103,10 +103,39 @@ export async function GET(req: NextRequest) {
 				...expirationFilter,
 				isActive: true,
 			},
-			include: {
+			select: {
+				id: true,
+				name: true,
+				code: true,
+				url: true,
+				size: true,
+				type: true,
+				area: true,
+				userId: true,
+				folderId: true,
+				isActive: true,
+				updatedAt: true,
+				description: true,
+				revisionCount: true,
+				expirationDate: true,
+				registrationDate: true,
 				user: {
 					select: {
+						id: true,
 						name: true,
+					},
+				},
+				comments: {
+					select: {
+						id: true,
+						content: true,
+						createdAt: true,
+						user: {
+							select: {
+								id: true,
+								name: true,
+							},
+						},
 					},
 				},
 			},

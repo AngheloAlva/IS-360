@@ -7,13 +7,13 @@ import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import { useState } from "react"
 import { toast } from "sonner"
-import Link from "next/link"
 
 import { createInspectionComment } from "@/project/work-order/actions/createInspectionComment"
 import { useInspectionComments } from "@/project/work-order/hooks/use-inspection-comments"
 import { WorkEntry } from "@/project/work-order/hooks/use-work-entries"
 import { INSPECTION_COMMENT_TYPE } from "@prisma/client"
 import { uploadFilesToCloud } from "@/lib/upload-files"
+import { extractFilenameFromUrl, openDocumentSecurely } from "@/lib/view-document"
 import { useQueryClient } from "@tanstack/react-query"
 import { cn } from "@/lib/utils"
 import {
@@ -31,6 +31,7 @@ import FileTable from "@/shared/components/forms/FileTable"
 import { Skeleton } from "@/shared/components/ui/skeleton"
 import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
+import Spinner from "@/shared/components/Spinner"
 import { Form } from "@/shared/components/ui/form"
 
 interface WorkBookEntryDetailsProps {
@@ -65,6 +66,19 @@ export function WorkBookEntryDetails({
 		!isOtcMember ? "SUPERVISOR_RESPONSE" : null
 	)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [loadingAttachments, setLoadingAttachments] = useState<Record<string, boolean>>({})
+
+	const handleViewAttachment = async (url: string, attachmentId: string) => {
+		const filename = extractFilenameFromUrl(url)
+		if (!filename) {
+			toast.error("No se pudo determinar el nombre del archivo")
+			return
+		}
+
+		setLoadingAttachments((prev) => ({ ...prev, [attachmentId]: true }))
+		await openDocumentSecurely(filename, "files")
+		setLoadingAttachments((prev) => ({ ...prev, [attachmentId]: false }))
+	}
 
 	const { data: comments, isLoading: commentsLoading } = useInspectionComments({
 		workEntryId: entry?.id || "",
@@ -294,16 +308,25 @@ export function WorkBookEntryDetails({
 								<div className="space-y-2">
 									<h4 className="font-semibold">Archivos Adjuntos</h4>
 									{entry.attachments.map((attachment) => (
-										<Link
-											target="_blank"
+										<Button
 											key={attachment.name}
-											href={attachment.url}
-											rel="noopener noreferrer"
-											className="flex flex-nowrap items-center gap-1 text-sm text-orange-500 hover:underline"
+											variant="ghost"
+											onClick={() => handleViewAttachment(attachment.url, attachment.name)}
+											disabled={loadingAttachments[attachment.name]}
+											className="flex h-auto w-fit flex-nowrap items-center gap-1 p-0 text-sm text-orange-500 hover:underline"
 										>
-											{attachment.name}
-											<ExternalLink className="h-4 w-4" />
-										</Link>
+											{loadingAttachments[attachment.name] ? (
+												<>
+													{attachment.name}
+													<Spinner />
+												</>
+											) : (
+												<>
+													{attachment.name}
+													<ExternalLink className="h-4 w-4" />
+												</>
+											)}
+										</Button>
 									))}
 								</div>
 							)}
@@ -377,17 +400,28 @@ export function WorkBookEntryDetails({
 																				Archivos adjuntos:
 																			</p>
 																			{comment.attachments.map((attachment) => (
-																				<a
+																				<Button
 																					key={attachment.id}
-																					href={attachment.url}
-																					target="_blank"
-																					rel="noopener noreferrer"
-																					className="flex items-center gap-1 text-xs text-orange-600 hover:underline"
+																					variant="ghost"
+																					onClick={() =>
+																						handleViewAttachment(attachment.url, attachment.id)
+																					}
+																					disabled={loadingAttachments[attachment.id]}
+																					className="flex h-auto w-fit items-center gap-1 p-0 text-xs text-orange-600 hover:underline"
 																				>
-																					<FileText className="h-3 w-3" />
-																					{attachment.name}
-																					<ExternalLink className="h-3 w-3" />
-																				</a>
+																					{loadingAttachments[attachment.id] ? (
+																						<>
+																							{attachment.name}
+																							<Spinner />
+																						</>
+																					) : (
+																						<>
+																							<FileText className="h-3 w-3" />
+																							{attachment.name}
+																							<ExternalLink className="h-3 w-3" />
+																						</>
+																					)}
+																				</Button>
 																			))}
 																		</div>
 																	)}

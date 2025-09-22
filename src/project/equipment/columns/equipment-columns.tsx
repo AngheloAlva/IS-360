@@ -2,11 +2,11 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { EyeIcon } from "lucide-react"
-import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 
 import EquipmentDetailsDialog from "@/project/equipment/components/dialogs/EquipmentDetailsDialog"
+import EquipmentAttachmentLink from "@/project/equipment/components/data/EquipmentAttachmentLink"
 import { Button } from "@/shared/components/ui/button"
 import { Badge } from "@/shared/components/ui/badge"
 
@@ -98,14 +98,7 @@ export const EquipmentColumns: ColumnDef<WorkEquipment>[] = [
 					{attachments.length > 0 ? (
 						attachments.map((attachment) => (
 							<li key={attachment.id}>
-								<Link
-									target="_blank"
-									href={attachment.url}
-									rel="noopener noreferrer"
-									className="text-green-500 hover:underline"
-								>
-									{attachment.name}
-								</Link>
+								<EquipmentAttachmentLink url={attachment.url} name={attachment.name} />
 							</li>
 						))
 					) : (

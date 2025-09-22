@@ -78,6 +78,7 @@ export function VehicleFolderDocuments({
 		columns: getVehicleDocumentColumns({
 			userId,
 			refetch,
+			companyId,
 			isOtcMember,
 			startupFolderId,
 			setShowUploadDialog,
@@ -293,6 +294,7 @@ export function VehicleFolderDocuments({
 					category="VEHICLES"
 					vehicleId={vehicleId}
 					isOpen={showUploadDialog}
+					userCompanyId={companyId}
 					startupFolderId={startupFolderId}
 					documentToUpdate={selectedDocument}
 					documentType={selectedDocumentType}

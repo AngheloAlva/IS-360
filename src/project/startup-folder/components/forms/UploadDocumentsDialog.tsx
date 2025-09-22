@@ -60,30 +60,31 @@ import type {
 
 interface UploadDocumentsDialogProps {
 	userId: string
+	category: DocumentCategory
 	isOpen: boolean
+	onClose: () => void
+	onUploadComplete: () => void
+	startupFolderId: string
 	workerId?: string
 	vehicleId?: string
-	onClose: () => void
-	startupFolderId: string
-	category: DocumentCategory
-	onUploadComplete?: () => void
+	documentType?: {
+		type:
+			| BasicDocumentType
+			| WorkerDocumentType
+			| VehicleDocumentType
+			| EnvironmentalDocType
+			| TechSpecsDocumentType
+			| SafetyAndHealthDocumentType
+			| EnvironmentDocType
+		name: string
+	} | null
 	documentToUpdate?:
 		| StartupFolderDocument
 		| VehicleStartupFolderDocument
 		| WorkerStartupFolderDocument
 		| BasicStartupFolderDocument
 		| null
-	documentType?: {
-		type:
-			| BasicDocumentType
-			| WorkerDocumentType
-			| EnvironmentDocType
-			| VehicleDocumentType
-			| EnvironmentalDocType
-			| TechSpecsDocumentType
-			| SafetyAndHealthDocumentType
-		name: string
-	} | null
+	userCompanyId?: string | null
 }
 
 export function UploadDocumentsDialog({
@@ -97,6 +98,7 @@ export function UploadDocumentsDialog({
 	startupFolderId,
 	documentToUpdate,
 	onUploadComplete,
+	userCompanyId,
 }: UploadDocumentsDialogProps) {
 	const defaultExpirationDate = addYears(new Date(), 1)
 
@@ -164,6 +166,7 @@ export function UploadDocumentsDialog({
 					],
 					randomString: startupFolderId || workerId || vehicleId || "",
 					containerType: "startup",
+					companyId: userCompanyId || undefined,
 					nameStrategy: "original",
 				})
 				uploadResult = results[0]
