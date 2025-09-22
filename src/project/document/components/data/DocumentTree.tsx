@@ -33,6 +33,8 @@ const TreeNodeItem = ({
 	loadingNodes,
 	expandedNodes,
 	toggleNode,
+	setFileLoading,
+	clearFileLoading,
 	router,
 }: {
 	node: TreeNode
@@ -41,6 +43,8 @@ const TreeNodeItem = ({
 	loadingNodes: Set<string>
 	expandedNodes: Set<string>
 	toggleNode: (nodeId: string) => void
+	setFileLoading: (fileId: string) => void
+	clearFileLoading: (fileId: string) => void
 	router: ReturnType<typeof useRouter>
 }) => {
 	const childNodes = loadedNodes[node.id] || []
@@ -68,7 +72,12 @@ const TreeNodeItem = ({
 			return
 		}
 
-		await openDocumentSecurely(filename, "documents")
+		setFileLoading(node.id)
+		try {
+			await openDocumentSecurely(filename, "documents")
+		} finally {
+			clearFileLoading(node.id)
+		}
 	}
 
 	if (node.type === "folder") {
@@ -90,14 +99,16 @@ const TreeNodeItem = ({
 					<>
 						{childNodes.map((childNode) => (
 							<TreeNodeItem
-								key={childNode.id}
-								node={childNode}
 								area={area}
+								router={router}
+								node={childNode}
+								key={childNode.id}
+								toggleNode={toggleNode}
 								loadedNodes={loadedNodes}
 								loadingNodes={loadingNodes}
 								expandedNodes={expandedNodes}
-								toggleNode={toggleNode}
-								router={router}
+								setFileLoading={setFileLoading}
+								clearFileLoading={clearFileLoading}
 							/>
 						))}
 					</>
@@ -105,6 +116,18 @@ const TreeNodeItem = ({
 			</Folder>
 		)
 	} else {
+		// Para archivos, verificamos si están en estado de carga
+		const isFileLoading = loadingNodes.has(node.id)
+
+		if (isFileLoading) {
+			return (
+				<div key={node.id} className="flex items-center gap-2 py-1">
+					<div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+					<span className="text-sm text-gray-600">{node.name}</span>
+				</div>
+			)
+		}
+
 		return (
 			<File
 				key={node.id}
@@ -123,6 +146,8 @@ const RenderTreeNodes = ({
 	loadingNodes,
 	expandedNodes,
 	toggleNode,
+	setFileLoading,
+	clearFileLoading,
 	router,
 }: {
 	nodes: TreeNode[]
@@ -131,6 +156,8 @@ const RenderTreeNodes = ({
 	loadingNodes: Set<string>
 	expandedNodes: Set<string>
 	toggleNode: (nodeId: string) => void
+	setFileLoading: (fileId: string) => void
+	clearFileLoading: (fileId: string) => void
 	router: ReturnType<typeof useRouter>
 }) => {
 	if (!nodes.length) return null
@@ -146,6 +173,8 @@ const RenderTreeNodes = ({
 					loadingNodes={loadingNodes}
 					expandedNodes={expandedNodes}
 					toggleNode={toggleNode}
+					setFileLoading={setFileLoading}
+					clearFileLoading={clearFileLoading}
 					router={router}
 				/>
 			))}
@@ -208,6 +237,18 @@ const useFetchTreeData = (areaValue: string) => {
 		[loadedNodes, fetchNodeData]
 	)
 
+	const setFileLoading = useCallback((fileId: string) => {
+		setLoadingNodes((prev) => new Set([...prev, fileId]))
+	}, [])
+
+	const clearFileLoading = useCallback((fileId: string) => {
+		setLoadingNodes((prev) => {
+			const newLoading = new Set(prev)
+			newLoading.delete(fileId)
+			return newLoading
+		})
+	}, [])
+
 	useEffect(() => {
 		const initializeTree = async () => {
 			const { folders, files } = await fetchNodeData(null)
@@ -217,12 +258,12 @@ const useFetchTreeData = (areaValue: string) => {
 		initializeTree()
 	}, [fetchNodeData])
 
-	return { expandedNodes, loadedNodes, loadingNodes, toggleNode }
+	return { expandedNodes, loadedNodes, loadingNodes, toggleNode, setFileLoading, clearFileLoading }
 }
 
 export function DocumentTree({ area, className }: DocumentTreeProps) {
 	const areaValue = Areas[area as keyof typeof Areas]?.value
-	const { expandedNodes, loadedNodes, loadingNodes, toggleNode } = useFetchTreeData(areaValue)
+	const { expandedNodes, loadedNodes, loadingNodes, toggleNode, setFileLoading, clearFileLoading } = useFetchTreeData(areaValue)
 
 	const router = useRouter()
 
@@ -249,13 +290,15 @@ export function DocumentTree({ area, className }: DocumentTreeProps) {
 			) : rootNodes.length > 0 ? (
 				<Files className="border-none">
 					<RenderTreeNodes
-						nodes={rootNodes}
 						area={area}
+						nodes={rootNodes}
+						router={router}
+						toggleNode={toggleNode}
 						loadedNodes={loadedNodes}
 						loadingNodes={loadingNodes}
 						expandedNodes={expandedNodes}
-						toggleNode={toggleNode}
-						router={router}
+						setFileLoading={setFileLoading}
+						clearFileLoading={clearFileLoading}
 					/>
 				</Files>
 			) : (

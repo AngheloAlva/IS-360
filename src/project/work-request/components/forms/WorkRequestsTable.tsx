@@ -218,7 +218,6 @@ export default function WorkRequestsTable({ hasPermission, id }: WorkRequestsTab
 					"Urgente": workRequest.isUrgent ? "Sí" : "No",
 					"Equipos": workRequest.equipments.map((eq) => eq.name).join(", "),
 					"Comentarios": workRequest.comments.map((com) => com.content).join(", "),
-					"Adjuntos": workRequest.attachments.map((att) => att.url).join(" | "),
 				}))
 			)
 
