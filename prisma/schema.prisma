@@ -70,78 +70,83 @@ model User {
   internalArea     String?
   isActive         Boolean     @default(true)
 
-  sessions                        Session[]
-  accounts                        Account[]
-  files                           File[]
-  folders                         Folder[]
-  safetyTalks                     UserSafetyTalk[]
-  safetyTalkAttempts              SafetyTalkAttempt[]
-  safetyTalkApproval              UserSafetyTalk[]          @relation("UserSafetyTalkApproval")
-  company                         Company?                  @relation(fields: [companyId], references: [id])
-  companiesCreatedBy              Company[]                 @relation("CompanyCreatedBy")
-  companyId                       String?
-  isSupervisor                    Boolean?
-  workOrders                      WorkOrder[]               @relation("WorkOrderResponsible")
-  workOrdersAsSupervisor          WorkOrder[]               @relation("WorkOrderSupervisor")
-  requestedClosures               WorkOrder[]               @relation("WorkOrderClosureRequester")
-  approvedClosures                WorkOrder[]               @relation("WorkOrderClosureApprover")
-  assignedEntries                 WorkEntry[]               @relation("AssignedUsers")
-  createdEntries                  WorkEntry[]               @relation("WorkEntryCreator")
-  notifications                   Notification[]
-  workPermitsAsParticipant        WorkPermit[]              @relation("WorkPermitParticipants")
-  workPermitsAsPreventionOfficer  WorkPermit[]              @relation("PreventionOfficer")
-  workPermits                     WorkPermit[]              @relation("WorkPermitUser")
-  workPermitApproval              WorkPermit[]              @relation("WorkPermitApproval")
-  workPermitClosing               WorkPermit[]              @relation("WorkPermitClosing")
-  attachmentsHistory              AttachmentHistory[]
-  equipmentHistory                EquipmentHistory[]
-  fileHistory                     FileHistory[]
-  twofactors                      TwoFactor[]
-  FileComment                     FileComment[]
-  MaintenancePlan                 MaintenancePlan[]
-  MaintenancePlanTask             MaintenancePlanTask[]
-  approvedMilestones              Milestone[]               @relation("MilestoneApprover")
-  requestedMilestones             Milestone[]               @relation("MilestoneRequestedBy")
-  safetyAndHealthFolders          SafetyAndHealthFolder[]
-  safetyAndHealthDocuments        SafetyAndHealthDocument[] @relation("SafetyAndHealthDocumentUploadedBy")
-  safetyAndHealthDocumentReviewer SafetyAndHealthDocument[] @relation("SafetyAndHealthDocumentReviewer")
-  workerFolder                    WorkerFolder[]            @relation("WorkerFolderWorker")
-  workerFolderReviewer            WorkerFolder[]            @relation("WorkerFolderReviewer")
-  workerDocument                  WorkerDocument[]          @relation("WorkerDocumentUploadedBy")
-  workerDocumentReviewer          WorkerDocument[]          @relation("WorkerDocumentReviewer")
-  vehicleFolder                   VehicleFolder[]
-  vehicleDocument                 VehicleDocument[]         @relation("VehicleDocumentUploadedBy")
-  vehicleDocumentReviewer         VehicleDocument[]         @relation("VehicleDocumentReviewer")
-  environmentalFolder             EnvironmentalFolder[]
-  environmentalDocument           EnvironmentalDocument[]   @relation("EnvironmentalDocumentUploadedBy")
-  environmentalDocumentReviewer   EnvironmentalDocument[]   @relation("EnvironmentalDocumentReviewer")
-  environmentFolder               EnvironmentFolder[]
-  environmentDocument             EnvironmentDocument[]     @relation("EnvironmentDocumentUploadedBy")
-  environmentDocumentReviewer     EnvironmentDocument[]     @relation("EnvironmentDocumentReviewer")
-  basicDocument                   BasicDocument[]           @relation("BasicDocumentUploadedBy")
-  basicDocumentReviewer           BasicDocument[]           @relation("BasicDocumentReviewer")
-  basicFolder                     BasicFolder[]             @relation("BasicFolderWorker")
-  techSpecsFolder                 TechSpecsFolder[]
-  techSpecsDocument               TechSpecsDocument[]       @relation("TechSpecsDocumentUploadedBy")
-  techSpecsDocumentReviewer       TechSpecsDocument[]       @relation("TechSpecsDocumentReviewer")
-  workRequestApproves             WorkRequest[]             @relation("WorkRequestApprovalBy")
-  workRequestComments             WorkRequestComment[]
-  workRequestOperator             WorkRequest[]             @relation("WorkRequestOperator")
-  workPermitAttachments           WorkPermitAttachment[]
-  activityLogs                    ActivityLog[]
-  WorkRequest                     WorkRequest[]
-  basicFolderReviewer             BasicFolder[]             @relation("BasicFolderReviewer")
-  equipment                       Equipment[]               @relation("EquipmentCreatedBy")
-  inspectionComments              InspectionComment[]       @relation("InspectionCommentAuthor")
-  lockoutPermitsAsUser            LockoutPermit[]           @relation("LockoutPermitRequestedBy")
-  lockoutPermitAreaResponsible    LockoutPermit[]           @relation("LockoutPermitAreaResponsible")
-  lockoutPermitSupervisor         LockoutPermit[]           @relation("LockoutPermitSupervisor")
-  lockoutPermitOperator           LockoutPermit[]           @relation("LockoutPermitOperator")
-  lockoutPermitRemoveLockout      LockoutPermit[]           @relation("LockoutPermitRemoveLockout")
-  lockoutPermitAttachments        LockoutPermitAttachment[]
-  zeroEnergyReviews               ZeroEnergyReview[]        @relation("ZeroEnergyReviewPerformedBy")
-  zeroEnergyReviewReviewer        ZeroEnergyReview[]        @relation("ZeroEnergyReviewReviewer")
-  fileAccessLogs                  FileAccessLog[]
+  sessions                           Session[]
+  accounts                           Account[]
+  files                              File[]
+  folders                            Folder[]
+  safetyTalks                        UserSafetyTalk[]
+  safetyTalkAttempts                 SafetyTalkAttempt[]
+  safetyTalkApproval                 UserSafetyTalk[]             @relation("UserSafetyTalkApproval")
+  company                            Company?                     @relation(fields: [companyId], references: [id])
+  companiesCreatedBy                 Company[]                    @relation("CompanyCreatedBy")
+  companyId                          String?
+  isSupervisor                       Boolean?
+  workOrders                         WorkOrder[]                  @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor             WorkOrder[]                  @relation("WorkOrderSupervisor")
+  requestedClosures                  WorkOrder[]                  @relation("WorkOrderClosureRequester")
+  approvedClosures                   WorkOrder[]                  @relation("WorkOrderClosureApprover")
+  assignedEntries                    WorkEntry[]                  @relation("AssignedUsers")
+  createdEntries                     WorkEntry[]                  @relation("WorkEntryCreator")
+  notifications                      Notification[]
+  workPermitsAsParticipant           WorkPermit[]                 @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer     WorkPermit[]                 @relation("PreventionOfficer")
+  workPermits                        WorkPermit[]                 @relation("WorkPermitUser")
+  workPermitApproval                 WorkPermit[]                 @relation("WorkPermitApproval")
+  workPermitClosing                  WorkPermit[]                 @relation("WorkPermitClosing")
+  attachmentsHistory                 AttachmentHistory[]
+  equipmentHistory                   EquipmentHistory[]
+  fileHistory                        FileHistory[]
+  twofactors                         TwoFactor[]
+  FileComment                        FileComment[]
+  MaintenancePlan                    MaintenancePlan[]
+  MaintenancePlanTask                MaintenancePlanTask[]
+  approvedMilestones                 Milestone[]                  @relation("MilestoneApprover")
+  requestedMilestones                Milestone[]                  @relation("MilestoneRequestedBy")
+  safetyAndHealthFolders             SafetyAndHealthFolder[]
+  safetyAndHealthDocuments           SafetyAndHealthDocument[]    @relation("SafetyAndHealthDocumentUploadedBy")
+  safetyAndHealthDocumentReviewer    SafetyAndHealthDocument[]    @relation("SafetyAndHealthDocumentReviewer")
+  workerFolder                       WorkerFolder[]               @relation("WorkerFolderWorker")
+  workerFolderReviewer               WorkerFolder[]               @relation("WorkerFolderReviewer")
+  workerDocument                     WorkerDocument[]             @relation("WorkerDocumentUploadedBy")
+  workerDocumentReviewer             WorkerDocument[]             @relation("WorkerDocumentReviewer")
+  vehicleFolder                      VehicleFolder[]
+  vehicleDocument                    VehicleDocument[]            @relation("VehicleDocumentUploadedBy")
+  vehicleDocumentReviewer            VehicleDocument[]            @relation("VehicleDocumentReviewer")
+  environmentalFolder                EnvironmentalFolder[]
+  environmentalDocument              EnvironmentalDocument[]      @relation("EnvironmentalDocumentUploadedBy")
+  environmentalDocumentReviewer      EnvironmentalDocument[]      @relation("EnvironmentalDocumentReviewer")
+  environmentFolder                  EnvironmentFolder[]
+  environmentDocument                EnvironmentDocument[]        @relation("EnvironmentDocumentUploadedBy")
+  environmentDocumentReviewer        EnvironmentDocument[]        @relation("EnvironmentDocumentReviewer")
+  basicDocument                      BasicDocument[]              @relation("BasicDocumentUploadedBy")
+  basicDocumentReviewer              BasicDocument[]              @relation("BasicDocumentReviewer")
+  basicFolder                        BasicFolder[]                @relation("BasicFolderWorker")
+  techSpecsFolder                    TechSpecsFolder[]
+  techSpecsDocument                  TechSpecsDocument[]          @relation("TechSpecsDocumentUploadedBy")
+  techSpecsDocumentReviewer          TechSpecsDocument[]          @relation("TechSpecsDocumentReviewer")
+  workRequestApproves                WorkRequest[]                @relation("WorkRequestApprovalBy")
+  workRequestComments                WorkRequestComment[]
+  workRequestOperator                WorkRequest[]                @relation("WorkRequestOperator")
+  workPermitAttachments              WorkPermitAttachment[]
+  activityLogs                       ActivityLog[]
+  WorkRequest                        WorkRequest[]
+  basicFolderReviewer                BasicFolder[]                @relation("BasicFolderReviewer")
+  equipment                          Equipment[]                  @relation("EquipmentCreatedBy")
+  inspectionComments                 InspectionComment[]          @relation("InspectionCommentAuthor")
+  lockoutPermitsAsUser               LockoutPermit[]              @relation("LockoutPermitRequestedBy")
+  lockoutPermitAreaResponsible       LockoutPermit[]              @relation("LockoutPermitAreaResponsible")
+  lockoutPermitSupervisor            LockoutPermit[]              @relation("LockoutPermitSupervisor")
+  lockoutPermitOperator              LockoutPermit[]              @relation("LockoutPermitOperator")
+  lockoutPermitRemoveLockout         LockoutPermit[]              @relation("LockoutPermitRemoveLockout")
+  lockoutPermitAttachments           LockoutPermitAttachment[]
+  zeroEnergyReviews                  ZeroEnergyReview[]           @relation("ZeroEnergyReviewPerformedBy")
+  zeroEnergyReviewReviewer           ZeroEnergyReview[]           @relation("ZeroEnergyReviewReviewer")
+  fileAccessLogs                     FileAccessLog[]
+  laborControlFolder                 WorkerLaborControlFolder[]   @relation("WorkerLaborControlFolderWorker")
+  workerLaborControlDocumentUploadBy WorkerLaborControlDocument[] @relation("WorkerLaborControlDocumentUploadBy")
+  workerLaborControlDocumentReviewBy WorkerLaborControlDocument[] @relation("WorkerLaborControlDocumentReviewBy")
+  laborControlDocumentUploadBy       LaborControlDocument[]       @relation("LaborControlDocumentUploadBy")
+  laborControlDocumentReviewBy       LaborControlDocument[]       @relation("LaborControlDocumentReviewBy")
 
   @@unique([email])
   @@unique([rut])
@@ -237,15 +242,16 @@ model Company {
   image    String?
   isActive Boolean @default(true)
 
-  createdBy      User            @relation("CompanyCreatedBy", fields: [createdById], references: [id])
-  createdById    String
-  users          User[]
-  workOrders     WorkOrder[]
-  workPermits    WorkPermit[]
-  lockoutPermits LockoutPermit[]
-  vehicles       Vehicle[]
-  StartupFolders StartupFolder[]
-  fileAccessLogs FileAccessLog[]
+  createdBy           User                 @relation("CompanyCreatedBy", fields: [createdById], references: [id])
+  createdById         String
+  users               User[]
+  workOrders          WorkOrder[]
+  workPermits         WorkPermit[]
+  lockoutPermits      LockoutPermit[]
+  vehicles            Vehicle[]
+  StartupFolders      StartupFolder[]
+  fileAccessLogs      FileAccessLog[]
+  laborControlFolders LaborControlFolder[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1657,4 +1663,90 @@ model FileAccessLog {
   @@index([userId])
   @@index([companyId])
   @@map("file_access_log")
+}
+
+enum LABOR_CONTROL_STATUS {
+  DRAFT
+  APPROVED
+  REJECTED
+  SUBMITTED
+}
+
+model LaborControlFolder {
+  id        String               @id @default(uuid())
+  status    LABOR_CONTROL_STATUS @default(DRAFT)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  companyId     String
+  company       Company                    @relation(fields: [companyId], references: [id])
+  documents     LaborControlDocument[]
+  workerFolders WorkerLaborControlFolder[]
+}
+
+model WorkerLaborControlFolder {
+  id        String               @id @default(uuid())
+  status    LABOR_CONTROL_STATUS @default(DRAFT)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  workerId             String
+  worker               User                         @relation("WorkerLaborControlFolderWorker", fields: [workerId], references: [id])
+  documents            WorkerLaborControlDocument[]
+  laborControlFolderId String?
+  LaborControlFolder   LaborControlFolder?          @relation(fields: [laborControlFolderId], references: [id])
+}
+
+enum LABOR_CONTROL_DOCUMENT_TYPE {
+  F30 // Formulario 30
+  TRG_TREASURY_CERTIFICATE // Certificado de tesoreria TRG
+}
+
+model LaborControlDocument {
+  id          String                      @id @default(uuid())
+  type        LABOR_CONTROL_DOCUMENT_TYPE
+  status      LABOR_CONTROL_STATUS        @default(DRAFT)
+  name        String
+  url         String
+  reviewNotes String?
+  reviewDate  DateTime?
+  uploadDate  DateTime                    @default(now())
+  updatedAt   DateTime                    @updatedAt
+
+  uploadById String
+  uploadBy   User               @relation("LaborControlDocumentUploadBy", fields: [uploadById], references: [id])
+  reviewById String
+  reviewBy   User               @relation("LaborControlDocumentReviewBy", fields: [reviewById], references: [id])
+  folderId   String
+  folder     LaborControlFolder @relation(fields: [folderId], references: [id])
+}
+
+enum WORKER_LABOR_CONTROL_DOCUMENT_TYPE {
+  PAYROLL_STTLEMENT // Liquidacion de sueldo
+  F30_1 // Formulario 30-1
+  PAYMENT_OF_PENSION_CONTRIBUTION // Pago de cotizaciones previsionales
+  FAREWELL_LETTER // Carta de despedida
+  STTLEMENT // Liquidacion
+  MEDICAL_LEAVE // Licencia médica
+  ATTENDANCE_BOOK // Libro de asistencia
+  ACCIDENT_CERTIFICATE // Certificado de accidentabilidad
+}
+
+model WorkerLaborControlDocument {
+  id          String                             @id @default(uuid())
+  type        WORKER_LABOR_CONTROL_DOCUMENT_TYPE
+  status      LABOR_CONTROL_STATUS               @default(DRAFT)
+  name        String
+  url         String
+  reviewNotes String?
+  reviewDate  DateTime?
+  uploadDate  DateTime                           @default(now())
+  updatedAt   DateTime                           @updatedAt
+
+  uploadById String
+  uploadBy   User                     @relation("WorkerLaborControlDocumentUploadBy", fields: [uploadById], references: [id])
+  reviewById String
+  reviewBy   User                     @relation("WorkerLaborControlDocumentReviewBy", fields: [reviewById], references: [id])
+  folderId   String
+  folder     WorkerLaborControlFolder @relation(fields: [folderId], references: [id])
 }
