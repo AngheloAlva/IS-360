@@ -39,6 +39,7 @@ import { SwitchFormField } from "@/shared/components/forms/SwitchFormField"
 import { SelectFormField } from "@/shared/components/forms/SelectFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
 import SubmitButton from "@/shared/components/forms/SubmitButton"
+import PrintReminderDialog from "../dialogs/PrintReminderDialog"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import { Separator } from "@/shared/components/ui/separator"
 import { Button } from "@/shared/components/ui/button"
@@ -65,6 +66,7 @@ export default function WorkPermitForm({
 }: WorkPermitFormProps): React.ReactElement {
 	const [workOrderSelected, setWorkOrderSelected] = useState<WorkOrder | null>(null)
 	const [expirationMessage, setExpirationMessage] = useState("")
+	const [showPrintDialog, setShowPrintDialog] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
 	const form = useForm<WorkPermitSchema>({
@@ -240,10 +242,14 @@ export default function WorkPermitForm({
 				return
 			}
 
-			toast.success("Permiso de trabajo", {
-				description: "Permiso de trabajo creado exitosamente",
-				duration: 3000,
-			})
+			if (!initialValues) {
+				setShowPrintDialog(true)
+			} else {
+				toast.success("Permiso de trabajo", {
+					description: "Permiso de trabajo actualizado exitosamente",
+					duration: 3000,
+				})
+			}
 
 			queryClient.invalidateQueries({
 				queryKey: [
@@ -253,12 +259,6 @@ export default function WorkPermitForm({
 					},
 				],
 			})
-
-			if (isOtcMember) {
-				router.push("/admin/dashboard/permisos-de-trabajo")
-			} else {
-				router.push("/dashboard/permiso-de-trabajo")
-			}
 		} catch (error) {
 			setIsSubmitting(false)
 
@@ -710,6 +710,19 @@ export default function WorkPermitForm({
 					</form>
 				</Form>
 			</CardContent>
+
+			<PrintReminderDialog
+				isOpen={showPrintDialog}
+				onClose={() => {
+					setShowPrintDialog(false)
+
+					if (isOtcMember) {
+						router.push("/admin/dashboard/permisos-de-trabajo")
+					} else {
+						router.push("/dashboard/permiso-de-trabajo")
+					}
+				}}
+			/>
 		</Card>
 	)
 }
