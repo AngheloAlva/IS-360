@@ -56,6 +56,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					internalRole: true,
 					isSupervisor: true,
 					documentAreas: true,
+					allowedModules: true,
 					company: {
 						select: {
 							name: true,
