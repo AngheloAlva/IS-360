@@ -21,9 +21,9 @@ export const LaborControlFoldersByCompanyColumns: (
 				: `/dashboard/control-laboral/${row.original.id}`
 
 			return (
-				<Link href={href} className="flex items-center gap-2">
+				<Link href={href} className="flex items-center gap-2 capitalize">
 					<FolderIcon className="text-muted-foreground size-3.5" />
-					{format(new Date(createdAt), "PPP", { locale: es })}
+					{format(new Date(createdAt), "MMMM yyyy", { locale: es })}
 				</Link>
 			)
 		},

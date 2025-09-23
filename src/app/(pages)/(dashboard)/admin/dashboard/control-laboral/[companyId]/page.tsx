@@ -31,7 +31,10 @@ export default async function StartupFolderReviewPage({
 				description="Gestion y seguimiento de todas las carpetas de control laboral de la empresa"
 			/>
 
-			<LaborControlFoldersTable companyId={companyId} />
+			<LaborControlFoldersTable
+				companyId={companyId}
+				isOtcMember={session.user.accessRole === "ADMIN"}
+			/>
 		</div>
 	)
 }

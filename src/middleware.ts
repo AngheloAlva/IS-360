@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 
-import { canAccessAdminRoute } from "@/lib/module-permissions"
+import { canAccessAdminRoute, getBestRedirectRoute } from "@/lib/module-permissions"
 
 import type { auth } from "@/lib/auth"
 import type { MODULES } from "@prisma/client"
@@ -32,10 +32,12 @@ export default async function authMiddleware(request: NextRequest) {
 		}
 
 		if (session.user.accessRole === "ADMIN") {
-			const userModules = (session.user.allowedModules as MODULES[]) || ["ALL"]
+			const userModules = (session.user.allowedModules as (MODULES | string)[]) || ["ALL"]
 
 			if (!canAccessAdminRoute(userModules, request.nextUrl.pathname)) {
-				return NextResponse.redirect(new URL("/admin/dashboard/inicio", request.url))
+				// En lugar de redirigir siempre a inicio, usar redirección inteligente
+				const bestRoute = getBestRedirectRoute(userModules)
+				return NextResponse.redirect(new URL(bestRoute, request.url))
 			}
 		}
 	}
