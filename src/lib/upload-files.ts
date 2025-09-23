@@ -51,6 +51,8 @@ export const uploadFilesToCloud = async ({
 		}),
 	})
 
+	console.log("sasResponse", sasResponse)
+
 	if (!sasResponse.ok) {
 		if (sasResponse.status === 403) {
 			const errorData = await sasResponse.json()

@@ -69,31 +69,6 @@ export async function validateFileAccess(
 					return { allowed: true, userId, companyId: userCompanyId, accessRole }
 				}
 
-				if (accessRole === "PARTNER_COMPANY") {
-					if (!context.companyId) {
-						const extractedCompanyId = await extractCompanyIdFromFilename(
-							context.filename,
-							context.containerType
-						)
-
-						if (!extractedCompanyId) {
-							return {
-								allowed: false,
-								reason: "No se pudo determinar la empresa propietaria del archivo",
-							}
-						}
-
-						context.companyId = extractedCompanyId
-					}
-
-					if (context.companyId !== userCompanyId) {
-						return {
-							allowed: false,
-							reason: "Sin permisos para acceder a documentos de otra empresa",
-						}
-					}
-				}
-
 				return { allowed: true, userId, companyId: userCompanyId, accessRole }
 
 			case "files":
@@ -109,27 +84,6 @@ export async function validateFileAccess(
 	} catch (error) {
 		console.error("Error validando acceso a archivo:", error)
 		return { allowed: false, reason: "Error interno del servidor" }
-	}
-}
-
-async function extractCompanyIdFromFilename(
-	filename: string,
-	containerType: string
-): Promise<string | null> {
-	try {
-		switch (containerType) {
-			case "startup":
-				return null
-
-			case "equipment":
-				return null
-
-			default:
-				return null
-		}
-	} catch (error) {
-		console.error("Error extrayendo companyId del filename:", error)
-		return null
 	}
 }
 

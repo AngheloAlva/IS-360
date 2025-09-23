@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
+import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -10,6 +11,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	})
 
 	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
+	const hasAccess = session.user.accessRole === ACCESS_ROLE.ADMIN
+
+	if (!hasAccess) {
 		return new NextResponse("No autorizado", { status: 401 })
 	}
 

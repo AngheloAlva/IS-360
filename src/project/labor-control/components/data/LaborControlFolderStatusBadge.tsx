@@ -1,0 +1,43 @@
+"use client"
+
+import { LABOR_CONTROL_STATUS } from "@prisma/client"
+import { cn } from "@/lib/utils"
+
+import { Badge } from "@/shared/components/ui/badge"
+
+interface LaborControlFolderStatusBadgeProps {
+	status: LABOR_CONTROL_STATUS | "NOT_UPLOADED"
+	className?: string
+}
+
+export function LaborControlFolderStatusBadge({
+	status,
+	className,
+}: LaborControlFolderStatusBadgeProps) {
+	const statusMap = {
+		DRAFT: {
+			label: "Borrador",
+			className: "bg-neutral-600/20 text-neutral-600 dark:bg-neutral-400/20 dark:text-neutral-400",
+		},
+		NOT_UPLOADED: {
+			label: "No subido",
+			className: "bg-stone-600/20 text-stone-600 dark:bg-stone-400/20 dark:text-stone-400",
+		},
+		SUBMITTED: {
+			label: "En revisión",
+			className: "bg-yellow-600/20 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-500",
+		},
+		APPROVED: {
+			label: "Aprobado",
+			className: "bg-emerald-600/20 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-500",
+		},
+		REJECTED: {
+			label: "Rechazado",
+			className: "bg-rose-600/20 text-rose-600 dark:bg-rose-500/20 dark:text-rose-500",
+		},
+	}
+
+	const statusInfo = statusMap[status]
+
+	return <Badge className={cn(statusInfo.className, className)}>{statusInfo.label}</Badge>
+}

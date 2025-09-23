@@ -57,12 +57,12 @@ export const WORKER_LABOR_CONTROL_STRUCTURE: WorkerLaborControlFolderStructure[]
 		description: "",
 	},
 	{
-		name: "Liquidacion",
+		name: "Liquidación de sueldo",
 		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.PAYROLL_STTLEMENT,
 		description: "",
 	},
 	{
-		name: "Liquidacion",
+		name: "Finiquito",
 		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.STTLEMENT,
 		description: "",
 	},

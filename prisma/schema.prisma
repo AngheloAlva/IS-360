@@ -1733,7 +1733,7 @@ enum WORKER_LABOR_CONTROL_DOCUMENT_TYPE {
   F30_1 // Formulario 30-1
   PAYMENT_OF_PENSION_CONTRIBUTION // Pago de cotizaciones previsionales
   FAREWELL_LETTER // Carta de despedida
-  STTLEMENT // Liquidacion
+  STTLEMENT // Finiquito
   MEDICAL_LEAVE // Licencia médica
   ATTENDANCE_BOOK // Libro de asistencia
   ACCIDENT_CERTIFICATE // Certificado de accidentabilidad
