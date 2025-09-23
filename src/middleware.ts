@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server"
 
+import { canAccessAdminRoute } from "@/lib/module-permissions"
+
 import type { auth } from "@/lib/auth"
+import type { MODULES } from "@prisma/client"
 
 type Session = typeof auth.$Infer.Session
 
@@ -26,6 +29,14 @@ export default async function authMiddleware(request: NextRequest) {
 	if (request.nextUrl.pathname.startsWith("/admin/dashboard")) {
 		if (session.user.accessRole === "PARTNER_COMPANY") {
 			return NextResponse.redirect(new URL("/dashboard/inicio", request.url))
+		}
+
+		if (session.user.accessRole === "ADMIN") {
+			const userModules = (session.user.allowedModules as MODULES[]) || ["ALL"]
+
+			if (!canAccessAdminRoute(userModules, request.nextUrl.pathname)) {
+				return NextResponse.redirect(new URL("/admin/dashboard/inicio", request.url))
+			}
 		}
 	}
 

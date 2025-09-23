@@ -14,6 +14,7 @@ export const statement = {
 	workRequest: ["create", "update", "delete", "list"],
 	lockoutPermit: ["create", "update", "delete", "list"],
 	workBook: ["create", "update", "delete", "list"],
+	laborControl: ["create", "update", "delete", "list"],
 } as const
 
 export const ac = createAccessControl(statement)
@@ -31,6 +32,7 @@ export const admin = ac.newRole({
 	company: ["create", "update", "delete", "list"],
 	workRequest: ["create", "update", "delete", "list"],
 	workBook: ["create", "update", "delete", "list"],
+	laborControl: ["create", "update", "delete", "list"],
 })
 
 export const user = ac.newRole({
@@ -45,6 +47,7 @@ export const user = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const maintenancePlanOperator = ac.newRole({
@@ -59,6 +62,7 @@ export const maintenancePlanOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const workOrderOperator = ac.newRole({
@@ -73,6 +77,7 @@ export const workOrderOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const startupFolderOperator = ac.newRole({
@@ -87,6 +92,22 @@ export const startupFolderOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
+})
+
+export const laborControlOperator = ac.newRole({
+	maintenancePlan: ["list"],
+	workOrder: ["list"],
+	startupFolder: ["list"],
+	workPermit: ["list"],
+	safetyTalk: ["list"],
+	documentation: ["list"],
+	equipment: ["list"],
+	company: ["list"],
+	user: ["list"],
+	workRequest: ["list"],
+	lockoutPermit: ["list"],
+	laborControl: ["list", "create", "update", "delete"],
 })
 
 export const workPermitOperator = ac.newRole({
@@ -101,6 +122,7 @@ export const workPermitOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const lockoutPermitOperator = ac.newRole({
@@ -129,6 +151,7 @@ export const workBookOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const safetyTalkOperator = ac.newRole({
@@ -143,6 +166,7 @@ export const safetyTalkOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const documentationOperator = ac.newRole({
@@ -157,6 +181,7 @@ export const documentationOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const equipmentOperator = ac.newRole({
@@ -171,6 +196,7 @@ export const equipmentOperator = ac.newRole({
 	user: ["list"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const companyOperator = ac.newRole({
@@ -185,6 +211,7 @@ export const companyOperator = ac.newRole({
 	user: ["list", "create", "delete", "set-role"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const userOperator = ac.newRole({
@@ -199,6 +226,7 @@ export const userOperator = ac.newRole({
 	user: ["list", "create", "delete", "set-role"],
 	workRequest: ["list"],
 	lockoutPermit: ["list"],
+	laborControl: ["list"],
 })
 
 export const partnerCompany = ac.newRole({
@@ -250,6 +278,7 @@ export const USER_ROLE = {
 	maintenancePlanOperator: "maintenancePlanOperator",
 	workOrderOperator: "workOrderOperator",
 	startupFolderOperator: "startupFolderOperator",
+	laborControlOperator: "laborControlOperator",
 	workPermitOperator: "workPermitOperator",
 	safetyTalkOperator: "safetyTalkOperator",
 	documentationOperator: "documentationOperator",
@@ -267,6 +296,7 @@ export const USER_ROLE_LABELS = {
 	[USER_ROLE.maintenancePlanOperator]: "Planes de Mantenimiento",
 	[USER_ROLE.workOrderOperator]: "Ordenes de Trabajo",
 	[USER_ROLE.startupFolderOperator]: "Carpetas de Arranque",
+	[USER_ROLE.laborControlOperator]: "Control de Trabajo",
 	[USER_ROLE.workPermitOperator]: "Permisos de Trabajo",
 	[USER_ROLE.safetyTalkOperator]: "Charlas de Seguridad",
 	[USER_ROLE.documentationOperator]: "Documentación",
@@ -284,6 +314,7 @@ export const USER_ROLE_ARRAY = [
 	"maintenancePlanOperator",
 	"workOrderOperator",
 	"startupFolderOperator",
+	"laborControlOperator",
 	"workPermitOperator",
 	"safetyTalkOperator",
 	"documentationOperator",

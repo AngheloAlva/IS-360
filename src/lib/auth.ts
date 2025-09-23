@@ -102,6 +102,11 @@ export const auth = betterAuth({
 				required: false,
 				input: false,
 			},
+			allowedModules: {
+				type: "string[]",
+				required: false,
+				input: true,
+			},
 		},
 	},
 	plugins: [

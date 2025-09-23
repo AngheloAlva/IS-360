@@ -23,6 +23,7 @@ import {
 	type DocumentAreasValuesArray,
 	type UserAreasValuesArray,
 } from "@/lib/consts/areas"
+import { ModuleOptions, type ModulesValuesArray } from "@/lib/consts/modules"
 
 import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
@@ -60,6 +61,7 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 			phone: initialData?.phone || "",
 			internalRole: initialData?.internalRole || "",
 			role: initialData?.role ? initialData.role.split(",") : [USER_ROLE.user],
+			allowedModules: (initialData?.allowedModules as (typeof ModulesValuesArray)[number][]) || ["ALL"],
 			documentAreas:
 				(initialData?.documentAreas as (typeof DocumentAreasValuesArray)[number][]) || [],
 			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
@@ -90,6 +92,7 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 						accessRole: "ADMIN",
 						internalRole: values.internalRole,
 						documentAreas: values.documentAreas,
+						allowedModules: values.allowedModules,
 					},
 				})
 
@@ -268,7 +271,17 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 									label: USER_ROLE_LABELS[role],
 								}))}
 								placeholder="Selecciona un rol"
-								description="Todos los usuarios podran visualizar los modulos, los roles otorgan permisos para administrar los modulos."
+								description="Los roles otorgan permisos para administrar los módulos."
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="allowedModules"
+								label="Módulos Permitidos"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								options={ModuleOptions}
+								placeholder="Selecciona módulos permitidos"
+								description="Módulos que el usuario podrá visualizar y acceder (solo aplica para administradores)."
 							/>
 						</div>
 

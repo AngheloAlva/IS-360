@@ -32,6 +32,11 @@ enum AREAS {
 
 enum MODULES {
   ALL // Todo
+  HOME // Inicio
+  REPORTABILITY // Reportabilidad
+  NOTIFICATIONS // Notificaciones
+  TOOLS // Herramientas
+  TUTORIALS // Tutoriales
   EQUIPMENT // Equipos y Ubicacioens
   SAFETY_TALK // Charlas de seguridad
   WORK_ORDERS // Ordenes de Trabajo y Libros de obras
@@ -43,6 +48,7 @@ enum MODULES {
   USERS // Usuarios
   MAINTENANCE_PLANS // Planes de Mantenimiento y Tareas de los planes
   STARTUP_FOLDERS // Carpetas de Arranque
+  LABOR_CONTROL_FOLDERS // Control de contratistas
   VEHICLES // Vehiculos (acceso contratista, no OTC)
   CONTACT // Contacto y Soporte
   NONE // Sin módulo
@@ -59,6 +65,7 @@ model User {
   updatedAt        DateTime
   role             String
   accessRole       ACCESS_ROLE @default(PARTNER_COMPANY)
+  allowedModules   MODULES[]   @default([ALL])
   internalRole     String?
   area             AREAS?
   banned           Boolean?
@@ -1715,8 +1722,8 @@ model LaborControlDocument {
 
   uploadById String
   uploadBy   User               @relation("LaborControlDocumentUploadBy", fields: [uploadById], references: [id])
-  reviewById String
-  reviewBy   User               @relation("LaborControlDocumentReviewBy", fields: [reviewById], references: [id])
+  reviewById String?
+  reviewBy   User?              @relation("LaborControlDocumentReviewBy", fields: [reviewById], references: [id])
   folderId   String
   folder     LaborControlFolder @relation(fields: [folderId], references: [id])
 }
@@ -1745,8 +1752,8 @@ model WorkerLaborControlDocument {
 
   uploadById String
   uploadBy   User                     @relation("WorkerLaborControlDocumentUploadBy", fields: [uploadById], references: [id])
-  reviewById String
-  reviewBy   User                     @relation("WorkerLaborControlDocumentReviewBy", fields: [reviewById], references: [id])
+  reviewById String?
+  reviewBy   User?                    @relation("WorkerLaborControlDocumentReviewBy", fields: [reviewById], references: [id])
   folderId   String
   folder     WorkerLaborControlFolder @relation(fields: [folderId], references: [id])
 }

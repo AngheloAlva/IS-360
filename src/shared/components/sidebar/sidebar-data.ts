@@ -1,8 +1,9 @@
 import {
-	CarIcon,
-	HomeIcon,
-	BellIcon,
 	BoxIcon,
+	CarIcon,
+	ViewIcon,
+	BellIcon,
+	HomeIcon,
 	UsersIcon,
 	WrenchIcon,
 	FoldersIcon,
@@ -103,6 +104,12 @@ export const data: NavBarData = {
 					name: "Carpetas de Arranques",
 					url: "/admin/dashboard/carpetas-de-arranques",
 					icon: FoldersIcon,
+				},
+				{
+					name: "Control Laboral",
+					url: "/admin/dashboard/control-laboral",
+					icon: ViewIcon,
+					test: true,
 				},
 				{
 					name: "Charlas de Seguridad",
@@ -211,6 +218,12 @@ export const data: NavBarData = {
 					name: "Carpetas de Arranque",
 					url: "/dashboard/carpetas-de-arranque",
 					icon: FoldersIcon,
+				},
+				{
+					name: "Control Laboral",
+					url: "/dashboard/control-laboral",
+					icon: ViewIcon,
+					test: true,
 				},
 				{
 					name: "Seguridad",

@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { getImageProps } from "next/image"
 
+import { ModulesLabels } from "@/lib/consts/modules"
 import { AreasLabels } from "@/lib/consts/areas"
 
 import UserDetailsDialog from "@/project/user/components/dialogs/UserDetailsDialog"
@@ -74,6 +75,39 @@ export const UserColumns: ColumnDef<ApiUser>[] = [
 			return (
 				<Badge variant="outline" className="bg-primary/10">
 					{AreasLabels[area]}
+				</Badge>
+			)
+		},
+	},
+	{
+		accessorKey: "allowedModules",
+		header: "Módulos",
+		cell: ({ row }) => {
+			const modules = row.getValue("allowedModules") as string[]
+
+			if (!modules || modules.length === 0) {
+				return <Badge variant="secondary">Ninguno</Badge>
+			}
+
+			if (modules.includes("ALL")) {
+				return (
+					<Badge variant="default" className="bg-green-500">
+						Todos
+					</Badge>
+				)
+			}
+
+			if (modules.length === 1) {
+				return (
+					<Badge variant="outline" className="bg-blue-50">
+						{ModulesLabels[modules[0] as keyof typeof ModulesLabels]}
+					</Badge>
+				)
+			}
+
+			return (
+				<Badge variant="outline" className="bg-blue-50">
+					{modules.length} módulos
 				</Badge>
 			)
 		},

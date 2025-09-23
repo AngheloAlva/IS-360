@@ -4,6 +4,7 @@ import { ChevronRightIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 
+import { filterAdminSidebarItems } from "@/lib/module-permissions"
 import { data } from "./sidebar-data"
 import { cn } from "@/lib/utils"
 
@@ -19,14 +20,30 @@ import {
 	SidebarMenuSubButton,
 } from "@/shared/components/ui/sidebar"
 
-export function NavMain({ canAccessAdminRoutes }: { canAccessAdminRoutes: boolean }) {
+import type { MODULES } from "@prisma/client"
+
+interface NavMainProps {
+	canAccessAdminRoutes: boolean
+	userModules?: MODULES[]
+}
+
+export function NavMain({ canAccessAdminRoutes, userModules = ["ALL"] }: NavMainProps) {
 	const pathName = usePathname()
 
 	const navData = canAccessAdminRoutes ? data["internal"] : data["external"]
 
+	// Filtrar grupos y elementos basándose en los módulos permitidos (solo para admins)
+	const isAdmin = canAccessAdminRoutes
+	const filteredNavData = navData
+		.map((group) => ({
+			...group,
+			items: filterAdminSidebarItems(group.items, userModules, isAdmin),
+		}))
+		.filter((group) => group.items.length > 0) // Solo mostrar grupos que tengan elementos
+
 	return (
 		<>
-			{navData.map((group, i) =>
+			{filteredNavData.map((group, i) =>
 				group.type === "normal" ? (
 					<SidebarGroup key={i}>
 						<SidebarGroupLabel>{group.title}</SidebarGroupLabel>

@@ -1,4 +1,5 @@
 import type { USER_ROLE_ARRAY } from "@/lib/permissions"
+import type { MODULES } from "@prisma/client"
 
 export interface ApiUser {
 	id: string
@@ -12,6 +13,7 @@ export interface ApiUser {
 	area: string | null
 	createdAt: string
 	isSupervisor: boolean
+	allowedModules: MODULES[]
 	company: {
 		name: string
 	} | null

@@ -88,7 +88,7 @@ export const updateInternalUser = async ({ userId, values }: UpdateInternalUserP
 	}
 
 	try {
-		const { role, ...rest } = values
+		const { role, allowedModules, ...rest } = values
 
 		const user = await prisma.user.update({
 			where: {
@@ -97,12 +97,14 @@ export const updateInternalUser = async ({ userId, values }: UpdateInternalUserP
 			data: {
 				...rest,
 				role: role.join(","),
+				allowedModules: allowedModules,
 			},
 			select: {
 				id: true,
 				email: true,
 				name: true,
 				role: true,
+				allowedModules: true,
 			},
 		})
 
@@ -116,7 +118,8 @@ export const updateInternalUser = async ({ userId, values }: UpdateInternalUserP
 				email: user.email,
 				name: user.name,
 				role: user.role,
-				updatedFields: [...Object.keys(rest), "role"],
+				allowedModules: user.allowedModules,
+				updatedFields: [...Object.keys(rest), "role", "allowedModules"],
 			},
 		})
 

@@ -1,4 +1,5 @@
 import Image from "next/image"
+
 import { NavMain } from "./navMain"
 import { NavUser } from "./navUser"
 import {
@@ -9,6 +10,7 @@ import {
 	SidebarContent,
 } from "@/shared/components/ui/sidebar"
 
+import type { MODULES } from "@prisma/client"
 import type { ComponentProps } from "react"
 import type { Session } from "@/lib/auth"
 
@@ -33,7 +35,10 @@ export function AppSidebar({ session, canAccessAdminRoutes, ...props }: AppSideb
 			</SidebarHeader>
 
 			<SidebarContent>
-				<NavMain canAccessAdminRoutes={canAccessAdminRoutes} />
+				<NavMain
+					canAccessAdminRoutes={canAccessAdminRoutes}
+					userModules={session.user.allowedModules as MODULES[]}
+				/>
 			</SidebarContent>
 
 			<SidebarFooter>
