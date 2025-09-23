@@ -1,3 +1,5 @@
+import { SPECIAL_MODULES } from "@/lib/consts/modules"
+
 import type { MODULES } from "@prisma/client"
 
 export const MODULE_ROUTE_MAP: Record<MODULES | string, string[]> = {
@@ -17,6 +19,7 @@ export const MODULE_ROUTE_MAP: Record<MODULES | string, string[]> = {
 	LOCKOUT_PERMITS: ["/admin/dashboard/permisos-de-bloqueo"],
 	VEHICLES: ["/dashboard/vehiculos"],
 	REPORTABILITY: ["/admin/dashboard/reportabilidad"],
+	REPORTABILITY_OTC: ["/admin/dashboard/reportabilidad-otc"],
 	NOTIFICATIONS: ["/admin/dashboard/notificaciones"],
 	TOOLS: ["/admin/dashboard/herramientas"],
 	TUTORIALS: ["/admin/dashboard/tutoriales"],
@@ -35,13 +38,31 @@ export function canAccessAdminRoute(userModules: (MODULES | string)[], route: st
 		return true
 	}
 
+	// Verificar si es una ruta de módulo especial
+	const isSpecialModuleRoute = SPECIAL_MODULES.some((specialModule) => {
+		const routes = MODULE_ROUTE_MAP[specialModule]
+		return routes?.some((routePath) => route.includes(routePath))
+	})
+
+	// Si es una ruta de módulo especial, solo permitir si específicamente lo tiene
+	if (isSpecialModuleRoute) {
+		for (const userModule of userModules) {
+			const allowedRoutes = MODULE_ROUTE_MAP[userModule]
+			if (allowedRoutes?.some((allowedRoute) => route.includes(allowedRoute))) {
+				return true
+			}
+		}
+		return false
+	}
+
+	// Para rutas normales, permitir con ALL
 	if (userModules.includes("ALL")) {
 		return true
 	}
 
 	for (const userModule of userModules) {
 		const allowedRoutes = MODULE_ROUTE_MAP[userModule]
-		if (allowedRoutes.some((allowedRoute) => route.includes(allowedRoute))) {
+		if (allowedRoutes?.some((allowedRoute) => route.includes(allowedRoute))) {
 			return true
 		}
 	}
@@ -62,11 +83,28 @@ export function filterAdminSidebarItems<T extends { url: string }>(
 		return items
 	}
 
-	if (userModules.includes("ALL")) {
-		return items
-	}
+	return items.filter((item) => {
+		// Verificar si es una ruta de módulo especial
+		const isSpecialModuleRoute = SPECIAL_MODULES.some((specialModule) => {
+			const routes = MODULE_ROUTE_MAP[specialModule]
+			return routes?.some((routePath) => item.url.includes(routePath))
+		})
 
-	return items.filter((item) => canAccessAdminRoute(userModules, item.url))
+		// Si es módulo especial, solo mostrar si específicamente lo tiene
+		if (isSpecialModuleRoute) {
+			return userModules.some((userModule) => {
+				const allowedRoutes = MODULE_ROUTE_MAP[userModule]
+				return allowedRoutes?.some((allowedRoute) => item.url.includes(allowedRoute))
+			})
+		}
+
+		// Para módulos normales, aplicar lógica estándar
+		if (userModules.includes("ALL")) {
+			return true
+		}
+
+		return canAccessAdminRoute(userModules, item.url)
+	})
 }
 
 /**

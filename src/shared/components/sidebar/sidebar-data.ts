@@ -154,6 +154,11 @@ export const data: NavBarData = {
 					icon: ChartColumnIcon,
 				},
 				{
+					name: "Reportabilidad",
+					url: "/admin/dashboard/reportabilidad-otc",
+					icon: ChartColumnIcon,
+				},
+				{
 					name: "Notificaciones",
 					url: "/admin/dashboard/notificaciones",
 					test: true,

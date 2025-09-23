@@ -34,6 +34,7 @@ enum MODULES {
   ALL // Todo
   HOME // Inicio
   REPORTABILITY // Reportabilidad
+  REPORTABILITY_OTC // Reportabilidad OTC
   NOTIFICATIONS // Notificaciones
   TOOLS // Herramientas
   TUTORIALS // Tutoriales

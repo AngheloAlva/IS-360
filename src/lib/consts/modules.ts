@@ -4,6 +4,7 @@ export const ModulesValuesArray = [
 	MODULES.ALL, // Todo
 	MODULES.HOME, // Inicio
 	MODULES.REPORTABILITY, // Reportabilidad
+	"REPORTABILITY_OTC", // Reportabilidad OTC (Especial/Oculto)
 	MODULES.NOTIFICATIONS, // Notificaciones
 	MODULES.TOOLS, // Herramientas
 	MODULES.TUTORIALS, // Tutoriales
@@ -23,6 +24,8 @@ export const ModulesValuesArray = [
 	MODULES.CONTACT, // Contacto y Soporte
 	MODULES.NONE, // Sin módulo
 ] as const
+
+export const SPECIAL_MODULES = ["REPORTABILITY_OTC"] as const
 
 export const ModuleOptions = [
 	{
@@ -101,6 +104,12 @@ export const ModuleOptions = [
 
 export const ModulesLabels = {
 	[MODULES.ALL]: "Acceso Completo",
+	[MODULES.HOME]: "Inicio",
+	[MODULES.REPORTABILITY]: "Reportabilidad",
+	["REPORTABILITY_OTC"]: "Reportabilidad Gerencia",
+	[MODULES.NOTIFICATIONS]: "Notificaciones",
+	[MODULES.TOOLS]: "Herramientas",
+	[MODULES.TUTORIALS]: "Tutoriales",
 	[MODULES.WORK_ORDERS]: "Órdenes de Trabajo",
 	[MODULES.WORK_PERMITS]: "Permisos de Trabajo",
 	[MODULES.SAFETY_TALK]: "Charlas de Seguridad",
