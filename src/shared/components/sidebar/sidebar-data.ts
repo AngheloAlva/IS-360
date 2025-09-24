@@ -2,7 +2,6 @@ import {
 	BoxIcon,
 	CarIcon,
 	ViewIcon,
-	BellIcon,
 	HomeIcon,
 	UsersIcon,
 	WrenchIcon,
@@ -157,12 +156,6 @@ export const data: NavBarData = {
 					name: "Reportabilidad",
 					url: "/admin/dashboard/reportabilidad-otc",
 					icon: ChartColumnIcon,
-				},
-				{
-					name: "Notificaciones",
-					url: "/admin/dashboard/notificaciones",
-					test: true,
-					icon: BellIcon,
 				},
 				{
 					name: "Tutoriales",

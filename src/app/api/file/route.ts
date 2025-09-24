@@ -131,8 +131,7 @@ export async function GET(request: NextRequest) {
 		const containerName =
 			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
 
-		// Generar URL SAS para archivo autorizado
-		const url = await generateSecureSasUrl(containerName, filename, "read", 60)
+		const url = await generateSecureSasUrl(containerName, filename, "read", 60, true)
 
 		return NextResponse.json({ url })
 	} catch (error: unknown) {

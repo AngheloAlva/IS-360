@@ -8,6 +8,26 @@ import { validateFileAccess, logFileAccess } from "@/lib/file-security"
 
 type ContainerType = "documents" | "files" | "startup" | "avatars" | "equipment"
 
+function getContentTypeFromFilename(filename: string): string {
+	const ext = filename.toLowerCase().split(".").pop()
+
+	switch (ext) {
+		case "pdf":
+			return "application/pdf"
+		case "jpg":
+		case "jpeg":
+			return "image/jpeg"
+		case "png":
+			return "image/png"
+		case "gif":
+			return "image/gif"
+		case "txt":
+			return "text/plain"
+		default:
+			return "application/octet-stream"
+	}
+}
+
 export async function GET(request: NextRequest) {
 	try {
 		const filename = request.nextUrl.searchParams.get("filename") as string
@@ -19,7 +39,6 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json({ error: "No se proporcionó nombre de archivo" }, { status: 400 })
 		}
 
-		// Validar acceso al archivo
 		const validation = await validateFileAccess({
 			filename,
 			containerType,
@@ -27,7 +46,6 @@ export async function GET(request: NextRequest) {
 			companyId,
 		})
 
-		// Registrar intento de acceso
 		await logFileAccess(
 			{
 				filename,
@@ -52,11 +70,13 @@ export async function GET(request: NextRequest) {
 		const containerName =
 			containerType === "documents" ? DOCUMENTS_CONTAINER_NAME : FILES_CONTAINER_NAME
 
-		// Generar URL SAS con permisos de solo lectura y expiración de 1 hora
-		const viewUrl = await generateSecureSasUrl(containerName, filename, "read", 60)
+		const viewUrl = await generateSecureSasUrl(containerName, filename, "read", 60, false)
 
-		// Redirigir directamente al archivo con la URL SAS
-		return NextResponse.redirect(viewUrl)
+		return NextResponse.json({
+			url: viewUrl,
+			filename,
+			contentType: getContentTypeFromFilename(filename),
+		})
 	} catch (error: unknown) {
 		console.error("Error en GET /api/file/view:", error)
 		return NextResponse.json(

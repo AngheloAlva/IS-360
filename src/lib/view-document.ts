@@ -34,8 +34,57 @@ export async function openDocumentSecurely(
 		return
 	}
 
-	console.log(res.url)
-	window.open(res.url, "_blank", "noopener,noreferrer")
+	const data = await res.json()
+
+	if (!data.url) {
+		alert("Error: No se pudo obtener la URL del archivo")
+		return
+	}
+
+	window.open(data.url, "_blank", "noopener,noreferrer")
+}
+
+export async function downloadDocumentSecurely(
+	filename: string,
+	containerType: "documents" | "files" | "startup" | "avatars" | "equipment" = "documents",
+	companyId?: string
+): Promise<void> {
+	const params = new URLSearchParams({
+		filename,
+		containerType,
+	})
+
+	if (companyId) {
+		params.set("companyId", companyId)
+	}
+
+	const downloadUrl = `/api/file?${params.toString()}`
+	const res = await fetch(downloadUrl)
+
+	if (res.status === 403) {
+		const errorData = await res.json()
+		alert(`Acceso denegado: ${errorData.reason || "Sin permisos para descargar este archivo"}`)
+		return
+	}
+
+	if (!res.ok) {
+		alert("Error al acceder al archivo")
+		return
+	}
+
+	const data = await res.json()
+
+	if (!data.url) {
+		alert("Error: No se pudo obtener la URL del archivo")
+		return
+	}
+
+	const link = document.createElement("a")
+	link.href = data.url
+	link.download = filename
+	document.body.appendChild(link)
+	link.click()
+	document.body.removeChild(link)
 }
 
 export const extractFilenameFromUrl = (url: string): string | null => {
