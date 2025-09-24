@@ -198,7 +198,7 @@ export const sendInspectionCommentNotification = async ({
 			return resend.emails.send({
 				from: "anghelo.alva@ingenieriasimple.cl",
 				to: recipient.email,
-				cc: i === 0 ? "soporte@ingenieriasimple.cl" : [],
+				bcc: i === 0 ? "soporte@ingenieriasimple.cl" : [],
 				subject,
 				react: await InspectionCommentNotificationEmail({
 					comment: commentData,

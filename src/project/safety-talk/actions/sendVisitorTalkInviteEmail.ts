@@ -20,7 +20,7 @@ export const sendVisitorTalkInviteEmail = async ({
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: [visitorEmail],
-			cc: ["anghelo.alva@ingenieriasimple.cl", "soporte@ingenieriasimple.cl"],
+			bcc: ["anghelo.alva@ingenieriasimple.cl", "soporte@ingenieriasimple.cl"],
 			subject: `Invitación a Charla de Visitas - ${companyName}`,
 			react: await VisitorTalkInviteEmail({
 				companyName,

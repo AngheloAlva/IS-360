@@ -34,62 +34,39 @@ export const sendRequestReviewEmail = async ({
 		switch (documentCategory) {
 			case DocumentCategory.SAFETY_AND_HEALTH:
 				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
 					"cristian.pavez@oleotrasandino.cl",
 					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.ENVIRONMENTAL:
-				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
-					"bcarrillo@dbj.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
-				]
+				emailNotification = ["bcarrillo@dbj.cl", "katherine.burgos@oleotrasandino.cl"]
 				break
 			case DocumentCategory.ENVIRONMENT:
-				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
-					"bcarrillo@dbj.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
-				]
+				emailNotification = ["bcarrillo@dbj.cl", "katherine.burgos@oleotrasandino.cl"]
 				break
 			case DocumentCategory.TECHNICAL_SPECS:
-				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
-					"jaime.chavez@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
-				]
+				emailNotification = ["jaime.chavez@oleotrasandino.cl"]
 				break
 			case DocumentCategory.PERSONNEL:
 				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
 					"cristian.pavez@oleotrasandino.cl",
 					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.VEHICLES:
 				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
 					"cristian.pavez@oleotrasandino.cl",
 					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
 				]
 				break
 			case DocumentCategory.BASIC:
-				emailNotification = [
-					"anghelo.alva@ingsimple.cl",
-					"katherine.burgos@oleotrasandino.cl",
-					"soporte@ingenieriasimple.cl",
-				]
+				emailNotification = ["katherine.burgos@oleotrasandino.cl"]
 		}
 
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: emailNotification,
+			bcc: ["soporte@ingenieriasimple.cl"],
 			subject: `Solicitud de Revisión ${folderName} - ${companyName}`,
 			react: await RequestReviewEmail({
 				reviewUrl,
