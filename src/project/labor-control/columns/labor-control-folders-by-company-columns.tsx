@@ -30,7 +30,7 @@ export const LaborControlFoldersByCompanyColumns: (
 
 			const href = isOtcMember
 				? `/admin/dashboard/control-laboral/${companyHref}/${folderSlug}`
-				: `/dashboard/control-laboral/${companyHref}/${folderSlug}`
+				: `/dashboard/control-laboral/${folderSlug}`
 
 			return (
 				<Link href={href} className="flex items-center gap-2 capitalize">

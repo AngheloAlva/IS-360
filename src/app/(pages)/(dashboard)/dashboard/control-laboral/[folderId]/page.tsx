@@ -1,10 +1,16 @@
-import { notFound } from "next/navigation"
-import { headers } from "next/headers"
+import { FolderInputIcon } from "lucide-react"
+import Link from "next/link"
 
-import { auth } from "@/lib/auth"
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import MemoizedModuleHeader from "@/shared/components/ModuleHeader"
-import LaborControlFolderDocuments from "@/project/labor-control/components/data/CompanyAccreditationFolderDocuments"
+import {
+	Table,
+	TableRow,
+	TableCell,
+	TableBody,
+	TableHead,
+	TableHeader,
+} from "@/shared/components/ui/table"
 
 export default async function StartupFolderReviewPage({
 	params,
@@ -12,14 +18,6 @@ export default async function StartupFolderReviewPage({
 	params: Promise<{ folderId: string }>
 }) {
 	const asyncParams = await params
-
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id || !session?.user?.companyId) return notFound()
-
-	const folderId = asyncParams.folderId
 
 	return (
 		<div className="w-full flex-1 space-y-6">
@@ -30,13 +28,52 @@ export default async function StartupFolderReviewPage({
 				description="Gestion y seguimiento de todas las carpetas de control laboral de la empresa"
 			/>
 
-			<LaborControlFolderDocuments
-				folderId={folderId}
-				folderStatus="DRAFT"
-				userId={session.user.id}
-				companyId={session.user.companyId}
-				isOtcMember={session.user.accessRole === "ADMIN"}
-			/>
+			<Card className="gap-2">
+				<CardHeader className="flex w-full items-start justify-between">
+					<CardTitle className="text-xl font-semibold">Documentos y Colaboradores</CardTitle>
+				</CardHeader>
+
+				<CardContent>
+					<Table className="bg-background">
+						<TableHeader className="bg-background">
+							<TableRow>
+								<TableHead>Nombre</TableHead>
+							</TableRow>
+						</TableHeader>
+
+						<TableBody>
+							<TableRow>
+								<TableCell>
+									<Link
+										href={
+											"/dashboard/control-laboral/" + asyncParams.folderId + "/acreditacion-empresa"
+										}
+										className="flex items-center"
+									>
+										<FolderInputIcon className="mr-2 h-4 w-4 fill-blue-500/20 text-blue-500" />
+										Acreditación empresa
+									</Link>
+								</TableCell>
+							</TableRow>
+							<TableRow>
+								<TableCell>
+									<Link
+										href={
+											"/dashboard/control-laboral/" +
+											asyncParams.folderId +
+											"/acreditacion-trabajadores"
+										}
+										className="flex items-center"
+									>
+										<FolderInputIcon className="mr-2 h-4 w-4 fill-blue-500/20 text-blue-500" />
+										Acreditación trabajadores
+									</Link>
+								</TableCell>
+							</TableRow>
+						</TableBody>
+					</Table>
+				</CardContent>
+			</Card>
 		</div>
 	)
 }

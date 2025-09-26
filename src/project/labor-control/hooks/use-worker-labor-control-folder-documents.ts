@@ -8,7 +8,7 @@ interface UseWorkerFolderDocumentsParams {
 
 export const fetchWorkerLaborControlFolderDocuments: QueryFunction<
 	Awaited<ReturnType<typeof getWorkerFolderDocuments>>,
-	readonly ["workerFolderDocuments", UseWorkerFolderDocumentsParams]
+	readonly ["workerLaborControlFolderDocuments", UseWorkerFolderDocumentsParams]
 > = async ({ queryKey }) => {
 	const [, { folderId }] = queryKey
 
@@ -18,7 +18,7 @@ export const fetchWorkerLaborControlFolderDocuments: QueryFunction<
 export const useWorkerLaborControlFolderDocuments = ({
 	folderId,
 }: UseWorkerFolderDocumentsParams) => {
-	const queryKey = ["workerFolderDocuments", { folderId }] as const
+	const queryKey = ["workerLaborControlFolderDocuments", { folderId }] as const
 
 	return useQuery({
 		queryKey,

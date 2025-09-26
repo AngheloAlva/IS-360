@@ -1,5 +1,7 @@
 import { FolderInputIcon } from "lucide-react"
+import Link from "next/link"
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import MemoizedModuleHeader from "@/shared/components/ModuleHeader"
 import {
 	Table,
@@ -9,8 +11,6 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
-import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 
 export default async function StartupFolderReviewPage({
 	params,

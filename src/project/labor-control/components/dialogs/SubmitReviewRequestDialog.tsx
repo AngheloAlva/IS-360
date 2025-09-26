@@ -71,7 +71,7 @@ export function SubmitReviewRequestDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className="ml-4 gap-2 bg-emerald-600 text-white transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white">
+				<Button className="ml-4 gap-2 bg-cyan-500 text-white transition-all hover:scale-105 hover:bg-cyan-600 hover:text-white">
 					<SendIcon className="h-4 w-4" />
 					Enviar a revisión
 				</Button>
@@ -97,11 +97,11 @@ export function SubmitReviewRequestDialog({
 					</Button>
 
 					<Button
-						className="bg-emerald-600 transition-all hover:scale-105 hover:bg-emerald-700 hover:text-white"
-						disabled={isSubmitting}
 						onClick={onSubmit}
+						disabled={isSubmitting}
+						className="bg-cyan-500 transition-all hover:scale-105 hover:bg-cyan-600 hover:text-white"
 					>
-						{isSubmitting ? "Enviando..." : "Enviar"}
+						{isSubmitting ? "Enviando..." : "Enviar a revisión"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

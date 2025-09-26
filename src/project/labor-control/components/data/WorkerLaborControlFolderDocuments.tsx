@@ -3,6 +3,7 @@
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { InfoIcon, UploadIcon, FileTextIcon } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { useWorkerLaborControlFolderDocuments } from "../../hooks/use-worker-labor-control-folder-documents"
 import { getWorkerLaborControlDocumentColumns } from "../../columns/worker-labor-control-document-columns"
@@ -11,6 +12,9 @@ import { queryClient } from "@/lib/queryClient"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { Progress } from "@/shared/components/ui/progress"
 import { Button } from "@/shared/components/ui/button"
@@ -80,12 +84,12 @@ export function WorkerLaborControlFolderDocuments({
 		data && documentsData.length > 0 ? (data.approvedDocuments / documents.length) * 100 : 0
 
 	return (
-		<div className="space-y-4">
-			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-semibold">Documentos de Colaboradores</h2>
+		<Card className="gap-2">
+			<CardHeader className="flex flex-row items-center justify-between">
+				<CardTitle className="text-xl font-semibold">Documentos del colaborador</CardTitle>
 
 				<div className="flex items-center gap-2">
-					{/* {isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<>
 							<UndoDocumentReviewDialog
 								userId={userId}
@@ -95,34 +99,13 @@ export function WorkerLaborControlFolderDocuments({
 								}))}
 								onSuccess={async () => {
 									queryClient.invalidateQueries({
-										queryKey: [
-											"startupFolderDocuments",
-											{ startupFolderId, category: "BASIC", workerId: null, vehicleId: null },
-										],
-									})
-									await refetch()
-								}}
-							/>
-
-							<UpdateDocumentStatusDialog
-								category={"BASIC"}
-								startupFolderId={startupFolderId}
-								documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
-									id: row.original.id,
-									name: row.original.name,
-								}))}
-								onSuccess={async () => {
-									queryClient.invalidateQueries({
-										queryKey: [
-											"startupFolderDocuments",
-											{ startupFolderId, category: "BASIC", workerId: null, vehicleId: null },
-										],
+										queryKey: ["workerLaborControlFolderDocuments", { folderId }],
 									})
 									await refetch()
 								}}
 							/>
 						</>
-					)} */}
+					)}
 
 					<Progress
 						value={progress}
@@ -131,130 +114,113 @@ export function WorkerLaborControlFolderDocuments({
 					/>
 					<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
-					{/* {isOtcMember && data?.folderStatus && (
-						<ChangeSubfolderStatusDialog
-							startupFolderId={folderId}
-							subfolderType="BASIC"
-							entityId={workerId}
-							entityName={workerName}
-							currentStatus={data.folderStatus}
-							onSuccess={async () => {
-								queryClient.invalidateQueries({
-									queryKey: ["basicFolderDocuments", { startupFolderId, workerId }],
-								})
-								await refetch()
-								toast.success("Estado actualizado exitosamente")
-							}}
-						/>
-					)} */}
-
-					{/* {!isOtcMember && data?.folderStatus === "DRAFT" && (
+					{!isOtcMember && data?.folderStatus === "DRAFT" && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							folderId={folderId}
-							workerId={workerId}
-							companyId={companyId}
-							category={DocumentCategory.BASIC}
+							workerId={data?.workerId || ""}
 							onSuccess={async () => {
 								queryClient.invalidateQueries({
-									queryKey: ["workerLaborControlFolderDocuments", { folderId, workerId }],
+									queryKey: ["workerLaborControlFolderDocuments", { folderId }],
 								})
 								await refetch()
 								toast.success("Documentos enviados a revisión exitosamente")
 							}}
 						/>
-					)} */}
-				</div>
-			</div>
-
-			<Table className="bg-background">
-				<TableHeader className="bg-background">
-					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id}>
-							{headerGroup.headers.map((header) => {
-								return (
-									<TableHead key={header.id}>
-										{header.isPlaceholder
-											? null
-											: flexRender(header.column.columnDef.header, header.getContext())}
-									</TableHead>
-								)
-							})}
-						</TableRow>
-					))}
-				</TableHeader>
-
-				<TableBody>
-					{isLoading ? (
-						<TableRow>
-							<TableCell colSpan={8} className="h-24 text-center">
-								Cargando documentos...
-							</TableCell>
-						</TableRow>
-					) : (
-						table.getRowModel().rows.map((row) => (
-							<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-								{row.getVisibleCells().map((cell) => (
-									<TableCell key={cell.id}>
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
-									</TableCell>
-								))}
-							</TableRow>
-						))
 					)}
+				</div>
+			</CardHeader>
 
-					{documentsNotUploaded.length > 0 &&
-						documentsNotUploaded.map((doc) => (
-							<TableRow key={doc.name}>
-								{isOtcMember && <TableCell></TableCell>}
-								<TableCell className="font-medium">
-									<div className="flex flex-col items-start justify-center">
-										<div className="flex items-center gap-2">
-											<FileTextIcon className="h-4 w-4 text-teal-500" />
-											{doc.name}
-
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<Button variant="ghost" size="icon">
-														<InfoIcon className="size-4 text-teal-500" />
-													</Button>
-												</TooltipTrigger>
-												<TooltipContent className="w-fit max-w-96 text-pretty">
-													{doc.description}
-												</TooltipContent>
-											</Tooltip>
-										</div>
-									</div>
-								</TableCell>
-								<TableCell>
-									<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
-								</TableCell>
-								<TableCell></TableCell>
-								<TableCell></TableCell>
-								<TableCell></TableCell>
-								<TableCell></TableCell>
-								<TableCell>
-									<div className="flex items-center gap-1">
-										{!isOtcMember &&
-											(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
-												<Button
-													size={"icon"}
-													variant="ghost"
-													className="text-cyan-600"
-													onClick={() => {
-														setShowUploadDialog(true)
-														setSelectedDocumentType({ type: doc.type, name: doc.name })
-													}}
-												>
-													<UploadIcon className="h-4 w-4" />
-												</Button>
-											)}
-									</div>
-								</TableCell>
+			<CardContent>
+				<Table className="bg-background">
+					<TableHeader className="bg-background">
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id}>
+								{headerGroup.headers.map((header) => {
+									return (
+										<TableHead key={header.id}>
+											{header.isPlaceholder
+												? null
+												: flexRender(header.column.columnDef.header, header.getContext())}
+										</TableHead>
+									)
+								})}
 							</TableRow>
 						))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+
+					<TableBody>
+						{isLoading ? (
+							<TableRow>
+								<TableCell colSpan={8} className="h-24 text-center">
+									Cargando documentos...
+								</TableCell>
+							</TableRow>
+						) : (
+							table.getRowModel().rows.map((row) => (
+								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+									{row.getVisibleCells().map((cell) => (
+										<TableCell key={cell.id}>
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</TableCell>
+									))}
+								</TableRow>
+							))
+						)}
+
+						{documentsNotUploaded.length > 0 &&
+							documentsNotUploaded.map((doc) => (
+								<TableRow key={doc.name}>
+									{isOtcMember && <TableCell></TableCell>}
+									<TableCell className="font-medium">
+										<div className="flex flex-col items-start justify-center">
+											<div className="flex items-center gap-2">
+												<FileTextIcon className="h-4 w-4 text-teal-500" />
+												{doc.name}
+
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<Button variant="ghost" size="icon">
+															<InfoIcon className="size-4 text-teal-500" />
+														</Button>
+													</TooltipTrigger>
+													<TooltipContent className="w-fit max-w-96 text-pretty">
+														{doc.description}
+													</TooltipContent>
+												</Tooltip>
+											</div>
+										</div>
+									</TableCell>
+									<TableCell>
+										<StartupFolderStatusBadge status={"NOT_UPLOADED"} />
+									</TableCell>
+									<TableCell></TableCell>
+									<TableCell></TableCell>
+									<TableCell></TableCell>
+									<TableCell></TableCell>
+									<TableCell>
+										<div className="flex items-center gap-1">
+											{!isOtcMember &&
+												(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
+													<Button
+														size={"icon"}
+														variant="ghost"
+														className="text-cyan-600"
+														onClick={() => {
+															setShowUploadDialog(true)
+															setSelectedDocumentType({ type: doc.type, name: doc.name })
+														}}
+													>
+														<UploadIcon className="h-4 w-4" />
+													</Button>
+												)}
+										</div>
+									</TableCell>
+								</TableRow>
+							))}
+					</TableBody>
+				</Table>
+			</CardContent>
 
 			{showUploadDialog && (
 				<UploadDocumentsDialog
@@ -283,6 +249,6 @@ export function WorkerLaborControlFolderDocuments({
 					}}
 				/>
 			)}
-		</div>
+		</Card>
 	)
 }
