@@ -42,6 +42,17 @@ export interface WorkerLaborControlDocument extends Omit<LaborControlDocument, "
 export interface WorkerLaborControlFolder {
 	id: string
 	status: LABOR_CONTROL_STATUS
+	workerId: string
+	worker: {
+		id: string
+		rut: string
+		name: string
+	}
+}
+
+export interface WorkerLaborControlFolder {
+	id: string
+	status: LABOR_CONTROL_STATUS
 	worker: {
 		id: string
 		rut: string

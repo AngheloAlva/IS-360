@@ -2,13 +2,32 @@
 
 import prisma from "@/lib/prisma"
 
-import type { LaborControlDocument, WorkerLaborControlFolder } from "../types"
+import type { LaborControlDocument } from "../types"
+import type { LABOR_CONTROL_STATUS } from "@prisma/client"
 
-export async function getLaborControlFolderDocuments({ folderId }: { folderId: string }): Promise<{
+export async function getCompanyAcreditacionFolderDocuments({
+	folderId,
+}: {
+	folderId: string
+}): Promise<{
 	documents: LaborControlDocument[]
-	workerFolders: WorkerLaborControlFolder[]
+	folderStatus: LABOR_CONTROL_STATUS
 }> {
 	try {
+		console.log(folderId)
+		const folder = await prisma.laborControlFolder.findUnique({
+			where: {
+				id: folderId,
+			},
+			select: {
+				status: true,
+			},
+		})
+
+		if (!folder) {
+			throw new Error("Folder not found")
+		}
+
 		const documents = await prisma.laborControlDocument.findMany({
 			where: { folderId },
 			select: {
@@ -46,26 +65,9 @@ export async function getLaborControlFolderDocuments({ folderId }: { folderId: s
 				},
 			},
 		})
-
-		const workerFolders = await prisma.workerLaborControlFolder.findMany({
-			where: { laborControlFolderId: folderId },
-			select: {
-				id: true,
-				status: true,
-				workerId: true,
-				worker: {
-					select: {
-						id: true,
-						rut: true,
-						name: true,
-					},
-				},
-			},
-		})
-
 		return {
 			documents,
-			workerFolders,
+			folderStatus: folder?.status,
 		}
 	} catch (error) {
 		console.error("Error fetching startup folder documents:", error)

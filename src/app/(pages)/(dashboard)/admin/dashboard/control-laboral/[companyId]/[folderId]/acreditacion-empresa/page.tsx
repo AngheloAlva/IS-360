@@ -9,7 +9,7 @@ import LaborControlFolderDocuments from "@/project/labor-control/components/data
 export default async function StartupFolderReviewPage({
 	params,
 }: {
-	params: Promise<{ folderId: string }>
+	params: Promise<{ companyId: string; folderId: string }>
 }) {
 	const asyncParams = await params
 
@@ -17,24 +17,28 @@ export default async function StartupFolderReviewPage({
 		headers: await headers(),
 	})
 
-	if (!session?.user?.id || !session?.user?.companyId) return notFound()
+	if (!session?.user?.id) return notFound()
 
-	const folderId = asyncParams.folderId
+	const companyId = asyncParams.companyId
+	const folderId = asyncParams.folderId.split("_")[1]
+	const companyName = asyncParams.companyId.split("_")[0].replaceAll("-", " ")
+	const folderName = asyncParams.folderId.split("_")[0].replaceAll("-", " ")
 
 	return (
 		<div className="w-full flex-1 space-y-6">
 			<MemoizedModuleHeader
-				title={"Carpetas de Control Laboral"}
+				title={companyName + " - " + folderName + " - Acreditación empresa"}
 				className="from-blue-600 to-sky-500"
-				backHref={"/admin/dashboard/control-laboral"}
-				description="Gestion y seguimiento de todas las carpetas de control laboral de la empresa"
+				backHref={
+					"/admin/dashboard/control-laboral/" + asyncParams.companyId + "/" + asyncParams.folderId
+				}
+				description={`Gestion de la carpeta "${folderName} > Acreditación empresa" de la empresa "${companyName}"`}
 			/>
 
 			<LaborControlFolderDocuments
 				folderId={folderId}
-				folderStatus="DRAFT"
+				companyId={companyId}
 				userId={session.user.id}
-				companyId={session.user.companyId}
 				isOtcMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>

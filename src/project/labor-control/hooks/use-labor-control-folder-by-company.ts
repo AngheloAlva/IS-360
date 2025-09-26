@@ -1,10 +1,12 @@
 import { Order, OrderBy } from "@/shared/components/OrderByButton"
+
 import { type QueryFunction, useQuery } from "@tanstack/react-query"
+import type { LABOR_CONTROL_STATUS } from "@prisma/client"
 
 export interface LaborControlFolderByCompany {
 	id: string
-	status: string
 	createdAt: string
+	status: LABOR_CONTROL_STATUS
 }
 
 interface LaborControlFolderByCompanyRes {

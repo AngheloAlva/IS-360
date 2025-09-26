@@ -6,7 +6,7 @@ import { useState } from "react"
 
 import { useWorkerLaborControlFolderDocuments } from "../../hooks/use-worker-labor-control-folder-documents"
 import { getWorkerLaborControlDocumentColumns } from "../../columns/worker-labor-control-document-columns"
-import { WORKER_LABOR_CONTROL_DOCUMENT_TYPE } from "@prisma/client"
+import { WORKER_LABOR_CONTROL_STRUCTURE } from "@/lib/consts/labor-control-folders-structure"
 import { queryClient } from "@/lib/queryClient"
 
 import { StartupFolderStatusBadge } from "@/project/startup-folder/components/data/StartupFolderStatusBadge"
@@ -23,8 +23,8 @@ import {
 	TableHeader,
 } from "@/shared/components/ui/table"
 
+import type { WORKER_LABOR_CONTROL_DOCUMENT_TYPE } from "@prisma/client"
 import type { WorkerLaborControlDocument } from "../../types"
-import { WORKER_LABOR_CONTROL_STRUCTURE } from "@/lib/consts/labor-control-folders-structure"
 
 interface WorkerLaborControlFolderDocumentsProps {
 	userId: string

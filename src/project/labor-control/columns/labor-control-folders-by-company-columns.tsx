@@ -1,28 +1,40 @@
-import { FolderIcon } from "lucide-react"
+import { FolderClockIcon } from "lucide-react"
 import { es } from "date-fns/locale"
 import { format } from "date-fns"
 import Link from "next/link"
 
+import { LaborControlFolderStatusBadge } from "../components/data/LaborControlFolderStatusBadge"
+
 import type { LaborControlFolderByCompany } from "../hooks/use-labor-control-folder-by-company"
 import type { ColumnDef } from "@tanstack/react-table"
+import { generateSlug } from "@/lib/generateSlug"
+
+interface LaborControlFoldersByCompanyColumnsProps {
+	companyId: string
+	companySlug?: string
+	isOtcMember?: boolean
+}
 
 export const LaborControlFoldersByCompanyColumns: (
-	companyId: string,
-	isOtcMember?: boolean
-) => ColumnDef<LaborControlFolderByCompany>[] = (companyId, isOtcMember) => [
+	props: LaborControlFoldersByCompanyColumnsProps
+) => ColumnDef<LaborControlFolderByCompany>[] = ({ companyId, isOtcMember, companySlug }) => [
 	{
 		id: "name",
 		header: "Nombre ",
 		cell: ({ row }) => {
 			const createdAt = row.original.createdAt
+			const companyHref = companySlug ? companySlug + "_" + companyId : companyId
+
+			const folderName = format(new Date(createdAt), "MMMM yyyy", { locale: es })
+			const folderSlug = generateSlug(folderName) + "_" + row.original.id
 
 			const href = isOtcMember
-				? `/admin/dashboard/control-laboral/${companyId}/${row.original.id}`
-				: `/dashboard/control-laboral/${row.original.id}`
+				? `/admin/dashboard/control-laboral/${companyHref}/${folderSlug}`
+				: `/dashboard/control-laboral/${companyHref}/${folderSlug}`
 
 			return (
 				<Link href={href} className="flex items-center gap-2 capitalize">
-					<FolderIcon className="text-muted-foreground size-3.5" />
+					<FolderClockIcon className="size-4 fill-blue-500/40 text-blue-500" />
 					{format(new Date(createdAt), "MMMM yyyy", { locale: es })}
 				</Link>
 			)
@@ -34,7 +46,7 @@ export const LaborControlFoldersByCompanyColumns: (
 		cell: ({ row }) => {
 			const status = row.original.status
 
-			return <p>{status}</p>
+			return <LaborControlFolderStatusBadge status={status} />
 		},
 	},
 ]

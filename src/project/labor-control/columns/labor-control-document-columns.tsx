@@ -94,7 +94,7 @@ export const getLaborControlDocumentColumns = ({
 			return (
 				<div className="flex flex-col items-start justify-center">
 					<div className="flex items-center gap-2">
-						<FileTextIcon className="h-4 w-4 text-blue-500" />
+						<FileTextIcon className="h-4 w-4 text-cyan-500" />
 						{name}
 					</div>
 

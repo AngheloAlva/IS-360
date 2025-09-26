@@ -1707,6 +1707,8 @@ model WorkerLaborControlFolder {
 
 enum LABOR_CONTROL_DOCUMENT_TYPE {
   F30 // Formulario 30
+  F30_1 // Formulario 30-1
+  SINIESTRALITY // Siniestralidad
   TRG_TREASURY_CERTIFICATE // Certificado de tesoreria TRG
 }
 
@@ -1730,14 +1732,11 @@ model LaborControlDocument {
 }
 
 enum WORKER_LABOR_CONTROL_DOCUMENT_TYPE {
-  PAYROLL_STTLEMENT // Liquidacion de sueldo
-  F30_1 // Formulario 30-1
-  PAYMENT_OF_PENSION_CONTRIBUTION // Pago de cotizaciones previsionales
-  FAREWELL_LETTER // Carta de despedida
-  STTLEMENT // Finiquito
-  MEDICAL_LEAVE // Licencia médica
   ATTENDANCE_BOOK // Libro de asistencia
-  ACCIDENT_CERTIFICATE // Certificado de accidentabilidad
+  MEDICAL_LEAVE // Licencia médica
+  PAYROLL_STTLEMENT // Liquidacion de sueldo
+  STTLEMENT // Finiquito
+  NOTICE_OF_TERMINATION // Aviso de termino de contrato
 }
 
 model WorkerLaborControlDocument {

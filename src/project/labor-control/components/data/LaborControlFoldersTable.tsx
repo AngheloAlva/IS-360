@@ -32,11 +32,13 @@ import { LaborControlFoldersByCompanyColumns } from "../../columns/labor-control
 
 interface AdminLaborControlFoldersListProps {
 	companyId: string
+	companySlug?: string
 	isOtcMember?: boolean
 }
 
 export default function LaborControlFoldersTable({
 	companyId,
+	companySlug,
 	isOtcMember,
 }: AdminLaborControlFoldersListProps) {
 	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
@@ -58,7 +60,7 @@ export default function LaborControlFoldersTable({
 		getCoreRowModel: getCoreRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
-		columns: LaborControlFoldersByCompanyColumns(companyId, isOtcMember),
+		columns: LaborControlFoldersByCompanyColumns({ companyId, isOtcMember, companySlug }),
 		state: {
 			pagination: {
 				pageSize: 15,
@@ -75,10 +77,7 @@ export default function LaborControlFoldersTable({
 			<CardContent className="flex w-full flex-col items-start gap-4">
 				<div className="flex w-full flex-wrap items-center gap-2 md:w-full md:flex-row">
 					<div className="flex flex-col">
-						<h2 className="text-xl font-semibold lg:text-2xl">Lista de Empresas</h2>
-						<p className="text-muted-foreground text-sm">
-							Gestión y seguimiento de todas las empresas con carpetas de control laboral
-						</p>
+						<h2 className="text-xl font-semibold lg:text-2xl">Lista de carpetas</h2>
 					</div>
 
 					<OrderByButton

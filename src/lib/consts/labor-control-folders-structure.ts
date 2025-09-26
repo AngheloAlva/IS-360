@@ -19,6 +19,16 @@ export const LABOR_CONTROL_STRUCTURE: LaborControlFolderStructure[] = [
 		description: "",
 	},
 	{
+		name: "F30_1",
+		type: LABOR_CONTROL_DOCUMENT_TYPE.F30_1,
+		description: "",
+	},
+	{
+		name: "Siniestralidad",
+		type: LABOR_CONTROL_DOCUMENT_TYPE.SINIESTRALITY,
+		description: "",
+	},
+	{
 		name: "TRG - Certificado Tesorería",
 		type: LABOR_CONTROL_DOCUMENT_TYPE.TRG_TREASURY_CERTIFICATE,
 		description: "",
@@ -27,33 +37,13 @@ export const LABOR_CONTROL_STRUCTURE: LaborControlFolderStructure[] = [
 
 export const WORKER_LABOR_CONTROL_STRUCTURE: WorkerLaborControlFolderStructure[] = [
 	{
-		name: "F30_1",
-		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.F30_1,
-		description: "",
-	},
-	{
-		name: "Certificado de accidentabilidad",
-		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.ACCIDENT_CERTIFICATE,
-		description: "",
-	},
-	{
 		name: "Libro de asistencia",
 		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.ATTENDANCE_BOOK,
 		description: "",
 	},
 	{
-		name: "Carta de despedida",
-		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.FAREWELL_LETTER,
-		description: "",
-	},
-	{
 		name: "Licencia médica",
 		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.MEDICAL_LEAVE,
-		description: "",
-	},
-	{
-		name: "Pago de cotizaciones previsionales",
-		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.PAYMENT_OF_PENSION_CONTRIBUTION,
 		description: "",
 	},
 	{
@@ -64,6 +54,11 @@ export const WORKER_LABOR_CONTROL_STRUCTURE: WorkerLaborControlFolderStructure[]
 	{
 		name: "Finiquito",
 		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.STTLEMENT,
+		description: "",
+	},
+	{
+		name: "Aviso de termino de contrato",
+		type: WORKER_LABOR_CONTROL_DOCUMENT_TYPE.NOTICE_OF_TERMINATION,
 		description: "",
 	},
 ]

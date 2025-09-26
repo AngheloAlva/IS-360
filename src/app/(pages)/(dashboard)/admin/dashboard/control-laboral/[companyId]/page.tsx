@@ -20,7 +20,8 @@ export default async function StartupFolderReviewPage({
 	if (!session?.user?.id) return notFound()
 
 	const companyId = asyncParams.companyId.split("_")[1]
-	const companyName = asyncParams.companyId.split("_")[0].replaceAll("-", " ")
+	const companySlug = asyncParams.companyId.split("_")[0]
+	const companyName = companySlug.replaceAll("-", " ")
 
 	return (
 		<div className="w-full flex-1 space-y-6">
@@ -33,6 +34,7 @@ export default async function StartupFolderReviewPage({
 
 			<LaborControlFoldersTable
 				companyId={companyId}
+				companySlug={companySlug}
 				isOtcMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>
