@@ -217,12 +217,12 @@ export const data: NavBarData = {
 					url: "/dashboard/carpetas-de-arranque",
 					icon: FoldersIcon,
 				},
-				{
-					name: "Control Laboral",
-					url: "/dashboard/control-laboral",
-					icon: ViewIcon,
-					test: true,
-				},
+				// {
+				// 	name: "Control Laboral",
+				// 	url: "/dashboard/control-laboral",
+				// 	icon: ViewIcon,
+				// 	test: true,
+				// },
 				{
 					name: "Seguridad",
 					url: "/dashboard/charlas-de-seguridad",
