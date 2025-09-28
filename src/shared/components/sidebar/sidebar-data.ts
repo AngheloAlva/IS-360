@@ -108,6 +108,7 @@ export const data: NavBarData = {
 					name: "Control Laboral",
 					url: "/admin/dashboard/control-laboral",
 					icon: ViewIcon,
+					test: true,
 				},
 				{
 					name: "Charlas de Seguridad",
@@ -220,6 +221,7 @@ export const data: NavBarData = {
 					name: "Control Laboral",
 					url: "/dashboard/control-laboral",
 					icon: ViewIcon,
+					test: true,
 				},
 				{
 					name: "Seguridad",
