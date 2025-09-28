@@ -36,6 +36,7 @@ interface DocumentReviewFormProps {
 	userId: string
 	folderId: string
 	workerId?: string
+	companyId?: string
 	refetch: () => void
 	document: LaborControlDocument | WorkerLaborControlDocument
 }
@@ -44,8 +45,9 @@ export function DocumentReviewForm({
 	userId,
 	refetch,
 	document,
-	workerId,
 	folderId,
+	workerId,
+	companyId,
 }: DocumentReviewFormProps) {
 	const [approvalStatus, setApprovalStatus] = useState<"APPROVED" | "REJECTED" | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -71,6 +73,7 @@ export function DocumentReviewForm({
 			const response = await addDocumentReview({
 				comments,
 				folderId,
+				workerId,
 				reviewerId: userId,
 				status: approvalStatus,
 				documentId: document.id,
@@ -80,7 +83,7 @@ export function DocumentReviewForm({
 				throw new Error("Error al procesar la revisión del documento")
 			}
 
-			toast(approvalStatus === "APPROVED" ? "Documento aprobado" : "Documento rechazado", {
+			toast.success(approvalStatus === "APPROVED" ? "Documento aprobado" : "Documento rechazado", {
 				description:
 					approvalStatus === "APPROVED"
 						? "El documento ha sido aprobado correctamente"
@@ -88,7 +91,10 @@ export function DocumentReviewForm({
 			})
 
 			queryClient.invalidateQueries({
-				queryKey: ["startupFolderDocuments", { folderId, workerId }],
+				queryKey: ["companyAccreditationFolderDocuments", { folderId, companyId }],
+			})
+			queryClient.invalidateQueries({
+				queryKey: ["workerLaborControlFolderDocuments", { folderId }],
 			})
 
 			refetch()

@@ -2,7 +2,7 @@
 
 import { resend } from "@/lib/resend"
 
-import { CompleteFolderEmail } from "@/project/startup-folder/components/emails/CompleteFolderEmail"
+import { CompleteFolderEmail } from "@/project/labor-control/components/emails/CompleteFolderEmail"
 
 interface SendCompletedNotificationEmailProps {
 	emails: string[]
@@ -27,7 +27,7 @@ export const sendCompletedNotificationEmail = async ({
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: emails,
-			subject: `Carpeta de arranque completada - ${folderName}`,
+			subject: `Control Laboral Completado - ${folderName}`,
 			react: await CompleteFolderEmail({
 				folderName,
 				companyName,

@@ -3,11 +3,13 @@
 import { headers } from "next/headers"
 
 import { LABOR_CONTROL_STRUCTURE } from "@/lib/consts/labor-control-folders-structure"
+import { sendReviewNotificationEmail } from "./emails/send-review-notification-email"
 import { MODULES, ACTIVITY_TYPE, LABOR_CONTROL_STATUS } from "@prisma/client"
-// import { sendReviewNotificationEmail } from "./emails/send-review-notification-email"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface AddDocumentReviewProps {
 	comments: string
@@ -73,6 +75,13 @@ export const addDocumentReview = async ({
 					folder: {
 						select: {
 							id: true,
+							emails: true,
+							createdAt: true,
+							company: {
+								select: {
+									name: true,
+								},
+							},
 						},
 					},
 				},
@@ -100,25 +109,22 @@ export const addDocumentReview = async ({
 						id: document.folder.id,
 					},
 					data: {
-						status: LABOR_CONTROL_STATUS.APPROVED,
+						companyFolderStatus: LABOR_CONTROL_STATUS.APPROVED,
 					},
 				})
 
-				// if (allDocuments.startupFolder) {
-				// 	sendReviewNotificationEmail({
-				// 		folderName:
-				// 			allDocuments.startupFolder.name + " - " + (allDocuments as any)?.worker?.name || "",
-				// 		companyName: allDocuments?.startupFolder.company.name,
-				// 		reviewDate: new Date(),
-				// 		reviewer: {
-				// 			name: session.user.name,
-				// 			email: session.user.email,
-				// 			phone: session.user.phone || null,
-				// 		},
-				// 		isApproved: true,
-				// 		emails: allDocuments.additionalNotificationEmails,
-				// 	})
-				// }
+				sendReviewNotificationEmail({
+					folderName: `Carpeta ${format(document.folder?.createdAt || new Date(), "MMMM yyyy", { locale: es })} - Acreditación Empresa`,
+					companyName: document.folder.company.name,
+					reviewDate: new Date(),
+					reviewer: {
+						name: session.user.name,
+						email: session.user.email,
+						phone: session.user.phone || null,
+					},
+					isApproved: true,
+					emails: document.folder.emails,
+				})
 
 				return {
 					ok: true,
@@ -136,37 +142,54 @@ export const addDocumentReview = async ({
 						id: document.folder.id,
 					},
 					data: {
-						status: LABOR_CONTROL_STATUS.DRAFT,
+						companyFolderStatus: LABOR_CONTROL_STATUS.DRAFT,
 					},
 				})
 
-				// if (allDocuments.startupFolder) {
-				// 	sendReviewNotificationEmail({
-				// 		folderName: "Documentos Básicos",
-				// 		companyName: allDocuments.startupFolder.company.name,
-				// 		reviewDate: new Date(),
-				// 		reviewer: {
-				// 			name: session.user.name,
-				// 			email: session.user.email,
-				// 			phone: session.user.phone || null,
-				// 		},
-				// 		isApproved: false,
-				// 		rejectedDocuments: allDocuments.documents
-				// 			.filter((d) => d.status === LABOR_CONTROL_STATUS.REJECTED)
-				// 			.map((d) => ({
-				// 				name: d.name,
-				// 				reason: d.reviewNotes || "",
-				// 			})),
-				// 		emails: allDocuments.additionalNotificationEmails,
-				// 	})
-				// }
+				sendReviewNotificationEmail({
+					folderName: `Carpeta ${format(document.folder?.createdAt || new Date(), "MMMM yyyy", { locale: es })} - Acreditación Empresa`,
+					companyName: document.folder.company.name,
+					reviewDate: new Date(),
+					reviewer: {
+						name: session.user.name,
+						email: session.user.email,
+						phone: session.user.phone || null,
+					},
+					isApproved: false,
+					rejectedDocuments: allDocuments
+						.filter((d) => d.status === LABOR_CONTROL_STATUS.REJECTED)
+						.map((d) => ({
+							name: d.name,
+							reason: d.reviewNotes || "",
+						})),
+					emails: document.folder.emails,
+				})
 
 				return {
 					ok: true,
 					message: "Revisión procesada exitosamente",
 				}
 			}
+
+			return {
+				ok: true,
+				message: "Revisión procesada exitosamente",
+			}
 		} else {
+			const worker = await prisma.user.findUnique({
+				where: {
+					id: workerId,
+				},
+				select: {
+					name: true,
+					company: {
+						select: {
+							name: true,
+						},
+					},
+				},
+			})
+
 			const document = await prisma.workerLaborControlDocument.update({
 				where: { id: documentId },
 				data: {
@@ -183,6 +206,8 @@ export const addDocumentReview = async ({
 					folder: {
 						select: {
 							id: true,
+							emails: true,
+							createdAt: true,
 						},
 					},
 				},
@@ -214,21 +239,20 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				// if (allDocuments.startupFolder) {
-				// 	sendReviewNotificationEmail({
-				// 		folderName:
-				// 			allDocuments.startupFolder.name + " - " + (allDocuments as any)?.worker?.name || "",
-				// 		companyName: allDocuments?.startupFolder.company.name,
-				// 		reviewDate: new Date(),
-				// 		reviewer: {
-				// 			name: session.user.name,
-				// 			email: session.user.email,
-				// 			phone: session.user.phone || null,
-				// 		},
-				// 		isApproved: true,
-				// 		emails: allDocuments.additionalNotificationEmails,
-				// 	})
-				// }
+				if (allDocuments) {
+					sendReviewNotificationEmail({
+						folderName: `Carpeta ${format(document.folder?.createdAt || new Date(), "MMMM yyyy", { locale: es })} - Acreditación Trabajador: ${worker?.name}`,
+						companyName: worker?.company?.name || "",
+						reviewDate: new Date(),
+						reviewer: {
+							name: session.user.name,
+							email: session.user.email,
+							phone: session.user.phone || null,
+						},
+						isApproved: true,
+						emails: document.folder.emails,
+					})
+				}
 
 				return {
 					ok: true,
@@ -250,31 +274,34 @@ export const addDocumentReview = async ({
 					},
 				})
 
-				// if (allDocuments.startupFolder) {
-				// 	sendReviewNotificationEmail({
-				// 		folderName: "Documentos Básicos",
-				// 		companyName: allDocuments.startupFolder.company.name,
-				// 		reviewDate: new Date(),
-				// 		reviewer: {
-				// 			name: session.user.name,
-				// 			email: session.user.email,
-				// 			phone: session.user.phone || null,
-				// 		},
-				// 		isApproved: false,
-				// 		rejectedDocuments: allDocuments.documents
-				// 			.filter((d) => d.status === LABOR_CONTROL_STATUS.REJECTED)
-				// 			.map((d) => ({
-				// 				name: d.name,
-				// 				reason: d.reviewNotes || "",
-				// 			})),
-				// 		emails: allDocuments.additionalNotificationEmails,
-				// 	})
-				// }
+				sendReviewNotificationEmail({
+					folderName: `Carpeta ${format(document.folder?.createdAt || new Date(), "MMMM yyyy", { locale: es })} - Acreditación Trabajador: ${worker?.name}`,
+					companyName: worker?.company?.name || "",
+					reviewDate: new Date(),
+					reviewer: {
+						name: session.user.name,
+						email: session.user.email,
+						phone: session.user.phone || null,
+					},
+					isApproved: false,
+					rejectedDocuments: allDocuments
+						.filter((d) => d.status === LABOR_CONTROL_STATUS.REJECTED)
+						.map((d) => ({
+							name: d.name,
+							reason: d.reviewNotes || "",
+						})),
+					emails: document.folder.emails,
+				})
 
 				return {
 					ok: true,
 					message: "Revisión procesada exitosamente",
 				}
+			}
+
+			return {
+				ok: true,
+				message: "Revisión procesada exitosamente",
 			}
 		}
 

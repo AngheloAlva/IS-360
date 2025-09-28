@@ -31,7 +31,7 @@ export default function DocumentViewButton({ url }: DocumentViewButtonProps) {
 		<Button
 			size="icon"
 			variant="ghost"
-			className="text-teal-600"
+			className="text-cyan-500"
 			onClick={handleViewDocument}
 			disabled={isLoading}
 		>

@@ -63,11 +63,11 @@ export const ReviewEmail = ({
 						{/* Main Content */}
 						<Section className="px-[40px] py-[32px]">
 							<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
-								Resultado de Revisión de Carpeta
+								Resultado de Revisión - Control Laboral
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Se ha completado la revisión de la carpeta en OTC 360.
+								Se ha completado la revisión de los documentos de Control Laboral en OTC 360.
 							</Text>
 
 							{/* Review Details */}
@@ -79,7 +79,7 @@ export const ReviewEmail = ({
 								<Row className="mb-[10px]">
 									<Column>
 										<Text className="text-[14px] leading-none font-semibold text-gray-700">
-											Carpeta Revisada:
+											Control Laboral Revisado:
 										</Text>
 										<Text className="mb-[10px] text-[16px] leading-none font-semibold text-blue-600">
 											{folderName}
@@ -148,14 +148,14 @@ export const ReviewEmail = ({
 
 								{isApproved ? (
 									<Text className="text-[16px] leading-[24px] text-green-700">
-										✅ La carpeta ha sido aprobada satisfactoriamente. Todos los documentos cumplen
-										con los requisitos establecidos.
+										✅ Los documentos de Control Laboral han sido aprobados satisfactoriamente. Toda
+										la documentación cumple con los requisitos establecidos.
 									</Text>
 								) : (
 									<>
 										<Text className="mb-[16px] text-[16px] leading-[24px] text-yellow-700">
-											⚠️ Se han encontrado documentos que requieren atención. Por favor, revise los
-											siguientes documentos:
+											⚠️ Se han encontrado documentos de Control Laboral que requieren atención. Por
+											favor, revise los siguientes documentos:
 										</Text>
 
 										{rejectedDocuments?.map((doc, index) => (
@@ -182,8 +182,8 @@ export const ReviewEmail = ({
 								</Heading>
 								{isApproved ? (
 									<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
-										La carpeta ha sido aprobada y está lista para su uso. No se requieren acciones
-										adicionales.
+										Los documentos de Control Laboral han sido aprobados y están listos. No se
+										requieren acciones adicionales.
 									</Text>
 								) : (
 									<>
@@ -194,21 +194,23 @@ export const ReviewEmail = ({
 											2. Realice las correcciones necesarias en los documentos
 										</Text>
 										<Text className="mb-[10px] text-[14px] leading-[10px] text-gray-600">
-											3. Vuelva a enviar la carpeta para su revisión
+											3. Vuelva a enviar los documentos de Control Laboral para su revisión
 										</Text>
 									</>
 								)}
 							</Section>
 
 							{/* Action Button */}
-							<Section className="mb-[32px] text-center">
-								<Button
-									href={systemUrl}
-									className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
-								>
-									Ir a OTC 360
-								</Button>
-							</Section>
+							{!isApproved && (
+								<Section className="mb-[32px] text-center">
+									<Button
+										href={systemUrl}
+										className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
+									>
+										Ir a OTC 360
+									</Button>
+								</Section>
+							)}
 
 							<Hr className="my-[24px] border-gray-200" />
 

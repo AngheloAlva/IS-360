@@ -22,6 +22,11 @@ export async function getWorkersAcreditacionFolders({ folderId }: { folderId: st
 					},
 				},
 			},
+			orderBy: {
+				worker: {
+					name: "asc",
+				},
+			},
 		})
 
 		return {

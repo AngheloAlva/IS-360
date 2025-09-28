@@ -2,10 +2,9 @@
 
 import { resend } from "@/lib/resend"
 
-import { ReviewEmail } from "@/project/startup-folder/components/emails/ReviewEmail"
+import { ReviewEmail } from "@/project/labor-control/components/emails/ReviewEmail"
 
 interface SendReviewNotificationEmailProps {
-	emails: string[]
 	folderName: string
 	companyName: string
 	reviewDate: Date
@@ -19,6 +18,7 @@ interface SendReviewNotificationEmailProps {
 		name: string
 		reason: string
 	}>
+	emails: string[]
 }
 
 export const sendReviewNotificationEmail = async ({
@@ -34,7 +34,7 @@ export const sendReviewNotificationEmail = async ({
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: emails,
-			subject: `Revisión de Carpetas de arranque - ${folderName}`,
+			subject: `Revisión Control Laboral - ${folderName}`,
 			react: await ReviewEmail({
 				reviewer,
 				folderName,

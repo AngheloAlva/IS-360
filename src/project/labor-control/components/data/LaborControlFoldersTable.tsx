@@ -1,11 +1,25 @@
 "use client"
 
-import { InfoIcon, FileSpreadsheetIcon } from "lucide-react"
+import { InfoIcon } from "lucide-react"
 import { useState } from "react"
+import {
+	flexRender,
+	useReactTable,
+	getCoreRowModel,
+	getFilteredRowModel,
+} from "@tanstack/react-table"
 
+import {
+	type LaborControlFolderByCompany,
+	useLaborControlFolderByCompany,
+} from "../../hooks/use-labor-control-folder-by-company"
+import { LaborControlFoldersByCompanyColumns } from "../../columns/labor-control-folders-by-company-columns"
+
+import OrderByButton, { Order, OrderBy } from "@/shared/components/OrderByButton"
+import { TablePagination } from "@/shared/components/ui/table-pagination"
 import { Card, CardContent } from "@/shared/components/ui/card"
+import RefreshButton from "@/shared/components/RefreshButton"
 import { Skeleton } from "@/shared/components/ui/skeleton"
-import { Button } from "@/shared/components/ui/button"
 import {
 	Table,
 	TableRow,
@@ -14,21 +28,6 @@ import {
 	TableHead,
 	TableHeader,
 } from "@/shared/components/ui/table"
-import {
-	flexRender,
-	getCoreRowModel,
-	getFilteredRowModel,
-	useReactTable,
-} from "@tanstack/react-table"
-import RefreshButton from "@/shared/components/RefreshButton"
-import Spinner from "@/shared/components/Spinner"
-import { TablePagination } from "@/shared/components/ui/table-pagination"
-import OrderByButton, { Order, OrderBy } from "@/shared/components/OrderByButton"
-import {
-	type LaborControlFolderByCompany,
-	useLaborControlFolderByCompany,
-} from "../../hooks/use-labor-control-folder-by-company"
-import { LaborControlFoldersByCompanyColumns } from "../../columns/labor-control-folders-by-company-columns"
 
 interface AdminLaborControlFoldersListProps {
 	companyId: string
@@ -43,7 +42,6 @@ export default function LaborControlFoldersTable({
 }: AdminLaborControlFoldersListProps) {
 	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [rowSelection, setRowSelection] = useState({})
-	const [exportLoading] = useState<boolean>(false)
 	const [order, setOrder] = useState<Order>("asc")
 	const [page, setPage] = useState<number>(1)
 
@@ -90,15 +88,6 @@ export default function LaborControlFoldersTable({
 						}}
 					/>
 
-					<Button
-						size={"lg"}
-						// onClick={handleExportToExcel}
-						className="bg-blue-600 hover:bg-blue-700"
-					>
-						{exportLoading ? <Spinner /> : <FileSpreadsheetIcon className="h-4 w-4" />}
-						Exportar
-					</Button>
-
 					<RefreshButton refetch={refetch} isFetching={isFetching} />
 				</div>
 
@@ -133,7 +122,7 @@ export default function LaborControlFoldersTable({
 								<TableCell colSpan={17} className="h-20 text-center">
 									<div className="flex items-center justify-center gap-2">
 										<InfoIcon className="size-4" />
-										No se encontraron resultados.
+										No se encontraron carpetas de control laboral.
 									</div>
 								</TableCell>
 							</TableRow>

@@ -39,8 +39,8 @@ export const CompleteFolderEmail = ({
 		<Html>
 			<Tailwind>
 				<Head>
-					<title>Carpeta Completada: {folderName} - OTC 360</title>
-					<Preview>La carpeta {folderName} ha sido completada exitosamente</Preview>
+					<title>Control Laboral Completado: {folderName} - OTC 360</title>
+					<Preview>El Control Laboral {folderName} ha sido completado exitosamente</Preview>
 				</Head>
 				<Body className="bg-gray-100 py-[40px] font-sans">
 					<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
@@ -56,24 +56,24 @@ export const CompleteFolderEmail = ({
 						{/* Main Content */}
 						<Section className="px-[40px] py-[32px]">
 							<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
-								¡Carpeta Completada!
+								¡Control Laboral Completado!
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								La carpeta ha sido completada exitosamente en OTC 360 y ya puedes iniciar las
-								actividades.
+								El Control Laboral ha sido completado exitosamente en OTC 360 y ya están
+								habilitadas las actividades laborales para el mes correspondiente.
 							</Text>
 
 							{/* Folder Details */}
 							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-blue-500 bg-blue-50 p-[24px]">
 								<Heading className="mb-[12px] text-[20px] font-bold text-gray-800">
-									Detalles de la Carpeta
+									Detalles del Control Laboral
 								</Heading>
 
 								<Row className="mb-[10px]">
 									<Column>
 										<Text className="text-[14px] leading-none font-semibold text-gray-700">
-											Carpeta Completada:
+											Control Laboral Completado:
 										</Text>
 										<Text className="mb-[10px] text-[16px] leading-none font-semibold text-blue-600">
 											{folderName}
@@ -133,8 +133,8 @@ export const CompleteFolderEmail = ({
 							{/* Success Message */}
 							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
 								<Text className="text-[16px] leading-[24px] text-green-700">
-									✅ La carpeta ha sido completada exitosamente. Todos los documentos cumplen con
-									los requisitos establecidos.
+									✅ El Control Laboral ha sido completado exitosamente. Todos los documentos
+									de acreditación de empresa y trabajadores cumplen con los requisitos establecidos.
 								</Text>
 							</Section>
 

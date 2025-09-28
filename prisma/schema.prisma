@@ -1681,10 +1681,12 @@ enum LABOR_CONTROL_STATUS {
 }
 
 model LaborControlFolder {
-  id        String               @id @default(uuid())
-  status    LABOR_CONTROL_STATUS @default(DRAFT)
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+  id                  String               @id @default(uuid())
+  status              LABOR_CONTROL_STATUS @default(DRAFT)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  emails              String[]
+  companyFolderStatus LABOR_CONTROL_STATUS @default(DRAFT)
 
   companyId     String
   company       Company                    @relation(fields: [companyId], references: [id])
@@ -1697,6 +1699,7 @@ model WorkerLaborControlFolder {
   status    LABOR_CONTROL_STATUS @default(DRAFT)
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
+  emails    String[]
 
   workerId             String
   worker               User                         @relation("WorkerLaborControlFolderWorker", fields: [workerId], references: [id])

@@ -17,12 +17,14 @@ const createWorkerDocumentSchema = z.object({
 
 export type CreateWorkerDocumentInput = z.infer<typeof createWorkerDocumentSchema>
 
-export async function createWorkerDocument(input: CreateWorkerDocumentInput) {
+export async function createWorkerDocument(
+	input: CreateWorkerDocumentInput
+): Promise<{ ok: boolean; message?: string }> {
 	try {
 		const { userId, workerId, documentType, documentName, url, folderId } =
 			createWorkerDocumentSchema.parse(input)
 
-		const basicFolder = await prisma.workerLaborControlFolder.findUnique({
+		const workerFolder = await prisma.workerLaborControlFolder.findUnique({
 			where: { id: folderId },
 			select: {
 				id: true,
@@ -35,7 +37,7 @@ export async function createWorkerDocument(input: CreateWorkerDocumentInput) {
 			},
 		})
 
-		if (!basicFolder) {
+		if (!workerFolder) {
 			return {
 				ok: false,
 				message: "Carpeta de personal no encontrada",
@@ -44,7 +46,7 @@ export async function createWorkerDocument(input: CreateWorkerDocumentInput) {
 
 		const user = await prisma.user.findUnique({ where: { id: userId } })
 
-		if (!user || user.companyId !== basicFolder.worker?.companyId) {
+		if (!user || user.companyId !== workerFolder.worker?.companyId) {
 			return {
 				ok: false,
 				message: "No autorizado - El usuario no pertenece a la empresa",
@@ -56,7 +58,7 @@ export async function createWorkerDocument(input: CreateWorkerDocumentInput) {
 				url,
 				name: documentName,
 				uploadById: userId,
-				folderId: basicFolder.id,
+				folderId: workerFolder.id,
 				type: documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
 			},
 		})

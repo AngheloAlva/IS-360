@@ -53,11 +53,11 @@ export const RequestReviewEmail = ({
 						{/* Main Content */}
 						<Section className="px-[40px] py-[32px]">
 							<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
-								Solicitud de Revisión de Carpeta
+								Solicitud de Revisión - Control Laboral
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Se ha recibido una nueva solicitud de revisión de subcarpeta en OTC 360.
+								Se ha recibido una nueva solicitud de revisión de documentos de Control Laboral en OTC 360.
 							</Text>
 
 							{/* Request Details */}
@@ -69,7 +69,7 @@ export const RequestReviewEmail = ({
 								<Row className="mb-[10px]">
 									<Column>
 										<Text className="text-[14px] font-semibold text-gray-700">
-											Carpeta Solicitada:
+											Carpeta de Control Laboral:
 										</Text>
 										<Text className="mb-[10px] text-[16px] font-semibold text-blue-600">
 											{folderName}
@@ -131,8 +131,8 @@ export const RequestReviewEmail = ({
 									📋 Acción Requerida
 								</Text>
 								<Text className="text-[14px] leading-[20px] text-yellow-700">
-									Esta solicitud requiere revisión y aprobación. Por favor, revisa los detalles y
-									procede con la evaluación correspondiente en el sistema.
+									Esta solicitud de Control Laboral requiere revisión y aprobación. Por favor, 
+									revisa los documentos de acreditación de empresa y trabajadores.
 								</Text>
 							</Section>
 
@@ -152,13 +152,13 @@ export const RequestReviewEmail = ({
 									Próximos Pasos
 								</Heading>
 								<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
-									1. Accede al sistema OTC 360 para revisar la solicitud
+									1. Accede al sistema OTC 360 para revisar la solicitud de Control Laboral
 								</Text>
 								<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
-									2. Evalúa la documentación de la subcarpeta solicitada
+									2. Evalúa los documentos de acreditación de empresa y trabajadores
 								</Text>
 								<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
-									3. Aprueba o rechaza la solicitud con comentarios
+									3. Aprueba o rechaza los documentos con comentarios específicos
 								</Text>
 								<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
 									4. El solicitante será notificado automáticamente de la decisión

@@ -10,7 +10,7 @@ interface UseLaborControlFolderDocumentsParams {
 
 export const fetchCompanyAcreditacionFolderDocuments: QueryFunction<
 	Awaited<ReturnType<typeof getCompanyAcreditacionFolderDocuments>>,
-	readonly ["companyAcreditacionFolderDocuments", UseLaborControlFolderDocumentsParams]
+	readonly ["companyAccreditationFolderDocuments", UseLaborControlFolderDocumentsParams]
 > = async ({ queryKey }) => {
 	const [, { folderId }] = queryKey
 
@@ -19,7 +19,7 @@ export const fetchCompanyAcreditacionFolderDocuments: QueryFunction<
 
 export const fetchWorkersAcreditacionFolders: QueryFunction<
 	Awaited<ReturnType<typeof getWorkersAcreditacionFolders>>,
-	readonly ["workersAcreditacionFolders", UseLaborControlFolderDocumentsParams]
+	readonly ["workersAccreditationFolders", UseLaborControlFolderDocumentsParams]
 > = async ({ queryKey }) => {
 	const [, { folderId }] = queryKey
 
@@ -30,7 +30,7 @@ export const useCompanyAcreditacionFolderDocuments = ({
 	folderId,
 	companyId,
 }: UseLaborControlFolderDocumentsParams) => {
-	const queryKey = ["companyAcreditacionFolderDocuments", { folderId, companyId }] as const
+	const queryKey = ["companyAccreditationFolderDocuments", { folderId, companyId }] as const
 
 	return useQuery({
 		queryKey,
@@ -49,7 +49,7 @@ export const useWorkersAcreditacionFolders = ({
 	folderId,
 	companyId,
 }: UseLaborControlFolderDocumentsParams) => {
-	const queryKey = ["workersAcreditacionFolders", { folderId, companyId }] as const
+	const queryKey = ["workersAccreditationFolders", { folderId, companyId }] as const
 
 	return useQuery({
 		queryKey,

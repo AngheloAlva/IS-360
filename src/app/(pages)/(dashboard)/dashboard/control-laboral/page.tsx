@@ -1,3 +1,4 @@
+import { AlertCircleIcon } from "lucide-react"
 import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
@@ -28,6 +29,18 @@ export default async function LaborControlFoldersPage() {
 				className="from-blue-600 to-sky-500"
 				description="Gestion y seguimiento de todas las carpetas de control laboral de la empresa"
 			/>
+
+			<Alert variant="default">
+				<AlertCircleIcon />
+				<AlertTitle>Información</AlertTitle>
+				<AlertDescription>
+					<span>
+						Se comenzaran a crear las carpetas de control laboral automáticamente el{" "}
+						<strong> primer día de cada mes</strong>, debera agregarse documentación correspondiente
+						y enviarla para su revisión.
+					</span>
+				</AlertDescription>
+			</Alert>
 
 			<LaborControlFoldersTable companyId={session.user.companyId} />
 		</div>

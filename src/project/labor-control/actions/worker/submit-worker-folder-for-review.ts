@@ -2,10 +2,11 @@
 
 import { z } from "zod"
 
-// import { sendNotification } from "@/shared/actions/notifications/send-notification"
-// import { sendRequestReviewEmail } from "../emails/send-request-review-email"
-import prisma from "@/lib/prisma"
+import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { LABOR_CONTROL_STATUS } from "@prisma/client"
+import { systemUrl } from "@/lib/consts/systemUrl"
+import { generateSlug } from "@/lib/generateSlug"
+import prisma from "@/lib/prisma"
 
 export const submitWorkerFolderForReview = async ({
 	userId,
@@ -74,6 +75,7 @@ export const submitWorkerFolderForReview = async ({
 				id: folderId,
 			},
 			data: {
+				emails: [user.email],
 				status: LABOR_CONTROL_STATUS.SUBMITTED,
 			},
 		})
@@ -106,6 +108,22 @@ export const submitWorkerFolderForReview = async ({
 				})
 			})
 		)
+
+		const companySlug = generateSlug(folder.LaborControlFolder?.company.name || "")
+		const companyId = folder.LaborControlFolder?.company.id || ""
+
+		await sendRequestReviewEmail({
+			reviewUrl: `${systemUrl}/admin/dashboard/control-laboral/${companySlug}_${companyId}`,
+			folderName: `Carpeta trabajador: ${folder.worker.name}`,
+			companyName: folder.LaborControlFolder?.company.name || "",
+			solicitationDate: new Date(),
+			solicitator: {
+				rut: user.rut,
+				name: user.name,
+				email: user.email,
+				phone: user.phone,
+			},
+		})
 
 		return {
 			ok: true,

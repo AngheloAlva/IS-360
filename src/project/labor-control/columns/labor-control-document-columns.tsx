@@ -32,6 +32,7 @@ interface GetDocumentColumnsProps {
 		>
 	>
 	folderId: string
+	companyId: string
 	isOtcMember: boolean
 	folderStatus: LABOR_CONTROL_STATUS | undefined
 	setSelectedDocumentType: Dispatch<
@@ -48,6 +49,7 @@ export const getLaborControlDocumentColumns = ({
 	userId,
 	refetch,
 	folderId,
+	companyId,
 	isOtcMember,
 	folderStatus,
 	setShowUploadDialog,
@@ -246,6 +248,7 @@ export const getLaborControlDocumentColumns = ({
 							userId={userId}
 							refetch={refetch}
 							folderId={folderId}
+							companyId={companyId}
 						/>
 					)}
 				</div>

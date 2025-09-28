@@ -3,6 +3,7 @@
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { InfoIcon, UploadIcon, FileTextIcon } from "lucide-react"
 import { useState } from "react"
+import { toast } from "sonner"
 
 import { useCompanyAcreditacionFolderDocuments } from "../../hooks/use-labor-control-folder-documents"
 import { getLaborControlDocumentColumns } from "../../columns/labor-control-document-columns"
@@ -10,6 +11,9 @@ import { LABOR_CONTROL_STRUCTURE } from "@/lib/consts/labor-control-folders-stru
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import { SubmitReviewRequestDialog } from "../dialogs/SubmitReviewRequestDialog"
+import { UndoDocumentReviewDialog } from "../dialogs/UndoDocumentReviewDialog"
+import { queryClient } from "@/lib/queryClient"
 import { LaborControlFolderStatusBadge } from "./LaborControlFolderStatusBadge"
 import { UploadDocumentsDialog } from "../forms/UploadDocumentsDialog"
 import { Progress } from "@/shared/components/ui/progress"
@@ -58,6 +62,7 @@ export default function CompanyAccreditationFolderDocuments({
 			userId,
 			refetch,
 			folderId,
+			companyId,
 			isOtcMember,
 			setShowUploadDialog,
 			setSelectedDocument,
@@ -76,55 +81,37 @@ export default function CompanyAccreditationFolderDocuments({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
+	const documentsApproved = documentsData.filter((d) => d.status === "APPROVED")
+
 	const progress =
 		data && documentsData.length > 0
-			? (documentsData.length / LABOR_CONTROL_STRUCTURE.length) * 100
+			? (documentsApproved.length / LABOR_CONTROL_STRUCTURE.length) * 100
 			: 0
 
 	return (
-		<Card className="gap-2">
+		<Card className="gap-4">
 			<CardHeader className="flex flex-row items-start justify-between">
-				<CardTitle className="text-xl font-semibold">Documentos de Acreditacion Empresa</CardTitle>
+				<CardTitle className="text-xl font-semibold">
+					Documentos de Acreditacion Empresa{" "}
+					<LaborControlFolderStatusBadge status={data?.folderStatus || "DRAFT"} />
+				</CardTitle>
 
 				<div className="flex items-center gap-2">
-					{/* {isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
-						<>
-							<UndoDocumentReviewDialog
-								userId={userId}
-								documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
-									id: row.original.id,
-									name: row.original.name,
-								}))}
-								onSuccess={async () => {
-									queryClient.invalidateQueries({
-										queryKey: [
-											"startupFolderDocuments",
-											{ startupFolderId, category, workerId: null, vehicleId: null },
-										],
-									})
-									await refetch()
-								}}
-							/>
-
-							<UpdateDocumentStatusDialog
-								startupFolderId={startupFolderId}
-								category={category}
-								documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
-									id: row.original.id,
-									name: row.original.name,
-								}))}
-								onSuccess={async () => {
-									queryClient.invalidateQueries({
-										queryKey: [
-											"startupFolderDocuments",
-											{ startupFolderId, category, workerId: null, vehicleId: null },
-										],
-									})
-									await refetch()
-								}}
-							/>
-						</>
-					)} */}
+					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+						<UndoDocumentReviewDialog
+							userId={userId}
+							documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
+								id: row.original.id,
+								name: row.original.name,
+							}))}
+							onSuccess={async () => {
+								queryClient.invalidateQueries({
+									queryKey: ["companyAccreditationFolderDocuments", { folderId, companyId }],
+								})
+								await refetch()
+							}}
+						/>
+					)}
 
 					<Progress
 						value={progress}
@@ -133,41 +120,19 @@ export default function CompanyAccreditationFolderDocuments({
 					/>
 					<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
-					{/* {isOtcMember && data?.folderStatus && (
-						<ChangeSubfolderStatusDialog
-							startupFolderId={startupFolderId}
-							subfolderType={getSubfolderType(category)}
-							currentStatus={data.folderStatus}
-							onSuccess={async () => {
-								queryClient.invalidateQueries({
-									queryKey: [
-										"startupFolderDocuments",
-										{ startupFolderId, category, workerId: null, vehicleId: null },
-									],
-								})
-								await refetch()
-								toast.success("Estado actualizado exitosamente")
-							}}
-						/>
-					)} */}
-
-					{/* {!isOtcMember && folderStatus === "DRAFT" && (
+					{!isOtcMember && data?.folderStatus === "DRAFT" && (
 						<SubmitReviewRequestDialog
 							userId={userId}
-							companyId={companyId}
-							folderId={startupFolderId}
+							folderId={folderId}
 							onSuccess={async () => {
 								queryClient.invalidateQueries({
-									queryKey: [
-										"startupFolderDocuments",
-										{ startupFolderId, category, workerId: null, vehicleId: null },
-									],
+									queryKey: ["companyAccreditationFolderDocuments", { folderId, companyId }],
 								})
 								await refetch()
 								toast.success("Documentos enviados a revisión exitosamente")
 							}}
 						/>
-					)} */}
+					)}
 				</div>
 			</CardHeader>
 
@@ -277,6 +242,10 @@ export default function CompanyAccreditationFolderDocuments({
 						setSelectedDocument(null)
 					}}
 					onUploadComplete={() => {
+						queryClient.invalidateQueries({
+							queryKey: ["companyAccreditationFolderDocuments", { folderId, companyId }],
+						})
+
 						setShowUploadDialog(false)
 						setSelectedDocument(null)
 					}}

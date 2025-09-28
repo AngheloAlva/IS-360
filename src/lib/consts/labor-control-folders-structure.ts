@@ -62,3 +62,18 @@ export const WORKER_LABOR_CONTROL_STRUCTURE: WorkerLaborControlFolderStructure[]
 		description: "",
 	},
 ]
+
+export const LABOR_CONTROL_DOCUMENT_TYPE_LABELS = {
+	F30: "F30",
+	F30_1: "F30_1",
+	SINIESTRALITY: "Siniestralidad",
+	TRG_TREASURY_CERTIFICATE: "TRG - Certificado Tesorería",
+}
+
+export const WORKER_LABOR_CONTROL_DOCUMENT_TYPE_LABELS = {
+	ATTENDANCE_BOOK: "Libro de asistencia",
+	MEDICAL_LEAVE: "Licencia médica",
+	PAYROLL_STTLEMENT: "Liquidación de sueldo",
+	STTLEMENT: "Finiquito",
+	NOTICE_OF_TERMINATION: "Aviso de termino de contrato",
+}

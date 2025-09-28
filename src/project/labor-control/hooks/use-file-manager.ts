@@ -26,7 +26,7 @@ export function useFileManager(
 	} | null,
 	onFilesChange?: (files: ManagedFile | null) => void
 ): FileManager {
-	const [file, setFiles] = useState<ManagedFile | null>(initialFile)
+	const [file, setFile] = useState<ManagedFile | null>(initialFile)
 
 	const addFiles = (newFile: File | null) => {
 		if (!newFile) return
@@ -39,12 +39,12 @@ export function useFileManager(
 		}
 		managedFile.expirationDate = managedFile.expirationDate || addYears(new Date(), 1)
 
-		setFiles(managedFile)
+		setFile(managedFile)
 		onFilesChange?.(managedFile)
 	}
 
 	const removeFile = () => {
-		setFiles(null)
+		setFile(null)
 		onFilesChange?.(null)
 	}
 

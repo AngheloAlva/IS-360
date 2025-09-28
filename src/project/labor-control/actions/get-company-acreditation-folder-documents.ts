@@ -14,13 +14,12 @@ export async function getCompanyAcreditacionFolderDocuments({
 	folderStatus: LABOR_CONTROL_STATUS
 }> {
 	try {
-		console.log(folderId)
 		const folder = await prisma.laborControlFolder.findUnique({
 			where: {
 				id: folderId,
 			},
 			select: {
-				status: true,
+				companyFolderStatus: true,
 			},
 		})
 
@@ -67,7 +66,7 @@ export async function getCompanyAcreditacionFolderDocuments({
 		})
 		return {
 			documents,
-			folderStatus: folder?.status,
+			folderStatus: folder?.companyFolderStatus,
 		}
 	} catch (error) {
 		console.error("Error fetching startup folder documents:", error)

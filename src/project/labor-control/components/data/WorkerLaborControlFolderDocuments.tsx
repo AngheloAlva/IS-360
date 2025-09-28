@@ -29,6 +29,7 @@ import {
 
 import type { WORKER_LABOR_CONTROL_DOCUMENT_TYPE } from "@prisma/client"
 import type { WorkerLaborControlDocument } from "../../types"
+import { LaborControlFolderStatusBadge } from "./LaborControlFolderStatusBadge"
 
 interface WorkerLaborControlFolderDocumentsProps {
 	userId: string
@@ -80,13 +81,18 @@ export function WorkerLaborControlFolderDocuments({
 		(doc) => !documentsData.some((d) => d.type === doc.type)
 	)
 
+	const documentsApproved = documentsData.filter((d) => d.status === "APPROVED")
+
 	const progress =
-		data && documentsData.length > 0 ? (data.approvedDocuments / documents.length) * 100 : 0
+		data && documentsData.length > 0 ? (documentsApproved.length / documents.length) * 100 : 0
 
 	return (
-		<Card className="gap-2">
+		<Card className="gap-4">
 			<CardHeader className="flex flex-row items-center justify-between">
-				<CardTitle className="text-xl font-semibold">Documentos del colaborador</CardTitle>
+				<CardTitle className="text-xl font-semibold">
+					Documentos del colaborador{" "}
+					<LaborControlFolderStatusBadge status={data?.folderStatus || "DRAFT"} />
+				</CardTitle>
 
 				<div className="flex items-center gap-2">
 					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (

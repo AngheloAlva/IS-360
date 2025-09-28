@@ -36,7 +36,7 @@ export default async function WorkerLaborControlFolderPage({
 			<WorkerLaborControlFolderDocuments
 				workerName={workerName}
 				userId={session.user.id}
-				folderId={workerFolderId}
+				folderId={workerFolderId.split("_")[1]}
 				isOtcMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>

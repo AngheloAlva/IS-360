@@ -56,6 +56,7 @@ export function SubmitReviewRequestDialog({
 			}
 
 			if (result.ok) {
+				setOpen(false)
 				onSuccess()
 			} else {
 				toast.error(result.message || "Error al enviar la solicitud.")

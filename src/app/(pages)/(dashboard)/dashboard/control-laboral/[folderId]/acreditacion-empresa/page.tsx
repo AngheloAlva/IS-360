@@ -3,8 +3,8 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
-import MemoizedModuleHeader from "@/shared/components/ModuleHeader"
 import LaborControlFolderDocuments from "@/project/labor-control/components/data/CompanyAccreditationFolderDocuments"
+import MemoizedModuleHeader from "@/shared/components/ModuleHeader"
 
 export default async function StartupFolderReviewPage({
 	params,

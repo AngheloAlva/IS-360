@@ -9,9 +9,10 @@ import { z } from "zod"
 
 import { type UploadDocumentsFormData, uploadDocumentsSchema } from "../../schemas/document.schema"
 import { updateStartupFolderDocument } from "../../actions/update-labor-control-document"
+import { createLaborControlDocument } from "../../actions/create-labor-control-document"
+import { createWorkerDocument } from "../../actions/worker/create-worker-document"
 import { ManagedFile, useFileManager } from "../../hooks/use-file-manager"
 import { uploadFilesToCloud } from "@/lib/upload-files"
-import { queryClient } from "@/lib/queryClient"
 import { cn } from "@/lib/utils"
 
 import { Button } from "@/shared/components/ui/button"
@@ -39,9 +40,6 @@ import type {
 	LABOR_CONTROL_DOCUMENT_TYPE,
 	WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
 } from "@prisma/client"
-import { createWorkerDocument } from "../../actions/worker/create-worker-document"
-import { LABOR_CONTROL_STRUCTURE } from "@/lib/consts/labor-control-folders-structure"
-import { createLaborControlDocument } from "../../actions/create-labor-control-document"
 
 interface UploadDocumentsDialogProps {
 	userId: string
@@ -50,7 +48,7 @@ interface UploadDocumentsDialogProps {
 	onUploadComplete: () => void
 	folderId: string
 	workerId?: string
-	documentType?: {
+	documentType: {
 		type: LABOR_CONTROL_DOCUMENT_TYPE | WORKER_LABOR_CONTROL_DOCUMENT_TYPE
 		name: string
 	} | null
@@ -163,7 +161,7 @@ export function UploadDocumentsDialog({
 				}
 
 				if (workerId) {
-					const {} = await createWorkerDocument({
+					const { ok, message } = await createWorkerDocument({
 						userId,
 						workerId,
 						folderId,
@@ -171,23 +169,31 @@ export function UploadDocumentsDialog({
 						documentType: docType,
 						url: uploadResult.url,
 					})
+
+					if (!ok) {
+						toast.error(message)
+						return
+					}
 				} else {
-					await createLaborControlDocument({
+					const { ok, message } = await createLaborControlDocument({
 						userId,
 						folderId,
 						url: uploadResult.url,
 						documentType: docType,
 						documentName: docName,
 					})
+					console.log({ ok, message })
+
+					if (!ok) {
+						toast.error(message)
+						return
+					}
 				}
 			}
 
 			toast.success(
 				documentToUpdate ? "Documento actualizado exitosamente" : "Documentos subidos exitosamente"
 			)
-			queryClient.invalidateQueries({
-				queryKey: ["laborControlFolderDocuments", { folderId }],
-			})
 
 			onClose()
 			onUploadComplete?.()
@@ -228,7 +234,13 @@ export function UploadDocumentsDialog({
 					<DialogTitle>Subir documento</DialogTitle>
 					<DialogDescription>
 						Sube el documento {documentType?.name} para la carpeta{" "}
-						<span className="font-semibold">{folderId}</span>.
+						{!workerId ? (
+							<span className="font-semibold">Acreditación Empresa</span>
+						) : (
+							<span className="font-semibold capitalize">
+								{folderId.split("_")[0].replaceAll("-", " ")}
+							</span>
+						)}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -239,7 +251,7 @@ export function UploadDocumentsDialog({
 								"border-muted-foreground/25 hover:bg-accent flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center transition-colors",
 								{
 									"border-primary bg-primary/5": dragActive,
-									"cursor-not-allowed opacity-50 hover:bg-transparent": false,
+									"cursor-not-allowed opacity-50 hover:bg-transparent": file !== null,
 								}
 							)}
 							onDragEnter={handleDragEnter}
@@ -252,14 +264,14 @@ export function UploadDocumentsDialog({
 								id="file-upload"
 								multiple={false}
 								className="hidden"
+								disabled={file !== null}
 								onChange={(e) => addFiles(e.target.files?.[0] || null)}
-								disabled={false}
 							/>
 
 							<label
 								htmlFor="file-upload"
 								className={cn("flex cursor-pointer flex-col items-center gap-2", {
-									"cursor-not-allowed": false,
+									"cursor-not-allowed": file !== null,
 								})}
 							>
 								<UploadIcon className="text-muted-foreground h-8 w-8" />
@@ -284,8 +296,6 @@ export function UploadDocumentsDialog({
 									<TableRow>
 										<TableHead>Nombre del archivo</TableHead>
 										<TableHead>Tamaño</TableHead>
-										<TableHead>Tipo</TableHead>
-										<TableHead>Vencimiento</TableHead>
 										<TableHead>Acciones</TableHead>
 									</TableRow>
 								</TableHeader>
@@ -294,9 +304,6 @@ export function UploadDocumentsDialog({
 										<TableRow key={file.file?.name}>
 											<TableCell>{file.documentName || file.file?.name}</TableCell>
 											<TableCell>{Math.round((file.file?.size || 0) / 1024)} KB</TableCell>
-											<TableCell>
-												{LABOR_CONTROL_STRUCTURE.find((dt) => dt.type === file.documentType)?.name}
-											</TableCell>
 											<TableCell>
 												<Button
 													size="icon"
@@ -323,7 +330,7 @@ export function UploadDocumentsDialog({
 								className="bg-cyan-600 hover:bg-cyan-700 hover:text-white"
 								disabled={(file === null && !documentToUpdate) || isSubmitting}
 							>
-								{isSubmitting ? <Spinner /> : documentToUpdate ? "Actualizar" : "Subir"}
+								{isSubmitting ? <Spinner /> : documentToUpdate ? "Actualizar" : "Subir Archivo"}
 							</Button>
 						</div>
 					</form>

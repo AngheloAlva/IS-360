@@ -214,7 +214,7 @@ export const getWorkerLaborControlDocumentColumns = ({
 							<Button
 								size={"icon"}
 								variant="ghost"
-								className="text-cyan-600"
+								className="text-blue-500"
 								onClick={() => {
 									setSelectedDocumentType({ type: doc.type, name: doc.name })
 									setSelectedDocument(doc)
@@ -230,6 +230,7 @@ export const getWorkerLaborControlDocumentColumns = ({
 							document={doc}
 							userId={userId}
 							refetch={refetch}
+							workerId={workerId}
 							folderId={doc.folderId}
 						/>
 					)}
