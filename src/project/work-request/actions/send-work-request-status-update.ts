@@ -48,7 +48,7 @@ export async function sendWorkRequestStatusUpdateEmail({
 				requestNumber,
 				status: statusText[status],
 				description,
-				baseUrl: "https://otc360.ingsimple.cl",
+				baseUrl: "https://otc360.cl",
 			}),
 		})
 

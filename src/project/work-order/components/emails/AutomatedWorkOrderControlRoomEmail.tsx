@@ -47,7 +47,10 @@ interface AutomatedWorkOrderControlRoomEmailProps {
 	}
 }
 
-const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: AutomatedWorkOrderControlRoomEmailProps) => {
+const AutomatedWorkOrderControlRoomEmail = ({
+	workOrder,
+	maintenanceTask,
+}: AutomatedWorkOrderControlRoomEmailProps) => {
 	const getPriorityColor = (priority: string) => {
 		switch (priority?.toLowerCase()) {
 			case "alta":
@@ -70,7 +73,7 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.ingsimple.cl/logo.png"
+								src="https://otc360.cl/logo.png"
 								alt="OTC 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
@@ -83,8 +86,9 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								<strong>Sala de Control</strong>, se ha generado automáticamente una nueva Orden de Trabajo 
-								desde el sistema de mantenimiento preventivo. Esta notificación es para su conocimiento y seguimiento operacional.
+								<strong>Sala de Control</strong>, se ha generado automáticamente una nueva Orden de
+								Trabajo desde el sistema de mantenimiento preventivo. Esta notificación es para su
+								conocimiento y seguimiento operacional.
 							</Text>
 
 							{/* Automation Info */}
@@ -92,13 +96,13 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 								<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
 									🤖 Origen: Mantenimiento Automático
 								</Heading>
-								
+
 								<Row className="mb-[12px]">
 									<Column className="w-[50%]">
 										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
 											Tarea de Mantenimiento:
 										</Text>
-										<Text className="mb-[12px] text-[16px] leading-none text-indigo-600 font-semibold">
+										<Text className="mb-[12px] text-[16px] leading-none font-semibold text-indigo-600">
 											{maintenanceTask.name}
 										</Text>
 									</Column>
@@ -111,9 +115,10 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 										</Text>
 									</Column>
 								</Row>
-								
+
 								<Text className="text-[14px] leading-[20px] text-indigo-700">
-									⚡ Esta OT fue creada automáticamente por el sistema según la programación de mantenimiento preventivo.
+									⚡ Esta OT fue creada automáticamente por el sistema según la programación de
+									mantenimiento preventivo.
 								</Text>
 							</Section>
 
@@ -232,7 +237,7 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 											{workOrder.equipments.map((eq, index) => (
 												<Text
 													key={index}
-													className="mb-[4px] text-[14px] leading-none text-gray-600 font-medium"
+													className="mb-[4px] text-[14px] leading-none font-medium text-gray-600"
 												>
 													🔧 {eq.name}
 												</Text>
@@ -265,13 +270,16 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 									• <strong>Seguimiento:</strong> Monitorear el progreso de la OT según programación
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
-									• <strong>Coordinación:</strong> Mantener comunicación con el responsable OTC y supervisor
+									• <strong>Coordinación:</strong> Mantener comunicación con el responsable OTC y
+									supervisor
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
-									• <strong>Recursos:</strong> Verificar disponibilidad de sistemas y equipos durante la intervención
+									• <strong>Recursos:</strong> Verificar disponibilidad de sistemas y equipos
+									durante la intervención
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
-									• <strong>Seguridad:</strong> Confirmar cumplimiento de protocolos antes del inicio de trabajos
+									• <strong>Seguridad:</strong> Confirmar cumplimiento de protocolos antes del
+									inicio de trabajos
 								</Text>
 							</Section>
 
@@ -288,8 +296,9 @@ const AutomatedWorkOrderControlRoomEmail = ({ workOrder, maintenanceTask }: Auto
 							<Hr className="my-[24px] border-gray-200" />
 
 							<Text className="text-[14px] leading-[20px] text-gray-600">
-								Esta notificación automática es generada por el sistema de mantenimiento preventivo para mantener 
-								informada a Sala de Control sobre las actividades programadas. No requiere respuesta.
+								Esta notificación automática es generada por el sistema de mantenimiento preventivo
+								para mantener informada a Sala de Control sobre las actividades programadas. No
+								requiere respuesta.
 							</Text>
 						</Section>
 

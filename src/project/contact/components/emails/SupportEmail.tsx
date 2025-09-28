@@ -18,7 +18,7 @@ interface SupportEmailProps {
 	type: "support" | "contact"
 }
 
-const systemUrl = "https://otc360.ingsimple.cl"
+const systemUrl = "https://otc360.cl"
 
 export const SupportEmail: React.FC<Readonly<SupportEmailProps>> = ({
 	message,

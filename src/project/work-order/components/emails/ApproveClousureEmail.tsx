@@ -42,7 +42,7 @@ export const ApproveClousureEmail: React.FC<Readonly<ApproveClosureEmailTemplate
 					{/* Header with Logo */}
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							src="https://otc360.ingsimple.cl/logo.png"
+							src="https://otc360.cl/logo.png"
 							alt="OTC 360 Logo"
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
@@ -78,7 +78,7 @@ export const ApproveClousureEmail: React.FC<Readonly<ApproveClosureEmailTemplate
 									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
 										Número OT:
 									</Text>
-									<Text className="mb-[12px] text-[16px] leading-none text-blue-600 font-bold">
+									<Text className="mb-[12px] text-[16px] leading-none font-bold text-blue-600">
 										{workOrderNumber}
 									</Text>
 								</Column>

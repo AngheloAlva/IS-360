@@ -47,7 +47,7 @@ export const MilestoneUpdateEmail: React.FC<Readonly<MilestoneUpdateEmailTemplat
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
 							alt="OTC 360 Logo"
-							src="https://otc360.ingsimple.cl/logo.png"
+							src="https://otc360.cl/logo.png"
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>

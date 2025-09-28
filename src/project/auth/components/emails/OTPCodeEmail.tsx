@@ -17,7 +17,7 @@ interface OTPCodeEmailTemplateProps {
 	otp: string
 }
 
-const systemUrl = "https://otc360.ingsimple.cl"
+const systemUrl = "https://otc360.cl"
 
 export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ otp }) => (
 	<Html>

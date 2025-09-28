@@ -44,7 +44,7 @@ export const RequestReviewEmail = ({
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.ingsimple.cl/logo.png"
+								src="https://otc360.cl/logo.png"
 								alt="OTC 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
@@ -57,7 +57,8 @@ export const RequestReviewEmail = ({
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Se ha recibido una nueva solicitud de revisión de documentos de Control Laboral en OTC 360.
+								Se ha recibido una nueva solicitud de revisión de documentos de Control Laboral en
+								OTC 360.
 							</Text>
 
 							{/* Request Details */}
@@ -131,7 +132,7 @@ export const RequestReviewEmail = ({
 									📋 Acción Requerida
 								</Text>
 								<Text className="text-[14px] leading-[20px] text-yellow-700">
-									Esta solicitud de Control Laboral requiere revisión y aprobación. Por favor, 
+									Esta solicitud de Control Laboral requiere revisión y aprobación. Por favor,
 									revisa los documentos de acreditación de empresa y trabajadores.
 								</Text>
 							</Section>

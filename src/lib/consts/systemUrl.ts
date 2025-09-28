@@ -1,1 +1,1 @@
-export const systemUrl = "https://otc360.ingsimple.cl"
+export const systemUrl = "https://otc360.cl"

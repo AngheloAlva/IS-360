@@ -40,7 +40,7 @@ export const RejectMilestoneEmail: React.FC<Readonly<RejectMilestoneEmailProps>>
 					{/* Header with Logo */}
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							src="https://otc360.ingsimple.cl/logo.png"
+							src="https://otc360.cl/logo.png"
 							alt="OTC 360 Logo"
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>

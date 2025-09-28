@@ -229,7 +229,7 @@ const BlankWorkPermitPDF = (): React.ReactElement => {
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
 						{/* eslint-disable-next-line jsx-a11y/alt-text */}
-						<Image style={styles.logo} src="https://otc360.ingsimple.cl/logo.png" />
+						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
 						<Text style={styles.headerTitle}>PERMISO DE TRABAJO</Text>
 					</View>
 					<View>

@@ -47,7 +47,7 @@ export const CompleteFolderEmail = ({
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.ingsimple.cl/logo.png"
+								src="https://otc360.cl/logo.png"
 								alt="OTC 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
@@ -60,8 +60,8 @@ export const CompleteFolderEmail = ({
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								El Control Laboral ha sido completado exitosamente en OTC 360 y ya están
-								habilitadas las actividades laborales para el mes correspondiente.
+								El Control Laboral ha sido completado exitosamente en OTC 360 y ya están habilitadas
+								las actividades laborales para el mes correspondiente.
 							</Text>
 
 							{/* Folder Details */}
@@ -133,8 +133,8 @@ export const CompleteFolderEmail = ({
 							{/* Success Message */}
 							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
 								<Text className="text-[16px] leading-[24px] text-green-700">
-									✅ El Control Laboral ha sido completado exitosamente. Todos los documentos
-									de acreditación de empresa y trabajadores cumplen con los requisitos establecidos.
+									✅ El Control Laboral ha sido completado exitosamente. Todos los documentos de
+									acreditación de empresa y trabajadores cumplen con los requisitos establecidos.
 								</Text>
 							</Section>
 

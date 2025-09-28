@@ -257,7 +257,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 			<Page size="A4" style={styles.page}>
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
-						<Image style={styles.logo} src="https://otc360.ingsimple.cl/logo.png" />
+						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
 						<Text style={styles.headerTitle}>REPORTE DE ORDEN DE TRABAJO</Text>
 					</View>
 				</View>
@@ -512,7 +512,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 				<Page size="A4" style={styles.page}>
 					<View style={styles.header}>
 						<View style={{ flexDirection: "row", alignItems: "center" }}>
-							<Image style={styles.logo} src="https://otc360.ingsimple.cl/logo.png" />
+							<Image style={styles.logo} src="https://otc360.cl/logo.png" />
 							<Text style={styles.headerTitle}>DETALLE DE ACTIVIDADES</Text>
 						</View>
 						<View>
