@@ -3,14 +3,7 @@
 import { Dispatch, SetStateAction } from "react"
 import { getImageProps } from "next/image"
 import { format } from "date-fns"
-import {
-	PenIcon,
-	UserIcon,
-	MailIcon,
-	PhoneIcon,
-	FileTextIcon,
-	CalendarX2Icon,
-} from "lucide-react"
+import { PenIcon, UserIcon, MailIcon, PhoneIcon, FileTextIcon, CalendarX2Icon } from "lucide-react"
 
 import { ReviewStatus } from "@prisma/client"
 import { cn } from "@/lib/utils"
@@ -247,7 +240,7 @@ export const getDocumentColumns = ({
 					{doc.url && <DocumentViewButton url={doc.url} companyId={companyId} />}
 
 					{!isOtcMember &&
-						folderStatus === "DRAFT" &&
+						(folderStatus === "DRAFT" || folderStatus === "EXPIRED") &&
 						(doc.status === "DRAFT" ||
 							doc.status === "REJECTED" ||
 							doc.status === "TO_UPDATE" ||

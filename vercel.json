@@ -7,10 +7,6 @@
     {
       "path": "/api/crons/automated-work-orders",
       "schedule": "0 11 * * *"
-    },
-    {
-      "path": "/api/crons/create-labor-control-folders",
-      "schedule": "0 11 1 * *"
     }
   ]
 }
