@@ -57,6 +57,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					isSupervisor: true,
 					documentAreas: true,
 					allowedModules: true,
+					allowedCompanies: true,
 					company: {
 						select: {
 							name: true,

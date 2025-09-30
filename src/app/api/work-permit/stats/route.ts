@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { format } from "date-fns"
 
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
+import { WORK_PERMIT_STATUS } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
-import { WORK_PERMIT_STATUS } from "@prisma/client"
 
 export const dynamic = "force-dynamic"
 
@@ -18,6 +19,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const searchParams = req.nextUrl.searchParams
 		const search = searchParams.get("search") || ""
 		const statusFilter = searchParams.get("statusFilter") || null
@@ -40,11 +43,24 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 				: {}),
 			...(statusFilter ? { status: statusFilter as WORK_PERMIT_STATUS } : {}),
 			...(companyId ? { companyId: companyId } : {}),
+			...(userAllowedCompanies?.length
+				? {
+						company: {
+							id: {
+								in: userAllowedCompanies,
+							},
+						},
+					}
+				: {}),
 			...(dateFrom || dateTo
 				? {
 						createdAt: {
-							...(dateFrom ? { gte: new Date(new Date(decodeURIComponent(dateFrom)).setHours(0, 0, 0, 0)) } : {}),
-							...(dateTo ? { lte: new Date(new Date(decodeURIComponent(dateTo)).setHours(23, 59, 59, 999)) } : {}),
+							...(dateFrom
+								? { gte: new Date(new Date(decodeURIComponent(dateFrom)).setHours(0, 0, 0, 0)) }
+								: {}),
+							...(dateTo
+								? { lte: new Date(new Date(decodeURIComponent(dateTo)).setHours(23, 59, 59, 999)) }
+								: {}),
 						},
 					}
 				: {}),

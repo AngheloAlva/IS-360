@@ -6,9 +6,11 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { ModuleOptions, type ModulesValuesArray } from "@/lib/consts/modules"
 import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { updateInternalUser } from "@/project/user/actions/updateUser"
+import { useCompaniesSelect } from "@/hooks/use-companies-select"
 import { USER_ROLE, USER_ROLE_LABELS } from "@/lib/permissions"
 import { queryClient } from "@/lib/queryClient"
 import { authClient } from "@/lib/auth-client"
@@ -23,7 +25,6 @@ import {
 	type DocumentAreasValuesArray,
 	type UserAreasValuesArray,
 } from "@/lib/consts/areas"
-import { ModuleOptions, type ModulesValuesArray } from "@/lib/consts/modules"
 
 import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
 import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
@@ -52,6 +53,8 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 	const [loading, setLoading] = useState(false)
 	const [open, setOpen] = useState(false)
 
+	const { data: companies } = useCompaniesSelect()
+
 	const form = useForm<InternalUserSchema>({
 		resolver: zodResolver(internalUserSchema),
 		defaultValues: {
@@ -61,7 +64,10 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 			phone: initialData?.phone || "",
 			internalRole: initialData?.internalRole || "",
 			role: initialData?.role ? initialData.role.split(",") : [USER_ROLE.user],
-			allowedModules: (initialData?.allowedModules as (typeof ModulesValuesArray)[number][]) || ["ALL"],
+			allowedModules: (initialData?.allowedModules as (typeof ModulesValuesArray)[number][]) || [
+				"ALL",
+			],
+			allowedCompanies: initialData?.allowedCompanies || [],
 			documentAreas:
 				(initialData?.documentAreas as (typeof DocumentAreasValuesArray)[number][]) || [],
 			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
@@ -93,6 +99,7 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 						internalRole: values.internalRole,
 						documentAreas: values.documentAreas,
 						allowedModules: values.allowedModules,
+						allowedCompanies: values.allowedCompanies || [],
 					},
 				})
 
@@ -282,6 +289,16 @@ export default function InternalUser({ initialData }: InternalUserFormProps): Re
 								options={ModuleOptions}
 								placeholder="Selecciona módulos permitidos"
 								description="Módulos que el usuario podrá visualizar y acceder (solo aplica para administradores)."
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="allowedCompanies"
+								label="Empresas Permitidas"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								options={companies || []}
+								placeholder="Selecciona empresas"
+								description="Empresas que el usuario podrá visualizar (vacío = todas las empresas). Solo aplica para administradores."
 							/>
 						</div>
 

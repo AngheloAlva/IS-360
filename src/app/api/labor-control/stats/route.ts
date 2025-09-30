@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -14,10 +15,31 @@ export async function GET(): Promise<NextResponse> {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const [totalFolders, totalFoldersToReview, totalFoldersActive, totalCompaniesApproved] =
 			await Promise.all([
-				prisma.startupFolder.count({}),
 				prisma.startupFolder.count({
+					...(userAllowedCompanies?.length
+						? {
+								where: {
+									companyId: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
+				}),
+				prisma.startupFolder.count({
+					...(userAllowedCompanies?.length
+						? {
+								where: {
+									companyId: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					where: {
 						OR: [
 							{ basicFolders: { some: { status: "SUBMITTED" } } },
@@ -31,6 +53,15 @@ export async function GET(): Promise<NextResponse> {
 					},
 				}),
 				prisma.startupFolder.count({
+					...(userAllowedCompanies?.length
+						? {
+								where: {
+									companyId: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					where: {
 						company: {
 							workOrders: {
@@ -43,6 +74,15 @@ export async function GET(): Promise<NextResponse> {
 				}),
 				prisma.company.count({
 					where: {
+						...(userAllowedCompanies?.length
+							? {
+									where: {
+										id: {
+											in: userAllowedCompanies,
+										},
+									},
+								}
+							: {}),
 						StartupFolders: {
 							some: {
 								AND: [

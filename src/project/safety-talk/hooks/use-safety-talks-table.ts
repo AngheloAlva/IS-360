@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query"
 import type { ApiSafetyTalk } from "../types/api-safety-talk"
+
+import { useQuery } from "@tanstack/react-query"
 
 interface UseSafetyTalksTableParams {
 	page?: number

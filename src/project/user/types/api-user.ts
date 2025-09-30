@@ -14,6 +14,7 @@ export interface ApiUser {
 	createdAt: string
 	isSupervisor: boolean
 	allowedModules: MODULES[]
+	allowedCompanies: string[]
 	company: {
 		name: string
 	} | null

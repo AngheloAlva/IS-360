@@ -2,8 +2,9 @@ import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 import { subDays } from "date-fns"
 
-import prisma from "@/lib/prisma"
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
 import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 
 export async function GET() {
 	const session = await auth.api.getSession({
@@ -15,8 +16,17 @@ export async function GET() {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const companies = await prisma.company.findMany({
 			where: {
+				...(userAllowedCompanies?.length
+					? {
+							id: {
+								in: userAllowedCompanies,
+							},
+						}
+					: {}),
 				NOT: {
 					rut: "96.655.490-8",
 				},
@@ -123,6 +133,18 @@ export async function GET() {
 		})
 
 		const workOrdersData = await prisma.company.findMany({
+			where: {
+				workOrders: {
+					some: {},
+				},
+				...(userAllowedCompanies?.length
+					? {
+							id: {
+								in: userAllowedCompanies,
+							},
+						}
+					: {}),
+			},
 			select: {
 				id: true,
 				name: true,
@@ -130,11 +152,6 @@ export async function GET() {
 					select: {
 						status: true,
 					},
-				},
-			},
-			where: {
-				workOrders: {
-					some: {}, // Asegura que solo se devuelvan empresas con órdenes de trabajo
 				},
 			},
 		})
@@ -187,6 +204,17 @@ export async function GET() {
 			where: {
 				createdAt: {
 					gte: thirtyDaysAgo,
+				},
+				workOrder: {
+					company: {
+						...(userAllowedCompanies?.length
+							? {
+									id: {
+										in: userAllowedCompanies,
+									},
+								}
+							: {}),
+					},
 				},
 			},
 			orderBy: {

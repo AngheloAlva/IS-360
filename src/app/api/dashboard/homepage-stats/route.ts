@@ -2,6 +2,7 @@ import { subDays, addMonths, format, startOfMonth } from "date-fns"
 import { NextResponse } from "next/server"
 import { headers } from "next/headers"
 
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import {
@@ -23,12 +24,23 @@ export async function GET() {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const oneWeekAgo = subDays(new Date(), 7)
 
 		const activityLogs = await prisma.activityLog.findMany({
 			where: {
 				timestamp: {
 					gte: oneWeekAgo,
+				},
+				user: {
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 				},
 			},
 			include: {
@@ -52,19 +64,75 @@ export async function GET() {
 			maintenancePlansCount,
 			startupFoldersCount,
 		] = await Promise.all([
-			prisma.company.count(),
+			prisma.company.count({
+				where: {
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
+				},
+			}),
 
 			prisma.equipment.count(),
 
-			prisma.user.count(),
+			prisma.user.count({
+				where: {
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
+				},
+			}),
 
-			prisma.workOrder.count(),
+			prisma.workOrder.count({
+				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
+				},
+			}),
 
-			prisma.workPermit.count(),
+			prisma.workPermit.count({
+				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
+				},
+			}),
 
 			prisma.maintenancePlan.count(),
 
-			prisma.startupFolder.count(),
+			prisma.startupFolder.count({
+				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
+				},
+			}),
 		])
 
 		const [
@@ -107,18 +175,45 @@ export async function GET() {
 
 			prisma.workOrder.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					status: WORK_ORDER_STATUS.IN_PROGRESS,
 				},
 			}),
 
 			prisma.workOrder.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					priority: WORK_ORDER_PRIORITY.HIGH,
 				},
 			}),
 
 			prisma.workPermit.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					status: WORK_PERMIT_STATUS.ACTIVE,
 				},
 			}),
@@ -127,24 +222,56 @@ export async function GET() {
 
 			prisma.startupFolder.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					status: StartupFolderStatus.COMPLETED,
 				},
 			}),
 
 			prisma.startupFolder.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									id: {
+										in: userAllowedCompanies,
+									},
+								},
+							}
+						: {}),
 					status: StartupFolderStatus.IN_PROGRESS,
 				},
 			}),
 
 			prisma.company.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					isActive: true,
 				},
 			}),
 
 			prisma.company.count({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					StartupFolders: {
 						some: {
 							status: StartupFolderStatus.PENDING,
@@ -339,6 +466,17 @@ export async function GET() {
 		]
 
 		const workOrdersByStatus = await prisma.workOrder.groupBy({
+			where: {
+				...(userAllowedCompanies?.length
+					? {
+							company: {
+								id: {
+									in: userAllowedCompanies,
+								},
+							},
+						}
+					: {}),
+			},
 			by: ["status"],
 			_count: {
 				id: true,

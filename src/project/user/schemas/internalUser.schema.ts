@@ -10,7 +10,10 @@ export const internalUserSchema = z.object({
 	phone: z.string().optional(),
 	rut: z.string().regex(rutRegex, { message: "El RUT no es válido" }),
 	role: z.array(z.string()).min(1, { message: "Debe seleccionar al menos un rol" }),
-	allowedModules: z.array(z.enum(ModulesValuesArray)).min(1, { message: "Debe seleccionar al menos un módulo" }),
+	allowedModules: z
+		.array(z.enum(ModulesValuesArray))
+		.min(1, { message: "Debe seleccionar al menos un módulo" }),
+	allowedCompanies: z.array(z.string()).optional(),
 	internalRole: z.string().optional(),
 	area: z.enum(UserAreasValuesArray).optional().nullable(),
 	documentAreas: z.array(z.enum(DocumentAreasValuesArray)).optional(),

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -16,12 +17,15 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const searchParams = req.nextUrl.searchParams
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
 		const search = searchParams.get("search") || ""
-		const order = searchParams.get("order") as Order
-		const orderBy = searchParams.get("orderBy") as OrderBy
+		const order = searchParams.get("order") || ("asc" as Order)
+		const orderBy = searchParams.get("orderBy") || ("name" as OrderBy)
+		const showAll = searchParams.get("showAll") === "true"
 
 		const skip = (page - 1) * limit
 
@@ -29,6 +33,13 @@ export async function GET(req: NextRequest) {
 			prisma.company.findMany({
 				where: {
 					isActive: true,
+					...(!showAll && userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					...(search
 						? {
 								OR: [
@@ -77,6 +88,13 @@ export async function GET(req: NextRequest) {
 			prisma.company.count({
 				where: {
 					isActive: true,
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					...(search
 						? {
 								OR: [

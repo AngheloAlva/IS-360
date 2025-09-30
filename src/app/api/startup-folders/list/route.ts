@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { WORK_ORDER_STATUS } from "@prisma/client"
 import { headers } from "next/headers"
+
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
+import { WORK_ORDER_STATUS } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -16,6 +18,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const searchParams = req.nextUrl.searchParams
 		const otStatus = searchParams.get("otStatus")
 		const search = searchParams.get("search") || ""
@@ -27,6 +31,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const companiesWithStartupFolders = await prisma.company.findMany({
 			where: {
 				isActive: true,
+				...(userAllowedCompanies?.length
+					? {
+							id: {
+								in: userAllowedCompanies,
+							},
+						}
+					: {}),
 				...(search
 					? {
 							OR: [

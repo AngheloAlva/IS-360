@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
@@ -14,6 +15,8 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json({ error: "No autorizado" }, { status: 401 })
 		}
 
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const searchParams = req.nextUrl.searchParams
 		const page = parseInt(searchParams.get("page") || "1")
 		const limit = parseInt(searchParams.get("limit") || "10")
@@ -24,6 +27,13 @@ export async function GET(req: NextRequest) {
 		const [safetyTalks, total] = await Promise.all([
 			prisma.userSafetyTalk.findMany({
 				where: {
+					...(userAllowedCompanies?.length
+						? {
+								company: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					...(search
 						? {
 								OR: [

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
 import { ACCESS_ROLE } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
@@ -23,6 +24,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	}
 
 	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const searchParams = req.nextUrl.searchParams
 		const search = searchParams.get("search") || ""
 		const order = searchParams.get("order") as Order
@@ -40,6 +43,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					laborControlFolders: {
 						some: {},
 					},
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					...(search
 						? {
 								OR: [
@@ -103,6 +113,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 					laborControlFolders: {
 						some: {},
 					},
+					...(userAllowedCompanies?.length
+						? {
+								id: {
+									in: userAllowedCompanies,
+								},
+							}
+						: {}),
 					...(search
 						? {
 								OR: [

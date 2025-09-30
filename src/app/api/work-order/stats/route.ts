@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { headers } from "next/headers"
 
-// Importar también WORK_ORDER_PRIORITY
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
 import {
 	MILESTONE_STATUS,
 	WORK_ORDER_STATUS,
 	WORK_ORDER_TYPE,
 	WORK_ORDER_PRIORITY,
 } from "@prisma/client"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth.api.getSession({
@@ -21,7 +21,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	}
 
 	try {
-		// Obtener parámetros de filtro
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
 		const searchParams = req.nextUrl.searchParams
 		const search = searchParams.get("search") || ""
 		const typeFilter = searchParams.get("typeFilter") || null
@@ -55,6 +56,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			...(isValidPriority ? { priority: priorityFilter as WORK_ORDER_PRIORITY } : {}),
 			...(isValidType ? { type: typeFilter as WORK_ORDER_TYPE } : {}),
 			...(companyId ? { companyId: companyId } : {}),
+			...(userAllowedCompanies?.length
+				? {
+						company: {
+							id: {
+								in: userAllowedCompanies,
+							},
+						},
+					}
+				: {}),
 			...(startDate || endDate
 				? {
 						solicitationDate: {

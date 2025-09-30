@@ -67,6 +67,7 @@ model User {
   role             String
   accessRole       ACCESS_ROLE @default(PARTNER_COMPANY)
   allowedModules   MODULES[]   @default([ALL])
+  allowedCompanies String[]    @default([])
   internalRole     String?
   area             AREAS?
   banned           Boolean?
