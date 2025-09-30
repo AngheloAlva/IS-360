@@ -19,8 +19,8 @@ export default async function WorkBooksPage() {
 	return (
 		<main className="flex h-full w-full flex-1 flex-col gap-8 transition-all">
 			<ModuleHeader
-				className="from-orange-600 to-red-700"
 				title="Libro de Obras"
+				className="from-orange-600 to-red-700"
 				description="Gestión de libros de obras de tu empresa"
 			>
 				<>

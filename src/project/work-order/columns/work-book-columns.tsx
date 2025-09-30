@@ -24,7 +24,7 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 			return (
 				<Link
 					href={`/dashboard/libro-de-obras/${id}`}
-					className="text-primary hover:text-feature font-medium hover:underline"
+					className="hover:text-feature font-medium text-orange-500 hover:underline"
 				>
 					{otNumber}
 				</Link>

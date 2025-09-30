@@ -86,7 +86,13 @@ export function WorkPermitsTableByCompany({
 		state: {
 			sorting,
 			columnFilters,
+			pagination: {
+				pageIndex: page - 1,
+				pageSize: 2,
+			},
 		},
+		manualPagination: true,
+		pageCount: data?.pages ?? 0,
 	})
 
 	return (

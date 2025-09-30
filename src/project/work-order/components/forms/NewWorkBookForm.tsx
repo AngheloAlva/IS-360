@@ -137,7 +137,7 @@ export default function NewWorkBookForm({
 		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger
 				className={cn(
-					"flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 text-sm font-semibold tracking-wide text-blue-600 transition-all hover:scale-105",
+					"flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 py-1 text-sm font-semibold tracking-wide text-orange-600 transition-all hover:scale-105",
 					className
 				)}
 				onClick={() => setOpen(true)}

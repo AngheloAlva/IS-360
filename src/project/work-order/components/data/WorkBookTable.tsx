@@ -61,7 +61,13 @@ export function WorkBookTable({ companyId }: { companyId: string }) {
 		state: {
 			sorting,
 			columnFilters,
+			pagination: {
+				pageIndex: page - 1,
+				pageSize: 2,
+			},
 		},
+		manualPagination: true,
+		pageCount: data?.pages ?? 0,
 	})
 
 	const router = useRouter()
@@ -169,6 +175,7 @@ export function WorkBookTable({ companyId }: { companyId: string }) {
 					table={table}
 					isLoading={isLoading}
 					onPageChange={setPage}
+					total={data?.total ?? 0}
 					pageCount={data?.pages ?? 0}
 					className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
 				/>
