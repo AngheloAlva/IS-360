@@ -177,7 +177,7 @@ export function WorkerFolderDocuments({
 						/>
 					)}
 
-					{!isOtcMember && data?.folderStatus === "DRAFT" && (
+					{!isOtcMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							workerId={workerId}

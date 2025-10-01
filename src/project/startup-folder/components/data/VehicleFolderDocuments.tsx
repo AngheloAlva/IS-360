@@ -180,7 +180,7 @@ export function VehicleFolderDocuments({
 						/>
 					)}
 
-					{!isOtcMember && data?.folderStatus === "DRAFT" && (
+					{!isOtcMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							vehicleId={vehicleId}
