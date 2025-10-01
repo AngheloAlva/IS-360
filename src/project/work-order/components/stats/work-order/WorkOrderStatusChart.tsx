@@ -121,8 +121,9 @@ export function WorkOrderTypeChart({ data, total }: WorkOrderStatusChartProps) {
 								}}
 							/>
 						</Pie>
+
 						<ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-						<ChartLegend content={<ChartLegendContent nameKey="status" />} />
+						<ChartLegend content={<ChartLegendContent nameKey="name" />} />
 					</PieChart>
 				</ChartContainer>
 			</CardContent>
