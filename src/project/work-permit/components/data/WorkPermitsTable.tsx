@@ -115,6 +115,10 @@ export default function WorkPermitsTable({ hasPermission, userId, id }: WorkPerm
 						? format(new Date(workPermit.approvalDate), "dd/MM/yyyy", { locale: es })
 						: "N/A",
 					"Aprobado por": workPermit.approvalBy?.name || "N/A",
+					"Fecha de Cierre": workPermit.closingDate
+						? format(new Date(workPermit.closingDate), "dd/MM/yyyy", { locale: es })
+						: "N/A",
+					"Cerrado por": workPermit.closingBy?.name || (workPermit.status === "COMPLETED" ? "Sistema (Cierre Automático)" : "N/A"),
 					"Observaciones": workPermit.observations || "N/A",
 				}))
 			)

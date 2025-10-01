@@ -260,7 +260,13 @@ export default function WorkPermitDetailsDialog({
 										<UserIcon className="h-4 w-4" />
 										Cerrado por
 									</p>
-									<p className="font-medium">{workPermit.closingBy?.name || "-"}</p>
+									<p className="font-medium">
+										{workPermit.closingBy?.name || (
+											<span className="font-semibold text-orange-600">
+												Sistema (Cierre Automático)
+											</span>
+										)}
+									</p>
 								</div>
 
 								<div>
