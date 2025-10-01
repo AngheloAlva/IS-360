@@ -140,8 +140,8 @@ export function SafetyTalkList({ userSafetyTalks }: SafetyTalkListProps) {
 						<CardTitle>Charla de Visitas</CardTitle>
 					</div>
 					<CardDescription>
-						Recorrido virtual por la planta OTC con información de seguridad. Puedes realizarla en
-						cualquier momento las veces que desees.
+						Recorrido virtual por la planta IS 360 con información de seguridad. Puedes realizarla
+						en cualquier momento las veces que desees.
 					</CardDescription>
 				</CardHeader>
 

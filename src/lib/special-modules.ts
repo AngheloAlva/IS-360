@@ -38,7 +38,7 @@ export function addSpecialModuleToUser(
 }
 
 /**
- * Script de ejemplo para asignar REPORTABILITY_OTC a usuarios específicos
+ * Script de ejemplo para asignar REPORTABILITY_IS 360 a usuarios específicos
  *
  * Uso en BD:
  *
@@ -54,7 +54,7 @@ export function addSpecialModuleToUser(
  */
 export const MANUAL_ASSIGNMENT_EXAMPLES = {
 	REPORTABILITY_OTC: `
--- Asignar acceso a Reportabilidad OTC
+-- Asignar acceso a Reportabilidad IS 360
 UPDATE "User" 
 SET "allowedModules" = array_append("allowedModules", 'REPORTABILITY_OTC'::text)
 WHERE "email" IN ('gerente@otc.cl', 'director@otc.cl');

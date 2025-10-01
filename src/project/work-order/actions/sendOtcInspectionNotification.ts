@@ -64,7 +64,7 @@ export const sendOtcInspectionNotification = async ({
 
 		const inspectionData = {
 			id: inspection.id,
-			activityName: inspection.activityName || "Inspección OTC",
+			activityName: inspection.activityName || "Inspección IS 360",
 			executionDate: inspection.executionDate,
 			activityStartTime: inspection.activityStartTime || "",
 			activityEndTime: inspection.activityEndTime || "",
@@ -140,8 +140,8 @@ export const sendOtcInspectionNotification = async ({
 		// Send emails to all recipients
 		const emailPromises = recipients.map(async (recipient, i) => {
 			const subject = hasSafetyIssues
-				? `🚨 URGENTE: Inspección OTC con No Conformidades - ${workOrderData.otNumber}`
-				: `📋 Nueva Inspección OTC Realizada - OT ${workOrderData.otNumber}`
+				? `🚨 URGENTE: Inspección IS 360 con No Conformidades - ${workOrderData.otNumber}`
+				: `📋 Nueva Inspección IS 360 Realizada - OT ${workOrderData.otNumber}`
 
 			const url = recipient.isInternal
 				? `${systemUrl}/admin/dashboard/ordenes-de-trabajo/${workOrderData.id}`

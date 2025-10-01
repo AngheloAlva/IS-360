@@ -102,8 +102,8 @@ const OtcInspectionNotificationEmail = ({
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.cl/logo.png"
-								alt="OTC 360 Logo"
+								src="https://is360.ingsimple.cl/logo.jpg"
+								alt="IS 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -111,12 +111,12 @@ const OtcInspectionNotificationEmail = ({
 						{/* Main Content */}
 						<Section className="px-[40px] py-[32px]">
 							<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
-								Nueva Inspección OTC Realizada
+								Nueva Inspección IS 360 Realizada
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Estimado/a {recipient.name}, se ha realizado una nueva inspección OTC en el sistema.
-								Le notificamos {getRoleContext()}.
+								Estimado/a {recipient.name}, se ha realizado una nueva inspección IS 360 en el
+								sistema. Le notificamos {getRoleContext()}.
 							</Text>
 
 							{/* Severity Alert */}
@@ -339,7 +339,7 @@ const OtcInspectionNotificationEmail = ({
 									href={url}
 									className="box-border rounded-[8px] bg-orange-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-orange-600"
 								>
-									Ver Inspección en OTC 360
+									Ver Inspección en IS 360
 								</Button>
 							</Section>
 
@@ -355,7 +355,7 @@ const OtcInspectionNotificationEmail = ({
 						{/* Footer */}
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360 - Sistema de Gestión de Inspecciones
+								© {new Date().getFullYear()} IS 360 - Sistema de Gestión de Inspecciones
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Notificación Automática del Sistema - No Responder

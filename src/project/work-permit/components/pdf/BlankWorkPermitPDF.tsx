@@ -229,7 +229,7 @@ const BlankWorkPermitPDF = (): React.ReactElement => {
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
 						{/* eslint-disable-next-line jsx-a11y/alt-text */}
-						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+						<Image style={styles.logo} src="https://is360.ingsimple.cl/logo.jpg" />
 						<Text style={styles.headerTitle}>PERMISO DE TRABAJO</Text>
 					</View>
 					<View>
@@ -263,7 +263,7 @@ const BlankWorkPermitPDF = (): React.ReactElement => {
 						</View>
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Adm. contrato OTC: </Text>
+								<Text style={styles.label}>Adm. contrato IS 360: </Text>
 							</View>
 						</View>
 					</View>
@@ -683,13 +683,13 @@ const BlankWorkPermitPDF = (): React.ReactElement => {
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
 						<Text style={styles.signatureLabel}>Firma Prevención</Text>
-						<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+						<Text style={styles.signatureLabel}>Riesgos IS 360</Text>
 					</View>
 
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
 						<Text style={styles.signatureLabel}>Firma</Text>
-						<Text style={styles.signatureLabel}>Operador OTC</Text>
+						<Text style={styles.signatureLabel}>Operador IS 360</Text>
 					</View>
 				</View>
 

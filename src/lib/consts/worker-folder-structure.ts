@@ -12,7 +12,7 @@ export interface WorkerFolderStructure {
 
 export const BASE_WORKER_STRUCTURE: WorkerFolderStructure = {
 	title: "Personal",
-	description: "Documentación individual obligatoria para trabajadores que ingresen a OTC.",
+	description: "Documentación individual obligatoria para trabajadores que ingresen a IS 360.",
 	documents: [
 		{
 			type: WorkerDocumentType.CONTRACT,
@@ -37,7 +37,7 @@ export const BASE_WORKER_STRUCTURE: WorkerFolderStructure = {
 		{
 			type: WorkerDocumentType.HEALTH_EXAM,
 			name: "Examen médico vigente",
-			description: "Emitido por OAL según batería exigida por OTC.",
+			description: "Emitido por OAL según batería exigida por IS 360.",
 		},
 		{
 			type: WorkerDocumentType.RISK_MATRIX_TRAINING,
@@ -47,7 +47,7 @@ export const BASE_WORKER_STRUCTURE: WorkerFolderStructure = {
 		{
 			type: WorkerDocumentType.WORK_PROCEDURE_TRAINING,
 			name: "Capacitación en procedimientos de trabajo",
-			description: "Registro de capacitación de los procedimientos presentados a OTC.",
+			description: "Registro de capacitación de los procedimientos presentados a IS 360.",
 		},
 		{
 			type: WorkerDocumentType.EMERGENCY_PROCEDURE_TRAINING,
@@ -84,7 +84,7 @@ export const BASE_WORKER_STRUCTURE: WorkerFolderStructure = {
 
 export const DRIVER_WORKER_STRUCTURE: WorkerFolderStructure = {
 	title: "Personal",
-	description: "Documentación individual obligatoria para conductores que ingresen a OTC.",
+	description: "Documentación individual obligatoria para conductores que ingresen a IS 360.",
 	documents: [
 		...BASE_WORKER_STRUCTURE.documents,
 		{

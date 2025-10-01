@@ -257,7 +257,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 				{/* Encabezado */}
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
-						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+						<Image style={styles.logo} src="https://is360.ingsimple.cl/logo.jpg" />
 						<Text style={styles.headerTitle}>PERMISO DE TRABAJO</Text>
 					</View>
 					<View>
@@ -313,7 +313,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Adm. contrato OTC:</Text>
+								<Text style={styles.label}>Adm. contrato IS 360:</Text>
 								<View style={styles.value}>
 									<Text style={styles.value}>{workPermit.otNumber?.responsible.name}</Text>
 								</View>
@@ -726,14 +726,14 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							<View style={styles.signatureColumn}>
 								<View style={styles.signatureBox}></View>
 								<Text style={styles.signatureLabel}>Firma Prevención</Text>
-								<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+								<Text style={styles.signatureLabel}>Riesgos IS 360</Text>
 							</View>
 						))}
 
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
 						<Text style={styles.signatureLabel}>Firma</Text>
-						<Text style={styles.signatureLabel}>Operador OTC</Text>
+						<Text style={styles.signatureLabel}>Operador IS 360</Text>
 					</View>
 				</View>
 

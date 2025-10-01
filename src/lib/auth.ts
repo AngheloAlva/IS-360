@@ -35,7 +35,7 @@ export const auth = betterAuth({
 			await resend.emails.send({
 				from: "anghelo.alva@ingenieriasimple.cl",
 				to: [user.email],
-				subject: `Restablecimiento de contraseña para OTC 360`,
+				subject: `Restablecimiento de contraseña para IS 360`,
 				text: `Ingresa al siguiente link para restablecer tu contraseña: ${url}`,
 			})
 		},
@@ -137,7 +137,7 @@ export const auth = betterAuth({
 					await resend.emails.send({
 						from: "anghelo.alva@ingenieriasimple.cl",
 						to: [user.email],
-						subject: `Código de verificación para OTC 360`,
+						subject: `Código de verificación para IS 360`,
 						react: await OTPCodeEmail({
 							otp,
 						}),

@@ -153,7 +153,7 @@ export const data: NavBarData = {
 				},
 				{
 					name: "Reportabilidad",
-					url: "/admin/dashboard/reportabilidad-otc",
+					url: "/admin/dashboard/reportabilidad-IS 360",
 					icon: ChartColumnIcon,
 				},
 				{

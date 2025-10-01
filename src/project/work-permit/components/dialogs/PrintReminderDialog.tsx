@@ -61,8 +61,8 @@ export default function PrintReminderDialog({ isOpen, onClose }: PrintReminderDi
 
 					<AlertDialogDescription className="text-base">
 						<p className="text-base font-medium text-white/90">
-							Recuerda imprimir este permiso y llevarlo firmado a las instalaciones de OTC. Para mas
-							información consulta el modulo de &quot;Tutoriales&quot;.
+							Recuerda imprimir este permiso y llevarlo firmado a las instalaciones de IS 360. Para
+							mas información consulta el modulo de &quot;Tutoriales&quot;.
 						</p>
 					</AlertDialogDescription>
 				</AlertDialogHeader>

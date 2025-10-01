@@ -44,8 +44,8 @@ export const RequestReviewEmail = ({
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.cl/logo.png"
-								alt="OTC 360 Logo"
+								src="https://is360.ingsimple.cl/logo.jpg"
+								alt="IS 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -57,7 +57,7 @@ export const RequestReviewEmail = ({
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Se ha recibido una nueva solicitud de revisión de subcarpeta en OTC 360.
+								Se ha recibido una nueva solicitud de revisión de subcarpeta en IS 360.
 							</Text>
 
 							{/* Request Details */}
@@ -152,7 +152,7 @@ export const RequestReviewEmail = ({
 									Próximos Pasos
 								</Heading>
 								<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
-									1. Accede al sistema OTC 360 para revisar la solicitud
+									1. Accede al sistema IS 360 para revisar la solicitud
 								</Text>
 								<Text className="mb-[10px] text-[14px] leading-[20px] text-gray-600">
 									2. Evalúa la documentación de la subcarpeta solicitada
@@ -168,7 +168,7 @@ export const RequestReviewEmail = ({
 							<Hr className="my-[24px] border-gray-200" />
 
 							<Text className="text-[14px] leading-[20px] text-gray-600">
-								Este correo ha sido generado automáticamente por el sistema OTC 360. Para cualquier
+								Este correo ha sido generado automáticamente por el sistema IS 360. Para cualquier
 								consulta técnica, contacta al administrador del sistema.
 							</Text>
 						</Section>
@@ -176,7 +176,7 @@ export const RequestReviewEmail = ({
 						{/* Footer */}
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360
+								© {new Date().getFullYear()} IS 360
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Notificación Interna del Sistema - No Responder

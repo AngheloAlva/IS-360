@@ -72,8 +72,8 @@ const AutomatedWorkOrderResponsibleEmail = ({
 					<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.cl/logo.png"
-								alt="OTC 360 Logo"
+								src="https://is360.ingsimple.cl/logo.jpg"
+								alt="IS 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -232,7 +232,7 @@ const AutomatedWorkOrderResponsibleEmail = ({
 
 							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
 								<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
-									✅ Acciones Requeridas (Responsable OTC)
+									✅ Acciones Requeridas (Responsable IS 360)
 								</Heading>
 
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
@@ -268,7 +268,7 @@ const AutomatedWorkOrderResponsibleEmail = ({
 									href={systemUrl}
 									className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 								>
-									Revisar OT en OTC 360
+									Revisar OT en IS 360
 								</Button>
 							</Section>
 
@@ -282,7 +282,7 @@ const AutomatedWorkOrderResponsibleEmail = ({
 
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360 - Sistema de Automatización
+								© {new Date().getFullYear()} IS 360 - Sistema de Automatización
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Notificación Automática - No Responder

@@ -1,8 +1,8 @@
-# Referencia de API - Sistema OTC
+# Referencia de API - Sistema IS 360
 
 ## 🔗 Visión General de la API
 
-El sistema OTC utiliza APIs RESTful construidas con Next.js App Router, proporcionando endpoints seguros y eficientes para todas las operaciones del sistema.
+El sistema IS 360 utiliza APIs RESTful construidas con Next.js App Router, proporcionando endpoints seguros y eficientes para todas las operaciones del sistema.
 
 ### Características Generales
 
@@ -124,7 +124,7 @@ Obtiene lista paginada de órdenes de trabajo.
 - `companyId` (string): Filtro por empresa
 - `startDate`, `endDate` (string): Rango de fechas
 - `permitFilter` (boolean): Solo órdenes con permisos
-- `isOtcMember` (boolean): Solo miembros OTC
+- `isOtcMember` (boolean): Solo miembros IS 360
 - `onlyWithRequestClousure` (boolean): Solo con solicitud de cierre
 
 **Response:**

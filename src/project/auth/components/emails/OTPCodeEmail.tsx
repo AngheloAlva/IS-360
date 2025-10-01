@@ -17,14 +17,14 @@ interface OTPCodeEmailTemplateProps {
 	otp: string
 }
 
-const systemUrl = "https://otc360.cl"
+const systemUrl = "https://is360.ingsimple.cl"
 
 export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ otp }) => (
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>Código de verificación para OTC 360 - OTC</title>
-				<Preview>Su código de verificación para acceder a OTC 360 - OTC es: {otp}</Preview>
+				<title>Código de verificación para IS 360 - IS 360</title>
+				<Preview>Su código de verificación para acceder a IS 360 - IS 360 es: {otp}</Preview>
 			</Head>
 			<Body className="bg-gray-100 py-[40px] font-sans">
 				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white p-[40px]">
@@ -32,8 +32,8 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 						<Img
 							width="150"
 							height="142"
-							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
+							alt="IS 360 Logo"
+							src={`${systemUrl}/logo.jpg`}
 							className="mx-auto h-auto w-[150px] object-cover"
 						/>
 					</Section>
@@ -47,8 +47,8 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 
 						<Text className="mb-[24px] text-[16px] text-gray-600">
 							Hemos recibido una solicitud de inicio de sesión en su cuenta de{" "}
-							<strong>OTC 360 - OTC</strong>. Para completar el proceso de verificación, utilice el
-							siguiente código:
+							<strong>IS 360 - IS 360</strong>. Para completar el proceso de verificación, utilice
+							el siguiente código:
 						</Text>
 
 						<Section className="mb-[24px] rounded-[8px] border border-gray-200 bg-gray-50 p-[24px] text-center">
@@ -77,13 +77,13 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 
 						<Text className="mb-[16px] text-[16px] text-gray-600">
 							Por razones de seguridad, nunca comparta este código con otras personas, incluyendo
-							personal de OTC 360. Nuestro equipo nunca le solicitará su código de verificación.
+							personal de IS 360. Nuestro equipo nunca le solicitará su código de verificación.
 						</Text>
 
 						<Text className="mb-[8px] text-[16px] text-gray-600">Saludos cordiales,</Text>
 
 						<Text className="mb-[24px] text-[16px] font-bold text-gray-700">
-							El equipo de OTC 360
+							El equipo de IS 360
 						</Text>
 					</Section>
 
@@ -91,7 +91,7 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 
 					<Section>
 						<Text className="m-0 text-center text-[14px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360. Todos los derechos reservados.
+							© {new Date().getFullYear()} IS 360. Todos los derechos reservados.
 						</Text>
 					</Section>
 				</Container>

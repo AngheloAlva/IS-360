@@ -315,7 +315,7 @@ export default function MaintenancePlanTaskForm({
 							control={form.control}
 							label="¿Automatizar creación de OTs?"
 							itemClassName="sm:col-span-2"
-							description="Las órdenes de trabajo se crearán automáticamente según la frecuencia de la tarea para la empresa OTC"
+							description="Las órdenes de trabajo se crearán automáticamente según la frecuencia de la tarea para la empresa IS 360"
 						/>
 
 						{form.watch("isAutomated") && (

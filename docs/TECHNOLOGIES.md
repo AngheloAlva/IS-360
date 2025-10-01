@@ -1,4 +1,4 @@
-# Tecnologías Utilizadas en OTC
+# Tecnologías Utilizadas en IS 360
 
 ## 🎯 Stack Principal
 

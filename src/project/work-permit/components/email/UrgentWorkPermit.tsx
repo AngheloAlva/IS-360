@@ -44,7 +44,7 @@ export const UrgentWorkPermitEmail = ({
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>🚨 Permiso de Trabajo Urgente - OTC 360</title>
+				<title>🚨 Permiso de Trabajo Urgente - IS 360</title>
 				<Preview>Nuevo permiso de trabajo urgente creado por {applicantName}</Preview>
 			</Head>
 
@@ -52,8 +52,8 @@ export const UrgentWorkPermitEmail = ({
 				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
+							alt="IS 360 Logo"
+							src={`${systemUrl}/logo.jpg`}
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>
@@ -207,16 +207,16 @@ export const UrgentWorkPermitEmail = ({
 						<Hr className="my-[24px] border-gray-200" />
 
 						<Text className="text-[14px] leading-[20px] text-gray-600">
-							Este es un correo automático generado por el sistema OTC 360 para notificar la
-							creación de un permiso de trabajo urgente. Por favor, tome las medidas necesarias de
-							forma inmediata.
+							Este es un correo automático generado por el sistema IS 360 para notificar la creación
+							de un permiso de trabajo urgente. Por favor, tome las medidas necesarias de forma
+							inmediata.
 						</Text>
 					</Section>
 
 					{/* Footer */}
 					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360
+							© {new Date().getFullYear()} IS 360
 						</Text>
 						<Text className="m-0 text-center text-[12px] text-gray-500">
 							Este es un correo automático, por favor no responder directamente.

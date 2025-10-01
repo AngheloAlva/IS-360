@@ -12,7 +12,7 @@ import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import { Button } from "@/shared/components/ui/button"
 
 export const metadata: Metadata = {
-	title: "Permisos de Bloqueo | OTC",
+	title: "Permisos de Bloqueo | IS 360",
 	description: "Gestión y monitoreo de permisos de bloqueo y etiquetado de energía",
 }
 

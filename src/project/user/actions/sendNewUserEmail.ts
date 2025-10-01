@@ -15,7 +15,7 @@ export const sendNewUserEmail = async ({ email, name, password }: SendNewUserEma
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: [email],
 			bcc: ["anghelo.alva@ingenieriasimple.cl", "soporte@ingenieriasimple.cl"],
-			subject: `Bienvenido a OTC 360`,
+			subject: `Bienvenido a IS 360`,
 			react: await NewUserEmail({
 				name,
 				email,

@@ -63,8 +63,8 @@ const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.cl/logo.png"
-								alt="OTC 360 Logo"
+								src="https://is360.ingsimple.cl/logo.jpg"
+								alt="IS 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -77,7 +77,7 @@ const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
 								Estimado/a <strong>{workOrder.supervisor.name}</strong>, se le ha asignado una nueva
-								Orden de Trabajo en el sistema OTC 360.
+								Orden de Trabajo en el sistema IS 360.
 							</Text>
 
 							{/* Work Order Details */}
@@ -226,7 +226,7 @@ const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
 									href={systemUrl}
 									className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 								>
-									Acceder a OTC 360
+									Acceder a IS 360
 								</Button>
 							</Section>
 
@@ -241,7 +241,7 @@ const NewWorkOrderEmail = ({ workOrder }: NewWorkOrderEmailProps) => {
 						{/* Footer */}
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360
+								© {new Date().getFullYear()} IS 360
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Notificación Automática del Sistema - No Responder

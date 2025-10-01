@@ -119,7 +119,7 @@ export async function requestClosure({ userId, workBookId }: RequestClosureParam
 			},
 		})
 
-		// Enviar correo al supervisor de OTC
+		// Enviar correo al supervisor de IS 360
 		if (workOrder.responsible.email) {
 			await sendRequestClosureEmail({
 				workOrderId: workOrder.id,

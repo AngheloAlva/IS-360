@@ -321,7 +321,7 @@ export default function WorkOrderDetailsDialog({
 								/>
 								<DialogLabel
 									isLoading={isLoading}
-									label="Responsable OTC"
+									label="Responsable IS 360"
 									value={data?.responsible.name}
 									icon={<UserIcon className="size-4" />}
 								/>

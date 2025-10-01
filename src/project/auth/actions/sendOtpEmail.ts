@@ -16,7 +16,7 @@ export const sendOtpEmail = async ({ email, otp }: SendOtpEmailProps) => {
 		const { data, error } = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
 			to: [email],
-			subject: `Código de verificación para OTC 360`,
+			subject: `Código de verificación para IS 360`,
 			react: await OTPCodeEmail({
 				otp,
 			}),

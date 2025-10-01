@@ -40,7 +40,7 @@ export const NewWorkRequestEmail = ({
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>Nueva Solicitud de Trabajo {isUrgent ? "URGENTE" : ""} - OTC 360</title>
+				<title>Nueva Solicitud de Trabajo {isUrgent ? "URGENTE" : ""} - IS 360</title>
 				<Preview>Se ha creado una nueva solicitud de trabajo: {requestNumber}</Preview>
 			</Head>
 
@@ -48,8 +48,8 @@ export const NewWorkRequestEmail = ({
 				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
+							alt="IS 360 Logo"
+							src={`${systemUrl}/logo.jpg`}
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>
@@ -60,7 +60,7 @@ export const NewWorkRequestEmail = ({
 						</Heading>
 
 						<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-							Se ha registrado una nueva solicitud de trabajo en el sistema OTC 360. A continuación,
+							Se ha registrado una nueva solicitud de trabajo en el sistema IS 360. A continuación,
 							encontrarás los detalles de la solicitud.
 						</Text>
 
@@ -158,7 +158,7 @@ export const NewWorkRequestEmail = ({
 								href={baseUrl}
 								className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 							>
-								Ver Solicitud en OTC 360
+								Ver Solicitud en IS 360
 							</Button>
 						</Section>
 
@@ -166,13 +166,13 @@ export const NewWorkRequestEmail = ({
 
 						<Text className="text-[14px] leading-[20px] text-gray-600">
 							Para ver más detalles o tomar acción sobre esta solicitud, por favor accede al sistema
-							OTC 360 utilizando el botón anterior.
+							IS 360 utilizando el botón anterior.
 						</Text>
 					</Section>
 
 					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360
+							© {new Date().getFullYear()} IS 360
 						</Text>
 						<Text className="m-0 text-center text-[12px] text-gray-500">
 							Este es un correo automático, por favor no responder directamente.

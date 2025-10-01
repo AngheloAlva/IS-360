@@ -72,7 +72,7 @@ export async function updateInspectionStatus({
 		if (workEntry.entryType !== "OTC_INSPECTION") {
 			return {
 				ok: false,
-				message: "Solo se puede cambiar el estado de inspecciones OTC",
+				message: "Solo se puede cambiar el estado de inspecciones IS 360",
 			}
 		}
 

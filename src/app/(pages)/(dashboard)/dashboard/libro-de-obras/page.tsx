@@ -47,7 +47,7 @@ export default async function WorkBooksPage() {
 								url: "https://youtube.com/embed/snastGIP1Pw",
 							},
 							{
-								title: "Respuesta a Inspección de OTC",
+								title: "Respuesta a Inspección de IS 360",
 								description: "Tutorial de como cerrar un hito en el libro de obras.",
 								url: "https://youtube.com/embed/WCUYcNFr7OI",
 							},

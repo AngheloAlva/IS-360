@@ -52,7 +52,7 @@ export function NavUser({ session }: { session: Session }): React.ReactElement {
 				<Button
 					size={"icon"}
 					variant={"ghost"}
-					className="group-data-[collapsible=icon]:hidden hover:bg-blue-500"
+					className="ml-auto group-data-[collapsible=icon]:hidden hover:bg-blue-500"
 					onClick={() => handleLogOut()}
 				>
 					<LogOutIcon />

@@ -44,7 +44,7 @@ export const VEHICLE_STRUCTURE: VehicleFolderStructure = {
 			type: VehicleDocumentType.CHECKLIST,
 			name: "Lista de chequeo previa al ingreso",
 			description:
-				"Revisión interna firmada antes del ingreso a OTC, que asegure las perfectas condiciones previa al servicio.",
+				"Revisión interna firmada antes del ingreso a IS 360, que asegure las perfectas condiciones previa al servicio.",
 		},
 		{
 			type: VehicleDocumentType.TRANSPORTATION_TO_OTC,

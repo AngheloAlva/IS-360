@@ -90,7 +90,7 @@ export default function StartupFolderTable({
 				title: "Vehículos y Equipos",
 				category: DocumentCategory.VEHICLES,
 				description:
-					"Documentación requerida para vehículos y equipos utilizados en trabajos de OTC.",
+					"Documentación requerida para vehículos y equipos utilizados en trabajos de IS 360.",
 				totalDocsToUpload: subFolders.vehiclesFolders.length * VEHICLE_STRUCTURE.documents.length,
 				documentsCount: subFolders.vehiclesFolders
 					.map((vf) => vf.documentCounts?.total ?? vf.totalDocuments ?? 0)

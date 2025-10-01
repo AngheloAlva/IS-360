@@ -33,7 +33,7 @@ export default async function LoginPage(): Promise<React.ReactElement> {
 						<div className="hidden flex-col items-start lg:flex">
 							<h1 className="inline text-xl font-bold xl:text-2xl 2xl:text-3xl">Bienvenido a </h1>
 							<div className="bg-gradient-to-br from-green-600 to-green-700 bg-clip-text">
-								<p className="inline text-2xl font-black text-transparent xl:text-4xl">OTC 360</p>
+								<p className="inline text-2xl font-black text-transparent xl:text-4xl">IS 360</p>
 							</div>
 						</div>
 					</div>
@@ -41,7 +41,7 @@ export default async function LoginPage(): Promise<React.ReactElement> {
 					<Login />
 
 					<p className="text-muted-foreground mt-auto h-full text-center text-sm leading-relaxed">
-						OTC 360 © {new Date().getFullYear()}
+						IS 360 © {new Date().getFullYear()}
 					</p>
 				</main>
 
@@ -50,7 +50,7 @@ export default async function LoginPage(): Promise<React.ReactElement> {
 						alt="Login"
 						width={1000}
 						height={1280}
-						src="/images/auth/login.jpeg"
+						src="/images/auth/login.jpg"
 						className="absolute inset-0 h-full w-full object-cover object-center"
 					/>
 				</section>

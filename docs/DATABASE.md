@@ -1,8 +1,8 @@
-# Base de Datos - Sistema OTC
+# Base de Datos - Sistema IS 360
 
 ## 🗄️ Visión General
 
-El sistema OTC utiliza **PostgreSQL** en un servidor en Azure como base de datos principal con **Prisma** como ORM. La base de datos está diseñada para manejar eficientemente:
+El sistema IS 360 utiliza **PostgreSQL** en un servidor en Azure como base de datos principal con **Prisma** como ORM. La base de datos está diseñada para manejar eficientemente:
 
 - Gestión de usuarios y empresas
 - Órdenes de trabajo y libros de obras

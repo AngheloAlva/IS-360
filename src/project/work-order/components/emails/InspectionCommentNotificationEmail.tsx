@@ -119,10 +119,10 @@ const InspectionCommentNotificationEmail = ({
 					<Container className="mx-auto my-[40px] max-w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">
 						<Section className="mt-[32px]">
 							<Img
-								src="https://otcapp.blob.core.windows.net/files/logo.png"
+								src="https://otcapp.blob.core.windows.net/files/logo.jpg"
 								width="40"
 								height="37"
-								alt="OTC"
+								alt="IS 360"
 								className="mx-auto my-0"
 							/>
 						</Section>
@@ -248,14 +248,14 @@ const InspectionCommentNotificationEmail = ({
 						<Text className="text-[14px] leading-[24px] text-black">
 							Saludos,
 							<br />
-							Equipo OTC
+							Equipo IS 360
 						</Text>
 
 						<Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
 
 						<Text className="text-[12px] leading-[24px] text-[#666666]">
-							Este correo fue enviado automáticamente desde el sistema OTC. Por favor no responder a
-							esta dirección de correo.
+							Este correo fue enviado automáticamente desde el sistema IS 360. Por favor no
+							responder a esta dirección de correo.
 						</Text>
 					</Container>
 				</Body>

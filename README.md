@@ -1,8 +1,8 @@
-# Sistema de Gestión de Contratistas OTC
+# Sistema de Gestión de Contratistas IS 360
 
 ## 🏢 Descripción del Proyecto
 
-OTC 360 es un sistema integral de gestión de contratistas diseñado para empresas industriales que necesitan administrar de manera eficiente:
+IS 360 es un sistema integral de gestión de contratistas diseñado para empresas industriales que necesitan administrar de manera eficiente:
 
 - Órdenes de trabajo y libros de obras
 - Permisos de trabajo y seguridad
@@ -18,6 +18,7 @@ OTC 360 es un sistema integral de gestión de contratistas diseñado para empres
 ## 🚀 Inicio Rápido
 
 ### Prerrequisitos
+
 - Node.js 22+
 - PostgreSQL
 - pnpm
@@ -28,7 +29,7 @@ OTC 360 es un sistema integral de gestión de contratistas diseñado para empres
 ```bash
 # Clonar el repositorio
 git clone <repository-url>
-cd otc
+cd is-360
 
 # Instalar dependencias
 pnpm install

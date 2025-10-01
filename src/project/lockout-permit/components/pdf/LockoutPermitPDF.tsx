@@ -249,7 +249,7 @@ const LockoutPermitPDF = ({ lockoutPermit }: LockoutPermitPDFProps) => {
 				{/* Encabezado */}
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
-						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+						<Image style={styles.logo} src="https://is360.ingsimple.cl/logo.jpg" />
 						<Text style={styles.headerTitle}>PERMISO DE BLOQUEO</Text>
 					</View>
 					<View>
@@ -616,7 +616,7 @@ const LockoutPermitPDF = ({ lockoutPermit }: LockoutPermitPDFProps) => {
 
 					<View style={styles.signatureColumn}>
 						<View style={styles.signatureBox}></View>
-						<Text style={styles.signatureLabel}>Firma Supervisor OTC</Text>
+						<Text style={styles.signatureLabel}>Firma Supervisor IS 360</Text>
 						<Text style={styles.signatureLabel}>{lockoutPermit.supervisor?.name || ""}</Text>
 					</View>
 				</View>

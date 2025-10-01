@@ -39,7 +39,7 @@ export const CompleteFolderEmail = ({
 		<Html>
 			<Tailwind>
 				<Head>
-					<title>Control Laboral Completado: {folderName} - OTC 360</title>
+					<title>Control Laboral Completado: {folderName} - IS 360</title>
 					<Preview>El Control Laboral {folderName} ha sido completado exitosamente</Preview>
 				</Head>
 				<Body className="bg-gray-100 py-[40px] font-sans">
@@ -47,8 +47,8 @@ export const CompleteFolderEmail = ({
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.cl/logo.png"
-								alt="OTC 360 Logo"
+								src="https://is360.ingsimple.cl/logo.jpg"
+								alt="IS 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -60,7 +60,7 @@ export const CompleteFolderEmail = ({
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								El Control Laboral ha sido completado exitosamente en OTC 360 y ya están habilitadas
+								El Control Laboral ha sido completado exitosamente en IS 360 y ya están habilitadas
 								las actividades laborales para el mes correspondiente.
 							</Text>
 
@@ -144,14 +144,14 @@ export const CompleteFolderEmail = ({
 									href={systemUrl}
 									className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 								>
-									Ir a OTC 360
+									Ir a IS 360
 								</Button>
 							</Section>
 
 							<Hr className="my-[24px] border-gray-200" />
 
 							<Text className="text-[14px] leading-[20px] text-gray-600">
-								Este correo ha sido generado automáticamente por el sistema OTC 360. Para cualquier
+								Este correo ha sido generado automáticamente por el sistema IS 360. Para cualquier
 								consulta técnica, contacta al administrador del sistema.
 							</Text>
 						</Section>
@@ -159,7 +159,7 @@ export const CompleteFolderEmail = ({
 						{/* Footer */}
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360
+								© {new Date().getFullYear()} IS 360
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Notificación Interna del Sistema - No Responder

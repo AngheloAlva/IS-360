@@ -585,8 +585,8 @@ export default function WorkPermitForm({
 											label: "Instalaciones de contratista",
 										},
 										{
-											value: "Bodegas de residuos OTC",
-											label: "Bodegas de residuos OTC",
+											value: "Bodegas de residuos IS 360",
+											label: "Bodegas de residuos IS 360",
 										},
 									]}
 								/>

@@ -14,7 +14,7 @@ import VideoTutorials from "@/shared/components/VideoTutorials"
 import { Button } from "@/shared/components/ui/button"
 
 export const metadata: Metadata = {
-	title: "Permisos de Trabajo | OTC",
+	title: "Permisos de Trabajo | IS 360",
 	description: "Gestión y monitoreo de permisos de trabajo para empresas contratistas",
 }
 

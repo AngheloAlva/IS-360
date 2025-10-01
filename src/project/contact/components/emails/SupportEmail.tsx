@@ -18,7 +18,7 @@ interface SupportEmailProps {
 	type: "support" | "contact"
 }
 
-const systemUrl = "https://otc360.cl"
+const systemUrl = "https://is360.ingsimple.cl"
 
 export const SupportEmail: React.FC<Readonly<SupportEmailProps>> = ({
 	message,
@@ -37,8 +37,8 @@ export const SupportEmail: React.FC<Readonly<SupportEmailProps>> = ({
 						<Img
 							width="150"
 							height="142"
-							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
+							alt="IS 360 Logo"
+							src={`${systemUrl}/logo.jpg`}
 							className="mx-auto h-auto w-[150px] object-cover"
 						/>
 					</Section>
@@ -69,7 +69,7 @@ export const SupportEmail: React.FC<Readonly<SupportEmailProps>> = ({
 
 					<Section>
 						<Text className="m-0 text-center text-[14px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360. Todos los derechos reservados.
+							© {new Date().getFullYear()} IS 360. Todos los derechos reservados.
 						</Text>
 					</Section>
 				</Container>

@@ -1,8 +1,8 @@
-# Módulos del Sistema OTC
+# Módulos del Sistema IS 360
 
 ## 🏗️ Arquitectura Modular
 
-El sistema OTC está organizado en módulos independientes y cohesivos, cada uno con su propia responsabilidad y funcionalidad específica. Esta arquitectura modular facilita el mantenimiento, escalabilidad y desarrollo de nuevas características.
+El sistema IS 360 está organizado en módulos independientes y cohesivos, cada uno con su propia responsabilidad y funcionalidad específica. Esta arquitectura modular facilita el mantenimiento, escalabilidad y desarrollo de nuevas características.
 
 ### Estructura de Módulos
 
@@ -20,7 +20,7 @@ Cada módulo sigue una estructura estándar:
 - ✅ Seguimiento de progreso y milestones
 - ✅ Gestión de libros de obra
 - ✅ Aprobación y cierre de órdenes
-- ✅ Inspecciones OTC
+- ✅ Inspecciones IS 360
 - ✅ Actividades diarias y adicionales
 - ✅ Generación automática de números OT
 - ✅ Notificaciones por email

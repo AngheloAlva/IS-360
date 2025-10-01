@@ -146,7 +146,7 @@ export default function WorkBookGeneralData({
 										<User className="h-5 w-5" />
 									</div>
 									<div>
-										<p className="text-muted-foreground text-sm font-medium">Responsable OTC</p>
+										<p className="text-muted-foreground text-sm font-medium">Responsable IS 360</p>
 										<p className="font-medium">
 											{data.responsible.name}{" "}
 											<span className="text-muted-foreground">- {data.responsible.phone}</span>

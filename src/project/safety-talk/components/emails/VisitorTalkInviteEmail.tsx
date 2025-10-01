@@ -42,7 +42,7 @@ export const VisitorTalkInviteEmail = ({
 		<Html>
 			<Tailwind>
 				<Head>
-					<title>Invitación a Charla de Visitas - OTC 360</title>
+					<title>Invitación a Charla de Visitas - IS 360</title>
 					<Preview>Accede a la charla de visitas de {companyName}</Preview>
 				</Head>
 
@@ -50,8 +50,8 @@ export const VisitorTalkInviteEmail = ({
 					<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								alt="OTC 360 Logo"
-								src={`${systemUrl}/logo.png`}
+								alt="IS 360 Logo"
+								src={`${systemUrl}/logo.jpg`}
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -65,7 +65,7 @@ export const VisitorTalkInviteEmail = ({
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
 								Estimado/a visitante de <strong>{companyName}</strong>, has sido invitado/a a
 								participar en una charla de visitas obligatoria antes de ingresar a las
-								instalaciones de OTC.
+								instalaciones de IS 360.
 							</Text>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
@@ -121,8 +121,8 @@ export const VisitorTalkInviteEmail = ({
 								</Text>
 								<Text className="text-[14px] leading-[20px] text-red-700">
 									La visualización completa de esta charla de visitas es{" "}
-									<strong>obligatoria</strong> para poder ingresar a las instalaciones de OTC. Sin
-									la certificación de haber completado la charla, no se permitirá el acceso.
+									<strong>obligatoria</strong> para poder ingresar a las instalaciones de IS 360.
+									Sin la certificación de haber completado la charla, no se permitirá el acceso.
 								</Text>
 							</Section>
 
@@ -130,7 +130,7 @@ export const VisitorTalkInviteEmail = ({
 
 							<Text className="text-[14px] leading-[20px] text-gray-600">
 								Si tienes alguna pregunta o problema técnico para acceder a la charla, por favor
-								contacta al equipo de visitas de OTC o a tu supervisor en {companyName}.
+								contacta al equipo de visitas de IS 360 o a tu supervisor en {companyName}.
 							</Text>
 
 							<Text className="mt-[16px] text-[14px] leading-[20px] text-gray-600">
@@ -141,7 +141,7 @@ export const VisitorTalkInviteEmail = ({
 						{/* Footer */}
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360
+								© {new Date().getFullYear()} IS 360
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Este es un correo automático, por favor no responder directamente.

@@ -155,7 +155,7 @@ export function BasicFolderDocuments({
 					/>
 					<div className="text-xs font-medium">{progress.toFixed(0)}%</div>
 
-					{/* Botón para cambio manual de estado - solo miembros OTC */}
+					{/* Botón para cambio manual de estado - solo miembros IS 360 */}
 					{isOtcMember && data?.folderStatus && (
 						<ChangeSubfolderStatusDialog
 							startupFolderId={startupFolderId}

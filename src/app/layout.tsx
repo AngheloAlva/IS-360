@@ -11,7 +11,7 @@ import "./globals.css"
 import "./font-size.css"
 
 export const metadata: Metadata = {
-	title: "OTC",
+	title: "IS 360",
 }
 
 export default function RootLayout({

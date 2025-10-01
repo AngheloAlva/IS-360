@@ -19,7 +19,7 @@ export const MODULE_ROUTE_MAP: Record<MODULES | string, string[]> = {
 	LOCKOUT_PERMITS: ["/admin/dashboard/permisos-de-bloqueo"],
 	VEHICLES: ["/dashboard/vehiculos"],
 	REPORTABILITY: ["/admin/dashboard/reportabilidad"],
-	REPORTABILITY_OTC: ["/admin/dashboard/reportabilidad-otc"],
+	REPORTABILITY_OTC: ["/admin/dashboard/reportabilidad-IS 360"],
 	NOTIFICATIONS: ["/admin/dashboard/notificaciones"],
 	TOOLS: ["/admin/dashboard/herramientas"],
 	TUTORIALS: ["/admin/dashboard/tutoriales"],

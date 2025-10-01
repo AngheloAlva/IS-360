@@ -29,7 +29,7 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 		{
 			type: SafetyAndHealthDocumentType.COMPANY_INFO,
 			name: "Ficha empresa",
-			description: "Información de la empresa, responsables y contactos ante OTC.",
+			description: "Información de la empresa, responsables y contactos ante IS 360.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.STAFF_LIST,
@@ -55,22 +55,22 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 		{
 			type: SafetyAndHealthDocumentType.RISK_MATRIX,
 			name: "Matriz de identificación y evaluación de riesgos",
-			description: "Identificación y evaluación de riesgos relacionados a las tareas en OTC.",
+			description: "Identificación y evaluación de riesgos relacionados a las tareas en IS 360.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.PREVENTION_PLAN,
 			name: "Plan de Prevención de Riesgos",
-			description: "Plan preventivo basado en la MIPER, específico para OTC.",
+			description: "Plan preventivo basado en la MIPER, específico para IS 360.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.WORK_PROCEDURE,
 			name: "Procedimientos de trabajo",
-			description: "Procedimientos firmados, vigentes, aplicables a los trabajos en OTC.",
+			description: "Procedimientos firmados, vigentes, aplicables a los trabajos en IS 360.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.EMERGENCY_PROCEDURE,
 			name: "Procedimiento de emergencia",
-			description: "Acciones ante incidentes o accidentes en instalaciones de OTC.",
+			description: "Acciones ante incidentes o accidentes en instalaciones de IS 360.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.TOOLS_MAINTENANCE,
@@ -94,17 +94,17 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 	title: "Medio Ambiente",
 	category: DocumentCategory.ENVIRONMENTAL,
-	description: "Documentación ambiental obligatoria según normativa OTC.",
+	description: "Documentación ambiental obligatoria según normativa IS 360.",
 	documents: [
 		{
 			type: EnvironmentalDocType.ENVIRONMENTAL_PLAN,
 			name: "Plan de Gestión Ambiental",
-			description: "Plan de gestión ambiental para trabajos en OTC.",
+			description: "Plan de gestión ambiental para trabajos en IS 360.",
 		},
 		{
 			type: EnvironmentalDocType.SPILL_PREVENTION,
 			name: "Procedimiento de prevención y control de derrames",
-			description: "Prevención y control de derrames según actividades en OTC.",
+			description: "Prevención y control de derrames según actividades en IS 360.",
 		},
 		{
 			type: EnvironmentalDocType.WASTE_MANAGEMENT,
@@ -121,7 +121,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 			type: EnvironmentalDocType.ENVIRONMENTAL_MATRIX,
 			name: "Matriz de aspectos e impactos ambientales",
 			description:
-				"Matriz de identificación y evaluación de aspectos e impactos ambientales, en formato OTC.",
+				"Matriz de identificación y evaluación de aspectos e impactos ambientales, en formato IS 360.",
 		},
 		{
 			type: EnvironmentalDocType.RECT_CERTIFICATE,
@@ -132,7 +132,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 			type: EnvironmentalDocType.WATER_CERTIFICATE,
 			name: "Certificado de compra de agua potable",
 			description:
-				"Certificado (guía o factura) de compra de agua potable, en caso de instalar faenas al interior de OTC.",
+				"Certificado (guía o factura) de compra de agua potable, en caso de instalar faenas al interior de IS 360.",
 		},
 		{
 			type: EnvironmentalDocType.WATER_FACTORY_RESOLUTION,
@@ -148,7 +148,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 			type: EnvironmentalDocType.CHEMICAL_TOILET_CONTRACT,
 			name: "Contrato servicio baños químicos",
 			description:
-				"Contrato entre empresa prestadora de servicio de limpieza de baños químicos. en caso de instalar faenas al interior de OTC.",
+				"Contrato entre empresa prestadora de servicio de limpieza de baños químicos. en caso de instalar faenas al interior de IS 360.",
 		},
 		{
 			type: EnvironmentalDocType.SAFETY_DATA_SHEET,
@@ -165,7 +165,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 		{
 			type: EnvironmentalDocType.ELECTRICAL_DECLARATION,
 			name: "TE1 - Declaración instalación eléctrica provisoria",
-			description: "Declaración TE1 para faenas dentro o fuera de OTC.",
+			description: "Declaración TE1 para faenas dentro o fuera de IS 360.",
 		},
 		{
 			type: EnvironmentalDocType.GAS_DECLARATION,
@@ -239,7 +239,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 export const ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
 	title: "Medio Ambiente",
 	category: DocumentCategory.ENVIRONMENT,
-	description: "Documentación medio ambiental obligatoria según normativa OTC.",
+	description: "Documentación medio ambiental obligatoria según normativa IS 360.",
 	documents: [
 		{
 			type: EnvironmentDocType.WORK_PROCEDURE,
@@ -293,7 +293,7 @@ export const ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
 export const EXTENDED_ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
 	title: "Medio Ambiente",
 	category: DocumentCategory.ENVIRONMENT,
-	description: "Documentación medio ambiental obligatoria según normativa OTC.",
+	description: "Documentación medio ambiental obligatoria según normativa IS 360.",
 	documents: [
 		...ENVIRONMENT_STRUCTURE.documents,
 		{

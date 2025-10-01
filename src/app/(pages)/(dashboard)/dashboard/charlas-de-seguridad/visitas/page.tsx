@@ -13,8 +13,8 @@ import {
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-	title: "Charla de Visitas - OTC 360",
-	description: "Charla de seguridad para visitantes de la planta OTC",
+	title: "Charla de Visitas - IS 360",
+	description: "Charla de seguridad para visitantes de la planta IS 360",
 }
 
 export default function VisitorTalk() {
@@ -30,7 +30,7 @@ export default function VisitorTalk() {
 					<div className="text-white">
 						<h1 className="text-3xl font-bold tracking-tight">Charla de Visitas</h1>
 						<p className="opacity-90">
-							Conoce las instalaciones de la planta OTC y sus protocolos de seguridad
+							Conoce las instalaciones de la planta IS 360 y sus protocolos de seguridad
 						</p>
 					</div>
 				</div>
@@ -41,8 +41,8 @@ export default function VisitorTalk() {
 					<div>
 						<CardTitle className="text-xl">Instrucciones</CardTitle>
 						<CardDescription>
-							Este mapa interactivo te permite conocer las diferentes áreas de la planta OTC y los
-							protocolos de seguridad asociados.
+							Este mapa interactivo te permite conocer las diferentes áreas de la planta IS 360 y
+							los protocolos de seguridad asociados.
 						</CardDescription>
 					</div>
 
@@ -79,7 +79,7 @@ export default function VisitorTalk() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Mapa de la Planta OTC</CardTitle>
+					<CardTitle>Mapa de la Planta IS 360</CardTitle>
 					<CardDescription>
 						Haz clic en los puntos para ver videos con información detallada
 					</CardDescription>

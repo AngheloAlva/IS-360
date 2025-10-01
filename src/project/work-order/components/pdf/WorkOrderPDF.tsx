@@ -210,7 +210,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 			case "PREVENTION_AREA":
 				return "Área de Prevención"
 			case "OTC_INSPECTION":
-				return "Inspección OTC"
+				return "Inspección IS 360"
 			case "COMMENT":
 				return "Comentario"
 			case "USER_NOTE":
@@ -257,7 +257,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 			<Page size="A4" style={styles.page}>
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
-						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+						<Image style={styles.logo} src="https://is360.ingsimple.cl/logo.jpg" />
 						<Text style={styles.headerTitle}>REPORTE DE ORDEN DE TRABAJO</Text>
 					</View>
 				</View>
@@ -503,7 +503,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 
 				<View style={styles.footer}>
 					<Text>
-						Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - OTC
+						Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - IS 360
 					</Text>
 				</View>
 			</Page>
@@ -512,7 +512,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 				<Page size="A4" style={styles.page}>
 					<View style={styles.header}>
 						<View style={{ flexDirection: "row", alignItems: "center" }}>
-							<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+							<Image style={styles.logo} src="https://is360.ingsimple.cl/logo.jpg" />
 							<Text style={styles.headerTitle}>DETALLE DE ACTIVIDADES</Text>
 						</View>
 						<View>
@@ -602,7 +602,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 
 					<View style={styles.footer}>
 						<Text>
-							Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - OTC
+							Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - IS 360
 						</Text>
 					</View>
 				</Page>

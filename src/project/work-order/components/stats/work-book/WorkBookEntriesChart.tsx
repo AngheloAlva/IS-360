@@ -23,7 +23,7 @@ const chartConfig = {
 		color: "var(--chart-2)",
 	},
 	inspection: {
-		label: "Inspección OTC",
+		label: "Inspección IS 360",
 		color: "var(--chart-3)",
 	},
 } satisfies ChartConfig

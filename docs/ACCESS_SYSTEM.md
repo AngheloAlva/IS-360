@@ -1,8 +1,8 @@
-# Sistema de Acceso y Permisos - OTC
+# Sistema de Acceso y Permisos - IS 360
 
 ## 🎯 Descripción General
 
-El sistema OTC implementa un control de acceso granular basado en **roles** y **módulos permitidos**. Este sistema permite controlar tanto qué funcionalidades puede usar un usuario como qué secciones puede ver en la navegación.
+El sistema IS 360 implementa un control de acceso granular basado en **roles** y **módulos permitidos**. Este sistema permite controlar tanto qué funcionalidades puede usar un usuario como qué secciones puede ver en la navegación.
 
 ## 🏗️ Arquitectura del Sistema
 
@@ -99,7 +99,7 @@ MODULES.VEHICLES              // Vehículos de Contratistas
 - **Características**:
   - Acceso limitado a funciones de su empresa
   - **Sin restricciones de módulos** (ven todo)
-  - No pueden gestionar usuarios de OTC
+  - No pueden gestionar usuarios de IS 360
   - Centrado en operaciones de campo
 
 ## 🎛️ Sistema de Módulos Permitidos

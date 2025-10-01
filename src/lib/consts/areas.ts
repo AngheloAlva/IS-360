@@ -69,7 +69,7 @@ export const Areas = {
 		title: "Biblioteca documental",
 		value: AREAS.DOCUMENTARY_LIBRARY,
 		description:
-			"Reúne todos los procedimientos instructivo y formato Aplicables de los estándares de OTC",
+			"Reúne todos los procedimientos instructivo y formato Aplicables de los estándares de IS 360",
 		className: "text-blue-500 hover:bg-blue-500/10 hover:border-blue-500",
 	},
 	"comunidades": {
@@ -87,7 +87,7 @@ export const Areas = {
 		className: "text-purple-500 hover:bg-purple-500/10 hover:border-purple-500",
 	},
 	"instructivos": {
-		title: "Instructivos y formatos OTC",
+		title: "Instructivos y formatos IS 360",
 		value: AREAS.INSTRUCTIONS,
 		description:
 			"Contiene documentos con guías y pasos detallados para la correcta ejecución de tareas y procedimientos dentro de la organización.",

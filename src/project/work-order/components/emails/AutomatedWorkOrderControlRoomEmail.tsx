@@ -73,8 +73,8 @@ const AutomatedWorkOrderControlRoomEmail = ({
 						{/* Header with Logo */}
 						<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 							<Img
-								src="https://otc360.cl/logo.png"
-								alt="OTC 360 Logo"
+								src="https://is360.ingsimple.cl/logo.jpg"
+								alt="IS 360 Logo"
 								className="mx-auto h-auto w-full max-w-[200px] object-cover"
 							/>
 						</Section>
@@ -201,7 +201,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 								<Row className="mb-[12px]">
 									<Column className="w-[50%]">
 										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
-											Responsable OTC:
+											Responsable IS 360:
 										</Text>
 										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 											{workOrder.responsible.name}
@@ -270,7 +270,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 									• <strong>Seguimiento:</strong> Monitorear el progreso de la OT según programación
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
-									• <strong>Coordinación:</strong> Mantener comunicación con el responsable OTC y
+									• <strong>Coordinación:</strong> Mantener comunicación con el responsable IS 360 y
 									supervisor
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
@@ -289,7 +289,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 									href={systemUrl}
 									className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
 								>
-									Ver Detalle en OTC 360
+									Ver Detalle en IS 360
 								</Button>
 							</Section>
 
@@ -305,7 +305,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 						{/* Footer */}
 						<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 							<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-								© {new Date().getFullYear()} OTC 360 - Sala de Control
+								© {new Date().getFullYear()} IS 360 - Sala de Control
 							</Text>
 							<Text className="m-0 text-center text-[12px] text-gray-500">
 								Sistema de Automatización - Notificación Informativa

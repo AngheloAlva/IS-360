@@ -50,7 +50,7 @@ export default function PowerBIDashboardPage() {
 						frameBorder="0"
 						height={iframeHeight}
 						allowFullScreen={true}
-						title="Reportabilidad OTC"
+						title="Reportabilidad IS 360"
 						onLoad={() => handleIframeLoad()}
 						src={
 							"https://app.powerbi.com/view?r=eyJrIjoiNDQwODQzMDItMDI0OC00MWY4LWE1NTEtOGQyNjVlMWZhNDk0IiwidCI6IjEwM2FjNTc1LTRhYmQtNDVjYi1iOGI4LWJjMjViY2IwNThiNSJ9"

@@ -73,8 +73,8 @@ export const ExpiredDocumentsEmail = ({
 				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							alt="OTC 360 Logo"
-							src={`${systemUrl}/logo.png`}
+							alt="IS 360 Logo"
+							src={`${systemUrl}/logo.jpg`}
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>
@@ -166,7 +166,7 @@ export const ExpiredDocumentsEmail = ({
 								href={systemUrl}
 								className="box-border rounded-[8px] bg-red-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-red-600"
 							>
-								Acceder al Sistema OTC 360
+								Acceder al Sistema IS 360
 							</Button>
 						</Section>
 
@@ -194,7 +194,7 @@ export const ExpiredDocumentsEmail = ({
 							) : (
 								<>
 									<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
-										1. Acceder al sistema OTC 360 con sus credenciales
+										1. Acceder al sistema IS 360 con sus credenciales
 									</Text>
 									<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
 										2. Navegar a la sección de documentos correspondiente
@@ -221,7 +221,7 @@ export const ExpiredDocumentsEmail = ({
 					{/* Footer */}
 					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360 - Sistema de Gestión de Contratistas
+							© {new Date().getFullYear()} IS 360 - Sistema de Gestión de Contratistas
 						</Text>
 						<Text className="m-0 text-center text-[12px] text-gray-500">
 							Este es un correo automático generado por el sistema de alertas.

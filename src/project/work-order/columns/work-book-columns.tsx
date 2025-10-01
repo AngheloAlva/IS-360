@@ -37,7 +37,7 @@ export const workBookColumns: ColumnDef<WorkBookByCompany>[] = [
 	},
 	{
 		accessorKey: "responsible.name",
-		header: "Responsable de OTC",
+		header: "Responsable de IS 360",
 	},
 	{
 		accessorKey: "workBookName",

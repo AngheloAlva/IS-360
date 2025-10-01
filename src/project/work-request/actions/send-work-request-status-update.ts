@@ -40,7 +40,7 @@ export async function sendWorkRequestStatusUpdateEmail({
 		const subject = `Actualización de estado - Solicitud de Trabajo #${requestNumber}`
 
 		await resend.emails.send({
-			from: "OTC Notificaciones <noreply@otc-notificaciones.cl>",
+			from: "IS 360 Notificaciones <noreply@otc-notificaciones.cl>",
 			to: userEmail,
 			subject,
 			react: WorkRequestStatusUpdateEmail({
@@ -48,7 +48,7 @@ export async function sendWorkRequestStatusUpdateEmail({
 				requestNumber,
 				status: statusText[status],
 				description,
-				baseUrl: "https://otc360.cl",
+				baseUrl: "https://is360.ingsimple.cl",
 			}),
 		})
 
