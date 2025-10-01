@@ -30,10 +30,7 @@ export const updateVehicleDocument = async ({
 		}
 
 		// Verificar que la carpeta esté en estado DRAFT o REJECTED para poder modificar documentos
-		if (
-			existingDocument.folder.status !== "DRAFT" &&
-			existingDocument.folder.status !== "REJECTED"
-		) {
+		if (existingDocument.folder.status === "APPROVED") {
 			return {
 				ok: false,
 				message:
