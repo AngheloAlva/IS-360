@@ -28,7 +28,7 @@ export function AppSidebar({ session, canAccessAdminRoutes, ...props }: AppSideb
 						<Image alt="Logo" width={50} height={52} src="/logo.svg" />
 					</div>
 					<div className="grid flex-1 text-left text-sm leading-tight">
-						<span className="truncate font-bold">OTC</span>
+						<span className="truncate font-bold">Ingeniería Simple</span>
 						<span className="truncate text-xs">360 ERP</span>
 					</div>
 				</div>
