@@ -191,7 +191,7 @@ export default function StartupFolderOverview({
 			{startupFolders && startupFolders.length > 0 ? (
 				<>
 					<Suspense fallback={<Skeleton className="h-96 w-full" />}>
-						<Tabs defaultValue={startupFolders?.[0].id}>
+						<Tabs defaultValue={startupFolders?.[0]?.id}>
 							<div className="flex w-full items-center justify-end gap-2">
 								{startupFolders && startupFolders.length > 1 && (
 									<TabsList className="w-full" onClick={() => setSelectedCategory(null)}>
@@ -336,7 +336,7 @@ export default function StartupFolderOverview({
 													Seguridad y Salud Ocupacional:{" "}
 												</div>
 												{(
-													(selectedFolder?.safetyAndHealthFolders[0].documentCounts?.approved /
+													(selectedFolder?.safetyAndHealthFolders[0]?.documentCounts?.approved /
 														SAFETY_AND_HEALTH_STRUCTURE.documents.length) *
 													100
 												).toFixed(0)}
@@ -352,7 +352,7 @@ export default function StartupFolderOverview({
 														Medio Ambiente:{" "}
 													</div>
 													{(
-														(selectedFolder?.environmentalFolders[0].documentCounts?.approved /
+														(selectedFolder?.environmentalFolders[0]?.documentCounts?.approved /
 															ENVIRONMENTAL_STRUCTURE.documents.length) *
 														100
 													).toFixed(0)}
@@ -368,8 +368,8 @@ export default function StartupFolderOverview({
 													</div>
 													{(
 														(Number(
-															selectedFolder?.environmentFolders[0].documentCounts?.approved ||
-																selectedFolder?.environmentFolders[0].approvedDocuments ||
+															selectedFolder?.environmentFolders[0]?.documentCounts?.approved ||
+																selectedFolder?.environmentFolders[0]?.approvedDocuments ||
 																0
 														) /
 															(selectedFolder?.moreMonthDuration
@@ -391,8 +391,8 @@ export default function StartupFolderOverview({
 													</div>
 													{(
 														(Number(
-															selectedFolder?.techSpecsFolders[0].documentCounts?.approved ||
-																selectedFolder?.techSpecsFolders[0].approvedDocuments ||
+															selectedFolder?.techSpecsFolders[0]?.documentCounts?.approved ||
+																selectedFolder?.techSpecsFolders[0]?.approvedDocuments ||
 																0
 														) /
 															TECH_SPEC_STRUCTURE.documents.length) *
@@ -497,7 +497,7 @@ export default function StartupFolderOverview({
 							selectedFolder.vehiclesFolders.every((vf) => vf.isCompleted) &&
 							(selectedFolder.environmentalFolders[0]?.isCompleted ||
 								selectedFolder.environmentFolders[0]?.isCompleted) &&
-							selectedFolder.safetyAndHealthFolders[0].isCompleted && (
+							selectedFolder.safetyAndHealthFolders[0]?.isCompleted && (
 								<Card>
 									<CardHeader>
 										<CardTitle>

@@ -1,7 +1,6 @@
 import AdminLaborControlFoldersList from "@/project/labor-control/components/data/AdminLaborControlFoldersList"
 import CreateFoldersButton from "@/project/labor-control/components/data/CreateFoldersButton"
 import MemoizedModuleHeader from "@/shared/components/ModuleHeader"
-import ScrollToTableButton from "@/shared/components/ScrollToTable"
 
 export default function AdminLaborControlFoldersPage() {
 	return (
@@ -13,12 +12,6 @@ export default function AdminLaborControlFoldersPage() {
 			>
 				<>
 					<CreateFoldersButton />
-
-					<ScrollToTableButton
-						label="Lista Carpetas"
-						id="labor-control-folders-list"
-						className="text-blue-600 hover:bg-white hover:text-blue-600"
-					/>
 				</>
 			</MemoizedModuleHeader>
 
