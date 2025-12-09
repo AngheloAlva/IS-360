@@ -39,14 +39,8 @@ export async function sendNewWorkRequestEmail({
 
 		await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
-			to: [
-				"gsereno@oleotrasandino.cl",
-				"katherine.burgos@oleotrasandino.cl",
-				"jaime.chavez@oleotrasandino.cl",
-				"gonzalo.orellana@oleotrasandino.cl",
-				"jculloa@oleotrasandino.cl",
-			],
-			bcc: ["anghelo.alva@ingenieriasimple.cl", "soporte@ingenieriasimple.cl"],
+			to: ["anghelo.alva@ingenieriasimple.cl"],
+			bcc: ["soporte@ingenieriasimple.cl"],
 			subject,
 			react: NewWorkRequestEmail({
 				baseUrl,

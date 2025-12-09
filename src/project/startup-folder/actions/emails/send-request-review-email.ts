@@ -33,34 +33,25 @@ export const sendRequestReviewEmail = async ({
 
 		switch (documentCategory) {
 			case DocumentCategory.SAFETY_AND_HEALTH:
-				emailNotification = [
-					"cristian.pavez@oleotrasandino.cl",
-					"katherine.burgos@oleotrasandino.cl",
-				]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 				break
 			case DocumentCategory.ENVIRONMENTAL:
-				emailNotification = ["bcarrillo@dbj.cl", "katherine.burgos@oleotrasandino.cl"]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 				break
 			case DocumentCategory.ENVIRONMENT:
-				emailNotification = ["bcarrillo@dbj.cl", "katherine.burgos@oleotrasandino.cl"]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 				break
 			case DocumentCategory.TECHNICAL_SPECS:
-				emailNotification = ["jaime.chavez@oleotrasandino.cl"]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 				break
 			case DocumentCategory.PERSONNEL:
-				emailNotification = [
-					"cristian.pavez@oleotrasandino.cl",
-					"katherine.burgos@oleotrasandino.cl",
-				]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 				break
 			case DocumentCategory.VEHICLES:
-				emailNotification = [
-					"cristian.pavez@oleotrasandino.cl",
-					"katherine.burgos@oleotrasandino.cl",
-				]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 				break
 			case DocumentCategory.BASIC:
-				emailNotification = ["katherine.burgos@oleotrasandino.cl"]
+				emailNotification = ["anghelo.alva@ingenieriasimple.cl"]
 		}
 
 		const { data, error } = await resend.emails.send({

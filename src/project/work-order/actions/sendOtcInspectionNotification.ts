@@ -120,10 +120,7 @@ export const sendOtcInspectionNotification = async ({
 			(inspection.nonConformities && inspection.nonConformities.trim().length > 0)
 
 		if (hasSafetyIssues) {
-			const safetyEmails = [
-				"katherine.burgos@oleotrasandino.cl",
-				"cristian.pavez@oleotrasandino.cl",
-			]
+			const safetyEmails = ["anghelo.alva@ingenieriasimple.cl"]
 
 			for (const email of safetyEmails) {
 				if (email.trim()) {

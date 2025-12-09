@@ -636,7 +636,7 @@ export async function GET(): Promise<NextResponse> {
 		}
 
 		const emailPromises = []
-		const otcInternalEmail = "katherine.burgos@oleotrasandino.cl"
+		const otcInternalEmail = "anghelo.alva@ingenieriasimple.cl"
 
 		for (const company of companiesMap.values()) {
 			const companySupervisors = await prisma.user.findMany({

@@ -82,7 +82,7 @@ export const sendAutomatedWorkOrderEmails = async ({
 
 		const controlRoomEmailResult = await resend.emails.send({
 			from: "anghelo.alva@ingenieriasimple.cl",
-			to: ["scontrol.trm@oleotrasandino.cl"],
+			to: ["anghelo.alva@ingenieriasimple.cl"],
 			subject: `🎛️ OT Automática Generada - ${workOrder.otNumber} | Sala de Control`,
 			react: await AutomatedWorkOrderControlRoomEmail({
 				workOrder,
