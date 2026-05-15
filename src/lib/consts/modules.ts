@@ -3,8 +3,6 @@ import { MODULES } from "@/generated/prisma/enums"
 export const ModulesValuesArray = [
 	MODULES.ALL, // Todo
 	MODULES.HOME, // Inicio
-	MODULES.REPORTABILITY, // Reportabilidad
-	"REPORTABILITY_OTC", // Reportabilidad OTC (Especial/Oculto)
 	MODULES.NOTIFICATIONS, // Notificaciones
 	MODULES.TOOLS, // Herramientas
 	MODULES.TUTORIALS, // Tutoriales
@@ -28,7 +26,7 @@ export const ModulesValuesArray = [
 	MODULES.NONE, // Sin módulo
 ] as const
 
-export const SPECIAL_MODULES = ["REPORTABILITY_OTC"] as const
+export const SPECIAL_MODULES = [] as const
 
 export const ModuleOptions = [
 	{
@@ -38,10 +36,6 @@ export const ModuleOptions = [
 	{
 		value: MODULES.HOME,
 		label: "Inicio",
-	},
-	{
-		value: MODULES.REPORTABILITY,
-		label: "Reportabilidad",
 	},
 	{
 		value: MODULES.NOTIFICATIONS,
@@ -120,8 +114,6 @@ export const ModuleOptions = [
 export const ModulesLabels = {
 	[MODULES.ALL]: "Acceso Completo",
 	[MODULES.HOME]: "Inicio",
-	[MODULES.REPORTABILITY]: "Reportabilidad",
-	["REPORTABILITY_OTC"]: "Reportabilidad Gerencia",
 	[MODULES.NOTIFICATIONS]: "Notificaciones",
 	[MODULES.TOOLS]: "Herramientas",
 	[MODULES.TUTORIALS]: "Tutoriales",

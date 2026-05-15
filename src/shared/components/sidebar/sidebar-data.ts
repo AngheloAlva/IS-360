@@ -24,7 +24,6 @@ import {
 	UserCircleIcon,
 	GanttChartIcon,
 	MonitorPlayIcon,
-	ChartColumnIcon,
 	LockKeyholeIcon,
 	type LucideIcon,
 } from "lucide-react"
@@ -157,16 +156,6 @@ export const data: NavBarData = {
 					name: "Solicitudes de Trabajo",
 					url: "/admin/dashboard/solicitudes-de-trabajo",
 					icon: FilePlus2Icon,
-				},
-				{
-					name: "Reportabilidad",
-					url: "/admin/dashboard/reportabilidad",
-					icon: ChartColumnIcon,
-				},
-				{
-					name: "Reportabilidad",
-					url: "/admin/dashboard/reportabilidad-otc",
-					icon: ChartColumnIcon,
 				},
 				{
 					name: "Tutoriales",

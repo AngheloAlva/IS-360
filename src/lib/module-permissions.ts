@@ -18,8 +18,6 @@ export const MODULE_ROUTE_MAP: Record<MODULES | string, string[]> = {
 	WORK_REQUESTS: ["/admin/dashboard/solicitudes-de-trabajo"],
 	LOCKOUT_PERMITS: ["/admin/dashboard/permisos-de-bloqueo"],
 	VEHICLES: ["/dashboard/vehiculos"],
-	REPORTABILITY: ["/admin/dashboard/reportabilidad"],
-	REPORTABILITY_OTC: ["/admin/dashboard/reportabilidad-otc"],
 	NOTIFICATIONS: ["/admin/dashboard/notificaciones"],
 	TOOLS: ["/admin/dashboard/herramientas"],
 	TUTORIALS: ["/admin/dashboard/tutoriales"],
