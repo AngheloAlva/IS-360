@@ -1,0 +1,45 @@
+import { type QueryFunction, useQuery } from "@tanstack/react-query"
+import type { DocumentCategory } from "@/generated/prisma/enums"
+
+import { getStartupFolderDocuments } from "../actions/get-startup-folder-documents"
+
+interface UseStartupFolderDocumentsParams {
+	startupFolderId: string
+	category: DocumentCategory
+	workerId?: string
+	vehicleId?: string
+}
+
+export const fetchStartupFolderDocuments: QueryFunction<
+	Awaited<ReturnType<typeof getStartupFolderDocuments>>,
+	readonly ["startupFolderDocuments", UseStartupFolderDocumentsParams]
+> = async ({ queryKey }) => {
+	const [, { startupFolderId, category, workerId, vehicleId }] = queryKey
+
+	return getStartupFolderDocuments({ startupFolderId, category, workerId, vehicleId })
+}
+
+export const useStartupFolderDocuments = ({
+	startupFolderId,
+	category,
+	workerId,
+	vehicleId,
+}: UseStartupFolderDocumentsParams) => {
+	const queryKey = [
+		"startupFolderDocuments",
+		{ startupFolderId, category, workerId, vehicleId },
+	] as const
+
+	return useQuery({
+		queryKey,
+		queryFn: fetchStartupFolderDocuments,
+		enabled: !!category && (!!startupFolderId || !!workerId || !!vehicleId),
+
+		staleTime: 2 * 60 * 1000,
+		gcTime: 5 * 60 * 1000,
+		retry: 2,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+
+		placeholderData: (previousData) => previousData,
+	})
+}

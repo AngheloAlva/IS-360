@@ -1,0 +1,81 @@
+import { Trash2Icon } from "lucide-react"
+import { useState } from "react"
+import { toast } from "sonner"
+
+import { deleteUser } from "@/project/user/actions/deleteUser"
+import { queryClient } from "@/lib/queryClient"
+
+import { Button } from "@/shared/components/ui/button"
+import Spinner from "@/shared/components/Spinner"
+import {
+	AlertDialog,
+	AlertDialogTitle,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTrigger,
+	AlertDialogContent,
+	AlertDialogDescription,
+} from "@/shared/components/ui/alert-dialog"
+
+export default function DeleteUser({ userId }: { userId: string }) {
+	const [isLoading, setIsLoading] = useState(false)
+	const [open, setOpen] = useState(false)
+
+	const handleDeleteUser = async () => {
+		setIsLoading(true)
+
+		try {
+			const res = await deleteUser(userId)
+
+			if (res.ok) {
+    void queryClient.invalidateQueries({
+					queryKey: ["users"],
+				})
+				toast.success("Se ha eliminado el usuario correctamente")
+			} else {
+				toast.error(res.message)
+			}
+		} catch (error) {
+			console.error(error)
+			toast.error("Error al eliminar el usuario")
+		} finally {
+			setOpen(false)
+			setIsLoading(false)
+		}
+	}
+
+	return (
+		<AlertDialog open={open} onOpenChange={setOpen}>
+			<AlertDialogTrigger asChild>
+				<Button size={"icon"} variant={"destructive"}>
+					<Trash2Icon className="size-4" />
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Eliminar usuario</AlertDialogTitle>
+					<AlertDialogDescription>
+						¿Estás seguro de querer eliminar este usuario?
+						<br />
+						Recuerda que una vez eliminado, no podrás modificar el usuario.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancelar</AlertDialogCancel>
+					<AlertDialogAction
+						disabled={isLoading}
+						onClick={(e) => {
+							e.preventDefault()
+       void handleDeleteUser()
+						}}
+						className="bg-rose-600 transition-all hover:scale-105 hover:bg-rose-700"
+					>
+						{isLoading ? <Spinner className="h-4 w-4" /> : "Eliminar"}
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	)
+}

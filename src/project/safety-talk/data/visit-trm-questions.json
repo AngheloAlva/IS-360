@@ -1,0 +1,246 @@
+[
+  {
+    "id": 1,
+    "pregunta": "¿Cómo deben quedar los vehículos estacionados en el Avellano?",
+    "opciones": ["Aculatados", "De frente", "En diagonal", "En cualquier posición"],
+    "correcta": "Aculatados"
+  },
+  {
+    "id": 2,
+    "pregunta": "¿Por dónde se debe transitar al interior de las instalaciones del Avellano?",
+    "opciones": [
+      "Por las vías señalizadas para peatones",
+      "Por la ruta más corta",
+      "Por cualquier camino disponible",
+      "Entre los equipos y cañerías"
+    ],
+    "correcta": "Por las vías señalizadas para peatones"
+  },
+  {
+    "id": 3,
+    "pregunta": "¿Se puede usar teléfono móvil en zona clasificada?",
+    "opciones": [
+      "Solo si es intrínsecamente seguro",
+      "Sí, con precaución",
+      "No, bajo ninguna circunstancia",
+      "Solo fuera del horario laboral"
+    ],
+    "correcta": "Solo si es intrínsecamente seguro"
+  },
+  {
+    "id": 4,
+    "pregunta": "¿A quién debes informar al momento de ingresar a planta?",
+    "opciones": [
+      "A la sala de control",
+      "A tu supervisor",
+      "A cualquier trabajador",
+      "A seguridad privada"
+    ],
+    "correcta": "A la sala de control"
+  },
+  {
+    "id": 5,
+    "pregunta": "¿Se debe solicitar permiso al ingresar a zona clasificada?",
+    "opciones": [
+      "Sí, a la sala de control",
+      "No es necesario",
+      "Solo si hay personal trabajando",
+      "Solo con equipos eléctricos"
+    ],
+    "correcta": "Sí, a la sala de control"
+  },
+  {
+    "id": 6,
+    "pregunta": "¿Qué tipo de productos se transportan por el oleoducto Trasandino?",
+    "opciones": [
+      "Combustibles líquidos e hidrocarburos",
+      "Agua tratada",
+      "Gases industriales",
+      "Productos alimenticios"
+    ],
+    "correcta": "Combustibles líquidos e hidrocarburos"
+  },
+  {
+    "id": 7,
+    "pregunta": "¿Cuáles son los principales riesgos asociados en Avellano?",
+    "opciones": [
+      "Incendio, explosión y derrames",
+      "Choques eléctricos y humedad",
+      "Ruido y polvo",
+      "Caídas de altura solamente"
+    ],
+    "correcta": "Incendio, explosión y derrames"
+  },
+  {
+    "id": 8,
+    "pregunta": "¿Cuántos puntos de encuentro hay en Avellano?",
+    "opciones": ["3", "2", "4", "1"],
+    "correcta": "3"
+  },
+  {
+    "id": 9,
+    "pregunta": "¿Por qué es importante respetar los puntos de encuentro?",
+    "opciones": [
+      "Para facilitar la evacuación segura",
+      "Para registrar asistencia",
+      "Para evitar sanciones",
+      "Para mantener orden visual"
+    ],
+    "correcta": "Para facilitar la evacuación segura"
+  },
+  {
+    "id": 10,
+    "pregunta": "¿Se puede fumar al interior del Avellano?",
+    "opciones": [
+      "No, está totalmente prohibido",
+      "Sí, en zonas abiertas",
+      "Solo fuera del horario laboral",
+      "Solo con permiso del supervisor"
+    ],
+    "correcta": "No, está totalmente prohibido"
+  },
+  {
+    "id": 11,
+    "pregunta": "¿Qué documento o permiso se debe gestionar antes de iniciar un trabajo en terreno?",
+    "opciones": [
+      "Permiso de trabajo seguro",
+      "Guía de despacho",
+      "Acta de ingreso",
+      "Registro de asistencia"
+    ],
+    "correcta": "Permiso de trabajo seguro"
+  },
+  {
+    "id": 12,
+    "pregunta": "¿Por dónde se debe transitar al interior de la planta?",
+    "opciones": [
+      "Por las zonas señalizadas para peatones",
+      "Por cualquier zona despejada",
+      "Por los pasillos de maquinaria",
+      "Por la ruta más corta"
+    ],
+    "correcta": "Por las zonas señalizadas para peatones"
+  },
+  {
+    "id": 13,
+    "pregunta": "¿Qué EPP son obligatorios al ingresar a planta?",
+    "opciones": [
+      "Casco, lentes, botines, guantes y chaleco reflectante",
+      "Solo casco y lentes",
+      "Solo guantes",
+      "Ninguno"
+    ],
+    "correcta": "Casco, lentes, botines, guantes y chaleco reflectante"
+  },
+  {
+    "id": 14,
+    "pregunta": "¿Qué EPP especial necesito para ingresar al área clasificada?",
+    "opciones": [
+      "Ropa antiestática y monogas H2S",
+      "Casco azul",
+      "Guantes dieléctricos",
+      "Solo gafas de sol"
+    ],
+    "correcta": "Ropa antiestática y monogas H2S"
+  },
+  {
+    "id": 15,
+    "pregunta": "¿Cuántas vías de evacuación hay en Avellano?",
+    "opciones": ["3", "2", "1", "4"],
+    "correcta": "3"
+  },
+  {
+    "id": 16,
+    "pregunta": "¿Puedo ingresar a la zona clasificada sin permiso?",
+    "opciones": [
+      "No, está prohibido",
+      "Sí, si es por poco tiempo",
+      "Solo con casco",
+      "Solo acompañado"
+    ],
+    "correcta": "No, está prohibido"
+  },
+  {
+    "id": 17,
+    "pregunta": "¿No es necesario usar protección auditiva en la rama reductora?",
+    "opciones": [
+      "Falso, siempre es necesario",
+      "Verdadero, no hay ruido",
+      "Solo los visitantes deben usarla",
+      "Depende del turno"
+    ],
+    "correcta": "Falso, siempre es necesario"
+  },
+  {
+    "id": 18,
+    "pregunta": "¿Cuáles son los puntos de encuentro y rutas de evacuación del Avellano?",
+    "opciones": [
+      "Están señalizados en el plano de emergencias",
+      "Solo se informan al jefe de turno",
+      "No existen formalmente",
+      "Se improvisan según el evento"
+    ],
+    "correcta": "Están señalizados en el plano de emergencias"
+  },
+  {
+    "id": 19,
+    "pregunta": "¿Debe utilizar bloqueador solar al interior de planta con un índice de radiación alto UV?",
+    "opciones": [
+      "Sí, como medida preventiva",
+      "No, solo los supervisores",
+      "Solo fuera de la planta",
+      "No es necesario"
+    ],
+    "correcta": "Sí, como medida preventiva"
+  },
+  {
+    "id": 20,
+    "pregunta": "¿Cómo comunicas una emergencia en terreno?",
+    "opciones": [
+      "Llamando al número de emergencia y entregando ubicación y tipo de incidente",
+      "Saliendo inmediatamente del área",
+      "Buscando ayuda de un compañero",
+      "Esperando instrucciones"
+    ],
+    "correcta": "Llamando al número de emergencia y entregando ubicación y tipo de incidente"
+  },
+  {
+    "id": 21,
+    "pregunta": "¿Qué gases tóxicos puedes encontrar en Avellano?",
+    "opciones": ["H2S y CO", "Oxígeno y nitrógeno", "CO2 únicamente", "Aire comprimido"],
+    "correcta": "H2S y CO"
+  },
+  {
+    "id": 22,
+    "pregunta": "¿Qué rol cumple el Plan de Emergencia de OTC?",
+    "opciones": [
+      "Establecer acciones ante emergencias",
+      "Planificar vacaciones",
+      "Organizar el personal",
+      "Definir turnos de trabajo"
+    ],
+    "correcta": "Establecer acciones ante emergencias"
+  },
+  {
+    "id": 23,
+    "pregunta": "¿Por qué es importante evitar derrames o fugas durante las operaciones?",
+    "opciones": [
+      "Porque afectan la seguridad y el medio ambiente",
+      "Porque generan olor",
+      "Porque retrasan la producción",
+      "Por razones estéticas"
+    ],
+    "correcta": "Porque afectan la seguridad y el medio ambiente"
+  },
+  {
+    "id": 24,
+    "pregunta": "¿Dónde se deben disponer los residuos domésticos?",
+    "opciones": [
+      "En los basureros designados",
+      "En el suelo",
+      "En los canales de drenaje",
+      "Fuera de la planta"
+    ],
+    "correcta": "En los basureros designados"
+  }
+]

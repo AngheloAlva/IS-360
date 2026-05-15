@@ -1,0 +1,291 @@
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { EditIcon, PlusIcon } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { useState } from "react"
+import { toast } from "sonner"
+
+import { ModuleOptions, type ModulesValuesArray } from "@/lib/consts/modules"
+import { createInternalUser } from "@/project/user/actions/createInternalUser"
+import { updateInternalUser } from "@/project/user/actions/updateUser"
+
+import { useCompaniesSelect } from "@/project/company/hooks/use-companies-select"
+import { HIDDEN_USER_ROLES, USER_ROLE, USER_ROLE_LABELS } from "@/lib/permissions"
+import { queryClient } from "@/lib/queryClient"
+import { cn } from "@/lib/utils"
+import {
+	internalUserSchema,
+	type InternalUserSchema,
+} from "@/project/user/schemas/internalUser.schema"
+import {
+	AreaOptions,
+	UserAreaOptions,
+	type UserAreasValuesArray,
+	type DocumentAreasValuesArray,
+} from "@/lib/consts/areas"
+
+import { InputWithPrefixFormField } from "@/shared/components/forms/InputWithPrefixFormField"
+import { MultiSelectFormField } from "@/shared/components/forms/MultiSelectFormField"
+import { SelectFormField } from "@/shared/components/forms/SelectFormField"
+import { InputFormField } from "@/shared/components/forms/InputFormField"
+import { RutFormField } from "@/shared/components/forms/RutFormField"
+import SubmitButton from "@/shared/components/forms/SubmitButton"
+import { Button } from "@/shared/components/ui/button"
+import { Form } from "@/shared/components/ui/form"
+import {
+	Sheet,
+	SheetTitle,
+	SheetHeader,
+	SheetTrigger,
+	SheetContent,
+	SheetDescription,
+} from "@/shared/components/ui/sheet"
+
+import type { ApiUser } from "@/project/user/types/api-user"
+
+interface InternalUserFormProps {
+	initialData?: ApiUser
+}
+
+export default function InternalUser({ initialData }: InternalUserFormProps): React.ReactElement {
+	const [loading, setLoading] = useState(false)
+	const [open, setOpen] = useState(false)
+
+	const { data: companies } = useCompaniesSelect()
+
+	const form = useForm<InternalUserSchema>({
+		resolver: zodResolver(internalUserSchema),
+		defaultValues: {
+			rut: initialData?.rut || "",
+			name: initialData?.name || "",
+			email: initialData?.email || "",
+			phone: initialData?.phone || "",
+			internalRole: initialData?.internalRole || "",
+			role: initialData?.role ? initialData.role.split(",") : [USER_ROLE.user],
+			allowedModules: (initialData?.allowedModules as (typeof ModulesValuesArray)[number][]) || [
+				"ALL",
+			],
+			allowedCompanies: initialData?.allowedCompanies || [],
+			documentAreas:
+				(initialData?.documentAreas as (typeof DocumentAreasValuesArray)[number][]) || [],
+			area: (initialData?.area as (typeof UserAreasValuesArray)[number]) || undefined,
+		},
+	})
+
+	async function onSubmit(values: InternalUserSchema) {
+		setLoading(true)
+
+		try {
+			if (!initialData) {
+				if (!values.role.length) {
+					toast.error("Por favor, selecciona un rol")
+					return
+				}
+
+				const result = await createInternalUser({ values })
+
+				if (!result.ok) {
+					if (result.errorCode === "USER_ALREADY_EXISTS") {
+						toast.error("El usuario ya existe", {
+							description: "Verifique el RUT del usuario por favor.",
+							duration: 5000,
+						})
+						return
+					}
+
+					toast.error(result.message ?? "Error al crear el usuario", {
+						description:
+							"Por favor, verifique que los datos ingresados sean correctos y que el email o RUT no estén duplicados",
+						duration: 5000,
+					})
+					return
+				}
+
+				toast.success("Usuario creado exitosamente", {
+					description: "El usuario ha sido creado exitosamente",
+					duration: 3000,
+				})
+
+				setOpen(false)
+				form.reset()
+				void queryClient.invalidateQueries({
+					queryKey: ["users"],
+				})
+			} else {
+				const { ok, data, message, emailWasChanged, passwordResetEmailSent } =
+					await updateInternalUser({ userId: initialData.id, values })
+
+				if (ok) {
+					toast.success("Usuario actualizado exitosamente", {
+						description:
+							emailWasChanged && passwordResetEmailSent
+								? `El usuario ${data?.name} fue actualizado y se envió un correo para restablecer contraseña.`
+								: `El usuario ${data?.name} ha sido actualizado exitosamente`,
+						duration: 3000,
+					})
+					setOpen(false)
+     void queryClient.invalidateQueries({
+						queryKey: ["users"],
+					})
+				} else {
+					toast.error("Error al actualizar el usuario", {
+						description: message || "Ocurrió un error al intentar actualizar el usuario",
+						duration: 5000,
+					})
+				}
+			}
+		} catch (error) {
+			console.log(error)
+			toast.error("Error al crear o actualizar el usuario", {
+				description: "Ocurrió un error al intentar crear o actualizar el usuario",
+				duration: 5000,
+			})
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	return (
+		<Sheet open={open} onOpenChange={setOpen}>
+			<SheetTrigger
+				className={cn(
+					"flex h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-white px-3 text-sm font-semibold text-purple-500 transition-all hover:scale-105",
+					{
+						"bg-primary/10 text-primary size-8 gap-0 p-1 hover:text-white": initialData,
+					}
+				)}
+				onClick={() => setOpen(true)}
+			>
+				{initialData ? <EditIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
+				<span className="hidden text-nowrap sm:inline">{!initialData && "Nuevo Usuario"}</span>
+			</SheetTrigger>
+
+			<SheetContent className="gap-0 sm:max-w-md">
+				<SheetHeader className="shadow">
+					<SheetTitle>{initialData ? "Editar Usuario" : "Nuevo Usuario"}</SheetTitle>
+					<SheetDescription>
+						{initialData
+							? ""
+							: "Al crear un nuevo usuario, se le enviará un correo electrónico con su contraseña temporal para acceder al sistema."}
+					</SheetDescription>
+				</SheetHeader>
+
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="flex h-full flex-col items-center justify-between overflow-y-auto px-4 pt-4 pb-14"
+					>
+						<div className="grid gap-x-2 gap-y-5 sm:grid-cols-2">
+							<InputFormField<InternalUserSchema>
+								name="name"
+								label="Nombre"
+								control={form.control}
+								placeholder="Nombre de la persona"
+							/>
+
+							<RutFormField<InternalUserSchema> name="rut" label="RUT" control={form.control} />
+
+							<InputFormField<InternalUserSchema>
+								name="email"
+								type="email"
+								label="Email"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								placeholder="correo@ejemplo.com"
+							/>
+
+							<InputWithPrefixFormField<InternalUserSchema>
+								type="tel"
+								name="phone"
+								prefix="+56"
+								label="Teléfono"
+								position="start"
+								control={form.control}
+								placeholder="9 XXXX XXXX"
+							/>
+
+							<InputFormField<InternalUserSchema>
+								name="internalRole"
+								label="Cargo"
+								control={form.control}
+								placeholder="Cargo del usuario"
+							/>
+
+							<SelectFormField<InternalUserSchema>
+								name="area"
+								label="Área"
+								control={form.control}
+								options={UserAreaOptions}
+								placeholder="Selecciona un área"
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="documentAreas"
+								options={AreaOptions}
+								control={form.control}
+								label="Áreas de documentos"
+								itemClassName="sm:col-span-2"
+								placeholder="Selecciona áreas de documentos"
+								description="Estas áreas determinan en donde el usuario podrá crear, editar y eliminar documentos."
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="role"
+								label="Rol"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								options={Array.from(Object.values(USER_ROLE))
+									.filter((role) => !HIDDEN_USER_ROLES.includes(role))
+									.map((role) => ({
+										value: role,
+										label: USER_ROLE_LABELS[role],
+									}))}
+								placeholder="Selecciona un rol"
+								description="Los roles otorgan permisos para administrar los módulos."
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="allowedModules"
+								label="Módulos Permitidos"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								options={ModuleOptions}
+								placeholder="Selecciona módulos permitidos"
+								description="Módulos que el usuario podrá visualizar y acceder (solo aplica para administradores)."
+							/>
+
+							<MultiSelectFormField<InternalUserSchema>
+								name="allowedCompanies"
+								label="Empresas Permitidas"
+								control={form.control}
+								itemClassName="sm:col-span-2"
+								options={companies || []}
+								placeholder="Selecciona empresas"
+								description="Empresas que el usuario podrá visualizar (vacío = todas las empresas). Solo aplica para administradores."
+							/>
+						</div>
+
+						<div className="flex w-full items-center justify-center gap-2">
+							<Button
+								size="lg"
+								type="button"
+								variant="outline"
+								onClick={() => setOpen(false)}
+								className="mt-5 w-1/2 tracking-wider"
+							>
+								Cancelar
+							</Button>
+
+							<SubmitButton
+								isSubmitting={loading}
+								className="mt-5 w-1/2 bg-purple-500 hover:bg-purple-600 hover:text-white"
+								label={initialData ? "Actualizar Usuario" : "Crear Usuario"}
+							/>
+						</div>
+					</form>
+				</Form>
+			</SheetContent>
+		</Sheet>
+	)
+}

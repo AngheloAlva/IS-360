@@ -1,0 +1,102 @@
+"use client"
+
+import { Area, XAxis, YAxis, AreaChart, CartesianGrid } from "recharts"
+import { ChartSplineIcon } from "lucide-react"
+import { format } from "date-fns"
+
+import { WorkRequestStatsResponse } from "@/project/work-request/hooks/use-work-request-stats"
+
+import {
+	ChartLegend,
+	ChartTooltip,
+	ChartContainer,
+	ChartLegendContent,
+	ChartTooltipContent,
+} from "@/shared/components/ui/chart"
+import {
+	Card,
+	CardTitle,
+	CardHeader,
+	CardContent,
+	CardDescription,
+} from "@/shared/components/ui/card"
+
+interface MonthlyTrendChartProps {
+	data: WorkRequestStatsResponse["monthlyTrend"]
+}
+
+export default function MonthlyTrendChart({ data }: MonthlyTrendChartProps) {
+	return (
+		<Card className="border-none">
+			<CardHeader className="pb-2">
+				<div className="flex items-start justify-between">
+					<div>
+						<CardTitle className="text-base font-semibold">Tendencia Diaria</CardTitle>
+						<CardDescription>
+							Solicitudes de trabajo creadas y atendidas en los últimos 30 días
+						</CardDescription>
+					</div>
+					<div className="rounded-lg bg-rose-500/10 p-1.5">
+						<ChartSplineIcon className="size-5 text-rose-500" />
+					</div>
+				</div>
+			</CardHeader>
+
+			<CardContent className="p-0">
+				<div className="h-70 w-full">
+					<ChartContainer
+						config={{
+							created: {
+								label: "Creadas",
+							},
+							attended: {
+								label: "Atendidas",
+							},
+						}}
+						className="h-70 w-full max-w-[90dvw]"
+					>
+						<AreaChart data={data} margin={{ right: 20 }}>
+							<CartesianGrid strokeDasharray="3 3" />
+							<XAxis
+								dataKey="month"
+								tickFormatter={(date) => format(new Date(date), "dd/MM")}
+								tick={{ fontSize: 12 }}
+							/>
+							<YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+							<ChartTooltip content={<ChartTooltipContent />} />
+							<ChartLegend content={<ChartLegendContent />} />
+
+							<defs>
+								<linearGradient id={"created"} x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor={"var(--color-sky-500)"} stopOpacity={0.8} />
+									<stop offset="95%" stopColor={"var(--color-sky-500)"} stopOpacity={0.1} />
+								</linearGradient>
+								<linearGradient id={"attended"} x1="0" y1="0" x2="0" y2="1">
+									<stop offset="5%" stopColor={"var(--color-rose-500)"} stopOpacity={0.8} />
+									<stop offset="95%" stopColor={"var(--color-rose-500)"} stopOpacity={0.1} />
+								</linearGradient>
+							</defs>
+
+							<Area
+								type="monotone"
+								name="Creadas"
+								dataKey="created"
+								stroke="var(--color-sky-500)"
+								fill="url(#created)"
+								activeDot={{ r: 6, strokeWidth: 2 }}
+							/>
+							<Area
+								type="monotone"
+								name="Atendidas"
+								dataKey="attended"
+								stroke="var(--color-rose-500)"
+								fill="url(#attended)"
+								activeDot={{ r: 6, strokeWidth: 2 }}
+							/>
+						</AreaChart>
+					</ChartContainer>
+				</div>
+			</CardContent>
+		</Card>
+	)
+}

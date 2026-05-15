@@ -1,0 +1,2098 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ACCESS_ROLE {
+  ADMIN
+  PARTNER_COMPANY
+}
+
+enum AREAS {
+  OPERATIONS // Operaciones
+  INSTRUCTIONS // Instructivos
+  INTEGRITY_AND_MAINTENANCE // Integridad y Mantencion
+  ENVIRONMENT // Medio Ambiente
+  OPERATIONAL_SAFETY // Seguridad Operacional
+  QUALITY_AND_OPERATIONAL_EXCELLENCE // Calidad y Exelencia Operacional
+  REGULATORY_COMPLIANCE // Cumplimiento Normativo
+  LEGAL // Juridica
+  COMMUNITIES // Comunidades (periodistas?)
+  PROJECTS // Proyectos
+  PURCHASING // Compras
+  ADMINISTRATION_AND_FINANCES // Administración y Finanzas
+  IT // Informática
+  GERENCY // Gerencia
+  DOCUMENTARY_LIBRARY // Biblioteca Documental
+}
+
+enum MODULES {
+  ALL // Todo
+  HOME // Inicio
+  REPORTABILITY // Reportabilidad
+  REPORTABILITY_OTC // Reportabilidad OTC
+  NOTIFICATIONS // Notificaciones
+  TOOLS // Herramientas
+  TUTORIALS // Tutoriales
+  EQUIPMENT // Equipos y Ubicacioens
+  EQUIPMENT_HISTORY // Historial de Equipos
+  SAFETY_TALK // Charlas de seguridad
+  WORK_ORDERS // Ordenes de Trabajo y Libros de obras
+  INDICATORS // Indicadores
+  WORK_PERMITS // Permisos de Trabajo
+  LOCKOUT_PERMITS // Permisos de Bloqueo
+  DOCUMENTATION // Documentacion
+  WORK_REQUESTS // Solicitudes de Trabajo
+  COMPANY // Empresas
+  USERS // Usuarios
+  MAINTENANCE_PLANS // Planes de Mantenimiento y Tareas de los planes
+  PROGRAMATION // Programación
+  STARTUP_FOLDERS // Carpetas de Arranque
+  LABOR_CONTROL_FOLDERS // Control de contratistas
+  VEHICLES // Vehiculos (acceso contratista, no OTC)
+  CONTACT // Contacto y Soporte
+  NONE // Sin módulo
+}
+
+model User {
+  id               String      @id
+  name             String
+  email            String
+  emailVerified    Boolean
+  image            String?
+  phone            String?
+  createdAt        DateTime
+  updatedAt        DateTime
+  role             String
+  accessRole       ACCESS_ROLE @default(PARTNER_COMPANY)
+  allowedModules   MODULES[]   @default([ALL])
+  allowedCompanies String[]    @default([])
+  internalRole     String?
+  area             AREAS?
+  banned           Boolean?
+  banReason        String?
+  banExpires       DateTime?
+  rut              String
+  twoFactorEnabled Boolean?
+  documentAreas    AREAS[]     @default([])
+  internalArea     String?
+  isActive              Boolean  @default(true)
+  accreditationOverride Boolean? // null = computed from folders, true/false = sticky admin override
+
+  sessions                           Session[]
+  accounts                           Account[]
+  files                              File[]
+  folders                            Folder[]
+  safetyTalks                        UserSafetyTalk[]
+  safetyTalkAttempts                 SafetyTalkAttempt[]
+  safetyTalkApproval                 UserSafetyTalk[]             @relation("UserSafetyTalkApproval")
+  company                            Company?                     @relation(fields: [companyId], references: [id])
+  companiesCreatedBy                 Company[]                    @relation("CompanyCreatedBy")
+  companyId                          String?
+  isSupervisor                       Boolean?
+  workOrders                         WorkOrder[]                  @relation("WorkOrderResponsible")
+  workOrdersAsSupervisor             WorkOrder[]                  @relation("WorkOrderSupervisor")
+  requestedClosures                  WorkOrder[]                  @relation("WorkOrderClosureRequester")
+  approvedClosures                   WorkOrder[]                  @relation("WorkOrderClosureApprover")
+  deletedWorkOrders                  WorkOrder[]                  @relation("WorkOrderDeletedBy")
+  assignedEntries                    WorkEntry[]                  @relation("AssignedUsers")
+  createdEntries                     WorkEntry[]                  @relation("WorkEntryCreator")
+  notifications                      Notification[]
+  workPermitsAsParticipant           WorkPermit[]                 @relation("WorkPermitParticipants")
+  workPermitsAsPreventionOfficer     WorkPermit[]                 @relation("PreventionOfficer")
+  workPermits                        WorkPermit[]                 @relation("WorkPermitUser")
+  workPermitApproval                 WorkPermit[]                 @relation("WorkPermitApproval")
+  workPermitClosing                  WorkPermit[]                 @relation("WorkPermitClosing")
+  attachmentsHistory                 AttachmentHistory[]
+  equipmentHistory                   EquipmentHistory[]
+  fileHistory                        FileHistory[]
+  twofactors                         TwoFactor[]
+  FileComment                        FileComment[]
+  MaintenancePlan                    MaintenancePlan[]
+  MaintenancePlanTask                MaintenancePlanTask[]
+  automatedResponsibleTasks          MaintenancePlanTask[]        @relation("MaintenancePlanTaskAutomatedResponsible")
+  approvedMilestones                 Milestone[]                  @relation("MilestoneApprover")
+  requestedMilestones                Milestone[]                  @relation("MilestoneRequestedBy")
+  safetyAndHealthFolders             SafetyAndHealthFolder[]
+  safetyAndHealthDocuments           SafetyAndHealthDocument[]    @relation("SafetyAndHealthDocumentUploadedBy")
+  safetyAndHealthDocumentReviewer    SafetyAndHealthDocument[]    @relation("SafetyAndHealthDocumentReviewer")
+  workerFolder                       WorkerFolder[]               @relation("WorkerFolderWorker")
+  workerFolderReviewer               WorkerFolder[]               @relation("WorkerFolderReviewer")
+  workerDocument                     WorkerDocument[]             @relation("WorkerDocumentUploadedBy")
+  workerDocumentReviewer             WorkerDocument[]             @relation("WorkerDocumentReviewer")
+  vehicleFolder                      VehicleFolder[]
+  vehicleDocument                    VehicleDocument[]            @relation("VehicleDocumentUploadedBy")
+  vehicleDocumentReviewer            VehicleDocument[]            @relation("VehicleDocumentReviewer")
+  environmentalFolder                EnvironmentalFolder[]
+  environmentalDocument              EnvironmentalDocument[]      @relation("EnvironmentalDocumentUploadedBy")
+  environmentalDocumentReviewer      EnvironmentalDocument[]      @relation("EnvironmentalDocumentReviewer")
+  environmentFolder                  EnvironmentFolder[]
+  environmentDocument                EnvironmentDocument[]        @relation("EnvironmentDocumentUploadedBy")
+  environmentDocumentReviewer        EnvironmentDocument[]        @relation("EnvironmentDocumentReviewer")
+  basicDocument                      BasicDocument[]              @relation("BasicDocumentUploadedBy")
+  basicDocumentReviewer              BasicDocument[]              @relation("BasicDocumentReviewer")
+  basicFolder                        BasicFolder[]                @relation("BasicFolderWorker")
+  techSpecsFolder                    TechSpecsFolder[]
+  techSpecsDocument                  TechSpecsDocument[]          @relation("TechSpecsDocumentUploadedBy")
+  techSpecsDocumentReviewer          TechSpecsDocument[]          @relation("TechSpecsDocumentReviewer")
+  workRequestApproves                WorkRequest[]                @relation("WorkRequestApprovalBy")
+  workRequestComments                WorkRequestComment[]
+  workRequestOperator                WorkRequest[]                @relation("WorkRequestOperator")
+  workPermitAttachments              WorkPermitAttachment[]
+  activityLogs                       ActivityLog[]
+  WorkRequest                        WorkRequest[]
+  basicFolderReviewer                BasicFolder[]                @relation("BasicFolderReviewer")
+  equipment                          Equipment[]                  @relation("EquipmentCreatedBy")
+  inspectionComments                 InspectionComment[]          @relation("InspectionCommentAuthor")
+  lockoutPermitsAsUser               LockoutPermit[]              @relation("LockoutPermitRequestedBy")
+  lockoutPermitAreaResponsible       LockoutPermit[]              @relation("LockoutPermitAreaResponsible")
+  lockoutPermitSupervisor            LockoutPermit[]              @relation("LockoutPermitSupervisor")
+  lockoutPermitOperator              LockoutPermit[]              @relation("LockoutPermitOperator")
+  lockoutPermitRemoveLockout         LockoutPermit[]              @relation("LockoutPermitRemoveLockout")
+  lockoutPermitAttachments           LockoutPermitAttachment[]
+  lockoutRegistrationOtcOperator     LockoutRegistration[]        @relation("LockoutRegistrationOtcOperator")
+  lockoutRegistrationContractor      LockoutRegistration[]        @relation("LockoutRegistrationContractor")
+  zeroEnergyReviews                  ZeroEnergyReview[]           @relation("ZeroEnergyReviewPerformedBy")
+  zeroEnergyReviewReviewer           ZeroEnergyReview[]           @relation("ZeroEnergyReviewReviewer")
+  fileAccessLogs                     FileAccessLog[]
+  laborControlFolder                 WorkerLaborControlFolder[]   @relation("WorkerLaborControlFolderWorker")
+  workerLaborControlDocumentUploadBy WorkerLaborControlDocument[] @relation("WorkerLaborControlDocumentUploadBy")
+  workerLaborControlDocumentReviewBy WorkerLaborControlDocument[] @relation("WorkerLaborControlDocumentReviewBy")
+  laborControlDocumentUploadBy       LaborControlDocument[]       @relation("LaborControlDocumentUploadBy")
+  laborControlDocumentReviewBy       LaborControlDocument[]       @relation("LaborControlDocumentReviewBy")
+  guideDocumentsCreated              StartupGuideDocument[]       @relation("GuideDocumentCreatedBy")
+  supportTickets                     SupportTicket[]              @relation("SupportTicketRequester")
+  supportTicketNotes                 SupportTicketNote[]
+  supportTicketAttachments           SupportTicketAttachment[]
+  inPersonSafetyTalkRecords          InPersonSafetyTalkRecord[]   @relation("InPersonSafetyTalkRegisteredBy")
+  apiKeys                            ApiKey[]                     @relation("UserApiKeys")
+  workerQRTokens                     WorkerQRToken[]              @relation("WorkerQRTokenWorker")
+  workerQRTokensIssued               WorkerQRToken[]              @relation("WorkerQRTokenCreatedBy")
+
+  @@unique([email])
+  @@unique([rut])
+  @@index([email], name: "email_idx")
+  @@index([companyId], name: "company_id_idx")
+  @@index([accessRole, isActive], name: "access_role_is_active_idx")
+  @@map("user")
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  type       String
+  title      String
+  message    String
+  link       String?
+  targetRole String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId], name: "notification_user_id_idx")
+  @@index([isRead], name: "notification_is_read_idx")
+  @@index([targetRole], name: "notification_target_role_idx")
+  @@map("notification")
+}
+
+model TwoFactor {
+  id          String
+  secret      String?
+  backupCodes String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([id])
+  @@unique([userId])
+  @@map("twoFactor")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Company {
+  id       String  @id @default(cuid())
+  name     String
+  rut      String  @unique
+  image    String?
+  isActive Boolean @default(true)
+
+  createdBy           User                 @relation("CompanyCreatedBy", fields: [createdById], references: [id])
+  createdById         String
+  users               User[]
+  workOrders          WorkOrder[]
+  workPermits         WorkPermit[]
+  lockoutPermits      LockoutPermit[]
+  supportTickets      SupportTicket[]
+  vehicles            Vehicle[]
+  StartupFolders      StartupFolder[]
+  fileAccessLogs      FileAccessLog[]
+  laborControlFolders LaborControlFolder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([id])
+  @@index([rut], name: "rut_idx")
+  @@index([name], name: "name_idx")
+  @@index([isActive], name: "is_active_idx")
+  @@map("company")
+}
+
+enum VEHICLE_TYPE {
+  CAR
+  TRUCK
+  MOTORCYCLE
+  BUS
+  TRACTOR
+  TRAILER
+  OTHER
+  VAN
+}
+
+model Vehicle {
+  id String @id @default(cuid())
+
+  plate    String?
+  model    String?
+  year     Int?
+  brand    String?
+  type     VEHICLE_TYPE?
+  color    String?
+  isMain   Boolean       @default(false)
+  isActive Boolean       @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+
+  vehiclesFolders VehicleFolder[]
+
+  @@index([companyId], name: "vehicle_company_id_idx")
+  @@map("vehicle")
+}
+
+enum WORK_ORDER_STATUS {
+  PLANNED
+  PENDING
+  COMPLETED
+  CANCELLED
+  IN_PROGRESS
+  CLOSURE_REQUESTED
+}
+
+enum WORK_ORDER_TYPE {
+  CORRECTIVE
+  PREVENTIVE
+  PREDICTIVE
+  PROACTIVE
+}
+
+enum WORK_ORDER_CAPEX {
+  CONFIDABILITY // Confiabilidad
+  MITIGATE_RISK // Mitiga riesgo
+  COMPLIANCE // Cumplimiento normativo
+}
+
+enum WORK_ORDER_PRIORITY {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model WorkOrder {
+  id                String              @id @default(cuid())
+  otNumber          String
+  type              WORK_ORDER_TYPE
+  status            WORK_ORDER_STATUS   @default(PLANNED)
+  progress          Float?              @default(0)
+  solicitationDate  DateTime
+  solicitationTime  String
+  workRequest       String
+  workDescription   String?
+  priority          WORK_ORDER_PRIORITY
+  capex             WORK_ORDER_CAPEX?
+  equipments        Equipment[]
+  programDate       DateTime
+  estimatedHours    Float
+  estimatedDays     Float
+  estimatedEndDate  DateTime
+  rescheduledEndDate DateTime?
+  endDate           DateTime?
+  isWorkBookInit    Boolean             @default(false)
+  workBookName      String?
+  workBookLocation  String?
+  workBookStartDate DateTime?
+  workBookEntries   WorkEntry[]
+
+  company               Company?             @relation(fields: [companyId], references: [id])
+  companyId             String?
+  supervisor            User                 @relation("WorkOrderSupervisor", fields: [supervisorId], references: [id])
+  supervisorId          String
+  responsible           User                 @relation("WorkOrderResponsible", fields: [responsibleId], references: [id])
+  responsibleId         String
+  manualDocuments       Attachment[]         @relation("WorkOrderManualDocuments")
+  initReport            Attachment?          @relation("WorkOrderInitReport", fields: [initReportId], references: [id])
+  initReportId          String?              @unique
+  endReport             Attachment?          @relation("WorkOrderEndReport", fields: [endReportId], references: [id])
+  endReportId           String?              @unique
+  workPermits           WorkPermit[]
+  lockoutPermits        LockoutPermit[]
+  closureRequestedBy    User?                @relation("WorkOrderClosureRequester", fields: [closureRequestedById], references: [id])
+  closureRequestedById  String?
+  closureRequestedAt    DateTime?
+  closureApprovedBy     User?                @relation("WorkOrderClosureApprover", fields: [closureApprovedById], references: [id])
+  closureApprovedById   String?
+  closureApprovedAt     DateTime?
+  closureRejectedReason String?
+  deletedAt             DateTime?
+  deletedBy             User?                @relation("WorkOrderDeletedBy", fields: [deletedById], references: [id])
+  deletedById           String?
+  equipmentHistory      EquipmentHistory[]
+  MaintenancePlanTask   MaintenancePlanTask? @relation(fields: [maintenancePlanTaskId], references: [id])
+  maintenancePlanTaskId String?
+  milestones            Milestone[]
+  workRequestId         String?
+  workRequested         WorkRequest?         @relation(fields: [workRequestId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([id])
+  @@unique([otNumber])
+  @@index([status], name: "status_idx")
+  @@index([otNumber], name: "ot_number_idx")
+  @@index([companyId, status], name: "company_status_idx")
+  @@index([deletedAt], name: "deleted_at_idx")
+  @@map("work_order")
+}
+
+enum MILESTONE_STATUS {
+  PENDING
+  COMPLETED
+  IN_PROGRESS
+  REQUESTED_CLOSURE
+}
+
+model Milestone {
+  id             String           @id @default(cuid())
+  name           String
+  description    String?
+  status         MILESTONE_STATUS @default(PENDING)
+  order          Int              @default(0)
+  isCompleted    Boolean          @default(false)
+  weight         Float
+  startDate      DateTime
+  endDate        DateTime
+  approvedAt     DateTime?
+  closureComment String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requestedBy   User?       @relation("MilestoneRequestedBy", fields: [requestedById], references: [id])
+  requestedById String?
+  approvedBy    User?       @relation("MilestoneApprover", fields: [approvedById], references: [id])
+  approvedById  String?
+  workOrder     WorkOrder   @relation(fields: [workOrderId], references: [id])
+  workOrderId   String
+  activities    WorkEntry[]
+
+  @@unique([id])
+  @@index([workOrderId, order])
+  @@map("milestone")
+}
+
+enum CRITICALITY {
+  CRITICAL
+  SEMICRITICAL
+  UNCITICAL
+}
+
+model Location {
+  id        String      @id @default(cuid())
+  name      String
+  parentId  String?
+  parent    Location?   @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children  Location[]  @relation("LocationHierarchy")
+  path      String
+  equipment Equipment[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([parentId])
+  @@index([path])
+}
+
+model Equipment {
+  id            String       @id @default(cuid())
+  barcode       String
+  name          String
+  description   String?
+  isOperational Boolean      @default(true)
+  type          String?
+  tag           String
+  criticality   CRITICALITY?
+  imageUrl      String?
+
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent                     Equipment?            @relation("EquipmentHierarchy", fields: [parentId], references: [id])
+  parentId                   String?
+  children                   Equipment[]           @relation("EquipmentHierarchy")
+  workOrders                 WorkOrder[]
+  history                    EquipmentHistory[]
+  maintenancePlans           MaintenancePlan[]
+  maintenancePlanTasksLegacy MaintenancePlanTask[] @relation("MaintenancePlanTaskLegacyEquipment")
+  maintenancePlanTasks       MaintenancePlanTask[] @relation("MaintenancePlanTaskEquipments")
+  attachments                Attachment[]
+  createdBy                  User?                 @relation("EquipmentCreatedBy", fields: [createdById], references: [id])
+  createdById                String?
+  workRequests               WorkRequest[]
+  lockoutPermits             LockoutPermit[]
+  zeroEnergyReviews          ZeroEnergyReview[]
+
+  @@unique([id])
+  @@unique([tag])
+  @@unique([barcode])
+  @@map("equipment")
+}
+
+enum WORK_APPLICATION_STATUS {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum ENTRY_TYPE {
+  COMMENT
+  OTC_INSPECTION
+  DAILY_ACTIVITY
+  ADDITIONAL_ACTIVITY
+}
+
+enum INSPECTION_STATUS {
+  REPORTED
+  RESOLVED
+}
+
+model WorkEntry {
+  id                  String             @id @default(cuid())
+  entryType           ENTRY_TYPE
+  executionDate       DateTime           @default(now())
+  activityName        String?
+  activityStartTime   String?
+  activityEndTime     String?
+  comments            String?
+  inspectionStatus    INSPECTION_STATUS? @default(REPORTED)
+  supervisionComments String?
+  safetyObservations  String?
+  nonConformities     String?
+  createdAt           DateTime           @default(now())
+
+  createdBy          User                @relation("WorkEntryCreator", fields: [createdById], references: [id])
+  createdById        String
+  workOrder          WorkOrder           @relation(fields: [workOrderId], references: [id])
+  workOrderId        String
+  milestone          Milestone?          @relation(fields: [milestoneId], references: [id])
+  milestoneId        String?
+  assignedUsers      User[]              @relation(name: "AssignedUsers")
+  equipmentHistory   EquipmentHistory[]
+  attachments        Attachment[]
+  inspectionComments InspectionComment[]
+
+  @@unique([id])
+  @@index([milestoneId])
+  @@index([workOrderId, createdAt])
+  @@index([workOrderId, entryType])
+  @@map("work_book_entry")
+}
+
+model Attachment {
+  id   String @id @default(cuid())
+  name String
+  url  String
+  type String
+  size Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workEntry             WorkEntry?           @relation(fields: [workEntryId], references: [id])
+  workEntryId           String?
+  manualDocuments       WorkOrder[]          @relation("WorkOrderManualDocuments")
+  initReport            WorkOrder?           @relation("WorkOrderInitReport")
+  initReportId          String?              @unique
+  endReport             WorkOrder?           @relation("WorkOrderEndReport")
+  endReportId           String?              @unique
+  history               AttachmentHistory[]
+  MaintenancePlanTask   MaintenancePlanTask? @relation(fields: [maintenancePlanTaskId], references: [id])
+  maintenancePlanTaskId String?
+  equipment             Equipment?           @relation(fields: [equipmentId], references: [id])
+  equipmentId           String?
+  workRequest           WorkRequest?         @relation(fields: [workRequestId], references: [id])
+  workRequestId         String?
+  inspectionComment     InspectionComment?   @relation(fields: [inspectionCommentId], references: [id])
+  inspectionCommentId   String?
+
+  @@map("attachment")
+}
+
+enum WORK_PERMIT_STATUS {
+  ACTIVE
+  REJECTED
+  COMPLETED
+  REVIEW_PENDING
+}
+
+model WorkPermit {
+  id                             String                 @id @default(cuid())
+  status                         WORK_PERMIT_STATUS     @default(REVIEW_PENDING)
+  isUrgent                       Boolean                @default(false)
+  requiresLockout                Boolean                @default(false)
+  aplicantPt                     String
+  mutuality                      String
+  otherMutuality                 String?
+  exactPlace                     String
+  workWillBe                     String
+  workWillBeOther                String?
+  tools                          String[]
+  otherTools                     String?
+  preChecks                      String[]
+  otherPreChecks                 String?
+  activityDetails                String[]
+  riskIdentification             String[]
+  otherRisk                      String?
+  preventiveControlMeasures      String[]
+  otherPreventiveControlMeasures String?
+  generateWaste                  Boolean
+  wasteType                      String?
+  wasteDisposalLocation          String?
+  otherWasteDisposalLocation     String?
+  whoDeliversWorkAreaOp          String?
+  workerExecutor                 String?
+  workCompleted                  Boolean?
+  cleanAndTidyWorkArea           Boolean?
+  additionalObservations         String?
+  observations                   String?
+  acceptTerms                    Boolean                @default(false)
+  formVersion                    Int                    @default(2)
+  startDate                      DateTime
+  endDate                        DateTime
+  initialAreaMeasurement         Float?
+  createdAt                      DateTime               @default(now())
+  updatedAt                      DateTime               @updatedAt
+  approvalDate                   DateTime?
+  approvalBy                     User?                  @relation("WorkPermitApproval", fields: [approvalById], references: [id])
+  approvalById                   String?
+  approvalNotes                  String?
+  closingDate                    DateTime?
+  closingBy                      User?                  @relation("WorkPermitClosing", fields: [closingById], references: [id])
+  closingById                    String?
+  preventionOfficerUser          User?                  @relation("PreventionOfficer", fields: [preventionOfficerId], references: [id])
+  preventionOfficerId            String?
+  otNumber                       WorkOrder?             @relation(fields: [otNumberId], references: [id])
+  otNumberId                     String?
+  user                           User                   @relation("WorkPermitUser", fields: [userId], references: [id])
+  userId                         String
+  participants                   User[]                 @relation("WorkPermitParticipants")
+  company                        Company                @relation(fields: [companyId], references: [id])
+  companyId                      String
+  attachments                    WorkPermitAttachment[]
+  lockoutPermits                 LockoutPermit[]
+  activities                     WorkPermitActivity[]
+
+  @@map("work_permit")
+}
+
+model WorkPermitActivity {
+  id                  String   @id @default(cuid())
+  activity            String
+  peligros            String[]
+  riesgos             String[]
+  medidasDeControl    String[]
+  otroPeligro         String?
+  otroRiesgo          String?
+  otraMedidaDeControl String?
+  order               Int
+
+  workPermitId String
+  workPermit   WorkPermit @relation(fields: [workPermitId], references: [id], onDelete: Cascade)
+
+  @@index([workPermitId])
+}
+
+model WorkPermitAttachment {
+  id   String @id @default(cuid())
+  name String
+  url  String
+  type String
+  size Int?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  uploadedAt DateTime @default(now())
+
+  uploadedBy   User       @relation(fields: [uploadedById], references: [id])
+  uploadedById String
+  workPermitId String
+  workPermit   WorkPermit @relation(fields: [workPermitId], references: [id])
+
+  @@map("work_permit_attachment")
+}
+
+enum LOCKOUT_PERMIT_STATUS {
+  ACTIVE
+  REJECTED
+  COMPLETED
+  REVIEW_PENDING
+}
+
+enum LOCKOUT_TYPE {
+  PREVENTIVE
+  CORRECTIVE
+  EMERGENCY
+  OTHER
+}
+
+model LockoutPermit {
+  id                   String                @id @default(cuid())
+  status               LOCKOUT_PERMIT_STATUS @default(REVIEW_PENDING)
+  lockoutType          LOCKOUT_TYPE
+  lockoutTypeOther     String?
+  startDate            DateTime
+  endDate              DateTime?
+  activitiesToExecute  String[]
+  lockoutRegistrations LockoutRegistration[]
+  removeLockoutReview  Boolean?
+  observations         String?
+  approved             Boolean?
+  approvalDate         DateTime?
+  approvalTime         String?
+  zeroEnergyReviews    ZeroEnergyReview[]
+  finalObservations    String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  approvalNotes        String?
+
+  workPermitId      String?
+  workPermit        WorkPermit?               @relation(fields: [workPermitId], references: [id])
+  supervisorId      String?
+  supervisor        User?                     @relation("LockoutPermitSupervisor", fields: [supervisorId], references: [id])
+  operatorId        String?
+  operator          User?                     @relation("LockoutPermitOperator", fields: [operatorId], references: [id])
+  removeLockoutId   String?
+  removeLockout     User?                     @relation("LockoutPermitRemoveLockout", fields: [removeLockoutId], references: [id])
+  areaResponsibleId String
+  areaResponsible   User                      @relation("LockoutPermitAreaResponsible", fields: [areaResponsibleId], references: [id])
+  requestedById     String
+  requestedBy       User                      @relation("LockoutPermitRequestedBy", fields: [requestedById], references: [id])
+  otNumberId        String?
+  otNumberRef       WorkOrder?                @relation(fields: [otNumberId], references: [id])
+  companyId         String
+  company           Company                   @relation(fields: [companyId], references: [id])
+  equipments        Equipment[]
+  attachments       LockoutPermitAttachment[]
+
+  @@map("lockout_permit")
+}
+
+model LockoutRegistration {
+  id    String @id @default(cuid())
+  order Int
+  name  String
+  rut   String
+
+  contractorId          String?
+  contractorLockNumber  String?
+  contractorInstallDate DateTime?
+  contractorInstallTime String?
+  contractorRemoveDate  DateTime?
+  contractorRemoveTime  String?
+  contractor            User?     @relation("LockoutRegistrationContractor", fields: [contractorId], references: [id])
+
+  otcOperatorId  String?
+  otcInstallDate DateTime?
+  otcInstallTime String?
+  otcRemoveDate  DateTime?
+  otcRemoveTime  String?
+  otcLockNumber  String?
+  otcOperator    User?     @relation("LockoutRegistrationOtcOperator", fields: [otcOperatorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lockoutPermitId String
+  lockoutPermit   LockoutPermit @relation(fields: [lockoutPermitId], references: [id], onDelete: Cascade)
+
+  @@map("lockout_registration")
+}
+
+model ZeroEnergyReview {
+  id           String   @id @default(cuid())
+  location     String?
+  action       String
+  reviewedZero Boolean?
+
+  lockoutPermit   LockoutPermit @relation(fields: [lockoutPermitId], references: [id], onDelete: Cascade)
+  lockoutPermitId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  equipmentId   String
+  equipment     Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  performedById String
+  performedBy   User      @relation("ZeroEnergyReviewPerformedBy", fields: [performedById], references: [id], onDelete: Cascade)
+  reviewerId    String?
+  reviewer      User?     @relation("ZeroEnergyReviewReviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@map("zero_energy_review")
+}
+
+model LockoutPermitAttachment {
+  id   String @id @default(cuid())
+  name String
+  url  String
+  type String
+  size Int?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  uploadedAt DateTime @default(now())
+
+  uploadedBy      User          @relation(fields: [uploadedById], references: [id])
+  uploadedById    String
+  lockoutPermitId String
+  lockoutPermit   LockoutPermit @relation(fields: [lockoutPermitId], references: [id])
+
+  @@map("lockout_permit_attachment")
+}
+
+model Folder {
+  id          String   @id @default(cuid())
+  slug        String
+  name        String
+  description String?
+  root        Boolean  @default(false)
+  area        AREAS
+  type        String   @default("default")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent     Folder?  @relation("FolderToFolder", fields: [parentId], references: [id])
+  parentId   String?
+  subFolders Folder[] @relation("FolderToFolder")
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  files      File[]
+
+  @@unique([slug, parentId, userId])
+  @@index([area, isActive], name: "folder_area_idx")
+  @@index([parentId, isActive], name: "folder_parent_idx")
+  @@map("folder")
+}
+
+model File {
+  id               String    @id @default(cuid())
+  code             String?
+  name             String
+  description      String?
+  area             AREAS?
+  type             String
+  size             Int
+  url              String
+  registrationDate DateTime
+  expirationDate   DateTime?
+  revisionCount    Int       @default(0)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  history  FileHistory[]
+  folder   Folder?       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId String?
+  user     User          @relation(fields: [userId], references: [id])
+  userId   String
+  comments FileComment[]
+
+  @@index([folderId, isActive], name: "file_folder_idx")
+  @@index([area, isActive], name: "file_area_idx")
+  @@map("file")
+}
+
+model FileComment {
+  id      String  @id @default(cuid())
+  title   String?
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  file   File   @relation(fields: [fileId], references: [id])
+  fileId String
+
+  @@map("file_comment")
+}
+
+model Counter {
+  id    String @id @default("ot_counter")
+  value Int    @default(1)
+}
+
+model WorkRequestCounter {
+  id    String @id @default("work_request_counter")
+  value Int    @default(1)
+
+  @@map("work_request_counter")
+}
+
+model SupportTicketCounter {
+  id    String @id @default("support_ticket_counter")
+  value Int    @default(1)
+
+  @@map("support_ticket_counter")
+}
+
+enum SAFETY_TALK_CATEGORY {
+  ENVIRONMENT
+  VISITOR_TRM
+  VISITOR
+  IRL
+}
+
+enum SAFETY_TALK_STATUS {
+  PENDING
+  IN_PROGRESS
+  PASSED
+  FAILED
+  BLOCKED
+  MANUALLY_APPROVED
+}
+
+model SafetyTalkAttempt {
+  id               String               @id @default(cuid())
+  category         SAFETY_TALK_CATEGORY
+  score            Float
+  passed           Boolean
+  answers          Json
+  attemptNumber    Int
+  completedAt      DateTime
+  timeSpentSeconds Int?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+  userSafetyTalkId String
+  userSafetyTalk   UserSafetyTalk @relation(fields: [userSafetyTalkId], references: [id])
+
+  @@index([userId])
+  @@index([userSafetyTalkId])
+  @@map("safety_talk_attempt")
+}
+
+model UserSafetyTalk {
+  id                  String               @id @default(cuid())
+  category            SAFETY_TALK_CATEGORY
+  status              SAFETY_TALK_STATUS   @default(PENDING)
+  currentAttempts     Int                  @default(0)
+  startedAt           DateTime?
+  lastAttemptAt       DateTime?
+  nextAttemptAt       DateTime?
+  score               Float?
+  minRequiredScore    Float                @default(70.0)
+  completedAt         DateTime?
+  expiresAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  manuallyApproved    Boolean              @default(false)
+  inPersonSessionDate DateTime?
+  approvalById        String?
+  approvalBy          User?                @relation("UserSafetyTalkApproval", fields: [approvalById], references: [id])
+
+  userId   String
+  user     User                @relation(fields: [userId], references: [id])
+  attempts SafetyTalkAttempt[]
+
+  @@index([userId])
+  @@index([category])
+  @@index([status])
+  @@map("user_safety_talk")
+}
+
+model AttachmentHistory {
+  id           String     @id @default(cuid())
+  attachment   Attachment @relation(fields: [attachmentId], references: [id])
+  attachmentId String
+  previousUrl  String
+  previousName String
+  modifiedBy   User       @relation(fields: [userId], references: [id])
+  userId       String
+  modifiedAt   DateTime   @default(now())
+  reason       String?
+
+  @@map("attachment_history")
+}
+
+model FileHistory {
+  id           String   @id @default(cuid())
+  file         File     @relation(fields: [fileId], references: [id])
+  fileId       String
+  previousUrl  String
+  previousName String
+  modifiedBy   User     @relation(fields: [userId], references: [id])
+  userId       String
+  modifiedAt   DateTime @default(now())
+  reason       String?
+
+  @@map("file_history")
+}
+
+model EquipmentHistory {
+  id          String     @id @default(cuid())
+  equipment   Equipment  @relation(fields: [equipmentId], references: [id])
+  equipmentId String
+  changeType  String
+  description String
+  modifiedBy  User       @relation(fields: [userId], references: [id])
+  userId      String
+  modifiedAt  DateTime   @default(now())
+  status      String
+  createdAt   DateTime   @default(now())
+  workOrder   WorkOrder? @relation(fields: [workOrderId], references: [id])
+  workOrderId String?
+  workEntry   WorkEntry? @relation(fields: [workEntryId], references: [id])
+  workEntryId String?
+
+  @@unique([id])
+  @@map("equipment_history")
+}
+
+enum PLAN_FREQUENCY {
+  DAILY
+  WEEKLY
+  MONTHLY
+  BIMONTHLY
+  QUARTERLY
+  FOURMONTHLY
+  BIANNUAL
+  YEARLY
+}
+
+enum TASK_SPECIALTY {
+  ELECTRIC
+  MECHANIC
+  INSTRUMENTATION_CONTROL
+  HYDRAULIC
+}
+
+enum TASK_TYPE {
+  CLEANING
+  INSPECTION
+  LUBRICATION
+  ADJUSTMENTS
+}
+
+model MaintenancePlan {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  equipment   Equipment             @relation(fields: [equipmentId], references: [id])
+  equipmentId String
+  createdBy   User                  @relation(fields: [createdById], references: [id])
+  createdById String
+  task        MaintenancePlanTask[]
+
+  @@map("maintenance_plan")
+}
+
+model MaintenancePlanTask {
+  id                            String               @id @default(cuid())
+  slug                          String               @unique
+  name                          String
+  description                   String?
+  isActive                      Boolean              @default(true)
+  frequency                     PLAN_FREQUENCY
+  nextDate                      DateTime
+  createdAt                     DateTime             @default(now())
+  updatedAt                     DateTime             @updatedAt
+  isAutomated                   Boolean              @default(false)
+  automatedCompanyId            String?
+  automatedSupervisorId         String?
+  automatedWorkOrderType        WORK_ORDER_TYPE?
+  automatedPriority             WORK_ORDER_PRIORITY?
+  automatedCapex                WORK_ORDER_CAPEX?
+  automatedEstimatedDays        Int?
+  automatedEstimatedDaysByMonth Boolean              @default(false)
+  automatedEstimatedHours       Int?
+  automatedDaysInAdvance        Int?
+  automatedWorkDescription      String?
+  blockIfPreviousNotCompleted   Boolean              @default(true)
+  emailsForCopy                 String[]
+  originalDayOfMonth            Int?
+  specialty                     TASK_SPECIALTY?
+  taskType                      TASK_TYPE?
+
+  equipment         Equipment?      @relation("MaintenancePlanTaskLegacyEquipment", fields: [equipmentId], references: [id])
+  equipmentId       String?
+  equipments        Equipment[]     @relation("MaintenancePlanTaskEquipments")
+  attachments       Attachment[]
+  maintenancePlan   MaintenancePlan @relation(fields: [maintenancePlanId], references: [id])
+  maintenancePlanId String
+  createdBy         User            @relation(fields: [createdById], references: [id])
+  createdById       String
+  automatedResponsible   User?      @relation("MaintenancePlanTaskAutomatedResponsible", fields: [automatedResponsibleId], references: [id])
+  automatedResponsibleId String?
+  workOrders        WorkOrder[]
+
+  @@map("maintenance_plan_task")
+}
+
+enum ReviewStatus {
+  DRAFT // Edicion
+  SUBMITTED // Enviado
+  APPROVED // Aprobado
+  REJECTED // Rechazado
+  EXPIRED // Expirado
+  TO_UPDATE // A actualizar
+  NOT_APPLIED // No aplicado
+}
+
+enum SafetyAndHealthDocumentType {
+  // Información Básica
+  COMPANY_INFO // Ficha empresa
+  STAFF_LIST // Nómina de personal
+  GANTT_CHART // Carta Gantt
+  MUTUAL // Certificado de adhesión a mutualidad
+  INTERNAL_REGULATION // Reglamento interno
+  ACCIDENT_RATE // Certificado de siniestralidad
+  // Procedimientos y Otros
+  RISK_MATRIX // Matriz de Identificación de peligros y evaluación de Riesgos
+  PREVENTION_PLAN // Plan de Prevención de riesgos
+  WORK_PROCEDURE // Procedimiento de trabajos
+  EMERGENCY_PROCEDURE // Procedimientos de Emergencia
+  TOOLS_MAINTENANCE // Programa de Mantención de Herramientas y Equipos
+  PPE_CERTIFICATION // Certificación de elementos de Protección Personal
+  HARASSMENT_PROCEDURE // Procedimiento de Acoso Laboral, Sexual y Violencia
+  ORGANIZATION_CHART // Organigrama
+  SAFE_WORK // Trabajo seguro
+  RISK_ANALYSIS // Análisis de riesgos
+  WORK_PERMIT // Permiso de trabajo
+  CONTRACTOR_REGULATION_RECEIPT // Registro de recepción del reglamento de contratistas
+}
+
+enum WorkerDocumentType {
+  CONTRACT // Contrato de Trabajo
+  INTERNAL_REGULATION_RECEIPT // Entrega de Reglamento Interno
+  RISK_INFORMATION // Inducción de Riesgos Laborales (IRL)
+  ID_CARD // Cédula de identidad
+  DRIVING_LICENSE // Licencias de conducir
+  HEALTH_EXAM // Examen médico vigente
+  PSYCHOTECHNICAL_EXAM // Examen Psico sensotécnico
+  RISK_MATRIX_TRAINING // Capacitación de la matriz de identificación de peligros
+  WORK_PROCEDURE_TRAINING // Capacitación del procedimiento de trabajo
+  EMERGENCY_PROCEDURE_TRAINING // Capacitación del Procedimiento de Emergencia
+  DEFENSIVE_DRIVING_TRAINING // Capacitación curso manejo defensivo
+  MOUNTAIN_DEFENSIVE_DRIVING // Curso de manejo defensivo en alta montaña
+  TOOLS_MAINTENANCE_TRAINING // Capacitación del procedimiento de Mantención de Herramientas
+  HARASSMENT_TRAINING // Capacitación de la Ley Karin
+  PPE_RECEIPT // Entrega de Elementos de Protección personal
+  PREVENTION_EXPERT // Experto en Prevención de riesgos
+  HIGH_RISK_TRAINING // Cursos para trabajos de alto riesgo
+  ENVIRONMENTAL_TRAINING // Capacitaciones ambientales
+  ALCOHOL_AND_DRUGS_EXAM // Examen de alcohol y drogas
+  IRL_SAFETY_TALK // Charlas de Inducción de Riesgos Laborales
+}
+
+enum VehicleDocumentType {
+  EQUIPMENT_FILE // Ficha de equipos
+  VEHICLE_REGISTRATION // Inscripción del Vehículo Motorizado (Padrón)
+  CIRCULATION_PERMIT // Permiso de circulación
+  TECHNICAL_REVIEW // Revisión técnica
+  INSURANCE // Seguro Obligatorio
+  CHECKLIST // Lista de chequeo previa al ingreso
+  TRANSPORTATION_TO_OTC // Vehículo de transporte de trabajadores
+  HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos peligrosos
+  NON_HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos No peligrosos
+  LIQUID_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos domésticos líquidos
+}
+
+enum EnvironmentalDocType {
+  ENVIRONMENTAL_PLAN // Plan de Gestión ambiental
+  SPILL_PREVENTION // Procedimiento de Prevención y control de derrames
+  WASTE_MANAGEMENT // Procedimiento de manejo de residuos
+  ENVIRONMENTAL_TRAINING // Capacitaciones ambientales
+  ENVIRONMENTAL_MATRIX // Matriz de identificación y evaluación de aspectos ambientales
+  RECT_CERTIFICATE // Certificado RECT
+  WATER_CERTIFICATE // Certificado compra de agua potable
+  WATER_FACTORY_RESOLUTION // Resolución sanitaria fábrica de botellones de agua
+  DINING_RESOLUTION // Resolución sanitaria comedor
+  CHEMICAL_TOILET_CONTRACT // Contrato servicio de limpieza de baños químicos
+  SAFETY_DATA_SHEET // Hojas de datos de seguridad de sustancias químicas
+  LAYOUT_PLAN // Plano layout de instalación de faenas
+  ELECTRICAL_DECLARATION // TE 1, Declaración de instalación eléctrica
+  GAS_DECLARATION // TC 6, Declaración de instalaciones interiores de gas
+  PEST_CONTROL_RESOLUTION // Resolución sanitaria de control de plagas
+  PEST_CONTROL_CERTIFICATE // Certificado mensual de desratización, desinsectación y sanitización
+  PEST_CONTROL_PRODUCTS_SDS // HDS productos control de plagas
+  PEST_CONTROL_TRACKING // Planilla control mensual sanitización
+  HAZARDOUS_STORAGE_CHECKLIST // Check list de Bodega de almacenamiento
+  HAZARDOUS_INVENTORY // Inventario mensual de sustancias peligrosas
+  LAND_MOVEMENT_PERMIT // Permiso municipal para excavaciones o edificaciones preliminares, etc.
+  DEBRIS_ROUTE // Ruta de traslado de escombros y/o tierra de excavación masiva
+  FUEL_CONSUMPTION // Planilla de registro de consumo de combustible
+  WATER_CONSUMPTION // Planilla de registro mensual de consumo de agua
+  OTHER // Otros documentos
+}
+
+enum EnvironmentDocType {
+  WORK_PROCEDURE // Procedimiento de trabajo con sección ambiental
+  ENVIRONMENTAL_ASPECTS_AND_IMPACTS_MATRIX // Matriz de aspectos ambientales y impactos
+  SAFETY_DATA_SHEET_FOR_CHEMICALS // Hoja de datos de seguridad de sustancias químicas
+  WORKER_TRAINING_RECORD // Planilla de capacitación de los trabajadores
+  HEALTH_RESOLUTION_FOR_WORKERS_DRINKING_WATER // Resolución de salud para el agua potable
+  HEALTH_RESOLUTION_FOR_THE_CHEMICAL_TOILET // Resolución de salud para el baño químico
+  RESOLUTION_FOR_THE_SITE_WHERE_DEBRIS_WILL_BE_DISPOSED // Resolución para el sitio donde se dispondrá el escombros
+  RESOLUTION_FOR_THE_DEBRIS_TRANSPORTER // Resolución para el transportador de escombros
+  DEBRIS_TRANSFER_ROUTE // Ruta de traslado de escombros y/o tierra de excavación masiva
+  HEALTH_RESOLUTION_FROM_THE_PEST_CONTROL_COMPANY // Resolución de salud de la empresa de control de plagas
+  ENVIRONMENTAL_MANAGEMENT_PLAN // Plan de Gestión ambiental
+}
+
+enum BasicDocumentType {
+  CONTRACT // Contrato de trabajo o de prestación de servicios.
+  INSURANCE // Certificado de cobertura del seguro contra accidentes laborales.
+  PPE_RECEIPT // Registro firmado de entrega de elementos de protección personal
+  SAFETY_AND_HEALTH_INFO // Inducción sobre Información de riesgos laborales (DS44), la cual debe incluir Los riesgos a los que se podría estar expuesto en OTC y las respectivas medidas de control.
+  IRL_SAFETY_TALK // Charlas de Inducción de Riesgos Laborales
+}
+
+enum TechSpecsDocumentType {
+  GANTT_CHART // Carta Gantt del trabajo
+  TECHNICAL_WORK_PROCEDURE // Procedimiento de trabajo técnico
+}
+
+enum DocumentCategory {
+  VEHICLES
+  PERSONNEL
+  ENVIRONMENTAL
+  ENVIRONMENT
+  SAFETY_AND_HEALTH
+  BASIC
+  TECHNICAL_SPECS
+}
+
+enum StartupFolderType {
+  BASIC
+  FULL
+}
+
+enum StartupFolderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model StartupFolder {
+  id                String              @id @default(uuid())
+  name              String              @default("Carpeta de arranque")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  type              StartupFolderType   @default(FULL)
+  status            StartupFolderStatus @default(PENDING)
+  moreMonthDuration Boolean             @default(false)
+  isDeleted         Boolean             @default(false)
+  isArchived        Boolean             @default(false)
+  archivedAt        DateTime?
+
+  workersFolders         WorkerFolder[]
+  vehiclesFolders        VehicleFolder[]
+  safetyAndHealthFolders SafetyAndHealthFolder[]
+  environmentalFolders   EnvironmentalFolder[]
+  company                Company                 @relation(fields: [companyId], references: [id])
+  companyId              String
+  environmentFolders     EnvironmentFolder[]
+  basicFolders           BasicFolder[]
+  techSpecsFolders       TechSpecsFolder[]
+
+  @@index([companyId, status], name: "startup_folder_company_status_idx")
+  @@map("startup_folder")
+}
+
+model TechSpecsFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?               @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder       @relation(fields: [startupFolderId], references: [id])
+  documents       TechSpecsDocument[]
+
+  @@unique([startupFolderId])
+  @@map("tech_specs_folder")
+}
+
+model TechSpecsDocument {
+  id             String                @id @default(uuid())
+  type           TechSpecsDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime              @default(now())
+  category       DocumentCategory
+  status         ReviewStatus          @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?                 @relation("TechSpecsDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?                 @relation("TechSpecsDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         TechSpecsFolder       @relation(fields: [folderId], references: [id])
+
+  @@map("tech_specs_document")
+}
+
+model BasicFolder {
+  id                           String       @id @default(uuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?           @relation("BasicFolderReviewer", fields: [reviewerId], references: [id])
+  workerId        String
+  worker          User            @relation("BasicFolderWorker", fields: [workerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder   @relation(fields: [startupFolderId], references: [id])
+  documents       BasicDocument[]
+
+  @@unique([workerId, startupFolderId])
+  @@map("basic_folder")
+}
+
+model BasicDocument {
+  id             String            @id @default(uuid())
+  type           BasicDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime          @default(now())
+  category       DocumentCategory
+  status         ReviewStatus      @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?             @relation("BasicDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?             @relation("BasicDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         BasicFolder       @relation(fields: [folderId], references: [id])
+
+  @@map("basic_document")
+}
+
+model SafetyAndHealthFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?                     @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder             @relation(fields: [startupFolderId], references: [id])
+  documents       SafetyAndHealthDocument[]
+
+  @@unique([startupFolderId])
+  @@map("safety_and_health_folder")
+}
+
+model SafetyAndHealthDocument {
+  id             String                      @id @default(uuid())
+  type           SafetyAndHealthDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime                    @default(now())
+  category       DocumentCategory
+  status         ReviewStatus                @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?                       @relation("SafetyAndHealthDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?                       @relation("SafetyAndHealthDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         SafetyAndHealthFolder       @relation(fields: [folderId], references: [id])
+
+  @@map("safety_and_health_document")
+}
+
+model WorkerFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+  isDriver                     Boolean      @default(true)
+
+  reviewerId      String?
+  reviewer        User?            @relation("WorkerFolderReviewer", fields: [reviewerId], references: [id])
+  workerId        String
+  worker          User             @relation("WorkerFolderWorker", fields: [workerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder    @relation(fields: [startupFolderId], references: [id])
+  documents       WorkerDocument[]
+
+  @@unique([workerId, startupFolderId])
+  @@map("worker_folders")
+}
+
+model WorkerDocument {
+  id             String             @id @default(uuid())
+  type           WorkerDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime           @default(now())
+  category       DocumentCategory
+  status         ReviewStatus       @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?              @relation("WorkerDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?              @relation("WorkerDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folder         WorkerFolder       @relation(fields: [folderId], references: [id])
+  folderId       String
+
+  @@map("worker_document")
+}
+
+model VehicleFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  vehicleId       String
+  startupFolderId String
+  reviewerId      String?
+  reviewer        User?             @relation(fields: [reviewerId], references: [id])
+  vehicle         Vehicle           @relation(fields: [vehicleId], references: [id])
+  startupFolder   StartupFolder     @relation(fields: [startupFolderId], references: [id])
+  documents       VehicleDocument[]
+
+  @@unique([vehicleId, startupFolderId])
+  @@map("vehicle_folders")
+}
+
+model VehicleDocument {
+  id             String              @id @default(uuid())
+  type           VehicleDocumentType
+  name           String
+  url            String
+  uploadedAt     DateTime            @default(now())
+  category       DocumentCategory
+  status         ReviewStatus        @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?               @relation("VehicleDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?               @relation("VehicleDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         VehicleFolder       @relation(fields: [folderId], references: [id])
+
+  @@map("vehicle_document")
+}
+
+model EnvironmentalFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?                   @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder           @relation(fields: [startupFolderId], references: [id])
+  documents       EnvironmentalDocument[]
+
+  @@unique([startupFolderId])
+  @@map("environmental_folder")
+}
+
+model EnvironmentalDocument {
+  id             String               @id @default(uuid())
+  type           EnvironmentalDocType
+  name           String
+  url            String
+  uploadedAt     DateTime             @default(now())
+  category       DocumentCategory
+  status         ReviewStatus         @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?                @relation("EnvironmentalDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?                @relation("EnvironmentalDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         EnvironmentalFolder  @relation(fields: [folderId], references: [id])
+
+  @@map("environmental_document")
+}
+
+model EnvironmentFolder {
+  id                           String       @id @default(cuid())
+  status                       ReviewStatus @default(DRAFT)
+  additionalNotificationEmails String[]
+  submittedAt                  DateTime?
+  createdAt                    DateTime     @default(now())
+  updatedAt                    DateTime     @updatedAt
+
+  reviewerId      String?
+  reviewer        User?                 @relation(fields: [reviewerId], references: [id])
+  startupFolderId String
+  startupFolder   StartupFolder         @relation(fields: [startupFolderId], references: [id])
+  documents       EnvironmentDocument[]
+
+  @@unique([startupFolderId])
+  @@map("environment_folder")
+}
+
+model EnvironmentDocument {
+  id             String             @id @default(uuid())
+  type           EnvironmentDocType
+  name           String
+  url            String
+  uploadedAt     DateTime           @default(now())
+  category       DocumentCategory
+  status         ReviewStatus       @default(DRAFT)
+  reviewNotes    String?
+  reviewedAt     DateTime?
+  submittedAt    DateTime?
+  expirationDate DateTime?
+  reviewerId     String?
+  reviewer       User?              @relation("EnvironmentDocumentReviewer", fields: [reviewerId], references: [id])
+  uploadedById   String?
+  uploadedBy     User?              @relation("EnvironmentDocumentUploadedBy", fields: [uploadedById], references: [id])
+  folderId       String
+  folder         EnvironmentFolder  @relation(fields: [folderId], references: [id])
+
+  @@map("environment_document")
+}
+
+enum WORK_REQUEST_STATUS {
+  REPORTED // Solicitud Reportada
+  APPROVED // Solicitud Aprobada
+  ATTENDED // Solicitud Atendida
+  CANCELLED // Solicitud Cancelada
+}
+
+enum WORK_REQUEST_TYPE {
+  MECHANIC
+  ELECTRIC
+}
+
+enum SUPPORT_TICKET_TYPE {
+  INCIDENT
+  IMPROVEMENT
+  QUERY
+}
+
+enum SUPPORT_TICKET_PRIORITY {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum SUPPORT_TICKET_STATUS {
+  REPORTED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
+model SupportTicket {
+  id             String                  @id @default(cuid())
+  ticketNumber   String                  @unique
+  title          String
+  type           SUPPORT_TICKET_TYPE
+  priority       SUPPORT_TICKET_PRIORITY
+  status         SUPPORT_TICKET_STATUS   @default(REPORTED)
+  affectedModule MODULES?
+  description    String
+  startedAt      DateTime?
+  resolvedAt     DateTime?
+  rejectedAt     DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  requesterId String
+  requester   User   @relation("SupportTicketRequester", fields: [requesterId], references: [id])
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  notes       SupportTicketNote[]
+  attachments SupportTicketAttachment[]
+
+  @@index([status], name: "support_ticket_status_idx")
+  @@index([requesterId, createdAt], name: "support_ticket_requester_created_at_idx")
+  @@index([companyId], name: "support_ticket_company_id_idx")
+  @@map("support_ticket")
+}
+
+model SupportTicketNote {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  supportTicketId String
+  supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [id], onDelete: Cascade)
+
+  attachments SupportTicketAttachment[]
+
+  @@index([supportTicketId, createdAt], name: "support_ticket_note_ticket_created_at_idx")
+  @@map("support_ticket_note")
+}
+
+model SupportTicketAttachment {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  type      String
+  size      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  supportTicketId String
+  supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [id], onDelete: Cascade)
+
+  supportTicketNoteId String?
+  supportTicketNote   SupportTicketNote? @relation(fields: [supportTicketNoteId], references: [id], onDelete: Cascade)
+
+  @@index([supportTicketId], name: "support_ticket_attachment_ticket_id_idx")
+  @@index([supportTicketNoteId], name: "support_ticket_attachment_note_id_idx")
+  @@map("support_ticket_attachment")
+}
+
+model WorkRequest {
+  id             String              @id @default(cuid())
+  requestNumber  String              @unique
+  description    String
+  isUrgent       Boolean             @default(false)
+  requestDate    DateTime            @default(now())
+  observations   String?
+  customLocation String?
+  status         WORK_REQUEST_STATUS @default(REPORTED)
+  operatorId     String?
+  operator       User?               @relation("WorkRequestOperator", fields: [operatorId], references: [id])
+  workType       WORK_REQUEST_TYPE?
+
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  approvalDate DateTime?
+  approvalById String?
+  approvalBy   User?                @relation("WorkRequestApprovalBy", fields: [approvalById], references: [id])
+  userId       String
+  user         User                 @relation(fields: [userId], references: [id])
+  attachments  Attachment[]
+  comments     WorkRequestComment[]
+  workOrders   WorkOrder[]
+  equipments   Equipment[]
+
+  @@map("work_request")
+}
+
+model WorkRequestComment {
+  id      String @id @default(cuid())
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  workRequestId String
+  workRequest   WorkRequest @relation(fields: [workRequestId], references: [id], onDelete: Cascade)
+
+  @@map("work_request_comment")
+}
+
+enum ACTIVITY_TYPE {
+  CREATE
+  UPDATE
+  DELETE
+  SUBMIT
+  APPROVE
+  REJECT
+  CANCEL
+  COMPLETE
+  VIEW
+  DOWNLOAD
+  UPLOAD
+  COMMENT
+  ASSIGN
+  UNASSIGN
+  LOGIN
+  LOGOUT
+}
+
+enum ACTIVITY_SEVERITY {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ACTOR_TYPE {
+  USER
+  EXTERNAL_VISITOR
+  SYSTEM
+}
+
+model ActivityLog {
+  id         String        @id @default(cuid())
+  timestamp  DateTime      @default(now())
+  module     MODULES
+  action     ACTIVITY_TYPE
+  entityId   String
+  entityType String
+  metadata   Json?
+
+  // Request-context fields (nullable — historical rows = NULL)
+  ipAddress String?
+  userAgent String?
+  sessionId String?
+  requestId String?
+
+  // Diff fields
+  changesBefore Json?
+  changesAfter  Json?
+
+  // Severity — nullable (no default); historical rows stay NULL
+  severity ACTIVITY_SEVERITY?
+
+  // Polymorphic actor
+  actorType       ACTOR_TYPE       @default(USER)
+  externalActorId String?
+  externalActor   ExternalVisitor? @relation(fields: [externalActorId], references: [id], onDelete: SetNull)
+
+  // User — nullable (was NOT NULL)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([module])
+  @@index([entityType, entityId])
+  @@index([timestamp])
+  @@index([actorType, externalActorId])
+  @@index([severity])
+  @@map("activity_log")
+}
+
+enum INSPECTION_COMMENT_TYPE {
+  SUPERVISOR_RESPONSE
+  RESPONSIBLE_APPROVAL
+  RESPONSIBLE_REJECTION
+}
+
+model InspectionComment {
+  id          String                  @id @default(cuid())
+  content     String
+  type        INSPECTION_COMMENT_TYPE
+  isResolved  Boolean                 @default(false)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  author      User                    @relation("InspectionCommentAuthor", fields: [authorId], references: [id])
+  authorId    String
+  workEntry   WorkEntry               @relation(fields: [workEntryId], references: [id])
+  workEntryId String
+  attachments Attachment[]
+
+  @@index([workEntryId])
+  @@index([authorId])
+  @@index([type])
+  @@map("inspection_comment")
+}
+
+model ExternalCompany {
+  id           String            @id @default(cuid())
+  name         String
+  rut          String            @unique
+  emails       String[]
+  createdAt    DateTime          @default(now())
+  visitors     ExternalVisitor[]
+  visitorTalks VisitorTalk[]
+
+  @@index([rut])
+  @@map("external_company")
+}
+
+model ExternalVisitor {
+  id              String                  @id @default(cuid())
+  name            String // Will be filled when visitor accesses the link
+  rut             String // Will be filled when visitor accesses the link
+  email           String // Email from the authorized list
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  company         ExternalCompany         @relation(fields: [companyId], references: [id])
+  companyId       String
+  visitorTalks    VisitorTalk[]
+  talkCompletions VisitorTalkCompletion[]
+  activityLogs    ActivityLog[]
+
+  @@unique([email, companyId]) // One visitor per email per company
+  @@index([companyId])
+  @@index([email])
+  @@map("external_visitor")
+}
+
+model VisitorTalk {
+  id          String                  @id @default(cuid())
+  uniqueToken String                  @unique
+  videoUrl    String
+  category    SAFETY_TALK_CATEGORY    @default(VISITOR) // VISITOR (PRS) o VISITOR_TRM
+  expiresAt   DateTime?
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  company     ExternalCompany         @relation(fields: [companyId], references: [id])
+  companyId   String
+  visitors    ExternalVisitor[]
+  completions VisitorTalkCompletion[]
+
+  @@index([uniqueToken])
+  @@index([companyId])
+  @@index([category])
+  @@map("visitor_talk")
+}
+
+enum VISITOR_TALK_STATUS {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model VisitorTalkCompletion {
+  id               String              @id @default(cuid())
+  status           VISITOR_TALK_STATUS @default(NOT_STARTED)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  ipAddress        String?
+  userAgent        String?
+  // Campos de evaluación
+  score            Float?
+  passed           Boolean?
+  answers          Json?
+  attemptNumber    Int                 @default(1)
+  timeSpentSeconds Int?
+  certificateUrl   String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  visitor          ExternalVisitor     @relation(fields: [visitorId], references: [id])
+  visitorId        String
+  visitorTalk      VisitorTalk         @relation(fields: [visitorTalkId], references: [id])
+  visitorTalkId    String
+
+  @@unique([visitorId, visitorTalkId])
+  @@index([visitorTalkId])
+  @@index([status])
+  @@map("visitor_talk_completion")
+}
+
+model FileAccessLog {
+  id            String      @id @default(cuid())
+  filename      String
+  containerType String
+  action        String
+  success       Boolean     @default(false)
+  accessRole    ACCESS_ROLE @default(PARTNER_COMPANY)
+  ipAddress     String?
+  userAgent     String?
+  timestamp     DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([userId])
+  @@index([companyId])
+  @@map("file_access_log")
+}
+
+enum LABOR_CONTROL_STATUS {
+  DRAFT
+  APPROVED
+  REJECTED
+  SUBMITTED
+  NOT_APPLIED
+}
+
+model LaborControlFolder {
+  id                  String               @id @default(uuid())
+  status              LABOR_CONTROL_STATUS @default(DRAFT)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  emails              String[]
+  companyFolderStatus LABOR_CONTROL_STATUS @default(DRAFT)
+
+  companyId     String
+  company       Company                    @relation(fields: [companyId], references: [id])
+  documents     LaborControlDocument[]
+  workerFolders WorkerLaborControlFolder[]
+}
+
+model WorkerLaborControlFolder {
+  id        String               @id @default(uuid())
+  status    LABOR_CONTROL_STATUS @default(DRAFT)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  emails    String[]
+
+  workerId             String
+  worker               User                         @relation("WorkerLaborControlFolderWorker", fields: [workerId], references: [id])
+  documents            WorkerLaborControlDocument[]
+  laborControlFolderId String?
+  LaborControlFolder   LaborControlFolder?          @relation(fields: [laborControlFolderId], references: [id])
+}
+
+enum LABOR_CONTROL_DOCUMENT_TYPE {
+  F30 // Formulario 30
+  F30_1 // Formulario 30-1
+  SINIESTRALITY // Siniestralidad
+  TRG_TREASURY_CERTIFICATE // Certificado de tesoreria TRG
+}
+
+model LaborControlDocument {
+  id          String                      @id @default(uuid())
+  type        LABOR_CONTROL_DOCUMENT_TYPE
+  status      LABOR_CONTROL_STATUS        @default(DRAFT)
+  name        String
+  url         String
+  reviewNotes String?
+  reviewDate  DateTime?
+  uploadDate  DateTime                    @default(now())
+  updatedAt   DateTime                    @updatedAt
+
+  uploadById String
+  uploadBy   User               @relation("LaborControlDocumentUploadBy", fields: [uploadById], references: [id])
+  reviewById String?
+  reviewBy   User?              @relation("LaborControlDocumentReviewBy", fields: [reviewById], references: [id])
+  folderId   String
+  folder     LaborControlFolder @relation(fields: [folderId], references: [id])
+}
+
+enum WORKER_LABOR_CONTROL_DOCUMENT_TYPE {
+  ATTENDANCE_BOOK // Libro de asistencia
+  MEDICAL_LEAVE // Licencia médica
+  PAYROLL_STTLEMENT // Liquidacion de sueldo
+  STTLEMENT // Finiquito
+  NOTICE_OF_TERMINATION // Aviso de termino de contrato
+}
+
+model WorkerLaborControlDocument {
+  id          String                             @id @default(uuid())
+  type        WORKER_LABOR_CONTROL_DOCUMENT_TYPE
+  status      LABOR_CONTROL_STATUS               @default(DRAFT)
+  name        String
+  url         String
+  reviewNotes String?
+  reviewDate  DateTime?
+  uploadDate  DateTime                           @default(now())
+  updatedAt   DateTime                           @updatedAt
+
+  uploadById String
+  uploadBy   User                     @relation("WorkerLaborControlDocumentUploadBy", fields: [uploadById], references: [id])
+  reviewById String?
+  reviewBy   User?                    @relation("WorkerLaborControlDocumentReviewBy", fields: [reviewById], references: [id])
+  folderId   String
+  folder     WorkerLaborControlFolder @relation(fields: [folderId], references: [id])
+}
+
+enum StartupGuideDocumentVisibility {
+  BASIC
+  FULL
+  BOTH
+}
+
+model StartupGuideDocument {
+  id          String                         @id @default(cuid())
+  name        String
+  description String?
+  url         String
+  type        String
+  size        Int?
+  visibility  StartupGuideDocumentVisibility @default(BOTH)
+  order       Int                            @default(0)
+  isActive    Boolean                        @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String
+  createdBy   User   @relation("GuideDocumentCreatedBy", fields: [createdById], references: [id])
+
+  @@index([visibility, isActive])
+  @@map("startup_guide_document")
+}
+
+model InPersonSafetyTalkRecord {
+  id             String                @id @default(cuid())
+  rut            String
+  name           String
+  company        String
+  category       SAFETY_TALK_CATEGORY?
+  sessionDate    DateTime
+  expiresAt      DateTime?
+  status         SAFETY_TALK_STATUS    @default(PASSED)
+  score          Float?
+  source         String                @default("MANUAL")
+  notes          String?
+  registeredById String?
+  registeredBy   User?                 @relation("InPersonSafetyTalkRegisteredBy", fields: [registeredById], references: [id])
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@index([rut])
+  @@index([company])
+  @@index([status])
+  @@map("in_person_safety_talk_record")
+}
+
+model ApiKey {
+  id           String    @id @default(cuid())
+  name         String
+  keyHash      String    @unique
+  keyPrefix    String
+  createdById  String
+  createdBy    User      @relation("UserApiKeys", fields: [createdById], references: [id])
+  isActive     Boolean   @default(true)
+  expiresAt    DateTime?
+  lastUsedAt   DateTime?
+  requestCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([keyHash])
+  @@map("api_key")
+}
+
+model WorkerQRToken {
+  id          String    @id @default(cuid())
+  workerId    String
+  worker      User      @relation("WorkerQRTokenWorker", fields: [workerId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  createdById String
+  createdBy   User      @relation("WorkerQRTokenCreatedBy", fields: [createdById], references: [id])
+
+  @@index([workerId, revokedAt])
+  @@index([tokenHash])
+  @@map("worker_qr_token")
+}

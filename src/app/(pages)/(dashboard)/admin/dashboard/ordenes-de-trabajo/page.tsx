@@ -1,0 +1,113 @@
+import { notFound } from "next/navigation"
+import { headers } from "next/headers"
+import dynamic from "next/dynamic"
+
+import { auth } from "@/lib/auth"
+
+import { LazyWorkOrderStatsContainer } from "@/project/work-order/components/stats/work-order/LazyWorkOrderStatsContainer"
+import LazyCreateWorkOrderForm from "@/project/work-order/components/forms/LazyCreateWorkOrderForm"
+import LazyNewWorkBookForm from "@/project/work-order/components/forms/LazyNewWorkBookForm"
+import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
+import ScrollToTableButton from "@/shared/components/ScrollToTable"
+import ModuleHeader from "@/shared/components/ModuleHeader"
+
+const VideoTutorials = dynamic(() => import("@/shared/components/VideoTutorials"))
+
+export default async function AdminUsersPage(): Promise<React.ReactElement> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) return notFound()
+
+	const [hasPermission, hassWorkBookPermission, hasDeleteEmptyPermission] = await Promise.all([
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workOrder: ["create"],
+				},
+			},
+		}),
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workBook: ["create"],
+				},
+			},
+		}),
+		auth.api.userHasPermission({
+			body: {
+				userId: session.user.id,
+				permissions: {
+					workOrder: ["delete-empty"],
+				},
+			},
+		}),
+	])
+
+	return (
+		<div className={"flex h-full w-full flex-1 flex-col gap-8 transition-all"}>
+			<ModuleHeader
+				title="Órdenes de Trabajo"
+				className="from-orange-600 to-red-600 dark:from-orange-800 dark:to-red-800"
+				description="Gestión y seguimiento de órdenes de trabajo"
+			>
+				<>
+					<VideoTutorials
+						className="text-red-500"
+						videos={[
+							{
+								title: "Creacion Orden de Trabajo",
+								description: "Tutorial de como crear una orden de trabajo.",
+								url: "https://youtube.com/embed/Yg_ZiODHu1U",
+							},
+							{
+								title: "Creacion Libro de Obras",
+								description: "Tutorial de como crear un libro de obras.",
+								url: "https://youtube.com/embed/K_LHCpommos",
+							},
+							{
+								title: "Cierre de Hitos",
+								description: "Tutorial de como cerrar hitos de una orden de trabajo.",
+								url: "https://youtube.com/embed/cTT1T9zIl7Q",
+							},
+							{
+								title: "Funcionalidades OT",
+								description: "Muestra todas las funcionalidades de las ordenes de trabajo.",
+								url: "https://youtube.com/embed/guIR3J8qyT8",
+							},
+							{
+								title: "Funcionalidades Libro de Obras",
+								description: "Muestra todas las funcionalidades de los libros de obras.",
+								url: "https://youtube.com/embed/vJTegLRfjDY",
+							},
+							{
+								title: "Edicion OT",
+								description: "Tutorial de como editar una orden de trabajo.",
+								url: "https://youtube.com/embed/7tkrv7JHOKs",
+							},
+						]}
+					/>
+
+					{hasPermission.success && <LazyCreateWorkOrderForm />}
+
+					{hassWorkBookPermission.success && (
+						<LazyNewWorkBookForm
+							userId={session.user.id}
+							companyId={process.env.NEXT_PUBLIC_OTC_COMPANY_ID!}
+							className="text-amber-600 hover:bg-white hover:text-amber-600 dark:text-amber-800 dark:hover:text-amber-800"
+						/>
+					)}
+				</>
+			</ModuleHeader>
+
+			<div className="space-y-4">
+				<LazyWorkOrderStatsContainer />
+			</div>
+
+			<WorkOrderTable id="work-order-table" canDelete={hasDeleteEmptyPermission.success} />
+		</div>
+	)
+}

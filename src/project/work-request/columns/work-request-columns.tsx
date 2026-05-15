@@ -1,0 +1,272 @@
+"use client"
+
+import { ColumnDef } from "@tanstack/react-table"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
+import {
+	XCircleIcon,
+	AlertCircleIcon,
+	CheckCircleIcon,
+	MessageCircleIcon,
+	AlertTriangleIcon,
+} from "lucide-react"
+
+import { WORK_REQUEST_STATUS, WORK_REQUEST_TYPE } from "@/generated/prisma/enums"
+import { DataGridColumnHeader } from "@/shared/components/data-grid/data-grid-column-header"
+
+import { DropdownMenuItem, DropdownMenuSeparator } from "@/shared/components/ui/dropdown-menu"
+import CreateWorkOrderForm from "@/project/work-order/components/forms/CreateWorkOrderForm"
+import type { WorkRequest } from "@/project/work-request/hooks/use-work-request"
+import ActionDataMenu from "@/shared/components/ActionDataMenu"
+import { Badge } from "@/shared/components/ui/badge"
+
+const statusBadgeVariant = (status: WORK_REQUEST_STATUS) => {
+	switch (status) {
+		case "REPORTED":
+			return "outline"
+		case "APPROVED":
+			return "secondary"
+		case "ATTENDED":
+			return "default"
+		case "CANCELLED":
+			return "destructive"
+		default:
+			return "secondary"
+	}
+}
+
+const statusText = (status: WORK_REQUEST_STATUS) => {
+	switch (status) {
+		case "REPORTED":
+			return "Reportada"
+		case "APPROVED":
+			return "Aprobada"
+		case "ATTENDED":
+			return "Atendida"
+		case "CANCELLED":
+			return "Cancelada"
+		default:
+			return status
+	}
+}
+
+const workTypeText = (workType: WORK_REQUEST_TYPE) => {
+	switch (workType) {
+		case "ELECTRIC":
+			return "Eléctrico"
+		case "MECHANIC":
+			return "Mecánico"
+		default:
+			return workType
+	}
+}
+
+interface WorkRequestColumnsProps {
+	hasPermission: boolean
+	isStatusLoading: boolean
+	handleOpenDetails: (request: WorkRequest) => void
+	handleOpenComment: (request: WorkRequest) => void
+	handleStatusUpdate: (id: string, status: WORK_REQUEST_STATUS) => void
+	handleUrgencyUpdate: (id: string, isUrgent: boolean) => void
+}
+
+export const getWorkRequestColumns = ({
+	hasPermission,
+	isStatusLoading,
+	handleOpenDetails,
+	handleOpenComment,
+	handleStatusUpdate,
+	handleUrgencyUpdate,
+}: WorkRequestColumnsProps): ColumnDef<WorkRequest>[] => [
+	{
+		accessorKey: "workOrder",
+		header: ({ column }) => <DataGridColumnHeader column={column} title="" visibility />,
+		enableSorting: false,
+		meta: {
+			headerTitle: "Acciones",
+		},
+		size: 50,
+		cell: ({ row }) => {
+			return (
+				<ActionDataMenu>
+					<>
+						<DropdownMenuItem onClick={() => handleOpenComment(row.original)}>
+							<MessageCircleIcon className="h-4 w-4" /> Comentar
+						</DropdownMenuItem>
+
+						<DropdownMenuItem asChild>
+							<CreateWorkOrderForm
+								workRequestId={row.original.id}
+								equipmentId={[row.original.equipments[0].id]}
+							/>
+						</DropdownMenuItem>
+
+						<DropdownMenuSeparator />
+
+						{row.original.status !== "ATTENDED" && (
+							<DropdownMenuItem
+								onClick={() => handleStatusUpdate(row.original.id, "ATTENDED")}
+								disabled={isStatusLoading}
+							>
+								<CheckCircleIcon className="h-4 w-4 text-teal-500" /> Marcar como atendida
+							</DropdownMenuItem>
+						)}
+						{row.original.status !== "CANCELLED" && (
+							<DropdownMenuItem
+								onClick={() => handleStatusUpdate(row.original.id, "CANCELLED")}
+								disabled={isStatusLoading}
+							>
+								<XCircleIcon className="h-4 w-4 text-rose-500" /> Cancelar solicitud
+							</DropdownMenuItem>
+						)}
+						{row.original.status !== "REPORTED" && (
+							<DropdownMenuItem
+								onClick={() => handleStatusUpdate(row.original.id, "REPORTED")}
+								disabled={isStatusLoading}
+							>
+								<AlertCircleIcon className="h-4 w-4 text-amber-500" /> Marcar como reportada
+							</DropdownMenuItem>
+						)}
+
+						{hasPermission && (
+							<>
+								<DropdownMenuSeparator />
+								{!row.original.isUrgent ? (
+									<DropdownMenuItem
+										onClick={() => handleUrgencyUpdate(row.original.id, true)}
+										disabled={isStatusLoading}
+									>
+										<AlertTriangleIcon className="h-4 w-4 text-rose-500" /> Marcar como urgente
+									</DropdownMenuItem>
+								) : (
+									<DropdownMenuItem
+										onClick={() => handleUrgencyUpdate(row.original.id, false)}
+										disabled={isStatusLoading}
+									>
+										<AlertTriangleIcon className="h-4 w-4 text-gray-500" /> Desmarcar urgente
+									</DropdownMenuItem>
+								)}
+							</>
+						)}
+					</>
+				</ActionDataMenu>
+			)
+		},
+	},
+	{
+		accessorKey: "requestNumber",
+		header: ({ column }) => (
+			<DataGridColumnHeader column={column} title="N° Solicitud" visibility />
+		),
+		meta: {
+			headerTitle: "N° Solicitud",
+		},
+		cell: ({ row }) => {
+			const requestNumber = row.original.requestNumber
+			return (
+				<div
+					onClick={() => handleOpenDetails(row.original)}
+					className="cursor-pointer text-cyan-500 hover:underline"
+				>
+					<span>{requestNumber}</span>
+				</div>
+			)
+		},
+	},
+	{
+		accessorKey: "description",
+		header: ({ column }) => <DataGridColumnHeader column={column} title="Descripción" visibility />,
+		enableSorting: false,
+		meta: {
+			headerTitle: "Descripción",
+		},
+		cell: ({ row }) => {
+			const description = row.original.description
+			return <p className="w-72 max-w-72 text-wrap">{description}</p>
+		},
+	},
+	{
+		accessorKey: "userId",
+		header: ({ column }) => <DataGridColumnHeader column={column} title="Solicitante" visibility />,
+		enableSorting: false,
+		meta: {
+			headerTitle: "Solicitante",
+		},
+		cell: ({ row }) => {
+			const user = row.original.user
+			const operator = row.original.operator
+
+			return operator?.name || user?.name || "Usuario desconocido"
+		},
+	},
+	{
+		accessorKey: "requestDate",
+		header: ({ column }) => <DataGridColumnHeader column={column} title="Fecha" visibility />,
+		meta: {
+			headerTitle: "Fecha",
+		},
+		cell: ({ row }) => {
+			const requestDate = row.original.requestDate
+
+			return format(new Date(requestDate), "dd/MM/yyyy HH:mm", { locale: es })
+		},
+	},
+	{
+		accessorKey: "isUrgent",
+		header: ({ column }) => <DataGridColumnHeader column={column} title="Urgente" visibility />,
+		meta: {
+			headerTitle: "Urgente",
+		},
+		cell: ({ row }) => {
+			const isUrgent = row.original.isUrgent
+
+			return isUrgent ? (
+				<Badge className="bg-rose-500/10 text-rose-500">Urgente</Badge>
+			) : (
+				<Badge className="bg-sky-500/10 text-sky-500">No</Badge>
+			)
+		},
+	},
+
+	{
+		accessorKey: "equipment",
+		header: ({ column }) => (
+			<DataGridColumnHeader column={column} title="Equipo / Ubicación" visibility />
+		),
+		enableSorting: false,
+		meta: {
+			headerTitle: "Equipo / Ubicación",
+		},
+		cell: ({ row }) => {
+			const equipment = row.original.equipments[0]
+
+			return <span className="line-clamp-1 w-72 max-w-72 min-w-72 truncate">{equipment?.name}</span>
+		},
+	},
+	{
+		accessorKey: "status",
+		header: ({ column }) => <DataGridColumnHeader column={column} title="Estado" visibility />,
+		meta: {
+			headerTitle: "Estado",
+		},
+		cell: ({ row }) => {
+			const status = row.original.status
+
+			return <Badge variant={statusBadgeVariant(status)}>{statusText(status)}</Badge>
+		},
+	},
+	{
+		accessorKey: "workType",
+		header: ({ column }) => (
+			<DataGridColumnHeader column={column} title="Tipo de trabajo" visibility />
+		),
+		meta: {
+			headerTitle: "Tipo de trabajo",
+		},
+		cell: ({ row }) => {
+			const workType = row.getValue("workType") as WORK_REQUEST_TYPE
+
+			return workTypeText(workType)
+		},
+	},
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "pregunta": "El permiso de trabajo seguro es una herramienta preventiva que tiene por objetivo identificar peligros potenciales de lesiones graves o muerte en la ejecución de la actividad, trabajo o tarea.",
+    "correcta": "true"
+  },
+  {
+    "id": 2,
+    "pregunta": "El estándar de trabajo en caliente OTC indica que no se puede realizar ningún tipo de trabajo al interior de TRM y PRS.",
+    "correcta": "false"
+  },
+  {
+    "id": 3,
+    "pregunta": "El peligro tiene como definición fuente, situación, acto o condición física (ya sea a las personas, materiales, equipos o ambiente laboral) con el potencial de causar eventos negativos o daños en el lugar de trabajo.",
+    "correcta": "true"
+  },
+  {
+    "id": 4,
+    "pregunta": "Los E.P.P básicos para ingresar a Oleoducto Trasandino son: botín de seguridad, casco de seguridad, lentes, mini escape y monogas H2S.",
+    "correcta": "false"
+  },
+  {
+    "id": 5,
+    "pregunta": "La condición subestándar es todo acto u omisión que comete el trabajador que lo desvía de la manera aceptada como correcta para desarrollar una actividad o trabajo.",
+    "correcta": "false"
+  },
+  {
+    "id": 6,
+    "pregunta": "Se puede fumar al interior de la planta Oleoducto Trasandino.",
+    "correcta": "false"
+  },
+  {
+    "id": 7,
+    "pregunta": "Riesgos críticos son aquellos capaces de producir un accidente grave o fatal.",
+    "correcta": "true"
+  },
+  {
+    "id": 8,
+    "pregunta": "Para estacionarse al interior de Oleoducto Trasandino, se debe realizar de la siguiente forma: estacionarse aculatado, dejar las llaves puestas en la chapa y dejar los seguros de las puertas arriba.",
+    "correcta": "true"
+  },
+  {
+    "id": 9,
+    "pregunta": "El empleador no tiene obligación de entregar los equipos de protección personal de forma gratuita a los trabajadores.",
+    "correcta": "false"
+  },
+  {
+    "id": 10,
+    "pregunta": "Algunos de los riesgos que se podrían presentar en Oleoducto Trasandino son: incendio, caída de altura, derrames, atmósferas peligrosas y partículas en suspensión.",
+    "correcta": "true"
+  },
+  {
+    "id": 11,
+    "pregunta": "Para realizar trabajo en altura, es necesario contar solo con equipos anticaída.",
+    "correcta": "false"
+  },
+  {
+    "id": 12,
+    "pregunta": "Ante una alarma de emergencia al interior de Oleoducto Trasandino se debe detener la actividad que se está realizando y dirigirse al punto de encuentro más cercano.",
+    "correcta": "true"
+  },
+  {
+    "id": 13,
+    "pregunta": "Hay puntos de encuentro y vías de evacuación al interior de la planta TRM y PRS.",
+    "correcta": "true"
+  },
+  {
+    "id": 14,
+    "pregunta": "Al momento de ingresar y salir de planta se debe dirigir a sala de control para anotar sus datos personales.",
+    "correcta": "true"
+  }
+]

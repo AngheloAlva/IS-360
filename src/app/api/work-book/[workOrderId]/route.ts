@@ -1,0 +1,128 @@
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
+
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
+import prisma from "@/lib/prisma"
+import { auth } from "@/lib/auth"
+
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: Promise<{ workOrderId: string }> }
+): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
+	try {
+		const { workOrderId } = await params
+		const isAdmin = session.user.accessRole === "ADMIN"
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+		const allowedCompanyIds = Array.from(
+			new Set([
+				...userAllowedCompanies,
+				...(session.user.companyId ? [session.user.companyId] : []),
+			])
+		)
+
+		if (!isAdmin && !allowedCompanyIds.length) {
+			return NextResponse.json({ error: "Sin permisos para acceder a este libro" }, { status: 403 })
+		}
+
+		const workBook = await prisma.workOrder.findFirst({
+			where: {
+				id: workOrderId,
+				deletedAt: null,
+				...(!isAdmin && {
+					companyId: {
+						in: allowedCompanyIds,
+					},
+				}),
+			},
+			include: {
+				workBookEntries: {
+					include: {
+						createdBy: true,
+						assignedUsers: true,
+					},
+				},
+				company: {
+					select: {
+						id: true,
+						rut: true,
+						name: true,
+						image: true,
+						isActive: true,
+					},
+				},
+				supervisor: {
+					select: {
+						id: true,
+						rut: true,
+						name: true,
+						phone: true,
+						email: true,
+					},
+				},
+				responsible: {
+					select: {
+						id: true,
+						rut: true,
+						name: true,
+						phone: true,
+						email: true,
+					},
+				},
+				equipments: {
+					select: {
+						id: true,
+						tag: true,
+						name: true,
+						type: true,
+						location: { select: { id: true, name: true, path: true } },
+						attachments: {
+							select: {
+								id: true,
+								url: true,
+								name: true,
+							},
+						},
+					},
+				},
+				milestones: {
+					select: {
+						startDate: true,
+					},
+				},
+				workPermits: {
+					select: {
+						participants: {
+							select: {
+								id: true,
+								rut: true,
+								name: true,
+							},
+						},
+					},
+				},
+				_count: {
+					select: {
+						milestones: true,
+					},
+				},
+			},
+		})
+
+		if (!workBook) {
+			return NextResponse.json({ error: "Libro de obras no encontrado" }, { status: 404 })
+		}
+
+		return NextResponse.json({ workBook })
+	} catch (error) {
+		console.error("Error fetching work book:", error)
+		return NextResponse.json({ error: "Error al obtener el libro de obras" }, { status: 500 })
+	}
+}

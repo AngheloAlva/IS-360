@@ -1,0 +1,213 @@
+import {
+	Hr,
+	Img,
+	Row,
+	Html,
+	Text,
+	Body,
+	Head,
+	Button,
+	Column,
+	Section,
+	Heading,
+	Preview,
+	Tailwind,
+	Container,
+} from "@react-email/components"
+import { systemUrl } from "@/lib/consts/systemUrl"
+
+interface ApproveClosureEmailTemplateProps {
+	workOrderName: string
+	workOrderNumber: string
+	companyName: string
+	supervisorName: string
+	closeDate?: Date
+	autoClosed?: boolean
+	milestoneName?: string
+	milestoneComment?: string
+}
+
+export const ApproveClousureEmail: React.FC<Readonly<ApproveClosureEmailTemplateProps>> = ({
+	workOrderName,
+	workOrderNumber,
+	companyName,
+	supervisorName,
+	closeDate,
+	autoClosed,
+	milestoneName,
+	milestoneComment,
+}) => (
+	<Html>
+		<Tailwind>
+			<Head>
+				<title>
+					{autoClosed
+						? `Libro de Obras ${workOrderName} cerrado automáticamente - OTC 360`
+						: "Cierre de Libro de Obras Aprobado - OTC 360"}
+				</title>
+				<Preview>
+					{autoClosed
+						? `El libro de obras ${workOrderName} se cerró automáticamente al aprobarse el último hito`
+						: `El cierre del libro de obras ${workOrderName} ha sido aprobado`}
+				</Preview>
+			</Head>
+			<Body className="bg-gray-100 py-[40px] font-sans">
+				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
+					{/* Header with Logo */}
+					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
+						<Img
+							src="https://otc360.cl/logo.png"
+							alt="OTC 360 Logo"
+							className="mx-auto h-auto w-full max-w-[200px] object-cover"
+						/>
+					</Section>
+
+					{/* Main Content */}
+					<Section className="px-[40px] py-[32px]">
+						<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
+							{autoClosed
+								? "Libro de Obras Cerrado Automáticamente"
+								: "Cierre de Libro de Obras Aprobado"}
+						</Heading>
+
+						<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
+							{autoClosed ? (
+								<>
+									Estimado/a <strong>{supervisorName}</strong>, le informamos que el último hito
+									{milestoneName ? (
+										<>
+											{" "}
+											(<strong>{milestoneName}</strong>)
+										</>
+									) : null}{" "}
+									ha sido <strong>aprobado</strong> y, como consecuencia, el libro de obras se
+									cerró <strong>automáticamente</strong>.
+								</>
+							) : (
+								<>
+									Estimado/a <strong>{supervisorName}</strong>, le informamos que su solicitud de
+									cierre del libro de obras ha sido <strong>aprobada</strong>.
+								</>
+							)}
+						</Text>
+
+						{autoClosed && milestoneComment ? (
+							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-gray-400 bg-gray-50 p-[16px]">
+								<Text className="mb-[4px] text-[14px] font-semibold text-gray-700">
+									Comentario de aprobación del último hito:
+								</Text>
+								<Text className="m-0 text-[14px] leading-[20px] text-gray-700">
+									{milestoneComment}
+								</Text>
+							</Section>
+						) : null}
+
+						{/* Work Order Details */}
+						<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-blue-500 bg-blue-50 p-[24px]">
+							<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
+								Detalles del Libro de Obras
+							</Heading>
+
+							<Row className="mb-[12px]">
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Nombre:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+										{workOrderName}
+									</Text>
+								</Column>
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Número OT:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none font-bold text-blue-600">
+										{workOrderNumber}
+									</Text>
+								</Column>
+							</Row>
+
+							<Row className="mb-[12px]">
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Empresa:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+										{companyName}
+									</Text>
+								</Column>
+								<Column className="w-[50%]">
+									<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+										Aprobado por:
+									</Text>
+									<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+										{supervisorName}
+									</Text>
+								</Column>
+							</Row>
+
+							{closeDate && (
+								<Row>
+									<Column>
+										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
+											Fecha de Cierre:
+										</Text>
+										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
+											{closeDate.toLocaleDateString("es-CL", {
+												day: "2-digit",
+												month: "long",
+												year: "numeric",
+											})}
+										</Text>
+									</Column>
+								</Row>
+							)}
+						</Section>
+
+						{/* Success Message */}
+						<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
+							<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
+								Estado del Cierre
+							</Heading>
+
+							<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
+								✅ El libro de obras ha sido cerrado exitosamente.
+							</Text>
+							<Text className="text-[14px] leading-[20px] text-gray-600">
+								No se podrán realizar más modificaciones al libro de obras. Toda la documentación
+								quedará archivada para futuras referencias.
+							</Text>
+						</Section>
+
+						{/* Action Button */}
+						<Section className="mb-[32px] text-center">
+							<Button
+								href={`${systemUrl}/admin/dashboard/ordenes-de-trabajo`}
+								className="box-border rounded-[8px] bg-blue-500 px-[32px] py-[12px] text-[16px] font-semibold text-white hover:bg-blue-600"
+							>
+								Ver Libro de Obras
+							</Button>
+						</Section>
+
+						<Hr className="my-[24px] border-gray-200" />
+
+						<Text className="text-[14px] leading-[20px] text-gray-600">
+							Si tiene alguna pregunta o necesita asistencia, no dude en contactar a nuestro equipo
+							de soporte técnico.
+						</Text>
+					</Section>
+
+					{/* Footer */}
+					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
+						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
+							© {new Date().getFullYear()} OTC 360
+						</Text>
+						<Text className="m-0 text-center text-[12px] text-gray-500">
+							Notificación Automática del Sistema - No Responder
+						</Text>
+					</Section>
+				</Container>
+			</Body>
+		</Tailwind>
+	</Html>
+)

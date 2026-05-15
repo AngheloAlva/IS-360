@@ -1,0 +1,279 @@
+import { NextRequest, NextResponse } from "next/server"
+import { headers } from "next/headers"
+import { subDays } from "date-fns"
+import { Prisma } from "@/generated/prisma/client"
+
+import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
+import { auth } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+import {
+	MILESTONE_STATUS,
+	WORK_ORDER_STATUS,
+	type WORK_ORDER_TYPE,
+	type WORK_ORDER_PRIORITY,
+} from "@/generated/prisma/enums"
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) {
+		return new NextResponse("No autorizado", { status: 401 })
+	}
+
+	try {
+		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
+
+		const searchParams = req.nextUrl.searchParams
+		const page = parseInt(searchParams.get("page") || "1")
+		const limit = parseInt(searchParams.get("limit") || "10")
+		const search = searchParams.get("search") || ""
+		const typeFilter = searchParams.get("typeFilter") || null
+		const statusFilter = searchParams.get("statusFilter") || null
+		const priorityFilter = searchParams.get("priorityFilter") || null
+		const companyId = searchParams.get("companyId") || null
+		const responsibleId = searchParams.get("responsibleId") || null
+		const startDate = searchParams.get("startDate") || null
+		const endDate = searchParams.get("endDate") || null
+		const permitFilter = searchParams.get("permitFilter") === "true"
+		const requestedSortBy = searchParams.get("sortBy") || searchParams.get("orderBy")
+		const requestedSortOrder = searchParams.get("sortOrder") || searchParams.get("order")
+		const sortOrder: Prisma.SortOrder = requestedSortOrder === "asc" ? "asc" : "desc"
+		const isOtcMember = searchParams.get("isOtcMember") === "true"
+		const onlyWithRequestClousure = searchParams.get("onlyWithRequestClousure") === "true"
+		const includeEquipments = searchParams.get("includeEquipments") === "true"
+
+		const getOrderBy = (): Prisma.WorkOrderOrderByWithRelationInput => {
+			switch (requestedSortBy) {
+				case "otNumber":
+					return { otNumber: sortOrder }
+				case "workRequest":
+					return { workRequest: sortOrder }
+				case "status":
+					return { status: sortOrder }
+				case "priority":
+					return { priority: sortOrder }
+				case "type":
+					return { type: sortOrder }
+				case "progress":
+					return { progress: sortOrder }
+				case "solicitationDate":
+					return { solicitationDate: sortOrder }
+				case "programDate":
+					return { programDate: sortOrder }
+				case "companyName":
+					return { company: { name: sortOrder } }
+				case "supervisorName":
+					return { supervisor: { name: sortOrder } }
+				case "name":
+					return { workRequest: sortOrder }
+				case "createdAt":
+				default:
+					return { createdAt: sortOrder }
+			}
+		}
+
+		const skip = (page - 1) * limit
+
+		const filter = {
+			deletedAt: null,
+			...(userAllowedCompanies?.length
+				? {
+						company: {
+							id: {
+								in: userAllowedCompanies,
+							},
+						},
+					}
+				: {}),
+			...(search
+				? {
+						OR: [
+							{ workBookName: { contains: search, mode: "insensitive" as const } },
+							{ workRequest: { contains: search, mode: "insensitive" as const } },
+							{ workBookLocation: { contains: search, mode: "insensitive" as const } },
+							{ otNumber: { contains: search, mode: "insensitive" as const } },
+							{ supervisor: { name: { contains: search, mode: "insensitive" as const } } },
+							{ company: { name: { contains: search, mode: "insensitive" as const } } },
+						],
+					}
+				: {}),
+			...(statusFilter
+				? { status: statusFilter as WORK_ORDER_STATUS }
+				: permitFilter
+					? {
+							status: {
+								in: [
+									WORK_ORDER_STATUS.PLANNED,
+									WORK_ORDER_STATUS.IN_PROGRESS,
+									WORK_ORDER_STATUS.PENDING,
+								],
+							},
+						}
+					: {}),
+			...(priorityFilter
+				? {
+						priority: priorityFilter as WORK_ORDER_PRIORITY,
+					}
+				: {}),
+			...(permitFilter
+				? {
+						AND: [
+							{
+								OR: [
+									{ rescheduledEndDate: { gte: subDays(new Date(), 1) } },
+									{
+										AND: [
+											{ rescheduledEndDate: null },
+											{ estimatedEndDate: { gte: subDays(new Date(), 1) } },
+										],
+									},
+								],
+							},
+						],
+					}
+				: {}),
+			...(typeFilter
+				? {
+						type: typeFilter as WORK_ORDER_TYPE,
+					}
+				: {}),
+			...(companyId
+				? {
+						companyId: companyId,
+					}
+				: {}),
+			...(responsibleId
+				? {
+						responsibleId: responsibleId,
+					}
+				: {}),
+			...(isOtcMember
+				? {
+						companyId: process.env.NEXT_PUBLIC_OTC_COMPANY_ID!,
+					}
+				: {}),
+			...(startDate || endDate
+				? {
+						solicitationDate: {
+							...(startDate ? { gte: new Date(startDate) } : {}),
+							...(endDate ? { lte: new Date(endDate) } : {}),
+						},
+					}
+				: {}),
+			...(onlyWithRequestClousure
+				? {
+						milestones: {
+							some: {
+								status: MILESTONE_STATUS.REQUESTED_CLOSURE,
+							},
+						},
+					}
+				: {}),
+		}
+
+		const [workOrders, total, stats] = await Promise.all([
+			prisma.workOrder.findMany({
+				where: filter,
+				select: {
+					id: true,
+					otNumber: true,
+					company: {
+						select: {
+							id: true,
+							image: true,
+							name: true,
+							rut: true,
+						},
+					},
+					supervisor: {
+						select: {
+							id: true,
+							rut: true,
+							name: true,
+							email: true,
+							image: true,
+							phone: true,
+						},
+					},
+					workRequest: true,
+					progress: true,
+					status: true,
+					solicitationDate: true,
+					estimatedEndDate: true,
+					rescheduledEndDate: true,
+					estimatedHours: true,
+					estimatedDays: true,
+					type: true,
+					priority: true,
+					programDate: true,
+					...(includeEquipments
+						? {
+								equipments: {
+									select: {
+										id: true,
+										name: true,
+									},
+								},
+							}
+						: {}),
+					_count: {
+						select: {
+							milestones: true,
+							workBookEntries: {
+								where: {
+									entryType: { in: ["ADDITIONAL_ACTIVITY", "DAILY_ACTIVITY"] },
+								},
+							},
+						},
+					},
+				},
+				skip,
+				take: limit,
+				orderBy: [getOrderBy(), { createdAt: "desc" }],
+			}),
+			prisma.workOrder.count({
+				where: filter,
+			}),
+			prisma.$transaction([
+				prisma.workOrder.count({
+					where: {
+						deletedAt: null,
+						status: { in: ["IN_PROGRESS", "PENDING"] },
+					},
+				}),
+				prisma.workOrder.count({
+					where: {
+						deletedAt: null,
+						status: "COMPLETED",
+					},
+				}),
+				prisma.workOrder.aggregate({
+					_avg: {
+						progress: true,
+					},
+					where: {
+						deletedAt: null,
+					},
+				}),
+			]),
+		])
+
+		const [activeCount, completedCount, totalEntries] = stats
+
+		return NextResponse.json({
+			workOrders,
+			total,
+			pages: Math.ceil(total / limit),
+			stats: {
+				activeCount,
+				completedCount,
+				totalEntries,
+			},
+		})
+	} catch (error) {
+		console.error("[WORK_BOOKS_GET]", error)
+		return NextResponse.json({ error: "Error fetching work books" }, { status: 500 })
+	}
+}

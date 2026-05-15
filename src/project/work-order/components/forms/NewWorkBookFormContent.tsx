@@ -1,0 +1,290 @@
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
+import { toast } from "sonner"
+
+import { type WorkBookSchema, workBookSchema } from "@/project/work-order/schemas/work-book.schema"
+import { updateWorkOrderLikeBook } from "@/project/work-order/actions/updateWorkOrder"
+import { WorkOrderPriorityLabels } from "@/lib/consts/work-order-priority"
+import { WorkOrderTypeLabels } from "@/lib/consts/work-order-types"
+import { WORK_ORDER_PRIORITY } from "@/generated/prisma/enums"
+import { queryClient } from "@/lib/queryClient"
+import { cn } from "@/lib/utils"
+import {
+	useWorkBooksByCompany,
+	type WorkBookByCompany,
+} from "@/project/work-order/hooks/use-work-books-by-company"
+
+import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
+import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
+import { InputFormField } from "@/shared/components/forms/InputFormField"
+import SubmitButton from "@/shared/components/forms/SubmitButton"
+import { Separator } from "@/shared/components/ui/separator"
+import { Button } from "@/shared/components/ui/button"
+import { Badge } from "@/shared/components/ui/badge"
+import { Form } from "@/shared/components/ui/form"
+
+interface NewWorkBookFormContentProps {
+	userId: string
+	companyId: string
+	onClose: () => void
+	tutorialMode?: boolean
+	tutorialWorkOrders?: WorkBookByCompany[]
+	presetWorkOrderId?: string
+	tutorialDefaultValues?: {
+		workBookName: string
+		workBookStartDate: Date
+	}
+	onTutorialSubmit?: (values: WorkBookSchema, workOrder: WorkBookByCompany) => void
+}
+
+export default function NewWorkBookFormContent({
+	userId,
+	companyId,
+	onClose,
+	tutorialMode = false,
+	tutorialWorkOrders,
+	presetWorkOrderId,
+	tutorialDefaultValues,
+	onTutorialSubmit,
+}: NewWorkBookFormContentProps): React.ReactElement {
+	const [loading, setLoading] = useState<boolean>(false)
+	const [workOrderSelected, setWorkOrderSelected] = useState<WorkBookByCompany | null>(null)
+
+	const form = useForm<WorkBookSchema>({
+		resolver: zodResolver(workBookSchema),
+		defaultValues: {
+			workBookName: tutorialDefaultValues?.workBookName ?? "",
+			userId: userId,
+			workOrderId: presetWorkOrderId ?? "",
+			workBookLocation: "",
+			workBookStartDate: tutorialDefaultValues?.workBookStartDate ?? new Date(),
+		},
+	})
+
+	useEffect(() => {
+		navigator.geolocation.getCurrentPosition((position) => {
+			form.setValue("workBookLocation", `${position.coords.latitude},${position.coords.longitude}`)
+		})
+	}, [form])
+
+	const { data } = useWorkBooksByCompany({
+		page: 1,
+		companyId,
+		limit: 15,
+		search: "",
+		enabled: !tutorialMode,
+	})
+
+	const workBooks = tutorialMode ? (tutorialWorkOrders ?? []) : (data?.workBooks ?? [])
+
+	useEffect(() => {
+		const workOrder = workBooks.find((workOrder) => workOrder.id === form.getValues("workOrderId"))
+		if (!workOrder) return
+
+		setWorkOrderSelected(workOrder)
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.watch("workOrderId"), workBooks])
+
+	useEffect(() => {
+		if (!presetWorkOrderId) {
+			return
+		}
+
+		form.setValue("workOrderId", presetWorkOrderId)
+	}, [form, presetWorkOrderId])
+
+	async function onSubmit(values: WorkBookSchema) {
+		try {
+			setLoading(true)
+
+			if (!workOrderSelected) {
+				toast("Error al actualizar el libro de obras", {
+					description: "Debe seleccionar una orden de trabajo.",
+					duration: 5000,
+				})
+
+				return
+			}
+
+			if (tutorialMode) {
+				onTutorialSubmit?.(values, workOrderSelected)
+				toast.success("Libro de obras creado (simulacion)")
+				onClose()
+				return
+			}
+
+			const { ok, message } = await updateWorkOrderLikeBook({
+				workOrderId: workOrderSelected.id,
+				values,
+			})
+
+			if (ok) {
+				toast.success("Libro de obras actualizado", {
+					description: message,
+					duration: 5000,
+				})
+
+    void queryClient.invalidateQueries({
+					queryKey: ["work-books", { companyId, onlyBooks: true }],
+				})
+				form.reset()
+				onClose()
+				setWorkOrderSelected(null)
+			} else {
+				toast.error("Error al actualizar el libro de obras", {
+					description: message,
+					duration: 5000,
+				})
+			}
+		} catch (error) {
+			console.error(error)
+
+			toast.error("Ocurrió un error al intentar crear el registro", {
+				description: (error as Error).message,
+				duration: 5000,
+			})
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	return (
+		<Form {...form}>
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="grid w-full gap-x-3 gap-y-5 overflow-y-scroll px-4 pt-4 pb-16 sm:grid-cols-2"
+			>
+				<div className="sm:col-span-2">
+					<h2 className="text-lg font-semibold">Orden de Trabajo (OT)</h2>
+					<p className="text-muted-foreground text-sm">
+						Seleccione una orden de trabajo para crear un libro de obras.
+					</p>
+				</div>
+
+				<div data-tutorial-id="work-book-init-ot">
+					<SelectWithSearchFormField<WorkBookSchema>
+						name="workOrderId"
+						label="Número de OT"
+						control={form.control}
+						itemClassName="sm:col-span-2"
+						placeholder="Seleccione una orden de trabajo"
+						options={
+							workBooks.map((workOrder) => ({
+								value: workOrder.id,
+								label: workOrder.otNumber + " - " + workOrder.workRequest,
+							})) ?? []
+						}
+					/>
+				</div>
+
+				{workOrderSelected && (
+					<div className="bg-secondary-background/20 grid gap-y-4 rounded-lg p-3 shadow sm:col-span-2 sm:grid-cols-2">
+						<div>
+							<h3 className="text-sm font-semibold">Trabajo solicitado:</h3>
+							<p className="text-muted-foreground">{workOrderSelected.workRequest}</p>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Tipo de trabajo:</h3>
+							<p className="text-muted-foreground">{WorkOrderTypeLabels[workOrderSelected.type]}</p>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Prioridad:</h3>
+							<Badge
+								className={cn("bg-primary/5 border-primary text-primary", {
+									"border-red-500 bg-red-500/5 text-red-500":
+										workOrderSelected.priority === WORK_ORDER_PRIORITY.HIGH,
+									"border-yellow-500 bg-yellow-500/5 text-yellow-500":
+										workOrderSelected.priority === WORK_ORDER_PRIORITY.MEDIUM,
+									"border-green-500 bg-green-500/5 text-green-500":
+										workOrderSelected.priority === WORK_ORDER_PRIORITY.LOW,
+								})}
+							>
+								{WorkOrderPriorityLabels[workOrderSelected.priority]}
+							</Badge>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Fecha de solicitud:</h3>
+							<p className="text-muted-foreground">
+								{format(workOrderSelected.solicitationDate, "PPP", { locale: es })}
+							</p>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Descripción del trabajo:</h3>
+							<p className="text-muted-foreground">{workOrderSelected.workDescription || "N/A"}</p>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Fecha programada:</h3>
+							<p className="text-muted-foreground">
+								{format(workOrderSelected.programDate, "PPP", { locale: es })}
+							</p>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Horas estimadas:</h3>
+							<p className="text-muted-foreground">{workOrderSelected.estimatedHours} horas</p>
+						</div>
+						<div>
+							<h3 className="text-sm font-semibold">Días estimados:</h3>
+							<p className="text-muted-foreground">
+								{workOrderSelected.estimatedDays} día
+								{workOrderSelected.estimatedDays === 1 ? "" : "s"}
+							</p>
+						</div>
+					</div>
+				)}
+
+				<Separator className="my-4 sm:col-span-2" />
+
+				<div className="sm:col-span-2">
+					<h2 className="text-xl font-bold">Datos Libro de Obras</h2>
+					<p className="text-muted-foreground text-sm">
+						Complete la información para crear un nuevo libro de obras.
+					</p>
+				</div>
+
+				<div data-tutorial-id="work-book-init-name">
+					<InputFormField<WorkBookSchema>
+						name="workBookName"
+						control={form.control}
+						label="Nombre de la Obra"
+						placeholder="Nombre de la obra"
+					/>
+				</div>
+
+				<div data-tutorial-id="work-book-init-date">
+					<DatePickerFormField<WorkBookSchema>
+						name="workBookStartDate"
+						control={form.control}
+						label="Fecha de Inicio"
+					/>
+				</div>
+
+				<div className="mt-10 flex items-center justify-center gap-2 sm:col-span-2">
+					<Button
+						size={"lg"}
+						type="button"
+						disabled={loading}
+						variant={"outline"}
+						onClick={onClose}
+						className="w-1/2 border-2 border-blue-900 font-semibold tracking-wide text-blue-800 transition-all hover:scale-105 hover:bg-blue-900"
+					>
+						Cancelar
+					</Button>
+
+					<div data-tutorial-id="work-book-init-submit" className="w-1/2">
+						<SubmitButton
+							isSubmitting={loading}
+							label={tutorialMode ? "Simular creacion" : "Crear Libro de Obras"}
+							className="w-full bg-blue-600 hover:bg-blue-700"
+						/>
+					</div>
+				</div>
+			</form>
+		</Form>
+	)
+}

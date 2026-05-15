@@ -1,0 +1,83 @@
+import { Prisma } from "@/generated/prisma/client"
+
+const lockoutPermitSelect = {
+  id: true,
+  status: true,
+  lockoutType: true,
+  lockoutTypeOther: true,
+  startDate: true,
+  endDate: true,
+  activitiesToExecute: true,
+  removeLockoutReview: true,
+  observations: true,
+  approved: true,
+  approvalDate: true,
+  approvalTime: true,
+  approvalNotes: true,
+  finalObservations: true,
+  workPermitId: true,
+  supervisorId: true,
+  supervisor: { select: { name: true } },
+  operatorId: true,
+  operator: { select: { name: true } },
+  removeLockoutId: true,
+  removeLockout: { select: { name: true } },
+  areaResponsibleId: true,
+  areaResponsible: { select: { name: true } },
+  requestedById: true,
+  requestedBy: { select: { name: true } },
+  otNumberId: true,
+  otNumberRef: { select: { otNumber: true } },
+  companyId: true,
+  company: { select: { name: true } },
+  equipments: { select: { id: true, name: true } },
+  _count: { select: { lockoutRegistrations: true, zeroEnergyReviews: true } },
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.LockoutPermitSelect
+
+export type LockoutPermitRow = Prisma.LockoutPermitGetPayload<{
+  select: typeof lockoutPermitSelect
+}>
+
+export { lockoutPermitSelect }
+
+export function flattenLockoutPermit(row: LockoutPermitRow) {
+  return {
+    id: row.id,
+    status: row.status,
+    lockoutType: row.lockoutType,
+    lockoutTypeOther: row.lockoutTypeOther,
+    startDate: row.startDate.toISOString(),
+    endDate: row.endDate?.toISOString() ?? null,
+    activitiesToExecute: JSON.stringify(row.activitiesToExecute),
+    removeLockoutReview: row.removeLockoutReview,
+    observations: row.observations,
+    approved: row.approved,
+    approvalDate: row.approvalDate?.toISOString() ?? null,
+    approvalTime: row.approvalTime,
+    approvalNotes: row.approvalNotes,
+    finalObservations: row.finalObservations,
+    workPermitId: row.workPermitId,
+    supervisorId: row.supervisorId,
+    supervisorName: row.supervisor?.name ?? null,
+    operatorId: row.operatorId,
+    operatorName: row.operator?.name ?? null,
+    removeLockoutId: row.removeLockoutId,
+    removeLockoutName: row.removeLockout?.name ?? null,
+    areaResponsibleId: row.areaResponsibleId,
+    areaResponsibleName: row.areaResponsible.name,
+    requestedById: row.requestedById,
+    requestedByName: row.requestedBy.name,
+    otNumberId: row.otNumberId,
+    otNumber: row.otNumberRef?.otNumber ?? null,
+    companyId: row.companyId,
+    companyName: row.company.name,
+    equipmentIds: JSON.stringify(row.equipments.map((e: { id: string }) => e.id)),
+    equipmentNames: JSON.stringify(row.equipments.map((e: { name: string }) => e.name)),
+    lockoutRegistrationCount: row._count.lockoutRegistrations,
+    zeroEnergyReviewCount: row._count.zeroEnergyReviews,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  }
+}

@@ -1,0 +1,32 @@
+export const WORK_ORDER_CAPEX_VALUES = {
+	CONFIDABILITY: "CONFIDABILITY",
+	MITIGATE_RISK: "MITIGATE_RISK",
+	COMPLIANCE: "COMPLIANCE",
+} as const
+
+export const WORK_ORDER_CAPEX_VALUES_ARRAY = [
+	WORK_ORDER_CAPEX_VALUES.CONFIDABILITY,
+	WORK_ORDER_CAPEX_VALUES.MITIGATE_RISK,
+	WORK_ORDER_CAPEX_VALUES.COMPLIANCE,
+] as const
+
+export const WorkOrderCAPEXLabels = {
+	CONFIDABILITY: "Confiabilidad",
+	MITIGATE_RISK: "Mitiga riesgo",
+	COMPLIANCE: "Cumplimiento normativo",
+}
+
+export const WorkOrderCAPEXOptions = [
+	{
+		value: WORK_ORDER_CAPEX_VALUES.CONFIDABILITY,
+		label: WorkOrderCAPEXLabels.CONFIDABILITY,
+	},
+	{
+		value: WORK_ORDER_CAPEX_VALUES.MITIGATE_RISK,
+		label: WorkOrderCAPEXLabels.MITIGATE_RISK,
+	},
+	{
+		value: WORK_ORDER_CAPEX_VALUES.COMPLIANCE,
+		label: WorkOrderCAPEXLabels.COMPLIANCE,
+	},
+]

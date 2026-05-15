@@ -1,0 +1,72 @@
+import { headers } from "next/headers"
+
+import { auth } from "@/lib/auth"
+
+import MaintenancePlanStatsContainer from "@/project/maintenance-plan/components/stats/MaintenancePlanStatsContainer"
+import { MaintenancePlanTable } from "@/project/maintenance-plan/components/data/MaintenancePlanTable"
+import MaintenancePlanForm from "@/project/maintenance-plan/components/forms/MaintenancePlanForm"
+import VideoTutorials from "@/shared/components/VideoTutorials"
+
+export default async function MaintenancePlansPage() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	if (!session?.user?.id) return null
+
+	const hasPermission = await auth.api.userHasPermission({
+		body: {
+			userId: session.user.id,
+			permissions: {
+				maintenancePlan: ["create"],
+			},
+		},
+	})
+
+	return (
+		<div className="flex h-full w-full flex-1 flex-col gap-6 transition-all">
+			<div className="rounded-lg bg-linear-to-r from-indigo-600 to-purple-700 p-6 shadow-lg dark:from-indigo-800 dark:to-purple-900">
+				<div className="flex items-center justify-between">
+					<div className="text-white">
+						<h1 className="text-3xl font-bold tracking-tight">Planes de Mantenimiento</h1>
+						<p className="opacity-90">
+							Gestión y seguimiento de planes de mantenimiento preventivo
+						</p>
+					</div>
+
+					<div className="flex flex-wrap items-center justify-end gap-2">
+						<VideoTutorials
+							videos={[
+								{
+									title: "Creacion de Plan de Mantenimiento",
+									description: "Tutorial de como crear un plan de mantenimiento.",
+									url: "https://youtube.com/embed/UjotpO6DcIQ",
+								},
+								{
+									title: "Creacion de Tareas para un Plan",
+									description: "Tutorial de como crear tareas para un plan de mantenimiento.",
+									url: "https://youtube.com/embed/uvrnlMjWJqU",
+								},
+								{
+									title: "Edicion de Tareas",
+									description: "Tutorial de como editar tareas de un plan de mantenimiento.",
+									url: "https://youtube.com/embed/DRbyHJyOgdk",
+								},
+							]}
+						/>
+
+						{hasPermission.success && <MaintenancePlanForm userId={session.user.id} />}
+					</div>
+				</div>
+			</div>
+
+			<MaintenancePlanStatsContainer />
+
+			<MaintenancePlanTable
+				userId={session.user.id}
+				id="maintenance-plans-list"
+				hasPermission={hasPermission.success}
+			/>
+		</div>
+	)
+}

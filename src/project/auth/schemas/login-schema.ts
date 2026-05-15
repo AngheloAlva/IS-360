@@ -1,0 +1,8 @@
+import { z } from "zod"
+
+export const loginSchema = z.object({
+	email: z.email({ message: "El email no es válido" }),
+	password: z.string().nonempty({ message: "La contraseña no puede estar vacía" }),
+})
+
+export type LoginSchema = z.infer<typeof loginSchema>

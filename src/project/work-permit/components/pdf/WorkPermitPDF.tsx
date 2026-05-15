@@ -1,0 +1,941 @@
+"use client"
+/* eslint-disable jsx-a11y/alt-text */
+
+import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer"
+import { es } from "date-fns/locale"
+import { format } from "date-fns"
+
+import type { WorkPermitData } from "@/app/api/work-permit/pdf/[id]/types"
+import { getPeligroLabel } from "@/lib/consts/peligros"
+import { getRiesgoLabel } from "@/lib/consts/riesgos"
+import { getMedidaDeControlLabel } from "@/lib/consts/medidas-de-control"
+
+// Estilos para el PDF
+const styles = StyleSheet.create({
+	page: {
+		padding: 35,
+		fontSize: 10,
+		backgroundColor: "#fff",
+		fontFamily: "Helvetica",
+	},
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		marginBottom: 25,
+		borderBottomWidth: 2,
+		borderBottomStyle: "solid",
+		borderBottomColor: "#3B82F6", // Azul moderno
+		paddingBottom: 12,
+	},
+	headerTitle: {
+		fontSize: 18,
+		fontWeight: "bold",
+		color: "#1E3A8A", // Azul oscuro
+		marginLeft: 15,
+	},
+	title: {
+		fontSize: 20,
+		fontWeight: "bold",
+		marginBottom: 18,
+		textAlign: "center",
+		color: "#1E3A8A", // Azul oscuro
+	},
+	subtitle: {
+		fontSize: 13,
+		fontWeight: "bold",
+		marginTop: 12,
+		marginBottom: 6,
+		borderBottomWidth: 1,
+		borderBottomStyle: "solid",
+		borderBottomColor: "#3B82F6", // Azul moderno
+		paddingBottom: 4,
+		color: "#1E3A8A", // Azul oscuro
+	},
+	section: {
+		marginBottom: 14,
+		padding: 8,
+		borderRadius: 4,
+		backgroundColor: "#F9FAFB", // Gris muy claro
+	},
+	row: {
+		flexDirection: "row",
+		marginBottom: 7,
+	},
+	column: {
+		flex: 1,
+		paddingHorizontal: 4,
+	},
+	label: {
+		fontWeight: "bold",
+		marginRight: 5,
+		color: "#4B5563", // Gris medio
+	},
+	value: {
+		flex: 1,
+		color: "#111827", // Casi negro
+	},
+	field: {
+		borderBottomWidth: 1,
+		borderBottomStyle: "solid",
+		borderBottomColor: "#D1D5DB", // Gris claro
+		padding: 6,
+		marginBottom: 6,
+		borderRadius: 2,
+	},
+	customLargeField: {
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: "#D1D5DB", // Gris claro
+		padding: 6,
+		height: 38,
+		marginBottom: 6,
+		borderRadius: 2,
+		backgroundColor: "#F9FAFB", // Gris muy claro
+	},
+	customField: {
+		borderBottomWidth: 1,
+		borderBottomStyle: "solid",
+		borderBottomColor: "#D1D5DB", // Gris claro
+		height: 5,
+		padding: 6,
+		borderRadius: 2,
+	},
+	signatureBox: {
+		height: 80,
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: "#D1D5DB", // Gris claro
+		marginTop: 6,
+		marginBottom: 6,
+		padding: 6,
+		borderRadius: 4,
+		backgroundColor: "#F9FAFB", // Gris muy claro
+		breakInside: "avoid",
+	},
+	signatureLabel: {
+		textAlign: "center",
+		marginTop: 6,
+		fontWeight: "medium",
+		color: "#4B5563", // Gris medio
+		breakInside: "avoid",
+	},
+	signatureSection: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		marginTop: 4,
+		paddingTop: 10,
+		borderTopWidth: 1,
+		borderTopColor: "#E5E7EB", // Gris muy claro
+		borderTopStyle: "solid",
+		breakInside: "avoid",
+	},
+	signatureColumn: {
+		width: "30%",
+		paddingHorizontal: 8,
+		breakInside: "avoid",
+	},
+	footer: {
+		position: "absolute",
+		bottom: 35,
+		left: 35,
+		right: 35,
+		textAlign: "center",
+		fontSize: 8,
+		color: "#6B7280", // Gris medio
+		borderTopWidth: 1,
+		borderTopColor: "#E5E7EB",
+		borderTopStyle: "solid",
+		paddingTop: 8,
+	},
+	logo: {
+		width: 50,
+		height: 50,
+		objectFit: "contain",
+	},
+	checkBox: {
+		width: 14,
+		height: 14,
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: "#3B82F6", // Azul moderno
+		marginRight: 5,
+		borderRadius: 2,
+	},
+	checkBoxChecked: {
+		width: 14,
+		height: 14,
+		borderWidth: 1,
+		borderStyle: "solid",
+		borderColor: "#3B82F6", // Azul moderno
+		backgroundColor: "#3B82F6", // Azul moderno
+		marginRight: 5,
+		borderRadius: 2,
+	},
+	checkBoxRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginVertical: 4,
+	},
+	table: {
+		display: "flex",
+		width: "100%",
+		borderWidth: 1,
+		borderColor: "#D1D5DB", // Gris claro
+		marginVertical: 10,
+		borderRadius: 4,
+		overflow: "hidden",
+	},
+	tableRow: {
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		borderColor: "#D1D5DB", // Gris claro
+	},
+	tableCol: {
+		borderStyle: "solid",
+		borderRightWidth: 1,
+		borderColor: "#D1D5DB", // Gris claro
+		padding: 6,
+	},
+	tableHeader: {
+		backgroundColor: "#EFF6FF", // Azul muy claro
+		color: "#1E3A8A", // Azul oscuro
+		fontWeight: "bold",
+		textAlign: "center",
+		padding: 6,
+	},
+	tableCell: {
+		padding: 6,
+		textAlign: "center",
+		color: "#374151", // Gris oscuro
+	},
+	measurementCol: {
+		width: "25%",
+		height: 35,
+		borderStyle: "solid",
+		borderRightWidth: 1,
+		borderColor: "#D1D5DB", // Gris claro
+	},
+	lastCol: {
+		borderRightWidth: 0,
+	},
+	participantsTable: {
+		display: "flex",
+		width: "100%",
+		borderWidth: 1,
+		borderColor: "#D1D5DB", // Gris claro
+		marginTop: 10,
+		borderRadius: 4,
+		overflow: "hidden",
+	},
+	participantsCol: {
+		flex: 1,
+		borderStyle: "solid",
+		borderRightWidth: 1,
+		borderColor: "#D1D5DB", // Gris claro
+	},
+	activitiesTable: {
+		width: "100%",
+		borderWidth: 1,
+		borderColor: "#000",
+	},
+	activitiesHeaderRow: {
+		flexDirection: "row",
+		backgroundColor: "#e5e7eb",
+		borderBottomWidth: 1,
+		borderColor: "#000",
+	},
+	activitiesRow: {
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		borderColor: "#000",
+		minHeight: 25,
+	},
+	activitiesCell: {
+		padding: 4,
+		fontSize: 7,
+		borderRightWidth: 1,
+		borderColor: "#000",
+	},
+	activitiesCellLast: {
+		padding: 4,
+		fontSize: 7,
+	},
+	activitiesHeaderCell: {
+		padding: 4,
+		fontSize: 8,
+		fontWeight: "bold",
+		borderRightWidth: 1,
+		borderColor: "#000",
+	},
+	activitiesHeaderCellLast: {
+		padding: 4,
+		fontSize: 8,
+		fontWeight: "bold",
+	},
+	notaBox: {
+		backgroundColor: "#fffbeb",
+		borderLeftWidth: 3,
+		borderLeftColor: "#f59e0b",
+		padding: 8,
+		marginBottom: 10,
+		fontSize: 7,
+	},
+})
+
+interface WorkPermitPDFProps {
+	workPermit: WorkPermitData
+}
+
+const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
+	const toolsString = Array.isArray(workPermit.tools)
+		? workPermit.tools.join(", ")
+		: workPermit.tools
+	const preChecksString = Array.isArray(workPermit.preChecks)
+		? workPermit.preChecks.join(", ")
+		: workPermit.preChecks
+	const riskIdentificationString = Array.isArray(workPermit.riskIdentification)
+		? workPermit.riskIdentification.join(", ")
+		: workPermit.riskIdentification
+	const preventiveControlMeasuresString = Array.isArray(workPermit.preventiveControlMeasures)
+		? workPermit.preventiveControlMeasures.join(", ")
+		: workPermit.preventiveControlMeasures
+
+	const hasStructuredActivities = !!(workPermit.activities && workPermit.activities.length > 0)
+
+	return (
+		<Document>
+			<Page size="A4" style={styles.page}>
+				{/* Encabezado */}
+				<View style={styles.header}>
+					<View style={{ flexDirection: "row", alignItems: "center" }}>
+						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+						<Text style={styles.headerTitle}>PERMISO DE TRABAJO</Text>
+					</View>
+					<View>
+						<Text>
+							Fecha de emisión:{" "}
+							{format(new Date(workPermit.createdAt), "dd/MM/yyyy", { locale: es })}
+						</Text>
+						<Text>
+							Fecha de vencimiento:{" "}
+							{format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es })}
+						</Text>
+					</View>
+				</View>
+
+				{/* Información del permiso */}
+				<View style={styles.section}>
+					<Text style={styles.subtitle}>1. INFORMACIÓN GENERAL</Text>
+
+					<View style={styles.row}>
+						{workPermit.isUrgent ? (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Permiso URGENTE</Text>
+								</View>
+							</View>
+						) : (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>
+										{" "}
+										N°
+										{workPermit.otNumber?.otNumber}
+									</Text>
+								</View>
+							</View>
+						)}
+
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Empresa:</Text>
+								<Text style={styles.value}>{workPermit.company.name}</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Cargo del solicitante:</Text>
+								<Text style={styles.value}>{workPermit.user.internalRole || ""}</Text>
+							</View>
+						</View>
+
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Adm. contrato OTC:</Text>
+								<View style={styles.value}>
+									<Text style={styles.value}>{workPermit.otNumber?.responsible.name}</Text>
+								</View>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Solicitante:</Text>
+								<Text style={styles.value}>{workPermit.user.name}</Text>
+							</View>
+						</View>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>RUT Solicitante:</Text>
+								<Text style={styles.value}>{workPermit.user.rut}</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Fecha inicio OT:</Text>
+								<Text style={styles.value}>
+									{format(new Date(workPermit.startDate), "dd/MM/yyyy", { locale: es })}
+								</Text>
+							</View>
+						</View>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Fecha término OT:</Text>
+								<Text style={styles.value}>
+									{format(new Date(workPermit.endDate), "dd/MM/yyyy", { locale: es })}
+								</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Mutualidad:</Text>
+								<Text style={styles.value}>{workPermit.mutuality}</Text>
+							</View>
+						</View>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Lugar exacto:</Text>
+								<Text style={styles.value}>{workPermit.exactPlace}</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Trabajo Requerido:</Text>
+								<Text style={styles.value}>
+									{workPermit.otNumber?.workRequest || "No especificado"}
+								</Text>
+							</View>
+						</View>
+					</View>
+
+					{workPermit.otherMutuality && (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otra Mutualidad:</Text>
+									<Text style={styles.value}>{workPermit.otherMutuality || "N/A"}</Text>
+								</View>
+							</View>
+						</View>
+					)}
+
+					{workPermit.otNumber?.workDescription && (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Descripción de Trabajo:</Text>
+									<Text style={styles.value}>{workPermit.otNumber.workDescription}</Text>
+								</View>
+							</View>
+						</View>
+					)}
+				</View>
+
+				{/* Detalles del trabajo */}
+				<View style={styles.section}>
+					<Text style={styles.subtitle}>2. DETALLES DEL TRABAJO</Text>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Trabajo a realizar:</Text>
+								<Text style={styles.value}>{workPermit.workWillBe}</Text>
+							</View>
+						</View>
+
+						{workPermit.workWillBe === "Otro" && (
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otro tipo:</Text>
+									<Text style={styles.value}>{workPermit.workWillBeOther || "N/A"}</Text>
+								</View>
+							</View>
+						)}
+					</View>
+
+					{workPermit.workWillBe === "Espacio confinado" ||
+					workPermit.workWillBe === "En Caliente" ? (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<Text style={styles.label}>Medición inicial del área:</Text>
+
+								<View style={styles.table}>
+									<View style={styles.tableRow}>
+										<View style={[styles.tableCol, styles.tableHeader, styles.measurementCol]}>
+											<Text>O2</Text>
+										</View>
+										<View style={[styles.tableCol, styles.tableHeader, styles.measurementCol]}>
+											<Text>LEL</Text>
+										</View>
+										<View style={[styles.tableCol, styles.tableHeader, styles.measurementCol]}>
+											<Text>CO</Text>
+										</View>
+										<View
+											style={[
+												styles.tableCol,
+												styles.tableHeader,
+												styles.measurementCol,
+												styles.lastCol,
+											]}
+										>
+											<Text>H2S</Text>
+										</View>
+									</View>
+									<View style={styles.tableRow}>
+										<View style={[styles.tableCol, styles.measurementCol, { height: 55 }]}>
+											<Text></Text>
+										</View>
+										<View style={[styles.tableCol, styles.measurementCol, { height: 55 }]}>
+											<Text></Text>
+										</View>
+										<View style={[styles.tableCol, styles.measurementCol, { height: 55 }]}>
+											<Text></Text>
+										</View>
+										<View
+											style={[
+												styles.tableCol,
+												styles.measurementCol,
+												styles.lastCol,
+												{ height: 55 },
+											]}
+										>
+											<Text></Text>
+										</View>
+									</View>
+								</View>
+							</View>
+						</View>
+					) : null}
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Herramientas:</Text>
+								<Text style={styles.value}>{toolsString}</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Otras herramientas:</Text>
+								<Text style={styles.value}>{workPermit.otherTools || "N/A"}</Text>
+							</View>
+						</View>
+					</View>
+
+					{/* Add activity details: string[] — only for legacy permits */}
+					{!hasStructuredActivities && (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Detalle de Actividades:</Text>
+								</View>
+
+								{workPermit.activityDetails.map((detail, index) => (
+									<View key={index} style={styles.row}>
+										<Text style={styles.value}>- {detail}</Text>
+									</View>
+								))}
+							</View>
+						</View>
+					)}
+				</View>
+
+				{/* Verificaciones previas */}
+				<View style={styles.section}>
+					<Text style={styles.subtitle}>3. VERIFICACIONES PREVIAS</Text>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Verificaciones:</Text>
+								<Text style={styles.value}>{preChecksString}</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.row}>
+								<Text style={styles.label}>Otras verificaciones:</Text>
+								<Text style={styles.value}>{workPermit.otherPreChecks || "N/A"}</Text>
+							</View>
+						</View>
+					</View>
+				</View>
+
+				{/* Riesgos y medidas — only for legacy permits */}
+				{!hasStructuredActivities && (
+					<View style={styles.section}>
+						<Text style={styles.subtitle}>4. RIESGOS Y MEDIDAS PREVENTIVAS</Text>
+
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Riesgos identificados:</Text>
+									<Text style={styles.value}>{riskIdentificationString}</Text>
+								</View>
+							</View>
+						</View>
+
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otros riesgos:</Text>
+									<Text style={styles.value}>{workPermit.otherRisk || "N/A"}</Text>
+								</View>
+							</View>
+						</View>
+
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Medidas preventivas:</Text>
+									<Text style={styles.value}>{preventiveControlMeasuresString}</Text>
+								</View>
+							</View>
+						</View>
+
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<View style={styles.row}>
+									<Text style={styles.label}>Otras medidas:</Text>
+									<Text style={styles.value}>
+										{workPermit.otherPreventiveControlMeasures || "N/A"}
+									</Text>
+								</View>
+							</View>
+						</View>
+					</View>
+				)}
+
+				{/* Gestión de residuos */}
+				<View style={styles.section}>
+					<Text style={styles.subtitle}>5. GESTIÓN DE RESIDUOS</Text>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<View style={styles.checkBoxRow}>
+								<View style={workPermit.generateWaste ? styles.checkBoxChecked : styles.checkBox} />
+								<Text>¿Genera residuos?</Text>
+							</View>
+						</View>
+					</View>
+
+					{workPermit.generateWaste && (
+						<>
+							<View style={styles.row}>
+								<View style={styles.column}>
+									<View style={styles.row}>
+										<Text style={styles.label}>Tipo de residuos:</Text>
+										<Text style={styles.value}>{workPermit.wasteType || "N/A"}</Text>
+									</View>
+								</View>
+							</View>
+
+							<View style={styles.row}>
+								<View style={styles.column}>
+									<View style={styles.row}>
+										<Text style={styles.label}>Lugar de disposición:</Text>
+										<Text style={styles.value}>
+											{workPermit.wasteDisposalLocation === "Otra"
+												? `Otra: ${workPermit.otherWasteDisposalLocation || "No especificado"}`
+												: workPermit.wasteDisposalLocation || "N/A"}
+										</Text>
+									</View>
+								</View>
+							</View>
+						</>
+					)}
+				</View>
+
+				<View style={styles.section}>
+					<Text style={styles.subtitle}>6. INFORMACIÓN ADICIONAL (COMPLETAR MANUALMENTE)</Text>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<Text style={styles.label}>Quién entrega el área de trabajo:</Text>
+							<View style={styles.customLargeField}></View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<Text style={styles.label}>¿Trabajo completado?</Text>
+							<View style={styles.row}>
+								<View style={styles.checkBox} />
+								<Text>Sí</Text>
+								<View style={{ width: 20 }} />
+								<View style={styles.checkBox} />
+								<Text>No</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<Text style={styles.label}>¿Área de trabajo limpia y ordenada?</Text>
+							<View style={styles.row}>
+								<View style={styles.checkBox} />
+								<Text>Sí</Text>
+								<View style={{ width: 20 }} />
+								<View style={styles.checkBox} />
+								<Text>No</Text>
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<Text style={styles.label}>Observaciones:</Text>
+							<View style={styles.customLargeField}>{workPermit.observations}</View>
+						</View>
+					</View>
+
+					<View style={styles.row}>
+						<View style={styles.column}>
+							<Text style={styles.label}>Participantes:</Text>
+
+							<View style={styles.participantsTable}>
+								<View style={styles.tableRow}>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>Nombre completo</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>RUT</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>Cargo</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader]}>
+										<Text>Empresa</Text>
+									</View>
+									<View style={[styles.participantsCol, styles.tableHeader, styles.lastCol]}>
+										<Text>Firma</Text>
+									</View>
+								</View>
+								{Array.isArray(workPermit.participants) &&
+									workPermit.participants.map((participant, index) => (
+										<View style={styles.tableRow} key={index}>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}>{participant.name}</Text>
+											</View>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}>{participant.rut}</Text>
+											</View>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}>{participant.internalRole || ""}</Text>
+											</View>
+											<View style={styles.participantsCol}>
+												<Text style={styles.tableCell}></Text>
+											</View>
+											<View style={[styles.participantsCol, styles.lastCol]}>
+												<Text style={styles.tableCell}></Text>
+											</View>
+										</View>
+									))}
+							</View>
+						</View>
+					</View>
+
+					{!hasStructuredActivities && (
+						<View style={styles.row}>
+							<View style={styles.column}>
+								<Text style={styles.label}>Observaciones adicionales:</Text>
+								<View style={[styles.customLargeField]}></View>
+							</View>
+						</View>
+					)}
+				</View>
+
+				{/* Sección de firmas — solo para permisos legacy (sin actividades estructuradas) */}
+				{!hasStructuredActivities && (
+					<View style={styles.signatureSection}>
+						<View style={styles.signatureColumn}>
+							<View style={styles.signatureBox}></View>
+							<Text style={styles.signatureLabel}>Firma Solicitante</Text>
+							<Text style={styles.signatureLabel}>{workPermit.user.name}</Text>
+						</View>
+
+						{(workPermit.workWillBe === "Espacio confinado" ||
+							workPermit.workWillBe === "En Caliente") && (
+							<View style={styles.signatureColumn}>
+								<View style={styles.signatureBox}></View>
+								<Text style={styles.signatureLabel}>Firma Prevención</Text>
+								<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+							</View>
+						)}
+
+						<View style={styles.signatureColumn}>
+							<View style={styles.signatureBox}></View>
+							<Text style={styles.signatureLabel}>Firma</Text>
+							<Text style={styles.signatureLabel}>Operador OTC</Text>
+						</View>
+					</View>
+				)}
+
+				{/* Footer */}
+				<View style={styles.footer}>
+					<Text>
+						Este documento debe ser impreso y firmado físicamente. Documento generado el{" "}
+						{format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })}
+					</Text>
+				</View>
+			</Page>
+
+			{/* Página de actividades — solo para permisos con actividades estructuradas */}
+			{hasStructuredActivities && (
+				<Page size="A4" style={styles.page}>
+					{/* Título de sección */}
+					<Text style={styles.subtitle}>DETALLE DE ACTIVIDADES Y ANÁLISIS DE RIESGOS</Text>
+
+					{/* Nota 1 */}
+					<View style={styles.notaBox}>
+						<Text>
+							{
+								"Nota: Este permiso de trabajo es válido mientras las condiciones descritas en él no cambien, lo cual se evalúa diariamente por el análisis de riesgos de la tarea (ART) de cada contratista. En caso de haber cambios, usted debe solicitar y generar un nuevo permiso de trabajo a OTC."
+							}
+						</Text>
+					</View>
+
+					{/* Subtítulo */}
+					<Text style={{ fontSize: 8, marginBottom: 8, color: "#374151" }}>
+						{"Es obligatorio describir cada actividad que compone el trabajo a ejecutar:"}
+					</Text>
+
+					{/* Tabla de actividades */}
+					<View style={styles.activitiesTable}>
+						{/* Header */}
+						<View style={styles.activitiesHeaderRow}>
+							<View style={[styles.activitiesHeaderCell, { width: "30%" }]}>
+								<Text>Actividad</Text>
+							</View>
+							<View style={[styles.activitiesHeaderCell, { width: "25%" }]}>
+								<Text>Peligros</Text>
+							</View>
+							<View style={[styles.activitiesHeaderCell, { width: "20%" }]}>
+								<Text>Riesgos Asociados</Text>
+							</View>
+							<View style={[styles.activitiesHeaderCellLast, { width: "25%" }]}>
+								<Text>Medidas de Control</Text>
+							</View>
+						</View>
+
+						{/* Filas de datos */}
+						{workPermit.activities!.map((act) => {
+							const peligroItems = [
+								...act.peligros.map((id) => getPeligroLabel(id)),
+								...(act.otroPeligro ? [`Otra: ${act.otroPeligro}`] : []),
+							]
+							const riesgoItems = [
+								...act.riesgos.map((id) => getRiesgoLabel(id)),
+								...(act.otroRiesgo ? [`Otra: ${act.otroRiesgo}`] : []),
+							]
+							const medidaItems = [
+								...act.medidasDeControl.map((id) => getMedidaDeControlLabel(id)),
+								...(act.otraMedidaDeControl ? [`Otra: ${act.otraMedidaDeControl}`] : []),
+							]
+
+							return (
+								<View style={styles.activitiesRow} key={act.id}>
+									<View style={[styles.activitiesCell, { width: "30%" }]}>
+										<Text>{act.activity}</Text>
+									</View>
+									<View style={[styles.activitiesCell, { width: "25%" }]}>
+										{peligroItems.map((item, i) => (
+											<Text key={i}>{`• ${item}`}</Text>
+										))}
+									</View>
+									<View style={[styles.activitiesCell, { width: "20%" }]}>
+										{riesgoItems.map((item, i) => (
+											<Text key={i}>{`• ${item}`}</Text>
+										))}
+									</View>
+									<View style={[styles.activitiesCellLast, { width: "25%" }]}>
+										{medidaItems.map((item, i) => (
+											<Text key={i}>{`• ${item}`}</Text>
+										))}
+									</View>
+								</View>
+							)
+						})}
+					</View>
+
+					{/* Observaciones adicionales */}
+					<View style={{ marginTop: 16 }}>
+						<Text style={styles.label}>Observaciones adicionales:</Text>
+						<View style={[styles.customLargeField]}></View>
+					</View>
+
+					{/* Nota y firmas */}
+					<View style={{ marginTop: 24, fontSize: 7, color: "#374151" }}>
+						<Text>
+							{
+								"Declaro haber revisado el presente permiso de trabajo verificando que se han analizado todas las actividades de las tareas a ejecutar en terreno, quedando una copia firmada en poder de sala de control antes del inicio de los trabajos."
+							}
+						</Text>
+					</View>
+
+					<View style={styles.signatureSection}>
+						<View style={styles.signatureColumn}>
+							<View style={styles.signatureBox}></View>
+							<Text style={styles.signatureLabel}>Firma Solicitante</Text>
+							<Text style={styles.signatureLabel}>{workPermit.user.name}</Text>
+						</View>
+
+						{(workPermit.workWillBe === "Espacio confinado" ||
+							workPermit.workWillBe === "En Caliente") && (
+							<View style={styles.signatureColumn}>
+								<View style={styles.signatureBox}></View>
+								<Text style={styles.signatureLabel}>Firma Prevención</Text>
+								<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+							</View>
+						)}
+
+						<View style={styles.signatureColumn}>
+							<View style={styles.signatureBox}></View>
+							<Text style={styles.signatureLabel}>Firma Operador OTC</Text>
+						</View>
+					</View>
+
+					{/* Footer */}
+					<View style={styles.footer}>
+						<Text>
+							Este documento debe ser impreso y firmado físicamente. Documento generado el{" "}
+							{format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })}
+						</Text>
+					</View>
+				</Page>
+			)}
+		</Document>
+	)
+}
+
+export default WorkPermitPDF

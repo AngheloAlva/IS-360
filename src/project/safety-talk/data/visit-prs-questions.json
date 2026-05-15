@@ -1,0 +1,230 @@
+[
+  {
+    "id": 1,
+    "pregunta": "¿Cómo deben quedar los vehículos estacionados en TRM?",
+    "opciones": ["Aculatados", "De frente", "En diagonal", "En cualquier posición"],
+    "correcta": "Aculatados"
+  },
+  {
+    "id": 2,
+    "pregunta": "¿Por dónde se debe transitar al interior de las instalaciones?",
+    "opciones": [
+      "Por las vías señalizadas para peatones",
+      "Por cualquier camino libre",
+      "Entre los equipos",
+      "Por la vía vehicular"
+    ],
+    "correcta": "Por las vías señalizadas para peatones"
+  },
+  {
+    "id": 3,
+    "pregunta": "¿Se puede usar teléfono móvil en zona clasificada?",
+    "opciones": [
+      "Solo si es intrínsecamente seguro",
+      "Sí, en todo momento",
+      "No, bajo ninguna circunstancia",
+      "Solo con autorización del supervisor"
+    ],
+    "correcta": "Solo si es intrínsecamente seguro"
+  },
+  {
+    "id": 4,
+    "pregunta": "¿A quién debe informar al momento de ingresar a planta?",
+    "opciones": [
+      "A la sala de control",
+      "A mantenimiento",
+      "A recursos humanos",
+      "A cualquier trabajador"
+    ],
+    "correcta": "A la sala de control"
+  },
+  {
+    "id": 5,
+    "pregunta": "¿Se debe solicitar permiso a sala de control al ingresar a zona clasificada?",
+    "opciones": [
+      "Sí, siempre",
+      "Solo si hay personal trabajando",
+      "No es necesario",
+      "Solo con equipos eléctricos"
+    ],
+    "correcta": "Sí, siempre"
+  },
+  {
+    "id": 6,
+    "pregunta": "¿Qué tipo de productos se transportan por el oleoducto Trasandino?",
+    "opciones": [
+      "Combustibles líquidos e hidrocarburos",
+      "Agua tratada",
+      "Gases industriales",
+      "Productos alimenticios"
+    ],
+    "correcta": "Combustibles líquidos e hidrocarburos"
+  },
+  {
+    "id": 7,
+    "pregunta": "¿Cuáles son los principales riesgos asociados en TRM?",
+    "opciones": [
+      "Incendio, explosión y derrames",
+      "Ruido y polvo",
+      "Caídas de altura solamente",
+      "Choques eléctricos"
+    ],
+    "correcta": "Incendio, explosión y derrames"
+  },
+  {
+    "id": 8,
+    "pregunta": "¿Cuántos puntos de encuentro hay en TRM?",
+    "opciones": ["3", "2", "4", "1"],
+    "correcta": "3"
+  },
+  {
+    "id": 9,
+    "pregunta": "¿Por qué es importante respetar los puntos de encuentro?",
+    "opciones": [
+      "Para facilitar una evacuación segura",
+      "Para registrar asistencia",
+      "Para mantener el orden",
+      "Por norma interna"
+    ],
+    "correcta": "Para facilitar una evacuación segura"
+  },
+  {
+    "id": 10,
+    "pregunta": "¿Se puede fumar al interior de TRM?",
+    "opciones": [
+      "No, está totalmente prohibido",
+      "Sí, en zonas abiertas",
+      "Solo con autorización",
+      "Solo fuera del horario laboral"
+    ],
+    "correcta": "No, está totalmente prohibido"
+  },
+  {
+    "id": 11,
+    "pregunta": "¿Qué documento o permiso se debe gestionar antes de iniciar un trabajo en terreno?",
+    "opciones": [
+      "Permiso de trabajo seguro",
+      "Acta de ingreso",
+      "Guía de despacho",
+      "Informe técnico"
+    ],
+    "correcta": "Permiso de trabajo seguro"
+  },
+  {
+    "id": 12,
+    "pregunta": "¿Por dónde se debe transitar al interior de la planta TRM?",
+    "opciones": [
+      "Por las vías señalizadas para peatones",
+      "Por cualquier zona libre",
+      "Entre tuberías",
+      "Por rutas de vehículos"
+    ],
+    "correcta": "Por las vías señalizadas para peatones"
+  },
+  {
+    "id": 13,
+    "pregunta": "¿Qué EPP son obligatorios al ingresar a planta?",
+    "opciones": [
+      "Casco, lentes, botines, guantes y chaleco reflectante",
+      "Solo casco y lentes",
+      "Solo guantes",
+      "Ninguno"
+    ],
+    "correcta": "Casco, lentes, botines, guantes y chaleco reflectante"
+  },
+  {
+    "id": 14,
+    "pregunta": "¿Qué E.P.P especial necesito para ingresar al área clasificada?",
+    "opciones": [
+      "Ropa antiestática y monogas H2S",
+      "Casco azul",
+      "Guantes dieléctricos",
+      "Solo gafas de sol"
+    ],
+    "correcta": "Ropa antiestática y monogas H2S"
+  },
+  {
+    "id": 15,
+    "pregunta": "¿Cuántas vías de evacuación hay en TRM?",
+    "opciones": ["3", "2", "1", "4"],
+    "correcta": "3"
+  },
+  {
+    "id": 16,
+    "pregunta": "¿Puedo ingresar a la zona clasificada sin permiso de sala de control?",
+    "opciones": ["No, está prohibido", "Sí, si es breve", "Solo con casco", "Solo acompañado"],
+    "correcta": "No, está prohibido"
+  },
+  {
+    "id": 17,
+    "pregunta": "¿No es necesario usar protección auditiva en la rama reductora?",
+    "opciones": [
+      "Falso, siempre es necesario",
+      "Verdadero, no hay ruido",
+      "Depende del área",
+      "Solo los visitantes deben usarla"
+    ],
+    "correcta": "Falso, siempre es necesario"
+  },
+  {
+    "id": 18,
+    "pregunta": "¿Cuáles son los puntos de encuentro y rutas de evacuación del TRM?",
+    "opciones": [
+      "Están señalizados en el plano de emergencia",
+      "Solo se informan al jefe de turno",
+      "No existen formalmente",
+      "Se determinan según la emergencia"
+    ],
+    "correcta": "Están señalizados en el plano de emergencia"
+  },
+  {
+    "id": 19,
+    "pregunta": "¿Debe utilizar bloqueador solar al interior de planta con un índice de radiación alto UV?",
+    "opciones": [
+      "Sí, como medida preventiva",
+      "No, solo los supervisores",
+      "Solo fuera de la planta",
+      "No es necesario"
+    ],
+    "correcta": "Sí, como medida preventiva"
+  },
+  {
+    "id": 20,
+    "pregunta": "¿Cómo comunicas una emergencia en terreno?",
+    "opciones": [
+      "Llamando al número de emergencia y entregando ubicación y tipo de incidente",
+      "Esperando instrucciones",
+      "Saliendo de inmediato",
+      "Buscando ayuda de un compañero"
+    ],
+    "correcta": "Llamando al número de emergencia y entregando ubicación y tipo de incidente"
+  },
+  {
+    "id": 21,
+    "pregunta": "¿Qué gases tóxicos puedes encontrar en TRM?",
+    "opciones": ["H2S y CO", "CO2", "Oxígeno y nitrógeno", "Aire comprimido"],
+    "correcta": "H2S y CO"
+  },
+  {
+    "id": 22,
+    "pregunta": "¿Qué rol cumple el Plan de Emergencia de OTC?",
+    "opciones": [
+      "Establecer acciones ante emergencias",
+      "Controlar asistencia",
+      "Organizar el personal",
+      "Revisar inventario"
+    ],
+    "correcta": "Establecer acciones ante emergencias"
+  },
+  {
+    "id": 23,
+    "pregunta": "¿Se puede botar desechos al canal Corvi?",
+    "opciones": [
+      "No, está estrictamente prohibido",
+      "Sí, si son líquidos",
+      "Solo residuos orgánicos",
+      "Sí, con autorización"
+    ],
+    "correcta": "No, está estrictamente prohibido"
+  }
+]

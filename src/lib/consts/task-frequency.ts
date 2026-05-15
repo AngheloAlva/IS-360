@@ -1,0 +1,69 @@
+import { PLAN_FREQUENCY } from "@/generated/prisma/enums"
+
+export const TASK_FREQUENCY_VALUES = {
+	DAILY: PLAN_FREQUENCY.DAILY,
+	WEEKLY: PLAN_FREQUENCY.WEEKLY,
+	MONTHLY: PLAN_FREQUENCY.MONTHLY,
+	BIMONTHLY: PLAN_FREQUENCY.BIMONTHLY,
+	QUARTERLY: PLAN_FREQUENCY.QUARTERLY,
+	FOURMONTHLY: PLAN_FREQUENCY.FOURMONTHLY,
+	BIANNUAL: PLAN_FREQUENCY.BIANNUAL,
+	YEARLY: PLAN_FREQUENCY.YEARLY,
+} as const
+
+export const TASK_FREQUENCY_VALUES_ARRAY = [
+	PLAN_FREQUENCY.DAILY,
+	PLAN_FREQUENCY.WEEKLY,
+	PLAN_FREQUENCY.MONTHLY,
+	PLAN_FREQUENCY.BIMONTHLY,
+	PLAN_FREQUENCY.QUARTERLY,
+	PLAN_FREQUENCY.FOURMONTHLY,
+	PLAN_FREQUENCY.BIANNUAL,
+	PLAN_FREQUENCY.YEARLY,
+] as const
+
+export const TaskFrequencyOptions = [
+	{
+		label: "Diario",
+		value: PLAN_FREQUENCY.DAILY,
+	},
+	{
+		label: "Semanal",
+		value: PLAN_FREQUENCY.WEEKLY,
+	},
+	{
+		label: "Mensual",
+		value: PLAN_FREQUENCY.MONTHLY,
+	},
+	{
+		label: "Bimestral",
+		value: PLAN_FREQUENCY.BIMONTHLY,
+	},
+	{
+		label: "Trimestral",
+		value: PLAN_FREQUENCY.FOURMONTHLY,
+	},
+	{
+		label: "Cuatrimestral",
+		value: PLAN_FREQUENCY.QUARTERLY,
+	},
+	{
+		label: "Semestral",
+		value: PLAN_FREQUENCY.BIANNUAL,
+	},
+	{
+		label: "Anual",
+		value: PLAN_FREQUENCY.YEARLY,
+	},
+]
+
+export const TaskFrequencyLabels = {
+	[PLAN_FREQUENCY.DAILY]: "Diario",
+	[PLAN_FREQUENCY.WEEKLY]: "Semanal",
+	[PLAN_FREQUENCY.MONTHLY]: "Mensual",
+	[PLAN_FREQUENCY.BIMONTHLY]: "Bimestral",
+	[PLAN_FREQUENCY.FOURMONTHLY]: "Trimestral",
+	[PLAN_FREQUENCY.QUARTERLY]: "Cuatrimestral",
+	[PLAN_FREQUENCY.BIANNUAL]: "Semestral",
+	[PLAN_FREQUENCY.YEARLY]: "Anual",
+}
