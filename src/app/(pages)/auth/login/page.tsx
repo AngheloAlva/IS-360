@@ -1,65 +1,85 @@
-import { redirect } from "next/navigation"
-import { headers } from "next/headers"
+"use client"
+
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 import Image from "next/image"
+import { ShieldCheckIcon, WrenchIcon, HardHatIcon } from "lucide-react"
 
-import { ACCESS_ROLE } from "@/generated/prisma/enums"
-import { auth } from "@/lib/auth"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import { DEMO_ROLE_LABELS, DEMO_USERS, setDemoUser, useDemoUser } from "@/lib/demo-auth"
+import { Button } from "@/shared/components/ui/button"
+import type { DemoRole } from "@/lib/demo-auth"
 
-import LoginForm from "@/project/auth/components/forms/LoginForm"
+const ROLE_ICONS: Record<DemoRole, React.ComponentType<{ className?: string }>> = {
+	admin: ShieldCheckIcon,
+	"internal-tech": WrenchIcon,
+	supervisor: HardHatIcon,
+}
 
-export default async function LoginPage({
-	searchParams,
-}: {
-	searchParams: Promise<{ callbackUrl?: string }>
-}): Promise<React.ReactElement> {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
+function targetFor(role: DemoRole): string {
+	return role === "supervisor" ? "/dashboard/inicio" : "/admin/dashboard/inicio"
+}
 
-	if (session?.user) {
-		if (session.user.accessRole === ACCESS_ROLE.ADMIN) redirect("/admin/dashboard/inicio")
-		else redirect("/dashboard/inicio")
+export default function LoginPage(): React.ReactElement {
+	const router = useRouter()
+	const params = useSearchParams()
+	const user = useDemoUser()
+
+	useEffect(() => {
+		if (!user) return
+		const callback = params.get("callbackUrl")
+		router.replace(callback && callback.startsWith("/") ? callback : targetFor(user.role))
+	}, [user, router, params])
+
+	const choose = (role: DemoRole) => {
+		setDemoUser(DEMO_USERS[role])
 	}
 
-	const { callbackUrl } = await searchParams
-
 	return (
-		<section className="bg-secondary-background h-screen p-4 xl:p-6">
-			<div className="h-full lg:grid lg:grid-cols-12 lg:gap-4">
-				<main className="flex flex-col items-center justify-center gap-8 py-6 lg:col-span-5 lg:h-full lg:items-center xl:col-span-5">
-					<div className="z-10 -mt-14 flex h-full w-full items-center justify-start gap-4 sm:w-4/5 lg:mt-0">
-						<Image
-							alt="Logo"
-							width={70}
-							height={70}
-							src={"/logo.svg"}
-							className="size-12.5 rounded-md shadow sm:size-14.5"
-						/>
-
-						<div className="hidden flex-col items-start lg:flex">
-							<h1 className="inline text-xl font-bold xl:text-2xl 2xl:text-3xl">Bienvenido a </h1>
-							<div className="bg-linear-to-br from-green-600 to-green-700 bg-clip-text">
-								<p className="inline text-2xl font-black text-transparent xl:text-4xl">IS 360</p>
-							</div>
-						</div>
-					</div>
-
-					<LoginForm callbackUrl={callbackUrl} />
-
-					<p className="text-muted-foreground mt-auto h-full text-center text-sm leading-relaxed">
-						IS 360 © {new Date().getFullYear()}
-					</p>
-				</main>
-
-				<section className="relative flex h-40 items-end overflow-hidden rounded-lg shadow-2xl sm:h-52 lg:col-span-7 lg:h-full xl:col-span-7">
+		<section className="bg-secondary-background min-h-screen p-4 xl:p-6">
+			<div className="mx-auto flex h-full max-w-5xl flex-col gap-8 py-10">
+				<header className="flex items-center gap-4">
 					<Image
-						alt="Login"
-						width={1000}
-						height={1280}
-						src="/images/auth/login.jpeg"
-						className="absolute inset-0 h-full w-full object-cover object-center"
+						alt="IS 360"
+						width={56}
+						height={56}
+						src="/logo.svg"
+						className="size-14 rounded-md shadow"
 					/>
-				</section>
+					<div>
+						<h1 className="text-xl font-bold xl:text-2xl">Bienvenido a IS 360</h1>
+						<p className="text-muted-foreground text-sm">
+							Esta es una demo — elegí un rol para recorrer la plataforma.
+						</p>
+					</div>
+				</header>
+
+				<div className="grid gap-4 md:grid-cols-3">
+					{(Object.keys(DEMO_USERS) as DemoRole[]).map((role) => {
+						const Icon = ROLE_ICONS[role]
+						const labels = DEMO_ROLE_LABELS[role]
+						return (
+							<Card key={role} className="flex flex-col">
+								<CardHeader>
+									<div className="bg-primary/10 text-primary mb-3 flex size-10 items-center justify-center rounded-md">
+										<Icon className="size-5" />
+									</div>
+									<CardTitle>{labels.title}</CardTitle>
+									<CardDescription>{labels.description}</CardDescription>
+								</CardHeader>
+								<CardContent className="mt-auto">
+									<Button className="w-full" onClick={() => choose(role)}>
+										Entrar como {labels.title}
+									</Button>
+								</CardContent>
+							</Card>
+						)
+					})}
+				</div>
+
+				<p className="text-muted-foreground mt-auto text-center text-sm">
+					IS 360 © {new Date().getFullYear()} — los datos no se guardan en servidor
+				</p>
 			</div>
 		</section>
 	)
