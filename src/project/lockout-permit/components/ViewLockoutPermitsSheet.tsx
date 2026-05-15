@@ -22,11 +22,11 @@ import {
 import type { WorkPermit } from "@/project/work-permit/hooks/use-work-permit"
 
 interface ViewLockoutPermitsSheetProps {
-	isOtcMember: boolean
+	isInternalMember: boolean
 	workPermit: WorkPermit
 }
 
-export function ViewLockoutPermitsSheet({ workPermit, isOtcMember }: ViewLockoutPermitsSheetProps) {
+export function ViewLockoutPermitsSheet({ workPermit, isInternalMember }: ViewLockoutPermitsSheetProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const lockoutPermitsCount = workPermit.lockoutPermits.length
 	const {
@@ -73,7 +73,7 @@ export function ViewLockoutPermitsSheet({ workPermit, isOtcMember }: ViewLockout
 						</p>
 
 						<ManageLockoutPermitsDialog
-							isOtcMember={isOtcMember}
+							isInternalMember={isInternalMember}
 							workPermitId={workPermit.id}
 							companyId={workPermit.company.id}
 						/>
@@ -90,7 +90,7 @@ export function ViewLockoutPermitsSheet({ workPermit, isOtcMember }: ViewLockout
 									index={index}
 									key={permit.id}
 									permit={permit}
-									isOtcMember={isOtcMember}
+									isInternalMember={isInternalMember}
 									workPermitId={workPermit.id}
 								/>
 							))}
@@ -106,7 +106,7 @@ export function ViewLockoutPermitsSheet({ workPermit, isOtcMember }: ViewLockout
 							<ManageLockoutPermitsDialog
 								workPermitId={workPermit.id}
 								companyId={workPermit.company.id}
-								isOtcMember={isOtcMember}
+								isInternalMember={isInternalMember}
 							/>
 						</div>
 					)}

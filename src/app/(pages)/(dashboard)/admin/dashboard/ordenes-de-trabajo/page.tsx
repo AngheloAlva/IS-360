@@ -96,7 +96,7 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 					{hassWorkBookPermission.success && (
 						<LazyNewWorkBookForm
 							userId={session.user.id}
-							companyId={process.env.NEXT_PUBLIC_OTC_COMPANY_ID!}
+							companyId={process.env.NEXT_PUBLIC_INTERNAL_COMPANY_ID!}
 							className="text-amber-600 hover:bg-white hover:text-amber-600 dark:text-amber-800 dark:hover:text-amber-800"
 						/>
 					)}

@@ -563,11 +563,11 @@ export default function WorkPermitDetailsDialog({
 																				Candado Contratista: {registration.contractorLockNumber}
 																			</div>
 																		)}
-																		{registration.otcLockNumber && (
-																			<div>Candado OTC: {registration.otcLockNumber}</div>
+																		{registration.internalLockNumber && (
+																			<div>Candado Interno: {registration.internalLockNumber}</div>
 																		)}
-																		{registration.otcOperator && (
-																			<div>Operador OTC: {registration.otcOperator.name}</div>
+																		{registration.internalOperator && (
+																			<div>Operador Interno: {registration.internalOperator.name}</div>
 																		)}
 																	</div>
 																</div>

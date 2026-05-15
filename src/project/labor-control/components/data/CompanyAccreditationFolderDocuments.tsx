@@ -36,14 +36,14 @@ interface CompanyAccreditationFolderDocumentsProps {
 	userId: string
 	folderId: string
 	companyId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 export default function CompanyAccreditationFolderDocuments({
 	userId,
 	folderId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 }: CompanyAccreditationFolderDocumentsProps): React.ReactElement {
 	const [rowSelection, setRowSelection] = useState({})
 	const [selectedDocumentType, setSelectedDocumentType] = useState<{
@@ -65,7 +65,7 @@ export default function CompanyAccreditationFolderDocuments({
 			refetch,
 			folderId,
 			companyId,
-			isOtcMember,
+			isInternalMember,
 			setShowUploadDialog,
 			setSelectedDocument,
 			setSelectedDocumentType,
@@ -99,7 +99,7 @@ export default function CompanyAccreditationFolderDocuments({
 				</CardTitle>
 
 				<div className="flex items-center gap-2">
-					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isInternalMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<UndoDocumentReviewDialog
 							userId={userId}
 							documents={table.getFilteredSelectedRowModel().rows.map((row) => ({
@@ -117,7 +117,7 @@ export default function CompanyAccreditationFolderDocuments({
 
 					<DocumentCountProgress progress={progress} />
 
-					{!isOtcMember && data?.folderStatus === "DRAFT" && (
+					{!isInternalMember && data?.folderStatus === "DRAFT" && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							folderId={folderId}
@@ -175,7 +175,7 @@ export default function CompanyAccreditationFolderDocuments({
 						{documentsNotUploaded.length > 0 &&
 							documentsNotUploaded.map((doc) => (
 								<TableRow key={doc.name}>
-									{isOtcMember && <TableCell></TableCell>}
+									{isInternalMember && <TableCell></TableCell>}
 									<TableCell className="font-semibold">
 										<div className="flex flex-col items-start justify-center">
 											<div className="flex items-center gap-2">
@@ -207,7 +207,7 @@ export default function CompanyAccreditationFolderDocuments({
 										<div className="flex items-center gap-1">
 											{(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
 												<>
-													{!isOtcMember && (
+													{!isInternalMember && (
 														<Button
 															size={"icon"}
 															variant="ghost"
@@ -221,7 +221,7 @@ export default function CompanyAccreditationFolderDocuments({
 														</Button>
 													)}
 
-													{isOtcMember && (
+													{isInternalMember && (
 														<MarkDocumentAsNotAppliedDialog
 															documentName={doc.name}
 															onMarkAsNotApplied={() =>

@@ -14,7 +14,7 @@ interface WorkBookMilestonesProps {
 	userRole: string
 	workOrderId: string
 	supervisorId: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	responsibleId: string
 	hasPermission: boolean
 	workOrderStartDate: Date
@@ -28,7 +28,7 @@ interface WorkBookMilestonesProps {
 export default function WorkBookMilestones({
 	userRole,
 	workOrderId,
-	isOtcMember,
+	isInternalMember,
 	supervisorId,
 	responsibleId,
 	hasPermission,
@@ -167,7 +167,7 @@ export default function WorkBookMilestones({
 				<MilestoneCards
 					userRole={userRole}
 					workOrderId={workOrderId}
-					isOtcMember={isOtcMember}
+					isInternalMember={isInternalMember}
 					supervisorId={supervisorId}
 					responsibleId={responsibleId}
 					hasPermission={hasPermission}

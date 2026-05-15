@@ -125,7 +125,7 @@ export function ApiDocsPage() {
 			{/* 1. Introduccion */}
 			<Section id="introduccion" title="Introduccion" icon={BookOpenIcon}>
 				<p className="text-muted-foreground leading-relaxed">
-					OTC expone una API REST de solo lectura disenada para extraer datos operativos
+					IS 360 expone una API REST de solo lectura disenada para extraer datos operativos
 					hacia Power BI u otras herramientas de Business Intelligence. Todos los
 					endpoints devuelven datos en formato JSON y requieren autenticacion mediante
 					API Key.
@@ -169,7 +169,7 @@ export function ApiDocsPage() {
 				</ul>
 				<p className="text-sm font-medium pt-2">Ejemplo con curl</p>
 				<CodeBlock language="bash">
-					{`curl -H "x-api-key: otc_pk_..." https://is360.cl/api/v1/companies`}
+					{`curl -H "x-api-key: is_pk_..." https://is360.cl/api/v1/companies`}
 				</CodeBlock>
 			</Section>
 
@@ -417,7 +417,7 @@ export function ApiDocsPage() {
 				<CodeBlock language="Power Query M">
 {`let
     BaseUrl = "https://is360.cl/api/v1/work-orders",
-    ApiKey = "otc_pk_...",
+    ApiKey = "is_pk_...",
     GetPage = (cursor as nullable text) =>
         let
             Url = if cursor = null

@@ -135,7 +135,7 @@ export default function VisitorSafetyTalksPage() {
 			<MemoizedModuleHeader
 				backHref="/dashboard/charlas-de-seguridad"
 				className="from-sky-600 to-indigo-700 dark:from-sky-800 dark:to-indigo-900"
-				title="Charlas de Visita - OTC"
+				title="Charlas de Visita - Interno"
 				description="Selecciona la planta correspondiente, visualiza el video y rinde la evaluación."
 			/>
 

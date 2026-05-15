@@ -27,7 +27,7 @@ interface VehicleFolderProps {
 	userId: string
 	companyId: string
 	onBack: () => void
-	isOtcMember: boolean
+	isInternalMember: boolean
 	startupFolderId: string
 	hasPermission: boolean
 	onSelectVehicle?: (vehicleId: string) => void
@@ -37,7 +37,7 @@ export default function VehicleFolder({
 	onBack,
 	userId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	startupFolderId,
 	onSelectVehicle,
@@ -83,7 +83,7 @@ export default function VehicleFolder({
 				userId={userId}
 				companyId={companyId}
 				documents={documents}
-				isOtcMember={isOtcMember}
+				isInternalMember={isInternalMember}
 				vehicleId={selectedEntity.id}
 				hasPermission={hasPermission}
 				startupFolderId={startupFolderId}
@@ -104,7 +104,7 @@ export default function VehicleFolder({
 					<h2 className="text-lg font-bold">Vehículos y Equipos</h2>
 				</div>
 
-				{!isOtcMember && (
+				{!isInternalMember && (
 					<div className="flex items-center gap-2">
 						<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
 							<FolderIcon className="h-4 w-4" />

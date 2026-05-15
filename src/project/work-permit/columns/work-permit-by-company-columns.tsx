@@ -72,7 +72,7 @@ export const getWorkPermitByCompanyColumns = (): ColumnDef<WorkPermit>[] => [
 							</DropdownMenuItem>
 
 							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
-								<ViewLockoutPermitsSheet workPermit={row.original} isOtcMember={false} />
+								<ViewLockoutPermitsSheet workPermit={row.original} isInternalMember={false} />
 							</DropdownMenuItem>
 
 							<DropdownMenuItem onClick={(e) => e.preventDefault()}>

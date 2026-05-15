@@ -40,7 +40,7 @@ import { cn } from "@/lib/utils"
 
 interface StartupFolderOverviewSummaryProps {
 	folder: StartupFolder
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	isArchivedView?: boolean
 	onRefetch: () => Promise<unknown>
@@ -53,7 +53,7 @@ const getPercent = (approved: number, total: number): number => {
 
 export default function StartupFolderOverviewSummary({
 	folder,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	isArchivedView = false,
 	onRefetch,
@@ -140,7 +140,7 @@ export default function StartupFolderOverviewSummary({
 		(folder.techSpecsFolders.length === 0 || folder.techSpecsFolders[0]?.isCompleted)
 
 	const canComplete =
-		isOtcMember &&
+		isInternalMember &&
 		hasPermission &&
 		!isArchivedView &&
 		folder.status !== StartupFolderStatus.COMPLETED &&
@@ -323,7 +323,7 @@ export default function StartupFolderOverviewSummary({
 								</div>
 							) : (
 								<p className="text-sm">
-									La carpeta esta lista, pero solo un admin OTC con permisos puede completarla.
+									La carpeta esta lista, pero solo un admin interno con permisos puede completarla.
 								</p>
 							)}
 						</div>

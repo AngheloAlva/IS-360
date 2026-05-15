@@ -57,7 +57,7 @@ export const createInspectionComment = async ({
 			},
 		})
 
-		if (!workEntry || workEntry.entryType !== "OTC_INSPECTION") {
+		if (!workEntry || workEntry.entryType !== "INTERNAL_INSPECTION") {
 			return {
 				ok: false,
 				message: "Inspección no encontrada",

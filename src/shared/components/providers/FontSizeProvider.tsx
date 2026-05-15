@@ -19,14 +19,14 @@ export function FontSizeProvider({
 	const [fontSize, setFontSize] = useState<FontSize>("medium")
 
 	useEffect(() => {
-		const savedFontSize = localStorage.getItem("otc-font-size") as FontSize | null
+		const savedFontSize = localStorage.getItem("internal-font-size") as FontSize | null
 		if (savedFontSize) {
 			setFontSize(savedFontSize)
 		}
 	}, [])
 
 	useEffect(() => {
-		localStorage.setItem("otc-font-size", fontSize)
+		localStorage.setItem("internal-font-size", fontSize)
 
 		document.documentElement.dataset.fontSize = fontSize
 	}, [fontSize])

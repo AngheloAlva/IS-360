@@ -365,7 +365,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 
 						<View style={styles.column}>
 							<View style={styles.row}>
-								<Text style={styles.label}>Adm. contrato OTC:</Text>
+								<Text style={styles.label}>Adm. contrato Interno:</Text>
 								<View style={styles.value}>
 									<Text style={styles.value}>{workPermit.otNumber?.responsible.name}</Text>
 								</View>
@@ -789,14 +789,14 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							<View style={styles.signatureColumn}>
 								<View style={styles.signatureBox}></View>
 								<Text style={styles.signatureLabel}>Firma Prevención</Text>
-								<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+								<Text style={styles.signatureLabel}>Riesgos Internos</Text>
 							</View>
 						)}
 
 						<View style={styles.signatureColumn}>
 							<View style={styles.signatureBox}></View>
 							<Text style={styles.signatureLabel}>Firma</Text>
-							<Text style={styles.signatureLabel}>Operador OTC</Text>
+							<Text style={styles.signatureLabel}>Operador Interno</Text>
 						</View>
 					</View>
 				)}
@@ -820,7 +820,7 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 					<View style={styles.notaBox}>
 						<Text>
 							{
-								"Nota: Este permiso de trabajo es válido mientras las condiciones descritas en él no cambien, lo cual se evalúa diariamente por el análisis de riesgos de la tarea (ART) de cada contratista. En caso de haber cambios, usted debe solicitar y generar un nuevo permiso de trabajo a OTC."
+								"Nota: Este permiso de trabajo es válido mientras las condiciones descritas en él no cambien, lo cual se evalúa diariamente por el análisis de riesgos de la tarea (ART) de cada contratista. En caso de haber cambios, usted debe solicitar y generar un nuevo permiso de trabajo al área interna."
 							}
 						</Text>
 					</View>
@@ -915,13 +915,13 @@ const WorkPermitPDF = ({ workPermit }: WorkPermitPDFProps) => {
 							<View style={styles.signatureColumn}>
 								<View style={styles.signatureBox}></View>
 								<Text style={styles.signatureLabel}>Firma Prevención</Text>
-								<Text style={styles.signatureLabel}>Riesgos OTC</Text>
+								<Text style={styles.signatureLabel}>Riesgos Internos</Text>
 							</View>
 						)}
 
 						<View style={styles.signatureColumn}>
 							<View style={styles.signatureBox}></View>
-							<Text style={styles.signatureLabel}>Firma Operador OTC</Text>
+							<Text style={styles.signatureLabel}>Firma Operador Interno</Text>
 						</View>
 					</View>
 

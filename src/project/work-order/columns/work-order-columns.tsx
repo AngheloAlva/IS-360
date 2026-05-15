@@ -27,7 +27,7 @@ import type { ColumnDef, Row } from "@tanstack/react-table"
 interface GetWorkOrderColumnsProps {
 	setSelectedId: (id: string) => void
 	setDialogDetailsOpen: (open: boolean) => void
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	canDelete?: boolean
 }
 

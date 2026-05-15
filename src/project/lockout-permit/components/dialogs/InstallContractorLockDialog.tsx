@@ -122,7 +122,7 @@ export default function InstallContractorLockDialog({
 								<p className="font-semibold">Información:</p>
 								<ul className="mt-1 list-inside list-disc space-y-1">
 									<li>La fecha y hora se registrarán automáticamente</li>
-									<li>OTC también debe instalar su candado</li>
+									<li>El responsable interno también debe instalar su candado</li>
 									<li>Ambos candados deben estar instalados para garantizar la seguridad</li>
 								</ul>
 							</div>

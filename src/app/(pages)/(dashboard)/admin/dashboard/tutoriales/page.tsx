@@ -275,7 +275,7 @@ const contractorTutorialModules: ModuleVideos[] = [
 				url: "https://youtube.com/embed/snastGIP1Pw",
 			},
 			{
-				title: "Respuesta a Inspección de OTC",
+				title: "Respuesta a Inspección Interna",
 				description: "Tutorial de como cerrar un hito en el libro de obras.",
 				url: "https://youtube.com/embed/WCUYcNFr7OI",
 			},
@@ -348,7 +348,7 @@ export default function AdminTutorialsPage(): React.ReactElement {
 						variant="outline"
 						className="border-emerald-600 bg-emerald-600/10 text-emerald-600"
 					>
-						Vista Admin OTC
+						Vista Admin Interno
 					</Badge>
 				</div>
 

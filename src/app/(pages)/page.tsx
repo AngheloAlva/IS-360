@@ -9,7 +9,7 @@ export default function HomePage(): React.ReactElement {
 				<div className="relative mx-auto max-w-7xl px-4 sm:mx-0 sm:px-6 md:px-10 lg:flex lg:h-screen lg:items-center lg:px-16">
 					<div className="max-w-xl text-center sm:text-left">
 						<h1 className="text-3xl font-extrabold text-white sm:text-5xl">
-							OTC
+							IS
 							<strong className="text-primary ml-1 font-extrabold">360</strong>
 						</h1>
 

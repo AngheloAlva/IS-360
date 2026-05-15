@@ -192,7 +192,7 @@ export function SafetyTalkCertificate({
 			<Page size="A4" orientation="landscape" style={styles.page}>
 				<View style={styles.frame}>
 					<View style={styles.topAccent} />
-					<Text style={styles.watermark}>OTC</Text>
+					<Text style={styles.watermark}>IS 360</Text>
 
 					<View style={styles.rightContent}>
 						<View style={styles.header}>
@@ -228,7 +228,7 @@ export function SafetyTalkCertificate({
 								<Text style={styles.footerValue}>{expiryDate}</Text>
 							</View>
 							<View style={styles.qrContainer}>
-								<Text style={styles.footerLabel}>Documento oficial OTC</Text>
+								<Text style={styles.footerLabel}>Documento oficial</Text>
 								<Text style={styles.qrHint}>Emitido digitalmente</Text>
 							</View>
 						</View>

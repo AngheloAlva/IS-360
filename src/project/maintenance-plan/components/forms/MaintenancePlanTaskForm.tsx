@@ -383,7 +383,7 @@ export default function MaintenancePlanTaskForm({
 									label: user.name,
 								})) ?? []
 							}
-							label="Responsable OTC"
+							label="Responsable Interno"
 							placeholder="Seleccionar responsable"
 							itemClassName="sm:col-span-2"
 						/>

@@ -136,7 +136,7 @@ export async function GET(): Promise<
 	try {
 		const userAllowedCompanies = await getAllowedCompanyIds(session.user.id)
 
-		// Obtener todas las OTs que tienen al menos una inspección de OTC
+		// Obtener todas las OTs que tienen al menos una inspección interna
 		const workOrdersWithInspections = await prisma.workOrder.findMany({
 			where: {
 				deletedAt: null,
@@ -151,7 +151,7 @@ export async function GET(): Promise<
 					: {}),
 				workBookEntries: {
 					some: {
-						entryType: ENTRY_TYPE.OTC_INSPECTION,
+						entryType: ENTRY_TYPE.INTERNAL_INSPECTION,
 					},
 				},
 			},
@@ -184,7 +184,7 @@ export async function GET(): Promise<
 				},
 				workBookEntries: {
 					where: {
-						entryType: ENTRY_TYPE.OTC_INSPECTION,
+						entryType: ENTRY_TYPE.INTERNAL_INSPECTION,
 					},
 					select: {
 						id: true,
@@ -228,7 +228,7 @@ export async function GET(): Promise<
 					select: {
 						workBookEntries: {
 							where: {
-								entryType: ENTRY_TYPE.OTC_INSPECTION,
+								entryType: ENTRY_TYPE.INTERNAL_INSPECTION,
 							},
 						},
 					},

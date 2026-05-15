@@ -53,12 +53,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 						order: true,
 						name: true,
 						rut: true,
-						otcLockNumber: true,
-						otcRemoveDate: true,
-						otcRemoveTime: true,
+						internalLockNumber: true,
+						internalRemoveDate: true,
+						internalRemoveTime: true,
 						contractorLockNumber: true,
-						otcInstallDate: true,
-						otcInstallTime: true,
+						internalInstallDate: true,
+						internalInstallTime: true,
 					},
 				},
 				zeroEnergyReviews: {
@@ -117,8 +117,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 			updatedAt: lockoutPermit.updatedAt.toISOString(),
 			lockoutRegistrations: lockoutPermit.lockoutRegistrations.map((reg) => ({
 				...reg,
-				otcInstallDate: reg.otcInstallDate?.toISOString() || null,
-				otcRemoveDate: reg.otcRemoveDate?.toISOString() || null,
+				internalInstallDate: reg.internalInstallDate?.toISOString() || null,
+				internalRemoveDate: reg.internalRemoveDate?.toISOString() || null,
 				// Add signature fields that are missing from schema but expected in interface
 				installSign: null,
 				removeSign: null,

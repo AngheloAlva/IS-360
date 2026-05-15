@@ -32,13 +32,13 @@ import {
 interface AdminLaborControlFoldersListProps {
 	companyId: string
 	companySlug?: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 }
 
 export default function LaborControlFoldersTable({
 	companyId,
 	companySlug,
-	isOtcMember,
+	isInternalMember,
 }: AdminLaborControlFoldersListProps) {
 	const [orderBy, setOrderBy] = useState<OrderBy>("createdAt")
 	const [rowSelection, setRowSelection] = useState({})
@@ -58,7 +58,7 @@ export default function LaborControlFoldersTable({
 		getCoreRowModel: getCoreRowModel(),
 		onRowSelectionChange: setRowSelection,
 		getFilteredRowModel: getFilteredRowModel(),
-		columns: LaborControlFoldersByCompanyColumns({ companyId, isOtcMember, companySlug }),
+		columns: LaborControlFoldersByCompanyColumns({ companyId, isInternalMember, companySlug }),
 		state: {
 			pagination: {
 				pageSize: 15,

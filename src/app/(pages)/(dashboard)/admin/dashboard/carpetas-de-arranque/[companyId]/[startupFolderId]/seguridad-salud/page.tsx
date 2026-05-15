@@ -32,7 +32,7 @@ export default async function AdminStartupFolderSafetyRoutePage({
 
 	return (
 		<StartupFolderRouteView
-			isOtcMember
+			isInternalMember
 			mode="safety"
 			companyId={companyId}
 			userId={session.user.id}

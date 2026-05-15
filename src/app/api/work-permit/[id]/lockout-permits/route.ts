@@ -68,18 +68,18 @@ export async function GET(
 						contractorInstallTime: true,
 						contractorRemoveDate: true,
 						contractorRemoveTime: true,
-						otcLockNumber: true,
-						otcOperatorId: true,
-						otcOperator: {
+						internalLockNumber: true,
+						internalOperatorId: true,
+						internalOperator: {
 							select: {
 								id: true,
 								name: true,
 							},
 						},
-						otcInstallDate: true,
-						otcInstallTime: true,
-						otcRemoveDate: true,
-						otcRemoveTime: true,
+						internalInstallDate: true,
+						internalInstallTime: true,
+						internalRemoveDate: true,
+						internalRemoveTime: true,
 					},
 					orderBy: {
 						order: "asc",

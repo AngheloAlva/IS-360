@@ -42,7 +42,7 @@ interface GetWorkerDocumentColumnsProps {
 	>
 	startupFolderId: string
 	workerId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	folderStatus: ReviewStatus | undefined
 	setSelectedDocumentType: Dispatch<
@@ -59,7 +59,7 @@ export const getWorkerDocumentColumns = ({
 	userId,
 	refetch,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	startupFolderId,
 	workerId,
 	folderStatus,
@@ -68,7 +68,7 @@ export const getWorkerDocumentColumns = ({
 	setShowUploadDialog,
 	setSelectedDocument,
 }: GetWorkerDocumentColumnsProps): ColumnDef<WorkerStartupFolderDocument>[] => [
-	...(isOtcMember
+	...(isInternalMember
 		? [
 				{
 					id: "select",
@@ -199,7 +199,7 @@ export const getWorkerDocumentColumns = ({
 				<div className="flex items-center gap-1">
 					{doc.url && <DocumentViewButton url={doc.url} companyId={companyId} />}
 
-					{isOtcMember && hasPermission && doc.status === "NOT_APPLIED" && (
+					{isInternalMember && hasPermission && doc.status === "NOT_APPLIED" && (
 						<UnmarkDocumentAsNotAppliedDialog
 							documentName={doc.name}
 							onUnmarkAsNotApplied={() =>
@@ -217,7 +217,7 @@ export const getWorkerDocumentColumns = ({
 						/>
 					)}
 
-					{!isOtcMember &&
+					{!isInternalMember &&
 						doc.type !== "IRL_SAFETY_TALK" &&
 						(folderStatus === "DRAFT" || folderStatus === "EXPIRED") &&
 						doc.status !== "NOT_APPLIED" &&
@@ -258,7 +258,7 @@ export const getWorkerDocumentColumns = ({
 							</Button>
 						)}
 
-					{(isOtcMember || folderStatus === "DRAFT") && doc.status !== "NOT_APPLIED" && (
+					{(isInternalMember || folderStatus === "DRAFT") && doc.status !== "NOT_APPLIED" && (
 						<UpdateExpirationDateDocument
 							folderId={doc.folderId}
 							companyId={companyId}
@@ -267,7 +267,7 @@ export const getWorkerDocumentColumns = ({
 						/>
 					)}
 
-					{isOtcMember && doc.status === "SUBMITTED" && (
+					{isInternalMember && doc.status === "SUBMITTED" && (
 						<DocumentReviewForm
 							document={doc}
 							refetch={refetch}

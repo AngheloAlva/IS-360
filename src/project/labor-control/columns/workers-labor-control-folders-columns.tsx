@@ -14,13 +14,13 @@ import { generateSlug } from "@/lib/generateSlug"
 interface GetDocumentColumnsProps {
 	folderId: string
 	companyId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 export const getWorkersLaborControlFoldersColumns = ({
 	folderId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 }: GetDocumentColumnsProps): ColumnDef<WorkerLaborControlFolder>[] => [
 	{
 		accessorKey: "name",
@@ -34,7 +34,7 @@ export const getWorkersLaborControlFoldersColumns = ({
 			return (
 				<Link
 					href={
-						isOtcMember
+						isInternalMember
 							? `/admin/dashboard/control-laboral/${companyId}/${folderId}/acreditacion-trabajadores/${workerFolderSlug}`
 							: `/dashboard/control-laboral/${folderId}/acreditacion-trabajadores/${workerFolderSlug}`
 					}

@@ -16,7 +16,7 @@ import {
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 
-interface OtcInspectionNotificationEmailProps {
+interface InternalInspectionNotificationEmailProps {
 	inspection: {
 		id: string
 		activityName: string
@@ -54,12 +54,12 @@ interface OtcInspectionNotificationEmailProps {
 	url: string
 }
 
-const OtcInspectionNotificationEmail = ({
+const InternalInspectionNotificationEmail = ({
 	url,
 	workOrder,
 	recipient,
 	inspection,
-}: OtcInspectionNotificationEmailProps) => {
+}: InternalInspectionNotificationEmailProps) => {
 	const getRoleContext = () => {
 		switch (recipient.role) {
 			case "responsible":
@@ -111,11 +111,11 @@ const OtcInspectionNotificationEmail = ({
 						{/* Main Content */}
 						<Section className="px-[40px] py-[32px]">
 							<Heading className="mb-[24px] text-center text-[28px] font-bold text-gray-800">
-								Nueva Inspección OTC Realizada
+								Nueva Inspección Interna Realizada
 							</Heading>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
-								Estimado/a {recipient.name}, se ha realizado una nueva inspección OTC en el sistema.
+								Estimado/a {recipient.name}, se ha realizado una nueva inspección interna en el sistema.
 								Le notificamos {getRoleContext()}.
 							</Text>
 
@@ -368,4 +368,4 @@ const OtcInspectionNotificationEmail = ({
 	)
 }
 
-export default OtcInspectionNotificationEmail
+export default InternalInspectionNotificationEmail

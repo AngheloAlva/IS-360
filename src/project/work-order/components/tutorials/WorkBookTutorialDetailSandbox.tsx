@@ -24,7 +24,7 @@ import {
 } from "@/shared/components/ui/dialog"
 import MilestonesForm from "@/project/work-order/components/forms/MilestonesForm"
 import ActivityForm from "@/project/work-order/components/forms/WorkBookActivityForm"
-import OtcInspectorForm from "@/project/work-order/components/forms/OtcInspectorForm"
+import InternalInspectorForm from "@/project/work-order/components/forms/InternalInspectorForm"
 import type { Milestone } from "@/project/work-order/hooks/use-work-book-milestones"
 import { MILESTONE_STATUS } from "@/generated/prisma/enums"
 
@@ -41,7 +41,7 @@ interface TutorialMilestone {
 
 interface InspectionCommentItem {
 	id: string
-	author: "CONTRATISTA" | "OTC"
+	author: "CONTRACTOR" | "INTERNAL"
 	content: string
 	status?: "APROBADO" | "RECHAZADO"
 }
@@ -86,7 +86,7 @@ export default function WorkBookTutorialDetailSandbox({
 	const [inspectionComments, setInspectionComments] = useState<InspectionCommentItem[]>([
 		{
 			id: "inspection-comment-1",
-			author: "OTC",
+			author: "INTERNAL",
 			content: "Se detecta observacion de seguridad en el uso de EPP.",
 			status: "RECHAZADO",
 		},
@@ -116,8 +116,8 @@ export default function WorkBookTutorialDetailSandbox({
 			return "REQUIERE RESPUESTA CONTRATISTA"
 		}
 
-		if (lastComment.author === "CONTRATISTA") {
-			return "EN REVISION OTC"
+		if (lastComment.author === "CONTRACTOR") {
+			return "EN REVISION INTERNA"
 		}
 
 		return "EN PROCESO"
@@ -170,28 +170,28 @@ export default function WorkBookTutorialDetailSandbox({
 			...previous,
 			{
 				id: crypto.randomUUID(),
-				author: "CONTRATISTA",
+				author: "CONTRACTOR",
 				content: "Se corrige observacion y se adjunta evidencia en la respuesta.",
 			},
 		])
 		toast.success("Respuesta del contratista enviada")
 	}
 
-	const handleOtcReview = (status: "APROBADO" | "RECHAZADO") => {
+	const handleInternalReview = (status: "APROBADO" | "RECHAZADO") => {
 		setInspectionComments((previous) => [
 			...previous,
 			{
 				id: crypto.randomUUID(),
-				author: "OTC",
+				author: "INTERNAL",
 				content:
 					status === "APROBADO"
-						? "OTC aprueba la respuesta y cierra la inspeccion."
-						: "OTC rechaza y solicita nueva respuesta del contratista.",
+						? "El responsable interno aprueba la respuesta y cierra la inspeccion."
+						: "El responsable interno rechaza y solicita nueva respuesta del contratista.",
 				status,
 			},
 		])
 		toast.success(
-			status === "APROBADO" ? "Revision OTC aprobada" : "Revision OTC rechazada para reingreso"
+			status === "APROBADO" ? "Revision interna aprobada" : "Revision interna rechazada para reingreso"
 		)
 	}
 
@@ -408,7 +408,7 @@ export default function WorkBookTutorialDetailSandbox({
 								</div>
 
 								<div className="flex flex-wrap gap-2">
-									<OtcInspectorForm
+									<InternalInspectorForm
 										workOrderId="tutorial-workbook"
 										tutorialMode
 										triggerDataTutorialId="tutorial-inspection-create"
@@ -427,17 +427,17 @@ export default function WorkBookTutorialDetailSandbox({
 									<Button
 										type="button"
 										variant="outline"
-										onClick={() => handleOtcReview("RECHAZADO")}
+										onClick={() => handleInternalReview("RECHAZADO")}
 										data-tutorial-id="tutorial-inspection-review"
 									>
-										OTC rechaza
+										Interno rechaza
 									</Button>
 									<Button
 										type="button"
-										onClick={() => handleOtcReview("APROBADO")}
+										onClick={() => handleInternalReview("APROBADO")}
 										className="bg-emerald-600 hover:bg-emerald-700"
 									>
-										OTC aprueba y cierra
+										Interno aprueba y cierra
 									</Button>
 								</div>
 							</CardContent>

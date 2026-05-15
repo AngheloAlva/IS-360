@@ -27,7 +27,7 @@ interface WorkerFolderProps {
 	userId: string
 	companyId: string
 	onBack: () => void
-	isOtcMember: boolean
+	isInternalMember: boolean
 	startupFolderId: string
 	hasPermission: boolean
 	onSelectWorker?: (workerId: string) => void
@@ -37,7 +37,7 @@ export default function WorkerFolder({
 	onBack,
 	userId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	startupFolderId,
 	hasPermission,
 	onSelectWorker,
@@ -81,7 +81,7 @@ export default function WorkerFolder({
 			<WorkerFolderDocuments
 				userId={userId}
 				companyId={companyId}
-				isOtcMember={isOtcMember}
+				isInternalMember={isInternalMember}
 				workerId={selectedEntity.id}
 				workerName={selectedEntity.name}
 				startupFolderId={startupFolderId}
@@ -103,7 +103,7 @@ export default function WorkerFolder({
 					<h2 className="text-lg font-bold">Documentación Personal</h2>
 				</div>
 
-				{!isOtcMember && (
+				{!isInternalMember && (
 					<div className="flex items-center gap-2">
 						<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
 							<FolderIcon className="h-4 w-4" />

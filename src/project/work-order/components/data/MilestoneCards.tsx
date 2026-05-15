@@ -34,7 +34,7 @@ interface MilestoneCardsProps {
 	workOrderId: string
 	supervisorId: string
 	responsibleId: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	hasPermission: boolean
 	milestones: Milestone[]
 	hassWorkBookPermission: boolean
@@ -48,7 +48,7 @@ interface MilestoneCardsProps {
 export default function MilestoneCards({
 	userRole,
 	milestones,
-	isOtcMember,
+	isInternalMember,
 	workOrderId,
 	hasPermission,
 	hassWorkBookPermission,
@@ -234,7 +234,7 @@ export default function MilestoneCards({
 							)}
 
 							{milestone.status === MILESTONE_STATUS.IN_PROGRESS &&
-								(hassWorkBookPermission || !isOtcMember) && (
+								(hassWorkBookPermission || !isInternalMember) && (
 									<RequestCloseMilestoneDialog
 										workOrderId={workOrderId}
 										milestoneId={milestone.id}

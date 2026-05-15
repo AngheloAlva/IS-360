@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const removeLockSchema = z.object({
 	lockoutRegistrationId: z.string().min(1, "El ID del registro es requerido"),
-	lockType: z.enum(["otc", "contractor"], {
+	lockType: z.enum(["internal", "contractor"], {
 		error: "Debe especificar el tipo de candado",
 	}),
 })

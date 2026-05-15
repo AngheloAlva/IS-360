@@ -42,7 +42,7 @@ interface VehicleFolderDocumentsProps {
 	vehicleId: string
 	companyId: string
 	onBack: () => void
-	isOtcMember: boolean
+	isInternalMember: boolean
 	startupFolderId: string
 	documents: {
 		name: string
@@ -58,7 +58,7 @@ export function VehicleFolderDocuments({
 	vehicleId,
 	companyId,
 	documents,
-	isOtcMember,
+	isInternalMember,
 	startupFolderId,
 	hasPermission,
 }: VehicleFolderDocumentsProps) {
@@ -85,7 +85,7 @@ export function VehicleFolderDocuments({
 			companyId,
 			vehicleId,
 			hasPermission,
-			isOtcMember,
+			isInternalMember,
 			startupFolderId,
 			setShowUploadDialog,
 			setSelectedDocument,
@@ -121,7 +121,7 @@ export function VehicleFolderDocuments({
 				</div>
 
 				<div className="flex items-center gap-2">
-					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isInternalMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<>
 							<UndoDocumentReviewDialog
 								category={"VEHICLES"}
@@ -162,8 +162,8 @@ export function VehicleFolderDocuments({
 
 					<DocumentCountProgress progress={progress} />
 
-					{/* Botón para cambio manual de estado - solo miembros OTC */}
-					{isOtcMember && data?.folderStatus && (
+					{/* Botón para cambio manual de estado - solo miembros internos */}
+					{isInternalMember && data?.folderStatus && (
 						<ChangeSubfolderStatusDialog
 							startupFolderId={startupFolderId}
 							subfolderType="VEHICLE"
@@ -180,7 +180,7 @@ export function VehicleFolderDocuments({
 						/>
 					)}
 
-					{!isOtcMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
+					{!isInternalMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							vehicleId={vehicleId}
@@ -238,7 +238,7 @@ export function VehicleFolderDocuments({
 					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
-								{isOtcMember && <TableCell></TableCell>}
+								{isInternalMember && <TableCell></TableCell>}
 								<TableCell className="font-semibold">
 									<div className="flex flex-col items-start justify-center">
 										<div className="flex items-center gap-2">
@@ -268,7 +268,7 @@ export function VehicleFolderDocuments({
 								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember &&
+										{!isInternalMember &&
 											(data?.folderStatus === "DRAFT" ||
 												data?.folderStatus === "REJECTED" ||
 												data?.folderStatus === "EXPIRED") && (
@@ -285,7 +285,7 @@ export function VehicleFolderDocuments({
 												</Button>
 											)}
 
-										{isOtcMember &&
+										{isInternalMember &&
 											hasPermission &&
 											(data?.folderStatus === "DRAFT" ||
 												data?.folderStatus === "REJECTED" ||

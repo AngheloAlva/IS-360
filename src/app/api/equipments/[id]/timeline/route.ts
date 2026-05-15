@@ -164,7 +164,7 @@ export async function GET(
 					by: ["workOrderId"],
 					where: {
 						workOrderId: { in: workOrderIds },
-						entryType: "OTC_INSPECTION",
+						entryType: "INTERNAL_INSPECTION",
 					},
 					_count: { id: true },
 				})

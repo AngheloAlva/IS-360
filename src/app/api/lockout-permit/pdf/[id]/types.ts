@@ -33,12 +33,12 @@ export interface LockoutPermitData {
 		order: number
 		name: string
 		rut: string
-		otcLockNumber?: string | null
+		internalLockNumber?: string | null
 		contractorLockNumber?: string | null
-		otcInstallDate?: string | null
-		otcInstallTime?: string | null
-		otcRemoveDate?: string | null
-		otcRemoveTime?: string | null
+		internalInstallDate?: string | null
+		internalInstallTime?: string | null
+		internalRemoveDate?: string | null
+		internalRemoveTime?: string | null
 		contractorInstallDate?: string | null
 		contractorInstallTime?: string | null
 		contractorRemoveDate?: string | null

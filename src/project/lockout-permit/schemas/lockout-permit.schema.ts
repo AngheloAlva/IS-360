@@ -12,14 +12,14 @@ const lockoutRecordSchema = z.object({
 	installTime: z.string().optional(),
 })
 
-export const createLockoutPermitSchema = (isOtcMember: boolean = false) => {
+export const createLockoutPermitSchema = (isInternalMember: boolean = false) => {
 	return z
 		.object({
 			lockoutType: z.nativeEnum(LOCKOUT_TYPE, {
 				error: () => ({ message: "Debe seleccionar un tipo de bloqueo válido" }),
 			}),
 			lockoutTypeOther: z.string().optional(),
-			lockoutAreaResponsibleId: isOtcMember
+			lockoutAreaResponsibleId: isInternalMember
 				? z.string().min(1, "El responsable del área es requerido")
 				: z.string().optional(),
 			lockoutEquipments: z

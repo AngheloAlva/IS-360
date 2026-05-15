@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "pregunta": "Para poder ingresar a realizar trabajos al interior de las plantas Hualpén y el Avellano es necesario:\nA) Contar con carpeta de arranque aprobada y capacitación IRL OTC\nB) Registrarse en el libro de empresas contratistas en sala de control.\nC) Solo pueden ingresar personal que cuente con la documentación al día.",
+    "pregunta": "Para poder ingresar a realizar trabajos al interior de las plantas Hualpén y el Avellano es necesario:\nA) Contar con carpeta de arranque aprobada y capacitación IRL Interna\nB) Registrarse en el libro de empresas contratistas en sala de control.\nC) Solo pueden ingresar personal que cuente con la documentación al día.",
     "opciones": ["A) Solo A", "B) a, b y c", "C) a y b"],
     "correcta": "B) a, b y c"
   },
@@ -17,7 +17,7 @@
   },
   {
     "id": 3,
-    "pregunta": "¿Cómo se debe estacionar al interior de OTC?",
+    "pregunta": "¿Cómo se debe estacionar al interior de las instalaciones?",
     "opciones": [
       "El vehículo se debe estacionar de forma aculatada.",
       "Dejar las llaves puestas en la chapa de contacto y las puertas sin seguro.",
@@ -27,7 +27,7 @@
   },
   {
     "id": 4,
-    "pregunta": "¿Con qué documentos la empresa colaboradora debe ingresar a realizar sus trabajos al interior de Industrias Demo?\nA) Contar con orden de trabajo.\nB) Tener toda la documentación de la empresa y los trabajadores en el portal IS 360.\nC) Realizar permiso de trabajo seguro.\nD) Contar con charla IRL de OTC.",
+    "pregunta": "¿Con qué documentos la empresa colaboradora debe ingresar a realizar sus trabajos al interior de Industrias Demo?\nA) Contar con orden de trabajo.\nB) Tener toda la documentación de la empresa y los trabajadores en el portal IS 360.\nC) Realizar permiso de trabajo seguro.\nD) Contar con charla IRL interna.",
     "opciones": ["A) Solo C", "B) a, b y c", "C) a y d", "D) Todas."],
     "correcta": "D) Todas."
   },

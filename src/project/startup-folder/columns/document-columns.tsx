@@ -44,7 +44,7 @@ interface GetDocumentColumnsProps {
 		>
 	>
 	startupFolderId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	folderStatus: ReviewStatus | undefined
 	setSelectedDocumentType: Dispatch<
@@ -65,7 +65,7 @@ export const getDocumentColumns = ({
 	userId,
 	refetch,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	folderStatus,
 	startupFolderId,
@@ -73,7 +73,7 @@ export const getDocumentColumns = ({
 	setSelectedDocument,
 	setSelectedDocumentType,
 }: GetDocumentColumnsProps): ColumnDef<StartupFolderDocument>[] => [
-	...(isOtcMember
+	...(isInternalMember
 		? [
 				{
 					id: "select",
@@ -204,7 +204,7 @@ export const getDocumentColumns = ({
 				<div className="flex items-center gap-1">
 					{doc.url && <DocumentViewButton url={doc.url} companyId={companyId} />}
 
-					{isOtcMember && hasPermission && doc.status === "NOT_APPLIED" && (
+					{isInternalMember && hasPermission && doc.status === "NOT_APPLIED" && (
 						<UnmarkDocumentAsNotAppliedDialog
 							documentName={doc.name}
 							onUnmarkAsNotApplied={() =>
@@ -221,7 +221,7 @@ export const getDocumentColumns = ({
 						/>
 					)}
 
-					{!isOtcMember &&
+					{!isInternalMember &&
 						(folderStatus === "DRAFT" || folderStatus === "EXPIRED") &&
 						doc.status !== "NOT_APPLIED" &&
 						(doc.status === "DRAFT" ||
@@ -261,7 +261,7 @@ export const getDocumentColumns = ({
 							</Button>
 						)}
 
-					{(isOtcMember || folderStatus === "DRAFT") && doc.status !== "NOT_APPLIED" && (
+					{(isInternalMember || folderStatus === "DRAFT") && doc.status !== "NOT_APPLIED" && (
 						<UpdateExpirationDateDocument
 							folderId={doc.folderId}
 							companyId={companyId}
@@ -270,7 +270,7 @@ export const getDocumentColumns = ({
 						/>
 					)}
 
-					{isOtcMember && doc.status === "SUBMITTED" && (
+					{isInternalMember && doc.status === "SUBMITTED" && (
 						<DocumentReviewForm
 							document={doc}
 							refetch={refetch}

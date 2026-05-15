@@ -34,7 +34,7 @@ export async function sendWorkRequestCommentNotification({
 		const subject = `Nuevo comentario en Solicitud de Trabajo #${requestNumber}`
 
 		await resend.emails.send({
-			from: "OTC Notificaciones <sistema@is360.cl>",
+			from: "Notificaciones Internas <sistema@is360.cl>",
 			to: userEmail,
 			subject,
 			react: WorkRequestNewCommentEmail({

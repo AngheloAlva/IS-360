@@ -20,7 +20,7 @@ export default async function CreateWorkPermitPage() {
 		)
 	}
 
-	const isOtcMember = res.user.accessRole === ACCESS_ROLE.ADMIN
+	const isInternalMember = res.user.accessRole === ACCESS_ROLE.ADMIN
 
 	return (
 		<div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4">
@@ -28,7 +28,7 @@ export default async function CreateWorkPermitPage() {
 				className={cn(
 					"rounded-lg bg-linear-to-r from-purple-600 to-indigo-700 p-6 shadow-lg dark:from-purple-800 dark:to-indigo-900",
 					{
-						"from-pink-600 to-rose-700 dark:from-pink-800 dark:to-rose-900": isOtcMember,
+						"from-pink-600 to-rose-700 dark:from-pink-800 dark:to-rose-900": isInternalMember,
 					}
 				)}
 			>
@@ -51,8 +51,8 @@ export default async function CreateWorkPermitPage() {
 
 			<WorkPermitForm
 				userName={res.user.name}
-				isOtcMember={isOtcMember}
-				companyId={isOtcMember ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID! : ""}
+				isInternalMember={isInternalMember}
+				companyId={isInternalMember ? process.env.NEXT_PUBLIC_INTERNAL_COMPANY_ID! : ""}
 			/>
 		</div>
 	)

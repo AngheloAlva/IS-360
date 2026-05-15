@@ -28,7 +28,7 @@ import { VisitorTalkMap } from "@/project/safety-talk/components/visitor/Visitor
 
 export const metadata: Metadata = {
 	title: "Charla de Visitas - IS 360",
-	description: "Charla de seguridad para visitantes de la planta OTC",
+	description: "Charla de seguridad para visitantes de la planta",
 }
 
 export default function VisitorTalk() {
@@ -44,7 +44,7 @@ export default function VisitorTalk() {
 					<div className="text-white">
 						<h1 className="text-3xl font-bold tracking-tight">Charla de Visitas</h1>
 						<p className="opacity-90">
-							Conoce las instalaciones de la planta OTC y sus protocolos de seguridad
+							Conoce las instalaciones de la planta y sus protocolos de seguridad
 						</p>
 					</div>
 				</div>
@@ -54,7 +54,7 @@ export default function VisitorTalk() {
 				<TabsList className="w-full">
 					<TabsTrigger value="prs">Inducción Visitas Hualpén</TabsTrigger>
 					<TabsTrigger value="trm">Inducción Visitas El Avellano</TabsTrigger>
-					<TabsTrigger value="irl">Inducción de Seguridad OTC</TabsTrigger>
+					<TabsTrigger value="irl">Inducción de Seguridad Interna</TabsTrigger>
 					<TabsTrigger value="external-company">Compartir con Empresa Externa</TabsTrigger>
 					<TabsTrigger value="interactive-map">Mapa Interactivo</TabsTrigger>
 				</TabsList>
@@ -155,7 +155,7 @@ export default function VisitorTalk() {
 
 						<DialogContent className="sm:max-w-5xl">
 							<DialogHeader>
-								<DialogTitle>Inducción de Seguridad OTC</DialogTitle>
+								<DialogTitle>Inducción de Seguridad Interna</DialogTitle>
 							</DialogHeader>
 							<div className="aspect-video overflow-hidden rounded-md">
 								<iframe
@@ -231,7 +231,7 @@ export default function VisitorTalk() {
 							<div>
 								<CardTitle className="text-xl">Instrucciones</CardTitle>
 								<CardDescription>
-									Este mapa interactivo te permite conocer las diferentes áreas de la planta OTC y
+									Este mapa interactivo te permite conocer las diferentes áreas de la planta y
 									los protocolos de seguridad asociados.
 								</CardDescription>
 							</div>
@@ -269,7 +269,7 @@ export default function VisitorTalk() {
 
 					<Card>
 						<CardHeader>
-							<CardTitle>Mapa de la Planta OTC</CardTitle>
+							<CardTitle>Mapa de la Planta</CardTitle>
 							<CardDescription>
 								Haz clic en los puntos para ver videos con información detallada
 							</CardDescription>

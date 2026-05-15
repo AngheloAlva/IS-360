@@ -18,7 +18,7 @@ export const updateExpirationDateVehicleDocument = async ({
 			headers: await headers(),
 		})
 
-		const isOtcMember = session?.user?.accessRole === ACCESS_ROLE.ADMIN
+		const isInternalMember = session?.user?.accessRole === ACCESS_ROLE.ADMIN
 
 		const existingDocument = await prisma.vehicleDocument.findUnique({
 			where: {
@@ -37,7 +37,7 @@ export const updateExpirationDateVehicleDocument = async ({
 			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		if (existingDocument.folder.status !== ReviewStatus.DRAFT && !isOtcMember) {
+		if (existingDocument.folder.status !== ReviewStatus.DRAFT && !isInternalMember) {
 			return {
 				ok: false,
 				message: "No puedes modificar documentos en esta carpeta porque ya fue aprobada",

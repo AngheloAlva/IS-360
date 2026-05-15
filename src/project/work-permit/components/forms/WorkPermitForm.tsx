@@ -59,7 +59,7 @@ import type { WorkPermit } from "../../hooks/use-work-permit"
 interface WorkPermitFormProps {
 	userName: string
 	companyId: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	initialValues?: WorkPermit
 }
 
@@ -67,7 +67,7 @@ export default function WorkPermitForm({
 	userName,
 	companyId,
 	initialValues,
-	isOtcMember = false,
+	isInternalMember = false,
 }: WorkPermitFormProps): React.ReactElement {
 	const [workOrderSelected, setWorkOrderSelected] = useState<WorkOrder | null>(null)
 	const [expirationMessage, setExpirationMessage] = useState("")
@@ -77,10 +77,10 @@ export default function WorkPermitForm({
 	const [showChangesDialog, setShowChangesDialog] = useState(shouldShowChanges)
 
 	const form = useForm<WorkPermitSchema>({
-		resolver: zodResolver(createWorkPermitSchema(isOtcMember)),
+		resolver: zodResolver(createWorkPermitSchema(isInternalMember)),
 		defaultValues: {
 			tools: initialValues?.tools || [],
-			acceptTerms: isOtcMember ? true : false,
+			acceptTerms: isInternalMember ? true : false,
 			isUrgent: initialValues?.isUrgent || false,
 			preChecks: initialValues?.preChecks || [],
 			wasteType: initialValues?.wasteType || "",
@@ -183,7 +183,7 @@ export default function WorkPermitForm({
 		companyId,
 		search: "",
 		limit: 1000,
-		isOtcMember,
+		isInternalMember,
 		order: "desc",
 		dateRange: null,
 		typeFilter: null,
@@ -199,14 +199,14 @@ export default function WorkPermitForm({
 		page: 1,
 		search: "",
 		limit: 1000,
-		companyId: isOtcMember ? process.env.NEXT_PUBLIC_OTC_COMPANY_ID! : companyId,
+		companyId: isInternalMember ? process.env.NEXT_PUBLIC_INTERNAL_COMPANY_ID! : companyId,
 	})
 
 	useEffect(() => {
 		const otNumber = form.watch("otNumber")
 		const isUrgent = form.watch("isUrgent")
 
-		if (isOtcMember && isUrgent) {
+		if (isInternalMember && isUrgent) {
 			form.setValue("endDate", new Date())
 			form.setValue("startDate", new Date())
 			setExpirationMessage(
@@ -332,8 +332,8 @@ export default function WorkPermitForm({
 		if (wasteType === "Industrial") {
 			return [
 				{
-					value: "Disposición en terreno con tolva gestionada por OTC",
-					label: "Disposición en terreno con tolva gestionada por OTC",
+					value: "Disposición en terreno con tolva gestionada por la empresa",
+					label: "Disposición en terreno con tolva gestionada por la empresa",
 				},
 				{
 					value: "Disposición en tolva de planta Hualpén",
@@ -389,7 +389,7 @@ export default function WorkPermitForm({
 						<CardContent className="grid grid-cols-1 gap-x-4 gap-y-5 md:grid-cols-2">
 							<div className="flex w-full flex-col gap-x-4 gap-y-5 md:col-span-2 lg:flex-row">
 								<div className="flex w-1/2 flex-col justify-start gap-5">
-									{isOtcMember && (
+									{isInternalMember && (
 										<SwitchFormField<WorkPermitSchema>
 											name="isUrgent"
 											label="¿Es urgente?"
@@ -406,7 +406,7 @@ export default function WorkPermitForm({
 										/>
 									) : (
 										<>
-											{(!isOtcMember || !isUrgent) && (
+											{(!isInternalMember || !isUrgent) && (
 												<SelectWithSearchFormField<WorkPermitSchema>
 													name="otNumber"
 													label="Número de OT"
@@ -420,7 +420,7 @@ export default function WorkPermitForm({
 												/>
 											)}
 
-											{isOtcMember && isUrgent && (
+											{isInternalMember && isUrgent && (
 												<Alert>
 													<InfoIcon />
 													<AlertTitle>Permiso Urgente</AlertTitle>
@@ -550,7 +550,7 @@ export default function WorkPermitForm({
 									</div>
 									<div>
 										<h3 className="text-sm font-semibold">
-											{isOtcMember ? "Operador/Mantenedor" : "Supervisor"}:
+											{isInternalMember ? "Operador/Mantenedor" : "Supervisor"}:
 										</h3>
 										<p className="text-muted-foreground">
 											{workOrderSelected?.supervisor.name || "N/A"}
@@ -695,7 +695,7 @@ export default function WorkPermitForm({
 										Este permiso de trabajo es válido mientras las condiciones descritas en él no
 										cambien, lo cual se evalúa diariamente por el análisis de riesgos de la tarea
 										(ART) de cada contratista. En caso de haber cambios, usted debe solicitar y
-										generar un nuevo permiso de trabajo a OTC.
+										generar un nuevo permiso de trabajo al área interna.
 									</AlertDescription>
 								</Alert>
 
@@ -788,7 +788,7 @@ export default function WorkPermitForm({
 								label="Observaciones adicionales a los trabajos"
 							/>
 
-							{!isOtcMember && (
+							{!isInternalMember && (
 								<SwitchFormField<WorkPermitSchema>
 									name="acceptTerms"
 									control={form.control}
@@ -816,7 +816,7 @@ export default function WorkPermitForm({
 						onClose={() => {
 							setShowPrintDialog(false)
 
-							if (isOtcMember) {
+							if (isInternalMember) {
 								router.push("/admin/dashboard/permisos-de-trabajo")
 							} else {
 								router.push("/dashboard/permiso-de-trabajo")

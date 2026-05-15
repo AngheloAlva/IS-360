@@ -154,7 +154,7 @@ const BASE_WORK_BOOK: WorkBookById = {
 		id: "tutorial-responsible",
 		rut: "22.222.222-2",
 		name: "Camila Soto",
-		email: "camila.soto@otc.cl",
+		email: "camila.soto@ingsimple.cl",
 		phone: "+56 9 8765 4321",
 	},
 	workPermits: [],

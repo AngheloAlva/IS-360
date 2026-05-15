@@ -23,7 +23,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const [operators, total] = await Promise.all([
 			prisma.user.findMany({
 				where: {
-					companyId: process.env.NEXT_PUBLIC_OTC_COMPANY_ID,
+					companyId: process.env.NEXT_PUBLIC_INTERNAL_COMPANY_ID,
 				},
 				select: {
 					id: true,
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			}),
 			prisma.user.count({
 				where: {
-					companyId: process.env.NEXT_PUBLIC_OTC_COMPANY_ID,
+					companyId: process.env.NEXT_PUBLIC_INTERNAL_COMPANY_ID,
 				},
 			}),
 		])

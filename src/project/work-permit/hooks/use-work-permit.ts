@@ -50,16 +50,16 @@ export interface WorkPermitLockoutPermit {
 		contractorInstallTime: string | null
 		contractorRemoveDate: Date | null
 		contractorRemoveTime: string | null
-		otcLockNumber: string | null
-		otcOperatorId: string | null
-		otcOperator: {
+		internalLockNumber: string | null
+		internalOperatorId: string | null
+		internalOperator: {
 			id: string
 			name: string
 		} | null
-		otcInstallDate: Date | null
-		otcInstallTime: string | null
-		otcRemoveDate: Date | null
-		otcRemoveTime: string | null
+		internalInstallDate: Date | null
+		internalInstallTime: string | null
+		internalRemoveDate: Date | null
+		internalRemoveTime: string | null
 	}>
 	zeroEnergyReviews: Array<{
 		id: string

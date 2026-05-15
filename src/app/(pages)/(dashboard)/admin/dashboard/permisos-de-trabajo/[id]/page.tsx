@@ -60,7 +60,7 @@ export default async function UpdateWorkPermitPage({
 				userName={res.user.name}
 				initialValues={workPermit}
 				companyId={workPermit.company.id}
-				isOtcMember={res.user.accessRole === ACCESS_ROLE.ADMIN}
+				isInternalMember={res.user.accessRole === ACCESS_ROLE.ADMIN}
 			/>
 		</div>
 	)

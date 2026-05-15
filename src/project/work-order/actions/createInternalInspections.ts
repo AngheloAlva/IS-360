@@ -2,21 +2,21 @@
 
 import { headers } from "next/headers"
 
-import { sendOtcInspectionNotification } from "./sendOtcInspectionNotification"
+import { sendInternalInspectionNotification } from "./sendInternalInspectionNotification"
 import { UploadResult as UploadFilesResult } from "@/lib/upload-files"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 
-import type { OtcInspectionSchema } from "@/project/work-order/schemas/otc-inspections.schema"
+import type { InternalInspectionSchema } from "@/project/work-order/schemas/internal-inspections.schema"
 
-interface CreateOtcInspectionsProps {
-	values: OtcInspectionSchema
+interface CreateInternalInspectionsProps {
+	values: InternalInspectionSchema
 	attachment?: UploadFilesResult[]
 }
 
-export const createOtcInspections = async ({ values, attachment }: CreateOtcInspectionsProps) => {
+export const createInternalInspections = async ({ values, attachment }: CreateInternalInspectionsProps) => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -51,7 +51,7 @@ export const createOtcInspections = async ({ values, attachment }: CreateOtcInsp
 		return await prisma.$transaction(async (tx) => {
 			const newWorkEntry = await tx.workEntry.create({
 				data: {
-					entryType: "OTC_INSPECTION",
+					entryType: "INTERNAL_INSPECTION",
 					...rest,
 					...(attachment && {
 						attachments: {
@@ -122,7 +122,7 @@ export const createOtcInspections = async ({ values, attachment }: CreateOtcInsp
 				},
 			})
 
-   await sendOtcInspectionNotification({ workEntryId: newWorkEntry.id })
+   await sendInternalInspectionNotification({ workEntryId: newWorkEntry.id })
 
 			return {
 				ok: true,
@@ -131,7 +131,7 @@ export const createOtcInspections = async ({ values, attachment }: CreateOtcInsp
 			}
 		})
 	} catch (error) {
-		console.error("[CREATE_OTC_INSPECTION]", error)
+		console.error("[CREATE_INTERNAL_INSPECTION]", error)
 		return {
 			ok: false,
 			message: "Error al crear el inspector",

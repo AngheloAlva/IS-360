@@ -23,8 +23,8 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>Código de verificación para IS 360 - OTC</title>
-				<Preview>Su código de verificación para acceder a IS 360 - OTC es: {otp}</Preview>
+				<title>Código de verificación para IS 360</title>
+				<Preview>Su código de verificación para acceder a IS 360 es: {otp}</Preview>
 			</Head>
 			<Body className="bg-gray-100 py-10 font-sans">
 				<Container className="mx-auto max-w-150 rounded-xl bg-white p-10">
@@ -47,7 +47,7 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 
 						<Text className="mb-6 text-[16px] text-gray-600">
 							Hemos recibido una solicitud de inicio de sesión en su cuenta de{" "}
-							<strong>IS 360 - OTC</strong>. Para completar el proceso de verificación, utilice el
+							<strong>IS 360</strong>. Para completar el proceso de verificación, utilice el
 							siguiente código:
 						</Text>
 

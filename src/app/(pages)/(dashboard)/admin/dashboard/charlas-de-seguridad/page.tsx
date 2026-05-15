@@ -43,7 +43,7 @@ export default async function SafetyTalksAdminPage(): Promise<React.ReactNode> {
 								className="cursor-pointer gap-2 bg-white font-semibold text-sky-600 transition-all hover:scale-105 hover:bg-white hover:text-sky-700 dark:text-sky-800"
 							>
 								<ScrollTextIcon className="size-4" />
-								Charlas OTC
+								Charlas Internas
 							</Button>
 						</Link>
 					)}

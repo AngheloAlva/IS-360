@@ -51,28 +51,28 @@ export const removeLock = async ({ values }: RemoveLockProps) => {
 		}
 
 		// Verificar permisos según el tipo de candado
-		if (lockType === "otc") {
-			// Solo OTC puede retirar su candado
+		if (lockType === "internal") {
+			// Solo el personal interno puede retirar su candado
 			if (session.user.accessRole !== "ADMIN" && session.user.accessRole !== "OPERATOR") {
 				return {
 					ok: false,
-					message: "No tienes permisos para retirar candados de OTC",
+					message: "No tienes permisos para retirar candados internos",
 				}
 			}
 
-			// Verificar que el candado OTC esté instalado
-			if (!registration.otcLockNumber) {
+			// Verificar que el candado interno esté instalado
+			if (!registration.internalLockNumber) {
 				return {
 					ok: false,
-					message: "No hay candado de OTC instalado en este registro",
+					message: "No hay candado interno instalado en este registro",
 				}
 			}
 
 			// Verificar que ya se haya retirado
-			if (registration.otcRemoveDate) {
+			if (registration.internalRemoveDate) {
 				return {
 					ok: false,
-					message: "El candado de OTC ya ha sido retirado",
+					message: "El candado interno ya ha sido retirado",
 				}
 			}
 		} else {
@@ -105,10 +105,10 @@ export const removeLock = async ({ values }: RemoveLockProps) => {
 		}
 
 		// Verificar que AMBOS candados estén instalados antes de permitir el retiro
-		if (!registration.otcLockNumber || !registration.contractorLockNumber) {
+		if (!registration.internalLockNumber || !registration.contractorLockNumber) {
 			return {
 				ok: false,
-				message: "Ambos candados (OTC y contratista) deben estar instalados antes de retirar",
+				message: "Ambos candados (interno y contratista) deben estar instalados antes de retirar",
 			}
 		}
 
@@ -122,10 +122,10 @@ export const removeLock = async ({ values }: RemoveLockProps) => {
 
 		// Actualizar el registro según el tipo de candado
 		const updateData =
-			lockType === "otc"
+			lockType === "internal"
 				? {
-						otcRemoveDate: now,
-						otcRemoveTime: timeString,
+						internalRemoveDate: now,
+						internalRemoveTime: timeString,
 					}
 				: {
 						contractorRemoveDate: now,
@@ -143,7 +143,7 @@ export const removeLock = async ({ values }: RemoveLockProps) => {
 		})
 
 		const allCompleted = allRegistrations.every(
-			(reg) => reg.otcRemoveDate && reg.contractorRemoveDate
+			(reg) => reg.internalRemoveDate && reg.contractorRemoveDate
 		)
 
 		// Si todos los registros están completados, marcar el permiso como completado
@@ -164,7 +164,7 @@ export const removeLock = async ({ values }: RemoveLockProps) => {
 
 		return {
 			ok: true,
-			message: `Candado ${lockType === "otc" ? "de OTC" : "del contratista"} retirado exitosamente`,
+			message: `Candado ${lockType === "internal" ? "interno" : "del contratista"} retirado exitosamente`,
 		}
 	} catch (error) {
 		console.error("[REMOVE_LOCK]", error)

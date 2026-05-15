@@ -267,7 +267,7 @@ export default function UpdateWorkOrderForm({
 
 						<SelectWithSearchFormField<UpdateWorkOrderSchema>
 							name="responsibleId"
-							label="Responsable OTC"
+							label="Responsable Interno"
 							control={form.control}
 							placeholder="Selecciona un responsable"
 							description="Persona que se encargara de la OT"

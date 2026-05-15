@@ -201,7 +201,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 								<Row className="mb-[12px]">
 									<Column className="w-[50%]">
 										<Text className="mb-[4px] text-[14px] leading-none font-semibold text-gray-700">
-											Responsable OTC:
+											Responsable Interno:
 										</Text>
 										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
 											{workOrder.responsible.name}
@@ -212,7 +212,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 											Empresa Contratista:
 										</Text>
 										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
-											{workOrder.company?.name || "OTC (Interno)"}
+											{workOrder.company?.name || "Equipo Interno"}
 										</Text>
 									</Column>
 								</Row>
@@ -270,7 +270,7 @@ const AutomatedWorkOrderControlRoomEmail = ({
 									• <strong>Seguimiento:</strong> Monitorear el progreso de la OT según programación
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">
-									• <strong>Coordinación:</strong> Mantener comunicación con el responsable OTC y
+									• <strong>Coordinación:</strong> Mantener comunicación con el responsable interno y
 									supervisor
 								</Text>
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">

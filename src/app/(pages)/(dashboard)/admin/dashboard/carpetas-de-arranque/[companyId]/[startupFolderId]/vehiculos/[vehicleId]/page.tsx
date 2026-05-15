@@ -39,7 +39,7 @@ export default async function AdminStartupFolderVehicleDocumentsRoutePage({
 			startupFolderId={startupFolderId}
 			routeBasePath="/admin/dashboard/carpetas-de-arranque"
 			backHref="/admin/dashboard/carpetas-de-arranque"
-			isOtcMember
+			isInternalMember
 			hasPermission={hasPermission.success}
 		/>
 	)

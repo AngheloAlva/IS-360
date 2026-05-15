@@ -91,7 +91,7 @@ const talk = {
 	value: "irl",
 	triggerLabel: "Inducción de Seguridad IRL",
 	title: "Inducción de Seguridad IRL",
-	subtitle: "Identifica los principales riesgos laborales presentes en OTC.",
+	subtitle: "Identifica los principales riesgos laborales presentes en las instalaciones.",
 	image: {
 		src: "/images/irl-front.png",
 		alt: "Introducción a la inducción IRL",
@@ -152,7 +152,7 @@ export default function VisitorSafetyTalkPage() {
 		<div className="w-full flex-1 space-y-6">
 			<MemoizedModuleHeader
 				className="from-emerald-600 to-sky-700 dark:from-emerald-800 dark:to-sky-900"
-				title="Charla de IRL - OTC"
+				title="Charla de IRL - Interno"
 				description="Visualiza el video completo y luego rinde la evaluación de la charla de seguridad."
 			>
 				<Button asChild variant="secondary" size="sm">

@@ -61,7 +61,7 @@ interface StartupFolderRouteViewProps {
 	startupFolderId: string
 	workerId?: string
 	vehicleId?: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	hasPermission?: boolean
 }
 
@@ -113,7 +113,7 @@ export default function StartupFolderRouteView({
 	startupFolderId,
 	workerId,
 	vehicleId,
-	isOtcMember = false,
+	isInternalMember = false,
 	hasPermission = false,
 }: StartupFolderRouteViewProps) {
 	const router = useRouter()
@@ -248,7 +248,7 @@ export default function StartupFolderRouteView({
 
 	const { documents: vehicleDocuments } = getVehicleDocuments()
 
-	const tutorialVideos = isOtcMember
+	const tutorialVideos = isInternalMember
 		? [
 				{
 					title: "Carpeta de Arranque Basica",
@@ -322,7 +322,7 @@ export default function StartupFolderRouteView({
 					<GuideDocumentsDropdown
 						hasPermission={hasPermission}
 						folderType={selectedFolder.type}
-						isAdmin={isOtcMember && hasPermission}
+						isAdmin={isInternalMember && hasPermission}
 					/>
 				</div>
 			</ModuleHeader>
@@ -353,7 +353,7 @@ export default function StartupFolderRouteView({
 				</div>
 
 				<div className="mt-5 flex items-center gap-2">
-					{isOtcMember && hasPermission && mode === "overview" && (
+					{isInternalMember && hasPermission && mode === "overview" && (
 						<>
 							<UpdateStartupFolder
 								type={selectedFolder.type}
@@ -377,7 +377,7 @@ export default function StartupFolderRouteView({
 						</>
 					)}
 
-					{isOtcMember && hasPermission && hasArchivedFolders && (
+					{isInternalMember && hasPermission && hasArchivedFolders && (
 						<Button
 							size={"lg"}
 							variant={"outline"}
@@ -395,7 +395,7 @@ export default function StartupFolderRouteView({
 						</Button>
 					)}
 
-					{isOtcMember && hasPermission && !isArchivedView && mode === "overview" && (
+					{isInternalMember && hasPermission && !isArchivedView && mode === "overview" && (
 						<CreateStartupFolder companyId={companyId} />
 					)}
 				</div>
@@ -416,7 +416,7 @@ export default function StartupFolderRouteView({
 						<BasicFolder
 							userId={userId}
 							companyId={companyId}
-							isOtcMember={isOtcMember}
+							isInternalMember={isInternalMember}
 							hasPermission={hasPermission}
 							startupFolderId={selectedFolder.id}
 							onSelectWorker={(id) => navigateTo(`${folderBasePath}/trabajadores/${id}`)}
@@ -436,7 +436,7 @@ export default function StartupFolderRouteView({
 					<StartupFolderDocuments
 						userId={userId}
 						companyId={companyId}
-						isOtcMember={isOtcMember}
+						isInternalMember={isInternalMember}
 						hasPermission={hasPermission}
 						startupFolderId={selectedFolder.id}
 						category={sectionCategory}
@@ -449,7 +449,7 @@ export default function StartupFolderRouteView({
 					<StartupFolderDocuments
 						userId={userId}
 						companyId={companyId}
-						isOtcMember={isOtcMember}
+						isInternalMember={isInternalMember}
 						hasPermission={hasPermission}
 						startupFolderId={selectedFolder.id}
 						category={DocumentCategory.SAFETY_AND_HEALTH}
@@ -462,7 +462,7 @@ export default function StartupFolderRouteView({
 					<StartupFolderDocuments
 						userId={userId}
 						companyId={companyId}
-						isOtcMember={isOtcMember}
+						isInternalMember={isInternalMember}
 						hasPermission={hasPermission}
 						startupFolderId={selectedFolder.id}
 						category={DocumentCategory.TECHNICAL_SPECS}
@@ -476,7 +476,7 @@ export default function StartupFolderRouteView({
 						<BasicFolder
 							userId={userId}
 							companyId={companyId}
-							isOtcMember={isOtcMember}
+							isInternalMember={isInternalMember}
 							hasPermission={hasPermission}
 							startupFolderId={selectedFolder.id}
 							onSelectWorker={(id) => navigateTo(`${folderBasePath}/trabajadores/${id}`)}
@@ -485,7 +485,7 @@ export default function StartupFolderRouteView({
 						<WorkerFolder
 							userId={userId}
 							companyId={companyId}
-							isOtcMember={isOtcMember}
+							isInternalMember={isInternalMember}
 							hasPermission={hasPermission}
 							startupFolderId={selectedFolder.id}
 							onBack={() => navigateTo(folderBasePath)}
@@ -501,7 +501,7 @@ export default function StartupFolderRouteView({
 							workerId={workerId}
 							companyId={companyId}
 							workerName={workerName}
-							isOtcMember={isOtcMember}
+							isInternalMember={isInternalMember}
 							hasPermission={hasPermission}
 							startupFolderId={selectedFolder.id}
 							onBack={() => navigateTo(`${folderBasePath}/trabajadores`)}
@@ -512,7 +512,7 @@ export default function StartupFolderRouteView({
 							workerId={workerId}
 							companyId={companyId}
 							workerName={workerName}
-							isOtcMember={isOtcMember}
+							isInternalMember={isInternalMember}
 							hasPermission={hasPermission}
 							startupFolderId={selectedFolder.id}
 							onBack={() => navigateTo(`${folderBasePath}/trabajadores`)}
@@ -523,7 +523,7 @@ export default function StartupFolderRouteView({
 					<VehicleFolder
 						userId={userId}
 						companyId={companyId}
-						isOtcMember={isOtcMember}
+						isInternalMember={isInternalMember}
 						hasPermission={hasPermission}
 						startupFolderId={selectedFolder.id}
 						onBack={() => navigateTo(folderBasePath)}
@@ -536,7 +536,7 @@ export default function StartupFolderRouteView({
 						userId={userId}
 						vehicleId={vehicleId}
 						companyId={companyId}
-						isOtcMember={isOtcMember}
+						isInternalMember={isInternalMember}
 						hasPermission={hasPermission}
 						startupFolderId={selectedFolder.id}
 						documents={vehicleDocuments}
@@ -548,7 +548,7 @@ export default function StartupFolderRouteView({
 			{mode === "overview" && (
 				<StartupFolderOverviewSummary
 					folder={selectedFolder}
-					isOtcMember={isOtcMember}
+					isInternalMember={isInternalMember}
 					hasPermission={hasPermission}
 					isArchivedView={isArchivedView}
 					onRefetch={refetch}

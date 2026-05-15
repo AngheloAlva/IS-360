@@ -44,13 +44,13 @@ import {
 interface ManageLockoutPermitsDialogProps {
 	workPermitId: string
 	companyId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 export default function ManageLockoutPermitsDialog({
 	workPermitId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 }: ManageLockoutPermitsDialogProps) {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -79,7 +79,7 @@ export default function ManageLockoutPermitsDialog({
 	const operators = operatorsData?.operators ?? []
 
 	const form = useForm<LockoutPermitSchema>({
-		resolver: zodResolver(createLockoutPermitSchema(isOtcMember)),
+		resolver: zodResolver(createLockoutPermitSchema(isInternalMember)),
 		defaultValues: {
 			lockoutType: undefined,
 			lockoutTypeOther: "",
@@ -178,7 +178,7 @@ export default function ManageLockoutPermitsDialog({
 								]}
 							/>
 
-							{isOtcMember && (
+							{isInternalMember && (
 								<SelectWithSearchFormField<LockoutPermitSchema>
 									name="lockoutAreaResponsibleId"
 									label="Responsable del Área"

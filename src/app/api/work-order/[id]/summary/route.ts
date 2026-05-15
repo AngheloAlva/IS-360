@@ -66,7 +66,7 @@ export async function GET(
 				},
 				workBookEntries: {
 					where: {
-						entryType: { not: "OTC_INSPECTION" },
+						entryType: { not: "INTERNAL_INSPECTION" },
 					},
 					select: {
 						id: true,
@@ -90,10 +90,10 @@ export async function GET(
 		// Fetch inspection count and top-5 separately (filtered _count not possible in a single select for count+top5 simultaneously)
 		const [inspectionCount, inspections] = await Promise.all([
 			prisma.workEntry.count({
-				where: { workOrderId: id, entryType: "OTC_INSPECTION" },
+				where: { workOrderId: id, entryType: "INTERNAL_INSPECTION" },
 			}),
 			prisma.workEntry.findMany({
-				where: { workOrderId: id, entryType: "OTC_INSPECTION" },
+				where: { workOrderId: id, entryType: "INTERNAL_INSPECTION" },
 				select: {
 					id: true,
 					activityName: true,

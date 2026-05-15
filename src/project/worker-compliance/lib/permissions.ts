@@ -1,7 +1,7 @@
 import { ACCESS_ROLE } from "@/generated/prisma/enums"
 import { auth } from "@/lib/auth"
 
-// Único usuario OTC autorizado a emitir/rotar QRs de acreditación.
+// Único usuario interno autorizado a emitir/rotar QRs de acreditación.
 // Los QRs se imprimen físicamente, así que regenerarlos invalida la tarjeta del trabajador;
 // por eso restringimos la emisión a una sola persona designada.
 export const QR_ISSUER_USER_ID = "csREIhAi7xKS1y4nohPsnk9A9tUkMidq"
@@ -18,7 +18,7 @@ export class ForbiddenError extends Error {
 	}
 }
 
-function isOtcMember(user: SessionUser): boolean {
+function isInternalMember(user: SessionUser): boolean {
 	return user.accessRole === (ACCESS_ROLE.ADMIN as string)
 }
 
@@ -30,8 +30,8 @@ export async function assertCanView(user: SessionUser, workerId: string): Promis
 	// Self-service: worker viewing their own compliance card
 	if (user.id === workerId) return
 
-	// OTC member with explicit view permission
-	if (isOtcMember(user)) {
+	// Internal member with explicit view permission
+	if (isInternalMember(user)) {
 		const result = await auth.api.userHasPermission({
 			body: {
 				userId: user.id,
@@ -47,11 +47,11 @@ export async function assertCanView(user: SessionUser, workerId: string): Promis
 export async function assertCanGenerateFor(user: SessionUser, _workerId: string): Promise<void> {
 	if (canIssueWorkerQR(user)) return
 
-	throw new ForbiddenError("Solo el emisor designado de OTC puede generar QRs de acreditación")
+	throw new ForbiddenError("Solo el emisor interno designado puede generar QRs de acreditación")
 }
 
 export async function assertCanRevokeFor(user: SessionUser, _workerId: string): Promise<void> {
 	if (canIssueWorkerQR(user)) return
 
-	throw new ForbiddenError("Solo el emisor designado de OTC puede revocar QRs de acreditación")
+	throw new ForbiddenError("Solo el emisor interno designado puede revocar QRs de acreditación")
 }

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 			},
 		})
 
-		if (!workEntry || workEntry.entryType !== "OTC_INSPECTION") {
+		if (!workEntry || workEntry.entryType !== "INTERNAL_INSPECTION") {
 			return NextResponse.json({ error: "Inspección no encontrada" }, { status: 404 })
 		}
 

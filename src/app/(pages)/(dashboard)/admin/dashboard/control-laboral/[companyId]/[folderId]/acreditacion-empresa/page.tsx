@@ -39,7 +39,7 @@ export default async function StartupFolderReviewPage({
 				folderId={folderId}
 				companyId={companyId}
 				userId={session.user.id}
-				isOtcMember={session.user.accessRole === "ADMIN"}
+				isInternalMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>
 	)

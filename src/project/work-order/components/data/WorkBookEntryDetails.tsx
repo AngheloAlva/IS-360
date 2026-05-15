@@ -44,7 +44,7 @@ interface WorkBookEntryDetailsProps {
 	onClose: () => void
 	entry: WorkEntry
 	userId?: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 const commentTypeLabels = {
@@ -85,11 +85,11 @@ export function WorkBookEntryDetails({
 	userId,
 	onClose,
 	isLoading,
-	isOtcMember,
+	isInternalMember,
 }: WorkBookEntryDetailsProps) {
 	const queryClient = useQueryClient()
 	const [commentType, setCommentType] = useState<INSPECTION_COMMENT_TYPE | null>(
-		!isOtcMember ? "SUPERVISOR_RESPONSE" : null
+		!isInternalMember ? "SUPERVISOR_RESPONSE" : null
 	)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [loadingAttachments, setLoadingAttachments] = useState<Record<string, boolean>>({})
@@ -108,7 +108,7 @@ export function WorkBookEntryDetails({
 
 	const { data: comments, isLoading: commentsLoading } = useInspectionComments({
 		workEntryId: entry?.id || "",
-		enabled: entry?.entryType === "OTC_INSPECTION" && !!entry?.id,
+		enabled: entry?.entryType === "INTERNAL_INSPECTION" && !!entry?.id,
 	})
 
 	const form = useForm<InspectionCommentSchema>({
@@ -116,14 +116,14 @@ export function WorkBookEntryDetails({
 		defaultValues: {
 			content: "",
 			workEntryId: entry.id,
-			type: !isOtcMember ? "SUPERVISOR_RESPONSE" : undefined,
+			type: !isInternalMember ? "SUPERVISOR_RESPONSE" : undefined,
 		},
 	})
 
 	const canAddComment = () => {
 		if (!entry || entry.inspectionStatus === "RESOLVED" || !userId) return false
 
-		if (!isOtcMember) {
+		if (!isInternalMember) {
 			const hasPendingResponse = comments?.some(
 				(c) =>
 					c.type === "SUPERVISOR_RESPONSE" &&
@@ -137,7 +137,7 @@ export function WorkBookEntryDetails({
 			return !hasPendingResponse
 		}
 
-		if (isOtcMember) {
+		if (isInternalMember) {
 			const hasPendingResponse = comments?.some(
 				(c) =>
 					c.type === "SUPERVISOR_RESPONSE" &&
@@ -156,10 +156,10 @@ export function WorkBookEntryDetails({
 
 	const getAvailableCommentTypes = (): INSPECTION_COMMENT_TYPE[] => {
 		if (!userId) return []
-		if (!isOtcMember) {
+		if (!isInternalMember) {
 			return ["SUPERVISOR_RESPONSE"]
 		}
-		if (isOtcMember) {
+		if (isInternalMember) {
 			return ["RESPONSIBLE_APPROVAL", "RESPONSIBLE_REJECTION"]
 		}
 		return []
@@ -193,7 +193,7 @@ export function WorkBookEntryDetails({
 			if (result.ok) {
 				toast.success(result.message)
 				form.reset()
-				setCommentType(!isOtcMember ? "SUPERVISOR_RESPONSE" : null)
+				setCommentType(!isInternalMember ? "SUPERVISOR_RESPONSE" : null)
 
     void queryClient.invalidateQueries({
 					queryKey: ["inspection-comments", { workEntryId: entry.id }],
@@ -244,7 +244,7 @@ export function WorkBookEntryDetails({
 								</p>
 							</div>
 
-							{entry.entryType === "OTC_INSPECTION" && entry.inspectionStatus && (
+							{entry.entryType === "INTERNAL_INSPECTION" && entry.inspectionStatus && (
 								<div className="flex items-center justify-between">
 									<Badge
 										className={cn(
@@ -382,7 +382,7 @@ export function WorkBookEntryDetails({
 								</div>
 							)}
 
-							{entry && entry.entryType === "OTC_INSPECTION" && (
+							{entry && entry.entryType === "INTERNAL_INSPECTION" && (
 								<div className="w-full space-y-3">
 									<Separator />
 
@@ -507,7 +507,7 @@ export function WorkBookEntryDetails({
 															</p>
 															<div className="flex gap-1">
 																{userId &&
-																	isOtcMember &&
+																	isInternalMember &&
 																	getAvailableCommentTypes().map((type) => (
 																		<Button
 																			key={type}
@@ -535,7 +535,7 @@ export function WorkBookEntryDetails({
 														<Form {...form}>
 															<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 																<div className="flex items-center justify-between">
-																	{userId && isOtcMember && (
+																	{userId && isInternalMember && (
 																		<>
 																			<Badge
 																				className={cn("text-sm", commentTypeColors[commentType])}
@@ -579,7 +579,7 @@ export function WorkBookEntryDetails({
 																		className="flex-1"
 																		onClick={() => {
 																			form.reset()
-																			setCommentType(!isOtcMember ? "SUPERVISOR_RESPONSE" : null)
+																			setCommentType(!isInternalMember ? "SUPERVISOR_RESPONSE" : null)
 																		}}
 																		disabled={isSubmitting}
 																	>

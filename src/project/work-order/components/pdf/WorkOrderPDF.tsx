@@ -209,8 +209,8 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 				return "Actividad Adicional"
 			case "PREVENTION_AREA":
 				return "Área de Prevención"
-			case "OTC_INSPECTION":
-				return "Inspección OTC"
+			case "INTERNAL_INSPECTION":
+				return "Inspección Interna"
 			case "COMMENT":
 				return "Comentario"
 			case "USER_NOTE":
@@ -487,7 +487,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 										</Text>
 									</View>
 									<View style={[styles.tableCol, styles.lastCol, { width: "13%" }]}>
-										{entry.entryType === "OTC_INSPECTION" && entry.inspectionStatus ? (
+										{entry.entryType === "INTERNAL_INSPECTION" && entry.inspectionStatus ? (
 											<View style={getStatusStyle(entry.inspectionStatus)}>
 												<Text>{getStatusLabel(entry.inspectionStatus)}</Text>
 											</View>
@@ -503,7 +503,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 
 				<View style={styles.footer}>
 					<Text>
-						Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - OTC
+						Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - Interno
 					</Text>
 				</View>
 			</Page>
@@ -562,7 +562,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 								</View>
 							)}
 
-							{entry.entryType === "OTC_INSPECTION" && (
+							{entry.entryType === "INTERNAL_INSPECTION" && (
 								<>
 									{entry.inspectionStatus && (
 										<View style={styles.activityRow}>
@@ -654,7 +654,7 @@ const WorkOrderPDF = ({ workOrder }: WorkOrderPDFProps) => {
 
 					<View style={styles.footer}>
 						<Text>
-							Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - OTC
+							Reporte generado el {format(new Date(), "dd/MM/yyyy HH:mm", { locale: es })} - Interno
 						</Text>
 					</View>
 				</Page>

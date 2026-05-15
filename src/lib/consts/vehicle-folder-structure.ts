@@ -47,7 +47,7 @@ export const VEHICLE_STRUCTURE: VehicleFolderStructure = {
 				"Revisión interna firmada antes del ingreso a la planta, que asegure las perfectas condiciones previa al servicio.",
 		},
 		{
-			type: VehicleDocumentType.TRANSPORTATION_TO_OTC,
+			type: VehicleDocumentType.TRANSPORTATION_TO_INTERNAL,
 			name: "Vehículo de transporte de trabajadores",
 			description: "Documentación del vehículo de traslado al sitio de trabajo.",
 		},

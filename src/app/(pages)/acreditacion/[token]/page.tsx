@@ -73,7 +73,7 @@ export default async function AccreditationPage({
 			<div className="flex w-full max-w-sm flex-col items-center gap-6 rounded-2xl border bg-white p-8 text-center shadow-sm">
 				<Image
 					src="/logo.png"
-					alt="OTC"
+					alt="IS 360"
 					width={72}
 					height={72}
 					priority

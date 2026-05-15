@@ -27,7 +27,7 @@ import {
 interface RemoveLockDialogProps {
 	lockoutRegistrationId: string
 	workerName: string
-	lockType: "otc" | "contractor"
+	lockType: "internal" | "contractor"
 	disabled?: boolean
 }
 
@@ -85,7 +85,7 @@ export default function RemoveLockDialog({
 		}
 	}
 
-	const lockTypeLabel = lockType === "otc" ? "OTC" : "del Contratista"
+	const lockTypeLabel = lockType === "internal" ? "Interno" : "del Contratista"
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -96,7 +96,7 @@ export default function RemoveLockDialog({
 					className="w-full cursor-pointer items-start justify-start"
 				>
 					<LockKeyholeOpen className="mr-2 h-4 w-4" />
-					Retirar Candado {lockType === "otc" ? "OTC" : "Contratista"}
+					Retirar Candado {lockType === "internal" ? "Interno" : "Contratista"}
 				</Button>
 			</DialogTrigger>
 

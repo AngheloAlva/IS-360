@@ -56,7 +56,7 @@ const SAFETY_TALKS: SafetyTalk[] = [
 	{
 		id: "irl",
 		title: "Inducción de Seguridad IRL",
-		description: "Introducción a los riesgos laborales presentes en OTC.",
+		description: "Introducción a los riesgos laborales presentes en las instalaciones.",
 		category: "IRL",
 		href: "/dashboard/charlas-de-seguridad/visitas?tab=irl",
 	},

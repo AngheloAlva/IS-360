@@ -45,7 +45,7 @@ interface StartupFolderDocumentsProps {
 	userId: string
 	companyId: string
 	onBack: () => void
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	startupFolderId: string
 	category: DocumentCategory
@@ -72,7 +72,7 @@ export default function StartupFolderDocuments({
 	userId,
 	category,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	startupFolderId,
 	moreMonthDuration,
@@ -98,7 +98,7 @@ export default function StartupFolderDocuments({
 			companyId,
 			hasPermission,
 			refetch,
-			isOtcMember,
+			isInternalMember,
 			startupFolderId,
 			setShowUploadDialog,
 			setSelectedDocument,
@@ -140,7 +140,7 @@ export default function StartupFolderDocuments({
 				</div>
 
 				<div className="flex items-center gap-2">
-					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isInternalMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<>
 							<UndoDocumentReviewDialog
 								category={category}
@@ -183,7 +183,7 @@ export default function StartupFolderDocuments({
 
 					<Separator orientation="vertical" />
 
-					{isOtcMember && data?.folderStatus && (
+					{isInternalMember && data?.folderStatus && (
 						<ChangeSubfolderStatusDialog
 							startupFolderId={startupFolderId}
 							subfolderType={getSubfolderType(category)}
@@ -201,7 +201,7 @@ export default function StartupFolderDocuments({
 						/>
 					)}
 
-					{!isOtcMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
+					{!isInternalMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							category={category}
@@ -261,7 +261,7 @@ export default function StartupFolderDocuments({
 					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
-								{isOtcMember && <TableCell></TableCell>}
+								{isInternalMember && <TableCell></TableCell>}
 								<TableCell className="font-semibold">
 									<div className="flex flex-col items-start justify-center">
 										<div className="flex items-center gap-2">
@@ -292,7 +292,7 @@ export default function StartupFolderDocuments({
 								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember &&
+										{!isInternalMember &&
 											(data?.folderStatus === "DRAFT" ||
 												data?.folderStatus === "REJECTED" ||
 												data?.folderStatus === "EXPIRED") && (

@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/components/ui
 import WorkBookEntriesTable from "@/project/work-order/components/data/WorkBookEntriesTable"
 import WorkBookGeneralData from "@/project/work-order/components/data/WorkBookGeneralData"
 import WorkBookMilestones from "@/project/work-order/components/data/WorkBookMilestones"
-import OtcInspectorForm from "@/project/work-order/components/forms/OtcInspectorForm"
+import InternalInspectorForm from "@/project/work-order/components/forms/InternalInspectorForm"
 import ActivityForm from "@/project/work-order/components/forms/WorkBookActivityForm"
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card"
 import { Button } from "@/shared/components/ui/button"
@@ -37,7 +37,7 @@ interface WorkBookMainProps {
 	userId: string
 	userRole: string
 	workBookId: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	hasPermission: boolean
 	hassWorkBookPermission: boolean
 	tutorialMode?: boolean
@@ -54,7 +54,7 @@ export default function WorkBookMain({
 	userRole,
 	workBookId,
 	hasPermission,
-	isOtcMember = false,
+	isInternalMember = false,
 	hassWorkBookPermission,
 	tutorialMode = false,
 	tutorialWorkBook,
@@ -223,7 +223,7 @@ export default function WorkBookMain({
 				<TabsContent value="milestones">
 					<WorkBookMilestones
 						userRole={userRole}
-						isOtcMember={isOtcMember}
+						isInternalMember={isInternalMember}
 						workOrderId={workBook.id}
 						hasPermission={hasPermission}
 						supervisorId={workBook.supervisorId}
@@ -302,7 +302,7 @@ export default function WorkBookMain({
 											entryType="ADDITIONAL_ACTIVITY"
 										/>
 
-										<OtcInspectorForm
+										<InternalInspectorForm
 											workOrderId={workBook.id}
 											tutorialMode={tutorialMode}
 											triggerDataTutorialId={
@@ -327,7 +327,7 @@ export default function WorkBookMain({
 													variant="outline"
 													data-tutorial-id="tutorial-inspection-review"
 												>
-													Revision OTC
+													Revision Interna
 												</Button>
 												<Badge variant="outline" data-tutorial-id="tutorial-inspection-status">
 													Estado: Requiere respuesta contratista
@@ -348,7 +348,7 @@ export default function WorkBookMain({
 						<CardContent>
 							<WorkBookEntriesTable
 								userId={userId}
-								isOtcMember={isOtcMember}
+								isInternalMember={isInternalMember}
 								workOrderId={workBook.id}
 								hasPermission={hasPermission}
 								workOrderNumber={workBook.otNumber}

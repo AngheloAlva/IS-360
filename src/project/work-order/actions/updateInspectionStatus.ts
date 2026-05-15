@@ -70,10 +70,10 @@ export async function updateInspectionStatus({
 			}
 		}
 
-		if (workEntry.entryType !== "OTC_INSPECTION") {
+		if (workEntry.entryType !== "INTERNAL_INSPECTION") {
 			return {
 				ok: false,
-				message: "Solo se puede cambiar el estado de inspecciones OTC",
+				message: "Solo se puede cambiar el estado de inspecciones internas",
 			}
 		}
 

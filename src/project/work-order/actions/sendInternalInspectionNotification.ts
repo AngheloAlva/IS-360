@@ -2,19 +2,19 @@
 
 import { Resend } from "resend"
 
-import OtcInspectionNotificationEmail from "@/project/work-order/components/emails/OtcInspectionNotificationEmail"
+import InternalInspectionNotificationEmail from "@/project/work-order/components/emails/InternalInspectionNotificationEmail"
 import prisma from "@/lib/prisma"
 import { systemUrl } from "@/lib/consts/systemUrl"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-interface SendOtcInspectionNotificationProps {
+interface SendInternalInspectionNotificationProps {
 	workEntryId: string
 }
 
-export const sendOtcInspectionNotification = async ({
+export const sendInternalInspectionNotification = async ({
 	workEntryId,
-}: SendOtcInspectionNotificationProps) => {
+}: SendInternalInspectionNotificationProps) => {
 	try {
 		const inspection = await prisma.workEntry.findUnique({
 			where: { id: workEntryId },
@@ -58,13 +58,13 @@ export const sendOtcInspectionNotification = async ({
 			},
 		})
 
-		if (!inspection || inspection.entryType !== "OTC_INSPECTION") {
+		if (!inspection || inspection.entryType !== "INTERNAL_INSPECTION") {
 			throw new Error("Inspección no encontrada o tipo incorrecto")
 		}
 
 		const inspectionData = {
 			id: inspection.id,
-			activityName: inspection.activityName || "Inspección OTC",
+			activityName: inspection.activityName || "Inspección Interna",
 			executionDate: inspection.executionDate,
 			activityStartTime: inspection.activityStartTime || "",
 			activityEndTime: inspection.activityEndTime || "",
@@ -137,8 +137,8 @@ export const sendOtcInspectionNotification = async ({
 		// Send emails to all recipients
 		const emailPromises = recipients.map(async (recipient, i) => {
 			const subject = hasSafetyIssues
-				? `🚨 URGENTE: Inspección OTC con No Conformidades - ${workOrderData.otNumber}`
-				: `📋 Nueva Inspección OTC Realizada - OT ${workOrderData.otNumber}`
+				? `🚨 URGENTE: Inspección Interna con No Conformidades - ${workOrderData.otNumber}`
+				: `📋 Nueva Inspección Interna Realizada - OT ${workOrderData.otNumber}`
 
 			const url = recipient.isInternal
 				? `${systemUrl}/admin/dashboard/ordenes-de-trabajo/${workOrderData.id}`
@@ -149,7 +149,7 @@ export const sendOtcInspectionNotification = async ({
 				to: recipient.email,
 				bcc: i === 0 ? "soporte@ingenieriasimple.cl" : [],
 				subject,
-				react: await OtcInspectionNotificationEmail({
+				react: await InternalInspectionNotificationEmail({
 					inspection: inspectionData,
 					workOrder: workOrderData,
 					recipient,
@@ -158,7 +158,7 @@ export const sendOtcInspectionNotification = async ({
 				tags: [
 					{
 						name: "type",
-						value: "otc-inspection-notification",
+						value: "internal-inspection-notification",
 					},
 					{
 						name: "work-order",
@@ -186,7 +186,7 @@ export const sendOtcInspectionNotification = async ({
 		results.forEach((result, index) => {
 			if (result.status === "rejected") {
 				console.error(
-					`[OTC_INSPECTION_NOTIFICATION] Failed to send to ${recipients[index].email}:`,
+					`[INTERNAL_INSPECTION_NOTIFICATION] Failed to send to ${recipients[index].email}:`,
 					result.reason
 				)
 			}
@@ -199,7 +199,7 @@ export const sendOtcInspectionNotification = async ({
 			failed: failed,
 		}
 	} catch (error) {
-		console.error("[SEND_OTC_INSPECTION_NOTIFICATION]", error)
+		console.error("[SEND_INTERNAL_INSPECTION_NOTIFICATION]", error)
 		return {
 			ok: false,
 			message: "Error al enviar notificaciones de inspección",

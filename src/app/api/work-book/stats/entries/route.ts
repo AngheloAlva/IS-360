@@ -58,7 +58,7 @@ export async function GET(): Promise<NextResponse> {
 				case "ADDITIONAL_ACTIVITY":
 					acc[monthKey].additionalActivity++
 					break
-				case "OTC_INSPECTION":
+				case "INTERNAL_INSPECTION":
 					acc[monthKey].inspection++
 					break
 			}

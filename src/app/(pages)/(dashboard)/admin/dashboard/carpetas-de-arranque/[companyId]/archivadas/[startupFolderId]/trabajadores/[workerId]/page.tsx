@@ -31,7 +31,7 @@ export default async function AdminArchivedStartupFolderWorkerDocumentsPage({
 			routeBasePath="/admin/dashboard/carpetas-de-arranque"
 			folderPathPrefix="archivadas"
 			isArchivedView
-			isOtcMember
+			isInternalMember
 			hasPermission={hasPermission.success}
 			backHref="/admin/dashboard/carpetas-de-arranque"
 		/>

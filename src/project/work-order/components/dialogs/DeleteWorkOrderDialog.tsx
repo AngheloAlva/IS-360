@@ -69,7 +69,7 @@ export default function DeleteWorkOrderDialog({
 					<AlertDialogTitle>¿Eliminar orden de trabajo {otNumber}?</AlertDialogTitle>
 					<AlertDialogDescription>
 						Esta accion solo se permite cuando la OT esta en estado Planificada o Pendiente y no
-						tiene hitos, actividades diarias ni inspecciones OTC. La OT se ocultara de las vistas
+						tiene hitos, actividades diarias ni inspecciones internas. La OT se ocultara de las vistas
 						pero quedara registrada para auditoria.
 					</AlertDialogDescription>
 				</AlertDialogHeader>

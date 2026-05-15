@@ -29,8 +29,8 @@ export const maintenancePlanTaskSchema = z.object({
 	// Campos de automatización
 	isAutomated: z.boolean().optional(),
 	automatedResponsibleId: z
-		.string({ error: "El responsable OTC es requerido" })
-		.min(1, "El responsable OTC es requerido"),
+		.string({ error: "El responsable interno es requerido" })
+		.min(1, "El responsable interno es requerido"),
 	automatedSupervisorId: z.string().optional(),
 	automatedCompanyId: z.string().optional(),
 	// Campos para configurar la OT automática

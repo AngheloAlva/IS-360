@@ -6,15 +6,15 @@ import { MinusCircleIcon, PlusCircleIcon, PlusIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { createOtcInspections } from "@/project/work-order/actions/createOtcInspections"
+import { createInternalInspections } from "@/project/work-order/actions/createInternalInspections"
 import { InspectionTypeOptions, InspectionType } from "../../const/inspection-type"
 import { useWorkBookMilestones, type Milestone } from "../../hooks/use-work-book-milestones"
 import { uploadFilesToCloud } from "@/lib/upload-files"
 import { queryClient } from "@/lib/queryClient"
 import {
-	otcInspectionsSchema,
-	type OtcInspectionSchema,
-} from "@/project/work-order/schemas/otc-inspections.schema"
+	internalInspectionsSchema,
+	type InternalInspectionSchema,
+} from "@/project/work-order/schemas/internal-inspections.schema"
 
 import { DatePickerFormField } from "@/shared/components/forms/DatePickerFormField"
 import { TimePickerFormField } from "@/shared/components/forms/TimePickerFormField"
@@ -38,7 +38,7 @@ import {
 
 type InspectionTypeValue = (typeof InspectionType)[number]
 
-export default function OtcInspectorForm({
+export default function InternalInspectorForm({
 	workOrderId,
 	tutorialMode = false,
 	tutorialMilestones,
@@ -50,7 +50,7 @@ export default function OtcInspectorForm({
 	workOrderId: string
 	tutorialMode?: boolean
 	tutorialMilestones?: Milestone[]
-	onTutorialSubmit?: (values: OtcInspectionSchema) => void
+	onTutorialSubmit?: (values: InternalInspectionSchema) => void
 	triggerDataTutorialId?: string
 	contentDataTutorialId?: string
 	submitDataTutorialId?: string
@@ -58,8 +58,8 @@ export default function OtcInspectorForm({
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [open, setOpen] = useState(false)
 
-	const form = useForm<OtcInspectionSchema>({
-		resolver: zodResolver(otcInspectionsSchema),
+	const form = useForm<InternalInspectionSchema>({
+		resolver: zodResolver(internalInspectionsSchema),
 		defaultValues: {
 			workOrderId,
 			inspectionName: "",
@@ -97,7 +97,7 @@ export default function OtcInspectorForm({
 		name: "inspections",
 	})
 
-	async function onSubmit(values: OtcInspectionSchema) {
+	async function onSubmit(values: InternalInspectionSchema) {
 		setIsSubmitting(true)
 
 		if (tutorialMode) {
@@ -119,7 +119,7 @@ export default function OtcInspectorForm({
 					randomString: workOrderId.slice(0, 4),
 				})
 
-				const { ok, message } = await createOtcInspections({
+				const { ok, message } = await createInternalInspections({
 					values: {
 						...values,
 						files: undefined,
@@ -129,7 +129,7 @@ export default function OtcInspectorForm({
 
 				if (!ok) throw new Error(message)
 			} else {
-				const { ok, message } = await createOtcInspections({
+				const { ok, message } = await createInternalInspections({
 					values: {
 						...values,
 						files: undefined,
@@ -168,14 +168,14 @@ export default function OtcInspectorForm({
 				onClick={() => setOpen(true)}
 			>
 				<PlusIcon className="h-4 w-4" />
-				<span className="hidden sm:inline">Inspección OTC</span>
+				<span className="hidden sm:inline">Inspección Interna</span>
 			</SheetTrigger>
 
 			<SheetContent data-tutorial-id={contentDataTutorialId} className="gap-0 sm:max-w-fit">
 				<SheetHeader className="shadow">
-					<SheetTitle>Inspección OTC</SheetTitle>
+					<SheetTitle>Inspección Interna</SheetTitle>
 					<SheetDescription>
-						Complete la información en el formulario para crear una nueva inspección OTC.
+						Complete la información en el formulario para crear una nueva inspección interna.
 					</SheetDescription>
 				</SheetHeader>
 
@@ -184,27 +184,27 @@ export default function OtcInspectorForm({
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="grid w-full gap-x-3 gap-y-5 overflow-y-scroll px-4 pt-4 pb-16 sm:grid-cols-2"
 					>
-						<InputFormField<OtcInspectionSchema>
+						<InputFormField<InternalInspectionSchema>
 							name="inspectionName"
 							control={form.control}
 							label="Nombre de la Inspección"
 							itemClassName="sm:col-span-2"
 						/>
 
-						<DatePickerFormField<OtcInspectionSchema>
+						<DatePickerFormField<InternalInspectionSchema>
 							name="executionDate"
 							control={form.control}
 							label="Fecha de Ejecución"
 						/>
 
 						<div className="grid gap-3 overflow-hidden md:grid-cols-2">
-							<TimePickerFormField<OtcInspectionSchema>
+							<TimePickerFormField<InternalInspectionSchema>
 								name="activityStartTime"
 								control={form.control}
 								label="Hora de Inicio"
 							/>
 
-							<TimePickerFormField<OtcInspectionSchema>
+							<TimePickerFormField<InternalInspectionSchema>
 								label="Hora de Fin"
 								name="activityEndTime"
 								control={form.control}
@@ -214,7 +214,7 @@ export default function OtcInspectorForm({
 						{isLoadingMilestones && !tutorialMode ? (
 							<Skeleton className="h-10 w-full rounded-md sm:col-span-2" />
 						) : (
-							<SelectFormField<OtcInspectionSchema>
+							<SelectFormField<InternalInspectionSchema>
 								optional
 								options={
 									milestonesData.map((milestone) => ({
@@ -278,7 +278,7 @@ export default function OtcInspectorForm({
 									)}
 								</div>
 
-								<SelectFormField<OtcInspectionSchema>
+								<SelectFormField<InternalInspectionSchema>
 									control={form.control}
 									label="Tipo de Inspección"
 									options={InspectionTypeOptions.filter((option) => {
@@ -290,7 +290,7 @@ export default function OtcInspectorForm({
 									name={`inspections.${index}.type`}
 								/>
 
-								<TextAreaFormField<OtcInspectionSchema>
+								<TextAreaFormField<InternalInspectionSchema>
 									label="Observación"
 									control={form.control}
 									name={`inspections.${index}.inspection`}
@@ -307,7 +307,7 @@ export default function OtcInspectorForm({
 							</p>
 						</div>
 
-						<FileTable<OtcInspectionSchema>
+						<FileTable<InternalInspectionSchema>
 							name="files"
 							isMultiple={true}
 							maxFileSize={500}

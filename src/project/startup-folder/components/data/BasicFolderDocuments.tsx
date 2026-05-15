@@ -41,7 +41,7 @@ interface BasicFolderDocumentsProps {
 	companyId: string
 	onBack: () => void
 	workerName: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	startupFolderId: string
 }
@@ -52,7 +52,7 @@ export function BasicFolderDocuments({
 	workerId,
 	companyId,
 	workerName,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	startupFolderId,
 }: BasicFolderDocumentsProps) {
@@ -77,7 +77,7 @@ export function BasicFolderDocuments({
 			workerId,
 			companyId,
 			hasPermission,
-			isOtcMember,
+			isInternalMember,
 			startupFolderId,
 			setShowUploadDialog,
 			setSelectedDocument,
@@ -115,7 +115,7 @@ export function BasicFolderDocuments({
 				</div>
 
 				<div className="flex items-center gap-2">
-					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isInternalMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<>
 							<UndoDocumentReviewDialog
 								category={"BASIC"}
@@ -156,7 +156,7 @@ export function BasicFolderDocuments({
 
 					<DocumentCountProgress progress={progress} />
 
-					{isOtcMember && data?.folderStatus && (
+					{isInternalMember && data?.folderStatus && (
 						<ChangeSubfolderStatusDialog
 							startupFolderId={startupFolderId}
 							subfolderType="BASIC"
@@ -173,7 +173,7 @@ export function BasicFolderDocuments({
 						/>
 					)}
 
-					{!isOtcMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
+					{!isInternalMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							workerId={workerId}
@@ -231,7 +231,7 @@ export function BasicFolderDocuments({
 					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
-								{isOtcMember && <TableCell></TableCell>}
+								{isInternalMember && <TableCell></TableCell>}
 								<TableCell className="font-semibold">
 									<div className="flex flex-col items-start justify-center">
 										<div className="flex items-center gap-2">
@@ -261,7 +261,7 @@ export function BasicFolderDocuments({
 								<TableCell></TableCell>
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember &&
+										{!isInternalMember &&
 											doc.type !== "IRL_SAFETY_TALK" &&
 											(data?.folderStatus === "DRAFT" ||
 												data?.folderStatus === "REJECTED" ||

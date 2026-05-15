@@ -63,7 +63,7 @@ import type { WorkOrdersWithInspectionsResponse } from "@/app/api/work-order/wit
 interface WorkOrderTableProps {
 	id?: string
 	canDelete?: boolean
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 }
 
 const SORTING_COLUMN_TO_API: Record<string, WorkOrderSortBy> = {
@@ -95,7 +95,7 @@ const API_SORT_TO_COLUMN: Partial<Record<WorkOrderSortBy, string>> = {
 export function WorkOrderTable({
 	id,
 	canDelete = false,
-	isOtcMember = false,
+	isInternalMember = false,
 }: WorkOrderTableProps) {
 	const [exportInspectionsLoading, setExportInspectionsLoading] = useState<boolean>(false)
 	const [dialogDetailsOpen, setDialogDetailsOpen] = useState<boolean>(false)
@@ -117,8 +117,8 @@ export function WorkOrderTable({
 		: []
 
 	const columns = useMemo(
-		() => getWorkOrderColumns({ setSelectedId, setDialogDetailsOpen, isOtcMember, canDelete }),
-		[isOtcMember, canDelete]
+		() => getWorkOrderColumns({ setSelectedId, setDialogDetailsOpen, isInternalMember, canDelete }),
+		[isInternalMember, canDelete]
 	)
 
 	const companyName = useMemo(
@@ -230,7 +230,7 @@ export function WorkOrderTable({
 			).then((res) => res.json())
 
 			if (!res?.formattedData?.length) {
-				toast.error("No hay inspecciones de OTC para exportar")
+				toast.error("No hay inspecciones internas para exportar")
 				return
 			}
 
@@ -326,14 +326,14 @@ export function WorkOrderTable({
 				)
 			}
 
-			const fileName = `inspecciones-otc-${format(new Date(), "dd-MM-yyyy")}.xlsx`
+			const fileName = `inspecciones-internas-${format(new Date(), "dd-MM-yyyy")}.xlsx`
 			XLSX.writeFile(workbook, fileName)
 			toast.success(
 				`Exportadas ${res.total} OTs con ${res.totalInspections} inspecciones exitosamente`
 			)
 		} catch (error) {
 			console.error("[EXPORT_INSPECTIONS_EXCEL]", error)
-			toast.error("Error al exportar inspecciones de OTC")
+			toast.error("Error al exportar inspecciones internas")
 		} finally {
 			setExportInspectionsLoading(false)
 		}

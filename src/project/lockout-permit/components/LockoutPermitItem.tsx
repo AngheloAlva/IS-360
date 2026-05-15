@@ -42,7 +42,7 @@ interface LockoutPermitItemProps {
 	}
 	index: number
 	workPermitId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 const statusConfig = {
@@ -78,14 +78,14 @@ const lockoutTypeLabels = {
 export function LockoutPermitItem({
 	permit,
 	workPermitId,
-	isOtcMember,
+	isInternalMember,
 	index,
 }: LockoutPermitItemProps) {
 	const [isUpdating, setIsUpdating] = useState(false)
 	const [approvalNotes, setApprovalNotes] = useState(permit.approvalNotes || "")
 
 	const statusInfo = statusConfig[permit.status]
-	const canApprove = isOtcMember && permit.status === LOCKOUT_PERMIT_STATUS.REVIEW_PENDING
+	const canApprove = isInternalMember && permit.status === LOCKOUT_PERMIT_STATUS.REVIEW_PENDING
 
 	const handleUpdateStatus = async (status: LOCKOUT_PERMIT_STATUS) => {
 		try {

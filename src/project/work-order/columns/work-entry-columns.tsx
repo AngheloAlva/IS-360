@@ -18,14 +18,14 @@ import type { WorkEntry } from "@/project/work-order/hooks/use-work-entries"
 import type { ENTRY_TYPE } from "@/generated/prisma/enums"
 
 interface GetWorkEntryColumnsProps {
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 export function getWorkEntryColumns({
-	isOtcMember,
+	isInternalMember,
 }: GetWorkEntryColumnsProps): ColumnDef<WorkEntry>[] {
 	return [
-		...(isOtcMember
+		...(isInternalMember
 			? [
 					{
 						id: "select",
@@ -68,7 +68,7 @@ export function getWorkEntryColumns({
 					<Badge
 						className={cn("bg-orange-600/10 text-orange-600", {
 							"bg-amber-600/10 text-amber-600": entryType === "ADDITIONAL_ACTIVITY",
-							"bg-red-500/10 text-red-500": entryType === "OTC_INSPECTION",
+							"bg-red-500/10 text-red-500": entryType === "INTERNAL_INSPECTION",
 							"bg-lime-500/10 text-lime-500": entryType === "COMMENT",
 						})}
 					>
@@ -110,7 +110,7 @@ export function getWorkEntryColumns({
 				const supervisionComments = row.original.supervisionComments
 				const safetyObservations = row.original.safetyObservations
 
-				if (entryType === "OTC_INSPECTION") {
+				if (entryType === "INTERNAL_INSPECTION") {
 					return (
 						<p className="max-w-64 truncate">
 							{nonConformities || supervisionComments || safetyObservations}
@@ -156,7 +156,7 @@ export function getWorkEntryColumns({
 				const inspectionStatus = row.original.inspectionStatus
 				const inspectionComments = row.original.inspectionComments
 
-				if (entryType !== "OTC_INSPECTION" || !inspectionStatus) {
+				if (entryType !== "INTERNAL_INSPECTION" || !inspectionStatus) {
 					return <span className="text-gray-400">-</span>
 				}
 

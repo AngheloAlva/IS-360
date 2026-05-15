@@ -24,7 +24,7 @@ import { Button } from "@/shared/components/ui/button"
 
 export default function WorkBookEntriesTable({
 	userId,
-	isOtcMember,
+	isInternalMember,
 	workOrderId,
 	workOrderNumber,
 	tutorialMode = false,
@@ -32,7 +32,7 @@ export default function WorkBookEntriesTable({
 }: {
 	userId: string
 	workOrderId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	workOrderNumber: string
 	tutorialMode?: boolean
@@ -81,7 +81,7 @@ export default function WorkBookEntriesTable({
 		[page, pageSize]
 	)
 
-	const columns = getWorkEntryColumns({ isOtcMember })
+	const columns = getWorkEntryColumns({ isInternalMember })
 
 	const table = useReactTable<WorkEntry>({
 		data: tableData?.entries ?? [],
@@ -134,7 +134,7 @@ export default function WorkBookEntriesTable({
 	return (
 		<div className="space-y-4">
 			<div className="flex w-full items-center justify-between">
-				{isOtcMember && hasSelectedRows && (
+				{isInternalMember && hasSelectedRows && (
 					<Button
 						variant="outline"
 						size="sm"
@@ -146,7 +146,7 @@ export default function WorkBookEntriesTable({
 						{isDownloading ? "Descargando..." : `Descargar Adjuntos (${selectedRows.length})`}
 					</Button>
 				)}
-				<div className={isOtcMember && hasSelectedRows ? "" : "ml-auto"}>
+				<div className={isInternalMember && hasSelectedRows ? "" : "ml-auto"}>
 					<WorkOrderPDFViewer workOrderId={workOrderId} workOrderNumber={workOrderNumber} />
 				</div>
 			</div>
@@ -184,7 +184,7 @@ export default function WorkBookEntriesTable({
 					userId={userId}
 					isLoading={false}
 					entry={selectedEntry}
-					isOtcMember={isOtcMember}
+					isInternalMember={isInternalMember}
 					onClose={() => setSelectedEntry(null)}
 				/>
 			)}

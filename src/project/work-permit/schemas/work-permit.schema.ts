@@ -44,20 +44,20 @@ const baseWorkPermitSchema = {
 		.refine((value) => value, { message: "Debe aceptar los términos y condiciones" }),
 }
 
-export const createWorkPermitSchema = (isOtcMember: boolean = false) => {
+export const createWorkPermitSchema = (isInternalMember: boolean = false) => {
 	return z
 		.object({
 			...baseWorkPermitSchema,
-			otNumber: isOtcMember
+			otNumber: isInternalMember
 				? z.string().optional().or(z.literal(""))
 				: z.string().nonempty({ message: "Debe seleccionar un número de OT" }),
 		})
 		.refine(
 			(data) => {
-				if (isOtcMember && !data.isUrgent && (!data.otNumber || data.otNumber === "")) {
+				if (isInternalMember && !data.isUrgent && (!data.otNumber || data.otNumber === "")) {
 					return false
 				}
-				if (!isOtcMember && (!data.otNumber || data.otNumber === "")) {
+				if (!isInternalMember && (!data.otNumber || data.otNumber === "")) {
 					return false
 				}
 				return true

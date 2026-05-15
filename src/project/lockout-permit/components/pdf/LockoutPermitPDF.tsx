@@ -362,7 +362,7 @@ export default function LockoutPermitPDF({ data }: LockoutPermitPDFProps) {
 
 					<View style={styles.identRow}>
 						<View style={[styles.identCell, { flex: 2 }]}>
-							<Text style={styles.identLabel}>EMPRESA COLABORADORA/MANTENCIÓN OTC:</Text>
+							<Text style={styles.identLabel}>EMPRESA COLABORADORA/MANTENCIÓN INTERNA:</Text>
 							<Text style={styles.identValue}>{data.company?.name || ""}</Text>
 						</View>
 						<View style={styles.identCellLast}>
@@ -623,7 +623,7 @@ export default function LockoutPermitPDF({ data }: LockoutPermitPDFProps) {
 				<View style={styles.signaturesSection} break>
 					<Text style={styles.noteText}>
 						SUPERVISOR RESPONSABLE DE LA ACTIVIDAD DEBERÁ ESPERAR LA AUTORIZACIÓN DEL OPERADOR
-						RESPONSABLE DE OTC (PERMISO DE INICIO DE TRABAJO), ANTES DE BLOQUEAR.
+						RESPONSABLE INTERNO (PERMISO DE INICIO DE TRABAJO), ANTES DE BLOQUEAR.
 					</Text>
 
 					<View style={styles.signaturesRow}>
@@ -687,7 +687,7 @@ export default function LockoutPermitPDF({ data }: LockoutPermitPDFProps) {
 				<View style={styles.footerSection}>
 					<View style={styles.footerRow}>
 						<View style={[styles.footerCell, { flex: 1.5 }]}>
-							<Text style={styles.footerLabel}>JEFE DE ÁREA A CARGO DE LA ACTIVIDAD OTC</Text>
+							<Text style={styles.footerLabel}>JEFE DE ÁREA A CARGO DE LA ACTIVIDAD INTERNA</Text>
 						</View>
 						<View style={[styles.footerCellLast, { flex: 2 }]}>
 							<Text style={styles.footerLabel}>Observación:</Text>

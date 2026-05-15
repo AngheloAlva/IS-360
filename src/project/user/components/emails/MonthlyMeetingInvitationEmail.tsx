@@ -119,7 +119,7 @@ export const MonthlyMeetingInvitationEmail = ({
 							</Text>
 
 							<Text className="mb-[16px] text-[16px] leading-[24px] text-gray-700">
-								Agradeceré al equipo OTC extender esta invitación a las empresas contratistas en
+								Agradeceré al equipo interno extender esta invitación a las empresas contratistas en
 								servicio que no estén en copia.
 							</Text>
 

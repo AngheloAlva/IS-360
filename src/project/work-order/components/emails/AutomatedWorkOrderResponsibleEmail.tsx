@@ -163,7 +163,7 @@ const AutomatedWorkOrderResponsibleEmail = ({
 											Empresa Contratista:
 										</Text>
 										<Text className="mb-[12px] text-[16px] leading-none text-gray-800">
-											{workOrder.company?.name || "OTC (Interno)"}
+											{workOrder.company?.name || "Equipo Interno"}
 										</Text>
 									</Column>
 								</Row>
@@ -232,7 +232,7 @@ const AutomatedWorkOrderResponsibleEmail = ({
 
 							<Section className="mb-[24px] rounded-[8px] border-l-[4px] border-green-500 bg-green-50 p-[24px]">
 								<Heading className="mb-[16px] text-[20px] font-bold text-gray-800">
-									✅ Acciones Requeridas (Responsable OTC)
+									✅ Acciones Requeridas (Responsable Interno)
 								</Heading>
 
 								<Text className="mb-[12px] text-[14px] leading-[20px] text-gray-600">

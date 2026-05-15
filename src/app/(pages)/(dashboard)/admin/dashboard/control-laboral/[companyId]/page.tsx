@@ -35,7 +35,7 @@ export default async function StartupFolderReviewPage({
 			<LaborControlFoldersTable
 				companyId={companyId}
 				companySlug={companySlug}
-				isOtcMember={session.user.accessRole === "ADMIN"}
+				isInternalMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>
 	)

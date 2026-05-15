@@ -47,9 +47,9 @@ export async function generateApiKey(opts: {
 }) {
   const rawBytes = randomBytes(32)
   const hexKey = rawBytes.toString("hex")
-  const plainTextKey = `otc_pk_${hexKey}`
+  const plainTextKey = `is_pk_${hexKey}`
   const keyHash = createHash("sha256").update(plainTextKey).digest("hex")
-  const keyPrefix = `otc_pk_${hexKey.slice(0, 8)}`
+  const keyPrefix = `is_pk_${hexKey.slice(0, 8)}`
 
   const expiresAt = opts.expiresInDays
     ? new Date(Date.now() + opts.expiresInDays * 24 * 60 * 60 * 1000)

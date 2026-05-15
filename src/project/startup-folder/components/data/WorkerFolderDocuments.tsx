@@ -47,7 +47,7 @@ interface WorkerFolderDocumentsProps {
 	companyId: string
 	workerName: string
 	onBack: () => void
-	isOtcMember: boolean
+	isInternalMember: boolean
 	startupFolderId: string
 	hasPermission: boolean
 }
@@ -58,7 +58,7 @@ export function WorkerFolderDocuments({
 	workerId,
 	companyId,
 	workerName,
-	isOtcMember,
+	isInternalMember,
 	startupFolderId,
 	hasPermission,
 }: WorkerFolderDocumentsProps) {
@@ -83,7 +83,7 @@ export function WorkerFolderDocuments({
 			workerId,
 			companyId,
 			hasPermission,
-			isOtcMember,
+			isInternalMember,
 			startupFolderId,
 			setShowUploadDialog,
 			setSelectedDocument,
@@ -120,7 +120,7 @@ export function WorkerFolderDocuments({
 					<StartupFolderStatusBadge status={data?.folderStatus ?? "DRAFT"} />
 				</div>
 				<div className="flex items-center gap-2">
-					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isInternalMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<>
 							<UndoDocumentReviewDialog
 								category={"PERSONNEL"}
@@ -161,8 +161,8 @@ export function WorkerFolderDocuments({
 
 					<DocumentCountProgress progress={progress} />
 
-					{/* Botón de configuración de carpeta - solo miembros OTC */}
-					{isOtcMember && data?.folderStatus && (
+					{/* Botón de configuración de carpeta - solo miembros internos */}
+					{isInternalMember && data?.folderStatus && (
 						<WorkerFolderConfigDialog
 							startupFolderId={startupFolderId}
 							workerId={workerId}
@@ -179,7 +179,7 @@ export function WorkerFolderDocuments({
 						/>
 					)}
 
-					{!isOtcMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
+					{!isInternalMember && (data?.folderStatus === "DRAFT" || data?.folderStatus === "EXPIRED") && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							workerId={workerId}
@@ -237,7 +237,7 @@ export function WorkerFolderDocuments({
 					{documentsNotUploaded.length > 0 &&
 						documentsNotUploaded.map((doc) => (
 							<TableRow key={doc.name}>
-								{isOtcMember && <TableCell></TableCell>}
+								{isInternalMember && <TableCell></TableCell>}
 								<TableCell className="font-semibold">
 									<div className="flex flex-col items-start justify-center">
 										<div className="flex items-center gap-2">
@@ -268,7 +268,7 @@ export function WorkerFolderDocuments({
 
 								<TableCell>
 									<div className="flex items-center gap-1">
-										{!isOtcMember &&
+										{!isInternalMember &&
 											doc.type !== "IRL_SAFETY_TALK" &&
 											(data?.folderStatus === "DRAFT" ||
 												data?.folderStatus === "REJECTED" ||
@@ -287,7 +287,7 @@ export function WorkerFolderDocuments({
 											)}
 
 										{doc.type !== "IRL_SAFETY_TALK" &&
-											isOtcMember &&
+											isInternalMember &&
 											hasPermission &&
 											(data?.folderStatus === "DRAFT" ||
 												data?.folderStatus === "REJECTED" ||

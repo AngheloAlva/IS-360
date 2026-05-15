@@ -19,13 +19,13 @@ import {
 interface WorkersAccreditationFolderDocumentsProps {
 	folderId: string
 	companyId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 export default function WorkersAccreditationFolderDocuments({
 	folderId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 }: WorkersAccreditationFolderDocumentsProps): React.ReactElement {
 	const [rowSelection, setRowSelection] = useState({})
 
@@ -42,7 +42,7 @@ export default function WorkersAccreditationFolderDocuments({
 		columns: getWorkersLaborControlFoldersColumns({
 			companyId,
 			folderId,
-			isOtcMember,
+			isInternalMember,
 		}),
 		data: foldersData,
 		getCoreRowModel: getCoreRowModel(),

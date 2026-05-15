@@ -6,13 +6,13 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { installOtcLock } from "../../actions/installOtcLock"
+import { installInternalLock } from "../../actions/installInternalLock"
 import { useOperators } from "@/shared/hooks/use-operators"
 import { queryClient } from "@/lib/queryClient"
 import {
-	installOtcLockSchema,
-	type InstallOtcLockSchema,
-} from "../../schemas/install-otc-lock.schema"
+	installInternalLockSchema,
+	type InstallInternalLockSchema,
+} from "../../schemas/install-internal-lock.schema"
 
 import { SelectWithSearchFormField } from "@/shared/components/forms/SelectWithSearchFormField"
 import { InputFormField } from "@/shared/components/forms/InputFormField"
@@ -30,25 +30,25 @@ import {
 	DialogDescription,
 } from "@/shared/components/ui/dialog"
 
-interface InstallOtcLockDialogProps {
+interface InstallInternalLockDialogProps {
 	lockoutPermitId: string
 	workerName: string
 	disabled?: boolean
 }
-export default function InstallOtcLockDialog({
+export default function InstallInternalLockDialog({
 	lockoutPermitId,
 	workerName,
 	disabled = false,
-}: InstallOtcLockDialogProps): React.ReactElement {
+}: InstallInternalLockDialogProps): React.ReactElement {
 	const [open, setOpen] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
-	const form = useForm<InstallOtcLockSchema>({
-		resolver: zodResolver(installOtcLockSchema),
+	const form = useForm<InstallInternalLockSchema>({
+		resolver: zodResolver(installInternalLockSchema),
 		defaultValues: {
 			lockoutPermitId,
-			otcOperatorId: "",
-			otcLockNumber: "",
+			internalOperatorId: "",
+			internalLockNumber: "",
 		},
 	})
 
@@ -57,21 +57,21 @@ export default function InstallOtcLockDialog({
 		limit: 100,
 	})
 
-	const onSubmit = async (values: InstallOtcLockSchema): Promise<void> => {
+	const onSubmit = async (values: InstallInternalLockSchema): Promise<void> => {
 		setIsSubmitting(true)
 
 		try {
-			const res = await installOtcLock({ values })
+			const res = await installInternalLock({ values })
 
 			if (!res.ok) {
-				toast.error("Error al instalar candado de OTC", {
+				toast.error("Error al instalar candado interno", {
 					description: res.message,
 					duration: 3000,
 				})
 				return
 			}
 
-			toast.success("Candado de OTC instalado exitosamente", {
+			toast.success("Candado Interno instalado exitosamente", {
 				duration: 3000,
 			})
 
@@ -86,7 +86,7 @@ export default function InstallOtcLockDialog({
 			form.reset()
 		} catch (error) {
 			console.error(error)
-			toast.error("Error al instalar candado de OTC", {
+			toast.error("Error al instalar candado interno", {
 				duration: 3000,
 			})
 		} finally {
@@ -94,7 +94,7 @@ export default function InstallOtcLockDialog({
 		}
 	}
 
-	const otcOperatorId = form.watch("otcOperatorId")
+	const internalOperatorId = form.watch("internalOperatorId")
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -105,7 +105,7 @@ export default function InstallOtcLockDialog({
 					disabled={disabled}
 				>
 					<LockKeyhole className="h-4 w-4" />
-					Instalar Candado OTC
+					Instalar Candado Interno
 				</Button>
 			</DialogTrigger>
 
@@ -113,16 +113,16 @@ export default function InstallOtcLockDialog({
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<DialogHeader>
-							<DialogTitle>Instalar Candado de OTC</DialogTitle>
+							<DialogTitle>Instalar Candado Interno</DialogTitle>
 							<DialogDescription>
-								Registre el candado de OTC para el trabajador <strong>{workerName}</strong>
+								Registre el candado interno para el trabajador <strong>{workerName}</strong>
 							</DialogDescription>
 						</DialogHeader>
 
 						<div className="flex flex-col gap-4 py-4">
-							<SelectWithSearchFormField<InstallOtcLockSchema>
-								name="otcOperatorId"
-								label="Operador de OTC"
+							<SelectWithSearchFormField<InstallInternalLockSchema>
+								name="internalOperatorId"
+								label="Operador Interno"
 								control={form.control}
 								options={
 									operators?.operators.map((operator) => ({
@@ -133,9 +133,9 @@ export default function InstallOtcLockDialog({
 								placeholder="Seleccione el operador"
 							/>
 
-							<InputFormField<InstallOtcLockSchema>
-								name="otcLockNumber"
-								label="Número de Candado OTC"
+							<InputFormField<InstallInternalLockSchema>
+								name="internalLockNumber"
+								label="Número de Candado Interno"
 								control={form.control}
 								placeholder="Ingrese el número de candado"
 							/>
@@ -159,7 +159,7 @@ export default function InstallOtcLockDialog({
 							<SubmitButton
 								label="Instalar Candado"
 								isSubmitting={isSubmitting}
-								disabled={isLoading || !otcOperatorId}
+								disabled={isLoading || !internalOperatorId}
 								className="w-fit bg-cyan-500 hover:bg-cyan-600"
 							/>
 						</DialogFooter>

@@ -26,7 +26,7 @@ import {
 interface WorkerFolderProps {
 	userId: string
 	companyId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	startupFolderId: string
 	onSelectWorker?: (workerId: string) => void
@@ -35,7 +35,7 @@ interface WorkerFolderProps {
 export default function BasicFolder({
 	userId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	startupFolderId,
 	onSelectWorker,
@@ -78,7 +78,7 @@ export default function BasicFolder({
 			<BasicFolderDocuments
 				userId={userId}
 				companyId={companyId}
-				isOtcMember={isOtcMember}
+				isInternalMember={isInternalMember}
 				workerId={selectedEntity.id}
 				hasPermission={hasPermission}
 				workerName={selectedEntity.name}
@@ -91,7 +91,7 @@ export default function BasicFolder({
 	return (
 		<div className="space-y-2">
 			<div className="flex w-full items-center justify-end">
-				{!isOtcMember && (
+				{!isInternalMember && (
 					<div className="flex items-center gap-2">
 						<Button variant="outline" onClick={() => setShowLinkDialog(true)} className="gap-2">
 							<FolderIcon className="h-4 w-4" />

@@ -65,7 +65,7 @@ export const getWorkPermitColumns = (hasPermission: boolean): ColumnDef<WorkPerm
 								</Link>
 							</DropdownMenuItem>
 
-							<ViewLockoutPermitsSheet workPermit={row.original} isOtcMember={hasPermission} />
+							<ViewLockoutPermitsSheet workPermit={row.original} isInternalMember={hasPermission} />
 
 							<DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
 								<WorkPermitAttachmentForm workPermitId={row.original.id} />

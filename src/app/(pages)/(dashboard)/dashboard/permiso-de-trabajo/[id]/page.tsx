@@ -71,7 +71,7 @@ export default async function UpdateWorkPermitPage({
 			</div>
 
 			<WorkPermitForm
-				isOtcMember={false}
+				isInternalMember={false}
 				initialValues={workPermit}
 				userName={session.user.name}
 				companyId={workPermit.company.id}

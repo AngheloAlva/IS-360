@@ -58,11 +58,11 @@ export const getWorkBookColumns = ({
 		{
 			accessorKey: "responsible.name",
 			header: ({ column }) => (
-				<DataGridColumnHeader column={column} title="Responsable OTC" visibility />
+				<DataGridColumnHeader column={column} title="Responsable Interno" visibility />
 			),
 			enableSorting: true,
 			meta: {
-				headerTitle: "Responsable OTC",
+				headerTitle: "Responsable Interno",
 			},
 			cell: ({ row }) => {
 				const responsible = row.original.responsible

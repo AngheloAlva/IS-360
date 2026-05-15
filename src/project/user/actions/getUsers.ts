@@ -113,7 +113,7 @@ export const getUserById = async (userId: string) => {
 	}
 }
 
-export const getOtcUsers = async (limit: number, page: number) => {
+export const getInternalUsers = async (limit: number, page: number) => {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -144,7 +144,7 @@ export const getOtcUsers = async (limit: number, page: number) => {
 			data: users,
 		}
 	} catch (error) {
-		console.error("[GET_OTC_USERS]", error)
+		console.error("[GET_INTERNAL_USERS]", error)
 
 		return {
 			ok: false,

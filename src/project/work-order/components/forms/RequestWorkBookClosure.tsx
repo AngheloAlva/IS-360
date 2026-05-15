@@ -37,7 +37,7 @@ export function RequestWorkBookClosure({ isDisabled, workOrderId }: RequestWorkB
 				throw new Error(response.message)
 			}
 
-			toast.success("La solicitud de cierre ha sido enviada al supervisor de OTC")
+			toast.success("La solicitud de cierre ha sido enviada al supervisor interno")
 
 			router.refresh()
 		} catch (error) {
@@ -65,7 +65,7 @@ export function RequestWorkBookClosure({ isDisabled, workOrderId }: RequestWorkB
 				<AlertDialogHeader>
 					<AlertDialogTitle>¿Solicitar cierre del libro de obras?</AlertDialogTitle>
 					<AlertDialogDescription>
-						Esta acción enviará una solicitud al supervisor de OTC para revisar y aprobar el cierre
+						Esta acción enviará una solicitud al supervisor interno para revisar y aprobar el cierre
 						del libro de obras. Una vez aprobado, no se podrán agregar más entradas.
 					</AlertDialogDescription>
 				</AlertDialogHeader>

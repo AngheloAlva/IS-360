@@ -35,7 +35,7 @@ interface GetWorkerLaborControlDocumentColumnsProps {
 			Error
 		>
 	>
-	isOtcMember: boolean
+	isInternalMember: boolean
 	folderStatus: LABOR_CONTROL_STATUS | undefined
 	setSelectedDocumentType: Dispatch<
 		SetStateAction<{
@@ -51,13 +51,13 @@ export const getWorkerLaborControlDocumentColumns = ({
 	userId,
 	refetch,
 	workerId,
-	isOtcMember,
+	isInternalMember,
 	folderStatus,
 	setShowUploadDialog,
 	setSelectedDocument,
 	setSelectedDocumentType,
 }: GetWorkerLaborControlDocumentColumnsProps): ColumnDef<WorkerLaborControlDocument>[] => [
-	...(isOtcMember
+	...(isInternalMember
 		? [
 				{
 					id: "select",
@@ -170,7 +170,7 @@ export const getWorkerLaborControlDocumentColumns = ({
 				<div className="flex items-center gap-1">
 					{doc.url && <DocumentViewButton url={doc.url} />}
 
-					{!isOtcMember &&
+					{!isInternalMember &&
 						folderStatus === "DRAFT" &&
 						doc.status !== "NOT_APPLIED" &&
 						(doc.status === "DRAFT" || doc.status === "REJECTED") && (
@@ -188,7 +188,7 @@ export const getWorkerLaborControlDocumentColumns = ({
 							</Button>
 						)}
 
-					{isOtcMember && workerId && doc.status === "SUBMITTED" && (
+					{isInternalMember && workerId && doc.status === "SUBMITTED" && (
 						<DocumentReviewForm
 							document={doc}
 							userId={userId}

@@ -65,7 +65,7 @@ export const VisitorTalkInviteEmail = ({
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
 								Estimado/a visitante de <strong>{companyName}</strong>, has sido invitado/a a
 								participar en una charla de visitas obligatoria antes de ingresar a las
-								instalaciones de OTC.
+								las instalaciones.
 							</Text>
 
 							<Text className="mb-[24px] text-[16px] leading-[24px] text-gray-600">
@@ -121,7 +121,7 @@ export const VisitorTalkInviteEmail = ({
 								</Text>
 								<Text className="text-[14px] leading-[20px] text-red-700">
 									La visualización completa de esta charla de visitas es{" "}
-									<strong>obligatoria</strong> para poder ingresar a las instalaciones de OTC. Sin
+									<strong>obligatoria</strong> para poder ingresar a las las instalaciones. Sin
 									la certificación de haber completado la charla, no se permitirá el acceso.
 								</Text>
 							</Section>
@@ -130,7 +130,7 @@ export const VisitorTalkInviteEmail = ({
 
 							<Text className="text-[14px] leading-[20px] text-gray-600">
 								Si tienes alguna pregunta o problema técnico para acceder a la charla, por favor
-								contacta al equipo de visitas de OTC o a tu supervisor en {companyName}.
+								contacta al equipo de visitas o a tu supervisor en {companyName}.
 							</Text>
 
 							<Text className="mt-[16px] text-[14px] leading-[20px] text-gray-600">

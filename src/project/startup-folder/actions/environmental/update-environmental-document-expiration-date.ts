@@ -17,7 +17,7 @@ export const updateEnvironmentalDocumentExpirationDate = async ({
 			headers: await headers(),
 		})
 
-		const isOtcMember = session?.user?.accessRole === "ADMIN"
+		const isInternalMember = session?.user?.accessRole === "ADMIN"
 
 		const existingDocument = await prisma.environmentalDocument.findUnique({
 			where: {
@@ -36,7 +36,7 @@ export const updateEnvironmentalDocumentExpirationDate = async ({
 			return { ok: false, message: "Documento no encontrado" }
 		}
 
-		if (existingDocument.folder.status !== "DRAFT" && !isOtcMember) {
+		if (existingDocument.folder.status !== "DRAFT" && !isInternalMember) {
 			return {
 				ok: false,
 				message: "No puedes modificar documentos en esta carpeta porque ya fue aprobada",

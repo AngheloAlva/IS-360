@@ -12,12 +12,12 @@ import { generateSlug } from "@/lib/generateSlug"
 interface LaborControlFoldersByCompanyColumnsProps {
 	companyId: string
 	companySlug?: string
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 }
 
 export const LaborControlFoldersByCompanyColumns: (
 	props: LaborControlFoldersByCompanyColumnsProps
-) => ColumnDef<LaborControlFolderByCompany>[] = ({ companyId, isOtcMember, companySlug }) => [
+) => ColumnDef<LaborControlFolderByCompany>[] = ({ companyId, isInternalMember, companySlug }) => [
 	{
 		id: "name",
 		header: "Nombre ",
@@ -28,7 +28,7 @@ export const LaborControlFoldersByCompanyColumns: (
 			const folderName = format(new Date(createdAt), "MMMM yyyy", { locale: es })
 			const folderSlug = generateSlug(folderName) + "_" + row.original.id
 
-			const href = isOtcMember
+			const href = isInternalMember
 				? `/admin/dashboard/control-laboral/${companyHref}/${folderSlug}`
 				: `/dashboard/control-laboral/${folderSlug}`
 

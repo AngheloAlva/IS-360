@@ -40,7 +40,7 @@ interface GetBasicDocumentColumnsProps {
 	>
 	startupFolderId: string
 	workerId: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 	hasPermission: boolean
 	folderStatus: ReviewStatus | undefined
 	setSelectedDocumentType: Dispatch<
@@ -58,7 +58,7 @@ export const getBasicDocumentColumns = ({
 	refetch,
 	workerId,
 	companyId,
-	isOtcMember,
+	isInternalMember,
 	hasPermission,
 	folderStatus,
 	startupFolderId,
@@ -66,7 +66,7 @@ export const getBasicDocumentColumns = ({
 	setSelectedDocument,
 	setSelectedDocumentType,
 }: GetBasicDocumentColumnsProps): ColumnDef<BasicStartupFolderDocument>[] => [
-	...(isOtcMember
+	...(isInternalMember
 		? [
 				{
 					id: "select",
@@ -204,7 +204,7 @@ export const getBasicDocumentColumns = ({
 				<div className="flex items-center gap-1">
 					{doc.url && <DocumentViewButton url={doc.url} companyId={companyId} />}
 
-					{isOtcMember && hasPermission && doc.status === "NOT_APPLIED" && (
+					{isInternalMember && hasPermission && doc.status === "NOT_APPLIED" && (
 						<UnmarkDocumentAsNotAppliedDialog
 							documentName={doc.name}
 							onUnmarkAsNotApplied={() =>
@@ -222,7 +222,7 @@ export const getBasicDocumentColumns = ({
 						/>
 					)}
 
-					{!isOtcMember &&
+					{!isInternalMember &&
 						doc.type !== "IRL_SAFETY_TALK" &&
 						(folderStatus === "DRAFT" || folderStatus === "EXPIRED") &&
 						doc.status !== "NOT_APPLIED" &&
@@ -263,7 +263,7 @@ export const getBasicDocumentColumns = ({
 							</Button>
 						)}
 
-					{(isOtcMember || folderStatus === "DRAFT") && doc.status !== "NOT_APPLIED" && (
+					{(isInternalMember || folderStatus === "DRAFT") && doc.status !== "NOT_APPLIED" && (
 						<UpdateExpirationDateDocument
 							folderId={doc.folderId}
 							companyId={companyId}
@@ -272,7 +272,7 @@ export const getBasicDocumentColumns = ({
 						/>
 					)}
 
-					{isOtcMember && doc.status === "SUBMITTED" && (
+					{isInternalMember && doc.status === "SUBMITTED" && (
 						<DocumentReviewForm
 							document={doc}
 							refetch={refetch}

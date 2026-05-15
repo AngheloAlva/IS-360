@@ -37,13 +37,13 @@ interface WorkerLaborControlFolderDocumentsProps {
 	userId: string
 	folderId: string
 	workerName: string
-	isOtcMember: boolean
+	isInternalMember: boolean
 }
 
 export function WorkerLaborControlFolderDocuments({
 	userId,
 	folderId,
-	isOtcMember,
+	isInternalMember,
 }: WorkerLaborControlFolderDocumentsProps) {
 	const [rowSelection, setRowSelection] = useState({})
 	const [selectedDocument, setSelectedDocument] = useState<WorkerLaborControlDocument | null>(null)
@@ -62,7 +62,7 @@ export function WorkerLaborControlFolderDocuments({
 		columns: getWorkerLaborControlDocumentColumns({
 			userId,
 			refetch,
-			isOtcMember,
+			isInternalMember,
 			setShowUploadDialog,
 			setSelectedDocument,
 			setSelectedDocumentType,
@@ -97,7 +97,7 @@ export function WorkerLaborControlFolderDocuments({
 				</CardTitle>
 
 				<div className="flex items-center gap-2">
-					{isOtcMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
+					{isInternalMember && table.getFilteredSelectedRowModel().rows.length > 0 && (
 						<>
 							<UndoDocumentReviewDialog
 								userId={userId}
@@ -117,7 +117,7 @@ export function WorkerLaborControlFolderDocuments({
 
 					<DocumentCountProgress progress={progress} />
 
-					{!isOtcMember && data?.folderStatus === "DRAFT" && (
+					{!isInternalMember && data?.folderStatus === "DRAFT" && (
 						<SubmitReviewRequestDialog
 							userId={userId}
 							folderId={folderId}
@@ -174,7 +174,7 @@ export function WorkerLaborControlFolderDocuments({
 						{documentsNotUploaded.length > 0 &&
 							documentsNotUploaded.map((doc) => (
 								<TableRow key={doc.name}>
-									{isOtcMember && <TableCell></TableCell>}
+									{isInternalMember && <TableCell></TableCell>}
 									<TableCell className="font-semibold">
 										<div className="flex flex-col items-start justify-center">
 											<div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export function WorkerLaborControlFolderDocuments({
 										<div className="flex items-center gap-1">
 											{(data?.folderStatus === "DRAFT" || data?.folderStatus === "REJECTED") && (
 												<>
-													{!isOtcMember && (
+													{!isInternalMember && (
 														<Button
 															size={"icon"}
 															variant="ghost"
@@ -220,7 +220,7 @@ export function WorkerLaborControlFolderDocuments({
 														</Button>
 													)}
 
-													{isOtcMember && (
+													{isInternalMember && (
 														<MarkDocumentAsNotAppliedDialog
 															documentName={doc.name}
 															onMarkAsNotApplied={() =>

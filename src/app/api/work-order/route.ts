@@ -40,7 +40,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const requestedSortBy = searchParams.get("sortBy") || searchParams.get("orderBy")
 		const requestedSortOrder = searchParams.get("sortOrder") || searchParams.get("order")
 		const sortOrder: Prisma.SortOrder = requestedSortOrder === "asc" ? "asc" : "desc"
-		const isOtcMember = searchParams.get("isOtcMember") === "true"
+		const isInternalMember = searchParams.get("isInternalMember") === "true"
 		const onlyWithRequestClousure = searchParams.get("onlyWithRequestClousure") === "true"
 		const includeEquipments = searchParams.get("includeEquipments") === "true"
 
@@ -149,9 +149,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 						responsibleId: responsibleId,
 					}
 				: {}),
-			...(isOtcMember
+			...(isInternalMember
 				? {
-						companyId: process.env.NEXT_PUBLIC_OTC_COMPANY_ID!,
+						companyId: process.env.NEXT_PUBLIC_INTERNAL_COMPANY_ID!,
 					}
 				: {}),
 			...(startDate || endDate

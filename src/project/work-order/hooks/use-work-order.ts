@@ -79,7 +79,7 @@ interface WorkOrdersParams {
 	sortBy?: WorkOrderSortBy
 	sortOrder?: WorkOrderSortOrder
 	pageSize?: number
-	isOtcMember?: boolean
+	isInternalMember?: boolean
 	permitFilter?: boolean
 	companyId?: string | null
 	responsibleId?: string | null
@@ -111,7 +111,7 @@ export const fetchWorkOrders: QueryFunction<
 			sortBy: WorkOrderSortBy
 			sortOrder: WorkOrderSortOrder
 			pageSize: number
-			isOtcMember?: boolean
+			isInternalMember?: boolean
 			permitFilter?: boolean
 			companyId: string | null
 			responsibleId: string | null
@@ -139,7 +139,7 @@ export const fetchWorkOrders: QueryFunction<
 			companyId,
 			responsibleId,
 			typeFilter,
-			isOtcMember,
+			isInternalMember,
 			statusFilter,
 			permitFilter,
 			priorityFilter,
@@ -164,7 +164,7 @@ export const fetchWorkOrders: QueryFunction<
 	if (sortOrder) searchParams.set("sortOrder", sortOrder)
 	if (orderBy) searchParams.set("orderBy", orderBy)
 	if (order) searchParams.set("order", order)
-	if (isOtcMember) searchParams.set("isOtcMember", isOtcMember.toString())
+	if (isInternalMember) searchParams.set("isInternalMember", isInternalMember.toString())
 	if (priorityFilter) searchParams.set("priorityFilter", priorityFilter)
 	if (onlyWithRequestClousure) {
 		searchParams.set("onlyWithRequestClousure", onlyWithRequestClousure.toString())
@@ -218,7 +218,7 @@ export const useWorkOrders = ({
 	responsibleId = null,
 	dateRange = null,
 	typeFilter = null,
-	isOtcMember = false,
+	isInternalMember = false,
 	statusFilter = null,
 	permitFilter = false,
 	orderBy = "createdAt",
@@ -246,7 +246,7 @@ export const useWorkOrders = ({
 					companyId,
 					responsibleId,
 					typeFilter,
-					isOtcMember,
+					isInternalMember,
 					statusFilter,
 					permitFilter,
 					priorityFilter,
@@ -266,7 +266,7 @@ export const useWorkOrders = ({
 			companyId,
 			responsibleId,
 			typeFilter,
-			isOtcMember,
+			isInternalMember,
 			statusFilter,
 			permitFilter,
 			priorityFilter,

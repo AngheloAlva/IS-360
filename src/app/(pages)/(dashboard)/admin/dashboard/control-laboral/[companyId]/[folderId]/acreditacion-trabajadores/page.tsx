@@ -37,7 +37,7 @@ export default async function StartupFolderReviewPage({
 			<WorkersAccreditationFolderDocuments
 				companyId={companyId}
 				folderId={asyncParams.folderId}
-				isOtcMember={session.user.accessRole === "ADMIN"}
+				isInternalMember={session.user.accessRole === "ADMIN"}
 			/>
 		</div>
 	)

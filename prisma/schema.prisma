@@ -51,7 +51,7 @@ enum MODULES {
   PROGRAMATION // Programación
   STARTUP_FOLDERS // Carpetas de Arranque
   LABOR_CONTROL_FOLDERS // Control de contratistas
-  VEHICLES // Vehiculos (acceso contratista, no OTC)
+  VEHICLES // Vehiculos (acceso contratista, no interno)
   CONTACT // Contacto y Soporte
   NONE // Sin módulo
 }
@@ -152,7 +152,7 @@ model User {
   lockoutPermitOperator              LockoutPermit[]              @relation("LockoutPermitOperator")
   lockoutPermitRemoveLockout         LockoutPermit[]              @relation("LockoutPermitRemoveLockout")
   lockoutPermitAttachments           LockoutPermitAttachment[]
-  lockoutRegistrationOtcOperator     LockoutRegistration[]        @relation("LockoutRegistrationOtcOperator")
+  lockoutRegistrationInternalOperator LockoutRegistration[]        @relation("LockoutRegistrationInternalOperator")
   lockoutRegistrationContractor      LockoutRegistration[]        @relation("LockoutRegistrationContractor")
   zeroEnergyReviews                  ZeroEnergyReview[]           @relation("ZeroEnergyReviewPerformedBy")
   zeroEnergyReviewReviewer           ZeroEnergyReview[]           @relation("ZeroEnergyReviewReviewer")
@@ -522,7 +522,7 @@ enum WORK_APPLICATION_STATUS {
 
 enum ENTRY_TYPE {
   COMMENT
-  OTC_INSPECTION
+  INTERNAL_INSPECTION
   DAILY_ACTIVITY
   ADDITIONAL_ACTIVITY
 }
@@ -767,13 +767,13 @@ model LockoutRegistration {
   contractorRemoveTime  String?
   contractor            User?     @relation("LockoutRegistrationContractor", fields: [contractorId], references: [id])
 
-  otcOperatorId  String?
-  otcInstallDate DateTime?
-  otcInstallTime String?
-  otcRemoveDate  DateTime?
-  otcRemoveTime  String?
-  otcLockNumber  String?
-  otcOperator    User?     @relation("LockoutRegistrationOtcOperator", fields: [otcOperatorId], references: [id])
+  internalOperatorId  String?
+  internalInstallDate DateTime?
+  internalInstallTime String?
+  internalRemoveDate  DateTime?
+  internalRemoveTime  String?
+  internalLockNumber  String?
+  internalOperator    User?     @relation("LockoutRegistrationInternalOperator", fields: [internalOperatorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1176,7 +1176,7 @@ enum VehicleDocumentType {
   TECHNICAL_REVIEW // Revisión técnica
   INSURANCE // Seguro Obligatorio
   CHECKLIST // Lista de chequeo previa al ingreso
-  TRANSPORTATION_TO_OTC // Vehículo de transporte de trabajadores
+  TRANSPORTATION_TO_INTERNAL // Vehículo de transporte de trabajadores
   HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos peligrosos
   NON_HAZARDOUS_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos No peligrosos
   LIQUID_WASTE_TRANSPORT // Resolución sanitaria para transporte de residuos domésticos líquidos
@@ -1228,7 +1228,7 @@ enum BasicDocumentType {
   CONTRACT // Contrato de trabajo o de prestación de servicios.
   INSURANCE // Certificado de cobertura del seguro contra accidentes laborales.
   PPE_RECEIPT // Registro firmado de entrega de elementos de protección personal
-  SAFETY_AND_HEALTH_INFO // Inducción sobre Información de riesgos laborales (DS44), la cual debe incluir Los riesgos a los que se podría estar expuesto en OTC y las respectivas medidas de control.
+  SAFETY_AND_HEALTH_INFO // Inducción sobre Información de riesgos laborales (DS44), la cual debe incluir Los riesgos a los que se podría estar expuesto en la planta y las respectivas medidas de control.
   IRL_SAFETY_TALK // Charlas de Inducción de Riesgos Laborales
 }
 

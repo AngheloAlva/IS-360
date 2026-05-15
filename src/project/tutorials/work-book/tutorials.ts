@@ -156,7 +156,7 @@ const WORK_BOOK_TUTORIALS: TutorialDefinition[] = [
 	{
 		slug: WORK_BOOK_TUTORIAL_SLUG.RESPOND_INSPECTIONS,
 		title: "Responder Inspecciones de Seguridad",
-		description: "Practica el ciclo contratista/OTC hasta cerrar una inspeccion aprobada.",
+		description: "Practica el ciclo contratista/interno hasta cerrar una inspeccion aprobada.",
 		steps: [
 			{
 				id: "inspection-open-form",
@@ -191,10 +191,10 @@ const WORK_BOOK_TUTORIALS: TutorialDefinition[] = [
 				targetId: "tutorial-inspection-respond",
 			},
 			{
-				id: "inspection-otc-review",
-				title: "Revision OTC",
+				id: "inspection-internal-review",
+				title: "Revision Interna",
 				description:
-					"OTC puede aprobar o rechazar. Si rechaza, el contratista vuelve a responder hasta aprobar.",
+					"El responsable interno puede aprobar o rechazar. Si rechaza, el contratista vuelve a responder hasta aprobar.",
 				targetId: "tutorial-inspection-review",
 			},
 		],
@@ -245,8 +245,8 @@ const WORK_BOOK_TUTORIAL_MOCK_ROWS: WorkBookByCompany[] = [
 		responsible: {
 			id: "mock-responsable-1",
 			name: "Camila Soto",
-			email: "camila.soto@otc.cl",
-			role: "OTC_MEMBER",
+			email: "camila.soto@ingsimple.cl",
+			role: "INTERNAL_MEMBER",
 		},
 		_count: {
 			workBookEntries: 12,
@@ -280,8 +280,8 @@ const WORK_BOOK_TUTORIAL_MOCK_ROWS: WorkBookByCompany[] = [
 		responsible: {
 			id: "mock-responsable-2",
 			name: "Pablo Mella",
-			email: "pablo.mella@otc.cl",
-			role: "OTC_MEMBER",
+			email: "pablo.mella@ingsimple.cl",
+			role: "INTERNAL_MEMBER",
 		},
 		_count: {
 			workBookEntries: 20,
@@ -315,8 +315,8 @@ const WORK_BOOK_TUTORIAL_MOCK_ROWS: WorkBookByCompany[] = [
 		responsible: {
 			id: "mock-responsable-3",
 			name: "Valeria Salas",
-			email: "valeria.salas@otc.cl",
-			role: "OTC_MEMBER",
+			email: "valeria.salas@ingsimple.cl",
+			role: "INTERNAL_MEMBER",
 		},
 		_count: {
 			workBookEntries: 0,

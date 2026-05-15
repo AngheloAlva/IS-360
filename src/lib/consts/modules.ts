@@ -21,7 +21,7 @@ export const ModulesValuesArray = [
 	MODULES.INDICATORS, // Indicadores
 	MODULES.STARTUP_FOLDERS, // Carpetas de Arranque
 	MODULES.LABOR_CONTROL_FOLDERS, // Control de contratistas
-	MODULES.VEHICLES, // Vehiculos (acceso contratista, no OTC)
+	MODULES.VEHICLES, // Vehiculos (acceso contratista, no interno)
 	MODULES.CONTACT, // Contacto y Soporte
 	MODULES.NONE, // Sin módulo
 ] as const

@@ -3,7 +3,7 @@ import { z } from "zod"
 import { fileSchema } from "@/shared/schemas/file.schema"
 import { InspectionType } from "../const/inspection-type"
 
-export const otcInspectionsSchema = z.object({
+export const internalInspectionsSchema = z.object({
 	workOrderId: z.string(),
 	milestoneId: z.string().optional(),
 
@@ -39,4 +39,4 @@ export const otcInspectionsSchema = z.object({
 	// nonConformities: z.string().optional(),
 })
 
-export type OtcInspectionSchema = z.infer<typeof otcInspectionsSchema>
+export type InternalInspectionSchema = z.infer<typeof internalInspectionsSchema>
