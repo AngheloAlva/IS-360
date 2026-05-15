@@ -636,7 +636,7 @@ export async function GET(): Promise<NextResponse> {
 		}
 
 		const emailPromises = []
-		const otcInternalEmail = "katherine.burgos@oleotrasandino.cl"
+		const internalEmail = "demo@ingsimple.cl"
 
 		for (const company of companiesMap.values()) {
 			const companySupervisors = await prisma.user.findMany({
@@ -663,7 +663,7 @@ export async function GET(): Promise<NextResponse> {
 			if (supervisorEmails.length > 0) {
 				emailPromises.push(
 					resend.emails.send({
-						from: "sistema.otc360@otc360.cl",
+						from: "sistema@is360.cl",
 						to: supervisorEmails,
 						subject: `🚨 Alerta: Documentos Vencidos - ${company.companyName}`,
 						react: ExpiredDocumentsEmail({
@@ -679,8 +679,8 @@ export async function GET(): Promise<NextResponse> {
 
 			emailPromises.push(
 				resend.emails.send({
-					from: "sistema.otc360@otc360.cl",
-					to: [otcInternalEmail],
+					from: "sistema@is360.cl",
+					to: [internalEmail],
 					subject: `Documentos Vencidos - ${company.companyName}`,
 					react: ExpiredDocumentsEmail({
 						companyName: company.companyName,

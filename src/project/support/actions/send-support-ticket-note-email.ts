@@ -32,7 +32,7 @@ export async function sendSupportTicketNoteEmail({
 				: `${systemUrl}/dashboard/soporte`
 
 		const { error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to,
 			bcc: ["anghelo.alva@ingsimple.cl"],
 			subject: `Nueva observacion en ticket ${ticketNumber}`,

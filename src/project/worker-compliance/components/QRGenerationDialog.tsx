@@ -200,7 +200,7 @@ export function QRGenerationDialog({
 										dangerouslySetInnerHTML={{ __html: qrSvg }}
 									/>
 									<span className="text-muted-foreground text-xs">
-										Acreditación trabajador — OTC 360
+										Acreditación trabajador — IS 360
 									</span>
 								</div>
 

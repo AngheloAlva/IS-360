@@ -25,7 +25,7 @@ export const sendCloseWorkBookEmail = async ({
 }: SendCloseWorkBookEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [email],
 			subject: `Cierre - Libro de Obras ${workOrderName}`,
 			react: await CloseWorkOrderEmail({

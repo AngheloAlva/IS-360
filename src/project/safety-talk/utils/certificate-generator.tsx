@@ -197,7 +197,7 @@ export function SafetyTalkCertificate({
 					<View style={styles.rightContent}>
 						<View style={styles.header}>
 							<View style={styles.brand}>
-								<Text style={styles.brandLabel}>Oleoducto Trasandino Chile</Text>
+								<Text style={styles.brandLabel}>Industrias Demo</Text>
 								<Text style={styles.title}>CERTIFICADO</Text>
 								<Text style={styles.subtitle}>DE APROBACIÓN</Text>
 							</View>

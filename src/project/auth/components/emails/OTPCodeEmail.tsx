@@ -17,14 +17,14 @@ interface OTPCodeEmailTemplateProps {
 	otp: string
 }
 
-const systemUrl = "https://otc360.cl"
+const systemUrl = "https://is360.cl"
 
 export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ otp }) => (
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>Código de verificación para OTC 360 - OTC</title>
-				<Preview>Su código de verificación para acceder a OTC 360 - OTC es: {otp}</Preview>
+				<title>Código de verificación para IS 360 - OTC</title>
+				<Preview>Su código de verificación para acceder a IS 360 - OTC es: {otp}</Preview>
 			</Head>
 			<Body className="bg-gray-100 py-10 font-sans">
 				<Container className="mx-auto max-w-150 rounded-xl bg-white p-10">
@@ -32,7 +32,7 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 						<Img
 							width="150"
 							height="142"
-							alt="OTC 360 Logo"
+							alt="IS 360 Logo"
 							src={`${systemUrl}/logo.png`}
 							className="mx-auto h-auto w-37.5 object-cover"
 						/>
@@ -47,7 +47,7 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 
 						<Text className="mb-6 text-[16px] text-gray-600">
 							Hemos recibido una solicitud de inicio de sesión en su cuenta de{" "}
-							<strong>OTC 360 - OTC</strong>. Para completar el proceso de verificación, utilice el
+							<strong>IS 360 - OTC</strong>. Para completar el proceso de verificación, utilice el
 							siguiente código:
 						</Text>
 
@@ -75,19 +75,19 @@ export const OTPCodeEmail: React.FC<Readonly<OTPCodeEmailTemplateProps>> = ({ ot
 
 						<Text className="mb-4 text-[16px] text-gray-600">
 							Por razones de seguridad, nunca comparta este código con otras personas, incluyendo
-							personal de OTC 360. Nuestro equipo nunca le solicitará su código de verificación.
+							personal de IS 360. Nuestro equipo nunca le solicitará su código de verificación.
 						</Text>
 
 						<Text className="mb-2 text-[16px] text-gray-600">Saludos cordiales,</Text>
 
-						<Text className="mb-6 text-[16px] font-bold text-gray-700">El equipo de OTC 360</Text>
+						<Text className="mb-6 text-[16px] font-bold text-gray-700">El equipo de IS 360</Text>
 					</Section>
 
 					<Hr className="my-6 border-t border-gray-300" />
 
 					<Section>
 						<Text className="m-0 text-center text-[14px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360. Todos los derechos reservados.
+							© {new Date().getFullYear()} IS 360. Todos los derechos reservados.
 						</Text>
 					</Section>
 				</Container>

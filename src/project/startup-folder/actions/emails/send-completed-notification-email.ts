@@ -25,7 +25,7 @@ export const sendCompletedNotificationEmail = async ({
 }: SendCompletedNotificationEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: emails,
 			subject: `Carpeta de arranque completada - ${folderName}`,
 			react: await CompleteFolderEmail({

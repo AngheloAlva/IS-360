@@ -27,7 +27,7 @@ import {
 import { VisitorTalkMap } from "@/project/safety-talk/components/visitor/VisitorTalkMap"
 
 export const metadata: Metadata = {
-	title: "Charla de Visitas - OTC 360",
+	title: "Charla de Visitas - IS 360",
 	description: "Charla de seguridad para visitantes de la planta OTC",
 }
 

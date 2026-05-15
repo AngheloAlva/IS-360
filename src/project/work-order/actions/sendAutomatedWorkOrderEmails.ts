@@ -49,7 +49,7 @@ export const sendAutomatedWorkOrderEmails = async ({
 
 	try {
 		const responsibleEmailResult = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [workOrder.responsible.email],
 			cc: maintenanceTask.emailsForCopy,
 			subject: `🤖 OT Automática Creada - ${workOrder.otNumber} | ${maintenanceTask.name}`,
@@ -66,7 +66,7 @@ export const sendAutomatedWorkOrderEmails = async ({
 		}
 
 		const supervisorEmailResult = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [workOrder.supervisor.email],
 			subject: `Nueva Orden de Trabajo Asignada - ${workOrder.otNumber}`,
 			react: await NewWorkOrderEmail({
@@ -81,8 +81,8 @@ export const sendAutomatedWorkOrderEmails = async ({
 		}
 
 		const controlRoomEmailResult = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
-			to: ["scontrol.trm@oleotrasandino.cl"],
+			from: "sistema@is360.cl",
+			to: ["demo@ingsimple.cl"],
 			subject: `🎛️ OT Automática Generada - ${workOrder.otNumber} | Sala de Control`,
 			react: await AutomatedWorkOrderControlRoomEmail({
 				workOrder,
@@ -98,7 +98,7 @@ export const sendAutomatedWorkOrderEmails = async ({
 
 		// 4. Notificación privada para ti (usando el email existente en el sistema)
 		await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: ["soporte@ingenieriasimple.cl"],
 			subject: `🤖 [SISTEMA] OT Automática Creada - ${workOrder.otNumber}`,
 			react: await AutomatedWorkOrderResponsibleEmail({

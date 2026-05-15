@@ -30,7 +30,7 @@ export default async function DashboardHomePage() {
 				<div className="absolute inset-0 bg-linear-to-tr from-black/60 to-transparent" />
 
 				<div className="relative z-10 text-start text-white">
-					<h1 className="text-4xl font-bold drop-shadow-2xl">Bienvenido a OTC 360</h1>
+					<h1 className="text-4xl font-bold drop-shadow-2xl">Bienvenido a IS 360</h1>
 					<p className="mt-2 text-lg drop-shadow-2xl">
 						Gestiona y supervisa todos los distintos módulos de tu empresa.
 					</p>

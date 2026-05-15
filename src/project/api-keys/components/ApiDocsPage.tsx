@@ -133,7 +133,7 @@ export function ApiDocsPage() {
 				<div className="rounded-lg border bg-blue-500/10 p-4">
 					<p className="text-sm font-medium">Base URL</p>
 					<code className="mt-1 block text-sm font-mono">
-						{"https://otc360.cl/api/v1"}
+						{"https://is360.cl/api/v1"}
 					</code>
 				</div>
 				<div className="rounded-lg border bg-blue-500/10 p-4">
@@ -169,7 +169,7 @@ export function ApiDocsPage() {
 				</ul>
 				<p className="text-sm font-medium pt-2">Ejemplo con curl</p>
 				<CodeBlock language="bash">
-					{`curl -H "x-api-key: otc_pk_..." https://otc360.cl/api/v1/companies`}
+					{`curl -H "x-api-key: otc_pk_..." https://is360.cl/api/v1/companies`}
 				</CodeBlock>
 			</Section>
 
@@ -389,7 +389,7 @@ export function ApiDocsPage() {
 					<li>
 						<strong className="text-foreground">URL:</strong>{" "}
 						<code className="bg-muted rounded px-1.5 py-0.5 text-xs">
-							https://otc360.cl/api/v1/companies
+							https://is360.cl/api/v1/companies
 						</code>{" "}
 						(o el endpoint deseado)
 					</li>
@@ -416,7 +416,7 @@ export function ApiDocsPage() {
 				<p className="text-sm font-medium pt-4">Ejemplo de funcion M para Power Query (paginacion automatica)</p>
 				<CodeBlock language="Power Query M">
 {`let
-    BaseUrl = "https://otc360.cl/api/v1/work-orders",
+    BaseUrl = "https://is360.cl/api/v1/work-orders",
     ApiKey = "otc_pk_...",
     GetPage = (cursor as nullable text) =>
         let

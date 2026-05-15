@@ -12,10 +12,10 @@ interface SendNewUserEmailProps {
 export const sendNewUserEmail = async ({ email, name, password }: SendNewUserEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [email],
-			bcc: ["sistema.otc360@otc360.cl", "soporte@ingenieriasimple.cl"],
-			subject: `Bienvenido a OTC 360`,
+			bcc: ["sistema@is360.cl", "soporte@ingenieriasimple.cl"],
+			subject: `Bienvenido a IS 360`,
 			react: await NewUserEmail({
 				name,
 				email,

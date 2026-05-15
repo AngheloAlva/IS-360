@@ -14,9 +14,9 @@ interface SendOtpEmailProps {
 export const sendOtpEmail = async ({ email, otp }: SendOtpEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [email],
-			subject: `Código de verificación para OTC 360`,
+			subject: `Código de verificación para IS 360`,
 			react: await OTPCodeEmail({
 				otp,
 			}),

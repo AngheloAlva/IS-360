@@ -188,7 +188,7 @@ export default function EvaluationPage() {
 				<div className="mb-8 flex">
 					<div className="flex-1 text-center">
 						<h1 className="mb-2 text-3xl font-bold">{getCategoryName(category)}</h1>
-						<p className="text-muted-foreground">Evaluación de Seguridad - Oleoducto Trasandino</p>
+						<p className="text-muted-foreground">Evaluación de Seguridad - Industrias Demo</p>
 					</div>
 				</div>
 

@@ -74,7 +74,7 @@ export const NewSupportTicketEmail = ({
 					</Section>
 
 					<Hr className="my-4 border-slate-200" />
-					<Text className="m-0 text-xs text-slate-500">OTC 360 - notificacion automatica</Text>
+					<Text className="m-0 text-xs text-slate-500">IS 360 - notificacion automatica</Text>
 				</Container>
 			</Body>
 		</Tailwind>

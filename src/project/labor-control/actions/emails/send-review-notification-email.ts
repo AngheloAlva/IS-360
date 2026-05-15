@@ -32,7 +32,7 @@ export const sendReviewNotificationEmail = async ({
 }: SendReviewNotificationEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: emails,
 			subject: `Revisión Control Laboral - ${folderName}`,
 			react: await ReviewEmail({

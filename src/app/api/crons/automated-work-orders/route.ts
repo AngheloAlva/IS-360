@@ -296,8 +296,8 @@ export async function GET(request: NextRequest) {
 
 		// Send email notification with detailed results
 		await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
-			to: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
+			to: "sistema@is360.cl",
 			subject: `Proceso de automatización completado - ${createdWorkOrders.length} OT creadas${blockedTasks.length > 0 ? `, ${blockedTasks.length} bloqueadas` : ""}`,
 			text: `Proceso de automatización completado. ${createdWorkOrders.length} órdenes de trabajo creadas, ${skippedTasks.length} omitidas, ${blockedTasks.length} bloqueadas, ${errors.length} errores.`,
 			html: `

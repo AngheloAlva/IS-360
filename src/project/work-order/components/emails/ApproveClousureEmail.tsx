@@ -42,8 +42,8 @@ export const ApproveClousureEmail: React.FC<Readonly<ApproveClosureEmailTemplate
 			<Head>
 				<title>
 					{autoClosed
-						? `Libro de Obras ${workOrderName} cerrado automáticamente - OTC 360`
-						: "Cierre de Libro de Obras Aprobado - OTC 360"}
+						? `Libro de Obras ${workOrderName} cerrado automáticamente - IS 360`
+						: "Cierre de Libro de Obras Aprobado - IS 360"}
 				</title>
 				<Preview>
 					{autoClosed
@@ -56,8 +56,8 @@ export const ApproveClousureEmail: React.FC<Readonly<ApproveClosureEmailTemplate
 					{/* Header with Logo */}
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							src="https://otc360.cl/logo.png"
-							alt="OTC 360 Logo"
+							src="https://is360.cl/logo.png"
+							alt="IS 360 Logo"
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
 					</Section>
@@ -200,7 +200,7 @@ export const ApproveClousureEmail: React.FC<Readonly<ApproveClosureEmailTemplate
 					{/* Footer */}
 					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360
+							© {new Date().getFullYear()} IS 360
 						</Text>
 						<Text className="m-0 text-center text-[12px] text-gray-500">
 							Notificación Automática del Sistema - No Responder

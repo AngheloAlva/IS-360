@@ -27,7 +27,7 @@ export const sendApproveClosureEmail = async ({
 }: SendApproveClosureEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [email],
 			subject: autoClosed
 				? `Libro de Obras ${workOrderName} cerrado automáticamente`

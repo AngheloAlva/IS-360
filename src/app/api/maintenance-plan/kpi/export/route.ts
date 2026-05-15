@@ -520,7 +520,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 		// ─── Build workbook ───────────────────────────────────────────────────
 		const wb = new ExcelJS.Workbook()
-		wb.creator = "OTC"
+		wb.creator = "IS 360"
 		wb.created = new Date()
 
 		const headerFill = "FF4F46E5" // indigo-600

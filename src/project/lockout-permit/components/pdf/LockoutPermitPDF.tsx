@@ -342,7 +342,7 @@ export default function LockoutPermitPDF({ data }: LockoutPermitPDFProps) {
 			<Page size="LETTER" style={styles.page}>
 				<View style={styles.header}>
 					<View style={{ flexDirection: "row", alignItems: "center" }}>
-						<Image style={styles.logo} src="https://otc360.cl/logo.png" />
+						<Image style={styles.logo} src="https://is360.cl/logo.png" />
 						<Text style={styles.headerTitle}>PERMISO DE BLOQUEO</Text>
 					</View>
 					<View>

@@ -65,7 +65,7 @@ export async function generateCertificate(userSafetyTalkId: string) {
 				category: userSafetyTalk.category,
 				expiresAt: userSafetyTalk.expiresAt || new Date(),
 				completedAt: userSafetyTalk.completedAt || new Date(),
-				companyName: userSafetyTalk.user.company?.name || "Oleoducto Trasandino Chile",
+				companyName: userSafetyTalk.user.company?.name || "Industrias Demo",
 			})
 		)
 

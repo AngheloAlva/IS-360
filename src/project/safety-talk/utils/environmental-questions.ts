@@ -17,17 +17,17 @@ export interface Question {
 export const environmentalQuestions: Question[] = [
 	{
 		id: 1,
-		text: "Cuando se realiza una actividad en Oleoducto Trasandino que genera residuos, ya sean peligrosos o no peligrosos, cómo debería proceder:",
+		text: "Cuando se realiza una actividad en Industrias Demo que genera residuos, ya sean peligrosos o no peligrosos, cómo debería proceder:",
 		type: "single",
 		options: [
 			{ id: "a", text: "Empacarlos correctamente y disponerlos fuera de la planta." },
 			{
 				id: "b",
-				text: "Disponerlo en las Bodegas/Tolvas correspondiente dentro de las Instalaciones de Oleoducto Trasandino.",
+				text: "Disponerlo en las Bodegas/Tolvas correspondiente dentro de las Instalaciones de Industrias Demo.",
 			},
 			{
 				id: "c",
-				text: "Informar al Inspector de Medio Ambiente tipo y cantidad de residuos generados, posteriormente, disponerlo en las Bodegas/Tolvas correspondiente dentro de las Instalaciones de Oleoducto Trasandino.",
+				text: "Informar al Inspector de Medio Ambiente tipo y cantidad de residuos generados, posteriormente, disponerlo en las Bodegas/Tolvas correspondiente dentro de las Instalaciones de Industrias Demo.",
 			},
 		],
 		correctAnswer: "c",
@@ -51,7 +51,7 @@ export const environmentalQuestions: Question[] = [
 	},
 	{
 		id: 3,
-		text: "En Oleoducto Trasandino, cuenta con un punto limpio, en donde se reciclan:",
+		text: "En Industrias Demo, cuenta con un punto limpio, en donde se reciclan:",
 		type: "single",
 		options: [
 			{ id: "a", text: "Cartones-Botellas Plásticas-Botellas de Vidrios-Latas de Aluminio" },

@@ -38,15 +38,9 @@ export async function sendNewWorkRequestEmail({
 		const subject = `Nueva Solicitud de Trabajo ${isUrgent ? "URGENTE" : ""} #${requestNumber}`
 
 		await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
-			to: [
-				"gsereno@oleotrasandino.cl",
-				"katherine.burgos@oleotrasandino.cl",
-				"jaime.chavez@oleotrasandino.cl",
-				"gonzalo.orellana@oleotrasandino.cl",
-				"jculloa@oleotrasandino.cl",
-			],
-			bcc: ["sistema.otc360@otc360.cl", "soporte@ingenieriasimple.cl"],
+			from: "sistema@is360.cl",
+			to: ["demo@ingsimple.cl"],
+			bcc: ["sistema@is360.cl", "soporte@ingenieriasimple.cl"],
 			subject,
 			react: NewWorkRequestEmail({
 				baseUrl,

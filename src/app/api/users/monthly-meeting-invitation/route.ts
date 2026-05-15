@@ -8,7 +8,7 @@ import { resend } from "@/lib/resend"
 
 import { MonthlyMeetingInvitationEmail } from "@/project/user/components/emails/MonthlyMeetingInvitationEmail"
 
-const DEFAULT_SUBJECT = "Invitacion a Reunion Mensual - OTC 360"
+const DEFAULT_SUBJECT = "Invitacion a Reunion Mensual - IS 360"
 const DEFAULT_MEETING_URL =
 	"https://teams.microsoft.com/l/meetup-join/19%3ameeting_YWQxZWZiOTItNDU0MC00OTM1LTgxMTAtYjc5NGUxN2Y0ZTlm%40thread.v2/0?context=%7b%22Tid%22%3a%22532d15da-4091-4505-979f-314786a64481%22%2c%22Oid%22%3a%224f601088-f31a-43f9-af0a-1ed43a45da19%22%7d"
 
@@ -109,7 +109,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 		for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
 			const { error } = await resend.batch.send(
 				recipients.map((recipient, index) => ({
-					from: "sistema.otc360@otc360.cl",
+					from: "sistema@is360.cl",
 					to: [recipient.email],
 					bcc: chunkIndex === 0 && index === 0 ? ["soporte@ingenieriasimple.cl"] : undefined,
 					subject,

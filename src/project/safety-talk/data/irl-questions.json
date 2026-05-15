@@ -27,7 +27,7 @@
   },
   {
     "id": 4,
-    "pregunta": "¿Con qué documentos la empresa colaboradora debe ingresar a realizar sus trabajos al interior de Oleoducto Trasandino?\nA) Contar con orden de trabajo.\nB) Tener toda la documentación de la empresa y los trabajadores en el portal OTC 360.\nC) Realizar permiso de trabajo seguro.\nD) Contar con charla IRL de OTC.",
+    "pregunta": "¿Con qué documentos la empresa colaboradora debe ingresar a realizar sus trabajos al interior de Industrias Demo?\nA) Contar con orden de trabajo.\nB) Tener toda la documentación de la empresa y los trabajadores en el portal IS 360.\nC) Realizar permiso de trabajo seguro.\nD) Contar con charla IRL de OTC.",
     "opciones": ["A) Solo C", "B) a, b y c", "C) a y d", "D) Todas."],
     "correcta": "D) Todas."
   },

@@ -77,7 +77,7 @@ export default function CreateWorkOrderFormContent({
 
 	const { data: equipmentsData } = useEquipments({ limit: 1000, order: "asc", orderBy: "name" })
 	const { data: companiesData } = useCompanies({ limit: 1000, orderBy: "name", order: "desc" })
-	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "oleotrasandino" })
+	const { data: responsibleUsersData } = useUsers({ limit: 1000, search: "demo" })
 
 	useEffect(() => {
 		if (!initialData?.companyId || !companiesData?.companies) return

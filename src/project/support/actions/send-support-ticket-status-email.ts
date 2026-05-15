@@ -30,7 +30,7 @@ export async function sendSupportTicketStatusEmail({
 				: `${systemUrl}/dashboard/soporte`
 
 		const { error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [email],
 			bcc: ["anghelo.alva@ingsimple.cl"],
 			subject: `Actualizacion ticket ${ticketNumber}`,

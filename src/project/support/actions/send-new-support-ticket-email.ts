@@ -18,7 +18,7 @@ interface SendNewSupportTicketEmailProps {
 export async function sendNewSupportTicketEmail(payload: SendNewSupportTicketEmailProps) {
 	try {
 		const { error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: ["anghelo.alva@ingsimple.cl", "soporte@ingenieriasimple.cl"],
 			subject: `Nuevo ticket de soporte ${payload.ticketNumber}`,
 			react: await NewSupportTicketEmail(payload),

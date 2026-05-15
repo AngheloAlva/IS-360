@@ -196,7 +196,7 @@ export const sendInspectionCommentNotification = async ({
 				: `${systemUrl}/dashboard/libro-de-obras/${workOrderData.id}`
 
 			return resend.emails.send({
-				from: "sistema.otc360@otc360.cl",
+				from: "sistema@is360.cl",
 				to: recipient.email,
 				bcc: i === 0 ? "soporte@ingenieriasimple.cl" : [],
 				subject,

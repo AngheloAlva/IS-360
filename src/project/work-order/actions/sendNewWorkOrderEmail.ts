@@ -28,8 +28,8 @@ interface SendNewWorkOrderEmailProps {
 export const sendNewWorkOrderEmail = async ({ workOrder }: SendNewWorkOrderEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
-			to: [workOrder.supervisor.email, "scontrol.trm@oleotrasandino.cl"],
+			from: "sistema@is360.cl",
+			to: [workOrder.supervisor.email, "demo@ingsimple.cl"],
 			bcc: ["soporte@ingenieriasimple.cl"],
 			subject: `Nueva Orden de Trabajo Asignada - ${workOrder.otNumber}`,
 			react: await NewWorkOrderEmail({

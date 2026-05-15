@@ -194,7 +194,7 @@ export default function ExternalEvaluationPage() {
 			<div className="mx-auto max-w-4xl">
 				<div className="mb-8 text-center">
 					<h1 className="mb-2 text-3xl font-bold">{getCategoryName(invitation.category)}</h1>
-					<p className="text-muted-foreground">Evaluación de Seguridad - Oleoducto Trasandino</p>
+					<p className="text-muted-foreground">Evaluación de Seguridad - Industrias Demo</p>
 				</div>
 
 				{step === "data-form" && (

@@ -23,15 +23,15 @@ export const MonthlyMeetingInvitationEmail = ({
 	<Html>
 		<Tailwind>
 			<Head>
-				<title>Invitacion a Reunion Mensual - OTC 360</title>
-				<Preview>Invitacion a reunion mensual de seguimiento en OTC 360</Preview>
+				<title>Invitacion a Reunion Mensual - IS 360</title>
+				<Preview>Invitacion a reunion mensual de seguimiento en IS 360</Preview>
 			</Head>
 
 			<Body className="bg-gray-100 py-[40px] font-sans">
 				<Container className="mx-auto max-w-[600px] rounded-[8px] bg-white shadow-lg">
 					<Section className="rounded-t-[8px] px-[40px] py-[32px] text-center">
 						<Img
-							alt="OTC 360 Logo"
+							alt="IS 360 Logo"
 							src={`${systemUrl}/logo.png`}
 							className="mx-auto h-auto w-full max-w-[200px] object-cover"
 						/>
@@ -134,7 +134,7 @@ export const MonthlyMeetingInvitationEmail = ({
 							<Text className="mb-[6px] text-[14px] font-semibold text-yellow-800">Nota</Text>
 							<Text className="m-0 text-[14px] leading-[20px] text-yellow-800">
 								Considere esta invitación solo si su empresa mantiene trabajos vigentes con
-								Oleoducto Trasandino Chile.
+								Industrias Demo.
 							</Text>
 						</Section>
 
@@ -158,7 +158,7 @@ export const MonthlyMeetingInvitationEmail = ({
 
 					<Section className="rounded-b-[8px] bg-gray-50 px-[40px] py-[24px]">
 						<Text className="m-0 mb-[8px] text-center text-[12px] text-gray-500">
-							© {new Date().getFullYear()} OTC 360
+							© {new Date().getFullYear()} IS 360
 						</Text>
 						<Text className="m-0 text-center text-[12px] text-gray-500">
 							Notificacion automatica del sistema

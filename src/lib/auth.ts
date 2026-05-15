@@ -36,9 +36,9 @@ export const auth = betterAuth({
 		enabled: true,
 		sendResetPassword: async ({ user, url }) => {
 			await resend.emails.send({
-				from: "sistema.otc360@otc360.cl",
+				from: "sistema@is360.cl",
 				to: [user.email],
-				subject: `Restablecimiento de contraseña para OTC 360`,
+				subject: `Restablecimiento de contraseña para IS 360`,
 				text: `Ingresa al siguiente link para restablecer tu contraseña: ${url}`,
 			})
 		},
@@ -274,9 +274,9 @@ export const auth = betterAuth({
 			otpOptions: {
 				async sendOTP({ user, otp }) {
 					await resend.emails.send({
-						from: "sistema.otc360@otc360.cl",
+						from: "sistema@is360.cl",
 						to: [user.email],
-						subject: `Código de verificación para OTC 360`,
+						subject: `Código de verificación para IS 360`,
 						react: await OTPCodeEmail({
 							otp,
 						}),

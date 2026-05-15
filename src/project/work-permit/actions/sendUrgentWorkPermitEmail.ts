@@ -30,9 +30,9 @@ export const sendUrgentWorkPermitEmail = async (props: SendUrgentWorkPermitEmail
 		}
 
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			// to: gerencyEmails,
-			to: "sistema.otc360@otc360.cl",
+			to: "sistema@is360.cl",
 			subject: `🚨 URGENTE: Nuevo Permiso de Trabajo`,
 			react: await UrgentWorkPermitEmail(props),
 		})

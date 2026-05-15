@@ -16,7 +16,7 @@
   },
   {
     "id": 4,
-    "pregunta": "Los E.P.P básicos para ingresar a Oleoducto Trasandino son: botín de seguridad, casco de seguridad, lentes, mini escape y monogas H2S.",
+    "pregunta": "Los E.P.P básicos para ingresar a Industrias Demo son: botín de seguridad, casco de seguridad, lentes, mini escape y monogas H2S.",
     "correcta": "false"
   },
   {
@@ -26,7 +26,7 @@
   },
   {
     "id": 6,
-    "pregunta": "Se puede fumar al interior de la planta Oleoducto Trasandino.",
+    "pregunta": "Se puede fumar al interior de la planta Industrias Demo.",
     "correcta": "false"
   },
   {
@@ -36,7 +36,7 @@
   },
   {
     "id": 8,
-    "pregunta": "Para estacionarse al interior de Oleoducto Trasandino, se debe realizar de la siguiente forma: estacionarse aculatado, dejar las llaves puestas en la chapa y dejar los seguros de las puertas arriba.",
+    "pregunta": "Para estacionarse al interior de Industrias Demo, se debe realizar de la siguiente forma: estacionarse aculatado, dejar las llaves puestas en la chapa y dejar los seguros de las puertas arriba.",
     "correcta": "true"
   },
   {
@@ -46,7 +46,7 @@
   },
   {
     "id": 10,
-    "pregunta": "Algunos de los riesgos que se podrían presentar en Oleoducto Trasandino son: incendio, caída de altura, derrames, atmósferas peligrosas y partículas en suspensión.",
+    "pregunta": "Algunos de los riesgos que se podrían presentar en Industrias Demo son: incendio, caída de altura, derrames, atmósferas peligrosas y partículas en suspensión.",
     "correcta": "true"
   },
   {
@@ -56,7 +56,7 @@
   },
   {
     "id": 12,
-    "pregunta": "Ante una alarma de emergencia al interior de Oleoducto Trasandino se debe detener la actividad que se está realizando y dirigirse al punto de encuentro más cercano.",
+    "pregunta": "Ante una alarma de emergencia al interior de Industrias Demo se debe detener la actividad que se está realizando y dirigirse al punto de encuentro más cercano.",
     "correcta": "true"
   },
   {

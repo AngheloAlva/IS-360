@@ -18,9 +18,9 @@ export const sendVisitorTalkInviteEmail = async ({
 }: SendVisitorTalkInviteEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [visitorEmail],
-			bcc: ["sistema.otc360@otc360.cl", "soporte@ingenieriasimple.cl"],
+			bcc: ["sistema@is360.cl", "soporte@ingenieriasimple.cl"],
 			subject: `Invitación a Charla de Visitas - ${companyName}`,
 			react: await VisitorTalkInviteEmail({
 				companyName,

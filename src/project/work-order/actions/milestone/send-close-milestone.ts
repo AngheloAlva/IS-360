@@ -29,7 +29,7 @@ export const sendRequestCloseMilestoneEmail = async ({
 }: SendRequestCloseMilestoneEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [responsibleEmail],
 			subject: `Solicitud de cierre de hito ${milestone.workOrder.otNumber}`,
 			react: await RequestCloseMilestoneEmail({
@@ -70,7 +70,7 @@ export const sendApproveMilestoneEmail = async ({
 }: SendApproveMilestoneEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [supervisorEmail],
 			subject: `Hito ${otNumber} aprobado`,
 			react: await ApproveMilestoneEmail({
@@ -114,7 +114,7 @@ export const sendRejectMilestoneEmail = async ({
 }: SendRejectMilestoneEmailProps) => {
 	try {
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: [supervisorEmail],
 			subject: `Hito ${otNumber} rechazado`,
 			react: await RejectMilestoneEmail({

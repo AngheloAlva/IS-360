@@ -25,13 +25,10 @@ export const sendRequestReviewEmail = async ({
 	solicitationDate,
 }: SendRequestReviewEmailProps) => {
 	try {
-		const emailNotification = [
-			"cristian.pavez@oleotrasandino.cl",
-			"katherine.burgos@oleotrasandino.cl",
-		]
+		const emailNotification = ["demo@ingsimple.cl"]
 
 		const { data, error } = await resend.emails.send({
-			from: "sistema.otc360@otc360.cl",
+			from: "sistema@is360.cl",
 			to: emailNotification,
 			bcc: ["soporte@ingenieriasimple.cl"],
 			subject: `Solicitud de Revisión Control Laboral - ${folderName} - ${companyName}`,

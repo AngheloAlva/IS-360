@@ -59,7 +59,7 @@ export function getInspectionDisplayStatus(
 export const INSPECTION_STATUS_LABELS: Record<InspectionDisplayStatus, string> = {
 	REPORTED: "Reportada",
 	ANSWERED_BY_CONTRACTOR: "Contestada por Contratista",
-	ANSWERED_BY_OTC: "Contestada por OTC",
+	ANSWERED_BY_OTC: "Contestada por Responsable",
 	RESOLVED: "Resuelta",
 }
 

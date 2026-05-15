@@ -110,7 +110,7 @@ export default async function AccreditationPage({
 					</div>
 				)}
 
-				<p className="text-[11px] text-gray-400">OTC 360 © {new Date().getFullYear()}</p>
+				<p className="text-[11px] text-gray-400">IS 360 © {new Date().getFullYear()}</p>
 			</div>
 		</div>
 	)

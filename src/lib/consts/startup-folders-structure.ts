@@ -29,7 +29,7 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 		{
 			type: SafetyAndHealthDocumentType.COMPANY_INFO,
 			name: "Ficha empresa",
-			description: "Información de la empresa, responsables y contactos ante OTC.",
+			description: "Información de la empresa, responsables y contactos ante la planta.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.STAFF_LIST,
@@ -55,22 +55,22 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 		{
 			type: SafetyAndHealthDocumentType.RISK_MATRIX,
 			name: "Matriz de identificación y evaluación de riesgos",
-			description: "Identificación y evaluación de riesgos relacionados a las tareas en OTC.",
+			description: "Identificación y evaluación de riesgos relacionados a las tareas en la planta.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.PREVENTION_PLAN,
 			name: "Plan de Prevención de Riesgos",
-			description: "Plan preventivo basado en la MIPER, específico para OTC.",
+			description: "Plan preventivo basado en la MIPER, específico para la planta.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.WORK_PROCEDURE,
 			name: "Procedimientos de trabajo",
-			description: "Procedimientos firmados, vigentes, aplicables a los trabajos en OTC.",
+			description: "Procedimientos firmados, vigentes, aplicables a los trabajos en la planta.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.EMERGENCY_PROCEDURE,
 			name: "Procedimiento de emergencia",
-			description: "Acciones ante incidentes o accidentes en instalaciones de OTC.",
+			description: "Acciones ante incidentes o accidentes en instalaciones de la planta.",
 		},
 		{
 			type: SafetyAndHealthDocumentType.TOOLS_MAINTENANCE,
@@ -100,17 +100,17 @@ export const SAFETY_AND_HEALTH_STRUCTURE: StartupFolderStructure = {
 export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 	title: "Medio Ambiente",
 	category: DocumentCategory.ENVIRONMENTAL,
-	description: "Documentación ambiental obligatoria según normativa OTC.",
+	description: "Documentación ambiental obligatoria según normativa interna.",
 	documents: [
 		{
 			type: EnvironmentalDocType.ENVIRONMENTAL_PLAN,
 			name: "Plan de Gestión Ambiental",
-			description: "Plan de gestión ambiental para trabajos en OTC.",
+			description: "Plan de gestión ambiental para trabajos en la planta.",
 		},
 		{
 			type: EnvironmentalDocType.SPILL_PREVENTION,
 			name: "Procedimiento de prevención y control de derrames",
-			description: "Prevención y control de derrames según actividades en OTC.",
+			description: "Prevención y control de derrames según actividades en la planta.",
 		},
 		{
 			type: EnvironmentalDocType.WASTE_MANAGEMENT,
@@ -127,7 +127,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 			type: EnvironmentalDocType.ENVIRONMENTAL_MATRIX,
 			name: "Matriz de aspectos e impactos ambientales",
 			description:
-				"Matriz de identificación y evaluación de aspectos e impactos ambientales, en formato OTC.",
+				"Matriz de identificación y evaluación de aspectos e impactos ambientales, en formato estándar.",
 		},
 		{
 			type: EnvironmentalDocType.RECT_CERTIFICATE,
@@ -138,7 +138,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 			type: EnvironmentalDocType.WATER_CERTIFICATE,
 			name: "Certificado de compra de agua potable",
 			description:
-				"Certificado (guía o factura) de compra de agua potable, en caso de instalar faenas al interior de OTC.",
+				"Certificado (guía o factura) de compra de agua potable, en caso de instalar faenas al interior de la planta.",
 		},
 		{
 			type: EnvironmentalDocType.WATER_FACTORY_RESOLUTION,
@@ -154,7 +154,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 			type: EnvironmentalDocType.CHEMICAL_TOILET_CONTRACT,
 			name: "Contrato servicio baños químicos",
 			description:
-				"Contrato entre empresa prestadora de servicio de limpieza de baños químicos. en caso de instalar faenas al interior de OTC.",
+				"Contrato entre empresa prestadora de servicio de limpieza de baños químicos. en caso de instalar faenas al interior de la planta.",
 		},
 		{
 			type: EnvironmentalDocType.SAFETY_DATA_SHEET,
@@ -171,7 +171,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 		{
 			type: EnvironmentalDocType.ELECTRICAL_DECLARATION,
 			name: "TE1 - Declaración instalación eléctrica provisoria",
-			description: "Declaración TE1 para faenas dentro o fuera de OTC.",
+			description: "Declaración TE1 para faenas dentro o fuera de la planta.",
 		},
 		{
 			type: EnvironmentalDocType.GAS_DECLARATION,
@@ -245,7 +245,7 @@ export const ENVIRONMENTAL_STRUCTURE: StartupFolderStructure = {
 export const ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
 	title: "Medio Ambiente",
 	category: DocumentCategory.ENVIRONMENT,
-	description: "Documentación medio ambiental obligatoria según normativa OTC.",
+	description: "Documentación medio ambiental obligatoria según normativa interna.",
 	documents: [
 		{
 			type: EnvironmentDocType.WORK_PROCEDURE,
@@ -299,7 +299,7 @@ export const ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
 export const EXTENDED_ENVIRONMENT_STRUCTURE: StartupFolderStructure = {
 	title: "Medio Ambiente",
 	category: DocumentCategory.ENVIRONMENT,
-	description: "Documentación medio ambiental obligatoria según normativa OTC.",
+	description: "Documentación medio ambiental obligatoria según normativa interna.",
 	documents: [
 		...ENVIRONMENT_STRUCTURE.documents,
 		{

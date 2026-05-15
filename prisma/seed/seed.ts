@@ -102,8 +102,8 @@ async function seed() {
 	// ── 2. Admin user via Better Auth ──
 	const bootstrapUser = await auth.api.signUpEmail({
 		body: {
-			name: "Admin OTC",
-			email: "admin@otc360.cl",
+			name: "Admin Demo",
+			email: "admin@is360.cl",
 			password: "admin1234",
 			rut: "11.111.111-1",
 			accessRole: "ADMIN",
@@ -123,7 +123,7 @@ async function seed() {
 	})
 
 	const adminUser = { user: { id: bootstrapUser.user.id } }
-	console.log("  ✅ Admin user created (admin@otc360.cl / admin1234)")
+	console.log("  ✅ Admin user created (admin@is360.cl / admin1234)")
 
 	// ── 3. Company ──
 	const company = await prisma.company.create({
@@ -165,7 +165,7 @@ async function seed() {
 	const otcChile = await prisma.location.upsert({
 		where: { id: "seed-otc-chile" },
 		update: {},
-		create: { id: "seed-otc-chile", name: "OTC Chile", parentId: null, path: "OTC Chile" },
+		create: { id: "seed-otc-chile", name: "Planta Principal", parentId: null, path: "Planta Principal" },
 	})
 
 	const sectorNorte = await prisma.location.upsert({
@@ -175,7 +175,7 @@ async function seed() {
 			id: "seed-sector-norte-km42",
 			name: "Sector Norte KM 42",
 			parentId: otcChile.id,
-			path: "OTC Chile / Sector Norte KM 42",
+			path: "Planta Principal / Sector Norte KM 42",
 		},
 	})
 
@@ -427,7 +427,7 @@ async function seed() {
 
 	console.log("\n🎉 Seed completed successfully!")
 	console.log("\n📋 Login credentials:")
-	console.log("   Admin:      admin@otc360.cl / admin1234")
+	console.log("   Admin:      admin@is360.cl / admin1234")
 	console.log("   Supervisor:  supervisor@demo.cl / supervisor1234")
 }
 
