@@ -45,12 +45,12 @@ export type LockoutRegistrationMinAggregateOutputType = {
   contractorInstallTime: string | null
   contractorRemoveDate: Date | null
   contractorRemoveTime: string | null
-  otcOperatorId: string | null
-  otcInstallDate: Date | null
-  otcInstallTime: string | null
-  otcRemoveDate: Date | null
-  otcRemoveTime: string | null
-  otcLockNumber: string | null
+  internalOperatorId: string | null
+  internalInstallDate: Date | null
+  internalInstallTime: string | null
+  internalRemoveDate: Date | null
+  internalRemoveTime: string | null
+  internalLockNumber: string | null
   createdAt: Date | null
   updatedAt: Date | null
   lockoutPermitId: string | null
@@ -67,12 +67,12 @@ export type LockoutRegistrationMaxAggregateOutputType = {
   contractorInstallTime: string | null
   contractorRemoveDate: Date | null
   contractorRemoveTime: string | null
-  otcOperatorId: string | null
-  otcInstallDate: Date | null
-  otcInstallTime: string | null
-  otcRemoveDate: Date | null
-  otcRemoveTime: string | null
-  otcLockNumber: string | null
+  internalOperatorId: string | null
+  internalInstallDate: Date | null
+  internalInstallTime: string | null
+  internalRemoveDate: Date | null
+  internalRemoveTime: string | null
+  internalLockNumber: string | null
   createdAt: Date | null
   updatedAt: Date | null
   lockoutPermitId: string | null
@@ -89,12 +89,12 @@ export type LockoutRegistrationCountAggregateOutputType = {
   contractorInstallTime: number
   contractorRemoveDate: number
   contractorRemoveTime: number
-  otcOperatorId: number
-  otcInstallDate: number
-  otcInstallTime: number
-  otcRemoveDate: number
-  otcRemoveTime: number
-  otcLockNumber: number
+  internalOperatorId: number
+  internalInstallDate: number
+  internalInstallTime: number
+  internalRemoveDate: number
+  internalRemoveTime: number
+  internalLockNumber: number
   createdAt: number
   updatedAt: number
   lockoutPermitId: number
@@ -121,12 +121,12 @@ export type LockoutRegistrationMinAggregateInputType = {
   contractorInstallTime?: true
   contractorRemoveDate?: true
   contractorRemoveTime?: true
-  otcOperatorId?: true
-  otcInstallDate?: true
-  otcInstallTime?: true
-  otcRemoveDate?: true
-  otcRemoveTime?: true
-  otcLockNumber?: true
+  internalOperatorId?: true
+  internalInstallDate?: true
+  internalInstallTime?: true
+  internalRemoveDate?: true
+  internalRemoveTime?: true
+  internalLockNumber?: true
   createdAt?: true
   updatedAt?: true
   lockoutPermitId?: true
@@ -143,12 +143,12 @@ export type LockoutRegistrationMaxAggregateInputType = {
   contractorInstallTime?: true
   contractorRemoveDate?: true
   contractorRemoveTime?: true
-  otcOperatorId?: true
-  otcInstallDate?: true
-  otcInstallTime?: true
-  otcRemoveDate?: true
-  otcRemoveTime?: true
-  otcLockNumber?: true
+  internalOperatorId?: true
+  internalInstallDate?: true
+  internalInstallTime?: true
+  internalRemoveDate?: true
+  internalRemoveTime?: true
+  internalLockNumber?: true
   createdAt?: true
   updatedAt?: true
   lockoutPermitId?: true
@@ -165,12 +165,12 @@ export type LockoutRegistrationCountAggregateInputType = {
   contractorInstallTime?: true
   contractorRemoveDate?: true
   contractorRemoveTime?: true
-  otcOperatorId?: true
-  otcInstallDate?: true
-  otcInstallTime?: true
-  otcRemoveDate?: true
-  otcRemoveTime?: true
-  otcLockNumber?: true
+  internalOperatorId?: true
+  internalInstallDate?: true
+  internalInstallTime?: true
+  internalRemoveDate?: true
+  internalRemoveTime?: true
+  internalLockNumber?: true
   createdAt?: true
   updatedAt?: true
   lockoutPermitId?: true
@@ -274,12 +274,12 @@ export type LockoutRegistrationGroupByOutputType = {
   contractorInstallTime: string | null
   contractorRemoveDate: Date | null
   contractorRemoveTime: string | null
-  otcOperatorId: string | null
-  otcInstallDate: Date | null
-  otcInstallTime: string | null
-  otcRemoveDate: Date | null
-  otcRemoveTime: string | null
-  otcLockNumber: string | null
+  internalOperatorId: string | null
+  internalInstallDate: Date | null
+  internalInstallTime: string | null
+  internalRemoveDate: Date | null
+  internalRemoveTime: string | null
+  internalLockNumber: string | null
   createdAt: Date
   updatedAt: Date
   lockoutPermitId: string
@@ -319,17 +319,17 @@ export type LockoutRegistrationWhereInput = {
   contractorInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
   contractorRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
   contractorRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcOperatorId?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcInstallDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
-  otcInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
-  otcRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcLockNumber?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalOperatorId?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalInstallDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
+  internalInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
+  internalRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalLockNumber?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LockoutRegistration"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LockoutRegistration"> | Date | string
   lockoutPermitId?: Prisma.StringFilter<"LockoutRegistration"> | string
   contractor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  otcOperator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  internalOperator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   lockoutPermit?: Prisma.XOR<Prisma.LockoutPermitScalarRelationFilter, Prisma.LockoutPermitWhereInput>
 }
 
@@ -344,17 +344,17 @@ export type LockoutRegistrationOrderByWithRelationInput = {
   contractorInstallTime?: Prisma.SortOrderInput | Prisma.SortOrder
   contractorRemoveDate?: Prisma.SortOrderInput | Prisma.SortOrder
   contractorRemoveTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcOperatorId?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcInstallDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcInstallTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcRemoveDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcRemoveTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcLockNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalOperatorId?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalInstallDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalInstallTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalRemoveDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalRemoveTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalLockNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lockoutPermitId?: Prisma.SortOrder
   contractor?: Prisma.UserOrderByWithRelationInput
-  otcOperator?: Prisma.UserOrderByWithRelationInput
+  internalOperator?: Prisma.UserOrderByWithRelationInput
   lockoutPermit?: Prisma.LockoutPermitOrderByWithRelationInput
 }
 
@@ -372,17 +372,17 @@ export type LockoutRegistrationWhereUniqueInput = Prisma.AtLeast<{
   contractorInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
   contractorRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
   contractorRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcOperatorId?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcInstallDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
-  otcInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
-  otcRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcLockNumber?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalOperatorId?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalInstallDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
+  internalInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
+  internalRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalLockNumber?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LockoutRegistration"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LockoutRegistration"> | Date | string
   lockoutPermitId?: Prisma.StringFilter<"LockoutRegistration"> | string
   contractor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
-  otcOperator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  internalOperator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   lockoutPermit?: Prisma.XOR<Prisma.LockoutPermitScalarRelationFilter, Prisma.LockoutPermitWhereInput>
 }, "id">
 
@@ -397,12 +397,12 @@ export type LockoutRegistrationOrderByWithAggregationInput = {
   contractorInstallTime?: Prisma.SortOrderInput | Prisma.SortOrder
   contractorRemoveDate?: Prisma.SortOrderInput | Prisma.SortOrder
   contractorRemoveTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcOperatorId?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcInstallDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcInstallTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcRemoveDate?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcRemoveTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  otcLockNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalOperatorId?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalInstallDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalInstallTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalRemoveDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalRemoveTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  internalLockNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lockoutPermitId?: Prisma.SortOrder
@@ -427,12 +427,12 @@ export type LockoutRegistrationScalarWhereWithAggregatesInput = {
   contractorInstallTime?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
   contractorRemoveDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LockoutRegistration"> | Date | string | null
   contractorRemoveTime?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
-  otcOperatorId?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
-  otcInstallDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LockoutRegistration"> | Date | string | null
-  otcInstallTime?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
-  otcRemoveDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LockoutRegistration"> | Date | string | null
-  otcRemoveTime?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
-  otcLockNumber?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
+  internalOperatorId?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
+  internalInstallDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LockoutRegistration"> | Date | string | null
+  internalInstallTime?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
+  internalRemoveDate?: Prisma.DateTimeNullableWithAggregatesFilter<"LockoutRegistration"> | Date | string | null
+  internalRemoveTime?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
+  internalLockNumber?: Prisma.StringNullableWithAggregatesFilter<"LockoutRegistration"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LockoutRegistration"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"LockoutRegistration"> | Date | string
   lockoutPermitId?: Prisma.StringWithAggregatesFilter<"LockoutRegistration"> | string
@@ -448,15 +448,15 @@ export type LockoutRegistrationCreateInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   contractor?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationContractorInput
-  otcOperator?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationOtcOperatorInput
+  internalOperator?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationInternalOperatorInput
   lockoutPermit: Prisma.LockoutPermitCreateNestedOneWithoutLockoutRegistrationsInput
 }
 
@@ -471,12 +471,12 @@ export type LockoutRegistrationUncheckedCreateInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcOperatorId?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalOperatorId?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lockoutPermitId: string
@@ -492,15 +492,15 @@ export type LockoutRegistrationUpdateInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   contractor?: Prisma.UserUpdateOneWithoutLockoutRegistrationContractorNestedInput
-  otcOperator?: Prisma.UserUpdateOneWithoutLockoutRegistrationOtcOperatorNestedInput
+  internalOperator?: Prisma.UserUpdateOneWithoutLockoutRegistrationInternalOperatorNestedInput
   lockoutPermit?: Prisma.LockoutPermitUpdateOneRequiredWithoutLockoutRegistrationsNestedInput
 }
 
@@ -515,12 +515,12 @@ export type LockoutRegistrationUncheckedUpdateInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lockoutPermitId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -537,12 +537,12 @@ export type LockoutRegistrationCreateManyInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcOperatorId?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalOperatorId?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lockoutPermitId: string
@@ -558,11 +558,11 @@ export type LockoutRegistrationUpdateManyMutationInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -578,12 +578,12 @@ export type LockoutRegistrationUncheckedUpdateManyInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lockoutPermitId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -610,12 +610,12 @@ export type LockoutRegistrationCountOrderByAggregateInput = {
   contractorInstallTime?: Prisma.SortOrder
   contractorRemoveDate?: Prisma.SortOrder
   contractorRemoveTime?: Prisma.SortOrder
-  otcOperatorId?: Prisma.SortOrder
-  otcInstallDate?: Prisma.SortOrder
-  otcInstallTime?: Prisma.SortOrder
-  otcRemoveDate?: Prisma.SortOrder
-  otcRemoveTime?: Prisma.SortOrder
-  otcLockNumber?: Prisma.SortOrder
+  internalOperatorId?: Prisma.SortOrder
+  internalInstallDate?: Prisma.SortOrder
+  internalInstallTime?: Prisma.SortOrder
+  internalRemoveDate?: Prisma.SortOrder
+  internalRemoveTime?: Prisma.SortOrder
+  internalLockNumber?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lockoutPermitId?: Prisma.SortOrder
@@ -636,12 +636,12 @@ export type LockoutRegistrationMaxOrderByAggregateInput = {
   contractorInstallTime?: Prisma.SortOrder
   contractorRemoveDate?: Prisma.SortOrder
   contractorRemoveTime?: Prisma.SortOrder
-  otcOperatorId?: Prisma.SortOrder
-  otcInstallDate?: Prisma.SortOrder
-  otcInstallTime?: Prisma.SortOrder
-  otcRemoveDate?: Prisma.SortOrder
-  otcRemoveTime?: Prisma.SortOrder
-  otcLockNumber?: Prisma.SortOrder
+  internalOperatorId?: Prisma.SortOrder
+  internalInstallDate?: Prisma.SortOrder
+  internalInstallTime?: Prisma.SortOrder
+  internalRemoveDate?: Prisma.SortOrder
+  internalRemoveTime?: Prisma.SortOrder
+  internalLockNumber?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lockoutPermitId?: Prisma.SortOrder
@@ -658,12 +658,12 @@ export type LockoutRegistrationMinOrderByAggregateInput = {
   contractorInstallTime?: Prisma.SortOrder
   contractorRemoveDate?: Prisma.SortOrder
   contractorRemoveTime?: Prisma.SortOrder
-  otcOperatorId?: Prisma.SortOrder
-  otcInstallDate?: Prisma.SortOrder
-  otcInstallTime?: Prisma.SortOrder
-  otcRemoveDate?: Prisma.SortOrder
-  otcRemoveTime?: Prisma.SortOrder
-  otcLockNumber?: Prisma.SortOrder
+  internalOperatorId?: Prisma.SortOrder
+  internalInstallDate?: Prisma.SortOrder
+  internalInstallTime?: Prisma.SortOrder
+  internalRemoveDate?: Prisma.SortOrder
+  internalRemoveTime?: Prisma.SortOrder
+  internalLockNumber?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lockoutPermitId?: Prisma.SortOrder
@@ -673,10 +673,10 @@ export type LockoutRegistrationSumOrderByAggregateInput = {
   order?: Prisma.SortOrder
 }
 
-export type LockoutRegistrationCreateNestedManyWithoutOtcOperatorInput = {
-  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput> | Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput[]
-  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput[]
-  createMany?: Prisma.LockoutRegistrationCreateManyOtcOperatorInputEnvelope
+export type LockoutRegistrationCreateNestedManyWithoutInternalOperatorInput = {
+  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput> | Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput[]
+  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput[]
+  createMany?: Prisma.LockoutRegistrationCreateManyInternalOperatorInputEnvelope
   connect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
 }
 
@@ -687,10 +687,10 @@ export type LockoutRegistrationCreateNestedManyWithoutContractorInput = {
   connect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
 }
 
-export type LockoutRegistrationUncheckedCreateNestedManyWithoutOtcOperatorInput = {
-  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput> | Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput[]
-  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput[]
-  createMany?: Prisma.LockoutRegistrationCreateManyOtcOperatorInputEnvelope
+export type LockoutRegistrationUncheckedCreateNestedManyWithoutInternalOperatorInput = {
+  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput> | Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput[]
+  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput[]
+  createMany?: Prisma.LockoutRegistrationCreateManyInternalOperatorInputEnvelope
   connect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
 }
 
@@ -701,17 +701,17 @@ export type LockoutRegistrationUncheckedCreateNestedManyWithoutContractorInput =
   connect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
 }
 
-export type LockoutRegistrationUpdateManyWithoutOtcOperatorNestedInput = {
-  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput> | Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput[]
-  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput[]
-  upsert?: Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutOtcOperatorInput | Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutOtcOperatorInput[]
-  createMany?: Prisma.LockoutRegistrationCreateManyOtcOperatorInputEnvelope
+export type LockoutRegistrationUpdateManyWithoutInternalOperatorNestedInput = {
+  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput> | Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput[]
+  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput[]
+  upsert?: Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutInternalOperatorInput | Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutInternalOperatorInput[]
+  createMany?: Prisma.LockoutRegistrationCreateManyInternalOperatorInputEnvelope
   set?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
   disconnect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
   delete?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
   connect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
-  update?: Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutOtcOperatorInput | Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutOtcOperatorInput[]
-  updateMany?: Prisma.LockoutRegistrationUpdateManyWithWhereWithoutOtcOperatorInput | Prisma.LockoutRegistrationUpdateManyWithWhereWithoutOtcOperatorInput[]
+  update?: Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutInternalOperatorInput | Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutInternalOperatorInput[]
+  updateMany?: Prisma.LockoutRegistrationUpdateManyWithWhereWithoutInternalOperatorInput | Prisma.LockoutRegistrationUpdateManyWithWhereWithoutInternalOperatorInput[]
   deleteMany?: Prisma.LockoutRegistrationScalarWhereInput | Prisma.LockoutRegistrationScalarWhereInput[]
 }
 
@@ -729,17 +729,17 @@ export type LockoutRegistrationUpdateManyWithoutContractorNestedInput = {
   deleteMany?: Prisma.LockoutRegistrationScalarWhereInput | Prisma.LockoutRegistrationScalarWhereInput[]
 }
 
-export type LockoutRegistrationUncheckedUpdateManyWithoutOtcOperatorNestedInput = {
-  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput> | Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput[]
-  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput[]
-  upsert?: Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutOtcOperatorInput | Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutOtcOperatorInput[]
-  createMany?: Prisma.LockoutRegistrationCreateManyOtcOperatorInputEnvelope
+export type LockoutRegistrationUncheckedUpdateManyWithoutInternalOperatorNestedInput = {
+  create?: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput> | Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput[] | Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput[]
+  connectOrCreate?: Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput | Prisma.LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput[]
+  upsert?: Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutInternalOperatorInput | Prisma.LockoutRegistrationUpsertWithWhereUniqueWithoutInternalOperatorInput[]
+  createMany?: Prisma.LockoutRegistrationCreateManyInternalOperatorInputEnvelope
   set?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
   disconnect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
   delete?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
   connect?: Prisma.LockoutRegistrationWhereUniqueInput | Prisma.LockoutRegistrationWhereUniqueInput[]
-  update?: Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutOtcOperatorInput | Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutOtcOperatorInput[]
-  updateMany?: Prisma.LockoutRegistrationUpdateManyWithWhereWithoutOtcOperatorInput | Prisma.LockoutRegistrationUpdateManyWithWhereWithoutOtcOperatorInput[]
+  update?: Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutInternalOperatorInput | Prisma.LockoutRegistrationUpdateWithWhereUniqueWithoutInternalOperatorInput[]
+  updateMany?: Prisma.LockoutRegistrationUpdateManyWithWhereWithoutInternalOperatorInput | Prisma.LockoutRegistrationUpdateManyWithWhereWithoutInternalOperatorInput[]
   deleteMany?: Prisma.LockoutRegistrationScalarWhereInput | Prisma.LockoutRegistrationScalarWhereInput[]
 }
 
@@ -799,7 +799,7 @@ export type LockoutRegistrationUncheckedUpdateManyWithoutLockoutPermitNestedInpu
   deleteMany?: Prisma.LockoutRegistrationScalarWhereInput | Prisma.LockoutRegistrationScalarWhereInput[]
 }
 
-export type LockoutRegistrationCreateWithoutOtcOperatorInput = {
+export type LockoutRegistrationCreateWithoutInternalOperatorInput = {
   id?: string
   order: number
   name: string
@@ -809,18 +809,18 @@ export type LockoutRegistrationCreateWithoutOtcOperatorInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   contractor?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationContractorInput
   lockoutPermit: Prisma.LockoutPermitCreateNestedOneWithoutLockoutRegistrationsInput
 }
 
-export type LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput = {
+export type LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput = {
   id?: string
   order: number
   name: string
@@ -831,23 +831,23 @@ export type LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lockoutPermitId: string
 }
 
-export type LockoutRegistrationCreateOrConnectWithoutOtcOperatorInput = {
+export type LockoutRegistrationCreateOrConnectWithoutInternalOperatorInput = {
   where: Prisma.LockoutRegistrationWhereUniqueInput
-  create: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput>
+  create: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput>
 }
 
-export type LockoutRegistrationCreateManyOtcOperatorInputEnvelope = {
-  data: Prisma.LockoutRegistrationCreateManyOtcOperatorInput | Prisma.LockoutRegistrationCreateManyOtcOperatorInput[]
+export type LockoutRegistrationCreateManyInternalOperatorInputEnvelope = {
+  data: Prisma.LockoutRegistrationCreateManyInternalOperatorInput | Prisma.LockoutRegistrationCreateManyInternalOperatorInput[]
   skipDuplicates?: boolean
 }
 
@@ -861,14 +861,14 @@ export type LockoutRegistrationCreateWithoutContractorInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  otcOperator?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationOtcOperatorInput
+  internalOperator?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationInternalOperatorInput
   lockoutPermit: Prisma.LockoutPermitCreateNestedOneWithoutLockoutRegistrationsInput
 }
 
@@ -882,12 +882,12 @@ export type LockoutRegistrationUncheckedCreateWithoutContractorInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcOperatorId?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalOperatorId?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lockoutPermitId: string
@@ -903,20 +903,20 @@ export type LockoutRegistrationCreateManyContractorInputEnvelope = {
   skipDuplicates?: boolean
 }
 
-export type LockoutRegistrationUpsertWithWhereUniqueWithoutOtcOperatorInput = {
+export type LockoutRegistrationUpsertWithWhereUniqueWithoutInternalOperatorInput = {
   where: Prisma.LockoutRegistrationWhereUniqueInput
-  update: Prisma.XOR<Prisma.LockoutRegistrationUpdateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedUpdateWithoutOtcOperatorInput>
-  create: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutOtcOperatorInput>
+  update: Prisma.XOR<Prisma.LockoutRegistrationUpdateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedUpdateWithoutInternalOperatorInput>
+  create: Prisma.XOR<Prisma.LockoutRegistrationCreateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedCreateWithoutInternalOperatorInput>
 }
 
-export type LockoutRegistrationUpdateWithWhereUniqueWithoutOtcOperatorInput = {
+export type LockoutRegistrationUpdateWithWhereUniqueWithoutInternalOperatorInput = {
   where: Prisma.LockoutRegistrationWhereUniqueInput
-  data: Prisma.XOR<Prisma.LockoutRegistrationUpdateWithoutOtcOperatorInput, Prisma.LockoutRegistrationUncheckedUpdateWithoutOtcOperatorInput>
+  data: Prisma.XOR<Prisma.LockoutRegistrationUpdateWithoutInternalOperatorInput, Prisma.LockoutRegistrationUncheckedUpdateWithoutInternalOperatorInput>
 }
 
-export type LockoutRegistrationUpdateManyWithWhereWithoutOtcOperatorInput = {
+export type LockoutRegistrationUpdateManyWithWhereWithoutInternalOperatorInput = {
   where: Prisma.LockoutRegistrationScalarWhereInput
-  data: Prisma.XOR<Prisma.LockoutRegistrationUpdateManyMutationInput, Prisma.LockoutRegistrationUncheckedUpdateManyWithoutOtcOperatorInput>
+  data: Prisma.XOR<Prisma.LockoutRegistrationUpdateManyMutationInput, Prisma.LockoutRegistrationUncheckedUpdateManyWithoutInternalOperatorInput>
 }
 
 export type LockoutRegistrationScalarWhereInput = {
@@ -933,12 +933,12 @@ export type LockoutRegistrationScalarWhereInput = {
   contractorInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
   contractorRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
   contractorRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcOperatorId?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcInstallDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
-  otcInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
-  otcRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
-  otcLockNumber?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalOperatorId?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalInstallDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
+  internalInstallTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalRemoveDate?: Prisma.DateTimeNullableFilter<"LockoutRegistration"> | Date | string | null
+  internalRemoveTime?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
+  internalLockNumber?: Prisma.StringNullableFilter<"LockoutRegistration"> | string | null
   createdAt?: Prisma.DateTimeFilter<"LockoutRegistration"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"LockoutRegistration"> | Date | string
   lockoutPermitId?: Prisma.StringFilter<"LockoutRegistration"> | string
@@ -970,15 +970,15 @@ export type LockoutRegistrationCreateWithoutLockoutPermitInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   contractor?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationContractorInput
-  otcOperator?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationOtcOperatorInput
+  internalOperator?: Prisma.UserCreateNestedOneWithoutLockoutRegistrationInternalOperatorInput
 }
 
 export type LockoutRegistrationUncheckedCreateWithoutLockoutPermitInput = {
@@ -992,12 +992,12 @@ export type LockoutRegistrationUncheckedCreateWithoutLockoutPermitInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcOperatorId?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalOperatorId?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1028,7 +1028,7 @@ export type LockoutRegistrationUpdateManyWithWhereWithoutLockoutPermitInput = {
   data: Prisma.XOR<Prisma.LockoutRegistrationUpdateManyMutationInput, Prisma.LockoutRegistrationUncheckedUpdateManyWithoutLockoutPermitInput>
 }
 
-export type LockoutRegistrationCreateManyOtcOperatorInput = {
+export type LockoutRegistrationCreateManyInternalOperatorInput = {
   id?: string
   order: number
   name: string
@@ -1039,11 +1039,11 @@ export type LockoutRegistrationCreateManyOtcOperatorInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lockoutPermitId: string
@@ -1059,18 +1059,18 @@ export type LockoutRegistrationCreateManyContractorInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcOperatorId?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalOperatorId?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lockoutPermitId: string
 }
 
-export type LockoutRegistrationUpdateWithoutOtcOperatorInput = {
+export type LockoutRegistrationUpdateWithoutInternalOperatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1080,18 +1080,18 @@ export type LockoutRegistrationUpdateWithoutOtcOperatorInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   contractor?: Prisma.UserUpdateOneWithoutLockoutRegistrationContractorNestedInput
   lockoutPermit?: Prisma.LockoutPermitUpdateOneRequiredWithoutLockoutRegistrationsNestedInput
 }
 
-export type LockoutRegistrationUncheckedUpdateWithoutOtcOperatorInput = {
+export type LockoutRegistrationUncheckedUpdateWithoutInternalOperatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1102,17 +1102,17 @@ export type LockoutRegistrationUncheckedUpdateWithoutOtcOperatorInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lockoutPermitId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type LockoutRegistrationUncheckedUpdateManyWithoutOtcOperatorInput = {
+export type LockoutRegistrationUncheckedUpdateManyWithoutInternalOperatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1123,11 +1123,11 @@ export type LockoutRegistrationUncheckedUpdateManyWithoutOtcOperatorInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lockoutPermitId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1143,14 +1143,14 @@ export type LockoutRegistrationUpdateWithoutContractorInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  otcOperator?: Prisma.UserUpdateOneWithoutLockoutRegistrationOtcOperatorNestedInput
+  internalOperator?: Prisma.UserUpdateOneWithoutLockoutRegistrationInternalOperatorNestedInput
   lockoutPermit?: Prisma.LockoutPermitUpdateOneRequiredWithoutLockoutRegistrationsNestedInput
 }
 
@@ -1164,12 +1164,12 @@ export type LockoutRegistrationUncheckedUpdateWithoutContractorInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lockoutPermitId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1185,12 +1185,12 @@ export type LockoutRegistrationUncheckedUpdateManyWithoutContractorInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lockoutPermitId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1207,12 +1207,12 @@ export type LockoutRegistrationCreateManyLockoutPermitInput = {
   contractorInstallTime?: string | null
   contractorRemoveDate?: Date | string | null
   contractorRemoveTime?: string | null
-  otcOperatorId?: string | null
-  otcInstallDate?: Date | string | null
-  otcInstallTime?: string | null
-  otcRemoveDate?: Date | string | null
-  otcRemoveTime?: string | null
-  otcLockNumber?: string | null
+  internalOperatorId?: string | null
+  internalInstallDate?: Date | string | null
+  internalInstallTime?: string | null
+  internalRemoveDate?: Date | string | null
+  internalRemoveTime?: string | null
+  internalLockNumber?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1227,15 +1227,15 @@ export type LockoutRegistrationUpdateWithoutLockoutPermitInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   contractor?: Prisma.UserUpdateOneWithoutLockoutRegistrationContractorNestedInput
-  otcOperator?: Prisma.UserUpdateOneWithoutLockoutRegistrationOtcOperatorNestedInput
+  internalOperator?: Prisma.UserUpdateOneWithoutLockoutRegistrationInternalOperatorNestedInput
 }
 
 export type LockoutRegistrationUncheckedUpdateWithoutLockoutPermitInput = {
@@ -1249,12 +1249,12 @@ export type LockoutRegistrationUncheckedUpdateWithoutLockoutPermitInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1270,12 +1270,12 @@ export type LockoutRegistrationUncheckedUpdateManyWithoutLockoutPermitInput = {
   contractorInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractorRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractorRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  otcRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  otcLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalOperatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalInstallDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalInstallTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalRemoveDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  internalRemoveTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  internalLockNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1293,17 +1293,17 @@ export type LockoutRegistrationSelect<ExtArgs extends runtime.Types.Extensions.I
   contractorInstallTime?: boolean
   contractorRemoveDate?: boolean
   contractorRemoveTime?: boolean
-  otcOperatorId?: boolean
-  otcInstallDate?: boolean
-  otcInstallTime?: boolean
-  otcRemoveDate?: boolean
-  otcRemoveTime?: boolean
-  otcLockNumber?: boolean
+  internalOperatorId?: boolean
+  internalInstallDate?: boolean
+  internalInstallTime?: boolean
+  internalRemoveDate?: boolean
+  internalRemoveTime?: boolean
+  internalLockNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lockoutPermitId?: boolean
   contractor?: boolean | Prisma.LockoutRegistration$contractorArgs<ExtArgs>
-  otcOperator?: boolean | Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>
+  internalOperator?: boolean | Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>
   lockoutPermit?: boolean | Prisma.LockoutPermitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lockoutRegistration"]>
 
@@ -1318,17 +1318,17 @@ export type LockoutRegistrationSelectCreateManyAndReturn<ExtArgs extends runtime
   contractorInstallTime?: boolean
   contractorRemoveDate?: boolean
   contractorRemoveTime?: boolean
-  otcOperatorId?: boolean
-  otcInstallDate?: boolean
-  otcInstallTime?: boolean
-  otcRemoveDate?: boolean
-  otcRemoveTime?: boolean
-  otcLockNumber?: boolean
+  internalOperatorId?: boolean
+  internalInstallDate?: boolean
+  internalInstallTime?: boolean
+  internalRemoveDate?: boolean
+  internalRemoveTime?: boolean
+  internalLockNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lockoutPermitId?: boolean
   contractor?: boolean | Prisma.LockoutRegistration$contractorArgs<ExtArgs>
-  otcOperator?: boolean | Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>
+  internalOperator?: boolean | Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>
   lockoutPermit?: boolean | Prisma.LockoutPermitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lockoutRegistration"]>
 
@@ -1343,17 +1343,17 @@ export type LockoutRegistrationSelectUpdateManyAndReturn<ExtArgs extends runtime
   contractorInstallTime?: boolean
   contractorRemoveDate?: boolean
   contractorRemoveTime?: boolean
-  otcOperatorId?: boolean
-  otcInstallDate?: boolean
-  otcInstallTime?: boolean
-  otcRemoveDate?: boolean
-  otcRemoveTime?: boolean
-  otcLockNumber?: boolean
+  internalOperatorId?: boolean
+  internalInstallDate?: boolean
+  internalInstallTime?: boolean
+  internalRemoveDate?: boolean
+  internalRemoveTime?: boolean
+  internalLockNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lockoutPermitId?: boolean
   contractor?: boolean | Prisma.LockoutRegistration$contractorArgs<ExtArgs>
-  otcOperator?: boolean | Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>
+  internalOperator?: boolean | Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>
   lockoutPermit?: boolean | Prisma.LockoutPermitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["lockoutRegistration"]>
 
@@ -1368,31 +1368,31 @@ export type LockoutRegistrationSelectScalar = {
   contractorInstallTime?: boolean
   contractorRemoveDate?: boolean
   contractorRemoveTime?: boolean
-  otcOperatorId?: boolean
-  otcInstallDate?: boolean
-  otcInstallTime?: boolean
-  otcRemoveDate?: boolean
-  otcRemoveTime?: boolean
-  otcLockNumber?: boolean
+  internalOperatorId?: boolean
+  internalInstallDate?: boolean
+  internalInstallTime?: boolean
+  internalRemoveDate?: boolean
+  internalRemoveTime?: boolean
+  internalLockNumber?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lockoutPermitId?: boolean
 }
 
-export type LockoutRegistrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order" | "name" | "rut" | "contractorId" | "contractorLockNumber" | "contractorInstallDate" | "contractorInstallTime" | "contractorRemoveDate" | "contractorRemoveTime" | "otcOperatorId" | "otcInstallDate" | "otcInstallTime" | "otcRemoveDate" | "otcRemoveTime" | "otcLockNumber" | "createdAt" | "updatedAt" | "lockoutPermitId", ExtArgs["result"]["lockoutRegistration"]>
+export type LockoutRegistrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order" | "name" | "rut" | "contractorId" | "contractorLockNumber" | "contractorInstallDate" | "contractorInstallTime" | "contractorRemoveDate" | "contractorRemoveTime" | "internalOperatorId" | "internalInstallDate" | "internalInstallTime" | "internalRemoveDate" | "internalRemoveTime" | "internalLockNumber" | "createdAt" | "updatedAt" | "lockoutPermitId", ExtArgs["result"]["lockoutRegistration"]>
 export type LockoutRegistrationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contractor?: boolean | Prisma.LockoutRegistration$contractorArgs<ExtArgs>
-  otcOperator?: boolean | Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>
+  internalOperator?: boolean | Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>
   lockoutPermit?: boolean | Prisma.LockoutPermitDefaultArgs<ExtArgs>
 }
 export type LockoutRegistrationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contractor?: boolean | Prisma.LockoutRegistration$contractorArgs<ExtArgs>
-  otcOperator?: boolean | Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>
+  internalOperator?: boolean | Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>
   lockoutPermit?: boolean | Prisma.LockoutPermitDefaultArgs<ExtArgs>
 }
 export type LockoutRegistrationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   contractor?: boolean | Prisma.LockoutRegistration$contractorArgs<ExtArgs>
-  otcOperator?: boolean | Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>
+  internalOperator?: boolean | Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>
   lockoutPermit?: boolean | Prisma.LockoutPermitDefaultArgs<ExtArgs>
 }
 
@@ -1400,7 +1400,7 @@ export type $LockoutRegistrationPayload<ExtArgs extends runtime.Types.Extensions
   name: "LockoutRegistration"
   objects: {
     contractor: Prisma.$UserPayload<ExtArgs> | null
-    otcOperator: Prisma.$UserPayload<ExtArgs> | null
+    internalOperator: Prisma.$UserPayload<ExtArgs> | null
     lockoutPermit: Prisma.$LockoutPermitPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1414,12 +1414,12 @@ export type $LockoutRegistrationPayload<ExtArgs extends runtime.Types.Extensions
     contractorInstallTime: string | null
     contractorRemoveDate: Date | null
     contractorRemoveTime: string | null
-    otcOperatorId: string | null
-    otcInstallDate: Date | null
-    otcInstallTime: string | null
-    otcRemoveDate: Date | null
-    otcRemoveTime: string | null
-    otcLockNumber: string | null
+    internalOperatorId: string | null
+    internalInstallDate: Date | null
+    internalInstallTime: string | null
+    internalRemoveDate: Date | null
+    internalRemoveTime: string | null
+    internalLockNumber: string | null
     createdAt: Date
     updatedAt: Date
     lockoutPermitId: string
@@ -1818,7 +1818,7 @@ readonly fields: LockoutRegistrationFieldRefs;
 export interface Prisma__LockoutRegistrationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   contractor<T extends Prisma.LockoutRegistration$contractorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LockoutRegistration$contractorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  otcOperator<T extends Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LockoutRegistration$otcOperatorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  internalOperator<T extends Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LockoutRegistration$internalOperatorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   lockoutPermit<T extends Prisma.LockoutPermitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LockoutPermitDefaultArgs<ExtArgs>>): Prisma.Prisma__LockoutPermitClient<runtime.Types.Result.GetResult<Prisma.$LockoutPermitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1859,12 +1859,12 @@ export interface LockoutRegistrationFieldRefs {
   readonly contractorInstallTime: Prisma.FieldRef<"LockoutRegistration", 'String'>
   readonly contractorRemoveDate: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
   readonly contractorRemoveTime: Prisma.FieldRef<"LockoutRegistration", 'String'>
-  readonly otcOperatorId: Prisma.FieldRef<"LockoutRegistration", 'String'>
-  readonly otcInstallDate: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
-  readonly otcInstallTime: Prisma.FieldRef<"LockoutRegistration", 'String'>
-  readonly otcRemoveDate: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
-  readonly otcRemoveTime: Prisma.FieldRef<"LockoutRegistration", 'String'>
-  readonly otcLockNumber: Prisma.FieldRef<"LockoutRegistration", 'String'>
+  readonly internalOperatorId: Prisma.FieldRef<"LockoutRegistration", 'String'>
+  readonly internalInstallDate: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
+  readonly internalInstallTime: Prisma.FieldRef<"LockoutRegistration", 'String'>
+  readonly internalRemoveDate: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
+  readonly internalRemoveTime: Prisma.FieldRef<"LockoutRegistration", 'String'>
+  readonly internalLockNumber: Prisma.FieldRef<"LockoutRegistration", 'String'>
   readonly createdAt: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"LockoutRegistration", 'DateTime'>
   readonly lockoutPermitId: Prisma.FieldRef<"LockoutRegistration", 'String'>
@@ -2283,9 +2283,9 @@ export type LockoutRegistration$contractorArgs<ExtArgs extends runtime.Types.Ext
 }
 
 /**
- * LockoutRegistration.otcOperator
+ * LockoutRegistration.internalOperator
  */
-export type LockoutRegistration$otcOperatorArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type LockoutRegistration$internalOperatorArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the User
    */
