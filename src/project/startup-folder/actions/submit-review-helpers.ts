@@ -1,7 +1,6 @@
 import { DocumentCategory, ReviewStatus } from "@/generated/prisma/enums"
-import type { Prisma } from "@/generated/prisma/client"
 import { generateSlug } from "@/lib/generateSlug"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 const SUBMITTABLE_FOLDER_STATUSES: ReviewStatus[] = [
 	ReviewStatus.DRAFT,
@@ -28,9 +27,9 @@ export function mergeNotificationEmails(emails: string[], requesterEmail: string
 export function buildStartupFolderAdminReviewUrl(
 	companyName: string,
 	companyId: string,
-	folderId: string
+	folderId: string,
 ): string {
-	return `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard/carpetas-de-arranque/${generateSlug(companyName)}_${companyId}/${folderId}`
+	return `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/admin/dashboard/carpetas-de-arranque/${generateSlug(companyName)}_${companyId}/${folderId}`
 }
 
 interface ReviewVehicleInfo {
@@ -55,15 +54,12 @@ export function buildFolderDisplayName({
 	if (category === DocumentCategory.SAFETY_AND_HEALTH) {
 		return `${startupFolderName} - Seguridad y Salud Ocupacional`
 	}
-
 	if (category === DocumentCategory.ENVIRONMENT || category === DocumentCategory.ENVIRONMENTAL) {
 		return `${startupFolderName} - Medio Ambiente`
 	}
-
 	if (category === DocumentCategory.TECHNICAL_SPECS) {
 		return `${startupFolderName} - Especificaciones Tecnicas`
 	}
-
 	if (category === DocumentCategory.PERSONNEL || category === DocumentCategory.BASIC) {
 		return `${startupFolderName} - ${workerName ?? "Trabajador"}`
 	}
@@ -124,46 +120,51 @@ interface SubmitRequester {
 }
 
 export async function getSubmitRequester(userId: string): Promise<SubmitRequester | null> {
-	return prisma.user.findUnique({
-		where: { id: userId },
-		select: {
-			rut: true,
-			name: true,
-			email: true,
-			phone: true,
-		},
-	})
+	const db = await getDemoDb()
+	const res = await db.query<SubmitRequester>(
+		`SELECT rut, name, email, phone FROM "user" WHERE id = $1 LIMIT 1`,
+		[userId],
+	)
+	return res.rows[0] ?? null
 }
 
 interface SubmitFolderDocumentsParams {
-	updateFolder: (tx: Prisma.TransactionClient, submittedAt: Date) => Promise<unknown>
-	getDocuments: (
-		tx: Prisma.TransactionClient
-	) => Promise<Array<{ id: string; status: ReviewStatus }>>
-	updateDocument: (
-		tx: Prisma.TransactionClient,
-		documentId: string,
-		status: ReviewStatus,
-		submittedAt: Date
-	) => Promise<unknown>
+	folderTable: string
+	documentTable: string
+	folderId: string
+	emails: string[]
+	requesterEmail: string
 }
 
 export async function submitFolderDocuments({
-	updateFolder,
-	getDocuments,
-	updateDocument,
+	folderTable,
+	documentTable,
+	folderId,
+	emails,
+	requesterEmail,
 }: SubmitFolderDocumentsParams): Promise<void> {
-	await prisma.$transaction(async (tx) => {
-		const submittedAt = new Date()
+	const db = await getDemoDb()
+	const submittedAt = new Date().toISOString()
+	const mergedEmails = mergeNotificationEmails(emails, requesterEmail)
 
-		await updateFolder(tx, submittedAt)
+	await db.query(
+		`UPDATE "${folderTable}"
+		 SET status = $1, "submittedAt" = $2, "additionalNotificationEmails" = $3, "updatedAt" = $2
+		 WHERE id = $4`,
+		[ReviewStatus.SUBMITTED, submittedAt, mergedEmails, folderId],
+	)
 
-		const documents = await getDocuments(tx)
+	const docs = await db.query<{ id: string; status: ReviewStatus }>(
+		`SELECT id, status FROM "${documentTable}" WHERE "folderId" = $1`,
+		[folderId],
+	)
 
-		await Promise.all(
-			documents.map((document) =>
-				updateDocument(tx, document.id, getSubmittedDocumentStatus(document.status), submittedAt)
-			)
-		)
-	})
+	for (const doc of docs.rows) {
+		const nextStatus = getSubmittedDocumentStatus(doc.status)
+		await db.query(`UPDATE "${documentTable}" SET status = $1, "submittedAt" = $2 WHERE id = $3`, [
+			nextStatus,
+			submittedAt,
+			doc.id,
+		])
+	}
 }

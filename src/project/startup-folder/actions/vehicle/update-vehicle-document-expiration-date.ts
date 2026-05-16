@@ -1,61 +1,7 @@
-"use server"
+import { VEHICLE_CONFIG } from "../../factory/configs"
+import { updateDocumentExpirationDate } from "../../factory/createFolderActions"
 
-import { headers } from "next/headers"
+import type { UpdateExpirationDateSchema } from "../../schemas/update-expiration-date"
 
-import { ACCESS_ROLE, ReviewStatus } from "@/generated/prisma/enums"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
-
-import type { UpdateExpirationDateSchema } from "@/project/startup-folder/schemas/update-expiration-date"
-
-export const updateExpirationDateVehicleDocument = async ({
-	data: { documentId, expirationDate },
-}: {
-	data: UpdateExpirationDateSchema
-}) => {
-	try {
-		const session = await auth.api.getSession({
-			headers: await headers(),
-		})
-
-		const isInternalMember = session?.user?.accessRole === ACCESS_ROLE.ADMIN
-
-		const existingDocument = await prisma.vehicleDocument.findUnique({
-			where: {
-				id: documentId,
-			},
-			include: {
-				folder: {
-					select: {
-						status: true,
-					},
-				},
-			},
-		})
-
-		if (!existingDocument) {
-			return { ok: false, message: "Documento no encontrado" }
-		}
-
-		if (existingDocument.folder.status !== ReviewStatus.DRAFT && !isInternalMember) {
-			return {
-				ok: false,
-				message: "No puedes modificar documentos en esta carpeta porque ya fue aprobada",
-			}
-		}
-
-		const updatedDocument = await prisma.vehicleDocument.update({
-			where: {
-				id: documentId,
-			},
-			data: {
-				expirationDate,
-			},
-		})
-
-		return { ok: true, data: updatedDocument }
-	} catch (error) {
-		console.error("Error al actualizar documento:", error)
-		return { ok: false, message: "Error al procesar la solicitud" }
-	}
-}
+export const updateExpirationDateVehicleDocument = (input: { data: UpdateExpirationDateSchema }) =>
+	updateDocumentExpirationDate(VEHICLE_CONFIG, input)
