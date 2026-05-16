@@ -34,7 +34,7 @@ const listHandler = http.get("*/api/work-order", async ({ request }) => {
 		`SELECT COUNT(*)::int AS value FROM work_order WHERE "deletedAt" IS NULL`
 	)) ?? 0
 
-	const workOrders = await query(
+	const workOrders = await query<Record<string, unknown>>(
 		`SELECT
 			wo.id,
 			wo."otNumber",
@@ -48,8 +48,14 @@ const listHandler = http.get("*/api/work-order", async ({ request }) => {
 			wo."estimatedDays",
 			wo.type,
 			wo.priority,
-			wo."programDate"
+			wo."programDate",
+			c.id AS "c_id", c.name AS "c_name", c.image AS "c_image", c.rut AS "c_rut",
+			s.id AS "s_id", s.name AS "s_name", s.email AS "s_email", s.image AS "s_image",
+			(SELECT COUNT(*)::int FROM milestone WHERE "workOrderId" = wo.id) AS "ms_count",
+			(SELECT COUNT(*)::int FROM work_book_entry WHERE "workOrderId" = wo.id) AS "wbe_count"
 		 FROM work_order wo
+		 LEFT JOIN "company" c ON c.id = wo."companyId"
+		 LEFT JOIN "user" s ON s.id = wo."supervisorId"
 		 WHERE wo."deletedAt" IS NULL
 		 ORDER BY wo."createdAt" DESC
 		 LIMIT $1 OFFSET $2`,
@@ -73,10 +79,29 @@ const listHandler = http.get("*/api/work-order", async ({ request }) => {
 
 	return HttpResponse.json({
 		workOrders: workOrders.map((wo) => ({
-			...wo,
-			company: null,
-			supervisor: null,
-			_count: { milestones: 0, workBookEntries: 0 },
+			id: wo.id,
+			otNumber: wo.otNumber,
+			workRequest: wo.workRequest,
+			progress: wo.progress,
+			status: wo.status,
+			solicitationDate: wo.solicitationDate,
+			estimatedEndDate: wo.estimatedEndDate,
+			rescheduledEndDate: wo.rescheduledEndDate,
+			estimatedHours: wo.estimatedHours,
+			estimatedDays: wo.estimatedDays,
+			type: wo.type,
+			priority: wo.priority,
+			programDate: wo.programDate,
+			company: wo.c_id
+				? { id: wo.c_id, name: wo.c_name, rut: wo.c_rut, image: wo.c_image ?? null }
+				: null,
+			supervisor: wo.s_id
+				? { id: wo.s_id, name: wo.s_name, email: wo.s_email, image: wo.s_image ?? null }
+				: null,
+			_count: {
+				milestones: (wo.ms_count as number) ?? 0,
+				workBookEntries: (wo.wbe_count as number) ?? 0,
+			},
 		})),
 		total,
 		pages: Math.max(1, Math.ceil(total / limit)),
@@ -121,16 +146,28 @@ const statsHandler = http.get("*/api/work-order/stats", async () => {
 		 GROUP BY month ORDER BY month ASC`
 	)
 
+	const companyRows = await query<{ name: string; value: number }>(
+		`SELECT COALESCE(c.name, 'Interno') AS name, COUNT(wo.id)::int AS value
+		 FROM work_order wo
+		 LEFT JOIN "company" c ON c.id = wo."companyId"
+		 WHERE wo."deletedAt" IS NULL
+		 GROUP BY c.name
+		 ORDER BY value DESC`
+	)
+
 	const avgProgress =
 		(await scalar<number>(
 			`SELECT COALESCE(AVG(progress), 0)::float AS value
 			 FROM work_order WHERE "deletedAt" IS NULL AND progress IS NOT NULL`
 		)) ?? 0
 
-	const recentWorkOrders = await query(
-		`SELECT id, "otNumber", status, priority, "createdAt", "workBookName", progress
-		 FROM work_order WHERE "deletedAt" IS NULL
-		 ORDER BY "createdAt" DESC LIMIT 10`
+	const recentWorkOrders = await query<Record<string, unknown>>(
+		`SELECT wo.id, wo."otNumber", wo.status, wo.priority, wo."createdAt", wo."workBookName", wo.progress,
+			c.id AS "c_id", c.name AS "c_name", c.image AS "c_image"
+		 FROM work_order wo
+		 LEFT JOIN "company" c ON c.id = wo."companyId"
+		 WHERE wo."deletedAt" IS NULL
+		 ORDER BY wo."createdAt" DESC LIMIT 10`
 	)
 
 	return HttpResponse.json({
@@ -143,11 +180,22 @@ const statsHandler = http.get("*/api/work-order/stats", async () => {
 		charts: {
 			priority: priorityRows,
 			type: typeRows.map((t) => ({ ...t, fill: TYPE_COLORS[t.name] ?? "var(--color-gray-500)" })),
-			companies: [] as Array<{ name: string; value: number }>,
+			companies: companyRows,
 			monthly: monthlyRows,
 			averageProgress: Math.round(avgProgress * 100) / 100,
 		},
-		recentWorkOrders: recentWorkOrders.map((wo) => ({ ...wo, company: null })),
+		recentWorkOrders: recentWorkOrders.map((wo) => ({
+			id: wo.id,
+			otNumber: wo.otNumber,
+			status: wo.status,
+			priority: wo.priority,
+			createdAt: wo.createdAt,
+			workBookName: wo.workBookName,
+			progress: wo.progress,
+			company: wo.c_id
+				? { id: wo.c_id, name: wo.c_name, image: wo.c_image ?? null }
+				: null,
+		})),
 	})
 })
 
@@ -155,28 +203,76 @@ const statsHandler = http.get("*/api/work-order/stats", async () => {
 
 const detailsHandler = http.get("*/api/work-order/:id/details", async ({ params }) => {
 	const id = params.id as string
-	const rows = await query(
+	const rows = await query<Record<string, unknown>>(
 		`SELECT
-			id, "otNumber", "solicitationDate", type, status, capex, "solicitationTime",
-			"workRequest", "workDescription", progress, priority, "createdAt", "programDate",
-			"estimatedHours", "estimatedDays", "estimatedEndDate", "rescheduledEndDate"
-		 FROM work_order WHERE id = $1 AND "deletedAt" IS NULL`,
+			wo.id, wo."otNumber", wo."solicitationDate", wo.type, wo.status, wo.capex, wo."solicitationTime",
+			wo."workRequest", wo."workDescription", wo.progress, wo.priority, wo."createdAt", wo."programDate",
+			wo."estimatedHours", wo."estimatedDays", wo."estimatedEndDate", wo."rescheduledEndDate",
+			c.id AS "companyId", c.name AS "companyName", c.image AS "companyImage",
+			s.id AS "supervisorIdRow", s.name AS "supervisorName", s.email AS "supervisorEmail",
+			r.id AS "responsibleIdRow", r.name AS "responsibleName", r.email AS "responsibleEmail"
+		 FROM work_order wo
+		 LEFT JOIN "company" c ON c.id = wo."companyId"
+		 LEFT JOIN "user" s ON s.id = wo."supervisorId"
+		 LEFT JOIN "user" r ON r.id = wo."responsibleId"
+		 WHERE wo.id = $1 AND wo."deletedAt" IS NULL`,
 		[id]
 	)
 	const wo = rows[0]
 	if (!wo) return new HttpResponse("Orden de trabajo no encontrada", { status: 404 })
 
+	const equipments = await query<Record<string, unknown>>(
+		`SELECT e.id, e.name, e.tag, e.barcode, e.type, e."isOperational", e.criticality
+		 FROM equipment e
+		 JOIN "_EquipmentToWorkOrder" j ON j."A" = e.id
+		 WHERE j."B" = $1`,
+		[id]
+	)
+
+	const entryCount = (await scalar<number>(
+		`SELECT COUNT(*)::int AS value FROM work_book_entry WHERE "workOrderId" = $1`,
+		[id]
+	)) ?? 0
+
+	const milestones = await query<Record<string, unknown>>(
+		`SELECT id, name, status, "order", "isCompleted", weight, "startDate", "endDate"
+		 FROM milestone WHERE "workOrderId" = $1 ORDER BY "order" ASC`,
+		[id]
+	)
+
 	return HttpResponse.json({
-		...wo,
+		id: wo.id,
+		otNumber: wo.otNumber,
+		solicitationDate: wo.solicitationDate,
+		solicitationTime: wo.solicitationTime,
+		type: wo.type,
+		status: wo.status,
+		capex: wo.capex,
+		workRequest: wo.workRequest,
+		workDescription: wo.workDescription,
+		progress: wo.progress,
+		priority: wo.priority,
+		createdAt: wo.createdAt,
+		programDate: wo.programDate,
+		estimatedHours: wo.estimatedHours,
+		estimatedDays: wo.estimatedDays,
+		estimatedEndDate: wo.estimatedEndDate,
+		rescheduledEndDate: wo.rescheduledEndDate,
 		initReport: null,
 		endReport: null,
-		equipments: [],
-		company: null,
-		supervisor: null,
-		responsible: null,
-		_count: { workBookEntries: 0 },
+		equipments,
+		company: wo.companyId
+			? { id: wo.companyId, name: wo.companyName, image: wo.companyImage ?? null }
+			: null,
+		supervisor: wo.supervisorIdRow
+			? { id: wo.supervisorIdRow, name: wo.supervisorName, email: wo.supervisorEmail }
+			: { id: "", name: "—", email: "" },
+		responsible: wo.responsibleIdRow
+			? { id: wo.responsibleIdRow, name: wo.responsibleName, email: wo.responsibleEmail }
+			: { id: "", name: "—", email: "" },
+		_count: { workBookEntries: entryCount },
 		workRequested: null,
-		milestones: [],
+		milestones,
 	})
 })
 

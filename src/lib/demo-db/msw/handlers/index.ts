@@ -1,4 +1,9 @@
+import { companyHandlers } from "./company"
+import { dashboardHandlers } from "./dashboard"
+import { equipmentHandlers } from "./equipment"
 import { fallbackHandlers } from "./_fallback"
+import { userHandlers } from "./user"
+import { workBookHandlers } from "./work-book"
 import { workOrderHandlers } from "./work-order"
 
 /**
@@ -6,4 +11,12 @@ import { workOrderHandlers } from "./work-order"
  * Per-module handlers (work-orders, work-permits, etc.) are added alongside
  * their PGlite-backed implementations in their own iteration.
  */
-export const handlers = [...workOrderHandlers, ...fallbackHandlers]
+export const handlers = [
+	...workOrderHandlers,
+	...workBookHandlers,
+	...userHandlers,
+	...companyHandlers,
+	...equipmentHandlers,
+	...dashboardHandlers,
+	...fallbackHandlers,
+]
