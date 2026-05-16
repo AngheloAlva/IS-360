@@ -44,8 +44,9 @@ export default function LockoutPermitTypeChart({ data }: LockoutPermitTypeChartP
 		color: TYPE_COLORS[item.type] || "hsl(220, 14%, 46%)",
 	}))
 
-	const handleBarClick = (data: { type: string }) => {
+	const handleBarClick = (data: { type?: string }) => {
 		const clickedType = data.type
+		if (!clickedType) return
 
 		if (filters.typeFilter === clickedType) {
 			actions.setTypeFilter(null)

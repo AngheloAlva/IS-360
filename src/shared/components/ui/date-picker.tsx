@@ -45,7 +45,7 @@ export function CalendarDatePicker({
 						captionLayout={"dropdown"}
 						defaultMonth={value ?? undefined}
 						selected={value ?? undefined}
-						fromYear={2024}
+						startMonth={new Date(2024, 0)}
 						onSelect={(newDate) => {
 							if (!newDate) {
 								onChange?.(null)

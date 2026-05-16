@@ -1,7 +1,6 @@
 "use client"
 
 import { FileTypeIcon, FolderIcon, FolderOpenIcon } from "lucide-react"
-import { AnimatePresence, motion } from "motion/react"
 import * as React from "react"
 
 import { MotionHighlight, MotionHighlightItem } from "@/shared/effects/motion-highlight"
@@ -11,28 +10,18 @@ import {
 	Accordion,
 	AccordionItem,
 	AccordionTrigger,
-	useAccordionItem,
 	AccordionContent,
-	AccordionItemProps,
-	AccordionTriggerProps,
 } from "./accordion"
 
 type FileButtonProps = React.ComponentProps<"div"> & {
-	icons?: {
-		close: React.ReactNode
-		open: React.ReactNode
-	}
 	icon?: React.ReactNode
-	open?: boolean
 	sideComponent?: React.ReactNode
 }
 
 function FileButton({
 	children,
 	className,
-	icons,
 	icon,
-	open,
 	sideComponent,
 	...props
 }: FileButtonProps) {
@@ -47,29 +36,7 @@ function FileButton({
 				{...props}
 			>
 				<span className="flex shrink items-center gap-2 truncate [&_svg]:size-4 [&_svg]:shrink-0">
-					{icon
-						? typeof icon !== "string"
-							? icon
-							: null
-						: icons && (
-								<AnimatePresence mode="wait">
-									<motion.span
-										key={open ? "open" : "close"}
-										initial={{ scale: 0.9 }}
-										animate={{ scale: 1 }}
-										exit={{ scale: 0.9 }}
-										transition={{ duration: 0.15 }}
-									>
-										{open
-											? typeof icons.open !== "string"
-												? icons.open
-												: null
-											: typeof icons.close !== "string"
-												? icons.close
-												: null}
-									</motion.span>
-								</AnimatePresence>
-							)}
+					{icon}
 					<span className="block shrink truncate text-sm wrap-break-word">{children}</span>
 				</span>
 				{sideComponent}
@@ -116,23 +83,27 @@ function Files({
 	)
 }
 
+type AccordionTriggerProps = React.ComponentProps<typeof AccordionTrigger>
+type AccordionItemProps = React.ComponentProps<typeof AccordionItem>
+
 type FolderTriggerProps = AccordionTriggerProps & {
 	sideComponent?: React.ReactNode
 }
 
 function FolderTrigger({ children, className, sideComponent, ...props }: FolderTriggerProps) {
-	const { isOpen } = useAccordionItem()
-
 	return (
 		<AccordionTrigger
 			data-slot="folder-trigger"
 			className="relative z-10 h-auto max-w-full py-0 font-normal hover:no-underline"
 			{...props}
-			chevron={false}
 		>
 			<FileButton
-				open={isOpen}
-				icons={{ open: <FolderOpenIcon />, close: <FolderIcon /> }}
+				icon={
+					<>
+						<FolderIcon className="group-aria-expanded/accordion-trigger:hidden" />
+						<FolderOpenIcon className="hidden group-aria-expanded/accordion-trigger:inline" />
+					</>
+				}
 				className={className}
 				sideComponent={sideComponent}
 			>
@@ -142,10 +113,7 @@ function FolderTrigger({ children, className, sideComponent, ...props }: FolderT
 	)
 }
 
-type FolderProps = Omit<
-	AccordionItemProps,
-	"value" | "onValueChange" | "defaultValue" | "children"
-> & {
+type FolderProps = Omit<AccordionItemProps, "value" | "children"> & {
 	children?: React.ReactNode
 	name: string
 	open?: string[]

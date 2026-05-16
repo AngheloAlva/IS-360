@@ -53,7 +53,7 @@ export function CalendarDateRangePicker({ value, onChange }: CalendarDateRangePi
 						captionLayout={"dropdown"}
 						defaultMonth={value?.from}
 						selected={value ?? undefined}
-						fromYear={2024}
+						startMonth={new Date(2024, 0)}
 						onSelect={(newDate) => {
 							onChange?.(newDate ?? null)
 						}}

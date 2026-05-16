@@ -52,8 +52,9 @@ export function WorkOrderTypeChart({ data, total }: WorkOrderStatusChartProps) {
 			percentage: total === 0 ? 0 : (item.value / total) * 100,
 		}))
 
-	const handleChartClick = (data: { name: string }) => {
+	const handleChartClick = (data: { name?: string }) => {
 		const clickedStatus = data.name
+		if (!clickedStatus) return
 
 		if (typeFilter === clickedStatus) {
 			setTypeFilter(null)

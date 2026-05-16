@@ -39,8 +39,9 @@ import {
 } from "@/shared/components/ui/sheet"
 
 import type { ENTRY_TYPE } from "@/generated/prisma/enums"
-import type { User } from "@/generated/prisma/client"
 import type { Milestone } from "@/project/work-order/hooks/use-work-book-milestones"
+
+type UserOption = { id: string; name: string }
 
 interface ActivityFormProps {
 	userId: string
@@ -74,7 +75,7 @@ export default function ActivityForm({
 	submitDataTutorialId,
 }: ActivityFormProps): React.ReactElement {
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [users, setUsers] = useState<User[]>([])
+	const [users, setUsers] = useState<UserOption[]>([])
 
 	const [open, setOpen] = useState(false)
 
@@ -116,19 +117,19 @@ export default function ActivityForm({
 
 	useEffect(() => {
 		if (tutorialMode) {
-			setUsers((tutorialUsers ?? []).map((user) => ({ ...user }) as User))
+			setUsers(tutorialUsers ?? [])
 			return
 		}
 
 		const fetchUsers = async () => {
 			try {
-				const { data, ok } = await getUsersByWorkOrderId(workOrderId)
+				const result = await getUsersByWorkOrderId(workOrderId)
 
-				if (!ok || !data) {
+				if (!result.ok) {
 					throw new Error("Error al cargar los usuarios")
 				}
 
-				setUsers(data)
+				setUsers(result.data)
 			} catch (error) {
 				console.error(error)
 				toast.error("Error al cargar los usuarios", {

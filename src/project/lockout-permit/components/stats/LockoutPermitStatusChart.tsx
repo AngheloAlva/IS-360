@@ -73,8 +73,11 @@ export default function LockoutPermitStatusChart({
 		},
 	].filter((item) => item.count > 0)
 
-	const handleChartClick = (chartData: { status: string }) => {
-		const clickedStatus = chartData.status
+	const handleChartClick = (chartData: unknown) => {
+		const clickedStatus =
+			(chartData as { payload?: { status?: string } }).payload?.status ??
+			(chartData as { status?: string }).status
+		if (!clickedStatus) return
 
 		if (filters.statusFilter === clickedStatus) {
 			actions.setStatusFilter(null)

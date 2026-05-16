@@ -42,8 +42,10 @@ export default function WorkPermitStatusChart({ data, total }: WorkPermitStatusC
 			percentage: total === 0 ? 0 : (item.count / total) * 100,
 		}))
 
-	const handleChartClick = (data: { status: string }) => {
-		const clickedStatus = data.status
+	const handleChartClick = (data: unknown) => {
+		const clickedStatus = (data as { status?: string; payload?: { status?: string } })
+			.payload?.status ?? (data as { status?: string }).status
+		if (!clickedStatus) return
 
 		if (filters.statusFilter === clickedStatus) {
 			actions.setStatusFilter(null)
