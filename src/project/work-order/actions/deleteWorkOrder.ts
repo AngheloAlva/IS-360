@@ -1,60 +1,38 @@
-"use server"
-
-import { headers } from "next/headers"
-import { revalidatePath } from "next/cache"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface DeleteWorkOrderProps {
 	workOrderId: string
 }
 
 export const deleteWorkOrder = async ({ workOrderId }: DeleteWorkOrderProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
-	const permission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permissions: {
-				workOrder: ["delete-empty"],
-			},
-		},
-	})
-
-	if (!permission.success) {
-		return { ok: false, message: "No tienes permiso para eliminar órdenes de trabajo" }
-	}
-
 	try {
-		const workOrder = await prisma.workOrder.findUnique({
-			where: { id: workOrderId },
-			select: {
-				id: true,
-				otNumber: true,
-				type: true,
-				status: true,
-				priority: true,
-				deletedAt: true,
-				supervisorId: true,
-				responsibleId: true,
-				companyId: true,
-				_count: {
-					select: {
-						milestones: true,
-						workBookEntries: true,
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+
+		const { rows } = await db.query<{
+			id: string
+			otNumber: string
+			type: string
+			status: string
+			priority: string
+			deletedAt: string | null
+			supervisorId: string
+			responsibleId: string
+			companyId: string | null
+		}>(
+			`SELECT "id", "otNumber", "type", "status", "priority", "deletedAt",
+				"supervisorId", "responsibleId", "companyId"
+			FROM "work_order" WHERE "id" = $1`,
+			[workOrderId]
+		)
+		const workOrder = rows[0]
 
 		if (!workOrder) {
 			return { ok: false, message: "Orden de trabajo no encontrada" }
@@ -67,11 +45,21 @@ export const deleteWorkOrder = async ({ workOrderId }: DeleteWorkOrderProps) => 
 		if (workOrder.status !== "PLANNED" && workOrder.status !== "PENDING") {
 			return {
 				ok: false,
-				message: "Solo se pueden eliminar órdenes en estado Planificada o Pendiente",
+				message:
+					"Solo se pueden eliminar órdenes en estado Planificada o Pendiente",
 			}
 		}
 
-		if (workOrder._count.milestones > 0 || workOrder._count.workBookEntries > 0) {
+		const { rows: milestoneRows } = await db.query<{ count: string }>(
+			`SELECT COUNT(*)::text AS count FROM "milestone" WHERE "workOrderId" = $1`,
+			[workOrderId]
+		)
+		const { rows: entryRows } = await db.query<{ count: string }>(
+			`SELECT COUNT(*)::text AS count FROM "work_book_entry" WHERE "workOrderId" = $1`,
+			[workOrderId]
+		)
+
+		if (Number(milestoneRows[0]?.count ?? 0) > 0 || Number(entryRows[0]?.count ?? 0) > 0) {
 			return {
 				ok: false,
 				message:
@@ -79,36 +67,36 @@ export const deleteWorkOrder = async ({ workOrderId }: DeleteWorkOrderProps) => 
 			}
 		}
 
-		await prisma.workOrder.update({
-			where: { id: workOrderId },
-			data: {
-				deletedAt: new Date(),
-				deletedById: session.user.id,
-			},
-		})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "work_order" SET "deletedAt" = $1, "deletedById" = $2, "updatedAt" = $1 WHERE "id" = $3`,
+			[now, user.id, workOrderId]
+		)
 
-		await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.DELETE,
-			entityId: workOrder.id,
-			entityType: "WorkOrder",
-			changesBefore: {
-				otNumber: workOrder.otNumber,
-				type: workOrder.type,
-				status: workOrder.status,
-				priority: workOrder.priority,
-				supervisorId: workOrder.supervisorId,
-				responsibleId: workOrder.responsibleId,
-				companyId: workOrder.companyId,
-			},
-			metadata: {
-				otNumber: workOrder.otNumber,
-				reason: "soft-delete (delete-empty)",
-			},
-		})
-
-		revalidatePath("/admin/dashboard/ordenes-de-trabajo")
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.DELETE,
+				entityId: workOrder.id,
+				entityType: "WorkOrder",
+				changesBefore: {
+					otNumber: workOrder.otNumber,
+					type: workOrder.type,
+					status: workOrder.status,
+					priority: workOrder.priority,
+					supervisorId: workOrder.supervisorId,
+					responsibleId: workOrder.responsibleId,
+					companyId: workOrder.companyId,
+				},
+				metadata: {
+					otNumber: workOrder.otNumber,
+					reason: "soft-delete (delete-empty)",
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return { ok: true, message: "Orden de trabajo eliminada exitosamente" }
 	} catch (error) {

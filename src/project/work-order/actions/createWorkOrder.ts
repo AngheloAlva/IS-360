@@ -1,14 +1,9 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { calculateNextDate } from "@/project/maintenance-plan/utils/calculate-next-date"
 import { generateOTNumber } from "@/project/work-order/actions/generateOTNumber"
 import { sendNewWorkOrderEmail } from "./sendNewWorkOrderEmail"
-import { ACTIVITY_TYPE, MODULES, PLAN_FREQUENCY } from "@/generated/prisma/enums"
+import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { WorkOrderSchema } from "@/project/work-order/schemas/workOrder.schema"
 import type { UploadResult as FileUploadResult } from "@/lib/upload-files"
@@ -26,83 +21,17 @@ export const createWorkOrder = async ({
 	equipmentId,
 	workRequestId,
 	initReportFile,
-	maintenancePlanTaskId,
+	maintenancePlanTaskId: _maintenancePlanTaskId,
 }: CreateWorkOrderProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const maintenancePlanTaskData:
-			| {
-					id: string
-					equipment: {
-						id: string
-					} | null
-					equipments: {
-						id: string
-					}[]
-					nextDate: Date
-					frequency: PLAN_FREQUENCY
-					originalDayOfMonth: number | null
-					attachments: {
-						id: string
-					}[]
-			  }[]
-			| null = []
-
-		if (maintenancePlanTaskId) {
-			for (const taskId of maintenancePlanTaskId) {
-				const taskData = await prisma.maintenancePlanTask.findUnique({
-					where: {
-						id: taskId,
-					},
-					select: {
-						id: true,
-						equipment: {
-							select: {
-								id: true,
-								name: true,
-							},
-						},
-						equipments: {
-							select: {
-								id: true,
-							},
-						},
-						nextDate: true,
-						frequency: true,
-						originalDayOfMonth: true,
-						attachments: {
-							select: {
-								id: true,
-								name: true,
-								type: true,
-								url: true,
-							},
-						},
-					},
-				})
-
-				if (!taskData) {
-					return {
-						ok: false,
-						message: "Tarea de mantenimiento no encontrada",
-					}
-				}
-
-				maintenancePlanTaskData.push(taskData)
-			}
-		}
-
+		const db = await getDemoDb()
 		const otNumber = await generateOTNumber()
+
 		const {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			file,
@@ -113,229 +42,123 @@ export const createWorkOrder = async ({
 			...rest
 		} = values
 
-		const maintenanceTaskEquipmentIds = maintenancePlanTaskData.flatMap((task) =>
-			(task.equipments.length > 0 ? task.equipments : task.equipment ? [task.equipment] : []).map(
-				(equipment) => equipment.id
-			)
-		)
-
 		const equipmentIdsToConnect = [
-			...new Set(
-				equipmentId?.length
-					? equipmentId
-					: maintenanceTaskEquipmentIds.length > 0
-						? maintenanceTaskEquipmentIds
-						: equipment
-			),
+			...new Set(equipmentId?.length ? equipmentId : equipment),
 		]
 
-		const newWorkOrder = await prisma.workOrder.create({
-			data: {
-				otNumber,
-				responsible: {
-					connect: {
-						id: responsibleId,
-					},
-				},
-				supervisor: {
-					connect: { id: supervisorId },
-				},
-				...(companyId
-					? {
-							company: {
-								connect: {
-									id: companyId,
-								},
-							},
-						}
-					: {}),
-				...rest,
-				...(initReportFile
-					? {
-							initReport: {
-								create: {
-									url: initReportFile.url,
-									name: initReportFile.name,
-									type: initReportFile.type,
-								},
-							},
-						}
-					: {}),
-				...(maintenancePlanTaskData.length > 0
-					? {
-							MaintenancePlanTask: {
-								connect: {
-									id: maintenancePlanTaskData[0].id,
-								},
-							},
-							manualDocuments: {
-								connect: maintenancePlanTaskData[0].attachments.map((attachment) => ({
-									id: attachment.id,
-								})),
-							},
-						}
-					: {}),
-				estimatedDays: +rest.estimatedDays,
-				estimatedHours: +rest.estimatedHours,
-				solicitationDate: rest.solicitationDate ? new Date(rest.solicitationDate) : new Date(),
-				solicitationTime: rest.solicitationTime
-					? rest.solicitationTime
-					: new Date().toTimeString().split(" ")[0],
-				estimatedEndDate: rest.estimatedEndDate ? new Date(rest.estimatedEndDate) : new Date(),
-				equipments: {
-					connect: equipmentIdsToConnect.map((id) => ({ id })),
-				},
-			},
-			select: {
-				id: true,
-				status: true,
-				otNumber: true,
-				type: true,
-				priority: true,
-				programDate: true,
-				estimatedDays: true,
-				estimatedHours: true,
-				workDescription: true,
-				responsible: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-				supervisor: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
-					},
-				},
-				equipments: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-				company: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-				initReport: {
-					select: {
-						id: true,
-						name: true,
-						type: true,
-						url: true,
-					},
-				},
-				MaintenancePlanTask: {
-					select: {
-						id: true,
-						nextDate: true,
-						frequency: true,
-						attachments: {
-							select: {
-								id: true,
-								name: true,
-								type: true,
-								url: true,
-							},
-						},
-					},
-				},
-			},
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		const solicitationDate = rest.solicitationDate
+			? new Date(rest.solicitationDate).toISOString()
+			: now
+		const solicitationTime = rest.solicitationTime
+			? rest.solicitationTime
+			: new Date().toTimeString().split(" ")[0]
+		const estimatedEndDate = rest.estimatedEndDate
+			? new Date(rest.estimatedEndDate).toISOString()
+			: now
+		const programDate = new Date(rest.programDate).toISOString()
 
-		if (maintenancePlanTaskData) {
-			for (const task of maintenancePlanTaskData) {
-				const nextDate = calculateNextDate(task.nextDate, task.frequency, task.originalDayOfMonth)
-
-				await prisma.maintenancePlanTask.update({
-					where: {
-						id: task.id,
-					},
-					data: {
-						nextDate,
-						workOrders: {
-							connect: {
-								id: newWorkOrder.id,
-							},
-						},
-					},
-				})
-			}
+		let initReportId: string | null = null
+		if (initReportFile) {
+			initReportId = crypto.randomUUID()
+			await db.query(
+				`INSERT INTO "attachment" ("id", "name", "url", "type", "createdAt", "updatedAt", "initReportId")
+				 VALUES ($1, $2, $3, $4, $5, $5, $1)`,
+				[
+					initReportId,
+					initReportFile.name,
+					initReportFile.url,
+					initReportFile.type,
+					now,
+				]
+			)
 		}
+
+		await db.query(
+			`INSERT INTO "work_order" (
+				"id", "otNumber", "type", "status", "progress",
+				"solicitationDate", "solicitationTime", "workRequest", "workDescription",
+				"priority", "capex", "programDate", "estimatedHours", "estimatedDays",
+				"estimatedEndDate", "companyId", "supervisorId", "responsibleId",
+				"initReportId", "createdAt", "updatedAt"
+			) VALUES (
+				$1, $2, $3, 'PLANNED', 0,
+				$4, $5, $6, $7,
+				$8, $9, $10, $11, $12,
+				$13, $14, $15, $16,
+				$17, $18, $18
+			)`,
+			[
+				id,
+				otNumber,
+				rest.type,
+				solicitationDate,
+				solicitationTime,
+				rest.workRequest,
+				rest.workDescription ?? null,
+				rest.priority,
+				rest.capex,
+				programDate,
+				+rest.estimatedHours,
+				+rest.estimatedDays,
+				estimatedEndDate,
+				companyId ?? null,
+				supervisorId,
+				responsibleId,
+				initReportId,
+				now,
+			]
+		)
+
+		for (const equipmentIdToConnect of equipmentIdsToConnect) {
+			await db.query(
+				`INSERT INTO "_EquipmentToWorkOrder" ("A", "B") VALUES ($1, $2)
+				 ON CONFLICT DO NOTHING`,
+				[equipmentIdToConnect, id]
+			)
+		}
+
+		// TODO(iter 3): cascade maintenancePlanTask updates (nextDate, attach workOrder)
 
 		if (workRequestId) {
-			await prisma.workRequest.update({
-				where: {
-					id: workRequestId,
-				},
-				data: {
-					status: "ATTENDED",
-					workOrders: {
-						connect: {
-							id: newWorkOrder.id,
-						},
-					},
-				},
+			await db.query(
+				`UPDATE "work_request" SET "status" = 'ATTENDED', "updatedAt" = $1 WHERE "id" = $2`,
+				[now, workRequestId]
+			)
+		}
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: id,
+				entityType: "WorkOrder",
+				metadata: { otNumber, type: rest.type, priority: rest.priority },
 			})
+		} catch {
+			// audit best-effort
 		}
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.CREATE,
-			entityId: newWorkOrder.id,
-			entityType: "WorkOrder",
-			metadata: {
-				status: newWorkOrder.status,
-				otNumber: newWorkOrder.otNumber,
-				type: newWorkOrder.type,
-				priority: newWorkOrder.priority,
-				programDate: newWorkOrder.programDate,
-				estimatedDays: newWorkOrder.estimatedDays,
-				estimatedHours: newWorkOrder.estimatedHours,
-				workDescription: newWorkOrder.workDescription,
-				responsible: newWorkOrder.responsible,
-				supervisor: newWorkOrder.supervisor,
-				equipments: newWorkOrder.equipments,
-				company: newWorkOrder.company,
-				initReport: newWorkOrder.initReport,
-				maintenancePlanTask: newWorkOrder.MaintenancePlanTask,
-			},
-		})
-
-  await sendNewWorkOrderEmail({
+		await sendNewWorkOrderEmail({
 			workOrder: {
-				otNumber: newWorkOrder.otNumber,
-				type: newWorkOrder.type,
-				priority: newWorkOrder.priority,
-				equipments: newWorkOrder.equipments,
-				programDate: newWorkOrder.programDate,
-				estimatedDays: +newWorkOrder.estimatedDays,
-				estimatedHours: +newWorkOrder.estimatedHours,
-				responsible: {
-					name: newWorkOrder.responsible.name,
-				},
-				workDescription: newWorkOrder.workDescription,
-				supervisor: {
-					name: newWorkOrder.supervisor.name,
-					email: newWorkOrder.supervisor.email,
-				},
+				otNumber,
+				type: rest.type,
+				priority: rest.priority,
+				equipments: [],
+				programDate: new Date(programDate),
+				estimatedDays: +rest.estimatedDays,
+				estimatedHours: +rest.estimatedHours,
+				responsible: { name: user.name },
+				workDescription: rest.workDescription ?? null,
+				supervisor: { name: user.name, email: user.email },
 			},
 		})
 
-		return {
-			ok: true,
-			message: "Orden de trabajo creado exitosamente",
-		}
+		return { ok: true, message: "Orden de trabajo creado exitosamente" }
 	} catch (error) {
 		console.error("[CREATE_WORK_ORDER]", error)
-		return {
-			ok: false,
-			message: "Error al crear el orden de trabajo",
-		}
+		return { ok: false, message: "Error al crear el orden de trabajo" }
 	}
 }

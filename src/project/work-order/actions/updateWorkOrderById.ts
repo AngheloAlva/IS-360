@@ -1,12 +1,7 @@
-"use server"
-
-import { revalidatePath } from "next/cache"
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES, WORK_ORDER_STATUS } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { UpdateWorkOrderSchema } from "@/project/work-order/schemas/updateWorkOrder.schema"
 import type { UploadResult } from "@/lib/upload-files"
@@ -27,35 +22,14 @@ export const updateWorkOrderById = async ({
 	values,
 	endReport,
 }: UpdateWorkOrderParams): Promise<UpdateWorkOrderResponse> => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				workOrder: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const progress = +values.progress
+		const db = await getDemoDb()
+		const progress = Number(values.progress?.[0] ?? 0)
 
 		let status: WORK_ORDER_STATUS
 		if (progress === 100) {
@@ -63,98 +37,140 @@ export const updateWorkOrderById = async ({
 		} else if (progress > 0) {
 			status = "IN_PROGRESS"
 		} else {
-			const hasActivities = await prisma.workEntry.count({
-				where: { workOrderId: id },
-			})
+			const { rows: countRows } = await db.query<{ count: string }>(
+				`SELECT COUNT(*)::text AS count FROM "work_book_entry" WHERE "workOrderId" = $1`,
+				[id]
+			)
+			const hasActivities = Number(countRows[0]?.count ?? 0)
 			status = hasActivities > 0 ? "IN_PROGRESS" : "PENDING"
 		}
 
-		const workOrder = await prisma.workOrder.update({
-			include: {
-				company: true,
-				supervisor: true,
-				responsible: true,
-				equipments: true,
-			},
-			where: {
-				id,
-			},
-			data: {
-				type: values.type,
-				capex: values.capex,
-				priority: values.priority,
-				progress: +values.progress,
-				programDate: values.programDate,
-				workRequest: values.workRequest,
-				workDescription: values.workDescription,
-				solicitationDate: values.solicitationDate,
-				solicitationTime: values.solicitationTime,
-				estimatedEndDate: values.estimatedEndDate,
-				rescheduledEndDate: values.rescheduledEndDate ?? null,
-				estimatedDays: parseInt(values.estimatedDays),
-				estimatedHours: parseInt(values.estimatedHours),
-				status,
-				endDate: values.status === "COMPLETED" || +values.progress === 100 ? new Date() : null,
-				company: {
-					connect: {
-						id: values.companyId,
-					},
-				},
-				supervisor: {
-					connect: {
-						id: values.supervisorId,
-					},
-				},
-				responsible: {
-					connect: {
-						id: values.responsibleId,
-					},
-				},
-				equipments: {
-					set: values.equipment.map((id) => ({ id })),
-				},
-				...(endReport?.length && {
-					endReport: {
-						create: {
-							url: endReport[0].url,
-							name: endReport[0].name,
-							size: endReport[0].size,
-							type: endReport[0].type,
-						},
-					},
-				}),
-			},
-		})
+		const now = new Date().toISOString()
+		const endDate =
+			values.status === "COMPLETED" || progress === 100 ? now : null
+		const estimatedEndDateIso = values.estimatedEndDate
+			? new Date(values.estimatedEndDate).toISOString()
+			: null
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.UPDATE,
-			entityId: id,
-			entityType: "WorkOrder",
-			metadata: {
-				type: workOrder.type,
-				status: workOrder.status,
-				solicitationDate: workOrder.solicitationDate,
-				solicitationTime: workOrder.solicitationTime,
-				workRequest: workOrder.workRequest,
-				workDescription: workOrder.workDescription,
-				priority: workOrder.priority,
-				capex: workOrder.capex,
-				programDate: workOrder.programDate,
-				estimatedHours: workOrder.estimatedHours,
-				estimatedDays: workOrder.estimatedDays,
-				estimatedEndDate: workOrder.estimatedEndDate,
-				rescheduledEndDate: workOrder.rescheduledEndDate,
-				progress: workOrder.progress,
-				companyId: workOrder.company?.id,
-				supervisorId: workOrder.supervisor?.id,
-				responsibleId: workOrder.responsible?.id,
-				equipmentCount: workOrder.equipments?.length || 0,
-			},
-		})
+		let endReportId: string | null = null
+		if (endReport?.length) {
+			endReportId = crypto.randomUUID()
+			await db.query(
+				`INSERT INTO "attachment" ("id", "name", "url", "type", "size", "createdAt", "updatedAt", "endReportId")
+				 VALUES ($1, $2, $3, $4, $5, $6, $6, $1)`,
+				[
+					endReportId,
+					endReport[0].name,
+					endReport[0].url,
+					endReport[0].type,
+					endReport[0].size ?? null,
+					now,
+				]
+			)
+		}
 
-		revalidatePath("/admin/dashboard/ordenes-de-trabajo")
+		await db.query(
+			`UPDATE "work_order" SET
+				"type" = $1,
+				"capex" = $2,
+				"priority" = $3,
+				"progress" = $4,
+				"programDate" = $5,
+				"workRequest" = $6,
+				"workDescription" = $7,
+				"solicitationDate" = $8,
+				"solicitationTime" = $9,
+				"estimatedEndDate" = $10,
+				"rescheduledEndDate" = $11,
+				"estimatedDays" = $12,
+				"estimatedHours" = $13,
+				"status" = $14,
+				"endDate" = $15,
+				"companyId" = $16,
+				"supervisorId" = $17,
+				"responsibleId" = $18,
+				${endReportId ? `"endReportId" = $20,` : ""}
+				"updatedAt" = $19
+			WHERE "id" = ${endReportId ? "$21" : "$20"}`,
+			endReportId
+				? [
+						values.type,
+						values.capex,
+						values.priority,
+						progress,
+						new Date(values.programDate).toISOString(),
+						values.workRequest,
+						values.workDescription ?? null,
+						new Date(values.solicitationDate).toISOString(),
+						values.solicitationTime,
+						estimatedEndDateIso,
+						values.rescheduledEndDate
+							? new Date(values.rescheduledEndDate).toISOString()
+							: null,
+						parseInt(values.estimatedDays),
+						parseInt(values.estimatedHours),
+						status,
+						endDate,
+						values.companyId,
+						values.supervisorId,
+						values.responsibleId,
+						now,
+						endReportId,
+						id,
+					]
+				: [
+						values.type,
+						values.capex,
+						values.priority,
+						progress,
+						new Date(values.programDate).toISOString(),
+						values.workRequest,
+						values.workDescription ?? null,
+						new Date(values.solicitationDate).toISOString(),
+						values.solicitationTime,
+						estimatedEndDateIso,
+						values.rescheduledEndDate
+							? new Date(values.rescheduledEndDate).toISOString()
+							: null,
+						parseInt(values.estimatedDays),
+						parseInt(values.estimatedHours),
+						status,
+						endDate,
+						values.companyId,
+						values.supervisorId,
+						values.responsibleId,
+						now,
+						id,
+					]
+		)
+
+		// Reset equipment many-to-many
+		await db.query(`DELETE FROM "_EquipmentToWorkOrder" WHERE "B" = $1`, [id])
+		for (const equipmentId of values.equipment) {
+			await db.query(
+				`INSERT INTO "_EquipmentToWorkOrder" ("A", "B") VALUES ($1, $2)
+				 ON CONFLICT DO NOTHING`,
+				[equipmentId, id]
+			)
+		}
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: id,
+				entityType: "WorkOrder",
+				metadata: {
+					type: values.type,
+					status,
+					priority: values.priority,
+					progress,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			ok: true,
