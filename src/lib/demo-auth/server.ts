@@ -30,7 +30,7 @@ export type DemoSessionUser = DemoUser & {
 	documentAreas: string[]
 	internalArea: string | null
 	isActive: boolean
-	allowedModules: string[] | null
+	allowedModules: string[]
 	banned: boolean
 	banReason: string | null
 	banExpires: Date | null
@@ -54,7 +54,7 @@ function buildSessionFromUser(base: DemoUser): DemoSession {
 		documentAreas: [],
 		internalArea: null,
 		isActive: true,
-		allowedModules: null,
+		allowedModules: base.role === "supervisor" ? [] : ["ALL"],
 		banned: false,
 		banReason: null,
 		banExpires: null,
