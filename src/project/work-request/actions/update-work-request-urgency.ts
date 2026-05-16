@@ -1,12 +1,9 @@
-"use server"
-
-import { headers } from "next/headers"
 import { z } from "zod"
 
-import { ACCESS_ROLE, ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
+import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 const updateWorkRequestUrgencySchema = z.object({
 	id: z.string(),
@@ -14,73 +11,58 @@ const updateWorkRequestUrgencySchema = z.object({
 })
 
 export async function updateWorkRequestUrgency(
-	formData: z.infer<typeof updateWorkRequestUrgencySchema>
+	formData: z.infer<typeof updateWorkRequestUrgencySchema>,
 ) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user) {
-		return {
-			ok: false,
-			message: "No se pudo obtener la sesión del usuario",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No se pudo obtener la sesión del usuario" }
 	}
 
-	// Validar que el usuario tenga permisos de ADMIN
-	if (session.user.accessRole !== ACCESS_ROLE.ADMIN) {
-		return {
-			error: "No tienes permisos para realizar esta acción",
-		}
+	if (user.accessRole !== "ADMIN") {
+		return { error: "No tienes permisos para realizar esta acción" }
 	}
 
 	try {
 		const validatedData = updateWorkRequestUrgencySchema.parse(formData)
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
 
-		const workRequest = await prisma.workRequest.findUnique({
-			where: {
-				id: validatedData.id,
-			},
-		})
-
-		if (!workRequest) {
-			return {
-				error: "Solicitud no encontrada",
-			}
+		const updateResult = await db.query<Record<string, unknown>>(
+			`UPDATE "work_request"
+			 SET "isUrgent" = $1, "updatedAt" = $2
+			 WHERE id = $3
+			 RETURNING *`,
+			[validatedData.isUrgent, now, validatedData.id],
+		)
+		const updated = updateResult.rows[0]
+		if (!updated) {
+			return { error: "Solicitud no encontrada" }
 		}
 
-		const updatedWorkRequest = await prisma.workRequest.update({
-			where: {
-				id: validatedData.id,
-			},
-			data: {
-				isUrgent: validatedData.isUrgent,
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_REQUESTS,
-			action: ACTIVITY_TYPE.UPDATE,
-			entityId: updatedWorkRequest.id,
-			entityType: "WorkRequest",
-			metadata: {
-				requestNumber: updatedWorkRequest.requestNumber,
-				description: updatedWorkRequest.description,
-				isUrgent: updatedWorkRequest.isUrgent,
-				urgencyChanged: true,
-			},
-		})
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_REQUESTS,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: validatedData.id,
+				entityType: "WorkRequest",
+				metadata: {
+					requestNumber: updated.requestNumber,
+					description: updated.description,
+					isUrgent: updated.isUrgent,
+					urgencyChanged: true,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			success: `Solicitud ${validatedData.isUrgent ? "marcada como urgente" : "desmarcada como urgente"} correctamente`,
-			workRequest: updatedWorkRequest,
+			workRequest: updated,
 		}
 	} catch (error) {
 		console.error("Error al actualizar la urgencia de la solicitud:", error)
-
-		return {
-			error: "Error al actualizar la urgencia de la solicitud",
-		}
+		return { error: "Error al actualizar la urgencia de la solicitud" }
 	}
 }

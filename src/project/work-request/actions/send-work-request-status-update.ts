@@ -1,11 +1,4 @@
-"use server"
-
-import { Resend } from "resend"
-
-import { WorkRequestStatusUpdateEmail } from "@/project/work-request/components/emails/work-request-status-update-email"
-import { WORK_REQUEST_STATUS } from "@/generated/prisma/enums"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import type { WORK_REQUEST_STATUS } from "@/generated/prisma/enums"
 
 interface SendWorkRequestStatusUpdateEmailProps {
 	userEmail: string
@@ -15,49 +8,9 @@ interface SendWorkRequestStatusUpdateEmailProps {
 	description: string
 }
 
-export async function sendWorkRequestStatusUpdateEmail({
-	userEmail,
-	userName,
-	requestNumber,
-	status,
-	description,
-}: SendWorkRequestStatusUpdateEmailProps) {
-	if (!process.env.RESEND_API_KEY) {
-		console.error("Resend API key not found")
-		return {
-			error: "Resend API key not found",
-		}
-	}
-
-	try {
-		const statusText = {
-			[WORK_REQUEST_STATUS.REPORTED]: "Reportada",
-			[WORK_REQUEST_STATUS.ATTENDED]: "Atendida",
-			[WORK_REQUEST_STATUS.APPROVED]: "Aprovada",
-			[WORK_REQUEST_STATUS.CANCELLED]: "Cancelada",
-		}
-
-		const subject = `Actualización de estado - Solicitud de Trabajo #${requestNumber}`
-
-		await resend.emails.send({
-			from: "Notificaciones Internas <sistema@is360.cl>",
-			to: userEmail,
-			subject,
-			react: WorkRequestStatusUpdateEmail({
-				userName,
-				requestNumber,
-				status: statusText[status],
-				description,
-			}),
-		})
-
-		return {
-			success: "Correo enviado correctamente",
-		}
-	} catch (error) {
-		console.error("Error al enviar correo:", error)
-		return {
-			error: "Error al enviar correo",
-		}
-	}
+export async function sendWorkRequestStatusUpdateEmail(
+	_props: SendWorkRequestStatusUpdateEmailProps,
+) {
+	console.log("[demo] sendWorkRequestStatusUpdateEmail noop")
+	return { ok: true }
 }

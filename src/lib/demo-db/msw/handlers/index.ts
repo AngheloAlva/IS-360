@@ -8,6 +8,7 @@ import { userHandlers } from "./user"
 import { workBookHandlers } from "./work-book"
 import { workOrderHandlers } from "./work-order"
 import { workPermitHandlers } from "./work-permit"
+import { workRequestHandlers } from "./work-request"
 
 /**
  * Order matters: specific handlers FIRST, fallback LAST.
@@ -17,6 +18,7 @@ import { workPermitHandlers } from "./work-permit"
 export const handlers = [
 	...workOrderHandlers,
 	...workPermitHandlers,
+	...workRequestHandlers,
 	...workBookHandlers,
 	...userHandlers,
 	...companyHandlers,
