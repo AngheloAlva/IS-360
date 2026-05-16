@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES, StartupFolderType } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface CreateStartupFolderProps {
 	name: string
@@ -20,104 +16,63 @@ export const createStartupFolder = async ({
 	type,
 	moreMonthDuration,
 }: CreateStartupFolderProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				startupFolder: ["create"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
-		return {
-			ok: false,
-			message: "No tienes permiso para crear carpetas de arranque",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const startupFolder = await prisma.startupFolder.create({
-			data: {
-				name,
-				type,
-				companyId,
-				moreMonthDuration,
-			},
-		})
+		const db = await getDemoDb()
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+
+		await db.query(
+			`INSERT INTO "startup_folder" (id, name, type, "companyId", "moreMonthDuration", status, "isDeleted", "isArchived", "createdAt", "updatedAt")
+			 VALUES ($1, $2, $3, $4, $5, 'PENDING', false, false, $6, $6)`,
+			[id, name, type, companyId, moreMonthDuration, now],
+		)
 
 		if (type === StartupFolderType.FULL) {
-			const safetyAndHealthFolder = await prisma.safetyAndHealthFolder.create({
-				data: {
-					startupFolder: {
-						connect: {
-							id: startupFolder.id,
-						},
-					},
-				},
-			})
-
-			const environmentFolder = await prisma.environmentFolder.create({
-				data: {
-					startupFolder: {
-						connect: {
-							id: startupFolder.id,
-						},
-					},
-				},
-			})
-
-			const techSpecsFolder = await prisma.techSpecsFolder.create({
-				data: {
-					startupFolder: {
-						connect: {
-							id: startupFolder.id,
-						},
-					},
-				},
-			})
-
-			if (!startupFolder || !safetyAndHealthFolder || !environmentFolder || !techSpecsFolder) {
-				throw new Error("Error al crear la carpeta de arranque")
-			}
+			const sahId = crypto.randomUUID()
+			const envId = crypto.randomUUID()
+			const techId = crypto.randomUUID()
+			await db.query(
+				`INSERT INTO "safety_and_health_folder" (id, status, "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt")
+				 VALUES ($1, 'DRAFT', ARRAY[]::text[], $2, $3, $3)`,
+				[sahId, id, now],
+			)
+			await db.query(
+				`INSERT INTO "environment_folder" (id, status, "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt")
+				 VALUES ($1, 'DRAFT', ARRAY[]::text[], $2, $3, $3)`,
+				[envId, id, now],
+			)
+			await db.query(
+				`INSERT INTO "tech_specs_folder" (id, status, "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt")
+				 VALUES ($1, 'DRAFT', ARRAY[]::text[], $2, $3, $3)`,
+				[techId, id, now],
+			)
 		}
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.CREATE,
-			entityId: startupFolder.id,
-			entityType: "StartupFolder",
-			metadata: {
-				name,
-				type,
-				companyId,
-			},
-		})
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: id,
+				entityType: "StartupFolder",
+				metadata: { name, type, companyId },
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			ok: true,
 			message: "Carpeta de arranque creada correctamente",
-			data: {
-				folderId: startupFolder.id,
-			},
+			data: { folderId: id },
 		}
 	} catch (error) {
 		console.error("Error al crear la carpeta de arranque:", error)
-		return {
-			ok: false,
-			message: "Error al crear la carpeta de arranque",
-		}
+		return { ok: false, message: "Error al crear la carpeta de arranque" }
 	}
 }

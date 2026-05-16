@@ -1,5 +1,3 @@
-"use server"
-
 import { z } from "zod"
 
 import { MODULES, ACTIVITY_TYPE, EnvironmentDocType, TechSpecsDocumentType } from "@/generated/prisma/enums"
@@ -54,20 +52,24 @@ export async function updateStartupFolderDocument({
 		const { documentId, category, expirationDate, documentName, documentType } =
 			updateDocumentSchema.parse(data)
 
-  await logActivity({
-			userId,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.UPDATE,
-			entityId: documentId,
-			entityType: "StartupFolderDocument",
-			metadata: {
-				documentName,
-				documentType,
-				category,
-				expirationDate: expirationDate.toISOString(),
-				hasNewFile: !!uploadedFile,
-			},
-		})
+		try {
+			await logActivity({
+				userId,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: documentId,
+				entityType: "StartupFolderDocument",
+				metadata: {
+					documentName,
+					documentType,
+					category,
+					expirationDate: expirationDate.toISOString(),
+					hasNewFile: !!uploadedFile,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		switch (category) {
 			case "PERSONNEL":

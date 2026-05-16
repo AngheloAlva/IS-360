@@ -1,11 +1,8 @@
-"use server"
-
 import { z } from "zod"
 
-import { DocumentCategory, EnvironmentalDocType, SafetyAndHealthDocumentType } from "@/generated/prisma/enums"
-import { MODULES, ACTIVITY_TYPE, EnvironmentDocType, TechSpecsDocumentType } from "@/generated/prisma/enums"
+import { ACTIVITY_TYPE, DocumentCategory, MODULES, ReviewStatus } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 const createDocumentSchema = z.object({
 	userId: z.string(),
@@ -21,6 +18,27 @@ const createDocumentSchema = z.object({
 
 export type CreateStartupFolderDocumentInput = z.infer<typeof createDocumentSchema>
 
+const CATEGORY_TO_TABLES: Partial<
+	Record<DocumentCategory, { folderTable: string; documentTable: string }>
+> = {
+	[DocumentCategory.ENVIRONMENTAL]: {
+		folderTable: "environmental_folder",
+		documentTable: "environmental_document",
+	},
+	[DocumentCategory.ENVIRONMENT]: {
+		folderTable: "environment_folder",
+		documentTable: "environment_document",
+	},
+	[DocumentCategory.TECHNICAL_SPECS]: {
+		folderTable: "tech_specs_folder",
+		documentTable: "tech_specs_document",
+	},
+	[DocumentCategory.SAFETY_AND_HEALTH]: {
+		folderTable: "safety_and_health_folder",
+		documentTable: "safety_and_health_document",
+	},
+}
+
 export async function createStartupFolderDocument(input: CreateStartupFolderDocumentInput) {
 	try {
 		const {
@@ -35,150 +53,83 @@ export async function createStartupFolderDocument(input: CreateStartupFolderDocu
 			startupFolderId,
 		} = createDocumentSchema.parse(input)
 
-		const startupFolder = await prisma.startupFolder.findUnique({
-			where: { id: startupFolderId },
-			select: {
-				id: true,
-				companyId: true,
-				basicFolders: {
-					select: {
-						id: true,
-					},
-				},
-				workersFolders: workerId
-					? {
-							where: { workerId },
-							select: { id: true },
-						}
-					: undefined,
-				vehiclesFolders: vehicleId
-					? {
-							where: { vehicleId },
-							select: { id: true },
-						}
-					: undefined,
-				environmentalFolders: {
-					select: { id: true },
-				},
-				environmentFolders: {
-					select: { id: true },
-				},
-				techSpecsFolders: {
-					select: { id: true },
-				},
-				safetyAndHealthFolders: {
-					select: { id: true },
-				},
-			},
-		})
+		const db = await getDemoDb()
 
+		const startupRes = await db.query<{ id: string; companyId: string }>(
+			`SELECT id, "companyId" FROM "startup_folder" WHERE id = $1 LIMIT 1`,
+			[startupFolderId],
+		)
+		const startupFolder = startupRes.rows[0]
 		if (!startupFolder) {
 			throw new Error("Startup folder not found")
 		}
 
-		// Verify user belongs to the company
-		const user = await prisma.user.findUnique({ where: { id: userId } })
-		if (!user || user.companyId !== startupFolder.companyId) {
+		const userRes = await db.query<{ companyId: string | null }>(
+			`SELECT "companyId" FROM "user" WHERE id = $1 LIMIT 1`,
+			[userId],
+		)
+		const userRow = userRes.rows[0]
+		if (!userRow || userRow.companyId !== startupFolder.companyId) {
 			throw new Error("Unauthorized - User does not belong to this company")
 		}
 
-  await logActivity({
-			userId,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.UPLOAD,
-			entityId: startupFolderId,
-			entityType: "StartupFolderDocument",
-			metadata: {
-				documentName,
-				documentType,
-				category,
-				workerId,
-				vehicleId,
-				documentUrl: url,
-				expirationDate: expirationDate.toISOString(),
-			},
-		})
-
-		switch (category) {
-			case "ENVIRONMENTAL": {
-				const folder = startupFolder.environmentalFolders[0]
-				if (!folder) {
-					throw new Error("Environmental folder not found")
-				}
-
-				return await prisma.environmentalDocument.create({
-					data: {
-						url,
-						category,
-						expirationDate,
-						name: documentName,
-						folderId: folder.id,
-						uploadedById: userId,
-						type: documentType as EnvironmentalDocType,
-					},
-				})
-			}
-
-			case "ENVIRONMENT": {
-				const folder = startupFolder.environmentFolders[0]
-				if (!folder) {
-					throw new Error("Environmental folder not found")
-				}
-
-				return await prisma.environmentDocument.create({
-					data: {
-						url,
-						category,
-						expirationDate,
-						name: documentName,
-						folderId: folder.id,
-						uploadedById: userId,
-						type: documentType as EnvironmentDocType,
-					},
-				})
-			}
-
-			case "TECHNICAL_SPECS": {
-				const folder = startupFolder.techSpecsFolders[0]
-				if (!folder) {
-					throw new Error("Technical specs folder not found")
-				}
-
-				return await prisma.techSpecsDocument.create({
-					data: {
-						url,
-						category,
-						expirationDate,
-						name: documentName,
-						folderId: folder.id,
-						uploadedById: userId,
-						type: documentType as TechSpecsDocumentType,
-					},
-				})
-			}
-
-			case "SAFETY_AND_HEALTH": {
-				const folder = startupFolder.safetyAndHealthFolders[0]
-				if (!folder) {
-					throw new Error("Safety and health folder not found")
-				}
-
-				return await prisma.safetyAndHealthDocument.create({
-					data: {
-						url,
-						category,
-						expirationDate,
-						name: documentName,
-						folderId: folder.id,
-						uploadedById: userId,
-						type: documentType as SafetyAndHealthDocumentType,
-					},
-				})
-			}
-
-			default:
-				throw new Error(`Unsupported document category: ${category}`)
+		const tables = CATEGORY_TO_TABLES[category]
+		if (!tables) {
+			throw new Error(`Unsupported document category: ${category}`)
 		}
+
+		const folderRes = await db.query<{ id: string }>(
+			`SELECT id FROM "${tables.folderTable}" WHERE "startupFolderId" = $1 LIMIT 1`,
+			[startupFolderId],
+		)
+		const folder = folderRes.rows[0]
+		if (!folder) {
+			throw new Error(`${category} folder not found`)
+		}
+
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		await db.query(
+			`INSERT INTO "${tables.documentTable}"
+			 (id, type, name, url, "uploadedAt", category, status, "uploadedById", "folderId", "expirationDate")
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+			[
+				id,
+				documentType,
+				documentName,
+				url,
+				now,
+				category,
+				ReviewStatus.DRAFT,
+				userId,
+				folder.id,
+				expirationDate.toISOString(),
+			],
+		)
+
+		try {
+			await logActivity({
+				userId,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.UPLOAD,
+				entityId: startupFolderId,
+				entityType: "StartupFolderDocument",
+				metadata: {
+					documentName,
+					documentType,
+					category,
+					workerId,
+					vehicleId,
+					documentUrl: url,
+					expirationDate: expirationDate.toISOString(),
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
+
+		const docRes = await db.query(`SELECT * FROM "${tables.documentTable}" WHERE id = $1`, [id])
+		return docRes.rows[0]
 	} catch (error) {
 		console.error("Error creating startup folder document:", error)
 		throw error

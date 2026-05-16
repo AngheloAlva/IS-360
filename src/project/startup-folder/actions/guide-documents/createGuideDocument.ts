@@ -1,70 +1,58 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import { guideDocumentSchema, type GuideDocumentInput } from "../../schemas/guide-document.schema"
 
 export const createGuideDocument = async (data: GuideDocumentInput) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	// Solo admins pueden crear documentos guía
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				startupFolder: ["create"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
-		return {
-			ok: false,
-			message: "No tienes permiso para crear documentos guía",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
 		const validatedData = guideDocumentSchema.parse(data)
+		const db = await getDemoDb()
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
 
-		const guideDocument = await prisma.startupGuideDocument.create({
-			data: {
-				name: validatedData.name,
-				description: validatedData.description,
-				url: validatedData.url,
-				type: validatedData.type,
-				size: validatedData.size,
-				visibility: validatedData.visibility,
-				order: validatedData.order ?? 0,
-				createdById: session.user.id,
-			},
-		})
+		await db.query(
+			`INSERT INTO "startup_guide_document"
+			 (id, name, description, url, type, size, visibility, "order", "isActive", "createdById", "createdAt", "updatedAt")
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9, $10, $10)`,
+			[
+				id,
+				validatedData.name,
+				validatedData.description ?? null,
+				validatedData.url,
+				validatedData.type,
+				validatedData.size ?? null,
+				validatedData.visibility,
+				validatedData.order ?? 0,
+				user.id,
+				now,
+			],
+		)
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.CREATE,
-			entityId: guideDocument.id,
-			entityType: "StartupGuideDocument",
-			metadata: {
-				name: guideDocument.name,
-				visibility: guideDocument.visibility,
-			},
-		})
+		const res = await db.query(`SELECT * FROM "startup_guide_document" WHERE id = $1`, [id])
+		const guideDocument = res.rows[0]
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: id,
+				entityType: "StartupGuideDocument",
+				metadata: {
+					name: validatedData.name,
+					visibility: validatedData.visibility,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			ok: true,
@@ -73,9 +61,6 @@ export const createGuideDocument = async (data: GuideDocumentInput) => {
 		}
 	} catch (error) {
 		console.error("Error al crear documento guía:", error)
-		return {
-			ok: false,
-			message: "Error al crear el documento guía",
-		}
+		return { ok: false, message: "Error al crear el documento guía" }
 	}
 }

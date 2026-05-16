@@ -1,34 +1,14 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { changeSubfolderStatusSchema } from "../schemas/change-subfolder-status.schema"
-import { MODULES, ACCESS_ROLE } from "@/generated/prisma/enums"
+import { ACCESS_ROLE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export async function changeSubfolderStatus(
-	formData: FormData | { [key: string]: string | FormDataEntryValue }
+	formData: FormData | { [key: string]: string | FormDataEntryValue },
 ) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (session?.user?.accessRole !== ACCESS_ROLE.ADMIN) {
-		throw new Error("No tienes permisos para realizar esta acción")
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				startupFolder: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
+	const user = getDemoUser()
+	if (!user || user.accessRole !== ACCESS_ROLE.ADMIN) {
 		throw new Error("No tienes permisos para realizar esta acción")
 	}
 
@@ -36,7 +16,6 @@ export async function changeSubfolderStatus(
 		formData instanceof FormData ? Object.fromEntries(formData.entries()) : formData
 
 	const validatedData = changeSubfolderStatusSchema.safeParse(rawFormData)
-
 	if (!validatedData.success) {
 		throw new Error("Datos inválidos")
 	}
@@ -44,96 +23,82 @@ export async function changeSubfolderStatus(
 	const { startupFolderId, subfolderType, newStatus, entityId, reason } = validatedData.data
 
 	try {
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
+
+		const updateByStartup = async (table: string) => {
+			await db.query(
+				`UPDATE "${table}" SET status = $1, "updatedAt" = $2 WHERE "startupFolderId" = $3`,
+				[newStatus, now, startupFolderId],
+			)
+		}
+		const updateByCompound = async (table: string, field: "workerId" | "vehicleId", id: string) => {
+			await db.query(
+				`UPDATE "${table}" SET status = $1, "updatedAt" = $2 WHERE "${field}" = $3 AND "startupFolderId" = $4`,
+				[newStatus, now, id, startupFolderId],
+			)
+		}
+
 		switch (subfolderType) {
 			case "SAFETY_AND_HEALTH":
-				await prisma.safetyAndHealthFolder.update({
-					where: { startupFolderId },
-					data: { status: newStatus },
-				})
+				await updateByStartup("safety_and_health_folder")
 				break
-
 			case "ENVIRONMENTAL":
-				await prisma.environmentalFolder.update({
-					where: { startupFolderId },
-					data: { status: newStatus },
-				})
+				await updateByStartup("environmental_folder")
 				break
-
 			case "ENVIRONMENT":
-				await prisma.environmentFolder.update({
-					where: { startupFolderId },
-					data: { status: newStatus },
-				})
+				await updateByStartup("environment_folder")
 				break
-
 			case "TECHNICAL_SPECS":
-				await prisma.techSpecsFolder.update({
-					where: { startupFolderId },
-					data: { status: newStatus },
-				})
+				await updateByStartup("tech_specs_folder")
 				break
-
 			case "WORKER":
-				if (!entityId) {
-					throw new Error("ID del trabajador requerido")
-				}
-				await prisma.workerFolder.update({
-					where: { workerId_startupFolderId: { workerId: entityId, startupFolderId } },
-					data: { status: newStatus },
-				})
+				if (!entityId) throw new Error("ID del trabajador requerido")
+				await updateByCompound("worker_folders", "workerId", entityId)
 				break
-
 			case "VEHICLE":
-				if (!entityId) {
-					throw new Error("ID del vehículo requerido")
-				}
-				await prisma.vehicleFolder.update({
-					where: { vehicleId_startupFolderId: { vehicleId: entityId, startupFolderId } },
-					data: { status: newStatus },
-				})
+				if (!entityId) throw new Error("ID del vehículo requerido")
+				await updateByCompound("vehicle_folders", "vehicleId", entityId)
 				break
-
 			case "BASIC":
-				if (!entityId) {
-					throw new Error("ID del trabajador requerido")
-				}
-				await prisma.basicFolder.update({
-					where: { workerId_startupFolderId: { workerId: entityId, startupFolderId } },
-					data: { status: newStatus },
-				})
+				if (!entityId) throw new Error("ID del trabajador requerido")
+				await updateByCompound("basic_folder", "workerId", entityId)
 				break
-
 			default:
 				throw new Error("Tipo de subcarpeta no válido")
 		}
 
-		const startupFolder = await prisma.startupFolder.findUnique({
-			where: { id: startupFolderId },
-			include: { company: { select: { name: true } } },
-		})
+		const sfRes = await db.query<{ id: string; companyName: string }>(
+			`SELECT sf.id, c.name AS "companyName"
+			 FROM "startup_folder" sf JOIN "company" c ON c.id = sf."companyId"
+			 WHERE sf.id = $1 LIMIT 1`,
+			[startupFolderId],
+		)
+		const startupFolder = sfRes.rows[0]
 
 		if (startupFolder) {
-			await logActivity({
-				action: "UPDATE",
-				module: MODULES.STARTUP_FOLDERS,
-				userId: session.user.id,
-				entityType: "Subfolder",
-				entityId: startupFolder.id,
-				metadata: {
-					startupFolderId,
-					subfolderType,
-					newStatus,
-					entityId,
-					reason,
-					companyName: startupFolder.company.name,
-				},
-			})
+			try {
+				await logActivity({
+					action: "UPDATE",
+					module: MODULES.STARTUP_FOLDERS,
+					userId: user.id,
+					entityType: "Subfolder",
+					entityId: startupFolder.id,
+					metadata: {
+						startupFolderId,
+						subfolderType,
+						newStatus,
+						entityId,
+						reason,
+						companyName: startupFolder.companyName,
+					},
+				})
+			} catch {
+				// audit best-effort
+			}
 		}
 
-		return {
-			ok: true,
-			message: "Estado actualizado exitosamente",
-		}
+		return { ok: true, message: "Estado actualizado exitosamente" }
 	} catch (error) {
 		console.error("Error changing subfolder status:", error)
 		throw new Error("Error al actualizar el estado de la subcarpeta")

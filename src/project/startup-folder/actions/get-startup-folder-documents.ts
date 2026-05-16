@@ -1,7 +1,4 @@
-"use server"
-
 import { DocumentCategory, ReviewStatus } from "@/generated/prisma/enums"
-import prisma from "@/lib/prisma"
 import {
 	SAFETY_AND_HEALTH_STRUCTURE,
 	ENVIRONMENTAL_STRUCTURE,
@@ -9,6 +6,7 @@ import {
 	EXTENDED_ENVIRONMENT_STRUCTURE,
 	TECH_SPEC_STRUCTURE,
 } from "@/lib/consts/startup-folders-structure"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type {
 	StartupFolderDocument,
@@ -17,6 +15,27 @@ import type {
 	EnvironmentalStartupFolderDocument,
 	SafetyAndHealthStartupFolderDocument,
 } from "../types"
+
+const CATEGORY_TO_TABLES: Partial<
+	Record<DocumentCategory, { folderTable: string; documentTable: string }>
+> = {
+	[DocumentCategory.SAFETY_AND_HEALTH]: {
+		folderTable: "safety_and_health_folder",
+		documentTable: "safety_and_health_document",
+	},
+	[DocumentCategory.ENVIRONMENTAL]: {
+		folderTable: "environmental_folder",
+		documentTable: "environmental_document",
+	},
+	[DocumentCategory.ENVIRONMENT]: {
+		folderTable: "environment_folder",
+		documentTable: "environment_document",
+	},
+	[DocumentCategory.TECHNICAL_SPECS]: {
+		folderTable: "tech_specs_folder",
+		documentTable: "tech_specs_document",
+	},
+}
 
 export async function getStartupFolderDocuments({
 	startupFolderId,
@@ -34,264 +53,170 @@ export async function getStartupFolderDocuments({
 	isDriver: boolean
 }> {
 	try {
-		let folderStatus: ReviewStatus = "DRAFT"
+		const tables = CATEGORY_TO_TABLES[category]
+		if (!tables) throw new Error(`Invalid category: ${category}`)
 
-		const folder = await (async () => {
-			switch (category) {
-				case "SAFETY_AND_HEALTH":
-					return prisma.safetyAndHealthFolder.findUnique({
-						where: { startupFolderId },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
-				case "ENVIRONMENTAL":
-					return prisma.environmentalFolder.findUnique({
-						where: { startupFolderId },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
-				case "ENVIRONMENT":
-					return prisma.environmentFolder.findUnique({
-						where: { startupFolderId },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
-				case "TECHNICAL_SPECS":
-					return prisma.techSpecsFolder.findUnique({
-						where: { startupFolderId },
-						include: {
-							_count: {
-								select: {
-									documents: true,
-								},
-							},
-						},
-					})
-				default:
-					throw new Error(`Invalid category: ${category}`)
-			}
-		})()
-
+		const db = await getDemoDb()
+		const folderRes = await db.query<{ id: string; status: ReviewStatus }>(
+			`SELECT id, status FROM "${tables.folderTable}" WHERE "startupFolderId" = $1 LIMIT 1`,
+			[startupFolderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) {
 			return {
 				documents: [],
-				folderStatus,
+				folderStatus: ReviewStatus.DRAFT,
 				totalDocuments: 0,
 				approvedDocuments: 0,
 				isDriver: false,
 			}
 		}
 
-		folderStatus = folder.status
+		const docsRes = await db.query<{
+			id: string
+			url: string
+			name: string
+			type: string
+			status: ReviewStatus
+			folderId: string
+			reviewerId: string | null
+			uploadedAt: Date
+			reviewedAt: Date | null
+			reviewNotes: string | null
+			submittedAt: Date | null
+			uploadedById: string | null
+			expirationDate: Date | null
+			uploaded_name: string | null
+			uploaded_rut: string | null
+			uploaded_email: string | null
+			uploaded_phone: string | null
+			uploaded_image: string | null
+			reviewer_name: string | null
+			reviewer_rut: string | null
+			reviewer_email: string | null
+			reviewer_phone: string | null
+			reviewer_image: string | null
+		}>(
+			`SELECT d.id, d.url, d.name, d.type, d.status, d."folderId", d."reviewerId",
+			        d."uploadedAt", d."reviewedAt", d."reviewNotes", d."submittedAt",
+			        d."uploadedById", d."expirationDate",
+			        u.name AS uploaded_name, u.rut AS uploaded_rut, u.email AS uploaded_email,
+			        u.phone AS uploaded_phone, u.image AS uploaded_image,
+			        r.name AS reviewer_name, r.rut AS reviewer_rut, r.email AS reviewer_email,
+			        r.phone AS reviewer_phone, r.image AS reviewer_image
+			 FROM "${tables.documentTable}" d
+			 LEFT JOIN "user" u ON u.id = d."uploadedById"
+			 LEFT JOIN "user" r ON r.id = d."reviewerId"
+			 WHERE d."folderId" = $1
+			 ORDER BY d.name DESC`,
+			[folder.id],
+		)
 
-		const rawDocuments = await (async () => {
-			switch (category) {
-				case "SAFETY_AND_HEALTH":
-					return prisma.safetyAndHealthDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									rut: true,
-									name: true,
-									email: true,
-									phone: true,
-									image: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { name: "desc" },
-					})
-				case "ENVIRONMENTAL":
-					return prisma.environmentalDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									rut: true,
-									name: true,
-									email: true,
-									phone: true,
-									image: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { name: "desc" },
-					})
-				case "ENVIRONMENT":
-					return prisma.environmentDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									rut: true,
-									name: true,
-									email: true,
-									phone: true,
-									image: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { name: "desc" },
-					})
-				case "TECHNICAL_SPECS":
-					return prisma.techSpecsDocument.findMany({
-						where: { folderId: folder.id },
-						include: {
-							uploadedBy: {
-								select: {
-									id: true,
-									rut: true,
-									name: true,
-									email: true,
-									phone: true,
-									image: true,
-								},
-							},
-							reviewer: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-						orderBy: { name: "desc" },
-					})
-				default:
-					return []
-			}
-		})()
-
-		const documents: StartupFolderDocument[] = rawDocuments.map((doc) => {
+		const documents: StartupFolderDocument[] = docsRes.rows.map((d) => {
 			const baseDoc = {
-				id: doc.id,
-				url: doc.url,
-				name: doc.name,
-				status: doc.status,
-				folderId: doc.folderId,
-				reviewer: doc.reviewer,
-				reviewerId: doc.reviewerId,
-				uploadedAt: doc.uploadedAt,
-				reviewedAt: doc.reviewedAt,
-				uploadedBy: doc.uploadedBy,
-				reviewNotes: doc.reviewNotes,
-				submittedAt: doc.submittedAt,
-				uploadedById: doc.uploadedById,
-				expirationDate: doc.expirationDate,
+				id: d.id,
+				url: d.url,
+				name: d.name,
+				status: d.status,
+				folderId: d.folderId,
+				reviewerId: d.reviewerId,
+				reviewer: d.reviewerId
+					? {
+							id: d.reviewerId,
+							name: d.reviewer_name ?? "",
+							rut: d.reviewer_rut ?? "",
+							email: d.reviewer_email ?? "",
+							phone: d.reviewer_phone ?? "",
+							image: d.reviewer_image ?? "",
+						}
+					: null,
+				uploadedAt: d.uploadedAt,
+				reviewedAt: d.reviewedAt,
+				reviewNotes: d.reviewNotes,
+				submittedAt: d.submittedAt,
+				uploadedById: d.uploadedById,
+				expirationDate: d.expirationDate,
+				uploadedBy: d.uploadedById
+					? {
+							id: d.uploadedById,
+							name: d.uploaded_name ?? "",
+							rut: d.uploaded_rut ?? "",
+							email: d.uploaded_email ?? "",
+							phone: d.uploaded_phone ?? "",
+							image: d.uploaded_image ?? "",
+						}
+					: null,
 			}
 
 			switch (category) {
-				case "SAFETY_AND_HEALTH":
+				case DocumentCategory.SAFETY_AND_HEALTH:
 					return {
 						...baseDoc,
 						category: "SAFETY_AND_HEALTH",
-						type: doc.type,
+						type: d.type,
 					} as SafetyAndHealthStartupFolderDocument
-				case "ENVIRONMENTAL":
+				case DocumentCategory.ENVIRONMENTAL:
 					return {
 						...baseDoc,
 						category: "ENVIRONMENTAL",
-						type: doc.type,
+						type: d.type,
 					} as EnvironmentalStartupFolderDocument
-				case "ENVIRONMENT":
+				case DocumentCategory.ENVIRONMENT:
 					return {
 						...baseDoc,
 						category: "ENVIRONMENT",
-						type: doc.type,
+						type: d.type,
 					} as EnvironmentStartupFolderDocument
-				case "TECHNICAL_SPECS":
+				case DocumentCategory.TECHNICAL_SPECS:
 					return {
 						...baseDoc,
 						category: "TECHNICAL_SPECS",
-						type: doc.type,
+						type: d.type,
 					} as TechSpecsStartupFolderDocument
 				default:
 					throw new Error(`Invalid category: ${category}`)
 			}
 		})
 
-		// Obtener los tipos esperados de la estructura canónica
-		const getExpectedTypes = async (): Promise<string[]> => {
+		const expectedTypes = await (async (): Promise<string[]> => {
 			switch (category) {
-				case "SAFETY_AND_HEALTH":
+				case DocumentCategory.SAFETY_AND_HEALTH:
 					return SAFETY_AND_HEALTH_STRUCTURE.documents.map((d) => d.type)
-				case "ENVIRONMENTAL":
+				case DocumentCategory.ENVIRONMENTAL:
 					return ENVIRONMENTAL_STRUCTURE.documents.map((d) => d.type)
-				case "ENVIRONMENT": {
-					const startupFolder = await prisma.startupFolder.findUnique({
-						where: { id: startupFolderId },
-						select: { moreMonthDuration: true },
-					})
+				case DocumentCategory.ENVIRONMENT: {
+					const meta = await db.query<{ moreMonthDuration: boolean }>(
+						`SELECT "moreMonthDuration" FROM "startup_folder" WHERE id = $1 LIMIT 1`,
+						[startupFolderId],
+					)
 					return (
-						startupFolder?.moreMonthDuration
+						meta.rows[0]?.moreMonthDuration
 							? EXTENDED_ENVIRONMENT_STRUCTURE
 							: ENVIRONMENT_STRUCTURE
 					).documents.map((d) => d.type)
 				}
-				case "TECHNICAL_SPECS":
+				case DocumentCategory.TECHNICAL_SPECS:
 					return TECH_SPEC_STRUCTURE.documents.map((d) => d.type)
 				default:
 					return []
 			}
-		}
+		})()
 
-		const expectedTypes = await getExpectedTypes()
-
-		// Contar tipos únicos que tienen al menos un documento aprobado/no aplica
 		const satisfiedTypes = new Set<string>()
 		for (const doc of documents) {
 			if (
 				expectedTypes.includes(doc.type) &&
-				(doc.status === "APPROVED" || doc.status === "NOT_APPLIED")
+				(doc.status === ReviewStatus.APPROVED || doc.status === ReviewStatus.NOT_APPLIED)
 			) {
 				satisfiedTypes.add(doc.type)
 			}
 		}
 
-		const totalDocuments = expectedTypes.length
-		const approvedDocuments = satisfiedTypes.size
-
 		return {
 			documents,
-			folderStatus,
-			totalDocuments,
-			approvedDocuments,
+			folderStatus: folder.status,
+			totalDocuments: expectedTypes.length,
+			approvedDocuments: satisfiedTypes.size,
 			isDriver: false,
 		}
 	} catch (error) {

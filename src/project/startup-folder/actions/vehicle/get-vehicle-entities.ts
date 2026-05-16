@@ -1,7 +1,5 @@
-"use server"
-
 import { ReviewStatus } from "@/generated/prisma/enums"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface GetCompanyEntitiesParams {
 	companyId: string
@@ -22,78 +20,50 @@ export const getVehicleEntities = async ({
 	vinculatedEntities: SelectedEntity[]
 }> => {
 	try {
-		const vinculatedVehicles = await prisma.startupFolder.findUnique({
-			where: {
-				id: startupFolderId,
-			},
-			select: {
-				id: true,
-				name: true,
-				vehiclesFolders: {
-					where: {
-						vehicle: {
-							companyId,
-							isActive: true,
-						},
-					},
-					select: {
-						status: true,
-						vehicle: {
-							select: {
-								id: true,
-								plate: true,
-								brand: true,
-								model: true,
-							},
-						},
-					},
-					orderBy: {
-						vehicle: {
-							plate: "asc",
-						},
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+		const linkedRes = await db.query<{
+			id: string
+			plate: string | null
+			brand: string | null
+			model: string | null
+			status: ReviewStatus
+		}>(
+			`SELECT v.id, v.plate, v.brand, v.model, vf.status
+			 FROM "vehicle_folders" vf
+			 JOIN "vehicle" v ON v.id = vf."vehicleId"
+			 WHERE vf."startupFolderId" = $1 AND v."companyId" = $2 AND v."isActive" = true
+			 ORDER BY v.plate ASC`,
+			[startupFolderId, companyId],
+		)
+		const linkedIds = linkedRes.rows.map((r) => r.id)
 
-		const allVehiclesFolders = await prisma.vehicle.findMany({
-			where: {
-				companyId,
-				isActive: true,
-				NOT: {
-					id: {
-						in: vinculatedVehicles?.vehiclesFolders.map((vf) => vf.vehicle.id),
-					},
-				},
-			},
-			select: {
-				id: true,
-				plate: true,
-				brand: true,
-				model: true,
-			},
-			orderBy: {
-				plate: "asc",
-			},
-		})
+		const allRes = await db.query<{
+			id: string
+			plate: string | null
+			brand: string | null
+			model: string | null
+		}>(
+			linkedIds.length > 0
+				? `SELECT id, plate, brand, model FROM "vehicle"
+				   WHERE "companyId" = $1 AND "isActive" = true AND id <> ALL($2::text[])
+				   ORDER BY plate ASC`
+				: `SELECT id, plate, brand, model FROM "vehicle"
+				   WHERE "companyId" = $1 AND "isActive" = true
+				   ORDER BY plate ASC`,
+			linkedIds.length > 0 ? [companyId, linkedIds] : [companyId],
+		)
 
 		return {
-			allEntities: allVehiclesFolders.map((vehicle) => ({
-				id: vehicle.id,
-				name: vehicle.plate + " " + vehicle.brand + " " + vehicle.model,
+			allEntities: allRes.rows.map((v) => ({
+				id: v.id,
+				name: `${v.plate ?? ""} ${v.brand ?? ""} ${v.model ?? ""}`.trim(),
 				status: ReviewStatus.DRAFT,
 			})),
-			vinculatedEntities:
-				vinculatedVehicles?.vehiclesFolders.map((vehicleFolder) => ({
-					id: vehicleFolder.vehicle.id,
-					name:
-						vehicleFolder.vehicle.plate +
-						" - " +
-						vehicleFolder.vehicle.brand +
-						" - " +
-						vehicleFolder.vehicle.model,
-					status: vehicleFolder.status,
-				})) ?? [],
+			vinculatedEntities: linkedRes.rows.map((v) => ({
+				id: v.id,
+				name: `${v.plate ?? ""} - ${v.brand ?? ""} - ${v.model ?? ""}`,
+				status: v.status,
+			})),
 		}
 	} catch (error) {
 		console.error("Error fetching vehicle entities:", error)

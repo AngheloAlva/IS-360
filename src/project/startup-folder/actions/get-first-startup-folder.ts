@@ -1,6 +1,4 @@
-"use server"
-
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface GetFirstStartupFolderParams {
 	companyId: string
@@ -18,18 +16,20 @@ export async function getFirstStartupFolder({
 	includeArchived = false,
 	archivedOnly = false,
 }: GetFirstStartupFolderParams): Promise<FirstStartupFolderResult | null> {
-	return prisma.startupFolder.findFirst({
-		where: {
-			companyId,
-			isDeleted: false,
-			...(archivedOnly ? { isArchived: true } : includeArchived ? {} : { isArchived: false }),
-		},
-		orderBy: {
-			createdAt: "desc",
-		},
-		select: {
-			id: true,
-			isArchived: true,
-		},
-	})
+	const db = await getDemoDb()
+	const archiveClause = archivedOnly
+		? `AND "isArchived" = true`
+		: includeArchived
+			? ""
+			: `AND "isArchived" = false`
+
+	const res = await db.query<FirstStartupFolderResult>(
+		`SELECT id, "isArchived"
+		 FROM "startup_folder"
+		 WHERE "companyId" = $1 AND "isDeleted" = false ${archiveClause}
+		 ORDER BY "createdAt" DESC
+		 LIMIT 1`,
+		[companyId],
+	)
+	return res.rows[0] ?? null
 }

@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import {
 	updateGuideDocumentSchema,
@@ -13,72 +9,64 @@ import {
 } from "../../schemas/guide-document.schema"
 
 export const updateGuideDocument = async (data: UpdateGuideDocumentInput) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				startupFolder: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
-		return {
-			ok: false,
-			message: "No tienes permiso para actualizar documentos guía",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
 		const validatedData = updateGuideDocumentSchema.parse(data)
+		const db = await getDemoDb()
 
-		const existingDocument = await prisma.startupGuideDocument.findUnique({
-			where: { id: validatedData.id },
-		})
-
+		const existingRes = await db.query<{ id: string; name: string; visibility: string }>(
+			`SELECT id, name, visibility FROM "startup_guide_document" WHERE id = $1 LIMIT 1`,
+			[validatedData.id],
+		)
+		const existingDocument = existingRes.rows[0]
 		if (!existingDocument) {
-			return {
-				ok: false,
-				message: "Documento guía no encontrado",
-			}
+			return { ok: false, message: "Documento guía no encontrado" }
 		}
 
-		const guideDocument = await prisma.startupGuideDocument.update({
-			where: { id: validatedData.id },
-			data: {
-				name: validatedData.name,
-				description: validatedData.description,
-				url: validatedData.url,
-				type: validatedData.type,
-				size: validatedData.size,
-				visibility: validatedData.visibility,
-				order: validatedData.order,
-			},
-		})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "startup_guide_document"
+			 SET name = $1, description = $2, url = $3, type = $4, size = $5,
+			     visibility = $6, "order" = $7, "updatedAt" = $8
+			 WHERE id = $9`,
+			[
+				validatedData.name,
+				validatedData.description ?? null,
+				validatedData.url,
+				validatedData.type,
+				validatedData.size ?? null,
+				validatedData.visibility,
+				validatedData.order ?? 0,
+				now,
+				validatedData.id,
+			],
+		)
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.UPDATE,
-			entityId: guideDocument.id,
-			entityType: "StartupGuideDocument",
-			metadata: {
-				name: guideDocument.name,
-				visibility: guideDocument.visibility,
-				previousName: existingDocument.name,
-			},
-		})
+		const updatedRes = await db.query(`SELECT * FROM "startup_guide_document" WHERE id = $1`, [
+			validatedData.id,
+		])
+		const guideDocument = updatedRes.rows[0]
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: validatedData.id,
+				entityType: "StartupGuideDocument",
+				metadata: {
+					name: validatedData.name,
+					visibility: validatedData.visibility,
+					previousName: existingDocument.name,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			ok: true,
@@ -87,9 +75,6 @@ export const updateGuideDocument = async (data: UpdateGuideDocumentInput) => {
 		}
 	} catch (error) {
 		console.error("Error al actualizar documento guía:", error)
-		return {
-			ok: false,
-			message: "Error al actualizar el documento guía",
-		}
+		return { ok: false, message: "Error al actualizar el documento guía" }
 	}
 }

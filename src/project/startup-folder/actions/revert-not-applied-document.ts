@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, DocumentCategory, MODULES, ReviewStatus } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import { recomputeSubfolderStatus } from "./recompute-subfolder-status"
 
@@ -14,149 +10,102 @@ interface RevertNotAppliedDocumentInput {
 	category: DocumentCategory
 }
 
+const CATEGORY_CONFIG: Record<
+	DocumentCategory,
+	{ folderTable: string; documentTable: string; entityField?: "workerId" | "vehicleId" }
+> = {
+	[DocumentCategory.SAFETY_AND_HEALTH]: {
+		folderTable: "safety_and_health_folder",
+		documentTable: "safety_and_health_document",
+	},
+	[DocumentCategory.ENVIRONMENTAL]: {
+		folderTable: "environmental_folder",
+		documentTable: "environmental_document",
+	},
+	[DocumentCategory.ENVIRONMENT]: {
+		folderTable: "environment_folder",
+		documentTable: "environment_document",
+	},
+	[DocumentCategory.TECHNICAL_SPECS]: {
+		folderTable: "tech_specs_folder",
+		documentTable: "tech_specs_document",
+	},
+	[DocumentCategory.PERSONNEL]: {
+		folderTable: "worker_folders",
+		documentTable: "worker_document",
+		entityField: "workerId",
+	},
+	[DocumentCategory.VEHICLES]: {
+		folderTable: "vehicle_folders",
+		documentTable: "vehicle_document",
+		entityField: "vehicleId",
+	},
+	[DocumentCategory.BASIC]: {
+		folderTable: "basic_folder",
+		documentTable: "basic_document",
+		entityField: "workerId",
+	},
+}
+
 export async function revertNotAppliedDocument({
 	documentId,
 	category,
 }: RevertNotAppliedDocumentInput): Promise<{ ok: boolean; message: string }> {
-	const session = await auth.api.getSession({ headers: await headers() })
-
-	if (!session?.user?.id) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		if (category === DocumentCategory.SAFETY_AND_HEALTH) {
-			const document = await prisma.safetyAndHealthDocument.findUnique({
-				where: { id: documentId },
-				select: { id: true, status: true, folder: { select: { startupFolderId: true } } },
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.safetyAndHealthDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				startupFolderId: document.folder.startupFolderId,
-			})
+		const cfg = CATEGORY_CONFIG[category]
+		if (!cfg) {
+			return { ok: false, message: "Categoria no soportada" }
 		}
 
-		if (category === DocumentCategory.ENVIRONMENTAL) {
-			const document = await prisma.environmentalDocument.findUnique({
-				where: { id: documentId },
-				select: { id: true, status: true, folder: { select: { startupFolderId: true } } },
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.environmentalDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				startupFolderId: document.folder.startupFolderId,
-			})
+		const db = await getDemoDb()
+
+		const entitySelect = cfg.entityField ? `, f."${cfg.entityField}" AS "entityId"` : ""
+		const docRes = await db.query<{
+			id: string
+			status: ReviewStatus
+			startupFolderId: string
+			entityId: string | null
+		}>(
+			`SELECT d.id, d.status, f."startupFolderId"${entitySelect}
+			 FROM "${cfg.documentTable}" d
+			 JOIN "${cfg.folderTable}" f ON f.id = d."folderId"
+			 WHERE d.id = $1 LIMIT 1`,
+			[documentId],
+		)
+		const document = docRes.rows[0]
+
+		if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
+			return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
 		}
 
-		if (category === DocumentCategory.ENVIRONMENT) {
-			const document = await prisma.environmentDocument.findUnique({
-				where: { id: documentId },
-				select: { id: true, status: true, folder: { select: { startupFolderId: true } } },
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.environmentDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				startupFolderId: document.folder.startupFolderId,
-			})
-		}
+		await db.query(`DELETE FROM "${cfg.documentTable}" WHERE id = $1`, [documentId])
 
-		if (category === DocumentCategory.TECHNICAL_SPECS) {
-			const document = await prisma.techSpecsDocument.findUnique({
-				where: { id: documentId },
-				select: { id: true, status: true, folder: { select: { startupFolderId: true } } },
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.techSpecsDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				startupFolderId: document.folder.startupFolderId,
-			})
-		}
-
-		if (category === DocumentCategory.PERSONNEL) {
-			const document = await prisma.workerDocument.findUnique({
-				where: { id: documentId },
-				select: {
-					id: true,
-					status: true,
-					folder: { select: { startupFolderId: true, workerId: true } },
-				},
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.workerDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				workerId: document.folder.workerId,
-				startupFolderId: document.folder.startupFolderId,
-			})
-		}
-
-		if (category === DocumentCategory.VEHICLES) {
-			const document = await prisma.vehicleDocument.findUnique({
-				where: { id: documentId },
-				select: {
-					id: true,
-					status: true,
-					folder: { select: { startupFolderId: true, vehicleId: true } },
-				},
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.vehicleDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				vehicleId: document.folder.vehicleId,
-				startupFolderId: document.folder.startupFolderId,
-			})
-		}
-
-		if (category === DocumentCategory.BASIC) {
-			const document = await prisma.basicDocument.findUnique({
-				where: { id: documentId },
-				select: {
-					id: true,
-					status: true,
-					folder: { select: { startupFolderId: true, workerId: true } },
-				},
-			})
-			if (!document || document.status !== ReviewStatus.NOT_APPLIED) {
-				return { ok: false, message: "Documento no encontrado o no esta en No Aplica" }
-			}
-			await prisma.basicDocument.delete({ where: { id: documentId } })
-			await recomputeSubfolderStatus({
-				category,
-				workerId: document.folder.workerId,
-				startupFolderId: document.folder.startupFolderId,
-			})
-		}
-
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.STARTUP_FOLDERS,
-			action: ACTIVITY_TYPE.DELETE,
-			entityId: documentId,
-			entityType: "StartupFolderDocument",
-			metadata: {
-				category,
-				status: "NOT_APPLIED",
-				action: "revert",
-			},
+		await recomputeSubfolderStatus({
+			category,
+			startupFolderId: document.startupFolderId,
+			workerId:
+				cfg.entityField === "workerId" ? document.entityId ?? undefined : undefined,
+			vehicleId:
+				cfg.entityField === "vehicleId" ? document.entityId ?? undefined : undefined,
 		})
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.DELETE,
+				entityId: documentId,
+				entityType: "StartupFolderDocument",
+				metadata: { category, status: "NOT_APPLIED", action: "revert" },
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return { ok: true, message: "No Aplica revertido correctamente" }
 	} catch (error) {

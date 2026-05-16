@@ -1,12 +1,8 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { linkVehicleEntity } from "./vehicle/link-vehicle-entity"
 import { linkWorkerEntity } from "./worker/link-worker-entity"
 import { linkBasicEntity } from "./basic/link-basic-entity"
 import { DocumentCategory } from "@/generated/prisma/enums"
-import { auth } from "@/lib/auth"
+import { getDemoUser } from "@/lib/demo-auth"
 
 interface LinkEntityProps {
 	entityId: string
@@ -26,15 +22,12 @@ export const linkEntity = async ({
 	entityCategory,
 	startupFolderId,
 }: LinkEntityProps): Promise<LinkEntityResponse> => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user) {
+	const user = getDemoUser()
+	if (!user) {
 		throw new Error("No se encontro usuario")
 	}
 
-	const userId = session.user.id
+	const userId = user.id
 
 	try {
 		switch (entityCategory) {
@@ -49,15 +42,9 @@ export const linkEntity = async ({
 				break
 		}
 
-		return {
-			ok: true,
-			message: "Entidad vinculada exitosamente",
-		}
+		return { ok: true, message: "Entidad vinculada exitosamente" }
 	} catch (error) {
 		console.error("Error vinculando entidad:", error)
-		return {
-			ok: false,
-			message: "Error al vincular la entidad",
-		}
+		return { ok: false, message: "Error al vincular la entidad" }
 	}
 }

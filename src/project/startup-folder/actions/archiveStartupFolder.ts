@@ -1,12 +1,9 @@
-"use server"
-
-import { headers } from "next/headers"
 import { z } from "zod"
 
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 const archiveStartupFolderSchema = z.object({
 	startupFolderId: z.string().min(1),
@@ -22,65 +19,35 @@ export const archiveStartupFolder = async ({
 	startupFolderId,
 	archive,
 }: ArchiveStartupFolderProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				startupFolder: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
-		return {
-			ok: false,
-			message: "No tienes permiso para archivar carpetas de arranque",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const validatedData = archiveStartupFolderSchema.parse({
-			startupFolderId,
-			archive,
-		})
+		const validatedData = archiveStartupFolderSchema.parse({ startupFolderId, archive })
+		const db = await getDemoDb()
 
-		const startupFolder = await prisma.startupFolder.findUnique({
-			where: {
-				id: validatedData.startupFolderId,
-			},
-			select: {
-				id: true,
-				name: true,
-				type: true,
-				companyId: true,
-				isDeleted: true,
-				isArchived: true,
-			},
-		})
+		const res = await db.query<{
+			id: string
+			name: string
+			type: string
+			companyId: string
+			isDeleted: boolean
+			isArchived: boolean
+		}>(
+			`SELECT id, name, type, "companyId", "isDeleted", "isArchived"
+			 FROM "startup_folder" WHERE id = $1 LIMIT 1`,
+			[validatedData.startupFolderId],
+		)
+		const startupFolder = res.rows[0]
 
 		if (!startupFolder) {
-			return {
-				ok: false,
-				message: "Carpeta de arranque no encontrada",
-			}
+			return { ok: false, message: "Carpeta de arranque no encontrada" }
 		}
 
 		if (startupFolder.isDeleted) {
-			return {
-				ok: false,
-				message: "No se puede archivar una carpeta eliminada",
-			}
+			return { ok: false, message: "No se puede archivar una carpeta eliminada" }
 		}
 
 		if (startupFolder.isArchived === validatedData.archive) {
@@ -92,29 +59,30 @@ export const archiveStartupFolder = async ({
 			}
 		}
 
-		const updatedFolder = await prisma.startupFolder.update({
-			where: {
-				id: startupFolder.id,
-			},
-			data: {
-				isArchived: validatedData.archive,
-				archivedAt: validatedData.archive ? new Date() : null,
-			},
-		})
+		const archivedAt = validatedData.archive ? new Date().toISOString() : null
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "startup_folder" SET "isArchived" = $1, "archivedAt" = $2, "updatedAt" = $3 WHERE id = $4`,
+			[validatedData.archive, archivedAt, now, startupFolder.id],
+		)
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.STARTUP_FOLDERS,
-			action: validatedData.archive ? ACTIVITY_TYPE.UPDATE : ACTIVITY_TYPE.UPDATE,
-			entityId: updatedFolder.id,
-			entityType: "StartupFolder",
-			metadata: {
-				companyId: updatedFolder.companyId,
-				name: startupFolder.name,
-				type: updatedFolder.type,
-				action: validatedData.archive ? "archived" : "unarchived",
-			},
-		})
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.STARTUP_FOLDERS,
+				action: ACTIVITY_TYPE.UPDATE,
+				entityId: startupFolder.id,
+				entityType: "StartupFolder",
+				metadata: {
+					companyId: startupFolder.companyId,
+					name: startupFolder.name,
+					type: startupFolder.type,
+					action: validatedData.archive ? "archived" : "unarchived",
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			ok: true,
@@ -122,15 +90,12 @@ export const archiveStartupFolder = async ({
 				? "Carpeta de arranque archivada correctamente"
 				: "Carpeta de arranque desarchivada correctamente",
 			data: {
-				folderId: updatedFolder.id,
-				isArchived: updatedFolder.isArchived,
+				folderId: startupFolder.id,
+				isArchived: validatedData.archive,
 			},
 		}
 	} catch (error) {
 		console.error("Error al archivar la carpeta de arranque:", error)
-		return {
-			ok: false,
-			message: "Error al archivar la carpeta de arranque",
-		}
+		return { ok: false, message: "Error al archivar la carpeta de arranque" }
 	}
 }
