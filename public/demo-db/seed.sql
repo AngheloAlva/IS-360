@@ -155,6 +155,61 @@ INSERT INTO "_WorkPermitParticipants" ("A", "B") VALUES
   ('seed-supervisor-2','demo-wp-003')
 ON CONFLICT DO NOTHING;
 
+-- ─── Maintenance Plans + tasks ─────────────────────────────────────────────
+INSERT INTO "maintenance_plan" ("id", "slug", "name", "description", "isActive", "equipmentId", "createdById", "createdAt", "updatedAt")
+VALUES
+  ('demo-mp-001', 'plan-bomba-centrifuga-a', 'Plan Bomba Centrífuga A', 'Mantenimiento preventivo programado para BC-001', true, 'demo-eq-001', 'demo-admin', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-mp-002', 'plan-motor-electrico-75kw', 'Plan Motor Eléctrico 75kW', 'Mantenimiento preventivo para ME-001', true, 'demo-eq-003', 'demo-admin', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "maintenance_plan_task" (
+  "id", "slug", "name", "description", "isActive", "frequency", "nextDate",
+  "originalDayOfMonth", "isAutomated", "automatedDaysInAdvance",
+  "blockIfPreviousNotCompleted", "emailsForCopy",
+  "equipmentId", "maintenancePlanId", "createdById", "automatedResponsibleId",
+  "createdAt", "updatedAt"
+)
+VALUES
+  ('demo-mpt-001', 'inspeccion-vibraciones-bc-001', 'Inspección de vibraciones', 'Medición y análisis de vibraciones',  true, 'MONTHLY',   '2026-05-30T08:00:00Z', 30, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-001', 'demo-mp-001', 'demo-admin', 'demo-tech', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-mpt-002', 'cambio-sellos-bc-001',          'Cambio de sellos',          'Reemplazo de sellos mecánicos',       true, 'BIANNUAL', '2026-07-15T08:00:00Z', 15, false, 7, true, ARRAY[]::TEXT[], 'demo-eq-001', 'demo-mp-001', 'demo-admin', 'demo-tech', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-mpt-003', 'cambio-aceite-me-001',          'Cambio de aceite',          'Cambio de aceite y filtros',          true, 'QUARTERLY','2026-06-25T08:00:00Z', 25, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-003', 'demo-mp-002', 'demo-admin', 'demo-tech', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
+  ('demo-mpt-004', 'termografia-me-001',            'Inspección termográfica',   'Termografía y análisis térmico',      true, 'MONTHLY',  '2026-05-28T08:00:00Z', 28, false, 5, true, ARRAY[]::TEXT[], 'demo-eq-003', 'demo-mp-002', 'demo-admin', 'demo-tech', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "_MaintenancePlanTaskEquipments" ("A", "B") VALUES
+  ('demo-eq-001', 'demo-mpt-001'),
+  ('demo-eq-001', 'demo-mpt-002'),
+  ('demo-eq-003', 'demo-mpt-003'),
+  ('demo-eq-003', 'demo-mpt-004')
+ON CONFLICT DO NOTHING;
+
+-- ─── Work Requests + counter ────────────────────────────────────────────────
+INSERT INTO "work_request_counter" ("id", "value") VALUES ('work-request-counter', 3)
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "work_request" (
+  "id", "requestNumber", "description", "isUrgent", "requestDate", "observations",
+  "status", "workType", "userId", "createdAt", "updatedAt",
+  "approvalDate", "approvalById"
+)
+VALUES
+  ('demo-wr-001', 'REQ-2026-0001', 'Compresor secundario presenta ruido anormal', true,  '2026-05-14T08:30:00Z', 'Detectado durante turno matutino', 'REPORTED', 'MECHANIC',  'demo-supervisor', '2026-05-14T08:30:00Z', '2026-05-14T08:30:00Z', NULL,                   NULL),
+  ('demo-wr-002', 'REQ-2026-0002', 'Solicitud limpieza tablero TG1',              false, '2026-05-10T09:15:00Z', 'Limpieza preventiva trimestral',   'APPROVED', 'ELECTRIC',  'demo-supervisor', '2026-05-10T09:15:00Z', '2026-05-11T11:00:00Z', '2026-05-11T11:00:00Z', 'demo-admin'),
+  ('demo-wr-003', 'REQ-2026-0003', 'Revisión generador auxiliar tras prueba',     false, '2026-05-08T14:00:00Z', 'Posterior a prueba de carga',      'ATTENDED', 'MECHANIC',  'seed-supervisor-2', '2026-05-08T14:00:00Z', '2026-05-09T16:00:00Z', '2026-05-09T16:00:00Z', 'demo-admin')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "_EquipmentToWorkRequest" ("A", "B") VALUES
+  ('demo-eq-008', 'demo-wr-001'),
+  ('demo-eq-004', 'demo-wr-002'),
+  ('demo-eq-007', 'demo-wr-003')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO "work_request_comment" ("id", "content", "userId", "workRequestId", "createdAt", "updatedAt")
+VALUES
+  ('demo-wrc-001', 'Confirmamos visita técnica el viernes',    'demo-admin', 'demo-wr-002', '2026-05-10T15:00:00Z', '2026-05-10T15:00:00Z'),
+  ('demo-wrc-002', 'Generador OK, parámetros normales',        'demo-tech',  'demo-wr-003', '2026-05-09T16:30:00Z', '2026-05-09T16:30:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
 -- ─── Equipment ↔ Work Order (Prisma implicit M2N) ───────────────────────────
 INSERT INTO "_EquipmentToWorkOrder" ("A", "B") VALUES
   ('demo-eq-001', 'demo-wo-001'),
