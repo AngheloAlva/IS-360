@@ -2,10 +2,14 @@ import { NextResponse, type NextRequest } from "next/server"
 
 import { canAccessAdminRoute, getBestRedirectRoute } from "@/lib/module-permissions"
 
-import type { auth } from "@/lib/auth"
+import { DEMO_USERS } from "@/lib/demo-auth/users"
+import { DEMO_ROLE_COOKIE } from "@/lib/demo-auth/storage"
+import type { DemoRole } from "@/lib/demo-auth/types"
 import { MODULES } from "./generated/prisma/enums"
 
-type Session = typeof auth.$Infer.Session
+function isDemoRole(value: string | undefined): value is DemoRole {
+	return value === "admin" || value === "internal-tech" || value === "supervisor"
+}
 
 export default async function authMiddleware(request: NextRequest) {
 	const requestId = crypto.randomUUID()
@@ -17,33 +21,26 @@ export default async function authMiddleware(request: NextRequest) {
 		return NextResponse.next({ request: { headers: requestHeaders } })
 	}
 
-	const session: Session = await fetch(`${request.nextUrl.origin}/api/auth/get-session`, {
-		headers: {
-			cookie: request.headers.get("cookie") || "",
-		},
-	}).then((res) => res.json())
+	const roleCookie = request.cookies.get(DEMO_ROLE_COOKIE)?.value
+	const role = isDemoRole(roleCookie) ? roleCookie : null
+	const demoUser = role ? DEMO_USERS[role] : null
 
-	if (!session) {
+	if (!demoUser) {
 		const callbackUrl = request.nextUrl.pathname + request.nextUrl.search
 		return NextResponse.redirect(
 			new URL(`/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`, request.url)
 		)
 	}
 
-	if (!session.user.isActive) {
-		return NextResponse.redirect(new URL("/"))
-	}
-
 	if (request.nextUrl.pathname.startsWith("/admin/dashboard")) {
-		if (session.user.accessRole === "PARTNER_COMPANY") {
+		if (demoUser.accessRole === "PARTNER_COMPANY") {
 			return NextResponse.redirect(new URL("/dashboard/inicio", request.url))
 		}
 
-		if (session.user.accessRole === "ADMIN") {
-			const userModules = (session.user.allowedModules as (MODULES | string)[]) || ["ALL"]
+		if (demoUser.accessRole === "ADMIN") {
+			const userModules: (MODULES | string)[] = ["ALL"]
 
 			if (!canAccessAdminRoute(userModules, request.nextUrl.pathname)) {
-				// En lugar de redirigir siempre a inicio, usar redirección inteligente
 				const bestRoute = getBestRedirectRoute(userModules)
 				return NextResponse.redirect(new URL(bestRoute, request.url))
 			}

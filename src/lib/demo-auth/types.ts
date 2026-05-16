@@ -5,7 +5,7 @@ export type DemoUser = {
 	name: string
 	email: string
 	role: DemoRole
-	accessRole: "ADMIN" | "PARTNER_COMPANY"
+	accessRole: "ADMIN" | "PARTNER_COMPANY" | "OPERATOR"
 	isSupervisor: boolean
 	companyId: string | null
 }
