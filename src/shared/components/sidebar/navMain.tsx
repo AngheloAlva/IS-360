@@ -64,7 +64,7 @@ export function NavMain({
 				group.type === "normal" ? (
 					<SidebarGroup key={i}>
 						<SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-						<SidebarMenu className="space-y-1">
+						<SidebarMenu>
 							{group.items.map((item) => {
 								const hasSubItems = !!item.subItems?.length
 								const isActive = pathName.includes(item.url)
@@ -106,8 +106,7 @@ export function NavMain({
 												<SidebarMenuAction
 													aria-label={`Toggle ${item.name}`}
 													className={cn({
-														"text-background hover:bg-text/80 hover:text-background":
-															isActive,
+														"text-background hover:bg-text/80 hover:text-background": isActive,
 													})}
 												>
 													<ChevronRightIcon className="transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -143,7 +142,7 @@ export function NavMain({
 					<SidebarGroup key={i}>
 						<SidebarGroupLabel>Otros</SidebarGroupLabel>
 
-						<SidebarMenu className="space-y-1">
+						<SidebarMenu>
 							<Collapsible asChild className="group/collapsible">
 								<SidebarMenuItem>
 									<CollapsibleTrigger asChild>

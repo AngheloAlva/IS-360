@@ -30,8 +30,8 @@ export function AppSidebar({
 		<Sidebar collapsible="icon" variant="sidebar" {...props}>
 			<SidebarHeader>
 				<div className="flex h-12 w-full items-center gap-2 overflow-hidden p-2 text-left text-sm">
-					<div className="flex aspect-square size-8 items-center justify-center">
-						<Image alt="Logo" width={50} height={52} src="/logo.svg" />
+					<div className="flex aspect-square h-auto w-24 items-center justify-center">
+						<Image alt="Logo" width={96} height={42} src="/logo.svg" />
 					</div>
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-bold">IS</span>
