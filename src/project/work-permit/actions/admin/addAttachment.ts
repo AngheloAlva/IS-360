@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 import {
 	getScopedWorkPermitId,
 	hasWorkPermitUpdatePermission,
@@ -16,99 +12,73 @@ import type { UploadResult } from "@/lib/upload-files"
 
 export const addWorkPermitAttachment = async (
 	values: WorkPermitAttachmentSchema,
-	uploadedFile: UploadResult
+	uploadedFile: UploadResult,
 ) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
 		const { workPermitId } = values
 
-		const hasPermission = await hasWorkPermitUpdatePermission(session.user.id)
-
+		const hasPermission = await hasWorkPermitUpdatePermission(user.id)
 		if (!hasPermission) {
-			return {
-				ok: false,
-				message: "No tienes permisos para adjuntar archivos",
-			}
+			return { ok: false, message: "No tienes permisos para adjuntar archivos" }
 		}
 
-		const scopedWorkPermitId = await getScopedWorkPermitId({
-			workPermitId,
-			userId: session.user.id,
-		})
-
-		if (!scopedWorkPermitId) {
-			return {
-				ok: false,
-				message: "Permiso de trabajo no encontrado",
-			}
+		const scopedId = await getScopedWorkPermitId({ workPermitId, userId: user.id })
+		if (!scopedId) {
+			return { ok: false, message: "Permiso de trabajo no encontrado" }
 		}
 
-		const attachment = await prisma.workPermitAttachment.create({
-			data: {
-				name: uploadedFile.name,
-				url: uploadedFile.url,
-				type: uploadedFile.type,
-				size: uploadedFile.size,
-				uploadedAt: new Date(),
-				uploadedBy: {
-					connect: {
-						id: session.user.id,
-					},
+		const db = await getDemoDb()
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+
+		const insertResult = await db.query<{
+			id: string
+			name: string
+			url: string
+			type: string
+			size: number | null
+			uploadedAt: string
+			workPermitId: string
+			uploadedById: string
+		}>(
+			`INSERT INTO "work_permit_attachment" (
+				id, name, url, type, size, "uploadedAt", "uploadedById", "workPermitId",
+				"createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $6, $6)
+			 RETURNING id, name, url, type, size, "uploadedAt", "workPermitId", "uploadedById"`,
+			[id, uploadedFile.name, uploadedFile.url, uploadedFile.type, uploadedFile.size, now, user.id, scopedId],
+		)
+		const attachment = insertResult.rows[0]
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_PERMITS,
+				action: ACTIVITY_TYPE.UPLOAD,
+				entityId: attachment.id,
+				entityType: "WorkPermitAttachment",
+				metadata: {
+					name: attachment.name,
+					url: attachment.url,
+					type: attachment.type,
+					size: attachment.size,
+					uploadedAt: attachment.uploadedAt,
+					workPermitId: attachment.workPermitId,
+					uploadedById: attachment.uploadedById,
 				},
-				workPermit: {
-					connect: {
-						id: scopedWorkPermitId,
-					},
-				},
-			},
-			select: {
-				id: true,
-				name: true,
-				url: true,
-				type: true,
-				size: true,
-				uploadedAt: true,
-				workPermitId: true,
-				uploadedById: true,
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_PERMITS,
-			action: ACTIVITY_TYPE.UPLOAD,
-			entityId: attachment.id,
-			entityType: "WorkPermitAttachment",
-			metadata: {
-				name: attachment.name,
-				url: attachment.url,
-				type: attachment.type,
-				size: attachment.size,
-				uploadedAt: attachment.uploadedAt,
-				workPermitId: attachment.workPermitId,
-				uploadedById: attachment.uploadedById,
-			},
-		})
-
-		return {
-			ok: true,
-			message: "Archivo adjuntado exitosamente",
+			})
+		} catch {
+			// audit best-effort
 		}
+
+		return { ok: true, message: "Archivo adjuntado exitosamente" }
 	} catch (error) {
 		console.error("[ADD_WORK_PERMIT_ATTACHMENT]", error)
-		return {
-			ok: false,
-			message: "Error al adjuntar el archivo",
-		}
+		return { ok: false, message: "Error al adjuntar el archivo" }
 	}
 }

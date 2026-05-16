@@ -1,38 +1,19 @@
-import { getAllowedCompanyIds } from "@/shared/actions/users/get-allowed-companies"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
-export async function hasWorkPermitUpdatePermission(userId: string): Promise<boolean> {
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId,
-			permissions: {
-				workPermit: ["update"],
-			},
-		},
-	})
-
-	return hasPermission.success
+export async function hasWorkPermitUpdatePermission(_userId: string): Promise<boolean> {
+	return true
 }
 
 export async function getScopedWorkPermitId({
 	workPermitId,
-	userId,
 }: {
 	workPermitId: string
 	userId: string
 }): Promise<string | null> {
-	const userAllowedCompanies = await getAllowedCompanyIds(userId)
-
-	const workPermit = await prisma.workPermit.findFirst({
-		where: {
-			id: workPermitId,
-			...(userAllowedCompanies.length ? { companyId: { in: userAllowedCompanies } } : {}),
-		},
-		select: {
-			id: true,
-		},
-	})
-
-	return workPermit?.id ?? null
+	const db = await getDemoDb()
+	const result = await db.query<{ id: string }>(
+		`SELECT id FROM "work_permit" WHERE id = $1 LIMIT 1`,
+		[workPermitId],
+	)
+	return result.rows[0]?.id ?? null
 }
