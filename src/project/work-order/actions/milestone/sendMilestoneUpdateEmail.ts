@@ -1,9 +1,3 @@
-"use server"
-
-import { resend } from "@/lib/resend"
-
-import { MilestoneUpdateEmail } from "@/project/work-order/components/emails/MilestoneUpdateEmail"
-
 interface SendMilestoneUpdateEmailProps {
 	email: string
 	updateDate?: Date
@@ -15,47 +9,9 @@ interface SendMilestoneUpdateEmailProps {
 	milestonesCount: number
 }
 
-export const sendMilestoneUpdateEmail = async ({
-	email,
-	updateDate,
-	workOrderId,
-	companyName,
-	workOrderName,
-	supervisorName,
-	workOrderNumber,
-	milestonesCount,
-}: SendMilestoneUpdateEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [email],
-			subject: `Actualización de Hitos - Libro de Obras ${workOrderName}`,
-			react: await MilestoneUpdateEmail({
-				companyName,
-				workOrderId,
-				workOrderName,
-				supervisorName,
-				workOrderNumber,
-				milestonesCount,
-				updateDate,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendMilestoneUpdateEmail = async (
+	props: SendMilestoneUpdateEmailProps
+) => {
+	console.info("[demo] email noop: sendMilestoneUpdateEmail", props)
+	return { ok: true, data: null as unknown }
 }

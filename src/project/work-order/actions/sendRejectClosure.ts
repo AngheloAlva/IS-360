@@ -1,9 +1,3 @@
-"use server"
-
-import { resend } from "@/lib/resend"
-
-import { RejectClousureEmail } from "@/project/work-order/components/emails/RejectClousureEmail"
-
 interface SendRejectClosureEmailProps {
 	email: string
 	companyName: string
@@ -13,43 +7,9 @@ interface SendRejectClosureEmailProps {
 	rejectionReason?: string
 }
 
-export const sendRejectClosureEmail = async ({
-	email,
-	companyName,
-	workOrderName,
-	supervisorName,
-	rejectionReason,
-	workOrderNumber,
-}: SendRejectClosureEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [email],
-			subject: `Rechazo de Cierre - Libro de Obras ${workOrderName}`,
-			react: await RejectClousureEmail({
-				workOrderName,
-				workOrderNumber,
-				companyName,
-				supervisorName,
-				rejectionReason,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendRejectClosureEmail = async (
+	props: SendRejectClosureEmailProps
+) => {
+	console.info("[demo] email noop: sendRejectClosureEmail", props)
+	return { ok: true, data: null as unknown }
 }

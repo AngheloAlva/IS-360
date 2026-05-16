@@ -1,8 +1,3 @@
-"use server"
-
-import NewWorkOrderEmail from "@/project/work-order/components/emails/NewWorkOrderEmail"
-import { resend } from "@/lib/resend"
-
 interface SendNewWorkOrderEmailProps {
 	workOrder: {
 		otNumber: string
@@ -25,33 +20,9 @@ interface SendNewWorkOrderEmailProps {
 	}
 }
 
-export const sendNewWorkOrderEmail = async ({ workOrder }: SendNewWorkOrderEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [workOrder.supervisor.email, "demo@ingsimple.cl"],
-			bcc: ["soporte@ingenieriasimple.cl"],
-			subject: `Nueva Orden de Trabajo Asignada - ${workOrder.otNumber}`,
-			react: await NewWorkOrderEmail({
-				workOrder,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendNewWorkOrderEmail = async (
+	props: SendNewWorkOrderEmailProps
+) => {
+	console.info("[demo] email noop: sendNewWorkOrderEmail", props)
+	return { ok: true, data: null as unknown }
 }

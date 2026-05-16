@@ -1,9 +1,3 @@
-"use server"
-
-import { resend } from "@/lib/resend"
-
-import { ApproveClousureEmail } from "@/project/work-order/components/emails/ApproveClousureEmail"
-
 interface SendApproveClosureEmailProps {
 	workOrderName: string
 	workOrderNumber: string
@@ -15,49 +9,9 @@ interface SendApproveClosureEmailProps {
 	milestoneComment?: string
 }
 
-export const sendApproveClosureEmail = async ({
-	email,
-	workOrderName,
-	workOrderNumber,
-	companyName,
-	supervisorName,
-	autoClosed,
-	milestoneName,
-	milestoneComment,
-}: SendApproveClosureEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [email],
-			subject: autoClosed
-				? `Libro de Obras ${workOrderName} cerrado automáticamente`
-				: `Aprobación de Cierre - Libro de Obras ${workOrderName}`,
-			react: await ApproveClousureEmail({
-				workOrderName,
-				workOrderNumber,
-				companyName,
-				supervisorName,
-				autoClosed,
-				milestoneName,
-				milestoneComment,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendApproveClosureEmail = async (
+	props: SendApproveClosureEmailProps
+) => {
+	console.info("[demo] email noop: sendApproveClosureEmail", props)
+	return { ok: true, data: null as unknown }
 }

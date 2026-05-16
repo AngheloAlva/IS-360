@@ -1,13 +1,3 @@
-"use server"
-
-import { Resend } from "resend"
-
-import { RequestCloseMilestoneEmail } from "@/project/work-order/components/emails/RequestCloseMilestoneEmail"
-import { ApproveMilestoneEmail } from "@/project/work-order/components/emails/ApproveMilestoneEmail"
-import { RejectMilestoneEmail } from "@/project/work-order/components/emails/RejectMilestoneEmail"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 interface SendRequestCloseMilestoneEmailProps {
 	responsibleEmail: string
 	milestone: {
@@ -23,37 +13,11 @@ interface SendRequestCloseMilestoneEmailProps {
 	}
 }
 
-export const sendRequestCloseMilestoneEmail = async ({
-	milestone,
-	responsibleEmail,
-}: SendRequestCloseMilestoneEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [responsibleEmail],
-			subject: `Solicitud de cierre de hito ${milestone.workOrder.otNumber}`,
-			react: await RequestCloseMilestoneEmail({
-				milestone,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendRequestCloseMilestoneEmail = async (
+	props: SendRequestCloseMilestoneEmailProps
+) => {
+	console.info("[demo] email noop: sendRequestCloseMilestoneEmail", props)
+	return { ok: true, data: null as unknown }
 }
 
 interface SendApproveMilestoneEmailProps {
@@ -62,41 +26,12 @@ interface SendApproveMilestoneEmailProps {
 	supervisorEmail: string
 	milestoneName: string
 }
-export const sendApproveMilestoneEmail = async ({
-	comment,
-	otNumber,
-	milestoneName,
-	supervisorEmail,
-}: SendApproveMilestoneEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [supervisorEmail],
-			subject: `Hito ${otNumber} aprobado`,
-			react: await ApproveMilestoneEmail({
-				comment,
-				otNumber,
-				milestoneName,
-			}),
-		})
 
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendApproveMilestoneEmail = async (
+	props: SendApproveMilestoneEmailProps
+) => {
+	console.info("[demo] email noop: sendApproveMilestoneEmail", props)
+	return { ok: true, data: null as unknown }
 }
 
 interface SendRejectMilestoneEmailProps {
@@ -106,39 +41,9 @@ interface SendRejectMilestoneEmailProps {
 	supervisorEmail: string
 }
 
-export const sendRejectMilestoneEmail = async ({
-	comment,
-	otNumber,
-	milestoneName,
-	supervisorEmail,
-}: SendRejectMilestoneEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [supervisorEmail],
-			subject: `Hito ${otNumber} rechazado`,
-			react: await RejectMilestoneEmail({
-				comment,
-				otNumber,
-				milestoneName,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendRejectMilestoneEmail = async (
+	props: SendRejectMilestoneEmailProps
+) => {
+	console.info("[demo] email noop: sendRejectMilestoneEmail", props)
+	return { ok: true, data: null as unknown }
 }
