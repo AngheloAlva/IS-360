@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import { sendRequestClosureEmail } from "./sendRequestEmail"
 
@@ -14,133 +10,102 @@ interface RequestClosureParams {
 }
 
 export async function requestClosure({ workBookId }: RequestClosureParams) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
-	const hassWorkBookPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permissions: {
-				workBook: ["create"],
-			},
-		},
-	})
-
 	try {
-		const workOrder = await prisma.workOrder.findFirst({
-			where: { id: workBookId, deletedAt: null },
-			include: {
-				supervisor: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
-					},
-				},
-				company: {
-					select: {
-						id: true,
-						name: true,
-						rut: true,
-					},
-				},
-				responsible: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+
+		const { rows } = await db.query<{
+			id: string
+			otNumber: string
+			supervisorId: string
+			responsibleId: string
+			companyId: string | null
+			responsibleEmail: string
+			responsibleName: string
+			supervisorName: string
+			companyName: string | null
+			companyRut: string | null
+		}>(
+			`SELECT wo."id", wo."otNumber", wo."supervisorId", wo."responsibleId", wo."companyId",
+				r."email" AS "responsibleEmail", r."name" AS "responsibleName",
+				s."name" AS "supervisorName",
+				c."name" AS "companyName", c."rut" AS "companyRut"
+			FROM "work_order" wo
+			LEFT JOIN "user" r ON r."id" = wo."responsibleId"
+			LEFT JOIN "user" s ON s."id" = wo."supervisorId"
+			LEFT JOIN "company" c ON c."id" = wo."companyId"
+			WHERE wo."id" = $1 AND wo."deletedAt" IS NULL`,
+			[workBookId]
+		)
+		const workOrder = rows[0]
 
 		if (!workOrder) {
-			return {
-				ok: false,
-				message: "Solicitud de cierre no encontrada",
-			}
+			return { ok: false, message: "Solicitud de cierre no encontrada" }
 		}
 
-		// Verificar que el usuario sea supervisor de la empresa colaboradora
-		if (session.user.id !== workOrder.supervisor.id && !hassWorkBookPermission.success) {
-			return {
-				ok: false,
-				message: "Forbidden",
-			}
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "work_order" SET "status" = 'CLOSURE_REQUESTED',
+				"closureRequestedById" = $1, "closureRequestedAt" = $2, "updatedAt" = $2
+			WHERE "id" = $3`,
+			[user.id, now, workBookId]
+		)
+
+		const entryId = crypto.randomUUID()
+		await db.query(
+			`INSERT INTO "work_book_entry" ("id", "entryType", "executionDate", "comments", "workOrderId", "createdById", "createdAt")
+			 VALUES ($1, 'COMMENT', $2, $3, $4, $5, $2)`,
+			[
+				entryId,
+				now,
+				"Solicitud de cierre del libro de obras",
+				workBookId,
+				user.id,
+			]
+		)
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.SUBMIT,
+				entityId: workBookId,
+				entityType: "WorkOrder",
+				metadata: {
+					status: "CLOSURE_REQUESTED",
+					otNumber: workOrder.otNumber,
+					workEntryId: entryId,
+					companyId: workOrder.companyId,
+					companyName: workOrder.companyName,
+					supervisorId: workOrder.supervisorId,
+					responsibleId: workOrder.responsibleId,
+					closureRequestedAt: now,
+				},
+			})
+		} catch {
+			// audit best-effort
 		}
 
-		// Actualizar el estado del libro de obras
-		const updatedWorkOrder = await prisma.workOrder.update({
-			where: { id: workBookId },
-			data: {
-				status: "CLOSURE_REQUESTED",
-				closureRequestedById: session.user.id,
-				closureRequestedAt: new Date(),
-			},
-		})
-
-		// Crear una entrada en el libro de obras
-		const workEntry = await prisma.workEntry.create({
-			data: {
-				entryType: "COMMENT",
-				comments: "Solicitud de cierre del libro de obras",
-				workOrderId: workBookId,
-				createdById: session.user.id,
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.SUBMIT,
-			entityId: workBookId,
-			entityType: "WorkOrder",
-			metadata: {
-				status: updatedWorkOrder.status,
-				otNumber: workOrder.otNumber,
-				workEntryId: workEntry.id,
-				workEntryComments: workEntry.comments,
-				companyId: workOrder.company?.id,
-				companyName: workOrder.company?.name,
-				supervisorId: workOrder.supervisor?.id,
-				supervisorName: workOrder.supervisor?.name,
-				responsibleId: workOrder.responsible?.id,
-				responsibleName: workOrder.responsible?.name,
-				closureRequestedAt: updatedWorkOrder.closureRequestedAt,
-			},
-		})
-
-		// Enviar correo al supervisor interno
-		if (workOrder.responsible.email) {
+		if (workOrder.responsibleEmail) {
 			await sendRequestClosureEmail({
 				workOrderId: workOrder.id,
-				supervisorName: session.user.name,
-				email: workOrder.responsible.email,
+				supervisorName: user.name,
+				email: workOrder.responsibleEmail,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: `Libro de Obras ${workOrder.otNumber}`,
-				companyName: workOrder.company
-					? workOrder.company.name + " - " + workOrder.company.rut
+				companyName: workOrder.companyName
+					? `${workOrder.companyName} - ${workOrder.companyRut ?? ""}`
 					: "Interno",
 			})
 		}
 
-		return {
-			ok: true,
-			message: "OK",
-		}
+		return { ok: true, message: "OK" }
 	} catch (error) {
 		console.error("[WORK_BOOK_REQUEST_CLOSURE]", error)
-		return {
-			ok: false,
-			message: "Internal error",
-		}
+		return { ok: false, message: "Internal error" }
 	}
 }

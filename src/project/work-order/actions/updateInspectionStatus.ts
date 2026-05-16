@@ -1,12 +1,8 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { createDiff } from "@/lib/activity/diff"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { INSPECTION_STATUS } from "@/generated/prisma/enums"
 
@@ -19,55 +15,27 @@ export async function updateInspectionStatus({
 	workEntryId,
 	status,
 }: UpdateInspectionStatusParams) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				workOrder: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission.success) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const workEntry = await prisma.workEntry.findUnique({
-			where: { id: workEntryId },
-			select: {
-				id: true,
-				entryType: true,
-				inspectionStatus: true,
-				workOrder: {
-					select: {
-						id: true,
-						responsibleId: true,
-						supervisorId: true,
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+		const { rows } = await db.query<{
+			id: string
+			entryType: string
+			inspectionStatus: string | null
+			workOrderId: string
+		}>(
+			`SELECT "id", "entryType", "inspectionStatus", "workOrderId"
+			FROM "work_book_entry" WHERE "id" = $1`,
+			[workEntryId]
+		)
+		const workEntry = rows[0]
 
 		if (!workEntry) {
-			return {
-				ok: false,
-				message: "Entrada no encontrada",
-			}
+			return { ok: false, message: "Entrada no encontrada" }
 		}
 
 		if (workEntry.entryType !== "INTERNAL_INSPECTION") {
@@ -77,35 +45,33 @@ export async function updateInspectionStatus({
 			}
 		}
 
-		const resolvedAt = status === "RESOLVED" ? new Date() : null
-
-		await prisma.workEntry.update({
-			where: { id: workEntryId },
-			data: {
-				inspectionStatus: status,
-				...(resolvedAt && {
-					resolvedAt,
-				}),
-			},
-		})
+		await db.query(
+			`UPDATE "work_book_entry" SET "inspectionStatus" = $1 WHERE "id" = $2`,
+			[status, workEntryId]
+		)
 
 		const diff = createDiff(
 			{ inspectionStatus: workEntry.inspectionStatus },
 			{ inspectionStatus: status }
 		)
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: status === "RESOLVED" ? ACTIVITY_TYPE.COMPLETE : ACTIVITY_TYPE.UPDATE,
-			entityId: workEntry.id,
-			entityType: "Inspection",
-			...diff,
-			metadata: {
-				resolvedAt,
-				workOrderId: workEntry.workOrder?.id,
-			},
-		})
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action:
+					status === "RESOLVED" ? ACTIVITY_TYPE.COMPLETE : ACTIVITY_TYPE.UPDATE,
+				entityId: workEntry.id,
+				entityType: "Inspection",
+				...diff,
+				metadata: {
+					resolvedAt: status === "RESOLVED" ? new Date().toISOString() : null,
+					workOrderId: workEntry.workOrderId,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
 		return {
 			ok: true,
@@ -113,9 +79,6 @@ export async function updateInspectionStatus({
 		}
 	} catch (error) {
 		console.error("Error updating inspection status:", error)
-		return {
-			ok: false,
-			message: "Error interno del servidor",
-		}
+		return { ok: false, message: "Error interno del servidor" }
 	}
 }

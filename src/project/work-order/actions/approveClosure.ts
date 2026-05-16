@@ -1,126 +1,92 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { sendApproveClosureEmail } from "./sendApproveEmail"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface ApproveWorkBookClosureProps {
 	workBookId: string
 }
 
-export async function approveWorkBookClosure({ workBookId }: ApproveWorkBookClosureProps) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+export async function approveWorkBookClosure({
+	workBookId,
+}: ApproveWorkBookClosureProps) {
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const workOrder = await prisma.workOrder.findFirst({
-			where: { id: workBookId, deletedAt: null },
-			select: {
-				id: true,
-				status: true,
-				otNumber: true,
-				workBookName: true,
-				closureRequestedBy: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
-					},
-				},
-				company: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+		const { rows } = await db.query<{
+			id: string
+			status: string
+			otNumber: string
+			workBookName: string | null
+			closureRequestedEmail: string | null
+			companyName: string | null
+		}>(
+			`SELECT wo."id", wo."status", wo."otNumber", wo."workBookName",
+				cr."email" AS "closureRequestedEmail",
+				c."name" AS "companyName"
+			FROM "work_order" wo
+			LEFT JOIN "user" cr ON cr."id" = wo."closureRequestedById"
+			LEFT JOIN "company" c ON c."id" = wo."companyId"
+			WHERE wo."id" = $1 AND wo."deletedAt" IS NULL`,
+			[workBookId]
+		)
+		const workOrder = rows[0]
 
 		if (!workOrder) {
-			return {
-				ok: false,
-				message: "Libro de obras no encontrado",
-			}
+			return { ok: false, message: "Libro de obras no encontrado" }
 		}
 
 		if (workOrder.status !== "CLOSURE_REQUESTED") {
-			return {
-				ok: false,
-				message: "No hay solicitud de cierre pendiente",
-			}
+			return { ok: false, message: "No hay solicitud de cierre pendiente" }
 		}
 
-		const updatedWorkOrder = await prisma.workOrder.update({
-			where: { id: workBookId },
-			data: {
-				status: "COMPLETED",
-				closureApprovedById: session.user.id,
-				closureApprovedAt: new Date(),
-			},
-			select: {
-				id: true,
-				status: true,
-				otNumber: true,
-				workBookName: true,
-				closureApprovedById: true,
-				closureApprovedAt: true,
-			},
-		})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "work_order" SET "status" = 'COMPLETED',
+				"closureApprovedById" = $1, "closureApprovedAt" = $2, "updatedAt" = $2
+			WHERE "id" = $3`,
+			[user.id, now, workBookId]
+		)
 
-		const workEntry = await prisma.workEntry.create({
-			data: {
-				entryType: "COMMENT",
-				comments: "Cierre del libro de obras aprobado",
-				workOrderId: workBookId,
-				createdById: session.user.id,
-			},
-			select: {
-				id: true,
-				entryType: true,
-				comments: true,
-				workOrderId: true,
-				createdById: true,
-			},
-		})
+		const entryId = crypto.randomUUID()
+		await db.query(
+			`INSERT INTO "work_book_entry" ("id", "entryType", "executionDate", "comments", "workOrderId", "createdById", "createdAt")
+			 VALUES ($1, 'COMMENT', $2, $3, $4, $5, $2)`,
+			[entryId, now, "Cierre del libro de obras aprobado", workBookId, user.id]
+		)
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.APPROVE,
-			entityId: updatedWorkOrder.id,
-			entityType: "WorkOrder",
-			metadata: {
-				status: updatedWorkOrder.status,
-				otNumber: updatedWorkOrder.otNumber,
-				workBookName: updatedWorkOrder.workBookName,
-				closureApprovedById: updatedWorkOrder.closureApprovedById,
-				closureApprovedAt: updatedWorkOrder.closureApprovedAt,
-				workEntryId: workEntry.id,
-				workEntryComments: workEntry.comments,
-				companyId: workOrder.company?.id,
-				companyName: workOrder.company?.name,
-			},
-		})
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.APPROVE,
+				entityId: workOrder.id,
+				entityType: "WorkOrder",
+				metadata: {
+					status: "COMPLETED",
+					otNumber: workOrder.otNumber,
+					workBookName: workOrder.workBookName,
+					closureApprovedById: user.id,
+					closureApprovedAt: now,
+					workEntryId: entryId,
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
 
-		if (workOrder.closureRequestedBy?.email) {
+		if (workOrder.closureRequestedEmail) {
 			await sendApproveClosureEmail({
-				supervisorName: session.user.name,
+				supervisorName: user.name,
 				workOrderNumber: workOrder.otNumber,
 				workOrderName: workOrder.workBookName || "",
-				email: workOrder.closureRequestedBy.email,
-				companyName: workOrder?.company?.name || "Interno",
+				email: workOrder.closureRequestedEmail,
+				companyName: workOrder.companyName || "Interno",
 			})
 		}
 
