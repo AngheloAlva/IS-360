@@ -1,14 +1,9 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { EquipmentSchema } from "@/project/equipment/schemas/equipment.schema"
-import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/client"
 import type { UploadResult } from "@/lib/upload-files"
 
 interface CreateEquipmentProps {
@@ -17,101 +12,79 @@ interface CreateEquipmentProps {
 }
 
 export const createEquipment = async ({ values, uploadResults }: CreateEquipmentProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				equipment: ["create"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const barcode = generateBarcode()
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { parentId, files, locationId, ...rest } = values
+		const db = await getDemoDb()
+		const { parentId, files: _files, locationId, ...rest } = values
 
-		await prisma.location.findUniqueOrThrow({
-			where: { id: locationId },
-		})
+		const locationResult = await db.query<{ id: string }>(
+			`SELECT id FROM "Location" WHERE id = $1`,
+			[locationId],
+		)
+		if (locationResult.rows.length === 0) {
+			return { ok: false, message: "La ubicación no existe" }
+		}
 
-		const equipment = await prisma.equipment.create({
-			data: {
+		const id = crypto.randomUUID()
+		const barcode = `${Date.now()}`
+		const now = new Date().toISOString()
+
+		await db.query(
+			`INSERT INTO "equipment" (
+				id, barcode, name, description, "isOperational", type, tag,
+				criticality, "locationId", "parentId", "createdById",
+				"createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $12)`,
+			[
+				id,
 				barcode,
-				createdBy: {
-					connect: {
-						id: session.user.id,
-					},
+				rest.name,
+				rest.description ?? null,
+				rest.isOperational ?? true,
+				rest.type ?? null,
+				rest.tag,
+				rest.criticality ?? null,
+				locationId,
+				parentId ?? null,
+				user.id,
+				now,
+			],
+		)
+
+		for (const r of uploadResults) {
+			await db.query(
+				`INSERT INTO "attachment" (id, name, url, type, size, "equipmentId", "createdAt", "updatedAt")
+				 VALUES ($1, $2, $3, $4, $5, $6, $7, $7)`,
+				[crypto.randomUUID(), r.name, r.url, r.type, r.size, id, now],
+			)
+		}
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.EQUIPMENT,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: id,
+				entityType: "Equipment",
+				metadata: {
+					name: rest.name,
+					barcode,
+					createdBy: user.id,
+					parentId: parentId ?? null,
+					attachments: uploadResults.length,
 				},
-				location: { connect: { id: locationId } },
-				...(parentId && { parent: { connect: { id: parentId } } }),
-				...(uploadResults.length > 0 && {
-					attachments: {
-						create: uploadResults.map((result) => ({
-							url: result.url,
-							name: result.name,
-							type: result.type,
-							size: result.size,
-						})),
-					},
-				}),
-				...rest,
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.EQUIPMENT,
-			action: ACTIVITY_TYPE.CREATE,
-			entityId: equipment.id,
-			entityType: "Equipment",
-			metadata: {
-				name: equipment.name,
-				barcode: equipment.barcode,
-				createdBy: session.user.id,
-				parentId: equipment.parentId,
-				attachments: uploadResults.length,
-			},
-		})
-
-		return {
-			ok: true,
+			})
+		} catch {
+			// audit best-effort
 		}
+
+		return { ok: true }
 	} catch (error) {
-		if ((error as PrismaClientKnownRequestError).code === "P2002") {
-			const target = (error as PrismaClientKnownRequestError).meta?.target as string[]
-			const field = target[0]
-			return {
-				ok: false,
-				message: `Ya existe un equipo con el ${field} '${values[field as keyof EquipmentSchema]}'. Este campo debe ser único.`,
-			}
-		}
-
-		return {
-			ok: false,
-			message: "Error al crear el equipo",
-		}
+		console.error("[CREATE_EQUIPMENT]", error)
+		return { ok: false, message: "Error al crear el equipo" }
 	}
-}
-
-const generateBarcode = () => {
-	return `${Date.now()}`
 }

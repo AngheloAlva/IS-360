@@ -1,13 +1,10 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { EquipmentSchema } from "@/project/equipment/schemas/equipment.schema"
+import type { PGlite } from "@electric-sql/pglite"
 
 interface UpdateEquipmentProps {
 	id: string
@@ -15,49 +12,28 @@ interface UpdateEquipmentProps {
 }
 
 export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				equipment: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
+		const db = await getDemoDb()
 		const { parentId, files = [], locationId, ...rest } = values
 
-		await prisma.location.findUniqueOrThrow({
-			where: { id: locationId },
-		})
+		const locationResult = await db.query<{ id: string }>(
+			`SELECT id FROM "Location" WHERE id = $1`,
+			[locationId],
+		)
+		if (locationResult.rows.length === 0) {
+			return { ok: false, message: "La ubicación no existe" }
+		}
 
 		if (parentId) {
 			if (parentId === id) {
-				return {
-					ok: false,
-					message: "Un equipo no puede ser su propio padre",
-				}
+				return { ok: false, message: "Un equipo no puede ser su propio padre" }
 			}
-
-			const descendants = await getDescendantIds(id)
+			const descendants = await getDescendantIds(db, id)
 			if (descendants.includes(parentId)) {
 				return {
 					ok: false,
@@ -66,126 +42,107 @@ export const updateEquipment = async ({ id, values }: UpdateEquipmentProps) => {
 			}
 		}
 
-		const connection: {
-			parent?: {
-				connect?: {
-					id: string
-				}
-				disconnect?: boolean
-			}
-		} = {}
+		const currentAttachmentsResult = await db.query<{
+			id: string
+			url: string
+		}>(`SELECT id, url FROM "attachment" WHERE "equipmentId" = $1`, [id])
+		const currentAttachments = currentAttachmentsResult.rows
 
-		if (parentId) {
-			connection.parent = {
-				connect: {
-					id: parentId,
-				},
-			}
-		} else {
-			connection.parent = {
-				disconnect: true,
-			}
-		}
-
-		// Obtener los attachments actuales del equipo
-		const currentAttachments = await prisma.attachment.findMany({
-			where: { equipment: { id } },
-			select: { id: true, url: true, name: true, type: true },
-		})
-
-		// Identificar qué archivos mantener (ya existentes) y cuáles son nuevos
 		const existingFileUrls = files
-			.filter((file) => !file.file) // Sin la propiedad file son archivos ya guardados
+			.filter((file) => !file.file)
 			.map((file) => file.url)
 
-		// IDs de adjuntos a eliminar (los que ya no están en la lista de archivos)
 		const attachmentsToDelete = currentAttachments
-			.filter((attachment) => !existingFileUrls.includes(attachment.url))
-			.map((attachment) => attachment.id)
+			.filter((a) => !existingFileUrls.includes(a.url))
+			.map((a) => a.id)
 
-		// Crear nuevos adjuntos para los archivos nuevos
 		const newAttachments = files
-			.filter((file) => !file.file && !currentAttachments.some((att) => att.url === file.url))
-			.map((file) => ({
-				url: file.url,
-				name: file.title,
-				type: file.type,
-				size: file.fileSize,
+			.filter((f) => !f.file && !currentAttachments.some((a) => a.url === f.url))
+			.map((f) => ({
+				url: f.url,
+				name: f.title,
+				type: f.type,
+				size: f.fileSize,
 			}))
 
-		// Actualizar el equipo con todos los cambios
-		await prisma.$transaction(async (tx) => {
-			// Actualizar equipo
-			const updatedEquipment = await tx.equipment.update({
-				where: { id },
-				data: {
-					...rest,
-					...connection,
-					location: { connect: { id: locationId } },
-					// Agregar nuevos attachments si existen
-					...(newAttachments.length > 0 && {
-						attachments: {
-							create: newAttachments,
-						},
-					}),
-				},
-			})
+		const now = new Date().toISOString()
 
-			// Eliminar attachments que ya no están en la lista
-			if (attachmentsToDelete.length > 0) {
-				await tx.attachment.deleteMany({
-					where: {
-						id: { in: attachmentsToDelete },
-					},
-				})
-			}
+		await db.query(
+			`UPDATE "equipment" SET
+				name = $1,
+				description = $2,
+				"isOperational" = $3,
+				type = $4,
+				tag = $5,
+				criticality = $6,
+				"locationId" = $7,
+				"parentId" = $8,
+				"updatedAt" = $9
+			 WHERE id = $10`,
+			[
+				rest.name,
+				rest.description ?? null,
+				rest.isOperational ?? true,
+				rest.type ?? null,
+				rest.tag,
+				rest.criticality ?? null,
+				locationId,
+				parentId ?? null,
+				now,
+				id,
+			],
+		)
 
-   await logActivity({
-				userId: session.user.id,
+		for (const a of newAttachments) {
+			await db.query(
+				`INSERT INTO "attachment" (id, name, url, type, size, "equipmentId", "createdAt", "updatedAt")
+				 VALUES ($1, $2, $3, $4, $5, $6, $7, $7)`,
+				[crypto.randomUUID(), a.name, a.url, a.type, a.size, id, now],
+			)
+		}
+
+		if (attachmentsToDelete.length > 0) {
+			await db.query(
+				`DELETE FROM "attachment" WHERE id = ANY($1::text[])`,
+				[attachmentsToDelete],
+			)
+		}
+
+		try {
+			await logActivity({
+				userId: user.id,
 				module: MODULES.EQUIPMENT,
 				action: ACTIVITY_TYPE.UPDATE,
-				entityId: updatedEquipment.id,
+				entityId: id,
 				entityType: "Equipment",
 				metadata: {
-					name: updatedEquipment.name,
-					barcode: updatedEquipment.barcode,
-					oldParentId: updatedEquipment.parentId,
-					newParentId: parentId,
+					name: rest.name,
+					newParentId: parentId ?? null,
 					attachmentsAdded: newAttachments.length,
 					attachmentsRemoved: attachmentsToDelete.length,
 				},
 			})
-		})
+		} catch {
+			// audit best-effort
+		}
 
-		return {
-			ok: true,
-		}
+		return { ok: true }
 	} catch (error) {
-		console.error(error)
-		return {
-			ok: false,
-			message: "Error al actualizar el equipo",
-		}
+		console.error("[UPDATE_EQUIPMENT]", error)
+		return { ok: false, message: "Error al actualizar el equipo" }
 	}
 }
 
-async function getDescendantIds(equipmentId: string): Promise<string[]> {
-	const children = await prisma.equipment.findMany({
-		where: {
-			parentId: equipmentId,
-		},
-		select: {
-			id: true,
-		},
-	})
-
-	const childIds = children.map((child) => child.id)
-
-	if (childIds.length === 0) {
-		return []
-	}
-	const descendantPromises = childIds.map((childId) => getDescendantIds(childId))
-	const nestedDescendants = await Promise.all(descendantPromises)
-
-	return [...childIds, ...nestedDescendants.flat()]
+async function getDescendantIds(db: PGlite, equipmentId: string): Promise<string[]> {
+	const result = await db.query<{ id: string }>(
+		`WITH RECURSIVE descendants AS (
+			SELECT id FROM "equipment" WHERE "parentId" = $1
+			UNION ALL
+			SELECT e.id FROM "equipment" e
+			JOIN descendants d ON e."parentId" = d.id
+		)
+		SELECT id FROM descendants`,
+		[equipmentId],
+	)
+	return result.rows.map((r) => r.id)
 }

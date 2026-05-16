@@ -1,10 +1,5 @@
-"use server"
-
-import { headers } from "next/headers"
-import { revalidatePath } from "next/cache"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface ReassignEquipmentToLocationInput {
 	id: string
@@ -17,54 +12,41 @@ export async function reassignEquipmentToLocation({
 	locationId,
 	clearParent,
 }: ReassignEquipmentToLocationInput) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return { ok: false, message: "No autorizado" }
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				equipment: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const [location, equipment] = await Promise.all([
-			prisma.location.findUnique({ where: { id: locationId }, select: { id: true } }),
-			prisma.equipment.findUnique({ where: { id }, select: { id: true, parentId: true } }),
-		])
+		const db = await getDemoDb()
 
-		if (!location) {
+		const locationResult = await db.query<{ id: string }>(
+			`SELECT id FROM "Location" WHERE id = $1`,
+			[locationId],
+		)
+		if (locationResult.rows.length === 0) {
 			return { ok: false, message: "La ubicación no existe" }
 		}
 
-		if (!equipment) {
+		const equipmentResult = await db.query<{ id: string }>(
+			`SELECT id FROM "equipment" WHERE id = $1`,
+			[id],
+		)
+		if (equipmentResult.rows.length === 0) {
 			return { ok: false, message: "El equipo no existe" }
 		}
 
-		const data = await prisma.equipment.update({
-			where: { id },
-			data: {
-				locationId,
-				...(clearParent && { parentId: null }),
-			},
-		})
+		const now = new Date().toISOString()
+		const updateResult = await db.query<Record<string, unknown>>(
+			clearParent
+				? `UPDATE "equipment" SET "locationId" = $1, "parentId" = NULL, "updatedAt" = $2 WHERE id = $3 RETURNING *`
+				: `UPDATE "equipment" SET "locationId" = $1, "updatedAt" = $2 WHERE id = $3 RETURNING *`,
+			[locationId, now, id],
+		)
 
-		revalidatePath("/admin/dashboard/equipos")
-		revalidatePath("/admin/dashboard/ubicaciones")
-
-		return { ok: true, data }
-	} catch {
+		return { ok: true, data: updateResult.rows[0] }
+	} catch (error) {
+		console.error("[REASSIGN_EQUIPMENT_TO_LOCATION]", error)
 		return { ok: false, message: "Error al reasignar el equipo" }
 	}
 }
