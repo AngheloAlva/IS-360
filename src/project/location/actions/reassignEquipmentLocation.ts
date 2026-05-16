@@ -1,33 +1,14 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import { reassignEquipmentLocationSchema } from "@/project/location/schemas/location.schema"
 import type { ReassignEquipmentLocationInput } from "@/project/location/schemas/location.schema"
 
-export async function reassignEquipmentLocation(input: ReassignEquipmentLocationInput) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return { ok: false, message: "No autorizado" }
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				equipment: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
+export async function reassignEquipmentLocation(
+	input: ReassignEquipmentLocationInput,
+) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
@@ -39,25 +20,31 @@ export async function reassignEquipmentLocation(input: ReassignEquipmentLocation
 	const { equipmentId, locationId } = parsed.data
 
 	try {
-		const location = await prisma.location.findUnique({
-			where: { id: locationId },
-			select: { id: true },
-		})
+		const db = await getDemoDb()
 
-		if (!location) {
+		const locationResult = await db.query<{ id: string }>(
+			`SELECT id FROM "Location" WHERE id = $1`,
+			[locationId],
+		)
+		if (locationResult.rows.length === 0) {
 			return { ok: false, message: "La ubicación no existe" }
 		}
 
-		const equipment = await prisma.equipment.update({
-			where: { id: equipmentId },
-			data: { locationId },
-		})
+		const now = new Date().toISOString()
+		const updateResult = await db.query<Record<string, unknown>>(
+			`UPDATE "equipment"
+			 SET "locationId" = $1, "updatedAt" = $2
+			 WHERE id = $3
+			 RETURNING *`,
+			[locationId, now, equipmentId],
+		)
+		if (updateResult.rows.length === 0) {
+			return { ok: false, message: "El equipo no existe" }
+		}
 
-		revalidatePath("/admin/dashboard/equipos")
-		revalidatePath("/admin/dashboard/ubicaciones")
-
-		return { ok: true, data: equipment }
-	} catch {
+		return { ok: true, data: updateResult.rows[0] }
+	} catch (error) {
+		console.error("[REASSIGN_EQUIPMENT_LOCATION]", error)
 		return { ok: false, message: "Error al reasignar la ubicación del equipo" }
 	}
 }

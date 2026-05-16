@@ -1,34 +1,12 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import { createLocationSchema } from "@/project/location/schemas/location.schema"
 import type { CreateLocationInput } from "@/project/location/schemas/location.schema"
-import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/client"
 
 export async function createLocation(input: CreateLocationInput) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return { ok: false, message: "No autorizado" }
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				location: ["create"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
@@ -40,13 +18,15 @@ export async function createLocation(input: CreateLocationInput) {
 	const { name, parentId } = parsed.data
 
 	try {
-		let path: string
+		const db = await getDemoDb()
 
+		let path: string
 		if (parentId) {
-			const parent = await prisma.location.findUnique({
-				where: { id: parentId },
-				select: { path: true },
-			})
+			const parentResult = await db.query<{ path: string }>(
+				`SELECT path FROM "Location" WHERE id = $1`,
+				[parentId],
+			)
+			const parent = parentResult.rows[0]
 			if (!parent) {
 				return { ok: false, message: "La ubicación padre no existe" }
 			}
@@ -55,29 +35,34 @@ export async function createLocation(input: CreateLocationInput) {
 			path = name
 		}
 
-		const sibling = await prisma.location.findFirst({
-			where: {
-				parentId: parentId ?? null,
-				name: { equals: name, mode: "insensitive" },
-			},
-		})
-
-		if (sibling) {
-			return { ok: false, message: `Ya existe una ubicación con el nombre "${name}" en este nivel` }
+		const siblingResult = await db.query<{ id: string }>(
+			parentId
+				? `SELECT id FROM "Location" WHERE "parentId" = $1 AND LOWER(name) = LOWER($2) LIMIT 1`
+				: `SELECT id FROM "Location" WHERE "parentId" IS NULL AND LOWER(name) = LOWER($1) LIMIT 1`,
+			parentId ? [parentId, name] : [name],
+		)
+		if (siblingResult.rows.length > 0) {
+			return {
+				ok: false,
+				message: `Ya existe una ubicación con el nombre "${name}" en este nivel`,
+			}
 		}
 
-		const location = await prisma.location.create({
-			data: { name, parentId: parentId ?? null, path },
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
 
-		revalidatePath("/admin/dashboard/ubicaciones")
-		revalidatePath("/admin/dashboard/equipos")
+		await db.query(
+			`INSERT INTO "Location" (id, name, "parentId", path, "createdAt", "updatedAt")
+			 VALUES ($1, $2, $3, $4, $5, $5)`,
+			[id, name, parentId ?? null, path, now],
+		)
 
-		return { ok: true, data: location }
+		return {
+			ok: true,
+			data: { id, name, parentId: parentId ?? null, path, createdAt: now, updatedAt: now },
+		}
 	} catch (error) {
-		if ((error as PrismaClientKnownRequestError).code === "P2002") {
-			return { ok: false, message: `Ya existe una ubicación con el nombre "${name}" en este nivel` }
-		}
+		console.error("[CREATE_LOCATION]", error)
 		return { ok: false, message: "Error al crear la ubicación" }
 	}
 }

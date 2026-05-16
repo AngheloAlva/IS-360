@@ -1,52 +1,28 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export async function listLocations() {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false as const, message: "No autorizado", data: null }
 	}
 
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				location: ["list"],
-			},
-		},
-	})
+	const db = await getDemoDb()
+	const result = await db.query<{
+		id: string
+		name: string
+		parentId: string | null
+		path: string
+		equipmentCount: number
+	}>(
+		`SELECT
+			l.id, l.name, l."parentId", l.path,
+			(SELECT COUNT(*)::int FROM "equipment" e WHERE e."locationId" = l.id) AS "equipmentCount"
+		 FROM "Location" l
+		 ORDER BY l.path ASC`,
+	)
 
-	if (!hasPermission) {
-		return { ok: false as const, message: "No autorizado", data: null }
-	}
-
-	const locations = await prisma.location.findMany({
-		select: {
-			id: true,
-			name: true,
-			parentId: true,
-			path: true,
-			_count: { select: { equipment: true } },
-		},
-		orderBy: { path: "asc" },
-	})
-
-	const data = locations.map((l) => ({
-		id: l.id,
-		name: l.name,
-		parentId: l.parentId,
-		path: l.path,
-		equipmentCount: l._count.equipment,
-	}))
-
-	return { ok: true as const, data }
+	return { ok: true as const, data: result.rows }
 }
 
 export type LocationItem = {

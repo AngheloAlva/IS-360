@@ -1,33 +1,12 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
-import { revalidatePath } from "next/cache"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import { deleteLocationSchema } from "@/project/location/schemas/location.schema"
 import type { DeleteLocationInput } from "@/project/location/schemas/location.schema"
 
 export async function deleteLocation(input: DeleteLocationInput) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return { ok: false, message: "No autorizado" }
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				location: ["delete"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
@@ -39,23 +18,30 @@ export async function deleteLocation(input: DeleteLocationInput) {
 	const { id } = parsed.data
 
 	try {
-		const location = await prisma.location.findUnique({
-			where: { id },
-			select: { id: true, name: true, parentId: true },
-		})
+		const db = await getDemoDb()
 
+		const locationResult = await db.query<{
+			id: string
+			name: string
+			parentId: string | null
+		}>(`SELECT id, name, "parentId" FROM "Location" WHERE id = $1`, [id])
+		const location = locationResult.rows[0]
 		if (!location) {
 			return { ok: false, message: "La ubicación no existe" }
 		}
 
 		if (location.name === "Sin ubicación" && location.parentId === null) {
-			return { ok: false, message: 'No se puede eliminar la ubicación sentinel "Sin ubicación"' }
+			return {
+				ok: false,
+				message: 'No se puede eliminar la ubicación sentinel "Sin ubicación"',
+			}
 		}
 
-		const childrenCount = await prisma.location.count({
-			where: { parentId: id },
-		})
-
+		const childrenResult = await db.query<{ count: number }>(
+			`SELECT COUNT(*)::int AS count FROM "Location" WHERE "parentId" = $1`,
+			[id],
+		)
+		const childrenCount = childrenResult.rows[0]?.count ?? 0
 		if (childrenCount > 0) {
 			return {
 				ok: false,
@@ -63,10 +49,11 @@ export async function deleteLocation(input: DeleteLocationInput) {
 			}
 		}
 
-		const equipmentCount = await prisma.equipment.count({
-			where: { locationId: id },
-		})
-
+		const equipmentResult = await db.query<{ count: number }>(
+			`SELECT COUNT(*)::int AS count FROM "equipment" WHERE "locationId" = $1`,
+			[id],
+		)
+		const equipmentCount = equipmentResult.rows[0]?.count ?? 0
 		if (equipmentCount > 0) {
 			return {
 				ok: false,
@@ -74,13 +61,11 @@ export async function deleteLocation(input: DeleteLocationInput) {
 			}
 		}
 
-		await prisma.location.delete({ where: { id } })
-
-		revalidatePath("/admin/dashboard/ubicaciones")
-		revalidatePath("/admin/dashboard/equipos")
+		await db.query(`DELETE FROM "Location" WHERE id = $1`, [id])
 
 		return { ok: true }
-	} catch {
+	} catch (error) {
+		console.error("[DELETE_LOCATION]", error)
 		return { ok: false, message: "Error al eliminar la ubicación" }
 	}
 }

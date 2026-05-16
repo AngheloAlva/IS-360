@@ -2,6 +2,7 @@ import { companyHandlers } from "./company"
 import { dashboardHandlers } from "./dashboard"
 import { equipmentHandlers } from "./equipment"
 import { fallbackHandlers } from "./_fallback"
+import { locationHandlers } from "./location"
 import { userHandlers } from "./user"
 import { workBookHandlers } from "./work-book"
 import { workOrderHandlers } from "./work-order"
@@ -17,6 +18,7 @@ export const handlers = [
 	...userHandlers,
 	...companyHandlers,
 	...equipmentHandlers,
+	...locationHandlers,
 	...dashboardHandlers,
 	...fallbackHandlers,
 ]
