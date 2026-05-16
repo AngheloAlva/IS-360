@@ -1,12 +1,7 @@
-"use server"
-
-import { revalidatePath } from "next/cache"
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { WorkBookMilestonesSchema } from "@/project/work-order/schemas/milestones.schema"
 
@@ -15,82 +10,65 @@ interface SaveMilestonesResponse {
 	message: string
 }
 
+// TODO(iter X): full implementation — validate weight totals on server, milestone history
 export async function createMilestones(
 	values: WorkBookMilestonesSchema
 ): Promise<SaveMilestonesResponse> {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
+
 	try {
-		const workOrder = await prisma.workOrder.findFirst({
-			where: { id: values.workOrderId, deletedAt: null },
-			include: { milestones: true },
-		})
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
 
-		if (!workOrder) {
-			return {
-				ok: false,
-				message: "El libro de obras no existe",
-			}
+		const { rows: woRows } = await db.query<{ id: string }>(
+			`SELECT "id" FROM "work_order" WHERE "id" = $1 AND "deletedAt" IS NULL`,
+			[values.workOrderId]
+		)
+		if (!woRows[0]) {
+			return { ok: false, message: "El libro de obras no existe" }
 		}
 
-		const createdMilestones = []
-		for (const [index, milestone] of values.milestones.entries()) {
-			const createdMilestone = await prisma.milestone.create({
-				data: {
-					name: milestone.name,
-					description: milestone.description || "",
-					order: index,
-					isCompleted: false,
-					weight: Number(milestone.weight),
-					startDate: milestone.startDate,
-					endDate: milestone.endDate,
-					workOrder: {
-						connect: { id: values.workOrderId },
-					},
-				},
+		for (let i = 0; i < values.milestones.length; i++) {
+			const m = values.milestones[i]
+			const id = m.id ?? crypto.randomUUID()
+			await db.query(
+				`INSERT INTO "milestone" ("id", "name", "description", "weight",
+					"order", "startDate", "endDate", "workOrderId",
+					"createdAt", "updatedAt")
+				 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)`,
+				[
+					id,
+					m.name,
+					m.description ?? null,
+					Number(m.weight),
+					i,
+					new Date(m.startDate).toISOString(),
+					new Date(m.endDate).toISOString(),
+					values.workOrderId,
+					now,
+				]
+			)
+		}
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: values.workOrderId,
+				entityType: "WorkOrderMilestones",
+				metadata: { count: values.milestones.length },
 			})
-			createdMilestones.push(createdMilestone)
+		} catch {
+			// audit best-effort
 		}
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.CREATE,
-			entityId: values.workOrderId,
-			entityType: "Milestone",
-			metadata: {
-				workOrderId: values.workOrderId,
-				milestones: createdMilestones.map((m) => ({
-					id: m.id,
-					name: m.name,
-					description: m.description,
-					weight: m.weight,
-					startDate: m.startDate,
-					endDate: m.endDate,
-					order: m.order,
-				})),
-			},
-		})
-
-		revalidatePath(`/dashboard/libro-de-obras/${values.workOrderId}`)
-
-		return {
-			ok: true,
-			message: "Hitos guardados correctamente",
-		}
+		return { ok: true, message: "Hitos creados exitosamente" }
 	} catch (error) {
-		console.error("Error al guardar los hitos:", error)
-		return {
-			ok: false,
-			message: error instanceof Error ? error.message : "Error al guardar los hitos",
-		}
+		console.error("[CREATE_MILESTONES]", error)
+		return { ok: false, message: "Error al crear los hitos" }
 	}
 }

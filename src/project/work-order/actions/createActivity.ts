@@ -1,12 +1,8 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { UploadResult as UploadFileResult } from "@/lib/upload-files"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { DailyActivitySchema } from "@/project/work-order/schemas/daily-activity.schema"
 import type { ENTRY_TYPE } from "@/generated/prisma/enums"
@@ -17,220 +13,74 @@ interface CreateActivityProps {
 	attachment?: UploadFileResult[]
 }
 
-export const createActivity = async ({ values, entryType, attachment }: CreateActivityProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+// TODO(iter X): full implementation — personnel assignment + attachments cascade
+export const createActivity = async ({
+	values,
+	entryType,
+	attachment,
+}: CreateActivityProps) => {
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		return await prisma.$transaction(async (tx) => {
-			const { workOrderId, milestoneId, comments, personnel, ...rest } = values
+		const db = await getDemoDb()
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		const executionDate = new Date(values.executionDate).toISOString()
 
-			const newWorkEntry = await tx.workEntry.create({
-				data: {
-					...rest,
-					entryType,
-					comments: comments || "",
-					workOrder: {
-						connect: {
-							id: workOrderId,
-						},
-					},
-					milestone: {
-						connect: {
-							id: milestoneId,
-						},
-					},
-					createdBy: {
-						connect: {
-							id: session.user.id,
-						},
-					},
-					assignedUsers: {
-						connect: personnel.map((personnel) => ({
-							id: personnel.userId,
-						})),
-					},
-					...(attachment && {
-						attachments: {
-							create: attachment.map((attachment) => ({
-								type: attachment.type,
-								url: attachment.url,
-								name: attachment.name,
-							})),
-						},
-					}),
-				},
-				select: {
-					id: true,
-					entryType: true,
-					comments: true,
-					workOrderId: true,
-					milestoneId: true,
-					createdById: true,
-					activityName: true,
-					assignedUsers: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
-					attachments: {
-						select: {
-							id: true,
-							name: true,
-							type: true,
-							url: true,
-						},
-					},
-				},
-			})
+		await db.query(
+			`INSERT INTO "work_book_entry" (
+				"id", "entryType", "executionDate", "activityName",
+				"activityStartTime", "activityEndTime", "comments",
+				"workOrderId", "milestoneId", "createdById", "createdAt"
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+			[
+				id,
+				entryType,
+				executionDate,
+				values.activityName,
+				values.activityStartTime,
+				values.activityEndTime,
+				values.comments || "",
+				values.workOrderId,
+				values.milestoneId,
+				user.id,
+				now,
+			]
+		)
 
-			const workOrder = await tx.workOrder.findUnique({
-				where: { id: workOrderId },
-				select: {
-					id: true,
-					status: true,
-					otNumber: true,
-					workBookName: true,
-					type: true,
-					equipments: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
-					company: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
-				},
-			})
-
-			if (!workOrder) {
-				return {
-					ok: false,
-					message: "Orden de trabajo no encontrada",
-				}
+		if (attachment?.length) {
+			for (const a of attachment) {
+				await db.query(
+					`INSERT INTO "attachment" ("id", "name", "url", "type", "createdAt", "updatedAt", "workEntryId")
+					 VALUES ($1, $2, $3, $4, $5, $5, $6)`,
+					[crypto.randomUUID(), a.name, a.url, a.type, now, id]
+				)
 			}
+		}
 
-			const updatedWorkOrder = await tx.workOrder.update({
-				where: {
-					id: workOrderId,
-				},
-				data: {
-					status: "IN_PROGRESS",
-				},
-				select: {
-					id: true,
-					status: true,
-					otNumber: true,
-					workBookName: true,
-				},
-			})
-
-			const updatedMilestone = await tx.milestone.update({
-				where: {
-					id: milestoneId,
-				},
-				data: {
-					status: "IN_PROGRESS",
-				},
-				select: {
-					id: true,
-					status: true,
-					name: true,
-				},
-			})
-
-			const equipmentHistories = await Promise.all(
-				workOrder.equipments.map(async (equipment) => {
-					return await tx.equipmentHistory.create({
-						data: {
-							equipment: {
-								connect: {
-									id: equipment.id,
-								},
-							},
-							workEntry: {
-								connect: {
-									id: newWorkEntry.id,
-								},
-							},
-							changeType: workOrder.type || "",
-							description: rest.activityName,
-							status: "",
-							modifiedBy: {
-								connect: {
-									id: session.user.id,
-								},
-							},
-						},
-						select: {
-							id: true,
-							changeType: true,
-							description: true,
-							status: true,
-							equipmentId: true,
-							workEntryId: true,
-							modifiedBy: {
-								select: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-					})
-				})
-			)
-
-   await logActivity({
-				userId: session.user.id,
+		try {
+			await logActivity({
+				userId: user.id,
 				module: MODULES.WORK_ORDERS,
 				action: ACTIVITY_TYPE.CREATE,
-				entityId: newWorkEntry.id,
+				entityId: id,
 				entityType: "WorkEntry",
 				metadata: {
-					entryType: newWorkEntry.entryType,
-					comments: newWorkEntry.comments,
-					workOrderId: newWorkEntry.workOrderId,
-					milestoneId: newWorkEntry.milestoneId,
-					createdById: newWorkEntry.createdById,
-					activityName: newWorkEntry.activityName,
-					assignedUsers: newWorkEntry.assignedUsers,
-					attachments: newWorkEntry.attachments,
-					workOrderStatus: updatedWorkOrder.status,
-					otNumber: updatedWorkOrder.otNumber,
-					workBookName: updatedWorkOrder.workBookName,
-					milestoneStatus: updatedMilestone.status,
-					milestoneName: updatedMilestone.name,
-					companyId: workOrder.company?.id,
-					companyName: workOrder.company?.name,
-					equipmentHistories,
+					entryType,
+					workOrderId: values.workOrderId,
+					milestoneId: values.milestoneId,
 				},
 			})
+		} catch {
+			// audit best-effort
+		}
 
-			return {
-				ok: true,
-				data: newWorkEntry,
-				message: "Actividad creada exitosamente",
-			}
-		})
+		return { ok: true, message: "Actividad creada exitosamente" }
 	} catch (error) {
 		console.error("[CREATE_ACTIVITY]", error)
-
-		return {
-			ok: false,
-			message: "Error al crear la actividad",
-		}
+		return { ok: false, message: "Error al crear la actividad" }
 	}
 }

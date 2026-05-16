@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 import { sendRequestCloseMilestoneEmail } from "./send-close-milestone"
 
 interface RequestCloseMilestoneResponse {
@@ -20,89 +16,84 @@ interface RequestCloseMilestoneParams {
 export async function requestCloseMilestone({
 	milestoneId,
 }: RequestCloseMilestoneParams): Promise<RequestCloseMilestoneResponse> {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
+
 	try {
-		const milestone = await prisma.milestone.findUnique({
-			where: { id: milestoneId },
-			select: {
-				name: true,
-				weight: true,
-				description: true,
-				workOrderId: true,
-				workOrder: {
-					select: {
-						otNumber: true,
-						workBookName: true,
-						workDescription: true,
-						progress: true,
-						responsible: {
-							select: {
-								email: true,
-							},
-						},
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+		const { rows } = await db.query<{
+			id: string
+			name: string
+			weight: number
+			description: string | null
+			workOrderId: string
+			otNumber: string
+			workBookName: string | null
+			workDescription: string | null
+			responsibleEmail: string | null
+		}>(
+			`SELECT m."id", m."name", m."weight", m."description", m."workOrderId",
+				wo."otNumber", wo."workBookName", wo."workDescription",
+				r."email" AS "responsibleEmail"
+			FROM "milestone" m
+			JOIN "work_order" wo ON wo."id" = m."workOrderId"
+			LEFT JOIN "user" r ON r."id" = wo."responsibleId"
+			WHERE m."id" = $1`,
+			[milestoneId]
+		)
+		const milestone = rows[0]
 
 		if (!milestone) {
-			return {
-				ok: false,
-				message: "El hito no existe",
-			}
+			return { ok: false, message: "El hito no existe" }
 		}
 
-		const updatedMilestone = await prisma.milestone.update({
-			where: { id: milestoneId },
-			data: {
-				requestedBy: {
-					connect: {
-						id: session.user.id,
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "milestone" SET "status" = 'REQUESTED_CLOSURE',
+				"isCompleted" = true, "requestedById" = $1, "updatedAt" = $2
+			WHERE "id" = $3`,
+			[user.id, now, milestoneId]
+		)
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.WORK_ORDERS,
+				action: ACTIVITY_TYPE.SUBMIT,
+				entityId: milestoneId,
+				entityType: "Milestone",
+				metadata: {
+					name: milestone.name,
+					weight: milestone.weight,
+					workOrderId: milestone.workOrderId,
+					otNumber: milestone.otNumber,
+					status: "REQUESTED_CLOSURE",
+				},
+			})
+		} catch {
+			// audit best-effort
+		}
+
+		if (milestone.responsibleEmail) {
+			await sendRequestCloseMilestoneEmail({
+				milestone: {
+					name: milestone.name,
+					weight: milestone.weight,
+					description: milestone.description,
+					workOrderId: milestone.workOrderId,
+					workOrder: {
+						otNumber: milestone.otNumber,
+						workBookName: milestone.workBookName,
+						workDescription: milestone.workDescription,
 					},
 				},
-				isCompleted: true,
-				status: "REQUESTED_CLOSURE",
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.WORK_ORDERS,
-			action: ACTIVITY_TYPE.SUBMIT,
-			entityId: milestoneId,
-			entityType: "Milestone",
-			metadata: {
-				name: milestone.name,
-				weight: milestone.weight,
-				description: milestone.description,
-				workOrderId: milestone.workOrderId,
-				otNumber: milestone.workOrder.otNumber,
-				workBookName: milestone.workOrder.workBookName,
-				workDescription: milestone.workOrder.workDescription,
-				progress: milestone.workOrder.progress,
-				status: updatedMilestone.status,
-				isCompleted: updatedMilestone.isCompleted,
-			},
-		})
-
-  await sendRequestCloseMilestoneEmail({
-			milestone,
-			responsibleEmail: milestone.workOrder.responsible.email,
-		})
-
-		return {
-			ok: true,
-			message: "Hito cerrado correctamente",
+				responsibleEmail: milestone.responsibleEmail,
+			})
 		}
+
+		return { ok: true, message: "Hito cerrado correctamente" }
 	} catch (error) {
 		console.error("Error al guardar los hitos:", error)
 		return {
