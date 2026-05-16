@@ -26,10 +26,13 @@ VALUES
   ('seed-supervisor-2', 'Patricia Soto',    'patricia.s@andinos.cl',    true, '16.666.666-6', 'supervisor', 'PARTNER_COMPANY', true, 'demo-company-2', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true)
 ON CONFLICT ("id") DO NOTHING;
 
--- ─── Location (single root for now) ─────────────────────────────────────────
+-- ─── Locations (root + 3 children, hierarchical) ───────────────────────────
 INSERT INTO "Location" ("id", "name", "parentId", "path", "createdAt", "updatedAt")
 VALUES
-  ('demo-loc-1', 'Planta Principal', NULL, 'Planta Principal', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
+  ('demo-loc-1',     'Planta Principal', NULL,          'Planta Principal',                       '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-pump',  'Sala de Bombas',   'demo-loc-1',  'Planta Principal / Sala de Bombas',      '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-elec',  'Sala Eléctrica',   'demo-loc-1',  'Planta Principal / Sala Eléctrica',      '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-yard',  'Patio Externo',    'demo-loc-1',  'Planta Principal / Patio Externo',       '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Equipment ──────────────────────────────────────────────────────────────
@@ -40,7 +43,9 @@ VALUES
   ('demo-eq-003', 'EQ-003', 'Motor Eléctrico 75kW',  'Motor trifásico de accionamiento', true,  'MOTOR',       'ME-001', 'CRITICAL',     'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
   ('demo-eq-004', 'EQ-004', 'Tablero Eléctrico TG1', 'Tablero general de distribución',  true,  'ELECTRICAL',  'TE-001', 'CRITICAL',     'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
   ('demo-eq-005', 'EQ-005', 'Intercambiador IC-2',   'Intercambiador de calor',          true,  'HEAT_EX',     'IC-002', 'SEMICRITICAL', 'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-006', 'EQ-006', 'Válvula Reguladora V1', 'Válvula de control principal',     false, 'VALVE',       'VR-001', 'UNCITICAL',    'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
+  ('demo-eq-006', 'EQ-006', 'Válvula Reguladora V1', 'Válvula de control principal',     false, 'VALVE',       'VR-001', 'UNCITICAL',    'demo-loc-1',    'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-007', 'EQ-007', 'Generador Auxiliar',    'Generador diésel 200kVA',          true,  'GENERATOR',   'GA-001', 'CRITICAL',     'demo-loc-yard', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-008', 'EQ-008', 'Compresor de Respaldo', 'Compresor secundario 30HP',        true,  'COMPRESSOR',  'CP-002', 'SEMICRITICAL', 'demo-loc-pump', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Work Orders (5 across distinct statuses) ──────────────────────────────
@@ -105,6 +110,51 @@ VALUES
   ('demo-wbe-101', 'DAILY_ACTIVITY', '2026-05-12T09:15:00Z', 'Análisis de vibración', '08:00', '09:30', 'Diagnóstico: rodamiento desgastado', 'demo-tech', 'demo-wo-002', 'demo-ms-101', '2026-05-12T09:30:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
+-- ─── Work Permits (3 in distinct statuses) ────────────────────────────────
+INSERT INTO "work_permit" (
+  "id", "status", "isUrgent",
+  "aplicantPt", "mutuality", "exactPlace", "workWillBe",
+  "tools", "preChecks", "activityDetails", "riskIdentification", "preventiveControlMeasures",
+  "generateWaste", "acceptTerms",
+  "startDate", "endDate", "createdAt", "updatedAt",
+  "otNumberId", "userId", "companyId",
+  "approvalDate", "approvalById", "closingDate", "closingById"
+)
+VALUES
+  ('demo-wp-001', 'ACTIVE', false,
+   'Patricia Soto', 'ACHS', 'Sala de Bombas — Bomba A', 'Mantenimiento mecánico',
+   ARRAY['Llave dinamométrica','Escalera','Equipo de bloqueo'], ARRAY['Inspección visual','Charla de 5 minutos'],
+   ARRAY['Cambio de sellos en bomba'], ARRAY['Caída a distinto nivel','Atrapamiento'], ARRAY['Uso de arnés','Bloqueo y etiquetado'],
+   false, true,
+   '2026-05-18T08:00:00Z', '2026-05-18T16:00:00Z', '2026-05-15T10:00:00Z', '2026-05-15T10:00:00Z',
+   'demo-wo-001', 'demo-supervisor', 'demo-company-1',
+   '2026-05-15T11:00:00Z', 'demo-admin', NULL, NULL),
+  ('demo-wp-002', 'REVIEW_PENDING', true,
+   'Carlos Rojas', 'Mutual de Seguridad', 'Patio Externo — Generador Auxiliar', 'Trabajo eléctrico',
+   ARRAY['Multímetro','Pinza amperimétrica','Equipo de bloqueo'], ARRAY['Inspección visual','Verificación de tensión'],
+   ARRAY['Diagnóstico eléctrico generador'], ARRAY['Contacto eléctrico','Arco eléctrico'], ARRAY['EPP dieléctrico','Bloqueo y etiquetado'],
+   false, true,
+   '2026-05-20T09:00:00Z', '2026-05-20T13:00:00Z', '2026-05-16T08:30:00Z', '2026-05-16T08:30:00Z',
+   NULL, 'demo-supervisor', 'demo-company-1',
+   NULL, NULL, NULL, NULL),
+  ('demo-wp-003', 'COMPLETED', false,
+   'Patricia Soto', 'ACHS', 'Sala Eléctrica — Tablero TG1', 'Inspección termográfica',
+   ARRAY['Cámara termográfica','EPP eléctrico'], ARRAY['Inspección visual','Charla de 5 minutos'],
+   ARRAY['Inspección termográfica programada'], ARRAY['Contacto eléctrico'], ARRAY['EPP dieléctrico','Distancia segura'],
+   false, true,
+   '2026-04-18T08:00:00Z', '2026-04-18T10:00:00Z', '2026-04-17T09:00:00Z', '2026-04-18T11:00:00Z',
+   'demo-wo-003', 'seed-supervisor-2', 'demo-company-2',
+   '2026-04-17T15:00:00Z', 'demo-admin', '2026-04-18T11:00:00Z', 'demo-admin')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Work Permit ↔ participants (Prisma implicit M2N) ──────────────────────
+INSERT INTO "_WorkPermitParticipants" ("A", "B") VALUES
+  ('demo-tech',        'demo-wp-001'),
+  ('seed-user-001',    'demo-wp-001'),
+  ('demo-tech',        'demo-wp-002'),
+  ('seed-supervisor-2','demo-wp-003')
+ON CONFLICT DO NOTHING;
+
 -- ─── Equipment ↔ Work Order (Prisma implicit M2N) ───────────────────────────
 INSERT INTO "_EquipmentToWorkOrder" ("A", "B") VALUES
   ('demo-eq-001', 'demo-wo-001'),
@@ -145,3 +195,8 @@ WHERE id = 'demo-wbe-101';
 -- Also correct progress for any other WOs whose seed value was arbitrary.
 -- demo-wo-003 is COMPLETED with no milestones → leave at 100 (no inconsistency to detect).
 -- demo-wo-001 / demo-wo-005 have no milestones → leave their starter values.
+
+-- Reassign existing equipment to the new sub-locations (introduced in this seed bump).
+-- Reads better in the UI: equipos agrupados por sub-area.
+UPDATE "equipment" SET "locationId" = 'demo-loc-pump' WHERE id IN ('demo-eq-001');
+UPDATE "equipment" SET "locationId" = 'demo-loc-elec' WHERE id IN ('demo-eq-003', 'demo-eq-004');
