@@ -1,8 +1,9 @@
 import { fallbackHandlers } from "./_fallback"
+import { workOrderHandlers } from "./work-order"
 
 /**
  * Order matters: specific handlers FIRST, fallback LAST.
- * Per-module handlers (work-orders, work-permits, etc.) will be added in
- * later iterations alongside their PGlite-backed implementations.
+ * Per-module handlers (work-orders, work-permits, etc.) are added alongside
+ * their PGlite-backed implementations in their own iteration.
  */
-export const handlers = [...fallbackHandlers]
+export const handlers = [...workOrderHandlers, ...fallbackHandlers]
