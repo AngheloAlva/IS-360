@@ -1,3 +1,4 @@
+import { recomputeWorkOrderProgress } from "./_recompute-progress"
 import { sendApproveMilestoneEmail, sendRejectMilestoneEmail } from "./send-close-milestone"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
@@ -15,8 +16,7 @@ interface RequestCloseMilestoneParams {
 }
 
 // TODO(iter X): full implementation — advisory locks, TOCTOU re-read,
-// float-safe progress recompute, auto-close OT when all milestones completed,
-// auto-close email cascade
+// auto-close OT when all milestones completed, auto-close email cascade
 export async function approveMilestone({
 	milestoneId,
 	closureComment,
@@ -56,6 +56,8 @@ export async function approveMilestone({
 			WHERE "id" = $4`,
 			[now, user.id, closureComment ?? null, milestoneId]
 		)
+
+		await recomputeWorkOrderProgress(db, milestone.workOrderId, now)
 
 		try {
 			await logActivity({
@@ -127,6 +129,8 @@ export async function rejectMilestone({
 			WHERE "id" = $3`,
 			[closureComment ?? null, now, milestoneId]
 		)
+
+		await recomputeWorkOrderProgress(db, milestone.workOrderId, now)
 
 		try {
 			await logActivity({
