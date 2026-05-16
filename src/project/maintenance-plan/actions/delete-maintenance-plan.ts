@@ -1,74 +1,51 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export const deleteMaintenancePlan = async (maintenancePlanId: string) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				maintenancePlan: ["delete"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No tienes permisos para eliminar el plan de mantenimiento",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const maintenancePlan = await prisma.maintenancePlan.update({
-			where: { id: maintenancePlanId },
-			data: { isActive: false },
-			select: {
-				id: true,
-				name: true,
-				slug: true,
-				equipmentId: true,
-			},
-		})
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
 
-  await logActivity({
-			userId: session.user.id,
-			module: MODULES.MAINTENANCE_PLANS,
-			action: ACTIVITY_TYPE.DELETE,
-			entityId: maintenancePlan.id,
-			entityType: "MaintenancePlan",
-			metadata: {
-				name: maintenancePlan.name,
-				slug: maintenancePlan.slug,
-				equipmentId: maintenancePlan.equipmentId,
-			},
-		})
-
-		return {
-			ok: true,
-			message: "Plan de mantenimiento eliminado correctamente",
+		const result = await db.query<{
+			id: string
+			name: string
+			slug: string
+			equipmentId: string
+		}>(
+			`UPDATE "maintenance_plan"
+			 SET "isActive" = false, "updatedAt" = $1
+			 WHERE id = $2
+			 RETURNING id, name, slug, "equipmentId"`,
+			[now, maintenancePlanId],
+		)
+		const plan = result.rows[0]
+		if (!plan) {
+			return { ok: false, message: "Plan de mantenimiento no encontrado" }
 		}
+
+		try {
+			await logActivity({
+				userId: user.id,
+				module: MODULES.MAINTENANCE_PLANS,
+				action: ACTIVITY_TYPE.DELETE,
+				entityId: plan.id,
+				entityType: "MaintenancePlan",
+				metadata: { name: plan.name, slug: plan.slug, equipmentId: plan.equipmentId },
+			})
+		} catch {
+			// audit best-effort
+		}
+
+		return { ok: true, message: "Plan de mantenimiento eliminado correctamente" }
 	} catch (error) {
 		console.error("[DELETE_MAINTENANCE_PLAN]", error)
-		return {
-			ok: false,
-			message: "Error al eliminar el plan de mantenimiento",
-		}
+		return { ok: false, message: "Error al eliminar el plan de mantenimiento" }
 	}
 }

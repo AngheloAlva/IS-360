@@ -1,11 +1,6 @@
-"use server"
-
-import { headers } from "next/headers"
-import { revalidatePath } from "next/cache"
-
 import { type MaintenancePlanSchema } from "../schemas/maintenance-plan.schema"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 interface UpdateMaintenancePlanProps {
 	values: MaintenancePlanSchema
@@ -13,53 +8,27 @@ interface UpdateMaintenancePlanProps {
 }
 
 export async function updateMaintenancePlan({ values, slug }: UpdateMaintenancePlanProps) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				maintenancePlan: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const existingPlan = await prisma.maintenancePlan.findUnique({
-			where: { slug },
-		})
+		const db = await getDemoDb()
 
-		if (!existingPlan) {
-			return {
-				ok: false,
-				message: "Plan de mantenimiento no encontrado",
-			}
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "maintenance_plan" WHERE slug = $1`,
+			[slug],
+		)
+		if (existing.rows.length === 0) {
+			return { ok: false, message: "Plan de mantenimiento no encontrado" }
 		}
 
-		const nameExists = await prisma.maintenancePlan.findFirst({
-			where: {
-				name: values.name,
-				slug: { not: slug },
-			},
-		})
-
-		if (nameExists) {
+		const conflict = await db.query<{ id: string }>(
+			`SELECT id FROM "maintenance_plan" WHERE name = $1 AND slug <> $2 LIMIT 1`,
+			[values.name, slug],
+		)
+		if (conflict.rows.length > 0) {
 			return {
 				ok: false,
 				code: "NAME_ALREADY_EXISTS",
@@ -67,25 +36,17 @@ export async function updateMaintenancePlan({ values, slug }: UpdateMaintenanceP
 			}
 		}
 
-		await prisma.maintenancePlan.update({
-			where: { slug },
-			data: {
-				name: values.name,
-				equipmentId: values.equipmentId,
-			},
-		})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "maintenance_plan"
+			 SET name = $1, "equipmentId" = $2, "updatedAt" = $3
+			 WHERE slug = $4`,
+			[values.name, values.equipmentId, now, slug],
+		)
 
-		revalidatePath("/maintenance-plans")
-
-		return {
-			ok: true,
-			message: "Plan de mantenimiento actualizado exitosamente",
-		}
+		return { ok: true, message: "Plan de mantenimiento actualizado exitosamente" }
 	} catch (error) {
-		console.error(error)
-		return {
-			ok: false,
-			message: "Error al actualizar el plan de mantenimiento",
-		}
+		console.error("[UPDATE_MAINTENANCE_PLAN]", error)
+		return { ok: false, message: "Error al actualizar el plan de mantenimiento" }
 	}
 }
