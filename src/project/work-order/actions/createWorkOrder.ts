@@ -1,6 +1,7 @@
 import { generateOTNumber } from "@/project/work-order/actions/generateOTNumber"
 import { sendNewWorkOrderEmail } from "./sendNewWorkOrderEmail"
-import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
+import { ACTIVITY_TYPE, MODULES, type PLAN_FREQUENCY } from "@/generated/prisma/enums"
+import { calculateNextDate } from "@/project/maintenance-plan/utils/calculate-next-date"
 import { logActivity } from "@/lib/activity/log"
 import { getDemoUser } from "@/lib/demo-auth"
 import { getDemoDb } from "@/lib/demo-db/client"
@@ -21,7 +22,7 @@ export const createWorkOrder = async ({
 	equipmentId,
 	workRequestId,
 	initReportFile,
-	maintenancePlanTaskId: _maintenancePlanTaskId,
+	maintenancePlanTaskId,
 }: CreateWorkOrderProps) => {
 	const user = getDemoUser()
 	if (!user) {
@@ -75,19 +76,21 @@ export const createWorkOrder = async ({
 			)
 		}
 
+		const planTaskId = maintenancePlanTaskId?.[0] ?? null
+
 		await db.query(
 			`INSERT INTO "work_order" (
 				"id", "otNumber", "type", "status", "progress",
 				"solicitationDate", "solicitationTime", "workRequest", "workDescription",
 				"priority", "capex", "programDate", "estimatedHours", "estimatedDays",
 				"estimatedEndDate", "companyId", "supervisorId", "responsibleId",
-				"initReportId", "createdAt", "updatedAt"
+				"initReportId", "maintenancePlanTaskId", "createdAt", "updatedAt"
 			) VALUES (
 				$1, $2, $3, 'PLANNED', 0,
 				$4, $5, $6, $7,
 				$8, $9, $10, $11, $12,
 				$13, $14, $15, $16,
-				$17, $18, $18
+				$17, $18, $19, $19
 			)`,
 			[
 				id,
@@ -107,6 +110,7 @@ export const createWorkOrder = async ({
 				supervisorId,
 				responsibleId,
 				initReportId,
+				planTaskId,
 				now,
 			]
 		)
@@ -119,7 +123,30 @@ export const createWorkOrder = async ({
 			)
 		}
 
-		// TODO(iter 3): cascade maintenancePlanTask updates (nextDate, attach workOrder)
+		if (planTaskId) {
+			const taskResult = await db.query<{
+				frequency: PLAN_FREQUENCY
+				nextDate: string
+				originalDayOfMonth: number | null
+			}>(
+				`SELECT frequency, "nextDate", "originalDayOfMonth"
+				 FROM "maintenance_plan_task" WHERE id = $1`,
+				[planTaskId],
+			)
+			const task = taskResult.rows[0]
+			if (task) {
+				const advanced = calculateNextDate(
+					new Date(task.nextDate),
+					task.frequency,
+					task.originalDayOfMonth,
+				)
+				await db.query(
+					`UPDATE "maintenance_plan_task"
+					 SET "nextDate" = $1, "updatedAt" = $2 WHERE id = $3`,
+					[advanced.toISOString(), now, planTaskId],
+				)
+			}
+		}
 
 		if (workRequestId) {
 			await db.query(
