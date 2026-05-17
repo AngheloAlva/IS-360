@@ -4,13 +4,28 @@ import { BlobServiceClient } from "@azure/storage-blob"
 export const DOCUMENTS_CONTAINER_NAME = process.env.AZURE_STORAGE_DOCUMENTS_CONTAINER_NAME as string
 export const FILES_CONTAINER_NAME = process.env.AZURE_STORAGE_FILES_CONTAINER_NAME as string
 
-const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING
+// Lazy init: el throw se difiere hasta el primer uso real para que el módulo
+// pueda importarse en builds de demo sin AZURE_STORAGE_CONNECTION_STRING.
+// En modo demo MSW intercepta /api/file en el browser y este cliente nunca se invoca.
+let _blobServiceClient: BlobServiceClient | null = null
 
-if (!connectionString) {
-	throw new Error("Azure Storage connection string not found")
+function getBlobServiceClient(): BlobServiceClient {
+	if (_blobServiceClient) return _blobServiceClient
+	const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING
+	if (!connectionString) {
+		throw new Error("Azure Storage connection string not found")
+	}
+	_blobServiceClient = BlobServiceClient.fromConnectionString(connectionString)
+	return _blobServiceClient
 }
 
-export const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString)
+export const blobServiceClient = new Proxy({} as BlobServiceClient, {
+	get(_target, prop) {
+		const client = getBlobServiceClient()
+		const value = Reflect.get(client, prop, client)
+		return typeof value === "function" ? value.bind(client) : value
+	},
+})
 
 function getContentTypeFromFilename(filename: string): string {
 	const ext = filename.toLowerCase().split(".").pop()

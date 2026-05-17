@@ -92,13 +92,23 @@ export default function EvaluationPage() {
 				return
 			}
 
+			const normalizedStatus = {
+				id: userStatus.id,
+				status: userStatus.status as SAFETY_TALK_STATUS,
+				score: userStatus.score,
+				nextAttemptAt: userStatus.nextAttemptAt ? new Date(userStatus.nextAttemptAt) : null,
+				currentAttempts: userStatus.currentAttempts,
+				expiresAt: userStatus.expiresAt ? new Date(userStatus.expiresAt) : null,
+			}
+
 			// Check if the safety talk has expired
-			const isExpired = userStatus.expiresAt && new Date(userStatus.expiresAt) < new Date()
+			const isExpired =
+				normalizedStatus.expiresAt && normalizedStatus.expiresAt < new Date()
 
 			// If status is PASSED but the talk is expired, allow retaking the evaluation
-			if (userStatus.status === "PASSED" && !isExpired) {
-				setResult({ passed: true, score: userStatus.score || 0 })
-				setStatus(userStatus)
+			if (normalizedStatus.status === "PASSED" && !isExpired) {
+				setResult({ passed: true, score: normalizedStatus.score || 0 })
+				setStatus(normalizedStatus)
 				setStep("result")
 				return
 			}
@@ -106,12 +116,12 @@ export default function EvaluationPage() {
 			// If expired, reset the status to allow new evaluation
 			if (isExpired) {
 				// User can retake the evaluation
-				setStatus(userStatus)
+				setStatus(normalizedStatus)
 				setStep("evaluation")
 				return
 			}
 
-			setStatus(userStatus)
+			setStatus(normalizedStatus)
 			setStep("evaluation")
 		} catch (error) {
 			console.error("Error loading status:", error)

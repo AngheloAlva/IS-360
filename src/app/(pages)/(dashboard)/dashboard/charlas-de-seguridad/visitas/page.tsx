@@ -114,8 +114,12 @@ export default function VisitorSafetyTalksPage() {
 					results[talk.value] = {
 						status: response.status.status,
 						score: response.status.score,
-						expiresAt: response.status.expiresAt,
-						nextAttemptAt: response.status.nextAttemptAt,
+						expiresAt: response.status.expiresAt
+							? new Date(response.status.expiresAt)
+							: null,
+						nextAttemptAt: response.status.nextAttemptAt
+							? new Date(response.status.nextAttemptAt)
+							: null,
 						currentAttempts: response.status.currentAttempts,
 					}
 				} else {

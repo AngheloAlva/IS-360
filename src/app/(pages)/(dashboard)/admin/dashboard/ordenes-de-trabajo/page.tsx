@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation"
 import { headers } from "next/headers"
-import dynamic from "next/dynamic"
 
 import { auth } from "@/lib/auth"
 
@@ -8,10 +7,7 @@ import { LazyWorkOrderStatsContainer } from "@/project/work-order/components/sta
 import LazyCreateWorkOrderForm from "@/project/work-order/components/forms/LazyCreateWorkOrderForm"
 import LazyNewWorkBookForm from "@/project/work-order/components/forms/LazyNewWorkBookForm"
 import { WorkOrderTable } from "@/project/work-order/components/data/WorkOrderTable"
-import ScrollToTableButton from "@/shared/components/ScrollToTable"
 import ModuleHeader from "@/shared/components/ModuleHeader"
-
-const VideoTutorials = dynamic(() => import("@/shared/components/VideoTutorials"))
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -55,42 +51,6 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 				description="Gestión y seguimiento de órdenes de trabajo"
 			>
 				<>
-					<VideoTutorials
-						className="text-red-500"
-						videos={[
-							{
-								title: "Creacion Orden de Trabajo",
-								description: "Tutorial de como crear una orden de trabajo.",
-								url: "https://youtube.com/embed/Yg_ZiODHu1U",
-							},
-							{
-								title: "Creacion Libro de Obras",
-								description: "Tutorial de como crear un libro de obras.",
-								url: "https://youtube.com/embed/K_LHCpommos",
-							},
-							{
-								title: "Cierre de Hitos",
-								description: "Tutorial de como cerrar hitos de una orden de trabajo.",
-								url: "https://youtube.com/embed/cTT1T9zIl7Q",
-							},
-							{
-								title: "Funcionalidades OT",
-								description: "Muestra todas las funcionalidades de las ordenes de trabajo.",
-								url: "https://youtube.com/embed/guIR3J8qyT8",
-							},
-							{
-								title: "Funcionalidades Libro de Obras",
-								description: "Muestra todas las funcionalidades de los libros de obras.",
-								url: "https://youtube.com/embed/vJTegLRfjDY",
-							},
-							{
-								title: "Edicion OT",
-								description: "Tutorial de como editar una orden de trabajo.",
-								url: "https://youtube.com/embed/7tkrv7JHOKs",
-							},
-						]}
-					/>
-
 					{hasPermission.success && <LazyCreateWorkOrderForm />}
 
 					{hassWorkBookPermission.success && (

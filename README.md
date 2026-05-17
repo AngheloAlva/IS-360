@@ -49,3 +49,20 @@ pnpm build      # Build de producción
 pnpm start      # Servir build
 pnpm lint       # Lint
 ```
+
+## Deploy (Vercel)
+
+La demo está pensada para deployarse sin backend:
+
+1. Importar el repo en Vercel.
+2. Setear una sola variable de entorno: `NEXT_PUBLIC_DEMO_MODE=true`.
+3. **No** setear `DATABASE_URL` ni credenciales de auth/email/Azure — todo se mockea client-side.
+4. Deploy.
+
+El `vercel.json` ya incluye los headers necesarios para el service worker de MSW (`Service-Worker-Allowed: /`) y cache largo para los assets de PGlite (`/demo-db/schema.sql`, `/demo-db/seed.sql`).
+
+> Las API routes (`src/app/api/**`) siguen existiendo en el bundle pero MSW las intercepta en el browser. Si por algún motivo un request alcanzara el servidor, devolvería 500 (Prisma sin DATABASE_URL) — eso es esperado y solo ocurriría si MSW no logra registrarse, en cuyo caso el `DemoModeProvider` lo detecta y muestra una pantalla de error explícita.
+
+## Resetear la demo
+
+Hay un botón flotante "Resetear demo" en la esquina inferior derecha que elimina toda la información local (IndexedDB) y vuelve a sembrar los datos iniciales. Útil cuando se modifica el seed o se quiere volver al estado base.
