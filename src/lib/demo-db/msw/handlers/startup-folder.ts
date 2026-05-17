@@ -386,15 +386,15 @@ const guideDocumentsHandler = http.get("*/api/startup-guide-documents", async ({
 	const params: unknown[] = []
 	if (!includeInactive) {
 		params.push(true)
-		visibilityClause += ` AND "isActive" = $${params.length}`
+		visibilityClause += ` AND g."isActive" = $${params.length}`
 	}
 	if (visibility === "BASIC") {
-		visibilityClause += ` AND visibility IN ('BASIC', 'BOTH')`
+		visibilityClause += ` AND g.visibility IN ('BASIC', 'BOTH')`
 	} else if (visibility === "FULL") {
-		visibilityClause += ` AND visibility IN ('FULL', 'BOTH')`
+		visibilityClause += ` AND g.visibility IN ('FULL', 'BOTH')`
 	} else if (visibility) {
 		params.push(visibility)
-		visibilityClause += ` AND visibility = $${params.length}`
+		visibilityClause += ` AND g.visibility = $${params.length}`
 	}
 
 	const rows = await query<Row>(
