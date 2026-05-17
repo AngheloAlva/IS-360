@@ -41,16 +41,40 @@ VALUES
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Equipment ──────────────────────────────────────────────────────────────
-INSERT INTO "equipment" ("id", "barcode", "name", "description", "isOperational", "type", "tag", "criticality", "locationId", "createdById", "createdAt", "updatedAt")
+-- 4 sistemas padre + 18 sub-equipos. parentId enlaza la jerarquía visual del árbol.
+INSERT INTO "equipment" ("id", "barcode", "name", "description", "isOperational", "type", "tag", "criticality", "locationId", "parentId", "createdById", "createdAt", "updatedAt")
 VALUES
-  ('demo-eq-001', 'EQ-001', 'Bomba Centrífuga A',    'Bomba principal de impulsión',     true,  'PUMP',        'BC-001', 'CRITICAL',     'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-002', 'EQ-002', 'Compresor Industrial',  'Compresor de aire 50HP',           true,  'COMPRESSOR',  'CP-001', 'SEMICRITICAL', 'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-003', 'EQ-003', 'Motor Eléctrico 75kW',  'Motor trifásico de accionamiento', true,  'MOTOR',       'ME-001', 'CRITICAL',     'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-004', 'EQ-004', 'Tablero Eléctrico TG1', 'Tablero general de distribución',  true,  'ELECTRICAL',  'TE-001', 'CRITICAL',     'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-005', 'EQ-005', 'Intercambiador IC-2',   'Intercambiador de calor',          true,  'HEAT_EX',     'IC-002', 'SEMICRITICAL', 'demo-loc-1', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-006', 'EQ-006', 'Válvula Reguladora V1', 'Válvula de control principal',     false, 'VALVE',       'VR-001', 'UNCITICAL',    'demo-loc-1',    'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-007', 'EQ-007', 'Generador Auxiliar',    'Generador diésel 200kVA',          true,  'GENERATOR',   'GA-001', 'CRITICAL',     'demo-loc-yard', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-eq-008', 'EQ-008', 'Compresor de Respaldo', 'Compresor secundario 30HP',        true,  'COMPRESSOR',  'CP-002', 'SEMICRITICAL', 'demo-loc-pump', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
+  -- ─── Sistemas padre (sin parentId) ────────────────────────────────────────
+  ('demo-sys-pmp', 'SYS-PMP-01', 'Sistema de Bombeo de Crudo',     'Tren de bombas centrífugas de impulsión de crudo a refinería', true, 'SYSTEM',     'SYS-PMP', 'CRITICAL',     'demo-loc-pump',  NULL, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-sys-cmp', 'SYS-CMP-01', 'Sistema de Compresión de Gas',   'Compresores de gas combustible y aire de instrumentos',         true, 'SYSTEM',     'SYS-CMP', 'CRITICAL',     'demo-loc-comp',  NULL, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-sys-tk',  'SYS-TK-01',  'Sistema de Almacenamiento',      'Patio de tanques de crudo y productos terminados',              true, 'SYSTEM',     'SYS-TK',  'CRITICAL',     'demo-loc-tanks', NULL, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-sys-ele', 'SYS-ELE-01', 'Sistema Eléctrico Principal',    'Distribución eléctrica de la planta',                           true, 'SYSTEM',     'SYS-ELE', 'CRITICAL',     'demo-loc-elec',  NULL, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+
+  -- ─── Sub-equipos del Sistema de Bombeo ────────────────────────────────────
+  ('demo-eq-001',  'EQ-001',     'Bomba Centrífuga BC-001',        'Bomba principal de impulsión de crudo, 250 m3/h',               true,  'PUMP',       'BC-001',  'CRITICAL',     'demo-loc-pump',  'demo-sys-pmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-009',  'EQ-009',     'Bomba Centrífuga BC-002',        'Bomba paralelo de impulsión, 250 m3/h',                          true,  'PUMP',       'BC-002',  'CRITICAL',     'demo-loc-pump',  'demo-sys-pmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-010',  'EQ-010',     'Bomba Centrífuga BC-003',        'Bomba de respaldo (stand-by) 250 m3/h',                          false, 'PUMP',       'BC-003',  'SEMICRITICAL', 'demo-loc-pump',  'demo-sys-pmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-005',  'EQ-005',     'Intercambiador de Calor IC-002', 'Intercambiador tubular precalentador de crudo',                  true,  'HEAT_EX',    'IC-002',  'SEMICRITICAL', 'demo-loc-pump',  'demo-sys-pmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-011',  'EQ-011',     'Intercambiador de Calor IC-003', 'Intercambiador placas, post-bombeo',                             true,  'HEAT_EX',    'IC-003',  'UNCITICAL',    'demo-loc-pump',  'demo-sys-pmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+
+  -- ─── Sub-equipos del Sistema de Compresión ────────────────────────────────
+  ('demo-eq-002',  'EQ-002',     'Compresor Industrial CP-001',    'Compresor de gas combustible 75 HP',                             true,  'COMPRESSOR', 'CP-001',  'CRITICAL',     'demo-loc-comp',  'demo-sys-cmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-008',  'EQ-008',     'Compresor de Respaldo CP-002',   'Compresor de gas combustible secundario 50 HP',                  true,  'COMPRESSOR', 'CP-002',  'SEMICRITICAL', 'demo-loc-comp',  'demo-sys-cmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-012',  'EQ-012',     'Compresor de Aire CP-003',       'Compresor de aire de instrumentos 30 HP',                        true,  'COMPRESSOR', 'CP-003',  'SEMICRITICAL', 'demo-loc-comp',  'demo-sys-cmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-006',  'EQ-006',     'Válvula Reguladora VR-001',      'Válvula de control de flujo a compresor principal',              false, 'VALVE',      'VR-001',  'UNCITICAL',    'demo-loc-comp',  'demo-sys-cmp', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+
+  -- ─── Sub-equipos del Sistema de Almacenamiento ────────────────────────────
+  ('demo-eq-013',  'EQ-013',     'Tanque Crudo TK-001',            'Tanque de techo flotante 10.000 m3 — crudo',                     true,  'TANK',       'TK-001',  'CRITICAL',     'demo-loc-tanks', 'demo-sys-tk',  'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-014',  'EQ-014',     'Tanque Crudo TK-002',            'Tanque de techo flotante 10.000 m3 — crudo',                     true,  'TANK',       'TK-002',  'CRITICAL',     'demo-loc-tanks', 'demo-sys-tk',  'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-015',  'EQ-015',     'Tanque Diésel TK-003',           'Tanque atmosférico 5.000 m3 — diésel terminado',                  true,  'TANK',       'TK-003',  'SEMICRITICAL', 'demo-loc-tanks', 'demo-sys-tk',  'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-016',  'EQ-016',     'Tanque Gasolina TK-004',         'Tanque atmosférico 3.000 m3 — gasolina',                          false, 'TANK',       'TK-004',  'SEMICRITICAL', 'demo-loc-tanks', 'demo-sys-tk',  'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-017',  'EQ-017',     'Horno de Calentamiento FH-001',  'Horno de proceso para crudo',                                     true,  'FURNACE',    'FH-001',  'CRITICAL',     'demo-loc-tanks', 'demo-sys-tk',  'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+
+  -- ─── Sub-equipos del Sistema Eléctrico ────────────────────────────────────
+  ('demo-eq-004',  'EQ-004',     'Tablero Eléctrico TE-001',       'Tablero general de distribución (TG1) 480V',                     true,  'ELECTRICAL', 'TE-001',  'CRITICAL',     'demo-loc-elec',  'demo-sys-ele', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-018',  'EQ-018',     'Tablero Eléctrico TE-002',       'Tablero secundario sala de bombas',                              true,  'ELECTRICAL', 'TE-002',  'SEMICRITICAL', 'demo-loc-elec',  'demo-sys-ele', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-003',  'EQ-003',     'Motor Eléctrico ME-001',         'Motor trifásico 75 kW — accionamiento BC-001',                    true,  'MOTOR',      'ME-001',  'CRITICAL',     'demo-loc-elec',  'demo-sys-ele', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-eq-007',  'EQ-007',     'Generador Auxiliar GA-001',      'Generador diésel 200 kVA de respaldo',                            true,  'GENERATOR',  'GA-001',  'CRITICAL',     'demo-loc-yard',  'demo-sys-ele', 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Work Orders (5 across distinct statuses) ──────────────────────────────
@@ -226,9 +250,12 @@ ON CONFLICT DO NOTHING;
 
 -- ─── Vehicles ───────────────────────────────────────────────────────────────
 INSERT INTO "vehicle" ("id", "plate", "model", "year", "brand", "type", "color", "isMain", "isActive", "companyId", "createdAt", "updatedAt") VALUES
-  ('demo-vehicle-1', 'GHJK-21', 'Hilux',     2022, 'Toyota', 'TRUCK', 'Blanco', true,  true, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
-  ('demo-vehicle-2', 'LPQR-58', 'NP300',     2021, 'Nissan', 'TRUCK', 'Gris',   false, true, 'demo-company-1', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
-  ('demo-vehicle-3', 'MNST-90', 'Ranger',    2023, 'Ford',   'TRUCK', 'Negro',  true,  true, 'demo-company-2', '2026-03-05T10:00:00Z', '2026-03-05T10:00:00Z')
+  ('demo-vehicle-1', 'GHJK-21', 'Hilux',         2022, 'Toyota',     'TRUCK',      'Blanco', true,  true, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-vehicle-2', 'LPQR-58', 'NP300',         2021, 'Nissan',     'TRUCK',      'Gris',   false, true, 'demo-company-1', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
+  ('demo-vehicle-3', 'MNST-90', 'Ranger',        2023, 'Ford',       'TRUCK',      'Negro',  true,  true, 'demo-company-2', '2026-03-05T10:00:00Z', '2026-03-05T10:00:00Z'),
+  ('demo-vehicle-4', 'BXKD-42', 'Sprinter 416',  2022, 'Mercedes',   'VAN',        'Blanco', false, true, 'demo-company-1', '2026-02-20T10:00:00Z', '2026-02-20T10:00:00Z'),
+  ('demo-vehicle-5', 'TRGR-07', 'Grúa Pluma 25t', 2020, 'Liebherr',  'TRUCK',      'Amarillo',false, true, 'demo-company-1', '2026-03-12T10:00:00Z', '2026-03-12T10:00:00Z'),
+  ('demo-vehicle-6', 'CLPK-83', 'L200 Katana',   2024, 'Mitsubishi', 'TRUCK',      'Rojo',   false, true, 'demo-company-2', '2026-04-02T10:00:00Z', '2026-04-02T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Additional partner-company workers (for startup-folder demo) ───────────
@@ -390,3 +417,14 @@ UPDATE "user" SET "email" = 'patricia.soto@mantepatagonia.cl' WHERE id = 'seed-s
 UPDATE "user" SET "email" = 'juan.perez@petroaustral.cl'     WHERE id = 'demo-worker-1';
 UPDATE "user" SET "email" = 'maria.gonzalez@petroaustral.cl' WHERE id = 'demo-worker-2';
 UPDATE "user" SET "email" = 'carlos.vega@mantepatagonia.cl'  WHERE id = 'demo-worker-3';
+
+-- ─── Iter 7 — 10.B re-runnable rebrand (equipos + jerarquía padre/hijo) ────
+-- Re-link existing equipment to the new parent systems and updated locations.
+UPDATE "equipment" SET "name" = 'Bomba Centrífuga BC-001',        "description" = 'Bomba principal de impulsión de crudo, 250 m3/h',     "locationId" = 'demo-loc-pump',  "parentId" = 'demo-sys-pmp' WHERE id = 'demo-eq-001';
+UPDATE "equipment" SET "name" = 'Compresor Industrial CP-001',    "description" = 'Compresor de gas combustible 75 HP',                  "locationId" = 'demo-loc-comp',  "parentId" = 'demo-sys-cmp' WHERE id = 'demo-eq-002';
+UPDATE "equipment" SET "name" = 'Motor Eléctrico ME-001',         "description" = 'Motor trifásico 75 kW — accionamiento BC-001',        "locationId" = 'demo-loc-elec',  "parentId" = 'demo-sys-ele' WHERE id = 'demo-eq-003';
+UPDATE "equipment" SET "name" = 'Tablero Eléctrico TE-001',       "description" = 'Tablero general de distribución (TG1) 480V',          "locationId" = 'demo-loc-elec',  "parentId" = 'demo-sys-ele' WHERE id = 'demo-eq-004';
+UPDATE "equipment" SET "name" = 'Intercambiador de Calor IC-002', "description" = 'Intercambiador tubular precalentador de crudo',       "locationId" = 'demo-loc-pump',  "parentId" = 'demo-sys-pmp' WHERE id = 'demo-eq-005';
+UPDATE "equipment" SET "name" = 'Válvula Reguladora VR-001',      "description" = 'Válvula de control de flujo a compresor principal',   "locationId" = 'demo-loc-comp',  "parentId" = 'demo-sys-cmp' WHERE id = 'demo-eq-006';
+UPDATE "equipment" SET "name" = 'Generador Auxiliar GA-001',      "description" = 'Generador diésel 200 kVA de respaldo',                "locationId" = 'demo-loc-yard',  "parentId" = 'demo-sys-ele' WHERE id = 'demo-eq-007';
+UPDATE "equipment" SET "name" = 'Compresor de Respaldo CP-002',   "description" = 'Compresor de gas combustible secundario 50 HP',       "locationId" = 'demo-loc-comp',  "parentId" = 'demo-sys-cmp' WHERE id = 'demo-eq-008';
