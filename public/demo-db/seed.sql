@@ -323,8 +323,12 @@ ON CONFLICT DO NOTHING;
 -- ─── Maintenance Plans + tasks ─────────────────────────────────────────────
 INSERT INTO "maintenance_plan" ("id", "slug", "name", "description", "isActive", "equipmentId", "createdById", "createdAt", "updatedAt")
 VALUES
-  ('demo-mp-001', 'plan-bomba-centrifuga-a', 'Plan Bomba Centrífuga A', 'Mantenimiento preventivo programado para BC-001', true, 'demo-eq-001', 'demo-admin', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
-  ('demo-mp-002', 'plan-motor-electrico-75kw', 'Plan Motor Eléctrico 75kW', 'Mantenimiento preventivo para ME-001', true, 'demo-eq-003', 'demo-admin', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z')
+  ('demo-mp-001', 'plan-bomba-centrifuga-bc001',  'Plan Bomba Centrífuga BC-001',   'Mantenimiento preventivo programado para BC-001',           true, 'demo-eq-001', 'demo-admin', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-mp-002', 'plan-motor-electrico-me001',   'Plan Motor Eléctrico ME-001',    'Mantenimiento preventivo para ME-001 (75 kW)',              true, 'demo-eq-003', 'demo-admin', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
+  -- 10.D nuevos planes
+  ('demo-mp-003', 'plan-sistema-compresion',      'Plan Sistema de Compresión',     'Mantenimiento integral del tren de compresión (CP-001/2/3)',true, 'demo-sys-cmp','demo-admin', '2026-02-20T10:00:00Z', '2026-02-20T10:00:00Z'),
+  ('demo-mp-004', 'plan-patio-tanques',           'Plan Patio de Tanques',          'Inspecciones, calibración y limpieza patio de tanques',     true, 'demo-sys-tk', 'demo-admin', '2026-03-01T10:00:00Z', '2026-03-01T10:00:00Z'),
+  ('demo-mp-005', 'plan-electrico-principal',     'Plan Sistema Eléctrico',         'Mantenimiento eléctrico y termografías programadas',        true, 'demo-sys-ele','demo-admin', '2026-03-10T10:00:00Z', '2026-03-10T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "maintenance_plan_task" (
@@ -335,17 +339,36 @@ INSERT INTO "maintenance_plan_task" (
   "createdAt", "updatedAt"
 )
 VALUES
-  ('demo-mpt-001', 'inspeccion-vibraciones-bc-001', 'Inspección de vibraciones', 'Medición y análisis de vibraciones',  true, 'MONTHLY',   '2026-05-30T08:00:00Z', 30, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-001', 'demo-mp-001', 'demo-admin', 'demo-tech', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
-  ('demo-mpt-002', 'cambio-sellos-bc-001',          'Cambio de sellos',          'Reemplazo de sellos mecánicos',       true, 'BIANNUAL', '2026-07-15T08:00:00Z', 15, false, 7, true, ARRAY[]::TEXT[], 'demo-eq-001', 'demo-mp-001', 'demo-admin', 'demo-tech', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
-  ('demo-mpt-003', 'cambio-aceite-me-001',          'Cambio de aceite',          'Cambio de aceite y filtros',          true, 'QUARTERLY','2026-06-25T08:00:00Z', 25, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-003', 'demo-mp-002', 'demo-admin', 'demo-tech', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
-  ('demo-mpt-004', 'termografia-me-001',            'Inspección termográfica',   'Termografía y análisis térmico',      true, 'MONTHLY',  '2026-05-28T08:00:00Z', 28, false, 5, true, ARRAY[]::TEXT[], 'demo-eq-003', 'demo-mp-002', 'demo-admin', 'demo-tech', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z')
+  ('demo-mpt-001', 'inspeccion-vibraciones-bc-001', 'Inspección de vibraciones',   'Medición y análisis de vibraciones',         true, 'MONTHLY',   '2026-05-30T08:00:00Z', 30, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-001', 'demo-mp-001', 'demo-admin', 'demo-tech', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-mpt-002', 'cambio-sellos-bc-001',          'Cambio de sellos',            'Reemplazo de sellos mecánicos',              true, 'BIANNUAL',  '2026-07-15T08:00:00Z', 15, false, 7, true, ARRAY[]::TEXT[], 'demo-eq-001', 'demo-mp-001', 'demo-admin', 'demo-tech', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-mpt-003', 'cambio-aceite-me-001',          'Cambio de aceite',            'Cambio de aceite y filtros',                 true, 'QUARTERLY', '2026-06-25T08:00:00Z', 25, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-003', 'demo-mp-002', 'demo-admin', 'demo-tech', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
+  ('demo-mpt-004', 'termografia-me-001',            'Inspección termográfica',     'Termografía y análisis térmico',             true, 'MONTHLY',   '2026-05-28T08:00:00Z', 28, false, 5, true, ARRAY[]::TEXT[], 'demo-eq-003', 'demo-mp-002', 'demo-admin', 'demo-tech', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
+  -- 10.D nuevos tasks
+  ('demo-mpt-005', 'cambio-aceite-cp-001',          'Cambio aceite CP-001',        'Cambio aceite y filtros compresor principal',true, 'QUARTERLY', '2026-06-10T08:00:00Z', 10, true,  5, true, ARRAY[]::TEXT[], 'demo-eq-002', 'demo-mp-003', 'demo-admin', 'demo-tech', '2026-02-20T10:00:00Z', '2026-02-20T10:00:00Z'),
+  ('demo-mpt-006', 'inspeccion-vibraciones-cp-001', 'Inspección vibraciones CP-001','Medición vibraciones compresor principal',  true, 'MONTHLY',   '2026-06-01T08:00:00Z', 1,  true,  5, true, ARRAY[]::TEXT[], 'demo-eq-002', 'demo-mp-003', 'demo-admin', 'demo-tech', '2026-02-20T10:00:00Z', '2026-02-20T10:00:00Z'),
+  ('demo-mpt-007', 'inspeccion-anual-tanques',      'Inspección anual tanques',    'Inspección visual y espesores tanques',      true, 'YEARLY',    '2027-02-10T08:00:00Z', 10, false, 30, true, ARRAY[]::TEXT[], 'demo-sys-tk', 'demo-mp-004', 'demo-admin', 'demo-tech', '2026-03-01T10:00:00Z', '2026-03-01T10:00:00Z'),
+  ('demo-mpt-008', 'calibracion-instrumentacion',   'Calibración instrumentación', 'Calibración transmisores nivel patio tanques',true,'BIANNUAL', '2026-08-20T08:00:00Z', 20, false, 14, true, ARRAY[]::TEXT[], 'demo-sys-tk', 'demo-mp-004', 'demo-admin', 'seed-user-001', '2026-03-01T10:00:00Z', '2026-03-01T10:00:00Z'),
+  ('demo-mpt-009', 'termografia-tableros',          'Termografía tableros',        'Termografía tableros TE-001 y TE-002',       true, 'QUARTERLY', '2026-06-28T08:00:00Z', 28, false, 7, true, ARRAY[]::TEXT[], 'demo-sys-ele','demo-mp-005', 'demo-admin', 'seed-user-002', '2026-03-10T10:00:00Z', '2026-03-10T10:00:00Z'),
+  ('demo-mpt-010', 'mantenimiento-generador',       'Mantenimiento generador',     'Mantenimiento programado 500 horas GA-001',  true, 'BIANNUAL',  '2026-10-12T08:00:00Z', 12, false, 14, true, ARRAY[]::TEXT[], 'demo-eq-007', 'demo-mp-005', 'demo-admin', 'demo-tech',     '2026-03-10T10:00:00Z', '2026-03-10T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "_MaintenancePlanTaskEquipments" ("A", "B") VALUES
   ('demo-eq-001', 'demo-mpt-001'),
   ('demo-eq-001', 'demo-mpt-002'),
   ('demo-eq-003', 'demo-mpt-003'),
-  ('demo-eq-003', 'demo-mpt-004')
+  ('demo-eq-003', 'demo-mpt-004'),
+  -- 10.D nuevos
+  ('demo-eq-002', 'demo-mpt-005'),
+  ('demo-eq-002', 'demo-mpt-006'),
+  ('demo-eq-013', 'demo-mpt-007'),
+  ('demo-eq-014', 'demo-mpt-007'),
+  ('demo-eq-015', 'demo-mpt-007'),
+  ('demo-eq-016', 'demo-mpt-007'),
+  ('demo-eq-013', 'demo-mpt-008'),
+  ('demo-eq-014', 'demo-mpt-008'),
+  ('demo-eq-004', 'demo-mpt-009'),
+  ('demo-eq-018', 'demo-mpt-009'),
+  ('demo-eq-007', 'demo-mpt-010')
 ON CONFLICT DO NOTHING;
 
 -- ─── Work Requests + counter ────────────────────────────────────────────────
@@ -528,6 +551,53 @@ ON CONFLICT ("id") DO NOTHING;
 -- demo-tech-001 (tech specs, APPROVED): 1 approved doc
 INSERT INTO "tech_specs_document" ("id", "type", "name", "url", "category", "status", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
   ('demo-doc-t001', 'TECHNICAL_WORK_PROCEDURE', 'Procedimiento Trabajo Técnico', 'https://example.com/twp.pdf', 'TECHNICAL_SPECS', 'APPROVED', 'demo-supervisor', 'demo-tech-001', '2026-02-01T10:00:00Z', '2026-03-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── 10.D — Worker folders adicionales (workers 4/5/6) ─────────────────────
+INSERT INTO "worker_folders" ("id", "status", "additionalNotificationEmails", "isDriver", "workerId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-wf-004', 'APPROVED', ARRAY[]::text[], false, 'demo-worker-4', 'demo-sf-001', '2026-01-25T10:00:00Z', '2026-03-15T10:00:00Z'),
+  ('demo-wf-005', 'SUBMITTED',ARRAY[]::text[], false, 'demo-worker-5', 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-04-05T10:00:00Z'),
+  ('demo-wf-006', 'DRAFT',    ARRAY[]::text[], true,  'demo-worker-6', 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-02-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "basic_folder" ("id", "status", "additionalNotificationEmails", "workerId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-bf-005', 'APPROVED', ARRAY[]::text[], 'demo-worker-4', 'demo-sf-001', '2026-01-25T10:00:00Z', '2026-03-15T10:00:00Z'),
+  ('demo-bf-006', 'SUBMITTED',ARRAY[]::text[], 'demo-worker-5', 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-04-05T10:00:00Z'),
+  ('demo-bf-007', 'DRAFT',    ARRAY[]::text[], 'demo-worker-6', 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-02-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── 10.D — Docs adicionales para enriquecer carpetas ──────────────────────
+INSERT INTO "basic_document" ("id", "type", "name", "url", "category", "status", "expirationDate", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
+  ('demo-doc-b005', 'CONTRACT',    'Contrato Francisca Riffo',           'https://example.com/contract-fr.pdf',  'BASIC', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor',     'demo-bf-005', '2026-01-26T10:00:00Z', '2026-02-05T10:00:00Z'),
+  ('demo-doc-b006', 'INSURANCE',   'Seguro Francisca Riffo',             'https://example.com/insurance-fr.pdf', 'BASIC', 'APPROVED', '2026-12-31T00:00:00Z', 'demo-supervisor',     'demo-bf-005', '2026-01-26T10:00:00Z', '2026-02-05T10:00:00Z'),
+  ('demo-doc-b007', 'PPE_RECEIPT', 'Entrega EPP Francisca Riffo',        'https://example.com/ppe-fr.pdf',       'BASIC', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor',     'demo-bf-005', '2026-01-26T10:00:00Z', '2026-02-05T10:00:00Z'),
+  ('demo-doc-b008', 'CONTRACT',    'Contrato Ignacio Pavez',             'https://example.com/contract-ip.pdf',  'BASIC', 'SUBMITTED','2027-02-01T00:00:00Z', 'seed-supervisor-2',   'demo-bf-006', '2026-03-10T10:00:00Z', NULL),
+  ('demo-doc-b009', 'INSURANCE',   'Seguro Ignacio Pavez',               'https://example.com/insurance-ip.pdf', 'BASIC', 'SUBMITTED','2026-12-31T00:00:00Z', 'seed-supervisor-2',   'demo-bf-006', '2026-03-10T10:00:00Z', NULL)
+ON CONFLICT ("id") DO NOTHING;
+
+-- env_document: agregar a folders que estaban vacías
+INSERT INTO "environment_document" ("id", "type", "name", "url", "category", "status", "uploadedById", "folderId", "uploadedAt", "submittedAt", "reviewedAt", "reviewNotes") VALUES
+  ('demo-doc-e001', 'ENVIRONMENTAL_MANAGEMENT_PLAN',           'Plan de Gestión Ambiental',           'https://example.com/env-plan.pdf',   'ENVIRONMENTAL', 'DRAFT',     'demo-supervisor',   'demo-env-001', '2026-01-22T10:00:00Z', NULL,                    NULL,                    NULL),
+  ('demo-doc-e002', 'ENVIRONMENTAL_ASPECTS_AND_IMPACTS_MATRIX','Matriz Aspectos e Impactos',          'https://example.com/matriz.pdf',     'ENVIRONMENTAL', 'SUBMITTED', 'seed-supervisor-2', 'demo-env-003', '2026-02-20T10:00:00Z', '2026-04-01T10:00:00Z',  NULL,                    NULL),
+  ('demo-doc-e003', 'ENVIRONMENTAL_MANAGEMENT_PLAN',           'Plan Ambiental Anual 2026',           'https://example.com/env-2026.pdf',   'ENVIRONMENTAL', 'APPROVED',  'seed-supervisor-2', 'demo-env-003', '2026-02-20T10:00:00Z', '2026-03-10T10:00:00Z',  '2026-04-01T10:00:00Z',  NULL)
+ON CONFLICT ("id") DO NOTHING;
+
+-- safety: enriquecer demo-sah-003
+INSERT INTO "safety_and_health_document" ("id", "type", "name", "url", "category", "status", "uploadedById", "folderId", "uploadedAt", "submittedAt", "reviewedAt", "reviewNotes") VALUES
+  ('demo-doc-s003', 'COMPANY_INFO',     'Antecedentes Empresa MantePatagonia', 'https://example.com/co-mp.pdf',    'SAFETY_AND_HEALTH', 'APPROVED', 'seed-supervisor-2', 'demo-sah-003', '2026-02-20T10:00:00Z', '2026-03-01T10:00:00Z', '2026-03-20T10:00:00Z', NULL),
+  ('demo-doc-s004', 'PREVENTION_PLAN',  'Plan Prevención de Riesgos',           'https://example.com/risk-mp.pdf',   'SAFETY_AND_HEALTH', 'APPROVED', 'seed-supervisor-2', 'demo-sah-003', '2026-02-20T10:00:00Z', '2026-03-01T10:00:00Z', '2026-03-20T10:00:00Z', NULL)
+ON CONFLICT ("id") DO NOTHING;
+
+-- tech_specs: agregar a demo-tech-003
+INSERT INTO "tech_specs_document" ("id", "type", "name", "url", "category", "status", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
+  ('demo-doc-t002', 'TECHNICAL_WORK_PROCEDURE', 'Procedimiento Trabajo Mecánico', 'https://example.com/twp-mech.pdf', 'TECHNICAL_SPECS', 'DRAFT', 'seed-supervisor-2', 'demo-tech-003', '2026-02-18T10:00:00Z', NULL)
+ON CONFLICT ("id") DO NOTHING;
+
+-- worker_document: docs para worker folders (demo-wf-001 DRAFT, demo-wf-004 APPROVED)
+INSERT INTO "worker_document" ("id", "type", "name", "url", "category", "status", "expirationDate", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
+  ('demo-doc-w001', 'HEALTH_EXAM',            'Examen Salud Juan Pérez',           'https://example.com/health-jp.pdf', 'WORKERS', 'DRAFT',    '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-001', '2026-03-01T10:00:00Z', NULL),
+  ('demo-doc-w002', 'HEALTH_EXAM',            'Examen Salud Francisca Riffo',      'https://example.com/health-fr.pdf', 'WORKERS', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-004', '2026-01-30T10:00:00Z', '2026-02-15T10:00:00Z'),
+  ('demo-doc-w003', 'RISK_MATRIX_TRAINING',   'Capacitación Matriz de Riesgos FR', 'https://example.com/mtx-fr.pdf',    'WORKERS', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-004', '2026-01-30T10:00:00Z', '2026-02-15T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Re-runnable adjustments ────────────────────────────────────────────────
