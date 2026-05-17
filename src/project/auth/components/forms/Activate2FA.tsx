@@ -1,65 +1,16 @@
-"use client"
+import { InfoIcon } from "lucide-react"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-import { toast } from "sonner"
-import { z } from "zod"
-
-import { authClient } from "@/lib/auth-client"
-
-import { InputFormField } from "@/shared/components/forms/InputFormField"
-import SubmitButton from "@/shared/components/forms/SubmitButton"
-import { Form } from "@/shared/components/ui/form"
-
-const enable2faSchema = z.object({
-	password: z.string().nonempty({ message: "La contraseña es obligatoria" }),
-})
+import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 
 export default function Activate2FA() {
-	const [loading2FA, setLoading2FA] = useState(false)
-	const router = useRouter()
-
-	const twoFactorForm = useForm<z.infer<typeof enable2faSchema>>({
-		resolver: zodResolver(enable2faSchema),
-		defaultValues: {
-			password: "",
-		},
-	})
-
-	const onSubmit2FA = async (values: z.infer<typeof enable2faSchema>) => {
-		setLoading2FA(true)
-
-		const { error } = await authClient.twoFactor.enable({
-			password: values.password,
-		})
-
-		if (error) {
-			toast.error("Error al activar 2FA", {
-				description: error.message,
-			})
-			setLoading2FA(false)
-			return
-		}
-
-		toast.success("2FA activado exitosamente")
-		router.push("/admin/dashboard/documentacion")
-		setLoading2FA(false)
-	}
-
 	return (
-		<Form {...twoFactorForm}>
-			<form onSubmit={twoFactorForm.handleSubmit(onSubmit2FA)} className="grid gap-5">
-				<InputFormField<z.infer<typeof enable2faSchema>>
-					type="password"
-					name="password"
-					label="Contraseña"
-					control={twoFactorForm.control}
-				/>
-
-				<SubmitButton label="Activar 2FA" isSubmitting={loading2FA} />
-			</form>
-		</Form>
+		<Alert>
+			<InfoIcon className="size-4" />
+			<AlertTitle>No disponible en la demo</AlertTitle>
+			<AlertDescription>
+				La autenticación de dos factores está deshabilitada en la demo. En el sistema real podrías
+				activarla aquí para proteger tu cuenta.
+			</AlertDescription>
+		</Alert>
 	)
 }

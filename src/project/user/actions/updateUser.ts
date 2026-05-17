@@ -1,93 +1,79 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { ExternalUserSchema } from "@/project/user/schemas/externalUser.schema"
 import type { InternalUserSchema } from "@/project/user/schemas/internalUser.schema"
-import type { PrismaClientKnownRequestError } from "@prisma/client/runtime/client"
 import type { ProfileFormSchema } from "@/project/auth/schemas/profile.schema"
+
+interface UserRow {
+	id: string
+	email: string
+	name: string
+	phone: string | null
+	image: string | null
+	role: string | null
+	companyId: string | null
+	isSupervisor: boolean
+	allowedModules: string[]
+	allowedCompanies: string[]
+}
+
+async function isDuplicateUniqueKeyError(error: unknown): Promise<boolean> {
+	if (!(error instanceof Error)) return false
+	const message = error.message.toLowerCase()
+	return message.includes("unique") || message.includes("duplicate")
+}
 
 interface UpdateExternalUserProps {
 	userId: string
 	values: ExternalUserSchema
 }
 
-const PASSWORD_RESET_REDIRECT_TO = "/auth/restablecer-contrasena"
-
 export const updateExternalUser = async ({ userId, values }: UpdateExternalUserProps) => {
-	const requestHeaders = await headers()
-	const session = await auth.api.getSession({
-		headers: requestHeaders,
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const currentUser = await prisma.user.findUnique({
-			where: {
-				id: userId,
-			},
-			select: {
-				email: true,
-			},
-		})
-
-		if (!currentUser) {
-			return {
-				ok: false,
-				message: "No se encontró el usuario a actualizar",
-			}
+		const db = await getDemoDb()
+		const currentRes = await db.query<{ email: string }>(
+			`SELECT email FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const current = currentRes.rows[0]
+		if (!current) {
+			return { ok: false, message: "No se encontró el usuario a actualizar" }
 		}
 
 		const nextEmail = values.email.trim().toLowerCase()
-		const emailWasChanged = currentUser.email.toLowerCase() !== nextEmail
+		const emailWasChanged = current.email.toLowerCase() !== nextEmail
+		const now = new Date().toISOString()
 
-		const user = await prisma.user.update({
-			where: {
-				id: userId,
-			},
-			data: {
-				...values,
-				email: nextEmail,
-			},
-			select: {
-				id: true,
-				email: true,
-				name: true,
-				companyId: true,
-				isSupervisor: true,
-			},
-		})
-
-		let passwordResetEmailSent = false
-		if (emailWasChanged) {
-			const resetPasswordResult = await auth.api.requestPasswordReset({
-				body: {
-					email: user.email,
-					redirectTo: PASSWORD_RESET_REDIRECT_TO,
-				},
-				headers: requestHeaders,
-			})
-
-			passwordResetEmailSent = resetPasswordResult.status
-
-			if (!resetPasswordResult.status) {
-				console.error("[UPDATE_EXTERNAL_USER][REQUEST_PASSWORD_RESET]", resetPasswordResult.message)
-			}
+		const keys = Object.keys(values) as (keyof ExternalUserSchema)[]
+		const setClauses: string[] = []
+		const params: unknown[] = []
+		for (const key of keys) {
+			params.push(key === "email" ? nextEmail : values[key])
+			setClauses.push(`"${key}" = $${params.length}`)
 		}
+		params.push(now)
+		setClauses.push(`"updatedAt" = $${params.length}`)
+		params.push(userId)
 
-  await logActivity({
-			userId: session.user.id,
+		const updateRes = await db.query<UserRow>(
+			`UPDATE "user"
+			 SET ${setClauses.join(", ")}
+			 WHERE id = $${params.length}
+			 RETURNING id, email, name, "companyId", "isSupervisor"`,
+			params,
+		)
+		const user = updateRes.rows[0]
+
+		await logActivity({
+			userId: sessionUser.id,
 			module: MODULES.USERS,
 			action: ACTIVITY_TYPE.UPDATE,
 			entityId: user.id,
@@ -103,22 +89,15 @@ export const updateExternalUser = async ({ userId, values }: UpdateExternalUserP
 		return {
 			ok: true,
 			data: user,
-			passwordResetEmailSent,
+			passwordResetEmailSent: false,
 			emailWasChanged,
 		}
 	} catch (error) {
-		if ((error as PrismaClientKnownRequestError).code === "P2002") {
-			return {
-				ok: false,
-				message: "El correo o RUT ingresado ya está registrado",
-			}
+		if (await isDuplicateUniqueKeyError(error)) {
+			return { ok: false, message: "El correo o RUT ingresado ya está registrado" }
 		}
-
 		console.error("[UPDATE_EXTERNAL_USER]", error)
-		return {
-			ok: false,
-			message: "Error al actualizar el usuario",
-		}
+		return { ok: false, message: "Error al actualizar el usuario" }
 	}
 }
 
@@ -128,79 +107,55 @@ interface UpdateInternalUserProps {
 }
 
 export const updateInternalUser = async ({ userId, values }: UpdateInternalUserProps) => {
-	const requestHeaders = await headers()
-	const session = await auth.api.getSession({
-		headers: requestHeaders,
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const currentUser = await prisma.user.findUnique({
-			where: {
-				id: userId,
-			},
-			select: {
-				email: true,
-			},
-		})
-
-		if (!currentUser) {
-			return {
-				ok: false,
-				message: "No se encontró el usuario a actualizar",
-			}
+		const db = await getDemoDb()
+		const currentRes = await db.query<{ email: string }>(
+			`SELECT email FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const current = currentRes.rows[0]
+		if (!current) {
+			return { ok: false, message: "No se encontró el usuario a actualizar" }
 		}
 
 		const { role, allowedModules, allowedCompanies, ...rest } = values
 		const nextEmail = rest.email.trim().toLowerCase()
-		const emailWasChanged = currentUser.email.toLowerCase() !== nextEmail
+		const emailWasChanged = current.email.toLowerCase() !== nextEmail
+		const now = new Date().toISOString()
 
-		const user = await prisma.user.update({
-			where: {
-				id: userId,
-			},
-			data: {
-				...rest,
-				email: nextEmail,
-				role: role.join(","),
-				allowedModules: allowedModules,
-				allowedCompanies: allowedCompanies || [],
-			},
-			select: {
-				id: true,
-				email: true,
-				name: true,
-				role: true,
-				allowedModules: true,
-				allowedCompanies: true,
-			},
-		})
-
-		let passwordResetEmailSent = false
-		if (emailWasChanged) {
-			const resetPasswordResult = await auth.api.requestPasswordReset({
-				body: {
-					email: user.email,
-					redirectTo: PASSWORD_RESET_REDIRECT_TO,
-				},
-				headers: requestHeaders,
-			})
-
-			passwordResetEmailSent = resetPasswordResult.status
-
-			if (!resetPasswordResult.status) {
-				console.error("[UPDATE_INTERNAL_USER][REQUEST_PASSWORD_RESET]", resetPasswordResult.message)
-			}
+		const restKeys = Object.keys(rest) as (keyof typeof rest)[]
+		const setClauses: string[] = []
+		const params: unknown[] = []
+		for (const key of restKeys) {
+			params.push(key === "email" ? nextEmail : rest[key])
+			setClauses.push(`"${key}" = $${params.length}`)
 		}
+		params.push(role.join(","))
+		setClauses.push(`"role" = $${params.length}`)
+		params.push(allowedModules)
+		setClauses.push(`"allowedModules" = $${params.length}`)
+		params.push(allowedCompanies || [])
+		setClauses.push(`"allowedCompanies" = $${params.length}`)
+		params.push(now)
+		setClauses.push(`"updatedAt" = $${params.length}`)
+		params.push(userId)
 
-  await logActivity({
-			userId: session.user.id,
+		const updateRes = await db.query<UserRow>(
+			`UPDATE "user"
+			 SET ${setClauses.join(", ")}
+			 WHERE id = $${params.length}
+			 RETURNING id, email, name, role, "allowedModules", "allowedCompanies"`,
+			params,
+		)
+		const user = updateRes.rows[0]
+
+		await logActivity({
+			userId: sessionUser.id,
 			module: MODULES.USERS,
 			action: ACTIVITY_TYPE.UPDATE,
 			entityId: user.id,
@@ -218,22 +173,15 @@ export const updateInternalUser = async ({ userId, values }: UpdateInternalUserP
 		return {
 			ok: true,
 			data: user,
-			passwordResetEmailSent,
+			passwordResetEmailSent: false,
 			emailWasChanged,
 		}
 	} catch (error) {
-		if ((error as PrismaClientKnownRequestError).code === "P2002") {
-			return {
-				ok: false,
-				message: "El correo o RUT ingresado ya está registrado",
-			}
+		if (await isDuplicateUniqueKeyError(error)) {
+			return { ok: false, message: "El correo o RUT ingresado ya está registrado" }
 		}
-
 		console.error("[UPDATE_INTERNAL_USER]", error)
-		return {
-			ok: false,
-			message: "Error al actualizar el usuario",
-		}
+		return { ok: false, message: "Error al actualizar el usuario" }
 	}
 }
 
@@ -244,38 +192,34 @@ interface UpdateProfileProps {
 }
 
 export const updateProfile = async ({ userId, imageUrl, values }: UpdateProfileProps) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const user = await prisma.user.update({
-			where: {
-				id: userId,
-			},
-			data: {
-				name: values.name,
-				phone: values.phone,
-				image: imageUrl || undefined,
-			},
-			select: {
-				id: true,
-				email: true,
-				name: true,
-				phone: true,
-				image: true,
-			},
-		})
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
 
-  await logActivity({
-			userId: session.user.id,
+		const setClauses: string[] = [`"name" = $1`, `"phone" = $2`, `"updatedAt" = $3`]
+		const params: unknown[] = [values.name, values.phone, now]
+		if (imageUrl) {
+			params.push(imageUrl)
+			setClauses.push(`"image" = $${params.length}`)
+		}
+		params.push(userId)
+
+		const updateRes = await db.query<UserRow>(
+			`UPDATE "user"
+			 SET ${setClauses.join(", ")}
+			 WHERE id = $${params.length}
+			 RETURNING id, email, name, phone, image`,
+			params,
+		)
+		const user = updateRes.rows[0]
+
+		await logActivity({
+			userId: sessionUser.id,
 			module: MODULES.USERS,
 			action: ACTIVITY_TYPE.UPDATE,
 			entityId: user.id,
@@ -289,15 +233,9 @@ export const updateProfile = async ({ userId, imageUrl, values }: UpdateProfileP
 			},
 		})
 
-		return {
-			ok: true,
-			data: user,
-		}
+		return { ok: true, data: user }
 	} catch (error) {
 		console.error("[UPDATE_PROFILE]", error)
-		return {
-			ok: false,
-			message: "Error al actualizar el perfil",
-		}
+		return { ok: false, message: "Error al actualizar el perfil" }
 	}
 }
