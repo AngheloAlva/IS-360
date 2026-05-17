@@ -602,9 +602,9 @@ ON CONFLICT ("id") DO NOTHING;
 
 -- worker_document: docs para worker folders (demo-wf-001 DRAFT, demo-wf-004 APPROVED)
 INSERT INTO "worker_document" ("id", "type", "name", "url", "category", "status", "expirationDate", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
-  ('demo-doc-w001', 'HEALTH_EXAM',            'Examen Salud Juan Pérez',           'https://example.com/health-jp.pdf', 'WORKERS', 'DRAFT',    '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-001', '2026-03-01T10:00:00Z', NULL),
-  ('demo-doc-w002', 'HEALTH_EXAM',            'Examen Salud Francisca Riffo',      'https://example.com/health-fr.pdf', 'WORKERS', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-004', '2026-01-30T10:00:00Z', '2026-02-15T10:00:00Z'),
-  ('demo-doc-w003', 'RISK_MATRIX_TRAINING',   'Capacitación Matriz de Riesgos FR', 'https://example.com/mtx-fr.pdf',    'WORKERS', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-004', '2026-01-30T10:00:00Z', '2026-02-15T10:00:00Z')
+  ('demo-doc-w001', 'HEALTH_EXAM',            'Examen Salud Juan Pérez',           'https://example.com/health-jp.pdf', 'PERSONNEL', 'DRAFT',    '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-001', '2026-03-01T10:00:00Z', NULL),
+  ('demo-doc-w002', 'HEALTH_EXAM',            'Examen Salud Francisca Riffo',      'https://example.com/health-fr.pdf', 'PERSONNEL', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-004', '2026-01-30T10:00:00Z', '2026-02-15T10:00:00Z'),
+  ('demo-doc-w003', 'RISK_MATRIX_TRAINING',   'Capacitación Matriz de Riesgos FR', 'https://example.com/mtx-fr.pdf',    'PERSONNEL', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-wf-004', '2026-01-30T10:00:00Z', '2026-02-15T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Re-runnable adjustments ────────────────────────────────────────────────
