@@ -1,86 +1,63 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
 import {
 	MODULES,
 	ACTIVITY_TYPE,
 	LABOR_CONTROL_STATUS,
-	WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
+	type WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
 } from "@/generated/prisma/enums"
+import { logActivity } from "@/lib/activity/log"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 import {
 	markDocumentAsNotAppliedSchema,
 	type MarkDocumentAsNotAppliedInput,
 } from "../../schemas/mark-document-not-applied.schema"
 
 export async function markWorkerLaborControlDocumentAsNotApplied(
-	input: MarkDocumentAsNotAppliedInput
+	input: MarkDocumentAsNotAppliedInput,
 ): Promise<{ ok: boolean; message?: string }> {
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
+		return { ok: false, message: "No se encontró usuario" }
+	}
+
 	try {
-		const session = await auth.api.getSession({
-			headers: await headers(),
-		})
-
-		if (!session?.user) {
-			return {
-				ok: false,
-				message: "No se encontró usuario",
-			}
-		}
-
 		const { userId, folderId, documentType, documentName, workerId } =
 			markDocumentAsNotAppliedSchema.parse(input)
 
 		if (!workerId) {
-			return {
-				ok: false,
-				message: "ID de trabajador requerido",
-			}
+			return { ok: false, message: "ID de trabajador requerido" }
 		}
 
-		const workerFolder = await prisma.workerLaborControlFolder.findUnique({
-			where: { id: folderId },
-			select: {
-				id: true,
-				worker: {
-					select: {
-						id: true,
-						companyId: true,
-					},
-				},
-			},
-		})
-
-		if (!workerFolder) {
-			return {
-				ok: false,
-				message: "Carpeta de trabajador no encontrada",
-			}
+		const db = await getDemoDb()
+		const folderRes = await db.query<{ id: string; worker_companyId: string | null }>(
+			`SELECT wlcf.id, u."companyId" AS "worker_companyId"
+			 FROM "WorkerLaborControlFolder" wlcf
+			 LEFT JOIN "user" u ON u.id = wlcf."workerId"
+			 WHERE wlcf.id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
+		if (!folder) {
+			return { ok: false, message: "Carpeta de trabajador no encontrada" }
 		}
 
-		const user = await prisma.user.findUnique({ where: { id: userId } })
-
+		const userRes = await db.query<{ companyId: string | null; accessRole: string }>(
+			`SELECT "companyId", "accessRole" FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const user = userRes.rows[0]
 		if (
 			!user ||
-			(user.companyId !== workerFolder.worker?.companyId && user.accessRole !== "ADMIN")
+			(user.companyId !== folder.worker_companyId && user.accessRole !== "ADMIN")
 		) {
-			return {
-				ok: false,
-				message: "No autorizado - El usuario no pertenece a esta empresa",
-			}
+			return { ok: false, message: "No autorizado - El usuario no pertenece a esta empresa" }
 		}
 
-		const existingDocument = await prisma.workerLaborControlDocument.findFirst({
-			where: {
-				folderId,
-				type: documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
-			},
-		})
-
-		if (existingDocument) {
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "WorkerLaborControlDocument" WHERE "folderId" = $1 AND type = $2 LIMIT 1`,
+			[folderId, documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE],
+		)
+		if (existing.rows.length) {
 			return {
 				ok: false,
 				message:
@@ -88,29 +65,29 @@ export async function markWorkerLaborControlDocumentAsNotApplied(
 			}
 		}
 
-		const document = await prisma.workerLaborControlDocument.create({
-			data: {
-				url: "",
-				name: documentName,
-				uploadById: userId,
-				folderId: workerFolder.id,
-				status: LABOR_CONTROL_STATUS.NOT_APPLIED,
-				type: documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
-			},
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		await db.query(
+			`INSERT INTO "WorkerLaborControlDocument" (
+				"id", "url", "name", "uploadById", "folderId", "type",
+				"status", "uploadDate", "updatedAt"
+			) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $7)`,
+			[
+				id,
+				documentName,
+				userId,
+				folderId,
+				documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
+				LABOR_CONTROL_STATUS.NOT_APPLIED,
+				now,
+			],
+		)
 
-		if (!document) {
-			return {
-				ok: false,
-				message: "Error al crear el documento",
-			}
-		}
-
-  await logActivity({
+		await logActivity({
 			userId,
 			module: MODULES.LABOR_CONTROL_FOLDERS,
 			action: ACTIVITY_TYPE.UPDATE,
-			entityId: document.id,
+			entityId: id,
 			entityType: "WorkerLaborControlDocument",
 			metadata: {
 				folderId,
@@ -122,15 +99,9 @@ export async function markWorkerLaborControlDocumentAsNotApplied(
 			},
 		})
 
-		return {
-			ok: true,
-			message: "Documento marcado como 'No Aplica' exitosamente",
-		}
+		return { ok: true, message: "Documento marcado como 'No Aplica' exitosamente" }
 	} catch (error) {
 		console.error("Error al marcar documento como No Aplica:", error)
-		return {
-			ok: false,
-			message: "Error al procesar la solicitud",
-		}
+		return { ok: false, message: "Error al procesar la solicitud" }
 	}
 }

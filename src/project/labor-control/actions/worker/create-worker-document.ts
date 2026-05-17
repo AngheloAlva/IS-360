@@ -1,10 +1,12 @@
-"use server"
-
 import { z } from "zod"
 
-import { ACTIVITY_TYPE, MODULES, WORKER_LABOR_CONTROL_DOCUMENT_TYPE } from "@/generated/prisma/enums"
+import {
+	ACTIVITY_TYPE,
+	MODULES,
+	type WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
+} from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 const createWorkerDocumentSchema = z.object({
 	url: z.string(),
@@ -18,82 +20,59 @@ const createWorkerDocumentSchema = z.object({
 export type CreateWorkerDocumentInput = z.infer<typeof createWorkerDocumentSchema>
 
 export async function createWorkerDocument(
-	input: CreateWorkerDocumentInput
+	input: CreateWorkerDocumentInput,
 ): Promise<{ ok: boolean; message?: string }> {
 	try {
 		const { userId, workerId, documentType, documentName, url, folderId } =
 			createWorkerDocumentSchema.parse(input)
+		const db = await getDemoDb()
 
-		const workerFolder = await prisma.workerLaborControlFolder.findUnique({
-			where: { id: folderId },
-			select: {
-				id: true,
-				worker: {
-					select: {
-						id: true,
-						companyId: true,
-					},
-				},
-			},
-		})
-
-		if (!workerFolder) {
-			return {
-				ok: false,
-				message: "Carpeta de personal no encontrada",
-			}
+		const folderRes = await db.query<{
+			id: string
+			worker_companyId: string | null
+		}>(
+			`SELECT wlcf.id, u."companyId" AS "worker_companyId"
+			 FROM "WorkerLaborControlFolder" wlcf
+			 LEFT JOIN "user" u ON u.id = wlcf."workerId"
+			 WHERE wlcf.id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
+		if (!folder) {
+			return { ok: false, message: "Carpeta de personal no encontrada" }
 		}
 
-		const user = await prisma.user.findUnique({ where: { id: userId } })
-
-		if (!user || user.companyId !== workerFolder.worker?.companyId) {
-			return {
-				ok: false,
-				message: "No autorizado - El usuario no pertenece a la empresa",
-			}
+		const userRes = await db.query<{ companyId: string | null }>(
+			`SELECT "companyId" FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const user = userRes.rows[0]
+		if (!user || user.companyId !== folder.worker_companyId) {
+			return { ok: false, message: "No autorizado - El usuario no pertenece a la empresa" }
 		}
 
-		const document = await prisma.workerLaborControlDocument.create({
-			data: {
-				url,
-				name: documentName,
-				uploadById: userId,
-				folderId: workerFolder.id,
-				type: documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE,
-			},
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		await db.query(
+			`INSERT INTO "WorkerLaborControlDocument" (
+				"id", "url", "name", "uploadById", "folderId", "type",
+				"status", "uploadDate", "updatedAt"
+			) VALUES ($1, $2, $3, $4, $5, $6, 'DRAFT', $7, $7)`,
+			[id, url, documentName, userId, folderId, documentType as WORKER_LABOR_CONTROL_DOCUMENT_TYPE, now],
+		)
 
-		if (!document) {
-			return {
-				ok: false,
-				message: "Error al crear el documento",
-			}
-		}
-
-  await logActivity({
+		await logActivity({
 			userId,
 			module: MODULES.STARTUP_FOLDERS,
 			action: ACTIVITY_TYPE.UPLOAD,
-			entityId: document.id,
+			entityId: id,
 			entityType: "BasicDocument",
-			metadata: {
-				folderId,
-				workerId,
-				documentType,
-				documentName,
-				documentUrl: url,
-			},
+			metadata: { folderId, workerId, documentType, documentName, documentUrl: url },
 		})
 
-		return {
-			ok: true,
-			message: "Documento de personal subido correctamente",
-		}
+		return { ok: true, message: "Documento de personal subido correctamente" }
 	} catch (error) {
 		console.error(error)
-		return {
-			ok: false,
-			message: "Ocurrio un error subiendo el documento",
-		}
+		return { ok: false, message: "Ocurrio un error subiendo el documento" }
 	}
 }

@@ -1,12 +1,11 @@
-"use server"
-
 import { z } from "zod"
 
-import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 import { LABOR_CONTROL_STATUS } from "@/generated/prisma/enums"
 import { systemUrl } from "@/lib/consts/systemUrl"
+import { getDemoDb } from "@/lib/demo-db/client"
 import { generateSlug } from "@/lib/generateSlug"
-import prisma from "@/lib/prisma"
+
+import { sendRequestReviewEmail } from "../emails/send-request-review-email"
 
 export const submitWorkerFolderForReview = async ({
 	userId,
@@ -15,47 +14,43 @@ export const submitWorkerFolderForReview = async ({
 	userId: string
 	folderId: string
 }) => {
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: {
-			rut: true,
-			name: true,
-			email: true,
-			phone: true,
-			companyId: true,
-		},
-	})
-
-	if (!user) {
-		return { ok: false, message: "Usuario no encontrado." }
-	}
-
 	try {
-		const folder = await prisma.workerLaborControlFolder.findUnique({
-			where: {
-				id: folderId,
-			},
-			select: {
-				worker: {
-					select: {
-						name: true,
-					},
-				},
-				LaborControlFolder: {
-					select: {
-						company: {
-							select: {
-								id: true,
-								name: true,
-							},
-						},
-					},
-				},
-				id: true,
-				status: true,
-			},
-		})
+		const db = await getDemoDb()
 
+		const userRes = await db.query<{
+			rut: string
+			name: string
+			email: string
+			phone: string | null
+			companyId: string | null
+		}>(
+			`SELECT rut, name, email, phone, "companyId" FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const user = userRes.rows[0]
+		if (!user) {
+			return { ok: false, message: "Usuario no encontrado." }
+		}
+
+		const folderRes = await db.query<{
+			id: string
+			status: LABOR_CONTROL_STATUS
+			workerName: string | null
+			companyId: string | null
+			companyName: string | null
+		}>(
+			`SELECT
+				wlcf.id, wlcf.status,
+				w.name AS "workerName",
+				c.id AS "companyId", c.name AS "companyName"
+			 FROM "WorkerLaborControlFolder" wlcf
+			 LEFT JOIN "user" w ON w.id = wlcf."workerId"
+			 LEFT JOIN "LaborControlFolder" lcf ON lcf.id = wlcf."laborControlFolderId"
+			 LEFT JOIN "company" c ON c.id = lcf."companyId"
+			 WHERE wlcf.id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) {
 			return { ok: false, message: "Carpeta no encontrada." }
 		}
@@ -70,60 +65,48 @@ export const submitWorkerFolderForReview = async ({
 			}
 		}
 
-		await prisma.workerLaborControlFolder.update({
-			where: {
-				id: folderId,
-			},
-			data: {
-				emails: [user.email],
-				status: LABOR_CONTROL_STATUS.SUBMITTED,
-			},
-		})
-
-		const documents = await prisma.workerLaborControlDocument.findMany({
-			where: {
-				folderId: folder.id,
-			},
-			select: {
-				id: true,
-				status: true,
-			},
-		})
-
-		await Promise.all(
-			documents.map(async (document) => {
-				const newStatus =
-					document.status === LABOR_CONTROL_STATUS.APPROVED
-						? LABOR_CONTROL_STATUS.APPROVED
-						: LABOR_CONTROL_STATUS.SUBMITTED
-
-				await prisma.workerLaborControlDocument.update({
-					where: {
-						id: document.id,
-					},
-					data: {
-						status: newStatus,
-						uploadDate: new Date(),
-					},
-				})
-			})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "WorkerLaborControlFolder"
+			 SET emails = $1, status = $2, "updatedAt" = $3
+			 WHERE id = $4`,
+			[[user.email], LABOR_CONTROL_STATUS.SUBMITTED, now, folderId],
 		)
 
-		const companySlug = generateSlug(folder.LaborControlFolder?.company.name || "")
-		const companyId = folder.LaborControlFolder?.company.id || ""
+		const docsRes = await db.query<{ id: string; status: LABOR_CONTROL_STATUS }>(
+			`SELECT id, status FROM "WorkerLaborControlDocument" WHERE "folderId" = $1`,
+			[folderId],
+		)
+		for (const doc of docsRes.rows) {
+			const newStatus =
+				doc.status === LABOR_CONTROL_STATUS.APPROVED
+					? LABOR_CONTROL_STATUS.APPROVED
+					: LABOR_CONTROL_STATUS.SUBMITTED
+			await db.query(
+				`UPDATE "WorkerLaborControlDocument"
+				 SET status = $1, "uploadDate" = $2, "updatedAt" = $2
+				 WHERE id = $3`,
+				[newStatus, now, doc.id],
+			)
+		}
 
-		await sendRequestReviewEmail({
-			reviewUrl: `${systemUrl}/admin/dashboard/control-laboral/${companySlug}_${companyId}`,
-			folderName: `Carpeta trabajador: ${folder.worker.name}`,
-			companyName: folder.LaborControlFolder?.company.name || "",
-			solicitationDate: new Date(),
-			solicitator: {
-				rut: user.rut,
-				name: user.name,
-				email: user.email,
-				phone: user.phone,
-			},
-		})
+		try {
+			const companySlug = generateSlug(folder.companyName || "")
+			await sendRequestReviewEmail({
+				reviewUrl: `${systemUrl}/admin/dashboard/control-laboral/${companySlug}_${folder.companyId ?? ""}`,
+				folderName: `Carpeta trabajador: ${folder.workerName ?? ""}`,
+				companyName: folder.companyName || "",
+				solicitationDate: new Date(),
+				solicitator: {
+					rut: user.rut,
+					name: user.name,
+					email: user.email,
+					phone: user.phone,
+				},
+			})
+		} catch (emailError) {
+			console.error("Error al enviar email de notificación:", emailError)
+		}
 
 		return {
 			ok: true,

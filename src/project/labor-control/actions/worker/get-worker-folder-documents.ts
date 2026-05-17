@@ -1,9 +1,7 @@
-"use server"
-
-import { LABOR_CONTROL_STATUS } from "@/generated/prisma/enums"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { WorkerLaborControlDocument } from "../../types"
+import type { LABOR_CONTROL_STATUS } from "@/generated/prisma/enums"
 
 export async function getWorkerFolderDocuments({ folderId }: { folderId: string }): Promise<{
 	workerId: string
@@ -13,75 +11,74 @@ export async function getWorkerFolderDocuments({ folderId }: { folderId: string 
 	documents: WorkerLaborControlDocument[]
 }> {
 	try {
-		let folderStatus: LABOR_CONTROL_STATUS = "DRAFT"
+		const db = await getDemoDb()
 
-		const folder = await prisma.workerLaborControlFolder.findUnique({
-			where: { id: folderId },
-			include: {
-				_count: {
-					select: {
-						documents: true,
-					},
-				},
-				worker: {
-					select: {
-						id: true,
-					},
-				},
-			},
-		})
-
+		const folderRes = await db.query<{ status: LABOR_CONTROL_STATUS; workerId: string }>(
+			`SELECT status, "workerId" FROM "WorkerLaborControlFolder" WHERE id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) {
 			return {
 				workerId: "",
-				folderStatus,
+				folderStatus: "DRAFT",
 				documents: [],
 				totalDocuments: 0,
 				approvedDocuments: 0,
 			}
 		}
 
-		folderStatus = folder.status
+		const docsRes = await db.query<Record<string, unknown>>(
+			`SELECT
+				d.*,
+				ub.id AS "ub_id", ub.rut AS "ub_rut", ub.name AS "ub_name",
+				ub.email AS "ub_email", ub.phone AS "ub_phone", ub.image AS "ub_image",
+				rb.id AS "rb_id", rb.rut AS "rb_rut", rb.name AS "rb_name",
+				rb.email AS "rb_email", rb.phone AS "rb_phone", rb.image AS "rb_image"
+			 FROM "WorkerLaborControlDocument" d
+			 LEFT JOIN "user" ub ON ub.id = d."uploadById"
+			 LEFT JOIN "user" rb ON rb.id = d."reviewById"
+			 WHERE d."folderId" = $1
+			 ORDER BY d.name DESC`,
+			[folderId],
+		)
 
-		const documents = await prisma.workerLaborControlDocument.findMany({
-			where: { folderId: folder.id },
-			include: {
-				uploadBy: {
-					select: {
-						id: true,
-						rut: true,
-						name: true,
-						email: true,
-						phone: true,
-						image: true,
-					},
-				},
-				reviewBy: {
-					select: {
-						id: true,
-						rut: true,
-						name: true,
-						email: true,
-						phone: true,
-						image: true,
-					},
-				},
-			},
-			orderBy: { name: "desc" },
-		})
+		const documents = docsRes.rows.map((row) => ({
+			...row,
+			uploadBy: row.ub_id
+				? {
+						id: row.ub_id,
+						rut: row.ub_rut,
+						name: row.ub_name,
+						email: row.ub_email,
+						phone: row.ub_phone,
+						image: row.ub_image,
+					}
+				: null,
+			reviewBy: row.rb_id
+				? {
+						id: row.rb_id,
+						rut: row.rb_rut,
+						name: row.rb_name,
+						email: row.rb_email,
+						phone: row.rb_phone,
+						image: row.rb_image,
+					}
+				: null,
+		})) as unknown as WorkerLaborControlDocument[]
 
-		const totalDocuments = folder._count.documents
-		const approvedDocuments = documents.filter((doc) => doc.status === "APPROVED").length
+		const totalDocuments = documents.length
+		const approvedDocuments = documents.filter((d) => d.status === "APPROVED").length
 
 		return {
 			documents,
-			folderStatus,
+			folderStatus: folder.status,
 			totalDocuments,
 			approvedDocuments,
-			workerId: folder.worker.id,
+			workerId: folder.workerId,
 		}
 	} catch (error) {
-		console.error("Error fetching basic folder documents:", error)
-		throw new Error("Could not fetch basic folder documents")
+		console.error("Error fetching worker folder documents:", error)
+		throw new Error("Could not fetch worker folder documents")
 	}
 }
