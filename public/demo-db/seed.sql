@@ -1,4 +1,4 @@
--- IS 360 demo seed (Iter 1 — minimum viable for Work Orders)
+-- IS 360 demo seed — Refinería Cabo Negro (rubro petrolero / mantenimiento)
 -- Idempotent: all inserts use ON CONFLICT DO NOTHING. Bootstrap tracks via _demo_seed_meta.
 -- IDs are stable so URLs survive reloads.
 
@@ -6,33 +6,38 @@
 -- Must mirror src/lib/demo-auth/users.ts so getDemoUser().id matches a real row.
 INSERT INTO "user" ("id", "name", "email", "emailVerified", "rut", "role", "accessRole", "isSupervisor", "companyId", "createdAt", "updatedAt", "isActive")
 VALUES
-  ('demo-admin',    'Admin Demo',      'admin@ingsimple.cl',    true, '11.111.111-1', 'admin',         'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
-  ('demo-tech',     'Técnico Demo',    'tecnico@ingsimple.cl',  true, '12.222.222-2', 'internal-tech', 'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
-  ('seed-user-001', 'María Fernández', 'maria.f@ingsimple.cl',  true, '14.444.444-4', 'internal-tech', 'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
-  ('seed-user-002', 'Carlos Rojas',    'carlos.r@ingsimple.cl', true, '15.555.555-5', 'internal-tech', 'ADMIN', true,  NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true)
+  ('demo-admin',     'Admin Demo',         'admin@cabonegro.cl',      true, '11.111.111-1', 'admin',         'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('demo-tech',      'Técnico Demo',       'tecnico@cabonegro.cl',    true, '12.222.222-2', 'internal-tech', 'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('seed-admin-2',   'Daniela Cárdenas',   'daniela.cardenas@cabonegro.cl', true, '10.101.010-1', 'admin',         'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('seed-user-001',  'María Fernández',    'maria.fernandez@cabonegro.cl',  true, '14.444.444-4', 'internal-tech', 'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('seed-user-002',  'Carlos Rojas',       'carlos.rojas@cabonegro.cl',     true, '15.555.555-5', 'internal-tech', 'ADMIN', true,  NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('seed-user-003',  'Andrés Sepúlveda',   'andres.sepulveda@cabonegro.cl', true, '17.777.777-7', 'internal-tech', 'ADMIN', false, NULL, '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true)
 ON CONFLICT ("id") DO NOTHING;
 
--- ─── Companies (after admin exists for createdById FK) ──────────────────────
+-- ─── Companies (contratistas de la refinería; "Refinería Cabo Negro" es el operador implícito) ─
 INSERT INTO "company" ("id", "name", "rut", "isActive", "createdById", "createdAt", "updatedAt")
 VALUES
-  ('demo-company-1', 'Contratista Norte SpA', '76.111.111-1', true, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-company-2', 'Servicios Andinos Ltda', '76.222.222-2', true, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
+  ('demo-company-1', 'PetroAustral Servicios Industriales SpA', '76.111.111-1', true, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-company-2', 'MantePatagonia Petroquímica Ltda',        '76.222.222-2', true, 'demo-admin', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Supervisors (depend on companies) ──────────────────────────────────────
 INSERT INTO "user" ("id", "name", "email", "emailVerified", "rut", "role", "accessRole", "isSupervisor", "companyId", "createdAt", "updatedAt", "isActive")
 VALUES
-  ('demo-supervisor',   'Supervisor Demo',  'supervisor@ingsimple.cl',  true, '13.333.333-3', 'supervisor', 'PARTNER_COMPANY', true, 'demo-company-1', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
-  ('seed-supervisor-2', 'Patricia Soto',    'patricia.s@andinos.cl',    true, '16.666.666-6', 'supervisor', 'PARTNER_COMPANY', true, 'demo-company-2', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true)
+  ('demo-supervisor',   'Supervisor Demo', 'supervisor@petroaustral.cl',     true, '13.333.333-3', 'supervisor', 'PARTNER_COMPANY', true, 'demo-company-1', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('seed-supervisor-2', 'Patricia Soto',   'patricia.soto@mantepatagonia.cl', true, '16.666.666-6', 'supervisor', 'PARTNER_COMPANY', true, 'demo-company-2', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true),
+  ('seed-supervisor-3', 'Rodrigo Pizarro', 'rodrigo.pizarro@petroaustral.cl', true, '21.444.444-4', 'supervisor', 'PARTNER_COMPANY', true, 'demo-company-1', '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z', true)
 ON CONFLICT ("id") DO NOTHING;
 
--- ─── Locations (root + 3 children, hierarchical) ───────────────────────────
+-- ─── Locations (refinería + 5 áreas operativas) ────────────────────────────
 INSERT INTO "Location" ("id", "name", "parentId", "path", "createdAt", "updatedAt")
 VALUES
-  ('demo-loc-1',     'Planta Principal', NULL,          'Planta Principal',                       '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-loc-pump',  'Sala de Bombas',   'demo-loc-1',  'Planta Principal / Sala de Bombas',      '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-loc-elec',  'Sala Eléctrica',   'demo-loc-1',  'Planta Principal / Sala Eléctrica',      '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
-  ('demo-loc-yard',  'Patio Externo',    'demo-loc-1',  'Planta Principal / Patio Externo',       '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
+  ('demo-loc-1',     'Refinería Cabo Negro', NULL,          'Refinería Cabo Negro',                         '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-pump',  'Sala de Bombas',       'demo-loc-1',  'Refinería Cabo Negro / Sala de Bombas',        '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-elec',  'Sala Eléctrica',       'demo-loc-1',  'Refinería Cabo Negro / Sala Eléctrica',        '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-yard',  'Patio Externo',        'demo-loc-1',  'Refinería Cabo Negro / Patio Externo',         '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-tanks', 'Patio de Tanques',     'demo-loc-1',  'Refinería Cabo Negro / Patio de Tanques',      '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z'),
+  ('demo-loc-comp',  'Zona de Compresión',   'demo-loc-1',  'Refinería Cabo Negro / Zona de Compresión',    '2026-01-01T10:00:00Z', '2026-01-01T10:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Equipment ──────────────────────────────────────────────────────────────
@@ -229,9 +234,12 @@ ON CONFLICT ("id") DO NOTHING;
 -- ─── Additional partner-company workers (for startup-folder demo) ───────────
 INSERT INTO "user" ("id", "name", "email", "emailVerified", "rut", "role", "accessRole", "isSupervisor", "companyId", "createdAt", "updatedAt", "isActive")
 VALUES
-  ('demo-worker-1', 'Juan Pérez',     'juan.perez@contratista.cl',     true, '18.111.111-1', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
-  ('demo-worker-2', 'María González', 'maria.gonzalez@contratista.cl', true, '19.222.222-2', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
-  ('demo-worker-3', 'Carlos Vega',    'carlos.vega@andinos.cl',        true, '20.333.333-3', 'driver', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true)
+  ('demo-worker-1', 'Juan Pérez',      'juan.perez@petroaustral.cl',      true, '18.111.111-1', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
+  ('demo-worker-2', 'María González',  'maria.gonzalez@petroaustral.cl',  true, '19.222.222-2', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
+  ('demo-worker-3', 'Carlos Vega',     'carlos.vega@mantepatagonia.cl',   true, '20.333.333-3', 'driver', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true),
+  ('demo-worker-4', 'Francisca Riffo', 'francisca.riffo@petroaustral.cl', true, '22.555.555-5', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
+  ('demo-worker-5', 'Ignacio Pavez',   'ignacio.pavez@mantepatagonia.cl', true, '23.666.666-6', 'worker', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true),
+  ('demo-worker-6', 'Camila Riquelme', 'camila.riquelme@mantepatagonia.cl', true, '24.777.777-7', 'driver', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true)
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Startup Folders ────────────────────────────────────────────────────────
@@ -361,3 +369,24 @@ WHERE id = 'demo-wbe-101';
 -- Reads better in the UI: equipos agrupados por sub-area.
 UPDATE "equipment" SET "locationId" = 'demo-loc-pump' WHERE id IN ('demo-eq-001');
 UPDATE "equipment" SET "locationId" = 'demo-loc-elec' WHERE id IN ('demo-eq-003', 'demo-eq-004');
+
+-- ─── Iter 7 — 10.A re-runnable rebrand (petroquímica / mantenimiento) ──────
+-- Companies, locations, and seeded users were renamed. ON CONFLICT DO NOTHING above
+-- skips them on already-seeded databases, so we explicitly UPDATE here.
+UPDATE "company" SET "name" = 'PetroAustral Servicios Industriales SpA' WHERE id = 'demo-company-1';
+UPDATE "company" SET "name" = 'MantePatagonia Petroquímica Ltda'        WHERE id = 'demo-company-2';
+
+UPDATE "Location" SET "name" = 'Refinería Cabo Negro', "path" = 'Refinería Cabo Negro' WHERE id = 'demo-loc-1';
+UPDATE "Location" SET "path" = 'Refinería Cabo Negro / Sala de Bombas' WHERE id = 'demo-loc-pump';
+UPDATE "Location" SET "path" = 'Refinería Cabo Negro / Sala Eléctrica' WHERE id = 'demo-loc-elec';
+UPDATE "Location" SET "path" = 'Refinería Cabo Negro / Patio Externo'  WHERE id = 'demo-loc-yard';
+
+UPDATE "user" SET "email" = 'admin@cabonegro.cl'             WHERE id = 'demo-admin';
+UPDATE "user" SET "email" = 'tecnico@cabonegro.cl'           WHERE id = 'demo-tech';
+UPDATE "user" SET "email" = 'maria.fernandez@cabonegro.cl'   WHERE id = 'seed-user-001';
+UPDATE "user" SET "email" = 'carlos.rojas@cabonegro.cl'      WHERE id = 'seed-user-002';
+UPDATE "user" SET "email" = 'supervisor@petroaustral.cl'     WHERE id = 'demo-supervisor';
+UPDATE "user" SET "email" = 'patricia.soto@mantepatagonia.cl' WHERE id = 'seed-supervisor-2';
+UPDATE "user" SET "email" = 'juan.perez@petroaustral.cl'     WHERE id = 'demo-worker-1';
+UPDATE "user" SET "email" = 'maria.gonzalez@petroaustral.cl' WHERE id = 'demo-worker-2';
+UPDATE "user" SET "email" = 'carlos.vega@mantepatagonia.cl'  WHERE id = 'demo-worker-3';
