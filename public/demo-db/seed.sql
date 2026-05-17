@@ -389,7 +389,7 @@ VALUES
   ('demo-wr-005', 'REQ-2026-0005', 'Fuga menor válvula fondo TK-002',                      true,  '2026-05-11T08:15:00Z', 'Detectada en ronda de inspección',     'ATTENDED',  'MECHANIC', 'seed-supervisor-3',  '2026-05-11T08:15:00Z', '2026-05-11T17:00:00Z', '2026-05-11T10:00:00Z', 'demo-admin'),
   ('demo-wr-006', 'REQ-2026-0006', 'Iluminación intermitente patio tanques sector C',      false, '2026-05-15T15:30:00Z', 'Reportado por turno noche',            'REPORTED',  'ELECTRIC', 'seed-supervisor-2',  '2026-05-15T15:30:00Z', '2026-05-15T15:30:00Z', NULL,                   NULL),
   ('demo-wr-007', 'REQ-2026-0007', 'Ruido cojinete en motor ME-001',                       false, '2026-05-09T11:20:00Z', 'Ruido leve, sin afectar operación',    'CANCELLED', 'MECHANIC', 'demo-supervisor',    '2026-05-09T11:20:00Z', '2026-05-14T16:00:00Z', '2026-05-14T16:00:00Z', 'demo-admin'),
-  ('demo-wr-008', 'REQ-2026-0008', 'Solicitud calibración transmisores nivel TK-001/004',  false, '2026-05-03T10:00:00Z', 'Calibración programada anual',         'APPROVED',  'OTHER',    'seed-supervisor-3',  '2026-05-03T10:00:00Z', '2026-05-04T09:00:00Z', '2026-05-04T09:00:00Z', 'demo-admin')
+  ('demo-wr-008', 'REQ-2026-0008', 'Solicitud calibración transmisores nivel TK-001/004',  false, '2026-05-03T10:00:00Z', 'Calibración programada anual',         'APPROVED',  'ELECTRIC', 'seed-supervisor-3',  '2026-05-03T10:00:00Z', '2026-05-04T09:00:00Z', '2026-05-04T09:00:00Z', 'demo-admin')
 ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "_EquipmentToWorkRequest" ("A", "B") VALUES

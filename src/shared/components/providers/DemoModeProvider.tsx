@@ -6,6 +6,7 @@ const DEMO_MODE_ENABLED = process.env.NEXT_PUBLIC_DEMO_MODE !== "false"
 
 export function DemoModeProvider({ children }: { children: React.ReactNode }) {
 	const [ready, setReady] = useState(!DEMO_MODE_ENABLED)
+	const [error, setError] = useState<Error | null>(null)
 
 	useEffect(() => {
 		if (!DEMO_MODE_ENABLED) return
@@ -26,7 +27,9 @@ export function DemoModeProvider({ children }: { children: React.ReactNode }) {
 				if (!cancelled) setReady(true)
 			} catch (err) {
 				console.error("[demo-db] No se pudo iniciar el modo demo:", err)
-				if (!cancelled) setReady(true)
+				if (!cancelled) {
+					setError(err instanceof Error ? err : new Error(String(err)))
+				}
 			}
 		}
 		void start()
@@ -35,6 +38,36 @@ export function DemoModeProvider({ children }: { children: React.ReactNode }) {
 			cancelled = true
 		}
 	}, [])
+
+	if (error) {
+		return (
+			<div className="flex min-h-screen items-center justify-center p-6">
+				<div className="max-w-2xl space-y-3 rounded-md border border-destructive/30 bg-destructive/5 p-6">
+					<h1 className="text-lg font-semibold text-destructive">
+						La demo no pudo arrancar
+					</h1>
+					<p className="text-sm text-muted-foreground">
+						El bootstrap de la base de datos local (PGlite + MSW) falló. La app
+						no puede continuar sin el modo demo porque caería a Prisma sin
+						configurar y todas las rutas devolverían 500.
+					</p>
+					<details className="text-xs">
+						<summary className="cursor-pointer text-muted-foreground">
+							Ver error técnico
+						</summary>
+						<pre className="mt-2 overflow-auto rounded bg-background p-3 text-foreground">
+							{error.message}
+							{error.stack ? `\n\n${error.stack}` : ""}
+						</pre>
+					</details>
+					<p className="text-xs text-muted-foreground">
+						Probá limpiar IndexedDB (DevTools → Application → Storage → Clear
+						site data) y recargar.
+					</p>
+				</div>
+			</div>
+		)
+	}
 
 	if (!ready) {
 		return (
