@@ -1,40 +1,30 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { generateSlug } from "@/lib/generateSlug"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { FolderFormSchema } from "@/project/document/schemas/folder.schema"
 
 export const createFolder = async (values: FolderFormSchema) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
+
 	try {
 		const { parentFolderId, userId: _ignoredUserId, ...rest } = values
+		void _ignoredUserId
+		const db = await getDemoDb()
+		const slug = generateSlug(rest.name)
 
-		const newFolderSlug = generateSlug(rest.name)
-
-		const existingFolder = await prisma.folder.findFirst({
-			where: {
-				area: rest.area,
-				slug: newFolderSlug,
-				parentId: parentFolderId || null,
-			},
-		})
-
-		if (existingFolder) {
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "folder"
+			 WHERE area = $1 AND slug = $2 AND ${parentFolderId ? `"parentId" = $3` : `"parentId" IS NULL`}
+			 LIMIT 1`,
+			parentFolderId ? [rest.area, slug, parentFolderId] : [rest.area, slug],
+		)
+		if (existing.rows.length) {
 			return {
 				ok: false,
 				message:
@@ -42,42 +32,45 @@ export const createFolder = async (values: FolderFormSchema) => {
 			}
 		}
 
-		const folder = await prisma.folder.create({
-			data: {
-				...rest,
-				...(parentFolderId && {
-					parent: {
-						connect: {
-							id: parentFolderId,
-						},
-					},
-				}),
-				user: {
-					connect: {
-						id: session.user.id,
-					},
-				},
-				slug: newFolderSlug,
-			},
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		const folderRes = await db.query<Record<string, unknown>>(
+			`INSERT INTO "folder" (
+				"id", "slug", "name", "description", "area", "type",
+				"parentId", "userId", "createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)
+			 RETURNING *`,
+			[
+				id,
+				slug,
+				rest.name,
+				rest.description ?? null,
+				rest.area,
+				rest.type ?? "default",
+				parentFolderId ?? null,
+				user.id,
+				now,
+			],
+		)
+		const folder = folderRes.rows[0]
 
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.DOCUMENTATION,
 			action: ACTIVITY_TYPE.CREATE,
-			entityId: folder.id,
+			entityId: id,
 			entityType: "Folder",
 			metadata: {
-				name: folder.name,
-				slug: folder.slug,
-				area: folder.area,
-				parentId: folder.parentId,
+				name: rest.name,
+				slug,
+				area: rest.area,
+				parentId: parentFolderId ?? null,
 			},
 		})
 
 		return { ok: true, data: folder }
 	} catch (error) {
-		console.error("Error creating folder:", error)
+		console.error("[CREATE_FOLDER]", error)
 		return { ok: false, message: "Error creating folder" }
 	}
 }

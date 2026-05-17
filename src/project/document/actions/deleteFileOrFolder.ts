@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export interface DeleteResponse {
 	success: boolean
@@ -15,63 +11,65 @@ export interface DeleteResponse {
 }
 
 async function getRecursiveFolderContents(folderId: string) {
-	const folder = await prisma.folder.findUnique({
-		where: { id: folderId },
-		include: {
-			files: true,
-			subFolders: true,
-		},
-	})
-
-	if (!folder) return { files: [], folders: [] }
-
-	let allFiles = [...folder.files]
-	let allFolders = [folder]
-
-	for (const subFolder of folder.subFolders) {
-		const subContents = await getRecursiveFolderContents(subFolder.id)
-		allFiles = [...allFiles, ...subContents.files]
-		allFolders = [...allFolders, ...subContents.folders]
+	const db = await getDemoDb()
+	const allFolderIds: string[] = []
+	const queue: string[] = [folderId]
+	while (queue.length) {
+		const next = queue.shift()!
+		allFolderIds.push(next)
+		const subs = await db.query<{ id: string }>(
+			`SELECT id FROM "folder" WHERE "parentId" = $1`,
+			[next],
+		)
+		queue.push(...subs.rows.map((r) => r.id))
 	}
 
-	return { files: allFiles, folders: allFolders }
+	if (!allFolderIds.length) {
+		return { fileIds: [] as string[], folderIds: [] as string[] }
+	}
+	const placeholders = allFolderIds.map((_, i) => `$${i + 1}`).join(", ")
+	const filesRes = await db.query<{ id: string }>(
+		`SELECT id FROM "file" WHERE "folderId" IN (${placeholders})`,
+		allFolderIds,
+	)
+	return {
+		fileIds: filesRes.rows.map((r) => r.id),
+		folderIds: allFolderIds,
+	}
 }
 
 export async function deleteFile(fileId: string): Promise<DeleteResponse> {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			success: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { success: false, message: "No autorizado" }
 	}
 
 	try {
-		const file = await prisma.file.findUnique({
-			where: { id: fileId },
-			select: {
-				id: true,
-				name: true,
-				type: true,
-				size: true,
-				folderId: true,
-			},
-		})
+		const db = await getDemoDb()
+		const fileRes = await db.query<{
+			id: string
+			name: string
+			type: string
+			size: number
+			folderId: string | null
+		}>(
+			`SELECT id, name, type, size, "folderId" FROM "file" WHERE id = $1`,
+			[fileId],
+		)
+		const file = fileRes.rows[0]
 		if (!file) return { success: false, message: "Archivo no encontrado" }
 
-		const updatedFile = await prisma.file.update({
-			where: { id: fileId },
-			data: { isActive: false, name: "(Eliminado) " + file.name },
-		})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "file" SET "isActive" = false, name = $1, "updatedAt" = $2 WHERE id = $3`,
+			[`(Eliminado) ${file.name}`, now, fileId],
+		)
 
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.DOCUMENTATION,
 			action: ACTIVITY_TYPE.DELETE,
-			entityId: updatedFile.id,
+			entityId: file.id,
 			entityType: "File",
 			metadata: {
 				name: file.name,
@@ -87,79 +85,64 @@ export async function deleteFile(fileId: string): Promise<DeleteResponse> {
 			deletedFiles: 1,
 		}
 	} catch (error) {
-		console.error("Error al eliminar el archivo:", error)
-		return {
-			success: false,
-			message: "Error al eliminar el archivo",
-		}
+		console.error("[DELETE_FILE]", error)
+		return { success: false, message: "Error al eliminar el archivo" }
 	}
 }
 
 export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			success: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { success: false, message: "No autorizado" }
 	}
 
 	try {
-		const contents = await getRecursiveFolderContents(folderId)
-
-		const folder = await prisma.folder.findUnique({
-			where: { id: folderId },
-			select: {
-				id: true,
-				name: true,
-				slug: true,
-				area: true,
-				parentId: true,
-			},
-		})
+		const db = await getDemoDb()
+		const folderRes = await db.query<{
+			id: string
+			name: string
+			slug: string
+			area: string
+			parentId: string | null
+		}>(
+			`SELECT id, name, slug, area, "parentId" FROM "folder" WHERE id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) return { success: false, message: "Carpeta no encontrada" }
 
-		const files = await prisma.file.findMany({
-			where: {
-				id: {
-					in: contents.files.map((file) => file.id),
-				},
-			},
-		})
+		const { fileIds, folderIds } = await getRecursiveFolderContents(folderId)
+		const now = new Date().toISOString()
 
-		if (files.length > 0) {
-			await Promise.all(
-				files.map((file) =>
-					prisma.file.update({
-						where: { id: file.id },
-						data: {
-							isActive: false,
-							name: "(Eliminado) " + file.name,
-						},
-					})
+		if (fileIds.length) {
+			const fileNamesRes = await db.query<{ id: string; name: string }>(
+				`SELECT id, name FROM "file"
+				 WHERE id IN (${fileIds.map((_, i) => `$${i + 1}`).join(", ")})`,
+				fileIds,
+			)
+			for (const f of fileNamesRes.rows) {
+				await db.query(
+					`UPDATE "file" SET "isActive" = false, name = $1, "updatedAt" = $2 WHERE id = $3`,
+					[`(Eliminado) ${f.name}`, now, f.id],
 				)
+			}
+		}
+
+		if (folderIds.length) {
+			const placeholders = folderIds.map((_, i) => `$${i + 3}`).join(", ")
+			await db.query(
+				`UPDATE "folder"
+				 SET "isActive" = false,
+				     slug = 'eliminado-' || slug,
+				     name = '(Eliminado) ' || name,
+				     "updatedAt" = $1
+				 WHERE id IN (${placeholders}) AND $2::boolean`,
+				[now, true, ...folderIds],
 			)
 		}
 
-		// Marcar todas las carpetas como inactivas
-		await prisma.folder.updateMany({
-			where: {
-				id: {
-					in: contents.folders.map((folder) => folder.id),
-				},
-			},
-			data: {
-				isActive: false,
-				slug: "eliminado-" + folder.slug,
-				name: "(Eliminado) " + folder.name,
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.DOCUMENTATION,
 			action: ACTIVITY_TYPE.DELETE,
 			entityId: folder.id,
@@ -169,47 +152,55 @@ export async function deleteFolder(folderId: string): Promise<DeleteResponse> {
 				slug: folder.slug,
 				area: folder.area,
 				parentId: folder.parentId,
-				affectedFiles: contents.files.length,
-				affectedFolders: contents.folders.length - 1, // -1 para no contar la carpeta actual
+				affectedFiles: fileIds.length,
+				affectedFolders: Math.max(0, folderIds.length - 1),
 			},
 		})
 
 		return {
 			success: true,
 			message: "Carpeta y contenido marcados como eliminados exitosamente",
-			deletedFiles: contents.files.length,
-			deletedFolders: contents.folders.length,
+			deletedFiles: fileIds.length,
+			deletedFolders: folderIds.length,
 		}
 	} catch (error) {
-		console.error("Error al eliminar la carpeta:", error)
-		return {
-			success: false,
-			message: "Error al eliminar la carpeta",
-		}
+		console.error("[DELETE_FOLDER]", error)
+		return { success: false, message: "Error al eliminar la carpeta" }
 	}
 }
 
 export async function getDeletePreview(
 	id: string,
-	type: "file" | "folder"
+	type: "file" | "folder",
 ): Promise<{
 	files: Array<{ id: string; name: string }>
 	folders: Array<{ id: string; name: string }>
 }> {
+	const db = await getDemoDb()
 	if (type === "file") {
-		const file = await prisma.file.findUnique({
-			where: { id },
-			select: { id: true, name: true },
-		})
-		return {
-			files: file ? [file] : [],
-			folders: [],
-		}
+		const res = await db.query<{ id: string; name: string }>(
+			`SELECT id, name FROM "file" WHERE id = $1`,
+			[id],
+		)
+		return { files: res.rows, folders: [] }
 	}
 
-	const contents = await getRecursiveFolderContents(id)
-	return {
-		files: contents.files.map((f) => ({ id: f.id, name: f.name })),
-		folders: contents.folders.map((f) => ({ id: f.id, name: f.name })),
-	}
+	const { fileIds, folderIds } = await getRecursiveFolderContents(id)
+	const files = fileIds.length
+		? (
+				await db.query<{ id: string; name: string }>(
+					`SELECT id, name FROM "file" WHERE id IN (${fileIds.map((_, i) => `$${i + 1}`).join(", ")})`,
+					fileIds,
+				)
+			).rows
+		: []
+	const folders = folderIds.length
+		? (
+				await db.query<{ id: string; name: string }>(
+					`SELECT id, name FROM "folder" WHERE id IN (${folderIds.map((_, i) => `$${i + 1}`).join(", ")})`,
+					folderIds,
+				)
+			).rows
+		: []
+	return { files, folders }
 }

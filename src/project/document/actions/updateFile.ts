@@ -1,10 +1,7 @@
-"use server"
-
-import prisma from "@/lib/prisma"
-import { logActivity } from "@/lib/activity/log"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
-import { headers } from "next/headers"
-import { auth } from "@/lib/auth"
+import { logActivity } from "@/lib/activity/log"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { UpdateFileSchema } from "@/project/document/schemas/update-file.schema"
 
@@ -30,93 +27,67 @@ export const updateFile = async ({
 	expirationDate,
 	registrationDate,
 }: UpdateFileParams) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			error: "No autorizado",
-		}
+	void _ignoredUserId
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, error: "No autorizado" }
 	}
 
 	try {
-		// Obtener el archivo actual
-		const currentFile = await prisma.file.findUnique({
-			where: { id: fileId },
-		})
-
-		if (!currentFile) {
+		const db = await getDemoDb()
+		const currentRes = await db.query<{ userId: string }>(
+			`SELECT "userId" FROM "file" WHERE id = $1`,
+			[fileId],
+		)
+		const current = currentRes.rows[0]
+		if (!current) {
 			return { ok: false, error: "Archivo no encontrado" }
 		}
 
-		const hasPermission = await auth.api.userHasPermission({
-			body: {
-				userId: session.user.id,
-				permissions: {
-					documentation: ["update", "delete"],
-				},
-			},
-		})
-
-		if (currentFile.userId !== session.user.id && !hasPermission.success) {
-			return { ok: false, error: "El usuario no tiene acceso a editar este archivo" }
-		}
-
-		const updatedFile = await prisma.file.update({
-			where: { id: fileId },
-			data: {
+		const now = new Date().toISOString()
+		const updateRes = await db.query<Record<string, unknown>>(
+			`UPDATE "file"
+			 SET url = $1, size = $2, type = $3, name = $4, description = $5,
+			     "expirationDate" = $6, "registrationDate" = $7,
+			     "revisionCount" = "revisionCount" + 1, "updatedAt" = $8
+			 WHERE id = $9
+			 RETURNING *`,
+			[
 				url,
 				size,
 				type,
 				name,
-				description,
-				expirationDate,
-				registrationDate,
-				revisionCount: { increment: 1 },
-				user: {
-					connect: {
-						id: currentFile.userId,
-					},
-				},
-			},
-		})
+				description ?? null,
+				expirationDate ?? null,
+				registrationDate ?? null,
+				now,
+				fileId,
+			],
+		)
+		const updatedFile = updateRes.rows[0]
 
-		if (url === previousUrl) {
-			return { ok: true, data: updatedFile }
+		if (url !== previousUrl) {
+			await db.query(
+				`INSERT INTO "file_history" (
+					"id", "fileId", "previousUrl", "previousName", "userId", "modifiedAt"
+				) VALUES ($1, $2, $3, $4, $5, $6)`,
+				[crypto.randomUUID(), fileId, previousUrl, previousName, user.id, now],
+			)
 		}
 
-		await prisma.fileHistory.create({
-			data: {
-				file: {
-					connect: {
-						id: fileId,
-					},
-				},
-				modifiedBy: {
-					connect: {
-						id: session.user.id,
-					},
-				},
-				previousUrl,
-				previousName,
-			},
-		})
-
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.DOCUMENTATION,
 			action: ACTIVITY_TYPE.UPDATE,
-			entityId: updatedFile.id,
+			entityId: fileId,
 			entityType: "File",
 			metadata: {
 				name,
 				type,
 				size,
 				description,
-				expirationDate: expirationDate?.toISOString(),
-				registrationDate: registrationDate?.toISOString(),
+				expirationDate: expirationDate?.toISOString?.(),
+				registrationDate: registrationDate?.toISOString?.(),
 				urlChanged: url !== previousUrl,
 			},
 		})

@@ -1,11 +1,7 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { ACTIVITY_TYPE, AREAS, MODULES } from "@/generated/prisma/enums"
+import { ACTIVITY_TYPE, type AREAS, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { FileFormSchema } from "@/project/document/schemas/new-file.schema"
 
@@ -22,15 +18,9 @@ interface UploadMultipleFilesProps {
 }
 
 export async function uploadMultipleFiles({ values, files }: UploadMultipleFilesProps) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			error: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, error: "No autorizado" }
 	}
 
 	try {
@@ -45,61 +35,70 @@ export async function uploadMultipleFiles({ values, files }: UploadMultipleFiles
 			parentFolderId,
 			registrationDate,
 		} = values
+		void _ignoredUserId
+		const db = await getDemoDb()
 
 		let folderId: string | null = null
 		if (parentFolderId) {
-			const foundFolder = await prisma.folder.findFirst({
-				where: { id: parentFolderId },
-				select: { id: true, userId: true },
-			})
-
-			if (!foundFolder) {
+			const folderRes = await db.query<{ id: string }>(
+				`SELECT id FROM "folder" WHERE id = $1`,
+				[parentFolderId],
+			)
+			if (!folderRes.rows[0]) {
 				return { ok: false, error: "Carpeta no encontrada" }
 			}
-
-			folderId = foundFolder.id
+			folderId = folderRes.rows[0].id
 		}
 
-		const results = await Promise.all(
-			files.map(async (file) => {
-				const createdFile = await prisma.file.create({
-					data: {
-						description,
-						url: file.url,
-						expirationDate,
-						type: file.type,
-						size: file.size,
-						registrationDate,
-						area: area as AREAS,
-						name: name || file.name,
-						code: code || otherCode,
-						user: { connect: { id: session.user.id } },
-						...(folderId ? { folder: { connect: { id: folderId } } } : {}),
-					},
-				})
+		const now = new Date().toISOString()
+		const results = []
+		for (const file of files) {
+			const id = crypto.randomUUID()
+			const insertRes = await db.query<Record<string, unknown>>(
+				`INSERT INTO "file" (
+					"id", "code", "name", "description", "area", "type", "size", "url",
+					"registrationDate", "expirationDate", "folderId", "userId",
+					"createdAt", "updatedAt"
+				) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)
+				 RETURNING *`,
+				[
+					id,
+					code || otherCode || null,
+					name || file.name,
+					description ?? null,
+					area as AREAS,
+					file.type,
+					file.size,
+					file.url,
+					registrationDate ?? now,
+					expirationDate ?? null,
+					folderId,
+					user.id,
+					now,
+				],
+			)
+			const created = insertRes.rows[0]
+			results.push(created)
 
-    await logActivity({
-					userId: session.user.id,
-					module: MODULES.DOCUMENTATION,
-					action: ACTIVITY_TYPE.CREATE,
-					entityId: createdFile.id,
-					entityType: "File",
-					metadata: {
-						name: createdFile.name,
-						type: createdFile.type,
-						size: createdFile.size,
-						code: createdFile.code,
-						area: createdFile.area,
-						description: createdFile.description,
-						folderId: createdFile.folderId,
-						expirationDate: createdFile.expirationDate?.toISOString(),
-						registrationDate: createdFile.registrationDate?.toISOString(),
-					},
-				})
-
-				return createdFile
+			await logActivity({
+				userId: user.id,
+				module: MODULES.DOCUMENTATION,
+				action: ACTIVITY_TYPE.CREATE,
+				entityId: id,
+				entityType: "File",
+				metadata: {
+					name: created.name,
+					type: created.type,
+					size: created.size,
+					code: created.code,
+					area: created.area,
+					description: created.description,
+					folderId: created.folderId,
+					expirationDate: (created.expirationDate as string | null) ?? null,
+					registrationDate: (created.registrationDate as string | null) ?? null,
+				},
 			})
-		)
+		}
 
 		return { ok: true, data: results }
 	} catch (error: unknown) {
