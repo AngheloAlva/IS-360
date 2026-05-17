@@ -1,33 +1,29 @@
-"use server"
+import { getDemoDb } from "@/lib/demo-db/client"
 
-import { LABOR_CONTROL_STATUS } from "@/generated/prisma/enums"
-import prisma from "@/lib/prisma"
+import type { LABOR_CONTROL_STATUS } from "@/generated/prisma/enums"
 
 export async function getFolderStatusByCompany({ folderId }: { folderId: string }): Promise<{
 	companyAccreditationStatus: LABOR_CONTROL_STATUS
 	workerAccreditationStatus: LABOR_CONTROL_STATUS
 }> {
 	try {
-		const workerLaborControlFolder = await prisma.workerLaborControlFolder.findUnique({
-			where: { id: folderId },
-			select: {
-				status: true,
-			},
-		})
+		const db = await getDemoDb()
 
-		const laborControlFolder = await prisma.laborControlFolder.findUnique({
-			where: { id: folderId },
-			select: {
-				status: true,
-			},
-		})
+		const workerRes = await db.query<{ status: LABOR_CONTROL_STATUS }>(
+			`SELECT status FROM "WorkerLaborControlFolder" WHERE id = $1`,
+			[folderId],
+		)
+		const companyRes = await db.query<{ status: LABOR_CONTROL_STATUS }>(
+			`SELECT status FROM "LaborControlFolder" WHERE id = $1`,
+			[folderId],
+		)
 
 		return {
-			companyAccreditationStatus: laborControlFolder?.status || "DRAFT",
-			workerAccreditationStatus: workerLaborControlFolder?.status || "DRAFT",
+			companyAccreditationStatus: companyRes.rows[0]?.status ?? "DRAFT",
+			workerAccreditationStatus: workerRes.rows[0]?.status ?? "DRAFT",
 		}
 	} catch (error) {
-		console.error("Error fetching basic folder documents:", error)
-		throw new Error("Could not fetch basic folder documents")
+		console.error("Error fetching folder status:", error)
+		throw new Error("Could not fetch folder status")
 	}
 }

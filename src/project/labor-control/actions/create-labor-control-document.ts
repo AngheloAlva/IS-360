@@ -1,10 +1,8 @@
-"use server"
-
 import { z } from "zod"
 
 import { MODULES, ACTIVITY_TYPE, type LABOR_CONTROL_DOCUMENT_TYPE } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import prisma from "@/lib/prisma"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 const createDocumentSchema = z.object({
 	url: z.string(),
@@ -17,68 +15,53 @@ const createDocumentSchema = z.object({
 export type CreateLaborControlDocumentInput = z.infer<typeof createDocumentSchema>
 
 export async function createLaborControlDocument(
-	input: CreateLaborControlDocumentInput
+	input: CreateLaborControlDocumentInput,
 ): Promise<{ ok: boolean; message?: string }> {
 	try {
-		const { url, userId, folderId, documentName, documentType } = createDocumentSchema.parse(input)
+		const { url, userId, folderId, documentName, documentType } =
+			createDocumentSchema.parse(input)
+		const db = await getDemoDb()
 
-		const folder = await prisma.laborControlFolder.findUnique({
-			where: { id: folderId },
-			select: {
-				id: true,
-				companyId: true,
-			},
-		})
-
+		const folderRes = await db.query<{ id: string; companyId: string }>(
+			`SELECT id, "companyId" FROM "LaborControlFolder" WHERE id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) {
 			throw new Error("Folder not found")
 		}
 
-		const user = await prisma.user.findUnique({ where: { id: userId } })
+		const userRes = await db.query<{ id: string; companyId: string | null }>(
+			`SELECT id, "companyId" FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const user = userRes.rows[0]
 		if (!user || user.companyId !== folder.companyId) {
 			throw new Error("Unauthorized - User does not belong to this company")
 		}
 
-		const document = await prisma.laborControlDocument.create({
-			data: {
-				url,
-				folderId,
-				name: documentName,
-				uploadById: userId,
-				type: documentType as LABOR_CONTROL_DOCUMENT_TYPE,
-			},
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		await db.query(
+			`INSERT INTO "LaborControlDocument" (
+				"id", "url", "folderId", "name", "uploadById", "type",
+				"status", "uploadDate", "updatedAt"
+			) VALUES ($1, $2, $3, $4, $5, $6, 'DRAFT', $7, $7)`,
+			[id, url, folderId, documentName, userId, documentType as LABOR_CONTROL_DOCUMENT_TYPE, now],
+		)
 
-		if (!document) {
-			return {
-				ok: false,
-				message: "Error al crear el documento",
-			}
-		}
-
-  await logActivity({
+		await logActivity({
 			userId,
 			entityId: folderId,
 			action: ACTIVITY_TYPE.UPLOAD,
 			module: MODULES.LABOR_CONTROL_FOLDERS,
 			entityType: "LaborControlDocument",
-			metadata: {
-				folderId,
-				documentName,
-				documentType,
-				documentUrl: url,
-			},
+			metadata: { folderId, documentName, documentType, documentUrl: url },
 		})
 
-		return {
-			ok: true,
-			message: "Document created successfully",
-		}
+		return { ok: true, message: "Document created successfully" }
 	} catch (error) {
 		console.error(error)
-		return {
-			ok: false,
-			message: "Error al crear el documento",
-		}
+		return { ok: false, message: "Error al crear el documento" }
 	}
 }

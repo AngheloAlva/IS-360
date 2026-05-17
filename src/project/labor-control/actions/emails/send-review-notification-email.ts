@@ -1,9 +1,3 @@
-"use server"
-
-import { resend } from "@/lib/resend"
-
-import { ReviewEmail } from "@/project/labor-control/components/emails/ReviewEmail"
-
 interface SendReviewNotificationEmailProps {
 	folderName: string
 	companyName: string
@@ -21,45 +15,9 @@ interface SendReviewNotificationEmailProps {
 	emails: string[]
 }
 
-export const sendReviewNotificationEmail = async ({
-	emails,
-	reviewer,
-	reviewDate,
-	folderName,
-	isApproved,
-	companyName,
-	rejectedDocuments,
-}: SendReviewNotificationEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: emails,
-			subject: `Revisión Control Laboral - ${folderName}`,
-			react: await ReviewEmail({
-				reviewer,
-				folderName,
-				companyName,
-				reviewDate,
-				isApproved,
-				rejectedDocuments,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendReviewNotificationEmail = async (
+	props: SendReviewNotificationEmailProps,
+) => {
+	console.info("[demo] email noop: sendReviewNotificationEmail", props)
+	return { ok: true, data: null as unknown }
 }

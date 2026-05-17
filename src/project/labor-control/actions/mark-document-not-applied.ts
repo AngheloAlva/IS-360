@@ -1,70 +1,53 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
 import {
 	MODULES,
 	ACTIVITY_TYPE,
 	LABOR_CONTROL_STATUS,
-	LABOR_CONTROL_DOCUMENT_TYPE,
+	type LABOR_CONTROL_DOCUMENT_TYPE,
 } from "@/generated/prisma/enums"
+import { logActivity } from "@/lib/activity/log"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 import {
 	markDocumentAsNotAppliedSchema,
 	type MarkDocumentAsNotAppliedInput,
 } from "../schemas/mark-document-not-applied.schema"
 
 export async function markLaborControlDocumentAsNotApplied(
-	input: MarkDocumentAsNotAppliedInput
+	input: MarkDocumentAsNotAppliedInput,
 ): Promise<{ ok: boolean; message?: string }> {
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
+		return { ok: false, message: "No se encontró usuario" }
+	}
+
 	try {
-		const session = await auth.api.getSession({
-			headers: await headers(),
-		})
-
-		if (!session?.user) {
-			return {
-				ok: false,
-				message: "No se encontró usuario",
-			}
-		}
-
 		const { userId, folderId, documentType, documentName } =
 			markDocumentAsNotAppliedSchema.parse(input)
+		const db = await getDemoDb()
 
-		const folder = await prisma.laborControlFolder.findUnique({
-			where: { id: folderId },
-			select: {
-				id: true,
-				companyId: true,
-			},
-		})
-
+		const folderRes = await db.query<{ id: string; companyId: string }>(
+			`SELECT id, "companyId" FROM "LaborControlFolder" WHERE id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) {
-			return {
-				ok: false,
-				message: "Carpeta no encontrada",
-			}
+			return { ok: false, message: "Carpeta no encontrada" }
 		}
 
-		const user = await prisma.user.findUnique({ where: { id: userId } })
+		const userRes = await db.query<{ companyId: string | null; accessRole: string }>(
+			`SELECT "companyId", "accessRole" FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const user = userRes.rows[0]
 		if (!user || (user.companyId !== folder.companyId && user.accessRole !== "ADMIN")) {
-			return {
-				ok: false,
-				message: "No autorizado - El usuario no pertenece a esta empresa",
-			}
+			return { ok: false, message: "No autorizado - El usuario no pertenece a esta empresa" }
 		}
 
-		const existingDocument = await prisma.laborControlDocument.findFirst({
-			where: {
-				folderId,
-				type: documentType as LABOR_CONTROL_DOCUMENT_TYPE,
-			},
-		})
-
-		if (existingDocument) {
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "LaborControlDocument" WHERE "folderId" = $1 AND type = $2 LIMIT 1`,
+			[folderId, documentType as LABOR_CONTROL_DOCUMENT_TYPE],
+		)
+		if (existing.rows.length) {
 			return {
 				ok: false,
 				message:
@@ -72,27 +55,27 @@ export async function markLaborControlDocumentAsNotApplied(
 			}
 		}
 
-		const document = await prisma.laborControlDocument.create({
-			data: {
-				url: "",
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		await db.query(
+			`INSERT INTO "LaborControlDocument" (
+				"id", "url", "folderId", "name", "uploadById", "type",
+				"status", "uploadDate", "updatedAt"
+			) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $7)`,
+			[
+				id,
 				folderId,
-				name: documentName,
-				uploadById: userId,
-				type: documentType as LABOR_CONTROL_DOCUMENT_TYPE,
-				status: LABOR_CONTROL_STATUS.NOT_APPLIED,
-			},
-		})
+				documentName,
+				userId,
+				documentType as LABOR_CONTROL_DOCUMENT_TYPE,
+				LABOR_CONTROL_STATUS.NOT_APPLIED,
+				now,
+			],
+		)
 
-		if (!document) {
-			return {
-				ok: false,
-				message: "Error al crear el documento",
-			}
-		}
-
-  await logActivity({
+		await logActivity({
 			userId,
-			entityId: document.id,
+			entityId: id,
 			action: ACTIVITY_TYPE.UPDATE,
 			module: MODULES.LABOR_CONTROL_FOLDERS,
 			entityType: "LaborControlDocument",
@@ -105,15 +88,9 @@ export async function markLaborControlDocumentAsNotApplied(
 			},
 		})
 
-		return {
-			ok: true,
-			message: "Documento marcado como 'No Aplica' exitosamente",
-		}
+		return { ok: true, message: "Documento marcado como 'No Aplica' exitosamente" }
 	} catch (error) {
 		console.error("Error al marcar documento como No Aplica:", error)
-		return {
-			ok: false,
-			message: "Error al procesar la solicitud",
-		}
+		return { ok: false, message: "Error al procesar la solicitud" }
 	}
 }

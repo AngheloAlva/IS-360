@@ -1,83 +1,73 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { sendCompletedNotificationEmail } from "./emails/send-completed-notification-email"
 import { ACTIVITY_TYPE, MODULES, LABOR_CONTROL_STATUS } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
+
+import { sendCompletedNotificationEmail } from "./emails/send-completed-notification-email"
 
 interface CompleteFolderParams {
 	startupFolderId: string
 }
 
 export const completeLaborControlFolder = async ({ startupFolderId }: CompleteFolderParams) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado - Sesión no encontrada" }
 	}
 
 	try {
-		const folder = await prisma.laborControlFolder.update({
-			where: { id: startupFolderId },
-			data: { status: LABOR_CONTROL_STATUS.APPROVED },
-			select: {
-				id: true,
-				company: {
-					select: {
-						name: true,
-						users: {
-							where: {
-								isActive: true,
-								isSupervisor: true,
-							},
-							select: {
-								email: true,
-							},
-						},
-					},
-				},
-			},
-		})
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
 
-  await logActivity({
-			entityId: folder.id,
-			userId: session.user.id,
-			action: ACTIVITY_TYPE.COMPLETE,
-			entityType: "LaborControlFolder",
-			module: MODULES.LABOR_CONTROL_FOLDERS,
-			metadata: {
-				companyName: folder.company.name,
-			},
-		})
-
+		const updateRes = await db.query<{ id: string; companyId: string }>(
+			`UPDATE "LaborControlFolder"
+			 SET status = $1, "updatedAt" = $2
+			 WHERE id = $3
+			 RETURNING id, "companyId"`,
+			[LABOR_CONTROL_STATUS.APPROVED, now, startupFolderId],
+		)
+		const folder = updateRes.rows[0]
 		if (!folder) {
 			return { ok: false, message: "Carpeta de control laboral no encontrada" }
 		}
 
-		// Enviar notificación de carpeta completada
-		try {
-			const supervisorEmails = folder.company.users.map((user) => user.email)
-			const folderName = `Control Laboral - ${folder.company.name} - ${new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric" })}`
+		const companyRes = await db.query<{ name: string }>(
+			`SELECT name FROM "company" WHERE id = $1`,
+			[folder.companyId],
+		)
+		const companyName = companyRes.rows[0]?.name ?? ""
 
+		const supervisorsRes = await db.query<{ email: string }>(
+			`SELECT email FROM "user"
+			 WHERE "companyId" = $1 AND "isActive" = true AND "isSupervisor" = true`,
+			[folder.companyId],
+		)
+		const supervisorEmails = supervisorsRes.rows.map((r) => r.email)
+
+		await logActivity({
+			entityId: folder.id,
+			userId: user.id,
+			action: ACTIVITY_TYPE.COMPLETE,
+			entityType: "LaborControlFolder",
+			module: MODULES.LABOR_CONTROL_FOLDERS,
+			metadata: { companyName },
+		})
+
+		try {
+			const folderName = `Control Laboral - ${companyName} - ${new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric" })}`
 			await sendCompletedNotificationEmail({
 				emails: supervisorEmails,
 				folderName,
-				companyName: folder.company.name,
+				companyName,
 				completeDate: new Date(),
 				completedBy: {
-					name: session.user.name,
-					email: session.user.email,
-					phone: session.user.phone || null,
+					name: user.name,
+					email: user.email,
+					phone: null,
 				},
 			})
 		} catch (emailError) {
 			console.error("Error al enviar email de notificación de completado:", emailError)
-			// No fallar la operación principal si el email falla
 		}
 
 		return { ok: true, message: "Carpeta de control laboral completada correctamente" }

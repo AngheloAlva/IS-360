@@ -1,13 +1,12 @@
-"use server"
-
 import { z } from "zod"
 
-import { sendRequestReviewEmail } from "./emails/send-request-review-email"
 import { ACTIVITY_TYPE, LABOR_CONTROL_STATUS, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
 import { systemUrl } from "@/lib/consts/systemUrl"
+import { getDemoDb } from "@/lib/demo-db/client"
 import { generateSlug } from "@/lib/generateSlug"
-import prisma from "@/lib/prisma"
+
+import { sendRequestReviewEmail } from "./emails/send-request-review-email"
 
 export const submitLaborControlFolderForReview = async ({
 	userId,
@@ -16,38 +15,37 @@ export const submitLaborControlFolderForReview = async ({
 	userId: string
 	folderId: string
 }) => {
-	const user = await prisma.user.findUnique({
-		where: { id: userId },
-		select: {
-			rut: true,
-			name: true,
-			email: true,
-			phone: true,
-			companyId: true,
-		},
-	})
-
-	if (!user) {
-		return { ok: false, message: "Usuario no encontrado." }
-	}
-
 	try {
-		const folder = await prisma.laborControlFolder.findUnique({
-			where: {
-				id: folderId,
-			},
-			select: {
-				company: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-				id: true,
-				companyFolderStatus: true,
-			},
-		})
+		const db = await getDemoDb()
 
+		const userRes = await db.query<{
+			rut: string
+			name: string
+			email: string
+			phone: string | null
+			companyId: string | null
+		}>(
+			`SELECT rut, name, email, phone, "companyId" FROM "user" WHERE id = $1`,
+			[userId],
+		)
+		const user = userRes.rows[0]
+		if (!user) {
+			return { ok: false, message: "Usuario no encontrado." }
+		}
+
+		const folderRes = await db.query<{
+			id: string
+			companyFolderStatus: LABOR_CONTROL_STATUS
+			companyId: string
+			companyName: string
+		}>(
+			`SELECT lcf.id, lcf."companyFolderStatus", lcf."companyId", c.name AS "companyName"
+			 FROM "LaborControlFolder" lcf
+			 LEFT JOIN "company" c ON c.id = lcf."companyId"
+			 WHERE lcf.id = $1`,
+			[folderId],
+		)
+		const folder = folderRes.rows[0]
 		if (!folder) {
 			return { ok: false, message: "Carpeta no encontrada." }
 		}
@@ -62,70 +60,55 @@ export const submitLaborControlFolderForReview = async ({
 			}
 		}
 
-		await prisma.laborControlFolder.update({
-			where: {
-				id: folderId,
-			},
-			data: {
-				emails: [user.email],
-				companyFolderStatus: LABOR_CONTROL_STATUS.SUBMITTED,
-			},
-		})
+		const now = new Date().toISOString()
 
-		const documents = await prisma.laborControlDocument.findMany({
-			where: {
-				folderId: folder.id,
-			},
-			select: {
-				id: true,
-				status: true,
-			},
-		})
-
-		await Promise.all(
-			documents.map(async (document) => {
-				const newStatus =
-					document.status === LABOR_CONTROL_STATUS.APPROVED
-						? LABOR_CONTROL_STATUS.APPROVED
-						: LABOR_CONTROL_STATUS.SUBMITTED
-
-				await prisma.laborControlDocument.update({
-					where: {
-						id: document.id,
-					},
-					data: {
-						status: newStatus,
-						uploadDate: new Date(),
-					},
-				})
-			})
+		await db.query(
+			`UPDATE "LaborControlFolder"
+			 SET emails = $1, "companyFolderStatus" = $2, "updatedAt" = $3
+			 WHERE id = $4`,
+			[[user.email], LABOR_CONTROL_STATUS.SUBMITTED, now, folderId],
 		)
 
-  await logActivity({
+		const docsRes = await db.query<{ id: string; status: LABOR_CONTROL_STATUS }>(
+			`SELECT id, status FROM "LaborControlDocument" WHERE "folderId" = $1`,
+			[folderId],
+		)
+
+		for (const doc of docsRes.rows) {
+			const newStatus =
+				doc.status === LABOR_CONTROL_STATUS.APPROVED
+					? LABOR_CONTROL_STATUS.APPROVED
+					: LABOR_CONTROL_STATUS.SUBMITTED
+			await db.query(
+				`UPDATE "LaborControlDocument"
+				 SET status = $1, "uploadDate" = $2, "updatedAt" = $2
+				 WHERE id = $3`,
+				[newStatus, now, doc.id],
+			)
+		}
+
+		await logActivity({
 			userId,
 			module: MODULES.LABOR_CONTROL_FOLDERS,
 			action: ACTIVITY_TYPE.SUBMIT,
 			entityId: folder.id,
 			entityType: "LaborControlFolder",
 			metadata: {
-				documentsCount: documents.length,
+				documentsCount: docsRes.rows.length,
 				previousStatus: folder.companyFolderStatus,
 				newStatus: LABOR_CONTROL_STATUS.SUBMITTED,
-				companyId: folder.company.id,
-				companyName: folder.company.name,
+				companyId: folder.companyId,
+				companyName: folder.companyName,
 			},
 		})
 
-		const companySlug = generateSlug(folder.company.name || "")
-		const companyId = folder.company.id || ""
-
 		try {
-			const folderName = `Control Laboral - ${folder.company.name} - ${new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric" })}`
-
+			const companySlug = generateSlug(folder.companyName || "")
+			const folderName = `Control Laboral - ${folder.companyName} - ${new Date().toLocaleDateString("es-CL", { month: "long", year: "numeric" })}`
 			await sendRequestReviewEmail({
 				folderName,
-				reviewUrl: `${systemUrl}/admin/dashboard/control-laboral/${companySlug}_${companyId}`,
-				companyName: folder.company.name,
+				reviewUrl: `${systemUrl}/admin/dashboard/control-laboral/${companySlug}_${folder.companyId}`,
+				companyName: folder.companyName,
 				solicitationDate: new Date(),
 				solicitator: {
 					rut: user.rut,
@@ -136,7 +119,6 @@ export const submitLaborControlFolderForReview = async ({
 			})
 		} catch (emailError) {
 			console.error("Error al enviar email de notificación:", emailError)
-			// No fallar la operación principal si el email falla
 		}
 
 		return {

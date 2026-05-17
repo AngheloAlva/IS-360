@@ -1,5 +1,3 @@
-"use server"
-
 import { z } from "zod"
 
 import {
@@ -38,34 +36,22 @@ export async function updateStartupFolderDocument({
 }) {
 	const { documentId, documentName, documentType } = updateDocumentSchema.parse(data)
 
- await logActivity({
+	await logActivity({
 		userId,
 		module: MODULES.STARTUP_FOLDERS,
 		action: ACTIVITY_TYPE.UPDATE,
 		entityId: documentId,
 		entityType: "StartupFolderDocument",
-		metadata: {
-			documentName,
-			documentType,
-			hasNewFile: !!uploadedFile,
-		},
+		metadata: { documentName, documentType, hasNewFile: !!uploadedFile },
 	})
 
 	if (workerId) {
 		return updateWorkerDocument({
 			uploadedFile,
-			data: {
-				documentId,
-				documentName,
-				documentType,
-				file: [],
-			},
+			data: { documentId, documentName, documentType, file: [] },
 			userId,
 		})
 	}
 
-	return {
-		ok: false,
-		message: "Documento no encontrado",
-	}
+	return { ok: false, message: "Documento no encontrado" }
 }

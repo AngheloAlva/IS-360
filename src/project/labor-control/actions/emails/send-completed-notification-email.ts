@@ -1,9 +1,3 @@
-"use server"
-
-import { resend } from "@/lib/resend"
-
-import { CompleteFolderEmail } from "@/project/labor-control/components/emails/CompleteFolderEmail"
-
 interface SendCompletedNotificationEmailProps {
 	emails: string[]
 	folderName: string
@@ -16,41 +10,9 @@ interface SendCompletedNotificationEmailProps {
 	completeDate: Date
 }
 
-export const sendCompletedNotificationEmail = async ({
-	emails,
-	folderName,
-	companyName,
-	completedBy,
-	completeDate,
-}: SendCompletedNotificationEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: emails,
-			subject: `Control Laboral Completado - ${folderName}`,
-			react: await CompleteFolderEmail({
-				folderName,
-				companyName,
-				completedBy,
-				completeDate,
-			}),
-		})
-
-		if (error) {
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendCompletedNotificationEmail = async (
+	props: SendCompletedNotificationEmailProps,
+) => {
+	console.info("[demo] email noop: sendCompletedNotificationEmail", props)
+	return { ok: true, data: null as unknown }
 }
