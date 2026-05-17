@@ -1,13 +1,10 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES, SUPPORT_TICKET_STATUS } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 import { sendSupportTicketStatusEmail } from "@/project/support/actions/send-support-ticket-status-email"
 import { updateSupportTicketStatusSchema } from "@/project/support/schemas/support-ticket.schema"
+
 import type { UploadResult } from "@/lib/upload-files"
 
 const statusLabels = {
@@ -23,115 +20,116 @@ export async function updateSupportTicketStatus(values: {
 	note?: string
 	attachments?: UploadResult[]
 }) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No se pudo obtener la sesión del usuario",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No se pudo obtener la sesión del usuario" }
 	}
-
-	if (session.user.accessRole !== "ADMIN") {
-		return {
-			error: "Solo administradores pueden cambiar el estado",
-		}
+	if (user.accessRole !== "ADMIN") {
+		return { error: "Solo administradores pueden cambiar el estado" }
 	}
 
 	try {
 		const parsed = updateSupportTicketStatusSchema.parse(values)
+		const db = await getDemoDb()
 
-		const ticket = await prisma.supportTicket.findUnique({
-			where: { id: parsed.ticketId },
-			include: {
-				requester: {
-					select: {
-						name: true,
-						email: true,
-						accessRole: true,
-					},
-				},
-			},
-		})
-
+		const ticketResult = await db.query<{
+			id: string
+			ticketNumber: string
+			title: string
+			startedAt: string | null
+			requesterName: string
+			requesterEmail: string
+			requesterAccessRole: string
+		}>(
+			`SELECT
+				st.id, st."ticketNumber", st.title, st."startedAt",
+				u.name AS "requesterName",
+				u.email AS "requesterEmail",
+				u."accessRole" AS "requesterAccessRole"
+			 FROM "support_ticket" st
+			 LEFT JOIN "user" u ON u.id = st."requesterId"
+			 WHERE st.id = $1`,
+			[parsed.ticketId],
+		)
+		const ticket = ticketResult.rows[0]
 		if (!ticket) {
-			return {
-				error: "Ticket no encontrado",
-			}
+			return { error: "Ticket no encontrado" }
 		}
 
-		const now = new Date()
-		const updatedTicket = await prisma.supportTicket.update({
-			where: {
-				id: parsed.ticketId,
-			},
-			data: {
-				status: parsed.status,
-				startedAt: parsed.status === SUPPORT_TICKET_STATUS.IN_PROGRESS ? now : ticket.startedAt,
-				resolvedAt: parsed.status === SUPPORT_TICKET_STATUS.RESOLVED ? now : null,
-				rejectedAt: parsed.status === SUPPORT_TICKET_STATUS.REJECTED ? now : null,
-			},
-		})
+		const now = new Date().toISOString()
+		const startedAt =
+			parsed.status === SUPPORT_TICKET_STATUS.IN_PROGRESS
+				? now
+				: (ticket.startedAt ?? null)
+		const resolvedAt = parsed.status === SUPPORT_TICKET_STATUS.RESOLVED ? now : null
+		const rejectedAt = parsed.status === SUPPORT_TICKET_STATUS.REJECTED ? now : null
+
+		await db.query(
+			`UPDATE "support_ticket"
+			 SET "status" = $1, "startedAt" = $2, "resolvedAt" = $3, "rejectedAt" = $4, "updatedAt" = $5
+			 WHERE id = $6`,
+			[parsed.status, startedAt, resolvedAt, rejectedAt, now, parsed.ticketId],
+		)
 
 		if (parsed.note) {
-			const note = await prisma.supportTicketNote.create({
-				data: {
-					content: parsed.note,
-					supportTicketId: parsed.ticketId,
-					userId: session.user.id,
-				},
-			})
+			const noteId = crypto.randomUUID()
+			await db.query(
+				`INSERT INTO "support_ticket_note" (
+					"id", "content", "supportTicketId", "userId", "createdAt", "updatedAt"
+				) VALUES ($1, $2, $3, $4, $5, $5)`,
+				[noteId, parsed.note, parsed.ticketId, user.id, now],
+			)
 
 			if (values.attachments?.length) {
-				await prisma.supportTicketAttachment.createMany({
-					data: values.attachments.map((att) => ({
-						url: att.url,
-						name: att.name,
-						type: att.type || "application/octet-stream",
-						size: att.size,
-						userId: session.user.id,
-						supportTicketId: parsed.ticketId,
-						supportTicketNoteId: note.id,
-					})),
-				})
+				for (const att of values.attachments) {
+					await db.query(
+						`INSERT INTO "support_ticket_attachment" (
+							"id", "name", "url", "type", "size",
+							"userId", "supportTicketId", "supportTicketNoteId",
+							"createdAt", "updatedAt"
+						) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)`,
+						[
+							crypto.randomUUID(),
+							att.name,
+							att.url,
+							att.type || "application/octet-stream",
+							att.size ?? null,
+							user.id,
+							parsed.ticketId,
+							noteId,
+							now,
+						],
+					)
+				}
 			}
 		}
 
 		try {
 			await sendSupportTicketStatusEmail({
-				name: ticket.requester.name,
-				email: ticket.requester.email,
+				name: ticket.requesterName,
+				email: ticket.requesterEmail,
 				ticketNumber: ticket.ticketNumber,
 				title: ticket.title,
 				statusLabel: statusLabels[parsed.status],
 				note: parsed.note,
-				accessRole: ticket.requester.accessRole as "ADMIN" | "PARTNER_COMPANY",
+				accessRole: ticket.requesterAccessRole as "ADMIN" | "PARTNER_COMPANY",
 			})
 		} catch (emailError) {
 			console.error("[UPDATE_SUPPORT_TICKET_STATUS_EMAIL]", emailError)
 		}
 
 		await logActivity({
-			userId: session.user.id,
+			userId: user.id,
 			module: MODULES.CONTACT,
 			action: ACTIVITY_TYPE.UPDATE,
-			entityId: updatedTicket.id,
+			entityId: parsed.ticketId,
 			entityType: "SupportTicket",
-			metadata: {
-				ticketNumber: ticket.ticketNumber,
-				status: updatedTicket.status,
-			},
+			metadata: { ticketNumber: ticket.ticketNumber, status: parsed.status },
 		})
 
-		return {
-			success: "Estado actualizado correctamente",
-		}
+		return { success: "Estado actualizado correctamente" }
 	} catch (error) {
 		console.error("[UPDATE_SUPPORT_TICKET_STATUS]", error)
-		return {
-			error: "Error al actualizar estado del ticket",
-		}
+		return { error: "Error al actualizar estado del ticket" }
 	}
 }

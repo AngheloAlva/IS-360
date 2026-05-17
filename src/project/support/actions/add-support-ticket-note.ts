@@ -1,13 +1,10 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 import { sendSupportTicketNoteEmail } from "@/project/support/actions/send-support-ticket-note-email"
 import { addSupportTicketNoteSchema } from "@/project/support/schemas/support-ticket.schema"
+
 import type { UploadResult } from "@/lib/upload-files"
 
 export async function addSupportTicketNote(values: {
@@ -15,87 +12,94 @@ export async function addSupportTicketNote(values: {
 	content: string
 	attachments?: UploadResult[]
 }) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No se pudo obtener la sesión del usuario",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No se pudo obtener la sesión del usuario" }
 	}
 
 	try {
 		const parsed = addSupportTicketNoteSchema.parse(values)
+		const db = await getDemoDb()
 
-		const ticket = await prisma.supportTicket.findUnique({
-			where: { id: parsed.ticketId },
-			select: {
-				id: true,
-				ticketNumber: true,
-				title: true,
-				requesterId: true,
-				requester: {
-					select: {
-						name: true,
-						email: true,
-						accessRole: true,
-					},
-				},
-			},
-		})
-
+		const ticketResult = await db.query<{
+			id: string
+			ticketNumber: string
+			title: string
+			requesterId: string
+			requesterName: string
+			requesterEmail: string
+			requesterAccessRole: string
+		}>(
+			`SELECT
+				st.id, st."ticketNumber", st.title, st."requesterId",
+				u.name AS "requesterName",
+				u.email AS "requesterEmail",
+				u."accessRole" AS "requesterAccessRole"
+			 FROM "support_ticket" st
+			 LEFT JOIN "user" u ON u.id = st."requesterId"
+			 WHERE st.id = $1`,
+			[parsed.ticketId],
+		)
+		const ticket = ticketResult.rows[0]
 		if (!ticket) {
 			return { error: "Ticket no encontrado" }
 		}
 
-		const isAdmin = session.user.accessRole === "ADMIN"
-		if (!isAdmin && ticket.requesterId !== session.user.id) {
+		const isAdmin = user.accessRole === "ADMIN"
+		if (!isAdmin && ticket.requesterId !== user.id) {
 			return { error: "No autorizado para agregar observaciones en este ticket" }
 		}
 
-		const note = await prisma.supportTicketNote.create({
-			data: {
-				content: parsed.content,
-				supportTicketId: parsed.ticketId,
-				userId: session.user.id,
-			},
-		})
+		const now = new Date().toISOString()
+		const noteId = crypto.randomUUID()
+		await db.query(
+			`INSERT INTO "support_ticket_note" (
+				"id", "content", "supportTicketId", "userId", "createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, $4, $5, $5)`,
+			[noteId, parsed.content, parsed.ticketId, user.id, now],
+		)
 
 		if (values.attachments?.length) {
-			await prisma.supportTicketAttachment.createMany({
-				data: values.attachments.map((att) => ({
-					url: att.url,
-					name: att.name,
-					type: att.type || "application/octet-stream",
-					size: att.size,
-					userId: session.user.id,
-					supportTicketId: parsed.ticketId,
-					supportTicketNoteId: note.id,
-				})),
-			})
+			for (const att of values.attachments) {
+				await db.query(
+					`INSERT INTO "support_ticket_attachment" (
+						"id", "name", "url", "type", "size",
+						"userId", "supportTicketId", "supportTicketNoteId",
+						"createdAt", "updatedAt"
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)`,
+					[
+						crypto.randomUUID(),
+						att.name,
+						att.url,
+						att.type || "application/octet-stream",
+						att.size ?? null,
+						user.id,
+						parsed.ticketId,
+						noteId,
+						now,
+					],
+				)
+			}
 		}
 
 		try {
 			const hasAttachments = (values.attachments?.length ?? 0) > 0
-
 			if (isAdmin) {
 				await sendSupportTicketNoteEmail({
-					to: [ticket.requester.email],
-					recipientName: ticket.requester.name,
-					commenterName: session.user.name,
+					to: [ticket.requesterEmail],
+					recipientName: ticket.requesterName,
+					commenterName: user.name,
 					ticketNumber: ticket.ticketNumber,
 					title: ticket.title,
 					noteContent: parsed.content,
 					hasAttachments,
-					accessRole: ticket.requester.accessRole as "ADMIN" | "PARTNER_COMPANY",
+					accessRole: ticket.requesterAccessRole as "ADMIN" | "PARTNER_COMPANY",
 				})
 			} else {
 				await sendSupportTicketNoteEmail({
-					to: ["anghelo.alva@ingsimple.cl", "soporte@ingenieriasimple.cl"],
+					to: ["demo@ingsimple.cl"],
 					recipientName: "Equipo de soporte",
-					commenterName: session.user.name,
+					commenterName: user.name,
 					ticketNumber: ticket.ticketNumber,
 					title: ticket.title,
 					noteContent: parsed.content,
@@ -108,23 +112,17 @@ export async function addSupportTicketNote(values: {
 		}
 
 		await logActivity({
-			userId: session.user.id,
+			userId: user.id,
 			module: MODULES.CONTACT,
 			action: ACTIVITY_TYPE.COMMENT,
 			entityId: ticket.id,
 			entityType: "SupportTicket",
-			metadata: {
-				ticketNumber: ticket.ticketNumber,
-			},
+			metadata: { ticketNumber: ticket.ticketNumber },
 		})
 
-		return {
-			success: "Observacion agregada exitosamente",
-		}
+		return { success: "Observacion agregada exitosamente" }
 	} catch (error) {
 		console.error("[ADD_SUPPORT_TICKET_NOTE]", error)
-		return {
-			error: "Error al agregar observacion",
-		}
+		return { error: "Error al agregar observacion" }
 	}
 }
