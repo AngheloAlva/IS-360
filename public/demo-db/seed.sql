@@ -104,7 +104,92 @@ VALUES
   ('demo-wo-005', 'OT-2026-0005', 'CORRECTIVE', 'PENDING',          15,
    '2026-05-14T14:00:00Z', '14:00:00', 'Reparación válvula reguladora',    'Válvula no responde al accionamiento',
    'HIGH',   'MITIGATE_RISK', '2026-05-18T08:00:00Z', 8, 2, '2026-05-19T16:00:00Z',
-   'demo-company-2', 'demo-supervisor', 'demo-tech',     '2026-05-14T14:00:00Z', '2026-05-14T14:00:00Z')
+   'demo-company-2', 'demo-supervisor', 'demo-tech',     '2026-05-14T14:00:00Z', '2026-05-14T14:00:00Z'),
+
+  -- ─── 20 OTs adicionales (Iter 7 10.C): distintos estados, equipos, fechas ─────────
+  ('demo-wo-006', 'OT-2026-0006', 'PREVENTIVE', 'COMPLETED',        100,
+   '2026-02-05T08:00:00Z', '08:00:00', 'Inspección anual tanque TK-001',  'Inspección de espesores y soldaduras',
+   'MEDIUM', 'COMPLIANCE',    '2026-02-10T08:00:00Z', 16, 2, '2026-02-11T17:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-02-05T08:00:00Z', '2026-02-11T17:30:00Z'),
+  ('demo-wo-007', 'OT-2026-0007', 'CORRECTIVE', 'COMPLETED',        100,
+   '2026-02-12T10:00:00Z', '10:00:00', 'Reemplazo válvula seguridad TK-003','Válvula de alivio fuera de calibración',
+   'HIGH',   'MITIGATE_RISK', '2026-02-13T08:00:00Z', 6, 1, '2026-02-13T14:30:00Z',
+   'demo-company-2',   'seed-supervisor-2',   'seed-user-001', '2026-02-12T10:00:00Z', '2026-02-13T14:30:00Z'),
+  ('demo-wo-008', 'OT-2026-0008', 'PREDICTIVE', 'COMPLETED',        100,
+   '2026-03-01T09:00:00Z', '09:00:00', 'Análisis vibraciones bombeo',     'Mediciones en BC-001 y BC-002',
+   'LOW',    'CONFIDABILITY', '2026-03-05T08:00:00Z', 4, 1, '2026-03-05T12:00:00Z',
+   NULL,               'demo-supervisor',     'seed-user-002', '2026-03-01T09:00:00Z', '2026-03-05T12:30:00Z'),
+  ('demo-wo-009', 'OT-2026-0009', 'PREVENTIVE', 'COMPLETED',        100,
+   '2026-03-10T08:30:00Z', '08:30:00', 'Cambio aceite compresor CP-001',  'Mantenimiento preventivo trimestral',
+   'MEDIUM', 'CONFIDABILITY', '2026-03-15T08:00:00Z', 3, 1, '2026-03-15T11:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-03-10T08:30:00Z', '2026-03-15T11:30:00Z'),
+  ('demo-wo-010', 'OT-2026-0010', 'CORRECTIVE', 'COMPLETED',        100,
+   '2026-03-18T14:00:00Z', '14:00:00', 'Reparación tablero TE-002',       'Disyuntor con disparos intermitentes',
+   'HIGH',   'MITIGATE_RISK', '2026-03-19T08:00:00Z', 5, 1, '2026-03-19T13:00:00Z',
+   'demo-company-1',   'seed-supervisor-3',   'seed-user-002', '2026-03-18T14:00:00Z', '2026-03-19T13:30:00Z'),
+  ('demo-wo-011', 'OT-2026-0011', 'PREVENTIVE', 'COMPLETED',        100,
+   '2026-03-25T08:00:00Z', '08:00:00', 'Limpieza intercambiador IC-003',  'Limpieza química de placas',
+   'LOW',    'CONFIDABILITY', '2026-03-28T08:00:00Z', 8, 1, '2026-03-28T16:00:00Z',
+   'demo-company-2',   'seed-supervisor-2',   'demo-tech',     '2026-03-25T08:00:00Z', '2026-03-28T16:30:00Z'),
+  ('demo-wo-012', 'OT-2026-0012', 'PROACTIVE',  'COMPLETED',        100,
+   '2026-04-02T09:00:00Z', '09:00:00', 'Revisión EPP y bloqueos',         'Auditoría de cumplimiento HSE',
+   'MEDIUM', 'COMPLIANCE',    '2026-04-04T08:00:00Z', 4, 1, '2026-04-04T12:00:00Z',
+   NULL,               'demo-supervisor',     'seed-user-001', '2026-04-02T09:00:00Z', '2026-04-04T12:30:00Z'),
+  ('demo-wo-013', 'OT-2026-0013', 'PREVENTIVE', 'COMPLETED',        100,
+   '2026-04-08T08:00:00Z', '08:00:00', 'Mantenimiento generador GA-001',  'Mantenimiento 500 horas',
+   'MEDIUM', 'CONFIDABILITY', '2026-04-12T08:00:00Z', 6, 1, '2026-04-12T14:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-04-08T08:00:00Z', '2026-04-12T14:30:00Z'),
+  ('demo-wo-014', 'OT-2026-0014', 'CORRECTIVE', 'CANCELLED',          0,
+   '2026-04-14T11:00:00Z', '11:00:00', 'Reemplazo motor ME-001',          'Cancelada — falsa alarma de bobinado',
+   'HIGH',   'MITIGATE_RISK', '2026-04-16T08:00:00Z', 12, 2, '2026-04-17T17:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-04-14T11:00:00Z', '2026-04-15T09:00:00Z'),
+
+  ('demo-wo-015', 'OT-2026-0015', 'PREVENTIVE', 'PLANNED',            0,
+   '2026-05-02T08:00:00Z', '08:00:00', 'Mantenimiento programado horno FH-001','Inspección refractarios y quemadores',
+   'HIGH',   'CONFIDABILITY', '2026-05-25T07:00:00Z', 24, 3, '2026-05-27T17:00:00Z',
+   'demo-company-2',   'seed-supervisor-2',   'demo-tech',     '2026-05-02T08:00:00Z', '2026-05-02T08:00:00Z'),
+  ('demo-wo-016', 'OT-2026-0016', 'PREVENTIVE', 'PLANNED',            0,
+   '2026-05-03T09:00:00Z', '09:00:00', 'Calibración instrumentación tanques','Calibración de transmisores de nivel',
+   'MEDIUM', 'COMPLIANCE',    '2026-05-26T08:00:00Z', 8, 1, '2026-05-26T16:00:00Z',
+   'demo-company-1',   'seed-supervisor-3',   'seed-user-001', '2026-05-03T09:00:00Z', '2026-05-03T09:00:00Z'),
+  ('demo-wo-017', 'OT-2026-0017', 'PREDICTIVE', 'PLANNED',            0,
+   '2026-05-05T10:00:00Z', '10:00:00', 'Inspección termográfica TE-001',  'Inspección termográfica trimestral',
+   'LOW',    'CONFIDABILITY', '2026-05-28T08:00:00Z', 4, 1, '2026-05-28T12:00:00Z',
+   NULL,               'demo-supervisor',     'seed-user-002', '2026-05-05T10:00:00Z', '2026-05-05T10:00:00Z'),
+  ('demo-wo-018', 'OT-2026-0018', 'PREVENTIVE', 'PLANNED',            0,
+   '2026-05-06T08:00:00Z', '08:00:00', 'Mantenimiento BC-003 (stand-by)', 'Rotación de bomba stand-by, pruebas operativas',
+   'MEDIUM', 'CONFIDABILITY', '2026-05-30T08:00:00Z', 4, 1, '2026-05-30T12:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-05-06T08:00:00Z', '2026-05-06T08:00:00Z'),
+  ('demo-wo-019', 'OT-2026-0019', 'PROACTIVE',  'PLANNED',            0,
+   '2026-05-07T11:00:00Z', '11:00:00', 'Simulacro emergencia derrame',    'Ejercicio anual con brigada de emergencia',
+   'HIGH',   'COMPLIANCE',    '2026-06-05T09:00:00Z', 4, 1, '2026-06-05T13:00:00Z',
+   NULL,               'demo-supervisor',     'demo-tech',     '2026-05-07T11:00:00Z', '2026-05-07T11:00:00Z'),
+
+  ('demo-wo-020', 'OT-2026-0020', 'CORRECTIVE', 'IN_PROGRESS',       40,
+   '2026-05-11T09:00:00Z', '09:00:00', 'Reparación fuga válvula TK-002',  'Fuga menor en válvula de fondo',
+   'HIGH',   'MITIGATE_RISK', '2026-05-13T08:00:00Z', 6, 1, '2026-05-13T14:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-05-11T09:00:00Z', '2026-05-13T08:30:00Z'),
+  ('demo-wo-021', 'OT-2026-0021', 'PREVENTIVE', 'IN_PROGRESS',       60,
+   '2026-05-12T08:30:00Z', '08:30:00', 'Mantenimiento programado CP-003', 'Cambio de aceite y filtros de aire',
+   'MEDIUM', 'CONFIDABILITY', '2026-05-14T08:00:00Z', 4, 1, '2026-05-14T12:00:00Z',
+   'demo-company-1',   'seed-supervisor-3',   'seed-user-001', '2026-05-12T08:30:00Z', '2026-05-14T11:00:00Z'),
+  ('demo-wo-022', 'OT-2026-0022', 'PREDICTIVE', 'IN_PROGRESS',       30,
+   '2026-05-13T14:00:00Z', '14:00:00', 'Análisis aceite BC-002',          'Toma de muestra y envío a laboratorio',
+   'LOW',    'CONFIDABILITY', '2026-05-15T09:00:00Z', 2, 1, '2026-05-15T11:00:00Z',
+   NULL,               'demo-supervisor',     'demo-tech',     '2026-05-13T14:00:00Z', '2026-05-15T10:00:00Z'),
+
+  ('demo-wo-023', 'OT-2026-0023', 'CORRECTIVE', 'PENDING',           10,
+   '2026-05-15T16:00:00Z', '16:00:00', 'Falla iluminación patio tanques', 'Luminarias intermitentes en sector C',
+   'LOW',    'MITIGATE_RISK', '2026-05-22T08:00:00Z', 4, 1, '2026-05-22T12:00:00Z',
+   'demo-company-2',   'seed-supervisor-2',   'seed-user-002', '2026-05-15T16:00:00Z', '2026-05-15T16:00:00Z'),
+  ('demo-wo-024', 'OT-2026-0024', 'CORRECTIVE', 'PENDING',           20,
+   '2026-05-16T09:30:00Z', '09:30:00', 'Reemplazo sello mecánico BC-002', 'Sello presenta fuga incipiente',
+   'HIGH',   'MITIGATE_RISK', '2026-05-21T08:00:00Z', 8, 1, '2026-05-21T16:00:00Z',
+   'demo-company-1',   'demo-supervisor',     'demo-tech',     '2026-05-16T09:30:00Z', '2026-05-16T09:30:00Z'),
+  ('demo-wo-025', 'OT-2026-0025', 'PREVENTIVE', 'PLANNED',            0,
+   '2026-05-17T08:00:00Z', '08:00:00', 'Inspección anual IC-002',         'Inspección termográfica y limpieza',
+   'MEDIUM', 'CONFIDABILITY', '2026-06-02T08:00:00Z', 6, 1, '2026-06-02T14:00:00Z',
+   'demo-company-2',   'seed-supervisor-2',   'seed-user-001', '2026-05-17T08:00:00Z', '2026-05-17T08:00:00Z')
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Milestones for demo-wo-004 (CLOSURE_REQUESTED, all done) ──────────────
@@ -173,7 +258,49 @@ VALUES
    false, true,
    '2026-04-18T08:00:00Z', '2026-04-18T10:00:00Z', '2026-04-17T09:00:00Z', '2026-04-18T11:00:00Z',
    'demo-wo-003', 'seed-supervisor-2', 'demo-company-2',
-   '2026-04-17T15:00:00Z', 'demo-admin', '2026-04-18T11:00:00Z', 'demo-admin')
+   '2026-04-17T15:00:00Z', 'demo-admin', '2026-04-18T11:00:00Z', 'demo-admin'),
+
+  -- ─── 5 permisos adicionales (Iter 7 10.C) ─────────────────────────────────
+  ('demo-wp-004', 'COMPLETED', false,
+   'Rodrigo Pizarro', 'ACHS', 'Patio de Tanques — TK-001', 'Inspección espesores',
+   ARRAY['Equipo ultrasonido','EPP'],          ARRAY['Inspección visual','Permiso espacio confinado'],
+   ARRAY['Medición de espesores de paredes'],  ARRAY['Atmósfera peligrosa','Caída a distinto nivel'], ARRAY['Vigía permanente','Detector de gases','Arnés'],
+   false, true,
+   '2026-02-10T08:00:00Z', '2026-02-11T17:00:00Z', '2026-02-08T10:00:00Z', '2026-02-11T17:30:00Z',
+   'demo-wo-006', 'seed-supervisor-3', 'demo-company-1',
+   '2026-02-09T11:00:00Z', 'demo-admin', '2026-02-11T17:30:00Z', 'demo-admin'),
+  ('demo-wp-005', 'COMPLETED', true,
+   'Patricia Soto', 'Mutual de Seguridad', 'Patio de Tanques — TK-003', 'Reemplazo válvula seguridad',
+   ARRAY['Llaves de impacto','Equipo de bloqueo','Detector de gases'], ARRAY['Inspección visual','Verificación atmósfera'],
+   ARRAY['Reemplazo válvula de alivio fuera de calibración'], ARRAY['Atmósfera peligrosa','Sobrepresión'], ARRAY['Detector continuo','Bloqueo y etiquetado','EPP ignífugo'],
+   true, true,
+   '2026-02-13T08:00:00Z', '2026-02-13T14:00:00Z', '2026-02-12T11:00:00Z', '2026-02-13T14:30:00Z',
+   'demo-wo-007', 'seed-supervisor-2', 'demo-company-2',
+   '2026-02-12T15:00:00Z', 'demo-admin', '2026-02-13T14:30:00Z', 'demo-admin'),
+  ('demo-wp-006', 'COMPLETED', false,
+   'Supervisor Demo', 'ACHS', 'Sala Eléctrica — TE-002', 'Trabajo eléctrico',
+   ARRAY['Multímetro','EPP dieléctrico','Equipo de bloqueo'], ARRAY['Verificación tensión cero'],
+   ARRAY['Diagnóstico y cambio de disyuntor'], ARRAY['Contacto eléctrico','Arco eléctrico'], ARRAY['EPP dieléctrico clase 2','Bloqueo y etiquetado'],
+   false, true,
+   '2026-03-19T08:00:00Z', '2026-03-19T13:00:00Z', '2026-03-18T15:00:00Z', '2026-03-19T13:30:00Z',
+   'demo-wo-010', 'demo-supervisor', 'demo-company-1',
+   '2026-03-18T17:00:00Z', 'demo-admin', '2026-03-19T13:30:00Z', 'demo-admin'),
+  ('demo-wp-007', 'ACTIVE', false,
+   'Supervisor Demo', 'ACHS', 'Patio de Tanques — TK-002', 'Reparación mecánica',
+   ARRAY['Llaves','Equipo de bloqueo','Detector de gases'], ARRAY['Inspección visual','Charla de 5 minutos'],
+   ARRAY['Sello de fondo de tanque presenta fuga menor'], ARRAY['Derrame','Atmósfera peligrosa'], ARRAY['Bandeja contención','Detector continuo'],
+   false, true,
+   '2026-05-13T08:00:00Z', '2026-05-13T14:00:00Z', '2026-05-12T16:00:00Z', '2026-05-12T16:00:00Z',
+   'demo-wo-020', 'demo-supervisor', 'demo-company-1',
+   '2026-05-12T18:00:00Z', 'demo-admin', NULL, NULL),
+  ('demo-wp-008', 'REVIEW_PENDING', false,
+   'Rodrigo Pizarro', 'ACHS', 'Sala de Bombas — BC-002', 'Mantenimiento mecánico',
+   ARRAY['Llaves dinamométricas','Extractor','Equipo de bloqueo'], ARRAY['Inspección visual','Charla de 5 minutos'],
+   ARRAY['Reemplazo de sello mecánico'], ARRAY['Atrapamiento','Caída a distinto nivel'], ARRAY['Bloqueo y etiquetado','Arnés'],
+   false, true,
+   '2026-05-21T08:00:00Z', '2026-05-21T16:00:00Z', '2026-05-17T10:00:00Z', '2026-05-17T10:00:00Z',
+   'demo-wo-024', 'seed-supervisor-3', 'demo-company-1',
+   NULL, NULL, NULL, NULL)
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Work Permit ↔ participants (Prisma implicit M2N) ──────────────────────
@@ -181,7 +308,16 @@ INSERT INTO "_WorkPermitParticipants" ("A", "B") VALUES
   ('demo-tech',        'demo-wp-001'),
   ('seed-user-001',    'demo-wp-001'),
   ('demo-tech',        'demo-wp-002'),
-  ('seed-supervisor-2','demo-wp-003')
+  ('seed-supervisor-2','demo-wp-003'),
+  ('demo-tech',        'demo-wp-004'),
+  ('demo-worker-1',    'demo-wp-004'),
+  ('seed-user-001',    'demo-wp-005'),
+  ('demo-worker-3',    'demo-wp-005'),
+  ('seed-user-002',    'demo-wp-006'),
+  ('demo-tech',        'demo-wp-007'),
+  ('demo-worker-4',    'demo-wp-007'),
+  ('demo-tech',        'demo-wp-008'),
+  ('demo-worker-1',    'demo-wp-008')
 ON CONFLICT DO NOTHING;
 
 -- ─── Maintenance Plans + tasks ─────────────────────────────────────────────
@@ -213,7 +349,7 @@ INSERT INTO "_MaintenancePlanTaskEquipments" ("A", "B") VALUES
 ON CONFLICT DO NOTHING;
 
 -- ─── Work Requests + counter ────────────────────────────────────────────────
-INSERT INTO "work_request_counter" ("id", "value") VALUES ('work-request-counter', 3)
+INSERT INTO "work_request_counter" ("id", "value") VALUES ('work-request-counter', 8)
 ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "work_request" (
@@ -222,15 +358,27 @@ INSERT INTO "work_request" (
   "approvalDate", "approvalById"
 )
 VALUES
-  ('demo-wr-001', 'REQ-2026-0001', 'Compresor secundario presenta ruido anormal', true,  '2026-05-14T08:30:00Z', 'Detectado durante turno matutino', 'REPORTED', 'MECHANIC',  'demo-supervisor', '2026-05-14T08:30:00Z', '2026-05-14T08:30:00Z', NULL,                   NULL),
-  ('demo-wr-002', 'REQ-2026-0002', 'Solicitud limpieza tablero TG1',              false, '2026-05-10T09:15:00Z', 'Limpieza preventiva trimestral',   'APPROVED', 'ELECTRIC',  'demo-supervisor', '2026-05-10T09:15:00Z', '2026-05-11T11:00:00Z', '2026-05-11T11:00:00Z', 'demo-admin'),
-  ('demo-wr-003', 'REQ-2026-0003', 'Revisión generador auxiliar tras prueba',     false, '2026-05-08T14:00:00Z', 'Posterior a prueba de carga',      'ATTENDED', 'MECHANIC',  'seed-supervisor-2', '2026-05-08T14:00:00Z', '2026-05-09T16:00:00Z', '2026-05-09T16:00:00Z', 'demo-admin')
+  ('demo-wr-001', 'REQ-2026-0001', 'Compresor secundario presenta ruido anormal',          true,  '2026-05-14T08:30:00Z', 'Detectado durante turno matutino',     'REPORTED',  'MECHANIC', 'demo-supervisor',    '2026-05-14T08:30:00Z', '2026-05-14T08:30:00Z', NULL,                   NULL),
+  ('demo-wr-002', 'REQ-2026-0002', 'Solicitud limpieza tablero TG1',                       false, '2026-05-10T09:15:00Z', 'Limpieza preventiva trimestral',       'APPROVED',  'ELECTRIC', 'demo-supervisor',    '2026-05-10T09:15:00Z', '2026-05-11T11:00:00Z', '2026-05-11T11:00:00Z', 'demo-admin'),
+  ('demo-wr-003', 'REQ-2026-0003', 'Revisión generador auxiliar tras prueba',              false, '2026-05-08T14:00:00Z', 'Posterior a prueba de carga',          'ATTENDED',  'MECHANIC', 'seed-supervisor-2',  '2026-05-08T14:00:00Z', '2026-05-09T16:00:00Z', '2026-05-09T16:00:00Z', 'demo-admin'),
+  -- 10.C nuevos
+  ('demo-wr-004', 'REQ-2026-0004', 'Vibración elevada en bomba BC-002',                    true,  '2026-05-13T09:45:00Z', 'Medida superior a umbral de alerta',   'APPROVED',  'MECHANIC', 'demo-supervisor',    '2026-05-13T09:45:00Z', '2026-05-13T13:00:00Z', '2026-05-13T13:00:00Z', 'demo-admin'),
+  ('demo-wr-005', 'REQ-2026-0005', 'Fuga menor válvula fondo TK-002',                      true,  '2026-05-11T08:15:00Z', 'Detectada en ronda de inspección',     'ATTENDED',  'MECHANIC', 'seed-supervisor-3',  '2026-05-11T08:15:00Z', '2026-05-11T17:00:00Z', '2026-05-11T10:00:00Z', 'demo-admin'),
+  ('demo-wr-006', 'REQ-2026-0006', 'Iluminación intermitente patio tanques sector C',      false, '2026-05-15T15:30:00Z', 'Reportado por turno noche',            'REPORTED',  'ELECTRIC', 'seed-supervisor-2',  '2026-05-15T15:30:00Z', '2026-05-15T15:30:00Z', NULL,                   NULL),
+  ('demo-wr-007', 'REQ-2026-0007', 'Ruido cojinete en motor ME-001',                       false, '2026-05-09T11:20:00Z', 'Ruido leve, sin afectar operación',    'CANCELLED', 'MECHANIC', 'demo-supervisor',    '2026-05-09T11:20:00Z', '2026-05-14T16:00:00Z', '2026-05-14T16:00:00Z', 'demo-admin'),
+  ('demo-wr-008', 'REQ-2026-0008', 'Solicitud calibración transmisores nivel TK-001/004',  false, '2026-05-03T10:00:00Z', 'Calibración programada anual',         'APPROVED',  'OTHER',    'seed-supervisor-3',  '2026-05-03T10:00:00Z', '2026-05-04T09:00:00Z', '2026-05-04T09:00:00Z', 'demo-admin')
 ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "_EquipmentToWorkRequest" ("A", "B") VALUES
   ('demo-eq-008', 'demo-wr-001'),
   ('demo-eq-004', 'demo-wr-002'),
-  ('demo-eq-007', 'demo-wr-003')
+  ('demo-eq-007', 'demo-wr-003'),
+  ('demo-eq-009', 'demo-wr-004'),
+  ('demo-eq-014', 'demo-wr-005'),
+  ('demo-eq-013', 'demo-wr-006'),
+  ('demo-eq-003', 'demo-wr-007'),
+  ('demo-eq-013', 'demo-wr-008'),
+  ('demo-eq-016', 'demo-wr-008')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO "work_request_comment" ("id", "content", "userId", "workRequestId", "createdAt", "updatedAt")
@@ -245,7 +393,29 @@ INSERT INTO "_EquipmentToWorkOrder" ("A", "B") VALUES
   ('demo-eq-002', 'demo-wo-002'),
   ('demo-eq-004', 'demo-wo-003'),
   ('demo-eq-003', 'demo-wo-004'),
-  ('demo-eq-006', 'demo-wo-005')
+  ('demo-eq-006', 'demo-wo-005'),
+  -- 10.C nuevos
+  ('demo-eq-013', 'demo-wo-006'),
+  ('demo-eq-015', 'demo-wo-007'),
+  ('demo-eq-001', 'demo-wo-008'),
+  ('demo-eq-009', 'demo-wo-008'),
+  ('demo-eq-002', 'demo-wo-009'),
+  ('demo-eq-018', 'demo-wo-010'),
+  ('demo-eq-011', 'demo-wo-011'),
+  ('demo-eq-007', 'demo-wo-013'),
+  ('demo-eq-003', 'demo-wo-014'),
+  ('demo-eq-017', 'demo-wo-015'),
+  ('demo-eq-013', 'demo-wo-016'),
+  ('demo-eq-014', 'demo-wo-016'),
+  ('demo-eq-015', 'demo-wo-016'),
+  ('demo-eq-016', 'demo-wo-016'),
+  ('demo-eq-004', 'demo-wo-017'),
+  ('demo-eq-010', 'demo-wo-018'),
+  ('demo-eq-014', 'demo-wo-020'),
+  ('demo-eq-012', 'demo-wo-021'),
+  ('demo-eq-009', 'demo-wo-022'),
+  ('demo-eq-009', 'demo-wo-024'),
+  ('demo-eq-005', 'demo-wo-025')
 ON CONFLICT DO NOTHING;
 
 -- ─── Vehicles ───────────────────────────────────────────────────────────────
@@ -428,3 +598,8 @@ UPDATE "equipment" SET "name" = 'Intercambiador de Calor IC-002', "description" 
 UPDATE "equipment" SET "name" = 'Válvula Reguladora VR-001',      "description" = 'Válvula de control de flujo a compresor principal',   "locationId" = 'demo-loc-comp',  "parentId" = 'demo-sys-cmp' WHERE id = 'demo-eq-006';
 UPDATE "equipment" SET "name" = 'Generador Auxiliar GA-001',      "description" = 'Generador diésel 200 kVA de respaldo',                "locationId" = 'demo-loc-yard',  "parentId" = 'demo-sys-ele' WHERE id = 'demo-eq-007';
 UPDATE "equipment" SET "name" = 'Compresor de Respaldo CP-002',   "description" = 'Compresor de gas combustible secundario 50 HP',       "locationId" = 'demo-loc-comp',  "parentId" = 'demo-sys-cmp' WHERE id = 'demo-eq-008';
+
+-- ─── Iter 7 — 10.C re-runnable bumps ──────────────────────────────────────
+-- work_request_counter was 3 in earlier seeds; bump to 8 so newly-created requests
+-- through the UI don't collide with REQ-2026-0004..0008 added in this batch.
+UPDATE "work_request_counter" SET "value" = 8 WHERE id = 'work-request-counter' AND "value" < 8;

@@ -4,7 +4,7 @@ const DB_NAME = "is-360-demo"
 const SCHEMA_URL = "/demo-db/schema.sql"
 const SEED_URL = "/demo-db/seed.sql"
 const SCHEMA_VERSION = 1
-const SEED_VERSION = 13
+const SEED_VERSION = 14
 
 let dbPromise: Promise<PGlite> | null = null
 
