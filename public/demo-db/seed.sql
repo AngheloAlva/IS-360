@@ -673,3 +673,43 @@ UPDATE "equipment" SET "name" = 'Compresor de Respaldo CP-002',   "description" 
 -- work_request_counter was 3 in earlier seeds; bump to 8 so newly-created requests
 -- through the UI don't collide with REQ-2026-0004..0008 added in this batch.
 UPDATE "work_request_counter" SET "value" = 8 WHERE id = 'work-request-counter' AND "value" < 8;
+
+-- ─── 10.E — Safety talks: user_safety_talk + attempts + in-person records ──
+-- 5 user_safety_talks asignados a workers/internos, en distintos estados.
+INSERT INTO "user_safety_talk" (
+  "id", "category", "status", "currentAttempts", "startedAt", "lastAttemptAt", "nextAttemptAt",
+  "score", "minRequiredScore", "completedAt", "expiresAt", "manuallyApproved", "userId",
+  "createdAt", "updatedAt"
+)
+VALUES
+  ('demo-ust-001', 'IRL',         'PASSED',           1, '2026-02-10T09:00:00Z', '2026-02-10T09:25:00Z', NULL,                   90.0, 70.0, '2026-02-10T09:25:00Z', '2027-02-10T09:25:00Z', false, 'demo-worker-1', '2026-02-10T09:00:00Z', '2026-02-10T09:25:00Z'),
+  ('demo-ust-002', 'IRL',         'PASSED',           2, '2026-03-05T10:00:00Z', '2026-03-12T10:30:00Z', NULL,                   80.0, 70.0, '2026-03-12T10:30:00Z', '2027-03-12T10:30:00Z', false, 'demo-worker-2', '2026-03-05T10:00:00Z', '2026-03-12T10:30:00Z'),
+  ('demo-ust-003', 'VISITOR',     'IN_PROGRESS',      1, '2026-05-12T08:30:00Z', '2026-05-12T08:50:00Z', '2026-05-13T08:50:00Z', 60.0, 70.0, NULL,                   NULL,                   false, 'demo-worker-4', '2026-05-12T08:30:00Z', '2026-05-12T08:50:00Z'),
+  ('demo-ust-004', 'ENVIRONMENT', 'PENDING',          0, NULL,                   NULL,                   NULL,                   NULL, 70.0, NULL,                   NULL,                   false, 'demo-worker-5', '2026-05-15T10:00:00Z', '2026-05-15T10:00:00Z'),
+  ('demo-ust-005', 'IRL',         'MANUALLY_APPROVED',0, NULL,                   NULL,                   NULL,                   NULL, 70.0, '2026-04-20T12:00:00Z', '2027-04-20T12:00:00Z', true,  'demo-worker-3', '2026-04-20T11:00:00Z', '2026-04-20T12:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+UPDATE "user_safety_talk" SET "approvalById" = 'demo-admin' WHERE id = 'demo-ust-005';
+
+-- Attempts: 1 successful + 1 failed-then-passed + 1 in-progress failed attempt.
+INSERT INTO "safety_talk_attempt" (
+  "id", "category", "score", "passed", "answers", "attemptNumber", "completedAt",
+  "timeSpentSeconds", "userId", "userSafetyTalkId", "createdAt", "updatedAt"
+)
+VALUES
+  ('demo-sta-001', 'IRL',     90.0, true,  '{"q1":"a","q2":"b","q3":"c","q4":"a","q5":"d"}'::jsonb, 1, '2026-02-10T09:25:00Z', 1500, 'demo-worker-1', 'demo-ust-001', '2026-02-10T09:25:00Z', '2026-02-10T09:25:00Z'),
+  ('demo-sta-002', 'IRL',     50.0, false, '{"q1":"b","q2":"c","q3":"a"}'::jsonb,                  1, '2026-03-05T10:25:00Z', 1500, 'demo-worker-2', 'demo-ust-002', '2026-03-05T10:25:00Z', '2026-03-05T10:25:00Z'),
+  ('demo-sta-003', 'IRL',     80.0, true,  '{"q1":"a","q2":"b","q3":"c","q4":"d","q5":"a"}'::jsonb, 2, '2026-03-12T10:30:00Z', 1300, 'demo-worker-2', 'demo-ust-002', '2026-03-12T10:30:00Z', '2026-03-12T10:30:00Z'),
+  ('demo-sta-004', 'VISITOR', 60.0, false, '{"q1":"a","q2":"a","q3":"b"}'::jsonb,                  1, '2026-05-12T08:50:00Z', 1200, 'demo-worker-4', 'demo-ust-003', '2026-05-12T08:50:00Z', '2026-05-12T08:50:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- In-person safety talk records (charlas presenciales: visitas, contratistas IRL)
+INSERT INTO "in_person_safety_talk_record" (
+  "id", "rut", "name", "company", "category", "sessionDate", "expiresAt",
+  "status", "score", "source", "notes", "registeredById", "createdAt", "updatedAt"
+)
+VALUES
+  ('demo-ipstr-001', '25.111.222-3', 'Pedro Salazar',       'Servicios Externos Cabo Negro', 'IRL',         '2026-03-15T10:00:00Z', '2027-03-15T10:00:00Z', 'PASSED', 95.0, 'IMPORT', 'Charla presencial registrada por capacitador externo', 'demo-admin', '2026-03-15T10:00:00Z', '2026-03-15T10:00:00Z'),
+  ('demo-ipstr-002', '26.222.333-4', 'Antonia Bravo',       'Auditoría TECNI SpA',           'VISITOR_TRM', '2026-04-02T09:30:00Z', '2026-10-02T09:30:00Z', 'PASSED', 80.0, 'MANUAL', 'Visita de auditoría',                                  'demo-admin', '2026-04-02T09:30:00Z', '2026-04-02T09:30:00Z'),
+  ('demo-ipstr-003', '27.333.444-5', 'Sebastián Aravena',   'Visitante Independiente',       'VISITOR',     '2026-05-08T11:00:00Z', '2026-08-08T11:00:00Z', 'PASSED', 75.0, 'MANUAL', 'Visita técnica de proveedor',                          'demo-tech',  '2026-05-08T11:00:00Z', '2026-05-08T11:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
