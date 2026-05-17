@@ -1,13 +1,10 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
-import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
+import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { linkEntity } from "@/project/startup-folder/actions/link-entity"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
+import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 
 interface PartnerUserInput {
 	rut: string
@@ -44,10 +41,8 @@ export async function createPartnerUsers({
 	companyId: string
 	users: PartnerUserInput[]
 }): Promise<CreatePartnerUsersResult> {
-	const requestHeaders = await headers()
-	const session = await auth.api.getSession({ headers: requestHeaders })
-
-	if (!session?.user?.id) {
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
 		return {
 			ok: false,
 			message: "No autorizado",
@@ -57,34 +52,59 @@ export async function createPartnerUsers({
 		}
 	}
 
+	const db = await getDemoDb()
 	const results: PartnerUserResult[] = []
 
-	for (const user of users) {
-		const temporalPassword = generateTemporalPassword()
-
+	for (const u of users) {
+		const email = u.email.trim().toLowerCase()
 		try {
-			const created = await auth.api.createUser({
-				headers: requestHeaders,
-				body: {
-					name: user.name,
-					email: user.email,
-					password: temporalPassword,
-					role: ["partnerCompany"],
-					data: {
-						companyId,
-						rut: user.rut,
-						phone: user.phone,
-						isSupervisor: user.isSupervisor ?? false,
-						internalRole: user.internalRole,
-						internalArea: user.internalArea,
-					},
-				},
-			})
+			const existing = await db.query<{ id: string }>(
+				`SELECT id FROM "user" WHERE email = $1 OR rut = $2 LIMIT 1`,
+				[email, u.rut],
+			)
+			if (existing.rows.length) {
+				results.push({
+					ok: false,
+					email,
+					name: u.name,
+					rut: u.rut,
+					message: `El RUT ${u.rut} o correo ${email} ya existe`,
+				})
+				continue
+			}
 
-			const newUserId = created.user.id
+			const newUserId = crypto.randomUUID()
+			const now = new Date().toISOString()
+			const temporalPassword = generateTemporalPassword()
 
-			if (user.startupFoldersId && user.startupFoldersId.length > 0) {
-				for (const folderId of user.startupFoldersId) {
+			await db.query(
+				`INSERT INTO "user" (
+					"id", "name", "email", "emailVerified", "rut", "phone",
+					"role", "accessRole", "internalRole", "internalArea",
+					"companyId", "isSupervisor", "isActive",
+					"createdAt", "updatedAt"
+				) VALUES (
+					$1, $2, $3, true, $4, $5,
+					'partnerCompany', 'PARTNER_COMPANY', $6, $7,
+					$8, $9, true,
+					$10, $10
+				)`,
+				[
+					newUserId,
+					u.name,
+					email,
+					u.rut,
+					u.phone ?? null,
+					u.internalRole ?? null,
+					u.internalArea ?? null,
+					companyId,
+					u.isSupervisor ?? false,
+					now,
+				],
+			)
+
+			if (u.startupFoldersId?.length) {
+				for (const folderId of u.startupFoldersId) {
 					await linkEntity({
 						entityId: newUserId,
 						startupFolderId: folderId,
@@ -94,65 +114,43 @@ export async function createPartnerUsers({
 			}
 
 			await logActivity({
-				userId: session.user.id,
+				userId: sessionUser.id,
 				module: MODULES.USERS,
 				action: ACTIVITY_TYPE.ASSIGN,
 				entityId: newUserId,
 				entityType: "User",
 				metadata: {
 					type: "partner-user-create",
-					email: user.email,
-					name: user.name,
+					email,
+					name: u.name,
 					companyId,
-					isSupervisor: user.isSupervisor ?? false,
-					internalRole: user.internalRole,
-					internalArea: user.internalArea,
-					startupFoldersId: user.startupFoldersId ?? [],
+					isSupervisor: u.isSupervisor ?? false,
+					internalRole: u.internalRole,
+					internalArea: u.internalArea,
+					startupFoldersId: u.startupFoldersId ?? [],
 				},
 			})
 
 			void sendNewUserEmail({
-				name: user.name,
-				email: user.email,
+				name: u.name,
+				email,
 				password: temporalPassword,
 			})
 
-			results.push({
-				ok: true,
-				email: user.email,
-				name: user.name,
-				rut: user.rut,
-				id: newUserId,
-			})
+			results.push({ ok: true, email, name: u.name, rut: u.rut, id: newUserId })
 		} catch (error) {
-			console.error("[CREATE_PARTNER_USERS]", { email: user.email, error })
-
-			const code = (error as { body?: { code?: string } })?.body?.code
-			let message = "Error al crear el usuario"
-
-			if (code === "USER_ALREADY_EXISTS") {
-				message = `El RUT ${user.rut} o correo ${user.email} ya existe`
-			} else if (code === "ONLY_ADMINS_CAN_ACCESS_THIS_ENDPOINT") {
-				message = "No tienes permiso para crear colaboradores"
-			}
-
+			console.error("[CREATE_PARTNER_USERS]", { email, error })
 			results.push({
 				ok: false,
-				email: user.email,
-				name: user.name,
-				rut: user.rut,
-				message,
+				email,
+				name: u.name,
+				rut: u.rut,
+				message: "Error al crear el usuario",
 			})
 		}
 	}
 
 	const successCount = results.filter((r) => r.ok).length
 	const errorCount = results.length - successCount
-
-	return {
-		ok: errorCount === 0,
-		results,
-		successCount,
-		errorCount,
-	}
+	return { ok: errorCount === 0, results, successCount, errorCount }
 }

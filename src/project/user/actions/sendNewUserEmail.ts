@@ -1,45 +1,10 @@
-"use server"
-
-import { NewUserEmail } from "@/project/user/components/emails/NewUserEmail"
-import { resend } from "@/lib/resend"
-
 interface SendNewUserEmailProps {
 	name: string
 	email: string
 	password: string
 }
 
-export const sendNewUserEmail = async ({ email, name, password }: SendNewUserEmailProps) => {
-	try {
-		const { data, error } = await resend.emails.send({
-			from: "sistema@is360.cl",
-			to: [email],
-			bcc: ["sistema@is360.cl", "soporte@ingenieriasimple.cl"],
-			subject: `Bienvenido a IS 360`,
-			react: await NewUserEmail({
-				name,
-				email,
-				password,
-			}),
-		})
-
-		if (error) {
-			console.error("[SEND_NEW_USER_EMAIL]", error)
-			return {
-				ok: false,
-				error,
-			}
-		}
-
-		return {
-			ok: true,
-			data,
-		}
-	} catch (error) {
-		console.error("[SEND_NEW_USER_EMAIL]", error)
-		return {
-			ok: false,
-			error,
-		}
-	}
+export const sendNewUserEmail = async (props: SendNewUserEmailProps) => {
+	console.info("[demo] email noop: sendNewUserEmail", props)
+	return { ok: true, data: null as unknown }
 }

@@ -1,79 +1,51 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_SEVERITY, ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { createDiff } from "@/lib/activity/diff"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export const reactivateUser = async (userId: string) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				user: ["update"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No tienes permisos para reactivar el usuario",
-		}
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const user = await prisma.user.update({
-			where: { id: userId },
-			data: { isActive: true },
-			select: {
-				id: true,
-				email: true,
-				name: true,
-				companyId: true,
-			},
-		})
+		const db = await getDemoDb()
+		const now = new Date().toISOString()
+		const updateRes = await db.query<{
+			id: string
+			email: string
+			name: string
+			companyId: string | null
+		}>(
+			`UPDATE "user"
+			 SET "isActive" = true, "updatedAt" = $1
+			 WHERE id = $2
+			 RETURNING id, email, name, "companyId"`,
+			[now, userId],
+		)
+		const user = updateRes.rows[0]
+		if (!user) {
+			return { ok: false, message: "Usuario no encontrado" }
+		}
 
 		const diff = createDiff({ isActive: false }, { isActive: true })
 
-  await logActivity({
+		await logActivity({
 			module: MODULES.USERS,
-			userId: session.user.id,
+			userId: sessionUser.id,
 			action: ACTIVITY_TYPE.UPDATE,
 			entityId: user.id,
 			entityType: "User",
 			severity: ACTIVITY_SEVERITY.HIGH,
 			...diff,
-			metadata: {
-				name: user.name,
-				email: user.email,
-				companyId: user.companyId,
-			},
+			metadata: { name: user.name, email: user.email, companyId: user.companyId },
 		})
 
-		return {
-			ok: true,
-			message: "Usuario reactivado correctamente",
-		}
+		return { ok: true, message: "Usuario reactivado correctamente" }
 	} catch (error) {
 		console.error("[REACTIVATE_USER]", error)
-		return {
-			ok: false,
-			message: "Error al reactivar el usuario",
-		}
+		return { ok: false, message: "Error al reactivar el usuario" }
 	}
 }

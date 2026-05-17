@@ -1,12 +1,9 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
-import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
+import { generateTemporalPassword } from "@/lib/generateTemporalPassword"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
+import { sendNewUserEmail } from "@/project/user/actions/sendNewUserEmail"
 
 import type { InternalUserSchema } from "@/project/user/schemas/internalUser.schema"
 
@@ -22,57 +19,68 @@ export async function createInternalUser({
 }: {
 	values: InternalUserSchema
 }): Promise<CreateInternalUserResult> {
-	const requestHeaders = await headers()
-	const session = await auth.api.getSession({ headers: requestHeaders })
-
-	if (!session?.user?.id) {
+	const sessionUser = getDemoUser()
+	if (!sessionUser) {
 		return { ok: false, message: "No autorizado", errorCode: "FORBIDDEN" }
 	}
 
-	const temporalPassword = generateTemporalPassword()
-
 	try {
-		const created = await auth.api.createUser({
-			headers: requestHeaders,
-			body: {
-				name: values.name,
-				email: values.email,
-				password: temporalPassword,
-				role: values.role as ["user"],
-				data: {
-					rut: values.rut,
-					area: values.area,
-					phone: values.phone,
-					accessRole: "ADMIN",
-					internalRole: values.internalRole,
-					documentAreas: values.documentAreas ?? [],
-					allowedModules: values.allowedModules,
-					allowedCompanies: values.allowedCompanies ?? [],
-				},
-			},
-		})
+		const db = await getDemoDb()
+		const email = values.email.trim().toLowerCase()
 
-		const newUserId = created.user.id
-
-		if (values.role.length > 1) {
-			await auth.api.setRole({
-				headers: requestHeaders,
-				body: {
-					userId: newUserId,
-					role: values.role as ["user"],
-				},
-			})
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "user" WHERE email = $1 OR rut = $2 LIMIT 1`,
+			[email, values.rut],
+		)
+		if (existing.rows.length) {
+			return {
+				ok: false,
+				message: "El usuario ya existe. Verifique el RUT y email.",
+				errorCode: "USER_ALREADY_EXISTS",
+			}
 		}
 
+		const newUserId = crypto.randomUUID()
+		const now = new Date().toISOString()
+		const temporalPassword = generateTemporalPassword()
+
+		await db.query(
+			`INSERT INTO "user" (
+				"id", "name", "email", "emailVerified", "rut", "phone", "area",
+				"role", "accessRole", "internalRole", "documentAreas",
+				"allowedModules", "allowedCompanies", "isActive",
+				"createdAt", "updatedAt"
+			) VALUES (
+				$1, $2, $3, true, $4, $5, $6,
+				$7, 'ADMIN', $8, $9,
+				$10, $11, true,
+				$12, $12
+			)`,
+			[
+				newUserId,
+				values.name,
+				email,
+				values.rut,
+				values.phone ?? null,
+				values.area ?? null,
+				values.role.join(","),
+				values.internalRole ?? null,
+				values.documentAreas ?? [],
+				values.allowedModules,
+				values.allowedCompanies ?? [],
+				now,
+			],
+		)
+
 		await logActivity({
-			userId: session.user.id,
+			userId: sessionUser.id,
 			module: MODULES.USERS,
 			action: ACTIVITY_TYPE.ASSIGN,
 			entityId: newUserId,
 			entityType: "User",
 			metadata: {
 				type: "internal-user-create",
-				email: values.email,
+				email,
 				name: values.name,
 				role: values.role,
 				accessRole: "ADMIN",
@@ -85,40 +93,16 @@ export async function createInternalUser({
 
 		void sendNewUserEmail({
 			name: values.name,
-			email: values.email,
+			email,
 			password: temporalPassword,
 		})
 
 		return {
 			ok: true,
-			data: { id: newUserId, email: values.email, name: values.name },
+			data: { id: newUserId, email, name: values.name },
 		}
 	} catch (error) {
 		console.error("[CREATE_INTERNAL_USER]", error)
-
-		const code = (error as { body?: { code?: string }; status?: string })?.body?.code
-		const status = (error as { status?: string })?.status
-
-		if (code === "USER_ALREADY_EXISTS") {
-			return {
-				ok: false,
-				message: "El usuario ya existe. Verifique el RUT y email.",
-				errorCode: "USER_ALREADY_EXISTS",
-			}
-		}
-
-		if (code === "ONLY_ADMINS_CAN_ACCESS_THIS_ENDPOINT" || status === "UNAUTHORIZED") {
-			return {
-				ok: false,
-				message: "No tienes permiso para crear usuarios",
-				errorCode: "FORBIDDEN",
-			}
-		}
-
-		return {
-			ok: false,
-			message: "Error al crear el usuario",
-			errorCode: "UNKNOWN",
-		}
+		return { ok: false, message: "Error al crear el usuario", errorCode: "UNKNOWN" }
 	}
 }
