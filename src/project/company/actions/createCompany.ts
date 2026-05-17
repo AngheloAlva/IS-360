@@ -1,12 +1,8 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { createStartupFolder } from "@/project/startup-folder/actions/createStartupFolder"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
+import { createStartupFolder } from "@/project/startup-folder/actions/createStartupFolder"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import type { CompanySchema } from "@/project/company/schemas/company.schema"
 
@@ -25,31 +21,9 @@ interface CreateCompanyResponse {
 export const createCompany = async ({
 	values,
 }: CreateCompanyProps): Promise<CreateCompanyResponse> => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				company: ["create"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
@@ -62,13 +36,12 @@ export const createCompany = async ({
 			...rest
 		} = values
 
-		const existingCompany = await prisma.company.findUnique({
-			where: {
-				rut: rest.rut,
-			},
-		})
-
-		if (existingCompany) {
+		const db = await getDemoDb()
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "company" WHERE rut = $1 LIMIT 1`,
+			[rest.rut],
+		)
+		if (existing.rows.length) {
 			return {
 				ok: false,
 				message:
@@ -76,84 +49,87 @@ export const createCompany = async ({
 			}
 		}
 
-		const company = await prisma.company.create({
-			data: {
-				...rest,
-				createdBy: {
-					connect: {
-						id: session.user.id,
-					},
-				},
-			},
-		})
+		const companyId = crypto.randomUUID()
+		const now = new Date().toISOString()
 
-  await logActivity({
-			userId: session.user.id,
+		await db.query(
+			`INSERT INTO "company" (
+				"id", "name", "rut", "isActive", "createdById", "createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, true, $4, $5, $5)`,
+			[companyId, rest.name, rest.rut, user.id, now],
+		)
+
+		await logActivity({
+			userId: user.id,
 			module: MODULES.COMPANY,
 			action: ACTIVITY_TYPE.CREATE,
-			entityId: company.id,
+			entityId: companyId,
 			entityType: "Company",
 			metadata: {
 				name: rest.name,
 				rut: rest.rut,
-				hasVehicles: vehicles && vehicles.length > 0,
-				hasSupervisors: supervisors && supervisors.length > 0,
+				hasVehicles: !!vehicles?.length,
+				hasSupervisors: !!supervisors?.length,
 			},
 		})
 
 		const { ok, message } = await createStartupFolder({
-			companyId: company.id,
+			companyId,
 			type: startupFolderType,
 			name: startupFolderName || "Carpeta de arranque",
 			moreMonthDuration: startupFolderMoreMonthDuration || false,
 		})
 
-		if (vehicles && vehicles.length > 0) {
-			vehicles.forEach(async (vehicleData) => {
-				const vehicle = await prisma.vehicle.create({
-					data: {
-						...vehicleData,
-						companyId: company.id,
-						year: Number(vehicleData.year),
-					},
-				})
+		if (vehicles?.length) {
+			for (const v of vehicles) {
+				const vehicleId = crypto.randomUUID()
+				await db.query(
+					`INSERT INTO "vehicle" (
+						"id", "plate", "model", "year", "brand", "type", "color", "isMain",
+						"isActive", "companyId", "createdAt", "updatedAt"
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9, $10, $10)`,
+					[
+						vehicleId,
+						v.plate,
+						v.model,
+						Number(v.year),
+						v.brand,
+						v.type,
+						v.color ?? null,
+						v.isMain ?? false,
+						companyId,
+						now,
+					],
+				)
 
-    await logActivity({
-					userId: session.user.id,
+				await logActivity({
+					userId: user.id,
 					module: MODULES.COMPANY,
 					action: ACTIVITY_TYPE.CREATE,
-					entityId: vehicle.id,
+					entityId: vehicleId,
 					entityType: "Vehicle",
 					metadata: {
-						companyId: company.id,
-						plate: vehicle.plate,
-						brand: vehicle.brand,
-						model: vehicle.model,
-						year: vehicle.year,
+						companyId,
+						plate: v.plate,
+						brand: v.brand,
+						model: v.model,
+						year: Number(v.year),
 					},
 				})
-			})
+			}
 		}
 
 		if (!ok) {
-			return {
-				ok: false,
-				message,
-			}
+			return { ok: false, message }
 		}
 
 		return {
 			ok: true,
 			message: "Empresa creada exitosamente",
-			data: {
-				id: company.id,
-			},
+			data: { id: companyId },
 		}
 	} catch (error) {
-		console.log(error)
-		return {
-			ok: false,
-			message: "Error al crear la empresa",
-		}
+		console.error("[CREATE_COMPANY]", error)
+		return { ok: false, message: "Error al crear la empresa" }
 	}
 }

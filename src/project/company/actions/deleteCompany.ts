@@ -1,86 +1,50 @@
-"use server"
-
-import { headers } from "next/headers"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export const deleteCompany = async (companyId: string) => {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
-	}
-
-	const hasPermission = await auth.api.userHasPermission({
-		body: {
-			userId: session.user.id,
-			permission: {
-				company: ["delete"],
-			},
-		},
-	})
-
-	if (!hasPermission) {
-		return {
-			ok: false,
-			message: "No autorizado",
-		}
+	const user = getDemoUser()
+	if (!user) {
+		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const company = await prisma.company.findUnique({
-			where: { id: companyId },
-			select: {
-				id: true,
-				name: true,
-				rut: true,
-				users: { select: { id: true } },
-				vehicles: { select: { id: true } },
-			},
-		})
-
+		const db = await getDemoDb()
+		const companyRes = await db.query<{ id: string; name: string; rut: string }>(
+			`SELECT id, name, rut FROM "company" WHERE id = $1`,
+			[companyId],
+		)
+		const company = companyRes.rows[0]
 		if (!company) {
-			return {
-				ok: false,
-				message: "Empresa no encontrada",
-			}
+			return { ok: false, message: "Empresa no encontrada" }
 		}
 
-		await prisma.$transaction(async (tx) => {
-			await tx.user.updateMany({
-				where: {
-					companyId,
-				},
-				data: {
-					isActive: false,
-				},
-			})
+		const now = new Date().toISOString()
+		const usersRes = await db.query<{ count: string }>(
+			`SELECT COUNT(*)::text AS count FROM "user" WHERE "companyId" = $1`,
+			[companyId],
+		)
+		const vehiclesRes = await db.query<{ count: string }>(
+			`SELECT COUNT(*)::text AS count FROM "vehicle" WHERE "companyId" = $1`,
+			[companyId],
+		)
 
-			await tx.vehicle.updateMany({
-				where: {
-					companyId,
-				},
-				data: {
-					isActive: false,
-				},
-			})
+		await db.query(
+			`UPDATE "user" SET "isActive" = false, "updatedAt" = $1 WHERE "companyId" = $2`,
+			[now, companyId],
+		)
+		await db.query(
+			`UPDATE "vehicle" SET "isActive" = false, "updatedAt" = $1 WHERE "companyId" = $2`,
+			[now, companyId],
+		)
+		await db.query(
+			`UPDATE "company" SET "isActive" = false, "updatedAt" = $1 WHERE id = $2`,
+			[now, companyId],
+		)
 
-			await tx.company.update({
-				where: { id: companyId },
-				data: { isActive: false },
-			})
-		})
-
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.COMPANY,
 			action: ACTIVITY_TYPE.DELETE,
 			entityId: company.id,
@@ -88,20 +52,14 @@ export const deleteCompany = async (companyId: string) => {
 			metadata: {
 				name: company.name,
 				rut: company.rut,
-				affectedUsers: company.users.length,
-				affectedVehicles: company.vehicles.length,
+				affectedUsers: parseInt(usersRes.rows[0]?.count ?? "0", 10),
+				affectedVehicles: parseInt(vehiclesRes.rows[0]?.count ?? "0", 10),
 			},
 		})
 
-		return {
-			ok: true,
-			message: "Empresa eliminada correctamente",
-		}
+		return { ok: true, message: "Empresa eliminada correctamente" }
 	} catch (error) {
-		console.error(error)
-		return {
-			ok: false,
-			message: "Error al eliminar la empresa",
-		}
+		console.error("[DELETE_COMPANY]", error)
+		return { ok: false, message: "Error al eliminar la empresa" }
 	}
 }
