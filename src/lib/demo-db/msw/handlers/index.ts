@@ -4,6 +4,7 @@ import { equipmentHandlers } from "./equipment"
 import { fallbackHandlers } from "./_fallback"
 import { locationHandlers } from "./location"
 import { maintenancePlanHandlers } from "./maintenance-plan"
+import { startupFolderHandlers } from "./startup-folder"
 import { userHandlers } from "./user"
 import { workBookHandlers } from "./work-book"
 import { workOrderHandlers } from "./work-order"
@@ -25,6 +26,7 @@ export const handlers = [
 	...equipmentHandlers,
 	...locationHandlers,
 	...maintenancePlanHandlers,
+	...startupFolderHandlers,
 	...dashboardHandlers,
 	...fallbackHandlers,
 ]

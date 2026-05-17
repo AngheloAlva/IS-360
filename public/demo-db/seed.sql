@@ -219,6 +219,112 @@ INSERT INTO "_EquipmentToWorkOrder" ("A", "B") VALUES
   ('demo-eq-006', 'demo-wo-005')
 ON CONFLICT DO NOTHING;
 
+-- ─── Vehicles ───────────────────────────────────────────────────────────────
+INSERT INTO "vehicle" ("id", "plate", "model", "year", "brand", "type", "color", "isMain", "isActive", "companyId", "createdAt", "updatedAt") VALUES
+  ('demo-vehicle-1', 'GHJK-21', 'Hilux',     2022, 'Toyota', 'TRUCK', 'Blanco', true,  true, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z'),
+  ('demo-vehicle-2', 'LPQR-58', 'NP300',     2021, 'Nissan', 'TRUCK', 'Gris',   false, true, 'demo-company-1', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z'),
+  ('demo-vehicle-3', 'MNST-90', 'Ranger',    2023, 'Ford',   'TRUCK', 'Negro',  true,  true, 'demo-company-2', '2026-03-05T10:00:00Z', '2026-03-05T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Additional partner-company workers (for startup-folder demo) ───────────
+INSERT INTO "user" ("id", "name", "email", "emailVerified", "rut", "role", "accessRole", "isSupervisor", "companyId", "createdAt", "updatedAt", "isActive")
+VALUES
+  ('demo-worker-1', 'Juan Pérez',     'juan.perez@contratista.cl',     true, '18.111.111-1', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
+  ('demo-worker-2', 'María González', 'maria.gonzalez@contratista.cl', true, '19.222.222-2', 'worker', 'PARTNER_COMPANY', false, 'demo-company-1', '2026-01-15T10:00:00Z', '2026-01-15T10:00:00Z', true),
+  ('demo-worker-3', 'Carlos Vega',    'carlos.vega@andinos.cl',        true, '20.333.333-3', 'driver', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true)
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Startup Folders ────────────────────────────────────────────────────────
+INSERT INTO "startup_folder" ("id", "name", "type", "status", "moreMonthDuration", "isDeleted", "isArchived", "companyId", "createdAt", "updatedAt") VALUES
+  ('demo-sf-001', 'Carpeta Q1 2026', 'FULL',  'IN_PROGRESS', false, false, false, 'demo-company-1', '2026-01-20T10:00:00Z', '2026-04-15T10:00:00Z'),
+  ('demo-sf-002', 'Carpeta Q2 2026', 'BASIC', 'PENDING',     true,  false, false, 'demo-company-1', '2026-04-01T10:00:00Z', '2026-04-01T10:00:00Z'),
+  ('demo-sf-003', 'Carpeta Q1 2026', 'FULL',  'IN_PROGRESS', false, false, false, 'demo-company-2', '2026-02-15T10:00:00Z', '2026-04-10T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Sub-folders for demo-sf-001 (FULL Q1 2026, demo-company-1) ─────────────
+INSERT INTO "safety_and_health_folder" ("id", "status", "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-sah-001', 'SUBMITTED', ARRAY[]::text[], 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-04-01T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "environment_folder" ("id", "status", "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-env-001', 'DRAFT', ARRAY[]::text[], 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-01-20T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "tech_specs_folder" ("id", "status", "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-tech-001', 'APPROVED', ARRAY[]::text[], 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-03-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "worker_folders" ("id", "status", "additionalNotificationEmails", "isDriver", "workerId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-wf-001', 'DRAFT',     ARRAY[]::text[], false, 'demo-worker-1', 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-04-01T10:00:00Z'),
+  ('demo-wf-002', 'SUBMITTED', ARRAY[]::text[], true,  'demo-worker-2', 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-04-01T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "basic_folder" ("id", "status", "additionalNotificationEmails", "workerId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-bf-001', 'APPROVED', ARRAY[]::text[], 'demo-worker-1', 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-03-15T10:00:00Z'),
+  ('demo-bf-002', 'DRAFT',    ARRAY[]::text[], 'demo-worker-2', 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-01-20T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "vehicle_folders" ("id", "status", "additionalNotificationEmails", "vehicleId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-vf-001', 'SUBMITTED', ARRAY[]::text[], 'demo-vehicle-1', 'demo-sf-001', '2026-01-20T10:00:00Z', '2026-04-05T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Sub-folders for demo-sf-002 (BASIC Q2 2026, demo-company-1) ────────────
+INSERT INTO "basic_folder" ("id", "status", "additionalNotificationEmails", "workerId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-bf-003', 'DRAFT', ARRAY[]::text[], 'demo-worker-1', 'demo-sf-002', '2026-04-01T10:00:00Z', '2026-04-01T10:00:00Z'),
+  ('demo-bf-004', 'DRAFT', ARRAY[]::text[], 'demo-worker-2', 'demo-sf-002', '2026-04-01T10:00:00Z', '2026-04-01T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Sub-folders for demo-sf-003 (FULL Q1 2026, demo-company-2) ─────────────
+INSERT INTO "safety_and_health_folder" ("id", "status", "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-sah-003', 'APPROVED', ARRAY[]::text[], 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-03-20T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "environment_folder" ("id", "status", "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-env-003', 'SUBMITTED', ARRAY[]::text[], 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-04-01T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "tech_specs_folder" ("id", "status", "additionalNotificationEmails", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-tech-003', 'DRAFT', ARRAY[]::text[], 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-02-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "worker_folders" ("id", "status", "additionalNotificationEmails", "isDriver", "workerId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-wf-003', 'DRAFT', ARRAY[]::text[], true, 'demo-worker-3', 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-04-01T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+INSERT INTO "vehicle_folders" ("id", "status", "additionalNotificationEmails", "vehicleId", "startupFolderId", "createdAt", "updatedAt") VALUES
+  ('demo-vf-003', 'DRAFT', ARRAY[]::text[], 'demo-vehicle-3', 'demo-sf-003', '2026-02-15T10:00:00Z', '2026-02-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- ─── Documents (a mix of statuses for visual demo) ──────────────────────────
+-- demo-bf-001 (Juan Pérez basic, APPROVED): 3 approved docs
+INSERT INTO "basic_document" ("id", "type", "name", "url", "category", "status", "expirationDate", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
+  ('demo-doc-b001', 'CONTRACT',     'Contrato Juan Pérez',           'https://example.com/contract.pdf',  'BASIC', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-bf-001', '2026-01-25T10:00:00Z', '2026-02-01T10:00:00Z'),
+  ('demo-doc-b002', 'INSURANCE',    'Seguro Accidentes Juan Pérez',  'https://example.com/insurance.pdf', 'BASIC', 'APPROVED', '2026-12-31T00:00:00Z', 'demo-supervisor', 'demo-bf-001', '2026-01-25T10:00:00Z', '2026-02-01T10:00:00Z'),
+  ('demo-doc-b003', 'PPE_RECEIPT',  'Entrega EPP Juan Pérez',        'https://example.com/ppe.pdf',       'BASIC', 'APPROVED', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-bf-001', '2026-01-25T10:00:00Z', '2026-02-01T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- demo-bf-002 (María González basic, DRAFT): 1 draft doc
+INSERT INTO "basic_document" ("id", "type", "name", "url", "category", "status", "expirationDate", "uploadedById", "folderId", "uploadedAt") VALUES
+  ('demo-doc-b004', 'CONTRACT', 'Contrato María González', 'https://example.com/contract2.pdf', 'BASIC', 'DRAFT', '2027-01-01T00:00:00Z', 'demo-supervisor', 'demo-bf-002', '2026-02-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- demo-vf-001 (vehicle Hilux, SUBMITTED): 2 submitted docs
+INSERT INTO "vehicle_document" ("id", "type", "name", "url", "category", "status", "expirationDate", "uploadedById", "folderId", "uploadedAt", "submittedAt") VALUES
+  ('demo-doc-v001', 'CIRCULATION_PERMIT', 'Permiso Circulación Hilux',  'https://example.com/perm.pdf', 'VEHICLES', 'SUBMITTED', '2027-03-31T00:00:00Z', 'demo-supervisor', 'demo-vf-001', '2026-04-01T10:00:00Z', '2026-04-05T10:00:00Z'),
+  ('demo-doc-v002', 'TECHNICAL_REVIEW',   'Revisión Técnica Hilux',     'https://example.com/tech.pdf', 'VEHICLES', 'SUBMITTED', '2027-03-31T00:00:00Z', 'demo-supervisor', 'demo-vf-001', '2026-04-01T10:00:00Z', '2026-04-05T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
+-- demo-sah-001 (safety, SUBMITTED): 1 doc submitted, 1 rejected for visual diversity
+INSERT INTO "safety_and_health_document" ("id", "type", "name", "url", "category", "status", "uploadedById", "folderId", "uploadedAt", "submittedAt", "reviewedAt", "reviewNotes") VALUES
+  ('demo-doc-s001', 'COMPANY_INFO',          'Antecedentes Empresa',       'https://example.com/co.pdf',   'SAFETY_AND_HEALTH', 'SUBMITTED', 'demo-supervisor', 'demo-sah-001', '2026-03-20T10:00:00Z', '2026-04-01T10:00:00Z', NULL, NULL),
+  ('demo-doc-s002', 'PREVENTION_PLAN',       'Plan de Prevención de Riesgos','https://example.com/risk.pdf', 'SAFETY_AND_HEALTH', 'REJECTED',  'demo-supervisor', 'demo-sah-001', '2026-03-20T10:00:00Z', '2026-04-01T10:00:00Z', '2026-04-02T10:00:00Z', 'Falta firma legal')
+ON CONFLICT ("id") DO NOTHING;
+
+-- demo-tech-001 (tech specs, APPROVED): 1 approved doc
+INSERT INTO "tech_specs_document" ("id", "type", "name", "url", "category", "status", "uploadedById", "folderId", "uploadedAt", "reviewedAt") VALUES
+  ('demo-doc-t001', 'TECHNICAL_WORK_PROCEDURE', 'Procedimiento Trabajo Técnico', 'https://example.com/twp.pdf', 'TECHNICAL_SPECS', 'APPROVED', 'demo-supervisor', 'demo-tech-001', '2026-02-01T10:00:00Z', '2026-03-15T10:00:00Z')
+ON CONFLICT ("id") DO NOTHING;
+
 -- ─── Re-runnable adjustments ────────────────────────────────────────────────
 -- These UPDATEs keep already-seeded databases consistent when seed data evolves
 -- (ON CONFLICT DO NOTHING above won't fix rows that pre-existed).
