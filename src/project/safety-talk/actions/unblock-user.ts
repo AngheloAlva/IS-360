@@ -1,75 +1,59 @@
-"use server"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
-import { UnblockUserSchema } from "../schemas/attempt.schema"
-import { logActivity } from "@/lib/activity/log"
-import { ACTIVITY_SEVERITY, ACTIVITY_TYPE, MODULES, SAFETY_TALK_CATEGORY } from "@/generated/prisma/enums"
+import {
+	ACTIVITY_SEVERITY,
+	ACTIVITY_TYPE,
+	MODULES,
+	type SAFETY_TALK_CATEGORY,
+} from "@/generated/prisma/enums"
 import { createDiff } from "@/lib/activity/diff"
+import { logActivity } from "@/lib/activity/log"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
+
+import { UnblockUserSchema } from "../schemas/attempt.schema"
 
 export async function unblockUser(data: unknown) {
 	try {
-		const session = await auth.api.getSession({
-			headers: await import("next/headers").then((mod) => mod.headers()),
-		})
-
-		if (!session?.user) {
-			return {
-				success: false,
-				error: "No autenticado",
-			}
+		const user = getDemoUser()
+		if (!user) {
+			return { success: false, error: "No autenticado" }
+		}
+		if (user.accessRole !== "ADMIN") {
+			return { success: false, error: "No tienes permisos para desbloquear usuarios" }
 		}
 
-		// Verificar que sea administrador
-		if (session.user.accessRole !== "ADMIN") {
-			return {
-				success: false,
-				error: "No tienes permisos para desbloquear usuarios",
-			}
-		}
+		const { userId, category, reason } = UnblockUserSchema.parse(data)
+		const db = await getDemoDb()
 
-		const validatedData = UnblockUserSchema.parse(data)
-		const { userId, category, reason } = validatedData
-
-		// Buscar UserSafetyTalk
-		const userSafetyTalk = await prisma.userSafetyTalk.findFirst({
-			where: {
-				userId,
-				category: category,
-			},
-		})
-
+		const res = await db.query<{ id: string; status: string; currentAttempts: number }>(
+			`SELECT id, status, "currentAttempts"
+			 FROM "user_safety_talk"
+			 WHERE "userId" = $1 AND category = $2
+			 LIMIT 1`,
+			[userId, category],
+		)
+		const userSafetyTalk = res.rows[0]
 		if (!userSafetyTalk) {
-			return {
-				success: false,
-				error: "No se encontró el registro de la charla",
-			}
+			return { success: false, error: "No se encontró el registro de la charla" }
 		}
-
 		if (userSafetyTalk.status !== "BLOCKED") {
-			return {
-				success: false,
-				error: "El usuario no está bloqueado",
-			}
+			return { success: false, error: "El usuario no está bloqueado" }
 		}
 
-		// Desbloquear usuario - resetear intentos y estado
-		await prisma.userSafetyTalk.update({
-			where: { id: userSafetyTalk.id },
-			data: {
-				status: "PENDING",
-				currentAttempts: 0,
-				nextAttemptAt: null,
-			},
-		})
+		const now = new Date().toISOString()
+		await db.query(
+			`UPDATE "user_safety_talk"
+			 SET status = 'PENDING', "currentAttempts" = 0, "nextAttemptAt" = NULL, "updatedAt" = $1
+			 WHERE id = $2`,
+			[now, userSafetyTalk.id],
+		)
 
 		const diff = createDiff(
 			{ status: "BLOCKED", currentAttempts: userSafetyTalk.currentAttempts },
-			{ status: "PENDING", currentAttempts: 0 }
+			{ status: "PENDING", currentAttempts: 0 },
 		)
 
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.SAFETY_TALK,
 			action: ACTIVITY_TYPE.UPDATE,
 			entityId: userSafetyTalk.id,
@@ -84,12 +68,9 @@ export async function unblockUser(data: unknown) {
 			},
 		})
 
-		return {
-			success: true,
-			message: "Usuario desbloqueado exitosamente",
-		}
+		return { success: true, message: "Usuario desbloqueado exitosamente" }
 	} catch (error) {
-		console.error("Error unblocking user:", error)
+		console.error("[UNBLOCK_USER]", error)
 		return {
 			success: false,
 			error: error instanceof Error ? error.message : "Error al desbloquear usuario",
@@ -99,66 +80,51 @@ export async function unblockUser(data: unknown) {
 
 export async function getUserSafetyTalkStatus(userId: string, category: SAFETY_TALK_CATEGORY) {
 	try {
-		const session = await auth.api.getSession({
-			headers: await import("next/headers").then((mod) => mod.headers()),
-		})
-
-		if (!session?.user?.id) {
-			return {
-				success: false,
-				error: "No autenticado",
-			}
+		const user = getDemoUser()
+		if (!user) {
+			return { success: false, error: "No autenticado" }
 		}
 
-		const canAccessRequestedUser = session.user.id === userId || session.user.accessRole === "ADMIN"
-
-		if (!canAccessRequestedUser) {
-			return {
-				success: false,
-				error: "No autorizado para consultar este estado",
-			}
+		const canAccess = user.id === userId || user.accessRole === "ADMIN"
+		if (!canAccess) {
+			return { success: false, error: "No autorizado para consultar este estado" }
 		}
 
-		const userSafetyTalk = await prisma.userSafetyTalk.findFirst({
-			where: {
-				userId,
-				category: category,
-			},
-			include: {
-				attempts: {
-					orderBy: {
-						attemptNumber: "desc",
-					},
-					take: 3,
-				},
-			},
-		})
-
-		if (!userSafetyTalk) {
-			return {
-				success: true,
-				status: null,
-				message: "No ha iniciado esta charla",
-			}
+		const db = await getDemoDb()
+		const res = await db.query<{
+			id: string
+			status: string
+			currentAttempts: number
+			nextAttemptAt: string | null
+			score: number | null
+			completedAt: string | null
+			expiresAt: string | null
+		}>(
+			`SELECT id, status, "currentAttempts", "nextAttemptAt", score, "completedAt", "expiresAt"
+			 FROM "user_safety_talk"
+			 WHERE "userId" = $1 AND category = $2
+			 LIMIT 1`,
+			[userId, category],
+		)
+		const row = res.rows[0]
+		if (!row) {
+			return { success: true, status: null, message: "No ha iniciado esta charla" }
 		}
 
 		return {
 			success: true,
 			status: {
-				id: userSafetyTalk.id,
-				status: userSafetyTalk.status,
-				currentAttempts: userSafetyTalk.currentAttempts,
-				nextAttemptAt: userSafetyTalk.nextAttemptAt,
-				score: userSafetyTalk.score,
-				completedAt: userSafetyTalk.completedAt,
-				expiresAt: userSafetyTalk.expiresAt,
+				id: row.id,
+				status: row.status,
+				currentAttempts: row.currentAttempts,
+				nextAttemptAt: row.nextAttemptAt,
+				score: row.score,
+				completedAt: row.completedAt,
+				expiresAt: row.expiresAt,
 			},
 		}
 	} catch (error) {
-		console.error("Error getting user safety talk status:", error)
-		return {
-			success: false,
-			error: "Error al obtener el estado",
-		}
+		console.error("[GET_USER_SAFETY_TALK_STATUS]", error)
+		return { success: false, error: "Error al obtener el estado" }
 	}
 }

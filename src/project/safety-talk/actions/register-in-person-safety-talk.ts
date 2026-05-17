@@ -1,55 +1,63 @@
-"use server"
-
-import { headers } from "next/headers"
 import { z } from "zod"
+
+import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
+import { logActivity } from "@/lib/activity/log"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 import {
 	inPersonSafetyTalkSchema,
 	type InPersonSafetyTalkSchema,
 } from "../schemas/in-person-safety-talk.schema"
 import { normalizeRut } from "../utils/normalize-rut"
-import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
-import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
 
 export async function registerInPersonSafetyTalk(data: InPersonSafetyTalkSchema) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user) {
+	const user = getDemoUser()
+	if (!user) {
 		return { ok: false, message: "No autorizado" }
 	}
 
 	try {
-		const validatedData = inPersonSafetyTalkSchema.parse(data)
-
+		const validated = inPersonSafetyTalkSchema.parse(data)
 		const expiresAt =
-			validatedData.expiresAt ??
-			new Date(validatedData.sessionDate.getTime() + 365 * 24 * 60 * 60 * 1000)
+			validated.expiresAt ??
+			new Date(validated.sessionDate.getTime() + 365 * 24 * 60 * 60 * 1000)
 
-		const record = await prisma.inPersonSafetyTalkRecord.create({
-			data: {
-				rut: normalizeRut(validatedData.rut),
-				name: validatedData.name,
-				company: validatedData.company,
-				category: validatedData.category,
-				sessionDate: validatedData.sessionDate,
-				expiresAt,
-				score: validatedData.score,
-				notes: validatedData.notes,
-				status: validatedData.status,
-				source: "MANUAL",
-				registeredById: session.user.id,
-			},
-		})
+		const id = crypto.randomUUID()
+		const now = new Date().toISOString()
+		const db = await getDemoDb()
+		const insertRes = await db.query<Record<string, unknown>>(
+			`INSERT INTO "in_person_safety_talk_record" (
+				"id", "rut", "name", "company", "category", "sessionDate", "expiresAt",
+				"score", "notes", "status", "source", "registeredById",
+				"createdAt", "updatedAt"
+			) VALUES (
+				$1, $2, $3, $4, $5, $6, $7,
+				$8, $9, $10, 'MANUAL', $11,
+				$12, $12
+			) RETURNING *`,
+			[
+				id,
+				normalizeRut(validated.rut),
+				validated.name,
+				validated.company,
+				validated.category,
+				validated.sessionDate.toISOString(),
+				expiresAt.toISOString(),
+				validated.score ?? null,
+				validated.notes ?? null,
+				validated.status,
+				user.id,
+				now,
+			],
+		)
+		const record = insertRes.rows[0]
 
-  await logActivity({
-			userId: session.user.id,
+		await logActivity({
+			userId: user.id,
 			module: MODULES.SAFETY_TALK,
 			action: ACTIVITY_TYPE.CREATE,
-			entityId: record.id,
+			entityId: id,
 			entityType: "InPersonSafetyTalkRecord",
 			metadata: {
 				rut: record.rut,
@@ -69,19 +77,10 @@ export async function registerInPersonSafetyTalk(data: InPersonSafetyTalkSchema)
 			record,
 		}
 	} catch (error) {
-		console.error("Error al registrar charla presencial:", error)
-
+		console.error("[REGISTER_IN_PERSON_SAFETY_TALK]", error)
 		if (error instanceof z.ZodError) {
-			return {
-				ok: false,
-				message: "Datos inválidos",
-				errors: error.issues,
-			}
+			return { ok: false, message: "Datos inválidos", errors: error.issues }
 		}
-
-		return {
-			ok: false,
-			message: "Error al crear el registro de charla presencial",
-		}
+		return { ok: false, message: "Error al crear el registro de charla presencial" }
 	}
 }

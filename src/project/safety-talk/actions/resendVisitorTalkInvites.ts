@@ -1,7 +1,5 @@
-"use server"
-
+import { getDemoDb } from "@/lib/demo-db/client"
 import { sendVisitorTalkInviteEmail } from "@/project/safety-talk/actions/sendVisitorTalkInviteEmail"
-import prisma from "@/lib/prisma"
 
 interface ResendVisitorTalkInvitesProps {
 	visitorTalkId: string
@@ -13,75 +11,57 @@ export async function resendVisitorTalkInvites({
 	emails,
 }: ResendVisitorTalkInvitesProps) {
 	try {
-		// Get visitor talk with company information
-		const visitorTalk = await prisma.visitorTalk.findUnique({
-			where: { id: visitorTalkId },
-			include: {
-				company: {
-					include: {
-						visitors: true,
-					},
-				},
-			},
-		})
-
-		if (!visitorTalk) {
-			return {
-				ok: false,
-				message: "Charla de visitantes no encontrada",
-				data: null,
-			}
-		}
-
-		if (!visitorTalk.isActive) {
-			return {
-				ok: false,
-				message: "La charla de visitantes no está activa",
-				data: null,
-			}
-		}
-
-		if (visitorTalk.expiresAt && visitorTalk.expiresAt < new Date()) {
-			return {
-				ok: false,
-				message: "La charla de visitantes ha expirado",
-				data: null,
-			}
-		}
-
-		// Determine which emails to send to
-		const targetEmails = emails || visitorTalk.company.emails
-		const filteredEmails = targetEmails.filter((email) =>
-			visitorTalk.company.emails.includes(email)
+		const db = await getDemoDb()
+		const res = await db.query<{
+			id: string
+			uniqueToken: string
+			isActive: boolean
+			expiresAt: string | null
+			companyId: string
+			companyName: string | null
+			companyEmails: string[] | null
+		}>(
+			`SELECT vt.id, vt."uniqueToken", vt."isActive", vt."expiresAt",
+				vt."companyId", ec.name AS "companyName", ec.emails AS "companyEmails"
+			 FROM "visitor_talk" vt
+			 LEFT JOIN "external_company" ec ON ec.id = vt."companyId"
+			 WHERE vt.id = $1
+			 LIMIT 1`,
+			[visitorTalkId],
 		)
-
-		if (filteredEmails.length === 0) {
-			return {
-				ok: false,
-				message: "No hay emails válidos para enviar",
-				data: null,
-			}
+		const visitorTalk = res.rows[0]
+		if (!visitorTalk) {
+			return { ok: false, message: "Charla de visitantes no encontrada", data: null }
+		}
+		if (!visitorTalk.isActive) {
+			return { ok: false, message: "La charla de visitantes no está activa", data: null }
+		}
+		if (visitorTalk.expiresAt && new Date(visitorTalk.expiresAt) < new Date()) {
+			return { ok: false, message: "La charla de visitantes ha expirado", data: null }
 		}
 
-		// Send invitation emails
-		const emailPromises = filteredEmails.map(async (email) => {
-			try {
+		const companyEmails = visitorTalk.companyEmails ?? []
+		const targetEmails = emails || companyEmails
+		const filteredEmails = targetEmails.filter((email) => companyEmails.includes(email))
+		if (!filteredEmails.length) {
+			return { ok: false, message: "No hay emails válidos para enviar", data: null }
+		}
+
+		const emailResults = await Promise.allSettled(
+			filteredEmails.map(async (email) => {
 				await sendVisitorTalkInviteEmail({
-					companyName: visitorTalk.company.name,
+					companyName: visitorTalk.companyName ?? "",
 					visitorEmail: email,
 					accessToken: visitorTalk.uniqueToken,
-					expiresAt: visitorTalk.expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+					expiresAt: visitorTalk.expiresAt
+						? new Date(visitorTalk.expiresAt)
+						: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
 				})
 				return { email, sent: true }
-			} catch (error) {
-				console.error(`Error sending email to ${email}:`, error)
-				return { email, sent: false, error }
-			}
-		})
-
-		const emailResults = await Promise.allSettled(emailPromises)
+			}),
+		)
 		const successfulEmails = emailResults.filter(
-			(result) => result.status === "fulfilled" && result.value.sent
+			(r) => r.status === "fulfilled" && r.value.sent,
 		).length
 
 		return {
@@ -94,11 +74,7 @@ export async function resendVisitorTalkInvites({
 			},
 		}
 	} catch (error) {
-		console.error("Error resending visitor talk invites:", error)
-		return {
-			ok: false,
-			message: "Error interno del servidor",
-			data: null,
-		}
+		console.error("[RESEND_VISITOR_TALK_INVITES]", error)
+		return { ok: false, message: "Error interno del servidor", data: null }
 	}
 }

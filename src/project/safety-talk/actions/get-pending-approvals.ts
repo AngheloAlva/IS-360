@@ -1,40 +1,36 @@
-"use server"
-
-import { headers } from "next/headers"
-
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
 
 export async function getPendingApprovals() {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
-	if (!session?.user) {
+	if (!getDemoUser()) {
 		throw new Error("No autorizado")
 	}
 
-	const pendingApprovals = await prisma.userSafetyTalk.findMany({
-		where: {
-			status: "PASSED",
-		},
-		select: {
-			id: true,
-			category: true,
-			status: true,
-			score: true,
-			completedAt: true,
-			user: {
-				select: {
-					name: true,
-					email: true,
-				},
-			},
-		},
-		orderBy: {
-			completedAt: "desc",
-		},
-	})
+	const db = await getDemoDb()
+	const res = await db.query<{
+		id: string
+		category: string
+		status: string
+		score: number | null
+		completedAt: string | null
+		user_name: string | null
+		user_email: string | null
+	}>(
+		`SELECT
+			t.id, t.category, t.status, t.score, t."completedAt",
+			u.name AS "user_name", u.email AS "user_email"
+		 FROM "user_safety_talk" t
+		 LEFT JOIN "user" u ON u.id = t."userId"
+		 WHERE t.status = 'PASSED'
+		 ORDER BY t."completedAt" DESC NULLS LAST`,
+	)
 
-	return pendingApprovals
+	return res.rows.map((row) => ({
+		id: row.id,
+		category: row.category,
+		status: row.status,
+		score: row.score,
+		completedAt: row.completedAt,
+		user: row.user_name ? { name: row.user_name, email: row.user_email } : null,
+	}))
 }

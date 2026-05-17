@@ -1,12 +1,11 @@
-"use server"
-
-import { uploadCertificateToStartupFolders } from "./upload-certificate-to-startup-folders"
-import { calculateScore, Question, validateAnswer } from "../utils/questions-loader"
-import { SubmitSafetyTalkAttemptSchema } from "../schemas/attempt.schema"
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import { auth } from "@/lib/auth"
-import prisma from "@/lib/prisma"
+import { getDemoUser } from "@/lib/demo-auth"
+import { getDemoDb } from "@/lib/demo-db/client"
+import { calculateScore, Question, validateAnswer } from "../utils/questions-loader"
+import { SubmitSafetyTalkAttemptSchema } from "../schemas/attempt.schema"
+
+import { uploadCertificateToStartupFolders } from "./upload-certificate-to-startup-folders"
 
 import type { SAFETY_TALK_CATEGORY } from "@/generated/prisma/enums"
 
@@ -23,6 +22,7 @@ type SubmitEvaluationResult = {
 	isExternal?: boolean
 	completionId?: string
 	userSafetyTalkId?: string
+	expiresAt?: Date
 	validatedAnswers?: Array<{
 		questionId: number
 		answer: string
@@ -33,36 +33,25 @@ type SubmitEvaluationResult = {
 
 export async function submitEvaluation(data: unknown): Promise<SubmitEvaluationResult> {
 	try {
-		const validatedData = SubmitSafetyTalkAttemptSchema.parse(data)
-		const { category, answers, timeSpentSeconds, invitationToken, selectedQuestions } =
-			validatedData
+		const validated = SubmitSafetyTalkAttemptSchema.parse(data)
+		const { category, answers, timeSpentSeconds, invitationToken, selectedQuestions } = validated
 
 		if (invitationToken) {
-			const email = validatedData.email
-			if (!email) {
-				return {
-					success: false,
-					error: "Email requerido para usuarios externos",
-				}
+			if (!validated.email) {
+				return { success: false, error: "Email requerido para usuarios externos" }
 			}
-			return await processExternalUserEvaluation(
+			return processExternalUserEvaluation(
 				invitationToken,
-				email,
+				validated.email,
 				category,
 				answers,
 				timeSpentSeconds,
-				selectedQuestions
-			)
-		} else {
-			return await processRegisteredUserEvaluation(
-				category,
-				answers,
-				timeSpentSeconds,
-				selectedQuestions
+				selectedQuestions,
 			)
 		}
+		return processRegisteredUserEvaluation(category, answers, timeSpentSeconds, selectedQuestions)
 	} catch (error) {
-		console.error("Error submitting evaluation:", error)
+		console.error("[SUBMIT_EVALUATION]", error)
 		return {
 			success: false,
 			error: error instanceof Error ? error.message : "Error al enviar la evaluación",
@@ -70,112 +59,96 @@ export async function submitEvaluation(data: unknown): Promise<SubmitEvaluationR
 	}
 }
 
+function validateAndScore(
+	category: SAFETY_TALK_CATEGORY,
+	answers: Array<{ questionId: number; answer: string; isCorrect?: boolean }>,
+	selectedQuestions?: Question[],
+) {
+	const validatedAnswers = answers.map((ans) => {
+		const isTrueFalse = ans.questionId > 100
+		const isCorrect = validateAnswer(category, ans.questionId, ans.answer, isTrueFalse, selectedQuestions)
+		return { ...ans, isCorrect, isTrueFalse }
+	})
+	const score = calculateScore(
+		category,
+		validatedAnswers.map((a) => ({ questionId: a.questionId, answer: a.answer, isTrueFalse: a.isTrueFalse })),
+		selectedQuestions,
+	)
+	return { validatedAnswers, score }
+}
+
 async function processRegisteredUserEvaluation(
 	category: SAFETY_TALK_CATEGORY,
 	answers: Array<{ questionId: number; answer: string; isCorrect?: boolean }>,
 	timeSpentSeconds?: number,
-	selectedQuestions?: Question[]
-) {
-	const session = await auth.api.getSession({
-		headers: await import("next/headers").then((mod) => mod.headers()),
-	})
-
-	if (!session?.user?.id) {
-		return {
-			success: false,
-			error: "No autenticado",
-		}
+	selectedQuestions?: Question[],
+): Promise<SubmitEvaluationResult> {
+	const user = getDemoUser()
+	if (!user) {
+		return { success: false, error: "No autenticado" }
 	}
 
-	const userId = session.user.id
-
-	let userSafetyTalk = await prisma.userSafetyTalk.findFirst({
-		where: {
-			userId,
-			category,
-		},
-		include: {
-			attempts: {
-				orderBy: {
-					attemptNumber: "desc",
-				},
-				take: 1,
-			},
-		},
-	})
-
-	const validatedAnswers = answers.map((ans) => {
-		const isTrueFalse = ans.questionId > 100
-		const isCorrect = validateAnswer(
-			category,
-			ans.questionId,
-			ans.answer,
-			isTrueFalse,
-			selectedQuestions
-		)
-		return {
-			...ans,
-			isCorrect,
-			isTrueFalse,
-		}
-	})
-
-	const score = calculateScore(
-		category,
-		validatedAnswers.map((a) => ({
-			questionId: a.questionId,
-			answer: a.answer,
-			isTrueFalse: a.isTrueFalse,
-		})),
-		selectedQuestions
-	)
-
+	const db = await getDemoDb()
+	const { validatedAnswers, score } = validateAndScore(category, answers, selectedQuestions)
 	const requiredScore = category === "IRL" ? 100 : 70
 	const passed = score >= requiredScore
+	const now = new Date()
+	const nowIso = now.toISOString()
 
-	if (!userSafetyTalk) {
-		userSafetyTalk = await prisma.userSafetyTalk.create({
-			data: {
-				userId,
-				category,
-				status: "IN_PROGRESS",
-				currentAttempts: 0,
-				startedAt: new Date(),
-			},
-			include: {
-				attempts: true,
-			},
-		})
+	const existingRes = await db.query<{ id: string; currentAttempts: number }>(
+		`SELECT id, "currentAttempts" FROM "user_safety_talk"
+		 WHERE "userId" = $1 AND category = $2 LIMIT 1`,
+		[user.id, category],
+	)
+	let userSafetyTalkId = existingRes.rows[0]?.id
+	let currentAttempts = existingRes.rows[0]?.currentAttempts ?? 0
+
+	if (!userSafetyTalkId) {
+		userSafetyTalkId = crypto.randomUUID()
+		await db.query(
+			`INSERT INTO "user_safety_talk" (
+				"id", "userId", category, status, "currentAttempts", "startedAt",
+				"createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, 'IN_PROGRESS', 0, $4, $4, $4)`,
+			[userSafetyTalkId, user.id, category, nowIso],
+		)
+		currentAttempts = 0
 	}
 
-	const attemptNumber = userSafetyTalk.currentAttempts + 1
-
-	const attempt = await prisma.safetyTalkAttempt.create({
-		data: {
-			userId,
-			userSafetyTalkId: userSafetyTalk.id,
+	const attemptNumber = currentAttempts + 1
+	const attemptId = crypto.randomUUID()
+	await db.query(
+		`INSERT INTO "safety_talk_attempt" (
+			"id", "userId", "userSafetyTalkId", category, score, passed,
+			answers, "attemptNumber", "completedAt", "timeSpentSeconds",
+			"createdAt", "updatedAt"
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $9, $9)`,
+		[
+			attemptId,
+			user.id,
+			userSafetyTalkId,
 			category,
 			score,
 			passed,
-			answers: validatedAnswers,
+			JSON.stringify(validatedAnswers),
 			attemptNumber,
-			completedAt: new Date(),
-			timeSpentSeconds,
-		},
-	})
+			nowIso,
+			timeSpentSeconds ?? null,
+		],
+	)
 
- await logActivity({
-		userId,
+	await logActivity({
+		userId: user.id,
 		module: MODULES.SAFETY_TALK,
 		action: ACTIVITY_TYPE.SUBMIT,
-		entityId: attempt.id,
+		entityId: attemptId,
 		entityType: "SafetyTalkAttempt",
 		metadata: {
 			category,
 			score,
 			passed,
 			attemptNumber,
-			userSafetyTalkId: userSafetyTalk.id,
+			userSafetyTalkId,
 			timeSpentSeconds,
 		},
 	})
@@ -183,32 +156,20 @@ async function processRegisteredUserEvaluation(
 	if (passed) {
 		const expiresAt = new Date()
 		expiresAt.setFullYear(expiresAt.getFullYear() + 1)
-
-		await prisma.userSafetyTalk.update({
-			where: { id: userSafetyTalk.id },
-			data: {
-				status: "PASSED",
-				currentAttempts: attemptNumber,
-				lastAttemptAt: new Date(),
-				score,
-				completedAt: new Date(),
-				expiresAt,
-				nextAttemptAt: null,
-			},
-		})
+		await db.query(
+			`UPDATE "user_safety_talk"
+			 SET status = 'PASSED', "currentAttempts" = $1, "lastAttemptAt" = $2,
+			     score = $3, "completedAt" = $2, "expiresAt" = $4, "nextAttemptAt" = NULL,
+			     "updatedAt" = $2
+			 WHERE id = $5`,
+			[attemptNumber, nowIso, score, expiresAt.toISOString(), userSafetyTalkId],
+		)
 
 		if (category === "IRL") {
 			try {
-				const uploadResult = await uploadCertificateToStartupFolders(userSafetyTalk.id, userId)
-				if (uploadResult.success) {
-					console.log(
-						`Certificate automatically uploaded to ${uploadResult.uploadedToFolders?.basicFolders || 0} basic folders and ${uploadResult.uploadedToFolders?.workerFolders || 0} worker folders`
-					)
-				} else {
-					console.error("Failed to upload certificate:", uploadResult.error)
-				}
+				await uploadCertificateToStartupFolders(userSafetyTalkId, user.id)
 			} catch (error) {
-				console.error("Error uploading certificate to startup folders:", error)
+				console.error("[SUBMIT_EVALUATION] cert upload noop failed", error)
 			}
 		}
 
@@ -219,31 +180,30 @@ async function processRegisteredUserEvaluation(
 			attemptNumber,
 			expiresAt,
 			validatedAnswers,
+			userSafetyTalkId,
 			message: "¡Felicitaciones! Has aprobado la evaluación",
 		}
-	} else {
-		await prisma.userSafetyTalk.update({
-			where: { id: userSafetyTalk.id },
-			data: {
-				status: "FAILED",
-				currentAttempts: attemptNumber,
-				lastAttemptAt: new Date(),
-				nextAttemptAt: null,
-				score,
-			},
-		})
+	}
 
-		const requiredScoreText = category === "IRL" ? "100%" : "70%"
-		return {
-			success: true,
-			passed: false,
-			score,
-			attemptNumber,
-			nextAttemptAt: null,
-			isPermanentlyBlocked: false,
-			validatedAnswers,
-			message: `No has aprobado. Necesitas ${requiredScoreText} para aprobar. Puedes intentar nuevamente.`,
-		}
+	await db.query(
+		`UPDATE "user_safety_talk"
+		 SET status = 'FAILED', "currentAttempts" = $1, "lastAttemptAt" = $2,
+		     "nextAttemptAt" = NULL, score = $3, "updatedAt" = $2
+		 WHERE id = $4`,
+		[attemptNumber, nowIso, score, userSafetyTalkId],
+	)
+
+	const requiredScoreText = category === "IRL" ? "100%" : "70%"
+	return {
+		success: true,
+		passed: false,
+		score,
+		attemptNumber,
+		nextAttemptAt: null,
+		isPermanentlyBlocked: false,
+		validatedAnswers,
+		userSafetyTalkId,
+		message: `No has aprobado. Necesitas ${requiredScoreText} para aprobar. Puedes intentar nuevamente.`,
 	}
 }
 
@@ -253,112 +213,96 @@ async function processExternalUserEvaluation(
 	category: SAFETY_TALK_CATEGORY,
 	answers: Array<{ questionId: number; answer: string; isCorrect?: boolean }>,
 	timeSpentSeconds?: number,
-	selectedQuestions?: Question[]
-) {
-	const visitorTalk = await prisma.visitorTalk.findUnique({
-		where: { uniqueToken: token },
-	})
-
+	selectedQuestions?: Question[],
+): Promise<SubmitEvaluationResult> {
+	const db = await getDemoDb()
+	const talkRes = await db.query<{
+		id: string
+		expiresAt: string | null
+		companyId: string
+	}>(
+		`SELECT id, "expiresAt", "companyId"
+		 FROM "visitor_talk" WHERE "uniqueToken" = $1 LIMIT 1`,
+		[token],
+	)
+	const visitorTalk = talkRes.rows[0]
 	if (!visitorTalk) {
-		return {
-			success: false,
-			error: "Invitación no encontrada",
-		}
+		return { success: false, error: "Invitación no encontrada" }
+	}
+	if (visitorTalk.expiresAt && new Date(visitorTalk.expiresAt) < new Date()) {
+		return { success: false, error: "La invitación ha expirado" }
 	}
 
-	if (visitorTalk.expiresAt && visitorTalk.expiresAt < new Date()) {
-		return {
-			success: false,
-			error: "La invitación ha expirado",
-		}
-	}
-
-	const visitor = await prisma.externalVisitor.findFirst({
-		where: {
-			email,
-			companyId: visitorTalk.companyId,
-		},
-	})
-
-	if (!visitor) {
+	const visitorRes = await db.query<{ id: string }>(
+		`SELECT id FROM "external_visitor"
+		 WHERE email = $1 AND "companyId" = $2 LIMIT 1`,
+		[email, visitorTalk.companyId],
+	)
+	const visitorId = visitorRes.rows[0]?.id
+	if (!visitorId) {
 		return {
 			success: false,
 			error: "Usuario no encontrado. Por favor completa tus datos primero.",
 		}
 	}
 
-	let completion = await prisma.visitorTalkCompletion.findUnique({
-		where: {
-			visitorId_visitorTalkId: {
-				visitorId: visitor.id,
-				visitorTalkId: visitorTalk.id,
-			},
-		},
-	})
-
-	if (completion?.status === "COMPLETED" && completion.passed) {
-		return {
-			success: false,
-			error: "Ya has completado esta evaluación exitosamente",
-		}
+	const completionRes = await db.query<{
+		id: string
+		status: string
+		passed: boolean | null
+		attemptNumber: number
+	}>(
+		`SELECT id, status, passed, "attemptNumber"
+		 FROM "visitor_talk_completion"
+		 WHERE "visitorId" = $1 AND "visitorTalkId" = $2 LIMIT 1`,
+		[visitorId, visitorTalk.id],
+	)
+	const existing = completionRes.rows[0]
+	if (existing?.status === "COMPLETED" && existing.passed) {
+		return { success: false, error: "Ya has completado esta evaluación exitosamente" }
 	}
 
-	const validatedAnswers = answers.map((ans) => {
-		const isTrueFalse = ans.questionId > 100
-		const isCorrect = validateAnswer(
-			category,
-			ans.questionId,
-			ans.answer,
-			isTrueFalse,
-			selectedQuestions
-		)
-		return {
-			...ans,
-			isCorrect,
-			isTrueFalse,
-		}
-	})
-
-	const score = calculateScore(
-		category,
-		validatedAnswers.map((a) => ({
-			questionId: a.questionId,
-			answer: a.answer,
-			isTrueFalse: a.isTrueFalse,
-		})),
-		selectedQuestions
-	)
-
+	const { validatedAnswers, score } = validateAndScore(category, answers, selectedQuestions)
 	const requiredScore = category === "IRL" ? 100 : 70
 	const passed = score >= requiredScore
+	const now = new Date().toISOString()
 
-	if (completion) {
-		completion = await prisma.visitorTalkCompletion.update({
-			where: { id: completion.id },
-			data: {
-				status: "COMPLETED",
-				completedAt: new Date(),
+	let completionId: string
+	if (existing) {
+		completionId = existing.id
+		await db.query(
+			`UPDATE "visitor_talk_completion"
+			 SET status = 'COMPLETED', "completedAt" = $1, score = $2, passed = $3,
+			     answers = $4, "timeSpentSeconds" = $5, "attemptNumber" = $6, "updatedAt" = $1
+			 WHERE id = $7`,
+			[
+				now,
 				score,
 				passed,
-				answers: validatedAnswers,
-				timeSpentSeconds,
-				attemptNumber: completion.attemptNumber + 1,
-			},
-		})
+				JSON.stringify(validatedAnswers),
+				timeSpentSeconds ?? null,
+				existing.attemptNumber + 1,
+				existing.id,
+			],
+		)
 	} else {
-		completion = await prisma.visitorTalkCompletion.create({
-			data: {
-				visitorId: visitor.id,
-				visitorTalkId: visitorTalk.id,
-				status: "COMPLETED",
-				completedAt: new Date(),
+		completionId = crypto.randomUUID()
+		await db.query(
+			`INSERT INTO "visitor_talk_completion" (
+				"id", "visitorId", "visitorTalkId", status, "completedAt", score, passed,
+				answers, "timeSpentSeconds", "attemptNumber", "createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, 'COMPLETED', $4, $5, $6, $7, $8, 1, $4, $4)`,
+			[
+				completionId,
+				visitorId,
+				visitorTalk.id,
+				now,
 				score,
 				passed,
-				answers: validatedAnswers,
-				timeSpentSeconds,
-				attemptNumber: 1,
-			},
-		})
+				JSON.stringify(validatedAnswers),
+				timeSpentSeconds ?? null,
+			],
+		)
 	}
 
 	return {
@@ -366,7 +310,7 @@ async function processExternalUserEvaluation(
 		passed,
 		score,
 		isExternal: true,
-		completionId: completion.id,
+		completionId,
 		validatedAnswers,
 		message: passed
 			? "¡Felicitaciones! Has aprobado la evaluación. Descarga tu certificado."

@@ -1,9 +1,8 @@
-"use server"
-
 import { ACTIVITY_TYPE, MODULES } from "@/generated/prisma/enums"
 import { logActivity } from "@/lib/activity/log"
-import prisma from "@/lib/prisma"
 import { SYSTEM_USER_ID } from "@/lib/consts/system-user"
+import { getDemoDb } from "@/lib/demo-db/client"
+
 import { type VisitorDataSchema } from "@/project/safety-talk/schemas/external-company.schema"
 
 type UpdateVisitorDataParams = {
@@ -12,98 +11,75 @@ type UpdateVisitorDataParams = {
 	visitorData: VisitorDataSchema
 }
 
-export async function updateVisitorData({
-	token,
-	email,
-	visitorData,
-}: UpdateVisitorDataParams) {
+export async function updateVisitorData({ token, email, visitorData }: UpdateVisitorDataParams) {
 	try {
-		// Find the visitor talk by token
-		const visitorTalk = await prisma.visitorTalk.findUnique({
-			where: { uniqueToken: token },
-			include: {
-				company: true,
-			},
-		})
+		const db = await getDemoDb()
 
+		const talkRes = await db.query<{
+			id: string
+			isActive: boolean
+			expiresAt: string | null
+			companyId: string
+			companyEmails: string[] | null
+		}>(
+			`SELECT vt.id, vt."isActive", vt."expiresAt", vt."companyId", ec.emails AS "companyEmails"
+			 FROM "visitor_talk" vt
+			 LEFT JOIN "external_company" ec ON ec.id = vt."companyId"
+			 WHERE vt."uniqueToken" = $1
+			 LIMIT 1`,
+			[token],
+		)
+		const visitorTalk = talkRes.rows[0]
 		if (!visitorTalk) {
-			return {
-				ok: false,
-				message: "Token de charla no válido",
-				data: null,
-			}
+			return { ok: false, message: "Token de charla no válido", data: null }
 		}
-
-		// Check if the talk is still active and not expired
 		if (!visitorTalk.isActive) {
-			return {
-				ok: false,
-				message: "La charla ya no está activa",
-				data: null,
-			}
+			return { ok: false, message: "La charla ya no está activa", data: null }
+		}
+		if (visitorTalk.expiresAt && new Date(visitorTalk.expiresAt) < new Date()) {
+			return { ok: false, message: "La charla ha expirado", data: null }
+		}
+		if (!visitorTalk.companyEmails?.includes(email)) {
+			return { ok: false, message: "Email no autorizado para esta empresa", data: null }
 		}
 
-		if (visitorTalk.expiresAt && visitorTalk.expiresAt < new Date()) {
-			return {
-				ok: false,
-				message: "La charla ha expirado",
-				data: null,
-			}
+		const visitorRes = await db.query<{ id: string }>(
+			`SELECT id FROM "external_visitor"
+			 WHERE email = $1 AND "companyId" = $2 LIMIT 1`,
+			[email, visitorTalk.companyId],
+		)
+		const visitorId = visitorRes.rows[0]?.id
+		if (!visitorId) {
+			return { ok: false, message: "Visitante no encontrado", data: null }
 		}
 
-		// Check if the email is authorized for this company
-		if (!visitorTalk.company.emails.includes(email)) {
-			return {
-				ok: false,
-				message: "Email no autorizado para esta empresa",
-				data: null,
-			}
-		}
+		const now = new Date().toISOString()
+		const updateRes = await db.query<{
+			id: string
+			email: string
+			name: string
+			rut: string
+		}>(
+			`UPDATE "external_visitor"
+			 SET name = $1, rut = $2, "updatedAt" = $3
+			 WHERE id = $4
+			 RETURNING id, email, name, rut`,
+			[visitorData.name, visitorData.rut, now, visitorId],
+		)
+		const visitor = updateRes.rows[0]
 
-		// Find or create the external visitor
-		let visitor = await prisma.externalVisitor.findUnique({
-			where: {
-				email_companyId: {
-					email: email,
-					companyId: visitorTalk.companyId,
-				},
-			},
-		})
+		const completionRes = await db.query<{ id: string }>(
+			`INSERT INTO "visitor_talk_completion" (
+				"id", "visitorId", "visitorTalkId", "status", "attemptNumber", "createdAt", "updatedAt"
+			) VALUES ($1, $2, $3, 'NOT_STARTED', 1, $4, $4)
+			 ON CONFLICT ("visitorId", "visitorTalkId") DO UPDATE
+			   SET "updatedAt" = EXCLUDED."updatedAt"
+			 RETURNING id`,
+			[crypto.randomUUID(), visitor.id, visitorTalk.id, now],
+		)
+		const completion = completionRes.rows[0]
 
-		if (!visitor) {
-			return {
-				ok: false,
-				message: "Visitante no encontrado",
-				data: null,
-			}
-		}
-
-		// Update visitor data
-		visitor = await prisma.externalVisitor.update({
-			where: { id: visitor.id },
-			data: {
-				name: visitorData.name,
-				rut: visitorData.rut,
-			},
-		})
-
-		// Create or update visitor talk completion
-		const completion = await prisma.visitorTalkCompletion.upsert({
-			where: {
-				visitorId_visitorTalkId: {
-					visitorId: visitor.id,
-					visitorTalkId: visitorTalk.id,
-				},
-			},
-			create: {
-				visitorId: visitor.id,
-				visitorTalkId: visitorTalk.id,
-				status: "NOT_STARTED",
-			},
-			update: {},
-		})
-
-  await logActivity({
+		await logActivity({
 			userId: SYSTEM_USER_ID,
 			module: MODULES.SAFETY_TALK,
 			action: ACTIVITY_TYPE.UPDATE,
@@ -124,18 +100,10 @@ export async function updateVisitorData({
 		return {
 			ok: true,
 			message: "Datos del visitante actualizados exitosamente",
-			data: {
-				visitor,
-				completion,
-				visitorTalk,
-			},
+			data: { visitor, completion, visitorTalk },
 		}
 	} catch (error) {
-		console.error("Error updating visitor data:", error)
-		return {
-			ok: false,
-			message: "Error interno del servidor",
-			data: null,
-		}
+		console.error("[UPDATE_VISITOR_DATA]", error)
+		return { ok: false, message: "Error interno del servidor", data: null }
 	}
 }
