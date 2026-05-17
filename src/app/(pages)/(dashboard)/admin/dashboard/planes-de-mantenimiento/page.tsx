@@ -5,7 +5,6 @@ import { auth } from "@/lib/auth"
 import MaintenancePlanStatsContainer from "@/project/maintenance-plan/components/stats/MaintenancePlanStatsContainer"
 import { MaintenancePlanTable } from "@/project/maintenance-plan/components/data/MaintenancePlanTable"
 import MaintenancePlanForm from "@/project/maintenance-plan/components/forms/MaintenancePlanForm"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function MaintenancePlansPage() {
 	const session = await auth.api.getSession({
@@ -35,26 +34,6 @@ export default async function MaintenancePlansPage() {
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
-						<VideoTutorials
-							videos={[
-								{
-									title: "Creacion de Plan de Mantenimiento",
-									description: "Tutorial de como crear un plan de mantenimiento.",
-									url: "https://youtube.com/embed/UjotpO6DcIQ",
-								},
-								{
-									title: "Creacion de Tareas para un Plan",
-									description: "Tutorial de como crear tareas para un plan de mantenimiento.",
-									url: "https://youtube.com/embed/uvrnlMjWJqU",
-								},
-								{
-									title: "Edicion de Tareas",
-									description: "Tutorial de como editar tareas de un plan de mantenimiento.",
-									url: "https://youtube.com/embed/DRbyHJyOgdk",
-								},
-							]}
-						/>
-
 						{hasPermission.success && <MaintenancePlanForm userId={session.user.id} />}
 					</div>
 				</div>

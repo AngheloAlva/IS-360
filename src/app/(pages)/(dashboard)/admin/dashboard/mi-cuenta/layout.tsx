@@ -7,8 +7,6 @@ import Link from "next/link"
 import { internalPersonalInfo } from "@/shared/components/sidebar/sidebar-data"
 import { cn } from "@/lib/utils"
 
-import VideoTutorials from "@/shared/components/VideoTutorials"
-
 export default function MiCuentaLayout({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname()
 
@@ -25,17 +23,6 @@ export default function MiCuentaLayout({ children }: { children: React.ReactNode
 						</p>
 					</div>
 				</div>
-
-				<VideoTutorials
-					className="bg-background text-text"
-					videos={[
-						{
-							title: "Configuración Mi Cuenta",
-							description: "Tutorial de como actualizar datos personales correctamente.",
-							url: "https://youtube.com/embed/wdRtoGujnXo",
-						},
-					]}
-				/>
 			</div>
 
 			<div className="mx-auto flex w-full flex-1 flex-row gap-4">

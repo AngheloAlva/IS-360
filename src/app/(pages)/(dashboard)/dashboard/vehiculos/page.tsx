@@ -5,7 +5,6 @@ import { auth } from "@/lib/auth"
 
 import { VehiclesByCompanyTable } from "@/project/vehicle/components/data/VehiclesByCompanyTable"
 import VehicleForm from "@/project/vehicle/components/forms/VehicleForm"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 
 const vehicleVideos = [
 	{
@@ -37,7 +36,6 @@ export default async function VehiclesPage(): Promise<React.ReactElement> {
 					</div>
 
 					<div className="flex items-center gap-2">
-						<VideoTutorials videos={vehicleVideos} className="text-teal-700" />
 						<VehicleForm companyId={session.user.companyId} />
 					</div>
 				</div>

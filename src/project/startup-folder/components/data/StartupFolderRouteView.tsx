@@ -20,7 +20,6 @@ import { UpdateStartupFolder } from "../forms/UpdateStartupFolder"
 import { GuideDocumentsDropdown } from "./GuideDocumentsDropdown"
 import { VehicleFolderDocuments } from "./VehicleFolderDocuments"
 import { WorkerFolderDocuments } from "./WorkerFolderDocuments"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 import { BasicFolderDocuments } from "./BasicFolderDocuments"
 import StartupFolderDocuments from "./StartupFolderDocuments"
 import ModuleHeader from "@/shared/components/ModuleHeader"
@@ -316,8 +315,6 @@ export default function StartupFolderRouteView({
 							Actualizando vista...
 						</div>
 					)}
-
-					<VideoTutorials videos={tutorialVideos} className="text-teal-600" />
 
 					<GuideDocumentsDropdown
 						hasPermission={hasPermission}

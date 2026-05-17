@@ -9,7 +9,6 @@ import { auth } from "@/lib/auth"
 import WorkPermitStatsContainer from "@/project/work-permit/components/stats/WorkPermitStatsContainer"
 import WorkPermitsTable from "@/project/work-permit/components/data/WorkPermitsTable"
 import PdfBlankButton from "@/project/work-permit/components/pdf/PdfBlankButton"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 import { Button } from "@/shared/components/ui/button"
 
 export const metadata: Metadata = {
@@ -45,27 +44,6 @@ export default async function WorkPermitsAdminPage() {
 					</div>
 
 					<div className="ml-auto flex items-center justify-end gap-2">
-						<VideoTutorials
-							className="text-red-500"
-							videos={[
-								{
-									title: "Creacion de Permiso de Trabajo",
-									description: "Tutorial de como crear un permiso de trabajo.",
-									url: "https://youtube.com/embed/0RcHtcDqRKk",
-								},
-								{
-									title: "Revisión Permiso de Trabajo",
-									description: "Muestra de un permiso de trabajo con todas sus funcionalidades.",
-									url: "https://youtube.com/embed/cXXmaIlkKxk",
-								},
-								{
-									title: "Funcionalidades Permiso de Trabajo",
-									description: "Muestra todas las funcionalidades de los permisos de trabajo.",
-									url: "https://youtube.com/embed/bIflB6OZ-70",
-								},
-							]}
-						/>
-
 						<PdfBlankButton />
 
 						{hasPermission.success && (

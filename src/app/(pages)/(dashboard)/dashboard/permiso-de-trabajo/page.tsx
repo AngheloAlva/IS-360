@@ -5,7 +5,6 @@ import Link from "next/link"
 import { auth } from "@/lib/auth"
 
 import { WorkPermitsTableByCompany } from "@/project/work-permit/components/data/WorkPermitsTableByCompany"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 import ModuleHeader from "@/shared/components/ModuleHeader"
 import { Button } from "@/shared/components/ui/button"
 
@@ -30,31 +29,6 @@ export default async function WorkPermitPage() {
 				className="from-purple-600 to-indigo-700 dark:from-purple-800 dark:to-indigo-900"
 			>
 				<>
-					<VideoTutorials
-						videos={[
-							{
-								title: "Creacion Permiso de Trabajo",
-								description: "Tutorial de como crear un permiso de trabajo.",
-								url: "https://youtube.com/embed/RlAQzjsIUm4",
-							},
-							{
-								title: "Consideración con Permisos de Trabajo",
-								description: "Consideraciones a tener en cuenta al crear un permiso de trabajo.",
-								url: "https://youtube.com/embed/GSSVKmZHGoI",
-							},
-							{
-								title: "Visualización Permiso de Trabajo",
-								description: "Consideraciones a tener en cuenta al crear un permiso de trabajo.",
-								url: "https://youtube.com/embed/CsnFK1NOUzs",
-							},
-							{
-								title: "Edición Permiso de Trabajo",
-								description: "Consideraciones a tener en cuenta al crear un permiso de trabajo.",
-								url: "https://youtube.com/embed/TGmy-UK-PKU",
-							},
-						]}
-					/>
-
 					<Link href="/dashboard/permiso-de-trabajo/agregar">
 						<Button
 							size={"lg"}

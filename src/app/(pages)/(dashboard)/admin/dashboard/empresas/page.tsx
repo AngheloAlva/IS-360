@@ -6,7 +6,6 @@ import { auth } from "@/lib/auth"
 import CompanyStatsContainer from "@/project/company/components/stats/CompanyStatsContainer"
 import { CompanyTable } from "@/project/company/components/data/CompanyTable"
 import CompanyForm from "@/project/company/components/forms/CompanyForm"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function AdminCompaniesPage(): Promise<React.ReactElement> {
 	const session = await auth.api.getSession({
@@ -34,22 +33,6 @@ export default async function AdminCompaniesPage(): Promise<React.ReactElement> 
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
-						<VideoTutorials
-							videos={[
-								{
-									title: "Creacion de Empresas",
-									description: "Tutorial de como crear una empresa.",
-									url: "https://youtube.com/embed/zA0xehVOB0s",
-								},
-								{
-									title: "Funcionalidad Empresas",
-									description:
-										"Tutorial de como utilizar todas las funcionalidades de las empresas.",
-									url: "https://youtube.com/embed/QJvsj75LouU",
-								},
-							]}
-						/>
-
 						{hasPermission.success && <CompanyForm />}
 					</div>
 				</div>

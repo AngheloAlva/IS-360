@@ -2,7 +2,6 @@ import { ChartBarDecreasing, FoldersIcon, Search } from "lucide-react"
 import Link from "next/link"
 
 import AreasDocumentationTable from "@/project/document/components/data/AreasDocumentationTable"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 import { Button } from "@/shared/components/ui/button"
 
 export default function DocumentationPage(): React.ReactElement {
@@ -24,37 +23,6 @@ export default function DocumentationPage(): React.ReactElement {
 				</div>
 
 				<div className="flex w-full items-center gap-2 lg:w-fit">
-					<VideoTutorials
-						className="bg-background text-text"
-						videos={[
-							{
-								title: "Subir documentos",
-								description: "Tutorial de como subir archivos correctamente.",
-								url: "https://youtube.com/embed/1o4Vej8Ftuk",
-							},
-							{
-								title: "Eliminar Archivos y Carpetas",
-								description: "Tutorial de como eliminar archivos y carpetas correctamente.",
-								url: "https://youtube.com/embed/b2J1QVmxenw",
-							},
-							{
-								title: "Revision Estadísticas",
-								description: "",
-								url: "https://youtube.com/embed/4bY3RdkSuKE",
-							},
-							{
-								title: "Búsqueda Documentos",
-								description: "",
-								url: "https://youtube.com/embed/MpIrvsgIwxs",
-							},
-							{
-								title: "Comentarios y Edicion Documentos",
-								description: "",
-								url: "https://youtube.com/embed/VV08VVJrl7k",
-							},
-						]}
-					/>
-
 					<Link href="/admin/dashboard/documentacion/busqueda" className="w-full lg:w-fit">
 						<Button
 							size={"lg"}

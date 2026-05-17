@@ -6,7 +6,6 @@ import { auth } from "@/lib/auth"
 import WorkRequestStatsContainer from "@/project/work-request/components/stats/WorkRequestStatsContainer"
 import CreateWorkRequestButton from "@/project/work-request/components/forms/CreateWorkRequestForm"
 import WorkRequestsTable from "@/project/work-request/components/data/WorkRequestsTable"
-import VideoTutorials from "@/shared/components/VideoTutorials"
 
 export default async function WorkRequestsPage() {
 	const session = await auth.api.getSession({
@@ -34,17 +33,6 @@ export default async function WorkRequestsPage() {
 					</div>
 
 					<div className="flex flex-wrap items-center justify-end gap-2">
-						<VideoTutorials
-							className="text-sky-600"
-							videos={[
-								{
-									title: "Creacion de Solicitud de Trabajo",
-									description: "Tutorial de como crear una solicitud de trabajo.",
-									url: "https://youtube.com/embed/rUHO23Z7lSs",
-								},
-							]}
-						/>
-
 						<CreateWorkRequestButton userId={session.user.id} />
 					</div>
 				</div>

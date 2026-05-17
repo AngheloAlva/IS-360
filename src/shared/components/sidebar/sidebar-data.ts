@@ -158,11 +158,6 @@ export const data: NavBarData = {
 					icon: FilePlus2Icon,
 				},
 				{
-					name: "Tutoriales",
-					url: "/admin/dashboard/tutoriales",
-					icon: BookOpenIcon,
-				},
-				{
 					name: "Soporte",
 					url: "/admin/dashboard/soporte",
 					icon: LifeBuoyIcon,
