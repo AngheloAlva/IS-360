@@ -26,7 +26,7 @@ export default async function SafetyTalksAdminPage(): Promise<React.ReactNode> {
 		},
 	})
 
-	const unauthorizedUsersIds = process.env.NEXT_PUBLIC_EXTERNAL_PLANT!.split(",")
+	const unauthorizedUsersIds: string[] = []
 
 	return (
 		<div className="w-full flex-1 space-y-6">

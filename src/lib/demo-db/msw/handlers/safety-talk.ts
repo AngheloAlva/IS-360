@@ -3,6 +3,8 @@ import { http, HttpResponse } from "msw"
 import { getDemoUser } from "@/lib/demo-auth"
 import { getDemoDb } from "@/lib/demo-db/client"
 import { submitSafetyTalkAttempt } from "@/project/safety-talk/actions/submit-attempt"
+import { normalizeRut } from "@/project/safety-talk/utils/normalize-rut"
+import { inPersonSafetyTalkSchema } from "@/project/safety-talk/schemas/in-person-safety-talk.schema"
 
 const ALL_CATEGORIES = ["VISITOR", "VISITOR_TRM", "IRL"] as const
 
@@ -324,6 +326,186 @@ const listHandler = http.get("*/api/safety-talks", async ({ request }) => {
 	return HttpResponse.json({ safetyTalks: [], total: 0, pages: 0 })
 })
 
+type OrphanedRow = {
+	id: string
+	rut: string
+	name: string
+	company: string
+	category: string | null
+	sessionDate: string
+	expiresAt: string | null
+	status: string
+	score: number | null
+	source: string
+	notes: string | null
+	createdAt: string
+	updatedAt: string
+}
+
+const mapOrphanedRow = (r: OrphanedRow) => ({
+	id: r.id,
+	rut: r.rut,
+	name: r.name,
+	company: r.company,
+	category: r.category,
+	fecha: r.sessionDate,
+	vencimiento: r.expiresAt,
+	estado: r.status === "PASSED" ? "Vigente" : "No Vigente",
+	status: r.status,
+	score: r.score,
+	source: r.source,
+	notes: r.notes,
+	createdAt: r.createdAt,
+	updatedAt: r.updatedAt,
+})
+
+const orphanedListHandler = http.get("*/api/orphaned-records", async ({ request }) => {
+	const user = getDemoUser()
+	if (!user) {
+		return HttpResponse.json({ error: "No autorizado" }, { status: 401 })
+	}
+
+	const url = new URL(request.url)
+	const page = parseInt(url.searchParams.get("page") ?? "1", 10)
+	const limit = parseInt(url.searchParams.get("limit") ?? "10", 10)
+	const search = url.searchParams.get("search") ?? ""
+	const sortByRaw = url.searchParams.get("sortBy") ?? "createdAt"
+	const sortOrder = (url.searchParams.get("sortOrder") ?? "desc").toLowerCase() === "asc" ? "ASC" : "DESC"
+	const allowedSort = new Set([
+		"createdAt",
+		"updatedAt",
+		"sessionDate",
+		"expiresAt",
+		"name",
+		"rut",
+		"company",
+		"status",
+		"score",
+	])
+	const sortBy = allowedSort.has(sortByRaw) ? sortByRaw : "createdAt"
+
+	const db = await getDemoDb()
+	const params: unknown[] = []
+	let where = ""
+	if (search) {
+		params.push(`%${search}%`)
+		where = `WHERE (name ILIKE $1 OR rut ILIKE $1 OR company ILIKE $1)`
+	}
+
+	const countRes = await db.query<{ count: string }>(
+		`SELECT COUNT(*)::text AS count FROM "in_person_safety_talk_record" ${where}`,
+		params,
+	)
+	const totalRecords = parseInt(countRes.rows[0]?.count ?? "0", 10)
+	const totalPages = Math.max(1, Math.ceil(totalRecords / limit))
+	const skip = (page - 1) * limit
+
+	const listParams = [...params, limit, skip]
+	const limitIdx = params.length + 1
+	const offsetIdx = params.length + 2
+	const listRes = await db.query<OrphanedRow>(
+		`SELECT id, rut, name, company, category,
+		        "sessionDate"::text AS "sessionDate",
+		        "expiresAt"::text AS "expiresAt",
+		        status, score, source, notes,
+		        "createdAt"::text AS "createdAt",
+		        "updatedAt"::text AS "updatedAt"
+		 FROM "in_person_safety_talk_record"
+		 ${where}
+		 ORDER BY "${sortBy}" ${sortOrder}
+		 LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+		listParams,
+	)
+
+	return HttpResponse.json({
+		metadata: {
+			generatedAt: new Date().toISOString(),
+			totalRecords,
+			filteredRecords: totalRecords,
+			currentPage: page,
+			totalPages,
+			limit,
+			hasNextPage: page < totalPages,
+			hasPreviousPage: page > 1,
+			description: "Registros de charlas de seguridad presenciales (contratistas y visitas)",
+		},
+		records: listRes.rows.map(mapOrphanedRow),
+	})
+})
+
+const orphanedCreateHandler = http.post("*/api/orphaned-records", async ({ request }) => {
+	const user = getDemoUser()
+	if (!user) {
+		return HttpResponse.json({ error: "No autorizado" }, { status: 401 })
+	}
+
+	const body = await request.json()
+	const parsed = inPersonSafetyTalkSchema.safeParse(body)
+	if (!parsed.success) {
+		return HttpResponse.json(
+			{ error: "Datos inválidos", details: parsed.error.flatten().fieldErrors },
+			{ status: 400 },
+		)
+	}
+
+	const { rut, name, company, category, sessionDate, expiresAt, score, notes, status } = parsed.data
+	const db = await getDemoDb()
+	const id = crypto.randomUUID()
+	const now = new Date().toISOString()
+	const exp = expiresAt ?? new Date(sessionDate.getTime() + 365 * 24 * 60 * 60 * 1000)
+
+	const res = await db.query<OrphanedRow>(
+		`INSERT INTO "in_person_safety_talk_record" (
+			"id", "rut", "name", "company", "category",
+			"sessionDate", "expiresAt", "status", "score", "source",
+			"notes", "registeredById", "createdAt", "updatedAt"
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'MANUAL', $10, $11, $12, $12)
+		 RETURNING id, rut, name, company, category,
+		           "sessionDate"::text AS "sessionDate",
+		           "expiresAt"::text AS "expiresAt",
+		           status, score, source, notes,
+		           "createdAt"::text AS "createdAt",
+		           "updatedAt"::text AS "updatedAt"`,
+		[
+			id,
+			normalizeRut(rut),
+			name,
+			company,
+			category ?? null,
+			sessionDate.toISOString(),
+			exp.toISOString(),
+			status,
+			score ?? null,
+			notes ?? null,
+			user.id,
+			now,
+		],
+	)
+
+	return HttpResponse.json(res.rows[0], { status: 201 })
+})
+
+const orphanedDeleteHandler = http.delete(
+	"*/api/orphaned-records/:id",
+	async ({ params }) => {
+		const user = getDemoUser()
+		if (!user) {
+			return HttpResponse.json({ error: "No autorizado" }, { status: 401 })
+		}
+		const id = String(params.id)
+		const db = await getDemoDb()
+		const existing = await db.query<{ id: string }>(
+			`SELECT id FROM "in_person_safety_talk_record" WHERE id = $1`,
+			[id],
+		)
+		if (!existing.rows[0]) {
+			return HttpResponse.json({ error: "Registro no encontrado" }, { status: 404 })
+		}
+		await db.query(`DELETE FROM "in_person_safety_talk_record" WHERE id = $1`, [id])
+		return HttpResponse.json({ success: true })
+	},
+)
+
 // ORDER MATTERS: specific paths first, then list
 export const safetyTalkHandlers = [
 	statsHandler,
@@ -332,5 +514,8 @@ export const safetyTalkHandlers = [
 	attemptHandler,
 	byWorkerHandler,
 	contractorHandler,
+	orphanedDeleteHandler,
+	orphanedListHandler,
+	orphanedCreateHandler,
 	listHandler,
 ]

@@ -150,7 +150,7 @@ const usersByCompanyHandler = http.get(
 			const placeholders = ids.map((_, i) => `$${i + 1}`).join(", ")
 			const wfRes = await db.query<{ workerId: string }>(
 				`SELECT DISTINCT wf."workerId"
-				 FROM "worker_folder" wf
+				 FROM "worker_folders" wf
 				 JOIN "startup_folder" sf ON sf.id = wf."startupFolderId"
 				 WHERE wf."workerId" IN (${placeholders})
 				   AND wf.status = 'APPROVED' AND sf."isArchived" = false`,

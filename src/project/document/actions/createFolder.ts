@@ -13,8 +13,9 @@ export const createFolder = async (values: FolderFormSchema) => {
 	}
 
 	try {
-		const { parentFolderId, userId: _ignoredUserId, ...rest } = values
+		const { parentFolderId: rawParentFolderId, userId: _ignoredUserId, ...rest } = values
 		void _ignoredUserId
+		const parentFolderId = rawParentFolderId || null
 		const db = await getDemoDb()
 		const slug = generateSlug(rest.name)
 
@@ -47,7 +48,7 @@ export const createFolder = async (values: FolderFormSchema) => {
 				rest.description ?? null,
 				rest.area,
 				rest.type ?? "default",
-				parentFolderId ?? null,
+				parentFolderId,
 				user.id,
 				now,
 			],
@@ -64,7 +65,7 @@ export const createFolder = async (values: FolderFormSchema) => {
 				name: rest.name,
 				slug,
 				area: rest.area,
-				parentId: parentFolderId ?? null,
+				parentId: parentFolderId,
 			},
 		})
 
