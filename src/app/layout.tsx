@@ -3,6 +3,7 @@ import { Toaster } from "sonner"
 
 import { generalFont } from "@/config/fonts"
 
+import { DemoBanner } from "@/shared/components/DemoBanner"
 import { DemoModeProvider } from "@/shared/components/providers/DemoModeProvider"
 import { FontSizeProvider } from "@/shared/components/providers/FontSizeProvider"
 import { ThemeProvider } from "@/shared/components/providers/ThemeProvider"
@@ -34,6 +35,7 @@ export default function RootLayout({
 				<ThemeProvider enableSystem defaultTheme="system" attribute="class">
 					<FontSizeProvider>
 						<DemoModeProvider>{children}</DemoModeProvider>
+						<DemoBanner />
 					</FontSizeProvider>
 					<Toaster richColors position="top-left" />
 				</ThemeProvider>
