@@ -304,20 +304,19 @@ VALUES
 ON CONFLICT ("id") DO NOTHING;
 
 -- ─── Work Permit ↔ participants (Prisma implicit M2N) ──────────────────────
+-- Note: las entradas que referencian demo-worker-1/3/4 viven en un segundo
+-- INSERT más abajo, después del bloque "Additional partner-company workers",
+-- porque esos rows aún no existen en este punto del seed.
 INSERT INTO "_WorkPermitParticipants" ("A", "B") VALUES
   ('demo-tech',        'demo-wp-001'),
   ('seed-user-001',    'demo-wp-001'),
   ('demo-tech',        'demo-wp-002'),
   ('seed-supervisor-2','demo-wp-003'),
   ('demo-tech',        'demo-wp-004'),
-  ('demo-worker-1',    'demo-wp-004'),
   ('seed-user-001',    'demo-wp-005'),
-  ('demo-worker-3',    'demo-wp-005'),
   ('seed-user-002',    'demo-wp-006'),
   ('demo-tech',        'demo-wp-007'),
-  ('demo-worker-4',    'demo-wp-007'),
-  ('demo-tech',        'demo-wp-008'),
-  ('demo-worker-1',    'demo-wp-008')
+  ('demo-tech',        'demo-wp-008')
 ON CONFLICT DO NOTHING;
 
 -- ─── Maintenance Plans + tasks ─────────────────────────────────────────────
@@ -461,6 +460,14 @@ VALUES
   ('demo-worker-5', 'Ignacio Pavez',   'ignacio.pavez@mantepatagonia.cl', true, '23.666.666-6', 'worker', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true),
   ('demo-worker-6', 'Camila Riquelme', 'camila.riquelme@mantepatagonia.cl', true, '24.777.777-7', 'driver', 'PARTNER_COMPANY', false, 'demo-company-2', '2026-02-10T10:00:00Z', '2026-02-10T10:00:00Z', true)
 ON CONFLICT ("id") DO NOTHING;
+
+-- ─── 10.C participants extra (referencian workers recién insertados arriba) ─
+INSERT INTO "_WorkPermitParticipants" ("A", "B") VALUES
+  ('demo-worker-1', 'demo-wp-004'),
+  ('demo-worker-3', 'demo-wp-005'),
+  ('demo-worker-4', 'demo-wp-007'),
+  ('demo-worker-1', 'demo-wp-008')
+ON CONFLICT DO NOTHING;
 
 -- ─── Startup Folders ────────────────────────────────────────────────────────
 INSERT INTO "startup_folder" ("id", "name", "type", "status", "moreMonthDuration", "isDeleted", "isArchived", "companyId", "createdAt", "updatedAt") VALUES
