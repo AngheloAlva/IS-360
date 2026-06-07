@@ -141,32 +141,66 @@ const statsHandler = http.get("*/api/work-request/stats", async () => {
 	const db = await getDemoDb()
 	const totals = await db.query<{
 		total: number
-		reported: number
-		approved: number
+		pending: number
 		attended: number
 		cancelled: number
 		urgent: number
+		urgent_attended: number
+		urgent_pending: number
+		nonurgent_attended: number
+		nonurgent_pending: number
 	}>(
 		`SELECT
-			(SELECT COUNT(*)::int FROM "work_request") AS total,
-			(SELECT COUNT(*)::int FROM "work_request" WHERE status = 'REPORTED') AS reported,
-			(SELECT COUNT(*)::int FROM "work_request" WHERE status = 'APPROVED') AS approved,
-			(SELECT COUNT(*)::int FROM "work_request" WHERE status = 'ATTENDED') AS attended,
-			(SELECT COUNT(*)::int FROM "work_request" WHERE status = 'CANCELLED') AS cancelled,
-			(SELECT COUNT(*)::int FROM "work_request" WHERE "isUrgent" = true) AS urgent`,
+			COUNT(*)::int AS total,
+			COUNT(*) FILTER (WHERE status = 'REPORTED')::int AS pending,
+			COUNT(*) FILTER (WHERE status = 'ATTENDED')::int AS attended,
+			COUNT(*) FILTER (WHERE status = 'CANCELLED')::int AS cancelled,
+			COUNT(*) FILTER (WHERE "isUrgent" = true)::int AS urgent,
+			COUNT(*) FILTER (WHERE "isUrgent" = true AND status = 'ATTENDED')::int AS urgent_attended,
+			COUNT(*) FILTER (WHERE "isUrgent" = true AND status = 'REPORTED')::int AS urgent_pending,
+			COUNT(*) FILTER (WHERE "isUrgent" = false AND status = 'ATTENDED')::int AS nonurgent_attended,
+			COUNT(*) FILTER (WHERE "isUrgent" = false AND status = 'REPORTED')::int AS nonurgent_pending
+		 FROM "work_request"`,
 	)
 	const t = totals.rows[0]!
+
+	// Daily created/attended counts for the last 30 days.
+	const daily = await db.query<{ day: string; created: number; attended: number }>(
+		`SELECT to_char(DATE("requestDate"), 'YYYY-MM-DD') AS day,
+			COUNT(*)::int AS created,
+			COUNT(*) FILTER (WHERE status = 'ATTENDED')::int AS attended
+		 FROM "work_request"
+		 WHERE "requestDate" >= NOW() - INTERVAL '30 days'
+		 GROUP BY DATE("requestDate")`,
+	)
+	const dailyMap = new Map(daily.rows.map((r) => [r.day, r]))
+	const monthlyTrend: { month: string; created: number; attended: number }[] = []
+	const today = new Date()
+	for (let i = 29; i >= 0; i--) {
+		const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i)
+		const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+		const row = dailyMap.get(key)
+		monthlyTrend.push({ month: key, created: row?.created ?? 0, attended: row?.attended ?? 0 })
+	}
+
 	return HttpResponse.json({
 		totalWorkRequests: t.total,
-		urgentCount: t.urgent,
-		workRequestsByStatus: [
-			{ status: "REPORTED", count: t.reported, fill: "var(--color-amber-500)" },
-			{ status: "APPROVED", count: t.approved, fill: "var(--color-blue-500)" },
-			{ status: "ATTENDED", count: t.attended, fill: "var(--color-emerald-500)" },
-			{ status: "CANCELLED", count: t.cancelled, fill: "var(--color-rose-500)" },
-		],
-		workRequestsByType: [],
-		activityData: [],
+		totalPending: t.pending,
+		totalAttended: t.attended,
+		totalUrgent: t.urgent,
+		totalCancelled: t.cancelled,
+		urgencyStats: {
+			urgent: {
+				attended: t.urgent_attended,
+				pending: t.urgent_pending,
+			},
+			nonUrgent: {
+				attended: t.nonurgent_attended,
+				pending: t.nonurgent_pending,
+			},
+		},
+		monthlyTrend,
+		operatorStats: [],
 	})
 })
 

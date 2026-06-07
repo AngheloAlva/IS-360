@@ -1,17 +1,59 @@
-import { headers } from "next/headers"
+"use client"
 
-import { auth } from "@/lib/auth"
+import { useEffect, useState } from "react"
+
+import { useDemoUser } from "@/lib/demo-auth"
 import { getFirstStartupFolder } from "@/project/startup-folder/actions/get-first-startup-folder"
 import StartupFolderInstantRedirect from "@/project/startup-folder/components/navigation/StartupFolderInstantRedirect"
+import StartupFolderPageLoading from "@/project/startup-folder/components/skeletons/StartupFolderPageLoading"
 
 import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
 
-export default async function StartupFoldersPage() {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
+type ResolveState =
+	| { status: "loading" }
+	| { status: "denied" }
+	| { status: "empty" }
+	| { status: "redirect"; targetPath: string }
 
-	if (!session?.user?.id || !session?.user?.companyId) {
+// The demo DB (PGlite) only runs in the browser, so the first-folder lookup and
+// redirect happen client-side instead of in a server component.
+export default function StartupFoldersPage(): React.ReactElement {
+	const user = useDemoUser()
+	const [state, setState] = useState<ResolveState>({ status: "loading" })
+
+	useEffect(() => {
+		if (!user) return
+
+		if (!user.id || !user.companyId) {
+			setState({ status: "denied" })
+			return
+		}
+
+		const companyId = user.companyId
+		let cancelled = false
+
+		getFirstStartupFolder({ companyId })
+			.then((firstFolder) => {
+				if (cancelled) return
+				if (firstFolder) {
+					setState({
+						status: "redirect",
+						targetPath: `/dashboard/carpetas-de-arranque/${companyId}/${firstFolder.id}`,
+					})
+				} else {
+					setState({ status: "empty" })
+				}
+			})
+			.catch(() => {
+				if (!cancelled) setState({ status: "empty" })
+			})
+
+		return () => {
+			cancelled = true
+		}
+	}, [user])
+
+	if (state.status === "denied") {
 		return (
 			<Alert variant="destructive">
 				<AlertTitle>Acceso denegado</AlertTitle>
@@ -20,24 +62,20 @@ export default async function StartupFoldersPage() {
 		)
 	}
 
-	const firstFolder = await getFirstStartupFolder({
-		companyId: session.user.companyId,
-	})
-
-	if (firstFolder) {
+	if (state.status === "empty") {
 		return (
-			<StartupFolderInstantRedirect
-				targetPath={`/dashboard/carpetas-de-arranque/${session.user.companyId}/${firstFolder.id}`}
-			/>
+			<Alert>
+				<AlertTitle>Sin carpetas de arranque</AlertTitle>
+				<AlertDescription>
+					Tu empresa aun no tiene carpetas disponibles para gestionar.
+				</AlertDescription>
+			</Alert>
 		)
 	}
 
-	return (
-		<Alert>
-			<AlertTitle>Sin carpetas de arranque</AlertTitle>
-			<AlertDescription>
-				Tu empresa aun no tiene carpetas disponibles para gestionar.
-			</AlertDescription>
-		</Alert>
-	)
+	if (state.status === "redirect") {
+		return <StartupFolderInstantRedirect targetPath={state.targetPath} />
+	}
+
+	return <StartupFolderPageLoading />
 }

@@ -2,7 +2,14 @@ import { http, HttpResponse } from "msw"
 
 import { getDemoDb } from "@/lib/demo-db/client"
 import { calculateNextDate } from "@/project/maintenance-plan/utils/calculate-next-date"
+import { TaskFrequencyLabels } from "@/lib/consts/task-frequency"
 import type { PLAN_FREQUENCY } from "@/generated/prisma/enums"
+
+const PRIORITY_COLORS: Record<string, string> = {
+	HIGH: "var(--color-red-500)",
+	MEDIUM: "var(--color-amber-500)",
+	LOW: "var(--color-emerald-500)",
+}
 
 const NEXT_WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -331,57 +338,325 @@ const planTaskWorkOrdersHandler = http.get(
 
 const statsHandler = http.get("*/api/maintenance-plan/stats", async () => {
 	const db = await getDemoDb()
+
+	// Basic stats: active plans, active tasks of active plans, upcoming and overdue tasks.
 	const counts = await db.query<{
 		totalPlans: number
 		totalTasks: number
-		upcoming: number
-		overdue: number
+		tasksWithUpcomingDate: number
+		tasksWithOverdueDate: number
 	}>(
 		`SELECT
 			(SELECT COUNT(*)::int FROM "maintenance_plan" WHERE "isActive" = true) AS "totalPlans",
-			(SELECT COUNT(*)::int FROM "maintenance_plan_task" t WHERE t."isActive" = true
-				AND EXISTS (SELECT 1 FROM "maintenance_plan" p WHERE p.id = t."maintenancePlanId" AND p."isActive" = true)) AS "totalTasks",
-			(SELECT COUNT(*)::int FROM "maintenance_plan_task" t WHERE t."isActive" = true
-				AND t."nextDate" >= NOW() AND t."nextDate" <= NOW() + INTERVAL '1 month') AS upcoming,
-			(SELECT COUNT(*)::int FROM "maintenance_plan_task" t WHERE t."isActive" = true
-				AND t."nextDate" < NOW()) AS overdue`,
+			(SELECT COUNT(*)::int FROM "maintenance_plan_task" t
+				JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+				WHERE t."isActive" = true AND p."isActive" = true) AS "totalTasks",
+			(SELECT COUNT(*)::int FROM "maintenance_plan_task" t
+				JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+				WHERE t."isActive" = true AND p."isActive" = true
+				AND t."nextDate" >= NOW() AND t."nextDate" <= NOW() + INTERVAL '1 month') AS "tasksWithUpcomingDate",
+			(SELECT COUNT(*)::int FROM "maintenance_plan_task" t
+				JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+				WHERE t."isActive" = true AND p."isActive" = true
+				AND t."nextDate" < NOW()) AS "tasksWithOverdueDate"`,
 	)
+
+	// Pie chart: active tasks grouped by frequency.
 	const byFreq = await db.query<{ frequency: string; count: number }>(
-		`SELECT frequency, COUNT(*)::int AS count FROM "maintenance_plan_task"
-		 WHERE "isActive" = true GROUP BY frequency`,
+		`SELECT t.frequency, COUNT(*)::int AS count
+		 FROM "maintenance_plan_task" t
+		 JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+		 WHERE t."isActive" = true AND p."isActive" = true
+		 GROUP BY t.frequency`,
 	)
+	const pieChartData = byFreq.rows.map((r) => ({
+		name: TaskFrequencyLabels[r.frequency as PLAN_FREQUENCY] ?? r.frequency,
+		value: r.count,
+		frequency: r.frequency,
+	}))
+
+	// Bar chart: work orders (linked to active plan tasks) grouped by priority.
+	const byPriority = await db.query<{ priority: string; count: number }>(
+		`SELECT wo.priority, COUNT(*)::int AS count
+		 FROM "work_order" wo
+		 JOIN "maintenance_plan_task" t ON t.id = wo."maintenancePlanTaskId"
+		 JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+		 WHERE wo."deletedAt" IS NULL AND t."isActive" = true AND p."isActive" = true
+		 GROUP BY wo.priority`,
+	)
+	const barChartData = byPriority.rows.map((r) => ({
+		value: r.count,
+		priority: r.priority,
+		fill: PRIORITY_COLORS[r.priority] ?? "var(--color-muted)",
+	}))
+
+	// Monthly completed: completed work orders (of active plan tasks) grouped by end month.
+	const completedByMonth = await db.query<{ ym: string; count: number }>(
+		`SELECT to_char(wo."endDate", 'YYYY-MM') AS ym, COUNT(*)::int AS count
+		 FROM "work_order" wo
+		 JOIN "maintenance_plan_task" t ON t.id = wo."maintenancePlanTaskId"
+		 JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+		 WHERE wo."deletedAt" IS NULL AND t."isActive" = true AND p."isActive" = true
+			AND wo.status = 'COMPLETED' AND wo."endDate" IS NOT NULL
+		 GROUP BY to_char(wo."endDate", 'YYYY-MM')
+		 ORDER BY ym ASC`,
+	)
+	const monthlyCompletedStats = completedByMonth.rows.map((r) => {
+		const [year, month] = r.ym.split("-")
+		const dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1)
+		const name = dateObj.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+		return {
+			name: name.charAt(0).toUpperCase() + name.slice(1),
+			date: r.ym,
+			value: r.count,
+		}
+	})
+
 	return HttpResponse.json({
-		...counts.rows[0],
-		tasksByFrequency: byFreq.rows.map((r) => ({
-			name: r.frequency,
-			value: r.count,
-			frequency: r.frequency,
-		})),
-		pieChartData: byFreq.rows.map((r) => ({
-			name: r.frequency,
-			value: r.count,
-			frequency: r.frequency,
-		})),
+		basicStats: counts.rows[0] ?? {
+			totalPlans: 0,
+			totalTasks: 0,
+			tasksWithUpcomingDate: 0,
+			tasksWithOverdueDate: 0,
+		},
+		pieChartData,
+		barChartData,
+		areaChartData: [],
+		monthlyCompletedStats,
 	})
 })
 
+const KPI_MONTH_NAMES = [
+	"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
+]
+
+interface KpiMonthBucket {
+	key: string
+	label: string
+	year: number
+	month: number
+}
+
+function buildKpiMonthBuckets(from: Date, to: Date, multiYear: boolean): KpiMonthBucket[] {
+	const buckets: KpiMonthBucket[] = []
+	const cursor = new Date(from.getFullYear(), from.getMonth(), 1)
+	const end = new Date(to.getFullYear(), to.getMonth(), 1)
+	while (cursor <= end) {
+		const year = cursor.getFullYear()
+		const month = cursor.getMonth() + 1
+		buckets.push({
+			key: `${year}-${String(month).padStart(2, "0")}`,
+			label: multiYear ? `${KPI_MONTH_NAMES[month - 1]} ${year}` : KPI_MONTH_NAMES[month - 1],
+			year,
+			month,
+		})
+		cursor.setMonth(cursor.getMonth() + 1)
+	}
+	return buckets
+}
+
+const HOURS_PER_DAY = 8
+
 const kpiHandler = http.get("*/api/maintenance-plan/kpi", async () => {
 	const db = await getDemoDb()
-	const totals = await db.query<{ total: number; completed: number; pending: number }>(
-		`SELECT
-			(SELECT COUNT(*)::int FROM "work_order" WHERE "maintenancePlanTaskId" IS NOT NULL AND "deletedAt" IS NULL) AS total,
-			(SELECT COUNT(*)::int FROM "work_order" WHERE "maintenancePlanTaskId" IS NOT NULL AND status = 'COMPLETED' AND "deletedAt" IS NULL) AS completed,
-			(SELECT COUNT(*)::int FROM "work_order" WHERE "maintenancePlanTaskId" IS NOT NULL AND status <> 'COMPLETED' AND "deletedAt" IS NULL) AS pending`,
+
+	// Determine the bucketing range from the earliest scheduled work order.
+	const earliest = await db.query<{ min: string | null }>(
+		`SELECT MIN("programDate") AS min FROM "work_order" WHERE "deletedAt" IS NULL`,
 	)
-	const t = totals.rows[0] ?? { total: 0, completed: 0, pending: 0 }
-	const compliance = t.total === 0 ? 0 : Math.round((t.completed / t.total) * 100)
+	const bucketFrom = earliest.rows[0]?.min ? new Date(earliest.rows[0].min) : new Date()
+	const bucketTo = new Date()
+	const multiYear = bucketFrom.getFullYear() !== bucketTo.getFullYear()
+	const buckets = buildKpiMonthBuckets(bucketFrom, bucketTo, multiYear)
+
+	// KPI 1: preventive WO totals + per-plan health.
+	const preventive = await db.query<{ total: number; completed: number }>(
+		`SELECT
+			COUNT(*)::int AS total,
+			COUNT(*) FILTER (WHERE status = 'COMPLETED')::int AS completed
+		 FROM "work_order"
+		 WHERE type = 'PREVENTIVE' AND "deletedAt" IS NULL`,
+	)
+	const totalPreventiveWOs = preventive.rows[0]?.total ?? 0
+	const completedPreventiveWOs = preventive.rows[0]?.completed ?? 0
+
+	const planHealth = await db.query<{ total: number; overdue: number }>(
+		`SELECT
+			COUNT(*)::int AS total,
+			COUNT(*) FILTER (WHERE t."nextDate" < NOW())::int AS overdue
+		 FROM "maintenance_plan_task" t
+		 JOIN "maintenance_plan" p ON p.id = t."maintenancePlanId"
+		 WHERE t."isActive" = true AND p."isActive" = true
+		 GROUP BY t."maintenancePlanId"`,
+	)
+	const planHealthScores = planHealth.rows
+		.filter((p) => p.total > 0)
+		.map((p) => Math.max(0, ((p.total - p.overdue) / p.total) * 100))
+	const compliancePercent =
+		planHealthScores.length > 0
+			? Math.round(planHealthScores.reduce((a, b) => a + b, 0) / planHealthScores.length)
+			: 0
+	const plansIncluded = planHealthScores.length
+
+	// KPI 5: on-time vs delayed (completed WOs with both dates).
+	const onTimeRows = await db.query<{ on_time: number; delayed: number }>(
+		`SELECT
+			COUNT(*) FILTER (WHERE "endDate" <= "estimatedEndDate")::int AS on_time,
+			COUNT(*) FILTER (WHERE "endDate" > "estimatedEndDate")::int AS delayed
+		 FROM "work_order"
+		 WHERE status = 'COMPLETED' AND "deletedAt" IS NULL
+			AND "endDate" IS NOT NULL AND "estimatedEndDate" IS NOT NULL`,
+	)
+	const onTimeCount = onTimeRows.rows[0]?.on_time ?? 0
+	const delayedCount = onTimeRows.rows[0]?.delayed ?? 0
+	const totalCompleted = onTimeCount + delayedCount
+	const onTimePercent = totalCompleted > 0 ? Math.round((onTimeCount / totalCompleted) * 100) : 0
+	const onTimeChart = [
+		{ name: "En fecha", value: onTimeCount, fill: "var(--color-green-500)" },
+		{ name: "Atrasadas", value: delayedCount, fill: "var(--color-red-500)" },
+	]
+
+	// KPI 3: average closure time (workBookStartDate → endDate).
+	const closure = await db.query<{ avg_hours: number | null }>(
+		`SELECT AVG(EXTRACT(EPOCH FROM ("endDate" - "workBookStartDate")) / 3600)::float AS avg_hours
+		 FROM "work_order"
+		 WHERE status = 'COMPLETED' AND "deletedAt" IS NULL
+			AND "workBookStartDate" IS NOT NULL AND "endDate" IS NOT NULL
+			AND "endDate" > "workBookStartDate"`,
+	)
+	const avgClosureHours = closure.rows[0]?.avg_hours
+		? Math.round(closure.rows[0].avg_hours * 10) / 10
+		: 0
+	const avgClosureDays = avgClosureHours > 0 ? Math.round(avgClosureHours / HOURS_PER_DAY) : 0
+
+	// KPI 2: preventive vs corrective hours by month.
+	const hoursByMonth = await db.query<{
+		year: number
+		month: number
+		type: string
+		total_hours: number
+	}>(
+		`SELECT
+			EXTRACT(YEAR FROM "programDate")::int AS year,
+			EXTRACT(MONTH FROM "programDate")::int AS month,
+			type::text AS type,
+			COALESCE(SUM("estimatedHours"), 0)::float AS total_hours
+		 FROM "work_order"
+		 WHERE type IN ('PREVENTIVE', 'CORRECTIVE') AND "deletedAt" IS NULL
+		 GROUP BY EXTRACT(YEAR FROM "programDate"), EXTRACT(MONTH FROM "programDate"), type`,
+	)
+	const preventiveVsCorrectiveChart = buckets.map((b) => {
+		const prev =
+			hoursByMonth.rows.find((r) => r.year === b.year && r.month === b.month && r.type === "PREVENTIVE")
+				?.total_hours ?? 0
+		const corr =
+			hoursByMonth.rows.find((r) => r.year === b.year && r.month === b.month && r.type === "CORRECTIVE")
+				?.total_hours ?? 0
+		const total = prev + corr
+		return {
+			name: b.key,
+			month: b.label,
+			preventive: Math.round(prev),
+			corrective: Math.round(corr),
+			ratio: total > 0 ? Math.round((prev / total) * 100) : 0,
+		}
+	})
+
+	// KPI 4: monthly WO status counts for the backlog chart.
+	const statusByMonth = await db.query<{
+		year: number
+		month: number
+		status: string
+		count: number
+		total_hours: number
+	}>(
+		`SELECT
+			EXTRACT(YEAR FROM "programDate")::int AS year,
+			EXTRACT(MONTH FROM "programDate")::int AS month,
+			status::text AS status,
+			COUNT(*)::int AS count,
+			COALESCE(SUM("estimatedHours"), 0)::float AS total_hours
+		 FROM "work_order"
+		 WHERE "deletedAt" IS NULL
+		 GROUP BY EXTRACT(YEAR FROM "programDate"), EXTRACT(MONTH FROM "programDate"), status`,
+	)
+	const backlogReliable = avgClosureHours > 0
+	const backlogChart = buckets.map((b) => {
+		const monthData = statusByMonth.rows.filter((r) => r.year === b.year && r.month === b.month)
+		const getCount = (status: string) => monthData.find((r) => r.status === status)?.count ?? 0
+		const pendientes = getCount("PLANNED") + getCount("PENDING")
+		const enProgreso = getCount("IN_PROGRESS") + getCount("CLOSURE_REQUESTED")
+		const completadas = getCount("COMPLETED")
+		const pendingHours = monthData
+			.filter((r) => r.status !== "COMPLETED" && r.status !== "CANCELLED")
+			.reduce((sum, r) => sum + (r.total_hours || 0), 0)
+		return {
+			name: b.label,
+			pendientes,
+			enProgreso,
+			completadas,
+			backlog: backlogReliable ? Math.round((pendingHours / avgClosureHours) * 10) / 10 : null,
+		}
+	})
+
+	// KPI 6: work request response time (WR creation → first linked WO creation).
+	const wrResponse = await db.query<{
+		year: number
+		month: number
+		avg_response_hours: number
+		count: number
+	}>(
+		`SELECT
+			EXTRACT(YEAR FROM wr."createdAt")::int AS year,
+			EXTRACT(MONTH FROM wr."createdAt")::int AS month,
+			AVG(EXTRACT(EPOCH FROM (wo_first."createdAt" - wr."createdAt")) / 3600)::float AS avg_response_hours,
+			COUNT(*)::int AS count
+		 FROM "work_request" wr
+		 INNER JOIN LATERAL (
+			SELECT wo."createdAt"
+			FROM "work_order" wo
+			WHERE wo."workRequestId" = wr.id AND wo."deletedAt" IS NULL
+			ORDER BY wo."createdAt" ASC
+			LIMIT 1
+		 ) wo_first ON true
+		 GROUP BY EXTRACT(YEAR FROM wr."createdAt"), EXTRACT(MONTH FROM wr."createdAt")`,
+	)
+	const wrResponseChart = buckets.map((b) => {
+		const data = wrResponse.rows.find((r) => r.year === b.year && r.month === b.month)
+		return {
+			name: b.label,
+			avgHours: data ? Math.round(data.avg_response_hours * 10) / 10 : 0,
+			count: data ? data.count : 0,
+		}
+	})
+	const { weightedSum, totalCount } = wrResponse.rows.reduce(
+		(acc, r) => ({
+			weightedSum: acc.weightedSum + (r.avg_response_hours || 0) * r.count,
+			totalCount: acc.totalCount + r.count,
+		}),
+		{ weightedSum: 0, totalCount: 0 },
+	)
+	const avgWrResponseHours = totalCount > 0 ? Math.round((weightedSum / totalCount) * 10) / 10 : 0
+
 	return HttpResponse.json({
-		complianceRate: compliance,
-		totalWorkOrders: t.total,
-		completedWorkOrders: t.completed,
-		pendingWorkOrders: t.pending,
-		monthlyTrend: [],
-		topPlans: [],
+		cards: {
+			compliancePercent,
+			completedPreventiveWOs,
+			totalPreventiveWOs,
+			plansIncluded,
+			onTimePercent,
+			onTimeCount,
+			delayedCount,
+			avgClosureHours,
+			avgClosureDays,
+			avgWrResponseHours,
+		},
+		charts: {
+			preventiveVsCorrective: preventiveVsCorrectiveChart,
+			onTime: onTimeChart,
+			backlog: backlogChart,
+			wrResponse: wrResponseChart,
+		},
 	})
 })
 

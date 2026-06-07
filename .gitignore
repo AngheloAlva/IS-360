@@ -50,6 +50,7 @@ yarn-error.log*
 # tooling / agents
 .atl
 .claude
+.playwright-mcp
 
 # logs
 *.log

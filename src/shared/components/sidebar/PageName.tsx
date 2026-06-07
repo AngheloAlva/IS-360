@@ -1,5 +1,6 @@
 "use client"
 
+import { Fragment } from "react"
 import { usePathname } from "next/navigation"
 
 import {
@@ -22,10 +23,12 @@ export default function PageName({ externalPath }: { externalPath: boolean }): R
 					const name = slug[0].split("-").join(" ")
 
 					return (
-						<BreadcrumbItem key={i}>
-							<BreadcrumbPage className="capitalize">{name}</BreadcrumbPage>
+						<Fragment key={i}>
+							<BreadcrumbItem>
+								<BreadcrumbPage className="capitalize">{name}</BreadcrumbPage>
+							</BreadcrumbItem>
 							{i < path.length - 1 && <BreadcrumbSeparator />}
-						</BreadcrumbItem>
+						</Fragment>
 					)
 				})}
 			</BreadcrumbList>

@@ -257,7 +257,7 @@ export const data: NavBarData = {
 				},
 				{
 					name: "Tutoriales",
-					url: "/dashboard/tutoriales",
+					url: "/dashboard/libro-de-obras/tutoriales/crear-libro-de-obras",
 					icon: BookOpenIcon,
 					supervisor: true,
 				},

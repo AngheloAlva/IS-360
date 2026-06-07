@@ -286,11 +286,12 @@ const AdminStartupFoldersList = memo(({ id }: AdminStartupFoldersListProps) => {
 						})
 
 						return (
-							<Link className="h-full" href={getCompanyStartupFolderHref(company)}>
-								<Card
-									key={company.id}
-									className="hover:bg-muted relative h-full transition-all hover:scale-102 hover:shadow-md hover:ring-teal-500"
-								>
+							<Link
+								key={company.id}
+								className="h-full"
+								href={getCompanyStartupFolderHref(company)}
+							>
+								<Card className="hover:bg-muted relative h-full transition-all hover:scale-102 hover:shadow-md hover:ring-teal-500">
 									<CardHeader className="sm:pb-2">
 										<div className="flex items-center gap-4">
 											<Avatar className="size-14 text-lg after:rounded-lg">
